@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#6b99ad"
+    tools:context=".MainActivity">
+
+    <org.osmdroid.views.MapView android:id="@+id/map"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <TextView android:id="@+id/upper_bar"
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+
+        android:gravity="center"
+
+        android:background="@drawable/rounded_corners"
+
+        android:fontFamily="@font/assistant_extralight"
+        android:text="Good Morning!"
+        android:textColor="#FEFEFE"
+        android:textSize="22dp"
+        android:textStyle="bold"
+        />
+
+        <TextView
+            android:layout_width="120dp"
+            android:layout_height="80dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginBottom="5dp"
+
+            android:gravity="center"
+
+            android:background="@drawable/rounded_corners"
+
+            android:text="Neue \n Route"
+            android:fontFamily="@font/assistant_extralight"
+            android:textSize="20dp"
+            android:textColor="#FEFEFE"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:layout_width="120dp"
+            android:layout_height="80dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
+
+            android:gravity="center"
+
+            android:background="@drawable/rounded_corners"
+
+            android:text="Routen-Historie"
+            android:fontFamily="@font/assistant_extralight"
+            android:textSize="20dp"
+            android:textColor="#FEFEFE"
+            android:textStyle="bold"
+            />
+
+</RelativeLayout>
