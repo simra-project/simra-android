@@ -43,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
     private final GeoPoint tuBerlin = new GeoPoint(52.51101, 13.3226082);
     private MapView mMapView;
     private MapController mMapController;
+    private Location lastLocation;
+    private boolean which = false;
+    private boolean whichTwo = false;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -90,6 +93,12 @@ public class MainActivity extends AppCompatActivity {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         getLocationWrapper();
+
+        try {
+            updateLoc(lastLocation);
+        } catch(NullPointerException npe) {
+            npe.printStackTrace();
+        }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //Map configuration
@@ -140,18 +149,12 @@ public class MainActivity extends AppCompatActivity {
             return;
 
         } Toast.makeText(MainActivity.this, "Du hast " +
-                    "die nötige Erlaubnis bereits erteilt.", Toast.LENGTH_SHORT).show();
+                    "die nötige Erlaubnis bereits erteilt (1).", Toast.LENGTH_SHORT).show();
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location lastLocation = locationManager.getLastKnownLocation(PROVIDER);
-        try {
-            updateLoc(lastLocation);
-        } catch(NullPointerException npe) {
-
-            npe.printStackTrace();
-        }
+        lastLocation = locationManager.getLastKnownLocation(PROVIDER);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         }
@@ -182,11 +185,45 @@ public class MainActivity extends AppCompatActivity {
         }
 
          Toast.makeText(MainActivity.this, "Du hast " +
-                "die nötige Erlaubnis bereits erteilt.", Toast.LENGTH_SHORT).show();
+                "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
         locationManager.requestLocationUpdates(PROVIDER, 0, 0, myLocationListener);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    }
+
+    private void removeUpdatesWrapper() {
+
+        int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showMessageOKCancel("Um eine neue Route anzulegen, ist der Zugriff auf deinen Standort" +
+                                "vonnöten.",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                                        LOCATION_ACCESS_CODE);
+                            }
+                        });
+                return;
+            }
+            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_ACCESS_CODE);
+            return;
+
+        }
+
+        Toast.makeText(MainActivity.this, "Du hast " +
+                "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+        locationManager.removeUpdates(myLocationListener);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     }
@@ -206,7 +243,17 @@ public class MainActivity extends AppCompatActivity {
             case LOCATION_ACCESS_CODE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission Granted
-                 getLocationWrapper();
+
+                    // super non-elegant case distinction
+                    if (!which & !whichTwo) {
+                        getLocationWrapper();
+                        which = true;
+                    } else if (which & !whichTwo){
+                        updateLocationWrapper();
+                        whichTwo = true;
+                    } else {
+                        removeUpdatesWrapper();
+                    }
 
                 } else {
                     // Permission Denied
@@ -231,7 +278,8 @@ public class MainActivity extends AppCompatActivity {
 
         super.onPause();
 
-        locationManager.removeUpdates(myLocationListener);
+        removeUpdatesWrapper();
+
     }
 
     private void updateLoc(Location loc){
