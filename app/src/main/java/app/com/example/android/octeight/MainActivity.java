@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Button;
 import android.view.*;
@@ -37,50 +38,63 @@ import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Basic map stuff
     private final GeoPoint tuBerlin = new GeoPoint(52.51101, 13.3226082);
     private MapView mMapView;
     private MapController mMapController;
-    private int LOCATION_ACCESS_CODE = 1;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // For permission request
+    private final int LOCATION_ACCESS_CODE = 1;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+
+    String PROVIDER = LocationManager.GPS_PROVIDER;
+    //String PROVIDER = LocationManager.NETWORK_PROVIDER;
 
     LocationManager locationManager;
+    double myLatitude, myLongitude;
 
-    Button requestBtn;
+    TextView textLatitude, textLongitude;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    ArrayList<OverlayItem> overlayItemArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //Permission-related stuff
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //Map-related stuff
+        // Context, Config, ContentView
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        setContentView(R.layout.activity_main);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        setContentView(R.layout.activity_main);
-        requestBtn =(Button)findViewById(R.id.buttonuntenrechts);
-        requestBtn.setOnClickListener(new View.OnClickListener() {
-                                          public void onClick(View v) {
-                                              if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                                                  Toast.makeText(MainActivity.this, "Du hast die nötige Erlaubnis erteilt.", Toast.LENGTH_SHORT).show();
-                                              }else {
-                                                  requestLocationPermission();
-                                              }
-                                          }
-                                      });
+        //requestBtn =(Button)findViewById(R.id.buttonuntenrechts);
 
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                //Map-related stuff
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                mMapView = (MapView) findViewById(R.id.map);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+        textLatitude = (TextView)findViewById(R.id.Latitude);
+        textLongitude = (TextView)findViewById(R.id.Longitude);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // If user wants to record new route, check location tracking permission
+        // --> if permission hasn't been granted, request permission
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        getLocationWrapper();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //Map configuration
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        mMapView = (MapView) findViewById(R.id.map);
         mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
         mMapView.setBuiltInZoomControls(true);
         mMapController = (MapController) mMapView.getController();
@@ -100,92 +114,131 @@ public class MainActivity extends AppCompatActivity {
         mMapView.getOverlays().add(myItemizedIconOverlay);
         //---  */
 
-        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
-        //for demo, getLastKnownLocation from GPS only, not from NETWORK
+    }
 
-        try {
-            Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if(lastLocation != null){
-                updateLoc(lastLocation);
+    private void getLocationWrapper() {
+
+        int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showMessageOKCancel("Um eine neue Route anzulegen, ist der Zugriff auf Deinen Standort" +
+                                " vonnöten.",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                                        LOCATION_ACCESS_CODE);
+                            }
+                        });
+                return;
             }
-        } catch (SecurityException e) {
-            Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
-            //  dialogGPS(this.getContext()); // lets the user know there is a problem with the gps
+            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_ACCESS_CODE);
+            return;
+
+        } Toast.makeText(MainActivity.this, "Du hast " +
+                    "die nötige Erlaubnis bereits erteilt.", Toast.LENGTH_SHORT).show();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Location lastLocation = locationManager.getLastKnownLocation(PROVIDER);
+        try {
+            updateLoc(lastLocation);
+        } catch(NullPointerException npe) {
+
+            npe.printStackTrace();
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         }
 
-        /*
-        //Add Scale Bar
-        ScaleBarOverlay myScaleBarOverlay = new ScaleBarOverlay(this);
-        myOpenMapView.getOverlays().add(myScaleBarOverlay);*/
 
+    private void updateLocationWrapper() {
+
+       int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showMessageOKCancel("Um eine neue Route anzulegen, ist der Zugriff auf deinen Standort" +
+                                "vonnöten.",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                                        LOCATION_ACCESS_CODE);
+                            }
+                        });
+                return;
+            }
+            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_ACCESS_CODE);
+            return;
+
+        }
+
+         Toast.makeText(MainActivity.this, "Du hast " +
+                "die nötige Erlaubnis bereits erteilt.", Toast.LENGTH_SHORT).show();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+        locationManager.requestLocationUpdates(PROVIDER, 0, 0, myLocationListener);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(MainActivity.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == LOCATION_ACCESS_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Berechtigung erteilt", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Berechtigung nicht erteilt", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case LOCATION_ACCESS_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                 getLocationWrapper();
 
-    private void requestLocationPermission(){
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
-            new AlertDialog.Builder(this)
-                    .setTitle("Permission needed")
-                    .setMessage("Wir benötigen diese Berechtigung um ihre Position auf der Karte zu bestimmen")
-                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_ACCESS_CODE);
-
-                        }
-                    })
-                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .create().show();
-        }else{
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_ACCESS_CODE);
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "Zugriff auf Standortdaten " +
+                            "wurde abgelehnt.", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
     public void onResume(){
         super.onResume();
-            try{
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
-            } catch(SecurityException e){
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+
+        updateLocationWrapper();
+
         }
 
     public void onPause(){
+
         super.onPause();
 
         locationManager.removeUpdates(myLocationListener);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //Map-related stuff
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //this will refresh the osmdroid configuration on resuming.
-        //if you make changes to the configuration, use
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //Configuration.getInstance().save(this, prefs);
-        mMapView.onPause();  //needed for compass, my location overlays, v6.0.0 and up
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     private void updateLoc(Location loc){
-        GeoPoint locGeoPoint = new GeoPoint(loc.getLatitude(), loc.getLongitude());
-        mMapController.setCenter(locGeoPoint);
-        mMapView.invalidate();
+
+        textLatitude.setText("Latitude: " + loc.getLatitude());
+        textLongitude.setText("Longitude: " + loc.getLongitude());
+
     }
 
     private LocationListener myLocationListener
@@ -226,16 +279,6 @@ public class MainActivity extends AppCompatActivity {
         myOpenMapView.invalidate();
     }*/
 
-    private void setOverlayLoc(Location overlayloc){
-        GeoPoint overlocGeoPoint = new GeoPoint(overlayloc);
-        //---
-        overlayItemArray.clear();
-
-        OverlayItem newMyLocationItem = new OverlayItem(
-                "My Location", "My Location", overlocGeoPoint);
-        overlayItemArray.add(newMyLocationItem);
-        //---
-    }
     
 
 }

@@ -27,7 +27,7 @@
         android:textStyle="bold"
         />
 
-        <TextView
+        <TextView android:id="@+id/Latitude"
             android:layout_width="120dp"
             android:layout_height="80dp"
             android:layout_alignParentLeft="true"
@@ -39,14 +39,13 @@
 
             android:background="@drawable/rounded_corners"
 
-            android:text="Neue \n Route"
             android:fontFamily="@font/assistant_extralight"
             android:textSize="15dp"
             android:textColor="#FEFEFE"
             android:textStyle="bold"
             />
 
-        <Button android:id="@+id/buttonuntenrechts"
+        <TextView android:id="@+id/Longitude"
             android:layout_width="120dp"
             android:layout_height="80dp"
             android:layout_alignParentEnd="true"
@@ -59,7 +58,6 @@
 
             android:background="@drawable/rounded_corners"
 
-            android:text="Überprüfe Berechtigung"
             android:fontFamily="@font/assistant_extralight"
             android:textSize="15dp"
             android:textColor="#FEFEFE"
