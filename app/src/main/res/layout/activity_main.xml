@@ -11,21 +11,48 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
-    <TextView android:id="@+id/upper_bar"
-        android:layout_margin="4dp"
+    <RelativeLayout android:id="@+id/upper_bar"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="85dp"
+        android:layout_margin="4dp"
+        android:elevation="8dp"
 
-        android:gravity="center"
+        android:background="@drawable/rounded_corners">
 
-        android:background="@drawable/rounded_corners"
+        <TextView android:id="@+id/welcome_text"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
 
-        android:fontFamily="@font/assistant_extralight"
-        android:text="Good Morning!"
-        android:textColor="#FEFEFE"
-        android:textSize="22dp"
-        android:textStyle="bold"
-        />
+            android:fontFamily="@font/assistant_extralight"
+            android:text="Welcome to SimRa!"
+            android:textColor="#FEFEFE"
+            android:textSize="22dp"
+            android:textStyle="bold"
+            />
+
+        <ImageButton android:id="@+id/burger_menu"
+            android:layout_width="40dp"
+            android:layout_height="55dp"
+            android:background="@drawable/menu"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            />
+
+        <ImageButton android:id="@+id/helmet_icon"
+            android:layout_width="70dp"
+            android:layout_height="75dp"
+            android:background="@drawable/helmet"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"
+            />
+
+    </RelativeLayout>
 
         <TextView android:id="@+id/Latitude"
             android:layout_width="120dp"

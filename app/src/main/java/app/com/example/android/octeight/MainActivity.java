@@ -3,6 +3,7 @@ package app.com.example.android.octeight;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Button;
@@ -47,13 +49,16 @@ public class MainActivity extends AppCompatActivity {
     private boolean which = false;
     private boolean whichTwo = false;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Buttons for burger menu & helmet icons --> INTENTS
+    ImageButton menuButton;
+    ImageButton helmetButton;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For permission request
     private final int LOCATION_ACCESS_CODE = 1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
 
@@ -79,8 +84,6 @@ public class MainActivity extends AppCompatActivity {
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         setContentView(R.layout.activity_main);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //requestBtn =(Button)findViewById(R.id.buttonuntenrechts);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
@@ -110,9 +113,11 @@ public class MainActivity extends AppCompatActivity {
         mMapController.setZoom(15);
         GeoPoint gPt = tuBerlin;
         mMapController.setCenter(gPt);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        //--- Create Overlay
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //--- Create Overlay --> upcoming tutorial on Osmdroid
+
        /** overlayItemArray = new ArrayList<OverlayItem>();
 
         DefaultResourceProxyImpl defaultResourceProxyImpl
@@ -123,8 +128,41 @@ public class MainActivity extends AppCompatActivity {
         mMapView.getOverlays().add(myItemizedIconOverlay);
         //---  */
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // BUTTONS
+
+        // (1): Burger Menu
+
+        menuButton = findViewById(R.id.burger_menu);
+         menuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent launchActivityIntent = new Intent(MainActivity.this,
+                        MenuActivity.class);
+                startActivity(launchActivityIntent);
+            }
+        });
+
+        // (2): Helmet
+
+        helmetButton = findViewById(R.id.helmet_icon);
+        helmetButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+        Intent launchActivityIntent = new Intent(MainActivity.this,
+        HelmetActivity.class);
+        startActivity(launchActivityIntent);
+        }
+        });
+
 
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Wrapper for location functionality called in onCreate()
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void getLocationWrapper() {
 
@@ -148,8 +186,8 @@ public class MainActivity extends AppCompatActivity {
                     LOCATION_ACCESS_CODE);
             return;
 
-        } Toast.makeText(MainActivity.this, "Du hast " +
-                    "die nötige Erlaubnis bereits erteilt (1).", Toast.LENGTH_SHORT).show();
+        } /**Toast.makeText(MainActivity.this, "Du hast " +
+                    "die nötige Erlaubnis bereits erteilt (1).", Toast.LENGTH_SHORT).show();*/
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
@@ -160,6 +198,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Wrapper for location functionality called in onResume()
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     private void updateLocationWrapper() {
 
        int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -167,8 +209,8 @@ public class MainActivity extends AppCompatActivity {
         if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
 
             if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um eine neue Route anzulegen, ist der Zugriff auf deinen Standort" +
-                                "vonnöten.",
+                showMessageOKCancel("Um fortzufahren, erlaube bitte den Zugriff auf Deine " +
+                                "Standortdaten.",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -184,8 +226,8 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-         Toast.makeText(MainActivity.this, "Du hast " +
-                "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();
+         /**Toast.makeText(MainActivity.this, "Du hast " +
+                "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();*/
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
@@ -194,6 +236,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Wrapper for location functionality called in onPause()
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     private void removeUpdatesWrapper() {
 
         int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -201,8 +247,8 @@ public class MainActivity extends AppCompatActivity {
         if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
 
             if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um eine neue Route anzulegen, ist der Zugriff auf deinen Standort" +
-                                "vonnöten.",
+                showMessageOKCancel("Um fortzufahren, erlaube bitte den Zugriff auf" +
+                                " Deine Standortdaten. (2)",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -218,8 +264,8 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        Toast.makeText(MainActivity.this, "Du hast " +
-                "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();
+        /**Toast.makeText(MainActivity.this, "Du hast " +
+                "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();*/
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
@@ -281,6 +327,8 @@ public class MainActivity extends AppCompatActivity {
         removeUpdatesWrapper();
 
     }
+
+    // Writes longitude & latitude values into text views
 
     private void updateLoc(Location loc){
 

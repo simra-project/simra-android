@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="5dp"
+    android:background="#FFFFFF"
+    tools:context=".HelmetActivity">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="185dp"
+        android:background="@drawable/mcc_ecdf"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corners"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:padding="5dp"
+
+        android:text="Lorem ipsum dolor sit amet,
+        sapien tincidunt porta at, ullamcorper nascetur lectus
+        libero mi in etiam. Dignissim lorem vivamus. Sit wisi, ipsum ligula id amet
+        vestibulum et, nam eget. Sollicitudin nec imperdiet pede.
+        Et arcu purus aenean. Natoque a nulla dolor blandit, fusce ultricies cras
+        risus elit, eu gravida. Vitae quisque ante enim, metus nulla, odio erat dolor,
+        quisque sit. Maecenas quis tempor arcu at condimentum, vel magna, nibh at eu
+        interdum pariatur praesent nulla, nibh at. Lorem lorem et turpis at viverra a,
+        malesuada ac lectus, dui venenatis ad accumsan non sit, ut aliquet cras sit.
+        Cras et rhoncus dolor aliquam purus, sem torquent dictum euismod rutrum lectus,
+        vestibulum at aliquet accumsan justo.
+        Suspendisse dignissim eget tortor velit, mauris sed lectus scelerisque,
+        varius fringilla lectus dictum, felis tempor. Urna vestibulum eu eu at.
+        Commodo sed, aliquam consectetuer litora diam fringilla turpis rutrum,
+        vestibulum wisi sit felis quisque, integer est, sem blandit.
+        Aliquam ut integer nam, vel curabitur urna eget tempor pellentesque.
+        Auctor quis aliquam hymenaeos."
+        android:fontFamily="@font/assistant_extralight"
+        android:textSize="15dp"
+        android:textColor="#FEFEFE"
+        android:textStyle="bold" />
+
+</RelativeLayout>
