@@ -34,7 +34,8 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity android:name=".MenuActivity" />
-        <activity android:name=".HelmetActivity"></activity>
+        <activity android:name=".HelmetActivity" />
+        <activity android:name=".RouteActivity"></activity>
     </application>
 
 </manifest>

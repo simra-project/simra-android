@@ -14,7 +14,7 @@
     <RelativeLayout android:id="@+id/upper_bar"
         android:layout_width="match_parent"
         android:layout_height="85dp"
-        android:layout_margin="4dp"
+        android:layout_margin="10dp"
         android:elevation="8dp"
 
         android:background="@drawable/rounded_corners">
@@ -23,11 +23,12 @@
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginRight="40dp"
 
             android:fontFamily="@font/assistant_extralight"
             android:text="Welcome to SimRa!"
             android:textColor="#FEFEFE"
-            android:textSize="22dp"
+            android:textSize="24dp"
             android:textStyle="bold"
             />
 
@@ -41,8 +42,8 @@
             />
 
         <ImageButton android:id="@+id/helmet_icon"
-            android:layout_width="70dp"
-            android:layout_height="75dp"
+            android:layout_width="80dp"
+            android:layout_height="85dp"
             android:background="@drawable/helmet"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
@@ -53,41 +54,42 @@
             />
 
     </RelativeLayout>
+    
+    <RelativeLayout android:id="@+id/route_button"
+        android:layout_width="250dp"
+        android:layout_height="85dp"
+        android:background="@drawable/rounded_corners"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp"
+        >
 
-        <TextView android:id="@+id/Latitude"
-            android:layout_width="120dp"
-            android:layout_height="80dp"
+
+        <ImageView android:id="@+id/route_image"
+            android:layout_width="65dp"
+            android:layout_height="60dp"
+            android:background="@drawable/route2"
+            android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="15dp"
+        />
 
+        <TextView android:id="@+id/route_text"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true"
             android:gravity="center"
-
-            android:background="@drawable/rounded_corners"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="30dp"
 
             android:fontFamily="@font/assistant_extralight"
-            android:textSize="15dp"
+            android:text="Neue Route"
             android:textColor="#FEFEFE"
+            android:textSize="24dp"
             android:textStyle="bold"
             />
 
-        <TextView android:id="@+id/Longitude"
-            android:layout_width="120dp"
-            android:layout_height="80dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"
-
-            android:gravity="center"
-
-            android:background="@drawable/rounded_corners"
-
-            android:fontFamily="@font/assistant_extralight"
-            android:textSize="15dp"
-            android:textColor="#FEFEFE"
-            />
+        </RelativeLayout>
 
 </RelativeLayout>
