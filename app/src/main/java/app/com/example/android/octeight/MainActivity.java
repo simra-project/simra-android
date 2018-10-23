@@ -68,6 +68,11 @@ public class MainActivity extends AppCompatActivity {
 
     private final int LOCATION_ACCESS_CODE = 1;
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Case-Switch for onPermissionResult
+
+    private static int myCase;
+
     // Log tag:
 
     private static final String TAG = "MainActivity";
@@ -87,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
+        myCase = 1;
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Context, Config, ContentView
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,19 +112,21 @@ public class MainActivity extends AppCompatActivity {
         mMapController.setZoom(15);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // If user wants to record new route, check location tracking permission
-        // --> if permission hasn't been granted, request permission
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        getLocationWrapper();
+        if(PermissionHandler.permissionGrantCheck(this)) {
+            try {
+                lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            } catch (SecurityException se) {
+                se.printStackTrace();
+            }
+        } else {
+            PermissionHandler.askPermission(MainActivity.this);
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
@@ -133,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
         DefaultResourceProxyImpl defaultResourceProxyImpl
                 = new DefaultResourceProxyImpl(this);
-        MyItemizedIconOverlay myItemizedIconOverlay
+           MyItemizedIconOverlay myItemizedIconOverlay
                 = new MyItemizedIconOverlay(
                 overlayItemArray, null, defaultResourceProxyImpl);
         mMapView.getOverlays().add(myItemizedIconOverlay);
@@ -185,127 +194,50 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Wrapper for location functionality called in onCreate()
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private void getLocationWrapper() {
+    public void onResume(){
 
-        int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+        Log.i(TAG,"On Resume called");
 
-        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+        super.onResume();
 
-            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um eine neue Route anzulegen, ist der Zugriff auf Deinen Standort" +
-                                " vonnöten.",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                                        LOCATION_ACCESS_CODE);
-                            }
-                        });
-                return;
+        myCase = 2;
+
+        if(PermissionHandler.permissionGrantCheck(this)) {
+            try {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
+            } catch (SecurityException se) {
+                se.printStackTrace();
             }
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_ACCESS_CODE);
-            return;
+        } else {
+            PermissionHandler.askPermission(MainActivity.this);
+        }
 
-        } /**Toast.makeText(MainActivity.this, "Du hast " +
-                    "die nötige Erlaubnis bereits erteilt (1).", Toast.LENGTH_SHORT).show();*/
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-        lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Log.i(TAG,"On Resume finished");
 
         }
 
+    public void onPause(){
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Wrapper for location functionality called in onResume()
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        myCase = 3;
 
-    private void updateLocationWrapper() {
+        Log.i(TAG,"On Pause called");
 
-       int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+        super.onPause();
 
-        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
-
-            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um fortzufahren, erlaube bitte den Zugriff auf Deine " +
-                                "Standortdaten.",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                                        LOCATION_ACCESS_CODE);
-                            }
-                        });
-                return;
+        if(PermissionHandler.permissionGrantCheck(this)) {
+            try {
+                locationManager.removeUpdates(myLocationListener);
+            }catch (SecurityException se) {
+                se.printStackTrace();
             }
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_ACCESS_CODE);
-            return;
-
+        }  else {
+            PermissionHandler.askPermission(MainActivity.this);
         }
 
-         /**Toast.makeText(MainActivity.this, "Du hast " +
-                "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();*/
+        Log.i(TAG,"On Pause finished");
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Wrapper for location functionality called in onPause()
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    private void removeUpdatesWrapper() {
-
-        int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-
-        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
-
-            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um fortzufahren, erlaube bitte den Zugriff auf" +
-                                " Deine Standortdaten. (2)",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                                        LOCATION_ACCESS_CODE);
-                            }
-                        });
-                return;
-            }
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_ACCESS_CODE);
-            return;
-
-        }
-
-        /**Toast.makeText(MainActivity.this, "Du hast " +
-                "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();*/
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-        locationManager.removeUpdates(myLocationListener);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    }
-
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(MainActivity.this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
     }
 
     @Override
@@ -313,7 +245,32 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case LOCATION_ACCESS_CODE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getLocationWrapper();
+                    // Check where we're at: case 1 = onCreate, case 2 = onResume, case 3 = onPause
+                    switch(myCase) {
+                        case 1:
+                            try {
+                                lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            } catch (SecurityException se) {
+                                se.printStackTrace();
+                            }
+                            break;
+                        case 2:
+                            try {
+                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
+                                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
+                            } catch (SecurityException se) {
+                                se.printStackTrace();
+                            }
+                            break;
+                        case 3:
+                            try {
+                                locationManager.removeUpdates(myLocationListener);
+                            } catch (SecurityException se) {
+                                se.printStackTrace();
+                            }
+                            break;
+                    }
+
                 } else {
                     // Permission Denied
                     Toast.makeText(MainActivity.this, "Zugriff auf Standortdaten " +
@@ -324,30 +281,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-        checkInProgress = false;
-    }
-
-    public void onResume(){
-
-        Log.i(TAG,"On Resume called");
-
-        super.onResume();
-        updateLocationWrapper();
-
-        Log.i(TAG,"On Resume finished");
-
-        }
-
-    public void onPause(){
-
-        Log.i(TAG,"On Pause called");
-
-        super.onPause();
-
-        removeUpdatesWrapper();
-
-        Log.i(TAG,"On Pause finished");
-
     }
 
     // Writes longitude & latitude values into text views
