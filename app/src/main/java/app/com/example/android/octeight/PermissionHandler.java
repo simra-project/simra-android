@@ -58,7 +58,7 @@ public class PermissionHandler {
 
     }
 
-    private static void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener,
+    private static synchronized void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener,
                 Activity activity) {
         new AlertDialog.Builder(activity)
                 .setMessage(message)

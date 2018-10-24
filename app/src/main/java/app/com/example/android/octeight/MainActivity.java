@@ -88,11 +88,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        myCase = 1;
+
         Log.i(TAG,"On Create called");
 
         super.onCreate(savedInstanceState);
-
-        myCase = 1;
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Context, Config, ContentView
@@ -197,11 +197,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void onResume(){
 
+        myCase = 2;
+
         Log.i(TAG,"On Resume called");
 
         super.onResume();
-
-        myCase = 2;
 
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
@@ -210,9 +210,9 @@ public class MainActivity extends AppCompatActivity {
             } catch (SecurityException se) {
                 se.printStackTrace();
             }
-        } else {
+        } /**else {
             PermissionHandler.askPermission(MainActivity.this);
-        }
+        }*/
 
         Log.i(TAG,"On Resume finished");
 
@@ -229,12 +229,12 @@ public class MainActivity extends AppCompatActivity {
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
                 locationManager.removeUpdates(myLocationListener);
-            }catch (SecurityException se) {
+            } catch (SecurityException se) {
                 se.printStackTrace();
             }
-        }  else {
+        } /** else {
             PermissionHandler.askPermission(MainActivity.this);
-        }
+        }*/
 
         Log.i(TAG,"On Pause finished");
 
