@@ -35,7 +35,8 @@
 
         <activity android:name=".MenuActivity" />
         <activity android:name=".HelmetActivity" />
-        <activity android:name=".RouteActivity"></activity>
+        <activity android:name=".RouteActivity" />
+        <activity android:name=".SaveActivity"></activity>
     </application>
 
 </manifest>

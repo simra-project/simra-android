@@ -45,4 +45,40 @@
 
     </RelativeLayout>
 
+    <RelativeLayout android:id="@+id/stop_button"
+        android:layout_width="250dp"
+        android:layout_height="85dp"
+        android:background="@drawable/rounded_corners"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp"
+        >
+
+        <ImageView android:id="@+id/stop_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/stop"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="15dp"
+            />
+
+        <TextView android:id="@+id/stop_text"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="30dp"
+
+            android:fontFamily="@font/assistant_extralight"
+            android:text="Aufzeichnung \n stoppen"
+            android:textColor="#FEFEFE"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            />
+
+    </RelativeLayout>
+
 </RelativeLayout>

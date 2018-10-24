@@ -3,6 +3,7 @@ package app.com.example.android.octeight;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -16,8 +17,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -25,7 +31,12 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class RouteActivity extends AppCompatActivity implements SensorEventListener {
@@ -45,7 +56,28 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     private Sensor myAcc;
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Views
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     TextView accDat;
+
+    RelativeLayout stopButton;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Logging
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    final String ROUTE_ACT = "RouteActiviy";
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Save sensor data
+
+    ArrayList<Float> xList = new ArrayList<>();
+
+    ArrayList<Float> yList = new ArrayList<>();
+
+    ArrayList<Float> zList = new ArrayList<>();
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,6 +137,25 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         } catch(NullPointerException npe) {
             npe.printStackTrace();
         }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Sensor-related configuration
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        stopButton = findViewById(R.id.stop_button);
+
+        // When stopButton is pressed, route data is saved to a JSON file & SaveActivity is
+        // triggered.
+        stopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveRouteData();
+                Intent launchActivityIntent = new Intent(RouteActivity.this,
+                        SaveActivity.class);
+                startActivity(launchActivityIntent);
+            }
+        });
+
 
     }
 
@@ -257,15 +308,62 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     @Override
     public final void onSensorChanged(SensorEvent event) {
-        // The light sensor returns a single value.
-        // Many sensors return 3 values, one for each axis.
+        // The acceleratometer returns 3 values, one for each axis.
         float x = event.values[0];
         float y = event.values[1];
         float z = event.values[2];
 
+        // Add the acceleratormeter data to the respective ArrayLists.
+        xList.add(x);
+
+        yList.add(y);
+
+        zList.add(z);
+
+        // Show the values on screen (for demonstration purposes only)
         accDat.setText("x: " + x + "y: " + y + "z: " + z);
     }
 
+    public void saveRouteData() {
+        Gson gson = new Gson();
+
+        String jsonX = gson.toJson(xList);
+        create(this, "x_acceleratometer.json", jsonX);
+        isFilePresent(this, "x_acceleratometer.json");
+
+        String jsonY = gson.toJson(yList);
+        create(this, "y_acceleratometer.json", jsonY);
+        isFilePresent(this, "y_acceleratometer.json");
+
+        String jsonZ = gson.toJson(zList);
+        create(this, "z_acceleratometer.json", jsonZ);
+        isFilePresent(this, "y_acceleratometer.json");
+
+    }
+
+    private boolean create(Context context, String fileName, String jsonString){
+        //String FILENAME = "storage.json";
+        try {
+            FileOutputStream fos = openFileOutput(fileName,Context.MODE_PRIVATE);
+            if (jsonString != null) {
+                fos.write(jsonString.getBytes());
+            }
+            fos.close();
+            return true;
+        } catch (FileNotFoundException fileNotFound) {
+            return false;
+        } catch (IOException ioException) {
+            return false;
+        }
+
+    }
+
+    public boolean isFilePresent(Context context, String fileName) {
+        String path = context.getFilesDir().getAbsolutePath() + "/" + fileName;
+        File file = new File(path);
+        Log.i(ROUTE_ACT, path);
+        return file.exists();
+    }
 
     public void onResume(){
 
