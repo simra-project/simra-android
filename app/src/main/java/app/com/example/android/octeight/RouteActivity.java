@@ -130,7 +130,19 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        getLocationWrapper();
+        try {
+            if(PermissionHandler.permissionGrantCheck(this)) {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+                lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            }
+         } catch (SecurityException se) {
+
+            se.printStackTrace();
+
+        }
 
         try {
             updateLoc(lastLocation);
@@ -157,147 +169,6 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         });
 
 
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Wrapper for location functionality called in onCreate()
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    private void getLocationWrapper() {
-
-        int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-
-        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
-
-            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um eine neue Route anzulegen, ist der Zugriff auf Deinen Standort" +
-                                " vonnöten.",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                                        LOCATION_ACCESS_CODE);
-                            }
-                        });
-                return;
-            }
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_ACCESS_CODE);
-            return;
-
-        } /**Toast.makeText(MainActivity.this, "Du hast " +
-         "die nötige Erlaubnis bereits erteilt (1).", Toast.LENGTH_SHORT).show();*/
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-        lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    }
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Wrapper for location functionality called in onResume()
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    private void updateLocationWrapper() {
-
-        int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-
-        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
-
-            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um fortzufahren, erlaube bitte den Zugriff auf Deine " +
-                                "Standortdaten.",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                                        LOCATION_ACCESS_CODE);
-                            }
-                        });
-                return;
-            }
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_ACCESS_CODE);
-            return;
-
-        }
-
-        /**Toast.makeText(MainActivity.this, "Du hast " +
-         "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();*/
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Wrapper for location functionality called in onPause()
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    private void removeUpdatesWrapper() {
-
-        int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-
-        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
-
-            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um fortzufahren, erlaube bitte den Zugriff auf" +
-                                " Deine Standortdaten. (2)",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                                        LOCATION_ACCESS_CODE);
-                            }
-                        });
-                return;
-            }
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_ACCESS_CODE);
-            return;
-
-        }
-
-        /**Toast.makeText(MainActivity.this, "Du hast " +
-         "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();*/
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-        locationManager.removeUpdates(myLocationListener);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    }
-
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(RouteActivity.this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case LOCATION_ACCESS_CODE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    updateLocationWrapper();
-                } else {
-                    // Permission Denied
-                    Toast.makeText(RouteActivity.this, "Zugriff auf Standortdaten " +
-                            "wurde abgelehnt.", Toast.LENGTH_SHORT)
-                            .show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
     }
 
 
@@ -327,22 +198,22 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
     public void saveRouteData() {
         Gson gson = new Gson();
 
-        String jsonX = gson.toJson(xList);
-        create(this, "x_acceleratometer.json", jsonX);
-        isFilePresent(this, "x_acceleratometer.json");
+        String xString = xList.toString();
+        create(this, "x_acceleratometer.csv", xString);
+        isFilePresent(this, "x_acceleratometer.csv");
 
-        String jsonY = gson.toJson(yList);
-        create(this, "y_acceleratometer.json", jsonY);
-        isFilePresent(this, "y_acceleratometer.json");
+        String yString = yList.toString();
+        create(this, "y_acceleratometer.csv", yString);
+        isFilePresent(this, "y_acceleratometer.csv");
 
-        String jsonZ = gson.toJson(zList);
-        create(this, "z_acceleratometer.json", jsonZ);
-        isFilePresent(this, "y_acceleratometer.json");
+        String zString = zList.toString();
+        create(this, "z_acceleratometer.csv", zString);
+        isFilePresent(this, "y_acceleratometer.csv");
 
     }
 
     private boolean create(Context context, String fileName, String jsonString){
-        //String FILENAME = "storage.json";
+
         try {
             FileOutputStream fos = openFileOutput(fileName,Context.MODE_PRIVATE);
             if (jsonString != null) {
@@ -369,7 +240,17 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
         super.onResume();
 
-        updateLocationWrapper();
+        try {
+            if (PermissionHandler.permissionGrantCheck(this)) {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            }
+        } catch (SecurityException se) {
+            se.printStackTrace();
+        }
 
         mSensorManager.registerListener(this, myAcc, SensorManager.SENSOR_DELAY_NORMAL);
 
@@ -379,7 +260,16 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
         super.onPause();
 
-        removeUpdatesWrapper();
+        try {
+            if (PermissionHandler.permissionGrantCheck(this)) {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+                locationManager.removeUpdates(myLocationListener);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            }
+        } catch (SecurityException se) {
+            se.printStackTrace();
+        }
 
         mSensorManager.unregisterListener(this);
 
