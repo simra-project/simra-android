@@ -21,21 +21,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <activity android:name=".StartActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
         </activity>
-
         <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
-
+        android:name="preloaded_fonts"
+        android:resource="@array/preloaded_fonts" />
+        <activity android:name=".MainActivity"/>
         <activity android:name=".MenuActivity" />
         <activity android:name=".HelmetActivity" />
-        <activity android:name=".RouteActivity"></activity>
+        <activity android:name=".RouteActivity" />
+
     </application>
 
 </manifest>
