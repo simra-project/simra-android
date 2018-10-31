@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -51,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private MapController mMapController;
     private Location lastLocation;
 
-    boolean checkInProgress = false;
+    private MyLocationNewOverlay mLocationOverlay;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -107,9 +111,15 @@ public class MainActivity extends AppCompatActivity {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         mMapView = findViewById(R.id.map);
         mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-        mMapView.setBuiltInZoomControls(true);
+        mMapView.setBuiltInZoomControls(false);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(15);
+
+        mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
+
+        mLocationOverlay.enableFollowLocation();
+        mLocationOverlay.enableMyLocation();
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -134,23 +144,10 @@ public class MainActivity extends AppCompatActivity {
         if (lastLocation != null)
             updateLoc(lastLocation);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //--- Create Overlay --> upcoming tutorial on Osmdroid
 
-       /** overlayItemArray = new ArrayList<OverlayItem>();
+        setLocationMarker();
 
-        DefaultResourceProxyImpl defaultResourceProxyImpl
-                = new DefaultResourceProxyImpl(this);
-           MyItemizedIconOverlay myItemizedIconOverlay
-                = new MyItemizedIconOverlay(
-                overlayItemArray, null, defaultResourceProxyImpl);
-        mMapView.getOverlays().add(myItemizedIconOverlay);
-        //---  */
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
 
         // (1): Burger Menu
@@ -194,6 +191,29 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void setLocationMarker() {
+
+        Drawable currentDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
+        Bitmap currentIcon = null;
+        if (currentDraw != null) {
+            currentIcon = ((BitmapDrawable) currentDraw).getBitmap();
+        }
+
+        mLocationOverlay.setPersonIcon(currentIcon);
+
+        mLocationOverlay.setDrawAccuracyEnabled(true);
+
+        mMapView.getOverlays().add(mLocationOverlay);
+
+    }
+
+    public void onStart() {
+
+        super.onStart();
+
+        setLocationMarker();
+
+    }
 
     public void onResume(){
 
@@ -216,6 +236,8 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(TAG,"On Resume finished");
 
+        setLocationMarker();
+
         }
 
     public void onPause(){
@@ -237,6 +259,9 @@ public class MainActivity extends AppCompatActivity {
         }*/
 
         Log.i(TAG,"On Pause finished");
+
+        setLocationMarker();
+
 
     }
 

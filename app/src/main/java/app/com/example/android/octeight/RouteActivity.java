@@ -30,6 +30,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,6 +49,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
     private MapView mMapView;
     private MapController mMapController;
     private Location lastLocation;
+    private MyLocationNewOverlay mLocationOverlay;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Sensor stuff
@@ -111,9 +114,11 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         mMapView = findViewById(R.id.map);
         mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-        mMapView.setBuiltInZoomControls(true);
+        mMapView.setBuiltInZoomControls(false);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(15);
+
+        mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Sensor-related configuration
@@ -270,8 +275,6 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         } catch (SecurityException se) {
             se.printStackTrace();
         }
-
-        mSensorManager.unregisterListener(this);
 
     }
 
