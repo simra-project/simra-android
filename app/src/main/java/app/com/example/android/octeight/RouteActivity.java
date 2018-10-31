@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,6 +17,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,6 +34,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -117,8 +122,22 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         mMapView.setBuiltInZoomControls(false);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(15);
+        mMapView.setMultiTouchControls(true); // gesture zooming
 
+        // MyLocationNewOverlay constitutes an alternative to definition of  a custom resource
+        // proxy (DefaultResourceProxyImpl is deprecated)
         mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
+        mLocationOverlay.enableFollowLocation();
+        mLocationOverlay.enableMyLocation();
+
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
+        setLocationMarker();
+
+        /**Enable compass (currently probably hidden behind upper bar)
+        CompassOverlay compassOverlay = new CompassOverlay(this, mMapView);
+        compassOverlay.enableCompass();
+        mMapView.getOverlays().add(compassOverlay);*/
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Sensor-related configuration
@@ -176,6 +195,33 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     }
 
+    public void setLocationMarker() {
+
+        // Set current location marker icon to custom icon
+
+        Drawable currentDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
+        Bitmap currentIcon = null;
+        if (currentDraw != null) {
+            currentIcon = ((BitmapDrawable) currentDraw).getBitmap();
+        }
+
+        // Set navigation arrow icon to custom icon
+
+        Drawable currentArrowDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
+        Bitmap currentArrowIcon = null;
+        if (currentArrowDraw != null) {
+            currentArrowIcon = ((BitmapDrawable) currentArrowDraw).getBitmap();
+        }
+
+        mLocationOverlay.setPersonIcon(currentIcon);
+
+        mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);
+
+        mLocationOverlay.setDrawAccuracyEnabled(true);
+
+        mMapView.getOverlays().add(mLocationOverlay);
+
+    }
 
     @Override
     public final void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -197,7 +243,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         zList.add(z);
 
         // Show the values on screen (for demonstration purposes only)
-        accDat.setText("x: " + x + "y: " + y + "z: " + z);
+        accDat.setText("x: " + x + "\ny: " + y + "\nz: " + z);
     }
 
     public void saveRouteData() {
@@ -241,6 +287,16 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         return file.exists();
     }
 
+    public void onStart() {
+
+        super.onStart();
+
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
+        setLocationMarker();
+
+    }
+
     public void onResume(){
 
         super.onResume();
@@ -256,6 +312,10 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         } catch (SecurityException se) {
             se.printStackTrace();
         }
+
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
+        setLocationMarker();
 
         mSensorManager.registerListener(this, myAcc, SensorManager.SENSOR_DELAY_NORMAL);
 
@@ -275,6 +335,10 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         } catch (SecurityException se) {
             se.printStackTrace();
         }
+
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
+        setLocationMarker();
 
     }
 

@@ -37,6 +37,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -112,13 +113,22 @@ public class MainActivity extends AppCompatActivity {
         mMapView = findViewById(R.id.map);
         mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
         mMapView.setBuiltInZoomControls(false);
+        mMapView.setMultiTouchControls(true); // gesture zooming
+
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(15);
 
-        mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
 
+        // MyLocationNewOverlay constitutes an alternative to definition of  a custom resource
+        // proxy (DefaultResourceProxyImpl is deprecated)
+        mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
         mLocationOverlay.enableFollowLocation();
         mLocationOverlay.enableMyLocation();
+
+        /** Enable compass (currently probably hidden behind upper bar)
+        CompassOverlay compassOverlay = new CompassOverlay(this, mMapView);
+        compassOverlay.enableCompass();
+        mMapView.getOverlays().add(compassOverlay);*/
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -145,6 +155,8 @@ public class MainActivity extends AppCompatActivity {
             updateLoc(lastLocation);
 
 
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
         setLocationMarker();
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -193,13 +205,25 @@ public class MainActivity extends AppCompatActivity {
 
     public void setLocationMarker() {
 
+        // Set current location marker icon to custom icon
+
         Drawable currentDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
         Bitmap currentIcon = null;
         if (currentDraw != null) {
             currentIcon = ((BitmapDrawable) currentDraw).getBitmap();
         }
 
+        // Set navigation arrow icon to custom icon
+
+        Drawable currentArrowDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
+        Bitmap currentArrowIcon = null;
+        if (currentArrowDraw != null) {
+            currentArrowIcon = ((BitmapDrawable) currentArrowDraw).getBitmap();
+        }
+
         mLocationOverlay.setPersonIcon(currentIcon);
+
+        mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);
 
         mLocationOverlay.setDrawAccuracyEnabled(true);
 
@@ -211,6 +235,8 @@ public class MainActivity extends AppCompatActivity {
 
         super.onStart();
 
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
         setLocationMarker();
 
     }
@@ -236,6 +262,8 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(TAG,"On Resume finished");
 
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
         setLocationMarker();
 
         }
@@ -260,6 +288,8 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(TAG,"On Pause finished");
 
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
         setLocationMarker();
 
 
