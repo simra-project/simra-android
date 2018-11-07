@@ -19,6 +19,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,8 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
+import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -125,10 +128,22 @@ public class MainActivity extends AppCompatActivity {
         mLocationOverlay.enableFollowLocation();
         mLocationOverlay.enableMyLocation();
 
-        /** Enable compass (currently probably hidden behind upper bar)
+        // Rotate map via gesture
+        mMapView.getOverlays().add(new RotationGestureOverlay(mMapView));
+
+        //Enable & add compass
         CompassOverlay compassOverlay = new CompassOverlay(this, mMapView);
         compassOverlay.enableCompass();
-        mMapView.getOverlays().add(compassOverlay);*/
+        mMapView.getOverlays().add(compassOverlay);
+
+        // TODO soft-code compass location in relation to width & height
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int height = displaymetrics.heightPixels;
+        int width = displaymetrics.widthPixels;
+
+        // Coordinates currently only optimized for Theresa's device --> needs work
+        compassOverlay.setCompassCenter(325,130);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

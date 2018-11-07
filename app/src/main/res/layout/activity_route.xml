@@ -20,16 +20,16 @@
 
         <TextView android:id="@+id/acc_dat"
             android:layout_width="150dp"
-            android:layout_height="45dp"
+            android:layout_height="60dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
 
             android:fontFamily="@font/assistant_extralight"
             android:textColor="#FEFEFE"
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:textStyle="bold"
             />
 
