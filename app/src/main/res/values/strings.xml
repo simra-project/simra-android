@@ -4,4 +4,14 @@
     <string name="welcome_text">Thanks for helping, keeping the street save.</string>
     <string name="welcome_text2">But keep in mind, its just a Beta App.</string>
     <string name="welcome_text3">sincerely TTMüller</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">MCC TU Berlin</string>
+    <string name="nav_header_subtitle">simra@mcc.tu-berlin.de</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="feedbackReceiver">mb@mcc.tu-berlin.de</string>
+    <string name="demoDataHeader">SimRa Teilnehmerdaten</string>
+    <string name="feedbackHeader">SimRa Feedback</string>
+    <string name="demoDataMail">Name: \nAlter: \nBeruf: \nFahrradtyp: Bsp. Rennrad\nDurchschnittlich wöchentlich zurückgelegte Kilometeranzahl mit dem Rad: </string>
+    <string name="feedbackMail"> </string>
 </resources>
