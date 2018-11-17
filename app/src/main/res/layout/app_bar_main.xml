@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="8dp"
+        android:layout_margin="10dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/rounded_corners"
+        android:theme="@style/ToolbarTheme"
+        android:titleTextColor="#FEFEFE"
+        app:titleTextAppearance="@style/Toolbar.TitleText"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+        <TextView android:id="@+id/welcome_text"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/assistant_extralight"
+            android:text="@string/welcome_header"
+            android:textColor="#FEFEFE"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            />
+
+        <ImageButton android:id="@+id/helmet_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="15dp"
+            android:layout_gravity="right"
+            android:background="@drawable/helmet"
+            />
+
+
+    </android.support.v7.widget.Toolbar>
+
+
+    <include layout="@layout/content_main" />
+
+    <RelativeLayout
+        android:id="@+id/route_button"
+        android:layout_width="250dp"
+        android:layout_height="85dp"
+        android:background="@drawable/rounded_corners"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp">
+
+
+        <ImageView
+            android:id="@+id/route_image"
+            android:layout_width="65dp"
+            android:layout_height="60dp"
+            android:background="@drawable/route2"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="15dp" />
+
+        <TextView
+            android:id="@+id/route_text"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="30dp"
+
+            android:fontFamily="@font/assistant_extralight"
+            android:text="Neue Route"
+            android:textColor="#FEFEFE"
+            android:textSize="24dp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+</RelativeLayout>
