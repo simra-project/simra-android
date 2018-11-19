@@ -46,7 +46,7 @@ import java.util.LinkedList;
 
 import static java.security.AccessController.getContext;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Basic map stuff
@@ -105,20 +105,6 @@ public class MainActivity extends AppCompatActivity {
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         setContentView(R.layout.activity_main);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-
-        //textLatitude = (TextView)findViewById(R.id.Latitude);
-        //textLongitude = (TextView)findViewById(R.id.Longitude);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Location updates: http://android-er.blogspot.com/2012/05/location-updates-from-gpsprovider-and.html
-
-        //textLog = (TextView)findViewById(R.id.Log);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Location updates: http://android-er.blogspot.com/2012/05/location-updates-from-gpsprovider-and.html
@@ -163,63 +149,24 @@ public class MainActivity extends AppCompatActivity {
         GeoPoint gPt = tuBerlin;
         mMapController.setCenter(gPt);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //--- Create Overlay --> upcoming tutorial on Osmdroid
-
-       /** overlayItemArray = new ArrayList<OverlayItem>();
-
-        DefaultResourceProxyImpl defaultResourceProxyImpl
-                = new DefaultResourceProxyImpl(this);
-        MyItemizedIconOverlay myItemizedIconOverlay
-                = new MyItemizedIconOverlay(
-                overlayItemArray, null, defaultResourceProxyImpl);
-        mMapView.getOverlays().add(myItemizedIconOverlay);
-        //---  */
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // CLICKABLES
 
-        // (1): Burger Menu
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //menuButton = findViewById(R.id.burger_menu);
-        //menuButton.setOnClickListener(new View.OnClickListener() {
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(MainActivity.this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-                drawer.addDrawerListener(toggle);
-                toggle.syncState();
-        // (2): Helmet
-
-       /* helmetButton = findViewById(R.id.helmet_icon);
-        helmetButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-        Intent launchActivityIntent = new Intent(MainActivity.this,
-        HelmetActivity.class);
-        startActivity(launchActivityIntent);
-        }
-        });*/
-
-       // (2.1): Toolbar
-
-        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        // setSupportActionBar(toolbar);
-
+        // (1): Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        // navigationView.bringToFront();
-        // navigationView.setNavigationItemSelectedListener(this);
-*/
+        navigationView.setNavigationItemSelectedListener(this);
 
-        // (3): Neue Route
+        // (2): Start Neue Route
 
         neuRoute = findViewById(R.id.route_button);
         neuRoute.setOnClickListener(new View.OnClickListener() {
@@ -244,9 +191,7 @@ public class MainActivity extends AppCompatActivity {
         if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
 
             if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um eine neue Route anzulegen, ist der Zugriff auf Deinen Standort" +
-                                " vonnöten.",
-                        new DialogInterface.OnClickListener() {
+                showMessageOKCancel(getString(R.string.permissionFineLocation), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
@@ -281,9 +226,7 @@ public class MainActivity extends AppCompatActivity {
         if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
 
             if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um fortzufahren, erlaube bitte den Zugriff auf Deine " +
-                                "Standortdaten.",
-                        new DialogInterface.OnClickListener() {
+                showMessageOKCancel(getString(R.string.permissionFineLocation), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
@@ -320,9 +263,7 @@ public class MainActivity extends AppCompatActivity {
         if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
 
             if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("Um fortzufahren, erlaube bitte den Zugriff auf" +
-                                " Deine Standortdaten. (2)",
-                        new DialogInterface.OnClickListener() {
+                showMessageOKCancel(getString(R.string.permissionFineLocation), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
