@@ -76,7 +76,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
     // Logging
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    final String ROUTE_ACT = "RouteActiviy";
+    final String ROUTE_ACT = "RouteActivity";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Save sensor data
