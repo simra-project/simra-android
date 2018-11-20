@@ -10,4 +10,4 @@
 .externalNativeBuild
 /.idea/caches/build_file_checksums.ser
 *.ser
-*.xml
+/.idea/misc.xml
