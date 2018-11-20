@@ -235,7 +235,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         float y = event.values[1];
         float z = event.values[2];
 
-        // Add the acceleratormeter data to the respective ArrayLists.
+        // Add the accelerometer data to the respective ArrayLists.
         xList.add(x);
 
         yList.add(y);
@@ -250,16 +250,16 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         Gson gson = new Gson();
 
         String xString = xList.toString();
-        create(this, "x_acceleratometer.csv", xString);
-        isFilePresent(this, "x_acceleratometer.csv");
+        create(this, "x_accelerometer.csv", xString);
+        isFilePresent(this, "x_accelerometer.csv");
 
         String yString = yList.toString();
-        create(this, "y_acceleratometer.csv", yString);
-        isFilePresent(this, "y_acceleratometer.csv");
+        create(this, "y_accelerometer.csv", yString);
+        isFilePresent(this, "y_accelerometer.csv");
 
         String zString = zList.toString();
-        create(this, "z_acceleratometer.csv", zString);
-        isFilePresent(this, "y_acceleratometer.csv");
+        create(this, "z_accelerometer.csv", zString);
+        isFilePresent(this, "y_accelerometer.csv");
 
     }
 
