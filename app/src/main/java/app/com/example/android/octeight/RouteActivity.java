@@ -230,7 +230,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     @Override
     public final void onSensorChanged(SensorEvent event) {
-        // The acceleratometer returns 3 values, one for each axis.
+        // The accelerometer returns 3 values, one for each axis.
         float x = event.values[0];
         float y = event.values[1];
         float z = event.values[2];
