@@ -218,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // Changes the default location marker and navigation arrow to a custom icon
+
     public void setLocationMarker() {
 
         // Set current location marker icon to custom icon
