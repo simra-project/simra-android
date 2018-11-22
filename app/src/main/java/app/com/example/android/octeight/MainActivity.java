@@ -1,54 +1,45 @@
 package app.com.example.android.octeight;
 
-import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Button;
-import android.view.*;
 
-import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
-import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -83,13 +74,11 @@ public class MainActivity extends AppCompatActivity {
 
     // Log tag:
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "MainActivity_LOG";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-
-    String PROVIDER = LocationManager.GPS_PROVIDER;
 
     LocationManager locationManager;
 
@@ -98,8 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
         myCase = 1;
 
-        Log.i(TAG,"On Create called");
-
+        Log.i(TAG,"OnCreate called");
         super.onCreate(savedInstanceState);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,13 +96,16 @@ public class MainActivity extends AppCompatActivity {
 
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        Configuration.getInstance().setUserAgentValue(getPackageName());
         setContentView(R.layout.activity_main);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         mMapView = findViewById(R.id.map);
-        mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+
+
+        mMapView.setTileSource(TileSourceFactory.MAPNIK);
         mMapView.setBuiltInZoomControls(false);
         mMapView.setMultiTouchControls(true); // gesture zooming
 
@@ -174,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
         // arrow
         setLocationMarker();
 
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
 
@@ -214,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Log.i(TAG,"On Create finished");
+        Log.i(TAG,"OnCreate finished");
 
     }
 
@@ -237,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
         if (currentArrowDraw != null) {
             currentArrowIcon = ((BitmapDrawable) currentArrowDraw).getBitmap();
         }
-
         mLocationOverlay.setPersonIcon(currentIcon);
 
         mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);
@@ -262,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
 
         myCase = 2;
 
-        Log.i(TAG,"On Resume called");
+        Log.i(TAG,"OnResume called");
 
         super.onResume();
 
@@ -277,19 +268,19 @@ public class MainActivity extends AppCompatActivity {
             PermissionHandler.askPermission(MainActivity.this);
         }*/
 
-        Log.i(TAG,"On Resume finished");
+
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
         setLocationMarker();
-
+        Log.i(TAG,"OnResume finished");
         }
 
     public void onPause(){
 
         myCase = 3;
 
-        Log.i(TAG,"On Pause called");
+        Log.i(TAG,"OnPause called");
 
         super.onPause();
 
@@ -303,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
             PermissionHandler.askPermission(MainActivity.this);
         }*/
 
-        Log.i(TAG,"On Pause finished");
+        Log.i(TAG,"OnPause finished");
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow

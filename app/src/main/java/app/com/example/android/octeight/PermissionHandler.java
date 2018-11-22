@@ -37,35 +37,10 @@ public class PermissionHandler {
 
     public static synchronized void askPermission(Activity activity) {
 
-        final Activity helper = activity;
-
-        if (!shouldShowRequestPermissionRationale(helper, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            showMessageOKCancel("Um fortzufahren, erlaube bitte den Zugriff auf" +
-                            " Deine Standortdaten.",
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            helper.requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                                    LOCATION_ACCESS_CODE);
-                        }
-                    }, helper);
-            return;
-        }
-
-        helper.requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+        activity.requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
                 LOCATION_ACCESS_CODE);
-        return;
 
     }
 
-    private static synchronized void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener,
-                Activity activity) {
-        new AlertDialog.Builder(activity)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
-    }
 
 }
