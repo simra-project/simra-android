@@ -30,7 +30,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
@@ -101,8 +103,17 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     LocationManager locationManager;
 
+    public static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
+            0, 19, 256, ".png", new String[] {
+            "http://a.tile.openstreetmap.org/",
+            "http://b.tile.openstreetmap.org/",
+            "http://c.tile.openstreetmap.org/" },
+            "© OpenStreetMap contributors");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Configuration.getInstance().setUserAgentValue(getPackageName());
 
         super.onCreate(savedInstanceState);
 
@@ -118,7 +129,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         // Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         mMapView = findViewById(R.id.map);
-        mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+        mMapView.setTileSource(HTTP_MAPNIK);
         mMapView.setBuiltInZoomControls(false);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(15);
