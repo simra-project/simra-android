@@ -87,17 +87,11 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     ArrayList<Float> zList = new ArrayList<>();
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // For permission request
-
-    private final int LOCATION_ACCESS_CODE = 1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
 
-    String PROVIDER = LocationManager.GPS_PROVIDER;
 
     LocationManager locationManager;
 
