@@ -33,11 +33,20 @@ import android.view.*;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.cachemanager.CacheManager;
+import org.osmdroid.tileprovider.tilesource.HEREWeGoTileSource;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
+import org.osmdroid.tileprovider.tilesource.MapBoxTileSource;
+import org.osmdroid.tileprovider.tilesource.MapQuestTileSource;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
@@ -89,12 +98,21 @@ public class MainActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
 
-    String PROVIDER = LocationManager.GPS_PROVIDER;
-
     LocationManager locationManager;
+
+    Context ctx;
+
+    public static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
+            0, 19, 256, ".png", new String[] {
+            "http://a.tile.openstreetmap.org/",
+            "http://b.tile.openstreetmap.org/",
+            "http://c.tile.openstreetmap.org/" },
+            "© OpenStreetMap contributors");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Configuration.getInstance().setUserAgentValue(getPackageName());
 
         myCase = 1;
 
@@ -106,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         // Context, Config, ContentView
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        Context ctx = getApplicationContext();
+        ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         setContentView(R.layout.activity_main);
 
@@ -114,13 +132,22 @@ public class MainActivity extends AppCompatActivity {
         //Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         mMapView = findViewById(R.id.map);
-        mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+
+        mMapView.setTileSource(HTTP_MAPNIK);
+
+        /**final MapBoxTileSource tileSource = new MapBoxTileSource();
+        tileSource.retrieveAccessToken(ctx);
+        tileSource.retrieveMapBoxMapId(ctx);
+        mMapView.setTileSource(tileSource);*/
+
+        /**final ITileSource tileSource = new HEREWeGoTileSource(ctx);
+        mMapView.setTileSource(tileSource);*/
+
         mMapView.setBuiltInZoomControls(false);
         mMapView.setMultiTouchControls(true); // gesture zooming
 
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(15);
-
 
         // MyLocationNewOverlay constitutes an alternative to definition of  a custom resource
         // proxy (DefaultResourceProxyImpl is deprecated)
@@ -155,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
                 lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                cacheTiles(lastLocation.getLatitude(), lastLocation.getLongitude());
             } catch (SecurityException se) {
                 se.printStackTrace();
             }
@@ -215,6 +243,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Log.i(TAG,"On Create finished");
+
+    }
+
+    public void cacheTiles(double latitude, double longitude) {
+
+        CacheManager cacheManager = new CacheManager(mMapView);
+        BoundingBox boundingBox = new BoundingBox(latitude-0.5, longitude-0.5,
+                latitude+0.5, longitude+0.5);
+
+        cacheManager.downloadAreaAsync(MainActivity.this, boundingBox, 15, 15);
 
     }
 
@@ -305,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
-        setLocationMarker();
+        // setLocationMarker();
 
 
     }
