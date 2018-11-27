@@ -258,7 +258,6 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
     }
 
     public void saveRouteData() {
-        Gson gson = new Gson();
 
         String xString = xList.toString();
         create(this, "x_acceleratometer.csv", xString);

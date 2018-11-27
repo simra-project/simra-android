@@ -46,6 +46,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
@@ -62,24 +63,22 @@ import static java.security.AccessController.getContext;
 public class MainActivity extends AppCompatActivity {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Basic map stuff
+    // Map stuff, Overlays
 
     private MapView mMapView;
     private MapController mMapController;
     private Location lastLocation;
-
     private MyLocationNewOverlay mLocationOverlay;
+    private CompassOverlay mCompassOverlay;
+    private ScaleBarOverlay mScaleBarOverlay;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
 
     ImageButton menuButton;
     ImageButton helmetButton;
-
     RelativeLayout neuRoute;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For permission request
 
@@ -95,12 +94,15 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
 
     LocationManager locationManager;
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Context ctx;
+
+    // For overlay scaling (e.g., compass)
+    DisplayMetrics dm;
 
     public static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
             0, 19, 256, ".png", new String[] {
@@ -114,17 +116,23 @@ public class MainActivity extends AppCompatActivity {
 
         Configuration.getInstance().setUserAgentValue(getPackageName());
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Case-Code required for onRequestPermissionResult-Method which executes functionality
+        // based on activity lifecycle
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         myCase = 1;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Log.i(TAG,"On Create called");
 
         super.onCreate(savedInstanceState);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Context, Config, ContentView
+        // Set some params (context, DisplayMetrics, Config, ContentView)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         ctx = getApplicationContext();
+        dm = ctx.getResources().getDisplayMetrics();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         setContentView(R.layout.activity_main);
 
@@ -152,25 +160,33 @@ public class MainActivity extends AppCompatActivity {
         // MyLocationNewOverlay constitutes an alternative to definition of  a custom resource
         // proxy (DefaultResourceProxyImpl is deprecated)
         mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
+
+
         mLocationOverlay.enableFollowLocation();
         mLocationOverlay.enableMyLocation();
+
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
+        setLocationMarker();
 
         // Rotate map via gesture
         mMapView.getOverlays().add(new RotationGestureOverlay(mMapView));
 
-        //Enable & add compass
-        CompassOverlay compassOverlay = new CompassOverlay(this, mMapView);
-        compassOverlay.enableCompass();
-        mMapView.getOverlays().add(compassOverlay);
+        //Enable & add compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
+        //                       java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
+        this.mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
+                mMapView);
+        mCompassOverlay.enableCompass();
+        mMapView.getOverlays().add(mCompassOverlay);
 
-        // TODO soft-code compass location in relation to width & height
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int height = displaymetrics.heightPixels;
-        int width = displaymetrics.widthPixels;
+        // ScaleBar (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
+        //            java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
+        mScaleBarOverlay = new ScaleBarOverlay(mMapView);
+        mScaleBarOverlay.setCentred(true);
+        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
 
         // Coordinates currently only optimized for Theresa's device --> needs work
-        compassOverlay.setCompassCenter(325,130);
+        //compassOverlay.setCompassCenter(325,130);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -182,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
                 lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                cacheTiles(lastLocation.getLatitude(), lastLocation.getLongitude());
             } catch (SecurityException se) {
                 se.printStackTrace();
             }
@@ -196,11 +211,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (lastLocation != null)
             updateLoc(lastLocation);
-
-
-        // Call function for setting custom icons for current location person marker + navigation
-        // arrow
-        setLocationMarker();
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
@@ -246,17 +256,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void cacheTiles(double latitude, double longitude) {
+   /** public void cacheTiles() {
 
         CacheManager cacheManager = new CacheManager(mMapView);
-        BoundingBox boundingBox = new BoundingBox(latitude-0.5, longitude-0.5,
+        BoundingBox boundingBox = new BoundingBox(52.4344418, 13.2827911,
                 latitude+0.5, longitude+0.5);
 
         cacheManager.downloadAreaAsync(MainActivity.this, boundingBox, 15, 15);
 
-    }
+    }*/
 
     public void setLocationMarker() {
+
 
         // Set current location marker icon to custom icon
 
@@ -268,15 +279,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Set navigation arrow icon to custom icon
 
-        Drawable currentArrowDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
+        /**Drawable currentArrowDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
         Bitmap currentArrowIcon = null;
         if (currentArrowDraw != null) {
             currentArrowIcon = ((BitmapDrawable) currentArrowDraw).getBitmap();
         }
 
-        mLocationOverlay.setPersonIcon(currentIcon);
+        mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);*/
 
-        mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);
+         mLocationOverlay.setPersonIcon(currentIcon);
 
         mLocationOverlay.setDrawAccuracyEnabled(true);
 
@@ -296,11 +307,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void onResume(){
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Case-Code required for onRequestPermissionResult-Method which executes functionality
+        // based on activity lifecycle
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         myCase = 2;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Log.i(TAG,"On Resume called");
 
         super.onResume();
+
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
+        setLocationMarker();
+
+        //cacheTiles(lastLocation.getLatitude(), lastLocation.getLongitude());
 
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
@@ -309,25 +331,28 @@ public class MainActivity extends AppCompatActivity {
             } catch (SecurityException se) {
                 se.printStackTrace();
             }
-        } /**else {
-            PermissionHandler.askPermission(MainActivity.this);
-        }*/
+        }
 
         Log.i(TAG,"On Resume finished");
-
-        // Call function for setting custom icons for current location person marker + navigation
-        // arrow
-        setLocationMarker();
 
         }
 
     public void onPause(){
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Case-Code required for onRequestPermissionResult-Method which executes functionality
+        // based on activity lifecycle
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         myCase = 3;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Log.i(TAG,"On Pause called");
 
         super.onPause();
+
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
+        setLocationMarker();
 
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
@@ -335,16 +360,9 @@ public class MainActivity extends AppCompatActivity {
             } catch (SecurityException se) {
                 se.printStackTrace();
             }
-        } /** else {
-            PermissionHandler.askPermission(MainActivity.this);
-        }*/
+        }
 
         Log.i(TAG,"On Pause finished");
-
-        // Call function for setting custom icons for current location person marker + navigation
-        // arrow
-        // setLocationMarker();
-
 
     }
 
