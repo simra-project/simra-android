@@ -22,7 +22,7 @@
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
 
-        <meta-data android:name="MAPBOX_MAPID" android:value="mapbox.mapbox-streets-v7" />
+        <meta-data android:name="MAPBOX_MAPID" android:value="mapbox.mapbox-light-v9" />
         <meta-data android:name="MAPBOX_ACCESS_TOKEN" android:value="pk.eyJ1IjoibWVlcmthdG1lIiwiYSI6ImNqb3IzanczdjBhcmEzd285bGN3M2tmYzYifQ.dK_okt0sWZHXc5zwSE4RzQ"/>
 
         <meta-data android:name="HEREWEGO_MAPID" android:value="hybrid.day" />
