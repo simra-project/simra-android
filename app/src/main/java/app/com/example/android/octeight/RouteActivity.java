@@ -34,6 +34,7 @@ import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
@@ -130,7 +131,8 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         mMapView = findViewById(R.id.map);
         mMapView.setTileSource(HTTP_MAPNIK);
-        mMapView.setBuiltInZoomControls(false);
+        // Disable zoom buttons
+        mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(15);
         mMapView.setMultiTouchControls(true); // gesture zooming

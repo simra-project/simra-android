@@ -43,6 +43,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -139,10 +140,13 @@ public class MainActivity extends AppCompatActivity {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         mMapView = findViewById(R.id.map);
 
         mMapView.setTileSource(HTTP_MAPNIK);
 
+        //**************************************************************************************
+        // ALTERNATIVE MAP TILE PROVICERS
         /**final MapBoxTileSource tileSource = new MapBoxTileSource();
         tileSource.retrieveAccessToken(ctx);
         tileSource.retrieveMapBoxMapId(ctx);
@@ -150,9 +154,12 @@ public class MainActivity extends AppCompatActivity {
 
         /**final ITileSource tileSource = new HEREWeGoTileSource(ctx);
         mMapView.setTileSource(tileSource);*/
+        //**************************************************************************************
 
-        mMapView.setBuiltInZoomControls(false);
-        mMapView.setMultiTouchControls(true); // gesture zooming
+        // Disable zoom buttons
+        mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+        // Gesture zooming
+        mMapView.setMultiTouchControls(true);
 
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(15);
@@ -161,9 +168,18 @@ public class MainActivity extends AppCompatActivity {
         // proxy (DefaultResourceProxyImpl is deprecated)
         mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
 
-
-        mLocationOverlay.enableFollowLocation();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // MyLocationONewOverlayParameters.
+        // --> enableMyLocation: Enable receiving location updates from the provided
+        //                          IMyLocationProvider and show your location on the maps.
+        // --> enableFollowLocation: Enables "follow" functionality.
+        // --> setEnableAutoStop: if true, when the user pans the map, follow my location will
+        //                          automatically disable if false, when the user pans the map,
+        //                           the map will continue to follow current location
         mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableFollowLocation();
+        mLocationOverlay.setEnableAutoStop(true);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
@@ -287,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
 
         mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);*/
 
-         mLocationOverlay.setPersonIcon(currentIcon);
+        mLocationOverlay.setPersonIcon(currentIcon);
 
         mLocationOverlay.setDrawAccuracyEnabled(true);
 
@@ -298,6 +314,15 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
 
         super.onStart();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // MyLocationONewOverlayParameters.
+        // --> enableMyLocation: Enable receiving location updates from the provided
+        //                          IMyLocationProvider and show your location on the maps.
+        // --> enableFollowLocation: Enables "follow" functionality.
+        mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableFollowLocation();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
@@ -318,8 +343,16 @@ public class MainActivity extends AppCompatActivity {
 
         super.onResume();
 
-        // Call function for setting custom icons for current location person marker + navigation
-        // arrow
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // MyLocationONewOverlayParameters.
+        // --> enableMyLocation: Enable receiving location updates from the provided
+        //                          IMyLocationProvider and show your location on the maps.
+        // --> enableFollowLocation: Enables "follow" functionality.
+        mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableFollowLocation();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // Call function for setting custom icons for current location person marker
         setLocationMarker();
 
         //cacheTiles(lastLocation.getLatitude(), lastLocation.getLongitude());
@@ -349,6 +382,15 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG,"On Pause called");
 
         super.onPause();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // MyLocationONewOverlayParameters.
+        // --> enableMyLocation: Enable receiving location updates from the provided
+        //                          IMyLocationProvider and show your location on the maps.
+        // --> enableFollowLocation: Enables "follow" functionality.
+        mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableFollowLocation();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
