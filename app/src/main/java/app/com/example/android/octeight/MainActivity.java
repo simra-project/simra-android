@@ -77,8 +77,9 @@ public class MainActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
 
-    //ImageButton menuButton;
-    //ImageButton helmetButton;
+    ImageButton menuButton;
+    ImageButton helmetButton;
+    ImageButton centerMap;
     RelativeLayout neuRoute;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -161,6 +162,22 @@ public class MainActivity extends AppCompatActivity {
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
 
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // MyLocationONewOverlayParameters.
+        // --> enableMyLocation: Enable receiving location updates from the provided
+        //                          IMyLocationProvider and show your location on the maps.
+        // --> enableFollowLocation: Enables "follow" functionality.
+        // --> setEnableAutoStop: if true, when the user pans the map, follow my location will
+        //                          automatically disable if false, when the user pans the map,
+        //                           the map will continue to follow current location
+        mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableFollowLocation();
+        mLocationOverlay.setEnableAutoStop(true);
+
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
+        setLocationMarker();
+
         mRotationGestureOverlay = new RotationGestureOverlay(mMapView);
         mRotationGestureOverlay.setEnabled(true);
 
@@ -189,22 +206,6 @@ public class MainActivity extends AppCompatActivity {
         mMapView.getOverlays().add(this.mCompassOverlay);
         //mMapView.getOverlays().add(this.mScaleBarOverlay);
         mMapView.getOverlays().add(this.mRotationGestureOverlay);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // MyLocationONewOverlayParameters.
-        // --> enableMyLocation: Enable receiving location updates from the provided
-        //                          IMyLocationProvider and show your location on the maps.
-        // --> enableFollowLocation: Enables "follow" functionality.
-        // --> setEnableAutoStop: if true, when the user pans the map, follow my location will
-        //                          automatically disable if false, when the user pans the map,
-        //                           the map will continue to follow current location
-        mLocationOverlay.enableMyLocation();
-        mLocationOverlay.enableFollowLocation();
-        mLocationOverlay.setEnableAutoStop(true);
-
-        // Call function for setting custom icons for current location person marker + navigation
-        // arrow
-        setLocationMarker();
 
         mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
@@ -244,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
 
         // (1): Burger Menu
 
-        /**menuButton = findViewById(R.id.burger_menu);
+        menuButton = findViewById(R.id.burger_menu);
          menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -264,10 +265,24 @@ public class MainActivity extends AppCompatActivity {
         HelmetActivity.class);
         startActivity(launchActivityIntent);
         }
-        });*/
+        });
 
+        // (3): CenterMap
 
-        // (3): Neue Route
+        centerMap = findViewById(R.id.center_button);
+
+        centerMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "centerMap clicked ");
+                if (lastLocation != null) {
+                    GeoPoint myPosition = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
+                    mMapView.getController().animateTo(myPosition);
+                }
+            }
+        });
+
+        // (4): Neue Route
 
         neuRoute = findViewById(R.id.route_button);
         neuRoute.setOnClickListener(new View.OnClickListener() {
