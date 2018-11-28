@@ -29,8 +29,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    api 'org.osmdroid:osmdroid-android:6.0.2'
-    api 'org.osmdroid:osmdroid-wms:6.0.2'
-    api 'org.osmdroid:osmdroid-mapsforge:6.0.2'
-    api 'org.osmdroid:osmdroid-geopackage:6.0.2'
+    api 'org.osmdroid:osmdroid-android:6.0.3'
+    api 'org.osmdroid:osmdroid-wms:6.0.3'
+    api 'org.osmdroid:osmdroid-mapsforge:6.0.3'
+    api 'org.osmdroid:osmdroid-geopackage:6.0.3'
 }
