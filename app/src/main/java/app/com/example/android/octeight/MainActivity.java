@@ -34,6 +34,7 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -141,9 +142,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        mMapView = (MapView) findViewById(R.id.map);
+        mMapView = findViewById(R.id.map);
+
+        // Get Tiles from MAPNIK (DEFAULT_TILE_SOURCE = MAPNIK)
         mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-        mMapView.setBuiltInZoomControls(true);
+
+        // Disable zoom buttons
+        mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+
+        // Enable touch controls
+        mMapView.setMultiTouchControls(true);
+
+        // Set user agent for OSM maps. Gets banned if abused.
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+        
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(15);
         GeoPoint gPt = tuBerlin;
