@@ -53,6 +53,15 @@
     <org.osmdroid.views.MapView android:id="@+id/map"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
+
+    <ImageButton android:id="@+id/center_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/my_center"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="110dp"
+        android:layout_marginRight="15dp"
+        />
     
     <RelativeLayout android:id="@+id/route_button"
         android:layout_width="250dp"
@@ -62,7 +71,6 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"
         >
-
 
         <ImageView android:id="@+id/route_image"
             android:layout_width="65dp"
