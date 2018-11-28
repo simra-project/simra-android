@@ -72,12 +72,13 @@ public class MainActivity extends AppCompatActivity {
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
     private ScaleBarOverlay mScaleBarOverlay;
+    private RotationGestureOverlay mRotationGestureOverlay;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
 
-    ImageButton menuButton;
-    ImageButton helmetButton;
+    //ImageButton menuButton;
+    //ImageButton helmetButton;
     RelativeLayout neuRoute;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,12 +99,6 @@ public class MainActivity extends AppCompatActivity {
     // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
 
     LocationManager locationManager;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Context ctx;
-
-    // For overlay scaling (e.g., compass)
-    DisplayMetrics dm;
 
     public static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
             0, 19, 256, ".png", new String[] {
@@ -132,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
         // Set some params (context, DisplayMetrics, Config, ContentView)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        ctx = getApplicationContext();
-        dm = ctx.getResources().getDisplayMetrics();
+        final Context ctx = getApplicationContext();
+        final DisplayMetrics dm = ctx.getResources().getDisplayMetrics();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         setContentView(R.layout.activity_main);
 
@@ -146,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         mMapView.setTileSource(HTTP_MAPNIK);
 
         //**************************************************************************************
-        // ALTERNATIVE MAP TILE PROVICERS
+        // ALTERNATIVE MAP TILE PROVIDERS
         /**final MapBoxTileSource tileSource = new MapBoxTileSource();
         tileSource.retrieveAccessToken(ctx);
         tileSource.retrieveMapBoxMapId(ctx);
@@ -156,17 +151,44 @@ public class MainActivity extends AppCompatActivity {
         mMapView.setTileSource(tileSource);*/
         //**************************************************************************************
 
+        //Set compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
+        //                       java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
+        this.mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
+                mMapView);
+
+        // MyLocationNewOverlay constitutes an alternative to definition of  a custom resource
+        // proxy (DefaultResourceProxyImpl is deprecated)
+        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
+
+
+        mRotationGestureOverlay = new RotationGestureOverlay(mMapView);
+        mRotationGestureOverlay.setEnabled(true);
+
+        /**
+        // ScaleBar (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
+        //            java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
+        mScaleBarOverlay = new ScaleBarOverlay(mMapView);
+        mScaleBarOverlay.setCentred(true);
+        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
+         */
+
+        // self-explanatory
+        mMapController = (MapController) mMapView.getController();
+        mMapController.setZoom(15);
         // Disable zoom buttons
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         // Gesture zooming
         mMapView.setMultiTouchControls(true);
+        mMapView.setFlingEnabled(true);
 
-        mMapController = (MapController) mMapView.getController();
-        mMapController.setZoom(15);
+        // self-explanatory
+        mMapView.setTilesScaledToDpi(true);
 
-        // MyLocationNewOverlay constitutes an alternative to definition of  a custom resource
-        // proxy (DefaultResourceProxyImpl is deprecated)
-        mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
+        // Add overlays
+        mMapView.getOverlays().add(this.mLocationOverlay);
+        mMapView.getOverlays().add(this.mCompassOverlay);
+        //mMapView.getOverlays().add(this.mScaleBarOverlay);
+        mMapView.getOverlays().add(this.mRotationGestureOverlay);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // MyLocationONewOverlayParameters.
@@ -179,30 +201,19 @@ public class MainActivity extends AppCompatActivity {
         mLocationOverlay.enableMyLocation();
         mLocationOverlay.enableFollowLocation();
         mLocationOverlay.setEnableAutoStop(true);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
         setLocationMarker();
 
-        // Rotate map via gesture
-        mMapView.getOverlays().add(new RotationGestureOverlay(mMapView));
-
-        //Enable & add compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
-        //                       java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
-        this.mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
-                mMapView);
+        mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
-        mMapView.getOverlays().add(mCompassOverlay);
+        mRotationGestureOverlay.setEnabled(true);
 
-        // ScaleBar (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
-        //            java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
-        mScaleBarOverlay = new ScaleBarOverlay(mMapView);
-        mScaleBarOverlay.setCentred(true);
-        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Coordinates currently only optimized for Theresa's device --> needs work
-        //compassOverlay.setCompassCenter(325,130);
+        //mCompassOverlay.setCompassCenter(((dm.widthPixels/5)*2),((dm.heightPixels)/8)*5);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -233,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
 
         // (1): Burger Menu
 
-        menuButton = findViewById(R.id.burger_menu);
+        /**menuButton = findViewById(R.id.burger_menu);
          menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -253,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
         HelmetActivity.class);
         startActivity(launchActivityIntent);
         }
-        });
+        });*/
 
 
         // (3): Neue Route
