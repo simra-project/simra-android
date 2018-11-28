@@ -1,5 +1,6 @@
 package app.com.example.android.octeight;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private MapView mMapView;
     private MapController mMapController;
     private Location lastLocation;
-
+    private final int ZOOM_LEVEL = 19;
     private MyLocationNewOverlay mLocationOverlay;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         mMapView.setMultiTouchControls(true); // gesture zooming
 
         mMapController = (MapController) mMapView.getController();
-        mMapController.setZoom(15);
+        mMapController.setZoom(ZOOM_LEVEL);
 
 
         // MyLocationNewOverlay constitutes an alternative to definition of  a custom resource
@@ -118,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
         mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
         mLocationOverlay.enableFollowLocation();
         mLocationOverlay.enableMyLocation();
+        mMapController.animateTo(mLocationOverlay.getMyLocation());
+
 
         // Rotate map via gesture
         mMapView.getOverlays().add(new RotationGestureOverlay(mMapView));
@@ -163,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
-        setLocationMarker();
+        // setLocationMarker();
 
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -245,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
-        setLocationMarker();
+        // setLocationMarker();
 
     }
 
@@ -272,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
-        setLocationMarker();
+        // setLocationMarker();
         Log.i(TAG,"OnResume finished");
         }
 
@@ -298,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
-        setLocationMarker();
+        // setLocationMarker();
 
 
     }
