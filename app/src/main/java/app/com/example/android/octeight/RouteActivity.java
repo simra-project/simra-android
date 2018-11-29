@@ -79,7 +79,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
     // Logging
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    final String ROUTE_ACT = "RouteActiviy";
+    final String ROUTE_ACT = "RouteActivity";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Save sensor data
@@ -90,17 +90,11 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     ArrayList<Float> zList = new ArrayList<>();
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // For permission request
-
-    private final int LOCATION_ACCESS_CODE = 1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
 
-    String PROVIDER = LocationManager.GPS_PROVIDER;
 
     LocationManager locationManager;
 
@@ -243,12 +237,12 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     @Override
     public final void onSensorChanged(SensorEvent event) {
-        // The acceleratometer returns 3 values, one for each axis.
+        // The accelerometer returns 3 values, one for each axis.
         float x = event.values[0];
         float y = event.values[1];
         float z = event.values[2];
 
-        // Add the acceleratormeter data to the respective ArrayLists.
+        // Add the accelerometer data to the respective ArrayLists.
         xList.add(x);
 
         yList.add(y);
@@ -262,16 +256,16 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
     public void saveRouteData() {
 
         String xString = xList.toString();
-        create(this, "x_acceleratometer.csv", xString);
-        isFilePresent(this, "x_acceleratometer.csv");
+        create(this, "x_accelerometer.csv", xString);
+        isFilePresent(this, "x_accelerometer.csv");
 
         String yString = yList.toString();
-        create(this, "y_acceleratometer.csv", yString);
-        isFilePresent(this, "y_acceleratometer.csv");
+        create(this, "y_accelerometer.csv", yString);
+        isFilePresent(this, "y_accelerometer.csv");
 
         String zString = zList.toString();
-        create(this, "z_acceleratometer.csv", zString);
-        isFilePresent(this, "y_acceleratometer.csv");
+        create(this, "z_accelerometer.csv", zString);
+        isFilePresent(this, "y_accelerometer.csv");
 
     }
 
