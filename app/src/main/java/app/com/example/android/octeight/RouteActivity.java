@@ -1,6 +1,5 @@
 package app.com.example.android.octeight;
 
-<<<<<<< HEAD
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -106,10 +105,10 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
     LocationManager locationManager;
 
     public static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
-            0, 19, 256, ".png", new String[] {
+            0, 19, 256, ".png", new String[]{
             "http://a.tile.openstreetmap.org/",
             "http://b.tile.openstreetmap.org/",
-            "http://c.tile.openstreetmap.org/" },
+            "http://c.tile.openstreetmap.org/"},
             "© OpenStreetMap contributors");
 
     @Override
@@ -149,9 +148,9 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         setLocationMarker();
 
         /**Enable compass (currently probably hidden behind upper bar)
-        CompassOverlay compassOverlay = new CompassOverlay(this, mMapView);
-        compassOverlay.enableCompass();
-        mMapView.getOverlays().add(compassOverlay);*/
+         CompassOverlay compassOverlay = new CompassOverlay(this, mMapView);
+         compassOverlay.enableCompass();
+         mMapView.getOverlays().add(compassOverlay);*/
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Sensor-related configuration
@@ -169,14 +168,14 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         try {
-            if(PermissionHandler.permissionGrantCheck(this)) {
+            if (PermissionHandler.permissionGrantCheck(this)) {
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
                 lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             }
-         } catch (SecurityException se) {
+        } catch (SecurityException se) {
 
             se.printStackTrace();
 
@@ -184,7 +183,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
         try {
             updateLoc(lastLocation);
-        } catch(NullPointerException npe) {
+        } catch (NullPointerException npe) {
             npe.printStackTrace();
         }
 
@@ -276,10 +275,10 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     }
 
-    private boolean create(Context context, String fileName, String jsonString){
+    private boolean create(Context context, String fileName, String jsonString) {
 
         try {
-            FileOutputStream fos = openFileOutput(fileName,Context.MODE_PRIVATE);
+            FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
             if (jsonString != null) {
                 fos.write(jsonString.getBytes());
             }
@@ -310,7 +309,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     }
 
-    public void onResume(){
+    public void onResume() {
 
         super.onResume();
 
@@ -334,7 +333,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     }
 
-    public void onPause(){
+    public void onPause() {
 
         super.onPause();
 
@@ -357,7 +356,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     // Writes longitude & latitude values into text views
 
-    private void updateLoc(Location loc){
+    private void updateLoc(Location loc) {
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Update location: http://android-er.blogspot.com/2012/05/update-location-on-openstreetmap.html
@@ -368,7 +367,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
     }
 
     private LocationListener myLocationListener
-            = new LocationListener(){
+            = new LocationListener() {
 
         @Override
         public void onLocationChanged(Location location) {
@@ -395,17 +394,4 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         }
 
     };
-
-=======
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
-public class RouteActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_route);
-    }
->>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 }

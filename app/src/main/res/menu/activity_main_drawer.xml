@@ -17,9 +17,21 @@
             android:icon="@drawable/ic_content_paste_black_24dp"
             android:title="Feedback" />
         <item
+            android:id="@+id/nav_infoSimRa"
+            android:icon="@drawable/ic_nav_helmet"
+            android:title="SimRa Aktuelles" />
+        <item
+            android:id="@+id/nav_infoMCC"
+            android:icon="@drawable/ic_nav_mcc"
+            android:title="MCC Aktuelles" />
+        <item
             android:id="@+id/nav_setting"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="Settings" />
+        <item
+            android:id="@+id/nav_impressum"
+            android:icon="@drawable/ic_info_black_24dp"
+            android:title="Impressum" />
     </group>
 
 </menu>

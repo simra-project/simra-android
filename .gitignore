@@ -8,10 +8,7 @@
 /build
 /captures
 .externalNativeBuild
-<<<<<<< HEAD
-=======
 /.idea/caches/build_file_checksums.ser
 *.ser
 /.idea/misc.xml
 .idea/caches/build_file_checksums.ser
->>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
