@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-=======
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
->>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RouteActivity">
 
-<<<<<<< HEAD
     <org.osmdroid.views.MapView android:id="@+id/map"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
@@ -89,6 +84,3 @@
     </RelativeLayout>
 
 </RelativeLayout>
-=======
-</android.support.constraint.ConstraintLayout>
->>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
