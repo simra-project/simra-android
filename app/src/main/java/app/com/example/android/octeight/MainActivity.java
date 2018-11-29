@@ -13,29 +13,25 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
+
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-<<<<<<< HEAD
-=======
-import android.support.annotation.NonNull;
+
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
->>>>>>> master
+
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-<<<<<<< HEAD
-=======
+
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
->>>>>>> master
+
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -45,7 +41,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.osmdroid.config.Configuration;
-<<<<<<< HEAD
+
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -55,7 +51,7 @@ import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
-=======
+
 import org.osmdroid.tileprovider.cachemanager.CacheManager;
 import org.osmdroid.tileprovider.tilesource.HEREWeGoTileSource;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
@@ -72,15 +68,14 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.TilesOverlay;
->>>>>>> master
+
 import org.osmdroid.views.overlay.compass.CompassOverlay;
+import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-<<<<<<< HEAD
-public class MainActivity extends AppCompatActivity {
-=======
+
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 
 import java.text.SimpleDateFormat;
@@ -90,7 +85,7 @@ import java.util.LinkedList;
 import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener {
->>>>>>> master
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
@@ -98,10 +93,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     private MapView mMapView;
     private MapController mMapController;
     private Location lastLocation;
-<<<<<<< HEAD
+
     private final int ZOOM_LEVEL = 19;
-=======
->>>>>>> master
+
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
     private ScaleBarOverlay mScaleBarOverlay;
@@ -171,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         mMapView = findViewById(R.id.map);
-<<<<<<< HEAD
+
 
 
         mMapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -180,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
-=======
+
 
         mMapView.setTileSource(HTTP_MAPNIK);
 
@@ -190,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
          tileSource.retrieveAccessToken(ctx);
          tileSource.retrieveMapBoxMapId(ctx);
          mMapView.setTileSource(tileSource);*/
->>>>>>> master
+
 
         /**final ITileSource tileSource = new HEREWeGoTileSource(ctx);
          mMapView.setTileSource(tileSource);*/
@@ -215,10 +209,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //                          automatically disable if false, when the user pans the map,
         //                           the map will continue to follow current location
         mLocationOverlay.enableMyLocation();
-<<<<<<< HEAD
+
         mMapController.animateTo(mLocationOverlay.getMyLocation());
 
-=======
+
         mLocationOverlay.enableFollowLocation();
         mLocationOverlay.setEnableAutoStop(true);
 
@@ -236,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
          mScaleBarOverlay.setCentred(true);
          mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
          */
->>>>>>> master
+
 
         // self-explanatory
         mMapController = (MapController) mMapView.getController();
@@ -289,15 +283,12 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         if (lastLocation != null)
             updateLoc(lastLocation);
 
-<<<<<<< HEAD
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
         // setLocationMarker();
 
 
-=======
->>>>>>> master
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
 
@@ -356,20 +347,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     }
 
-<<<<<<< HEAD
+
     // Changes the default location marker and navigation arrow to a custom icon
-=======
-    /** public void cacheTiles() {
-
-     CacheManager cacheManager = new CacheManager(mMapView);
-     BoundingBox boundingBox = new BoundingBox(52.4344418, 13.2827911,
-     latitude+0.5, longitude+0.5);
-
-     cacheManager.downloadAreaAsync(MainActivity.this, boundingBox, 15, 15);
-
-     }*/
->>>>>>> master
-
     public void setLocationMarker() {
 
 
@@ -383,14 +362,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         // Set navigation arrow icon to custom icon
 
-<<<<<<< HEAD
-        Drawable currentArrowDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
-        Bitmap currentArrowIcon = null;
-        if (currentArrowDraw != null) {
-            currentArrowIcon = ((BitmapDrawable) currentArrowDraw).getBitmap();
-        }
-        mLocationOverlay.setPersonIcon(currentIcon);
-=======
+
         /**Drawable currentArrowDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
          Bitmap currentArrowIcon = null;
          if (currentArrowDraw != null) {
@@ -398,7 +370,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
          }
 
          mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);*/
->>>>>>> master
 
         mLocationOverlay.setPersonIcon(currentIcon);
 
@@ -462,18 +433,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 se.printStackTrace();
             }
         }
-
-
-
-<<<<<<< HEAD
-        // Call function for setting custom icons for current location person marker + navigation
-        // arrow
-        // setLocationMarker();
-        Log.i(TAG,"OnResume finished");
-        }
-=======
     }
->>>>>>> master
+
 
     public void onPause(){
 
@@ -511,14 +472,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         Log.i(TAG,"OnPause finished");
 
-<<<<<<< HEAD
-        // Call function for setting custom icons for current location person marker + navigation
-        // arrow
-        // setLocationMarker();
-
-
-=======
->>>>>>> master
     }
 
     @Override
