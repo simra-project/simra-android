@@ -8,6 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+<<<<<<< HEAD
+=======
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
@@ -40,4 +42,5 @@
         <item name="android:textStyle">italic</item>
     </style>
 
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 </resources>

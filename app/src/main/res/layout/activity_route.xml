@@ -1,9 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+=======
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RouteActivity">
 
+<<<<<<< HEAD
+    <org.osmdroid.views.MapView android:id="@+id/map"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <RelativeLayout android:id="@+id/upper_bar"
+        android:layout_width="match_parent"
+        android:layout_height="85dp"
+        android:layout_margin="10dp"
+        android:elevation="8dp"
+
+        android:background="@drawable/rounded_corners">
+
+        <TextView android:id="@+id/acc_dat"
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+
+            android:fontFamily="@font/assistant_extralight"
+            android:textColor="#FEFEFE"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            />
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="85dp"
+            android:background="@drawable/forward"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout android:id="@+id/stop_button"
+        android:layout_width="250dp"
+        android:layout_height="85dp"
+        android:background="@drawable/rounded_corners"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp"
+        >
+
+        <ImageView android:id="@+id/stop_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/stop"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="15dp"
+            />
+
+        <TextView android:id="@+id/stop_text"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="30dp"
+
+            android:fontFamily="@font/assistant_extralight"
+            android:text="Aufzeichnung \n stoppen"
+            android:textColor="#FEFEFE"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            />
+
+    </RelativeLayout>
+
+</RelativeLayout>
+=======
 </android.support.constraint.ConstraintLayout>
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
