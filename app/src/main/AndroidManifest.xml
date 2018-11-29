@@ -25,10 +25,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name=".MainActivity">
+
+
+        <meta-data android:name="MAPBOX_MAPID" android:value="mapbox.mapbox-light-v9" />
+        <meta-data android:name="MAPBOX_ACCESS_TOKEN" android:value="pk.eyJ1IjoibWVlcmthdG1lIiwiYSI6ImNqb3IzanczdjBhcmEzd285bGN3M2tmYzYifQ.dK_okt0sWZHXc5zwSE4RzQ"/>
+
+        <meta-data android:name="HEREWEGO_MAPID" android:value="hybrid.day" />
+        <meta-data android:name="HEREWEGO_APPID" android:value="t17LkxdBtMj55CyljUxT" />
+        <meta-data android:name="HEREWEGO_APPCODE" android:value="Dv1l6L3uczbBmhFasUc1Eg" />
+
+        <activity android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -37,10 +45,12 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
+        <activity android:name=".MainActivity"/>
         <activity android:name=".MenuActivity" />
         <activity android:name=".HelmetActivity" />
         <activity android:name=".RouteActivity" />
-        <activity android:name=".SaveActivity"></activity>
+        <activity android:name=".SaveActivity"/>
+        <activity android:name=".WebActivity"/>
     </application>
 
 </manifest>
