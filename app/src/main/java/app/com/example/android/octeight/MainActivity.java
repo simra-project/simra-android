@@ -394,7 +394,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
-        // setLocationMarker();
+        setLocationMarker();
 
     }
 
