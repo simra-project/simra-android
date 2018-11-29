@@ -41,8 +41,13 @@ public class PermissionHandler {
         final Activity helper = activity;
 
         if (!shouldShowRequestPermissionRationale(helper, Manifest.permission.ACCESS_FINE_LOCATION)) {
+<<<<<<< HEAD
             showMessageOKCancel("Um fortzufahren, erlaube im folgenden Fenster bitte den Zugriff auf" +
                             " Deine Standortdaten.",
+=======
+            showMessageOKCancel("Um die App verwenden zu können, erlaube bitte den Zugriff auf" +
+                            " Deinen Standort.",
+>>>>>>> master
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -65,6 +70,10 @@ public class PermissionHandler {
                 .setMessage(message)
                 .setCancelable(false)
                 .setPositiveButton("OK", okListener)
+<<<<<<< HEAD
+=======
+               // .setNegativeButton("", null)
+>>>>>>> master
                 .create()
                 .show();
     }

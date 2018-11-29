@@ -30,8 +30,11 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
@@ -95,8 +98,17 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     LocationManager locationManager;
 
+    public static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
+            0, 19, 256, ".png", new String[]{
+            "http://a.tile.openstreetmap.org/",
+            "http://b.tile.openstreetmap.org/",
+            "http://c.tile.openstreetmap.org/"},
+            "© OpenStreetMap contributors");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Configuration.getInstance().setUserAgentValue(getPackageName());
 
         super.onCreate(savedInstanceState);
 
@@ -112,8 +124,9 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         // Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         mMapView = findViewById(R.id.map);
-        mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-        mMapView.setBuiltInZoomControls(false);
+        mMapView.setTileSource(HTTP_MAPNIK);
+        // Disable zoom buttons
+        mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(15);
         mMapView.setMultiTouchControls(true); // gesture zooming
@@ -129,9 +142,9 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         setLocationMarker();
 
         /**Enable compass (currently probably hidden behind upper bar)
-        CompassOverlay compassOverlay = new CompassOverlay(this, mMapView);
-        compassOverlay.enableCompass();
-        mMapView.getOverlays().add(compassOverlay);*/
+         CompassOverlay compassOverlay = new CompassOverlay(this, mMapView);
+         compassOverlay.enableCompass();
+         mMapView.getOverlays().add(compassOverlay);*/
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Sensor-related configuration
@@ -149,14 +162,14 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         try {
-            if(PermissionHandler.permissionGrantCheck(this)) {
+            if (PermissionHandler.permissionGrantCheck(this)) {
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
                 lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             }
-         } catch (SecurityException se) {
+        } catch (SecurityException se) {
 
             se.printStackTrace();
 
@@ -164,7 +177,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
         try {
             updateLoc(lastLocation);
-        } catch(NullPointerException npe) {
+        } catch (NullPointerException npe) {
             npe.printStackTrace();
         }
 
@@ -241,7 +254,6 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
     }
 
     public void saveRouteData() {
-        Gson gson = new Gson();
 
         String xString = xList.toString();
         create(this, "x_accelerometer.csv", xString);
@@ -257,10 +269,10 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     }
 
-    private boolean create(Context context, String fileName, String jsonString){
+    private boolean create(Context context, String fileName, String jsonString) {
 
         try {
-            FileOutputStream fos = openFileOutput(fileName,Context.MODE_PRIVATE);
+            FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
             if (jsonString != null) {
                 fos.write(jsonString.getBytes());
             }
@@ -291,7 +303,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     }
 
-    public void onResume(){
+    public void onResume() {
 
         super.onResume();
 
@@ -315,7 +327,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     }
 
-    public void onPause(){
+    public void onPause() {
 
         super.onPause();
 
@@ -338,7 +350,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     // Writes longitude & latitude values into text views
 
-    private void updateLoc(Location loc){
+    private void updateLoc(Location loc) {
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Update location: http://android-er.blogspot.com/2012/05/update-location-on-openstreetmap.html
@@ -349,7 +361,7 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
     }
 
     private LocationListener myLocationListener
-            = new LocationListener(){
+            = new LocationListener() {
 
         @Override
         public void onLocationChanged(Location location) {
@@ -376,5 +388,4 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         }
 
     };
-
 }

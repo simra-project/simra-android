@@ -16,9 +16,24 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+<<<<<<< HEAD
+=======
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+>>>>>>> master
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+<<<<<<< HEAD
+=======
+import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+>>>>>>> master
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +45,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.osmdroid.config.Configuration;
+<<<<<<< HEAD
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -39,32 +55,66 @@ import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+=======
+import org.osmdroid.tileprovider.cachemanager.CacheManager;
+import org.osmdroid.tileprovider.tilesource.HEREWeGoTileSource;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
+import org.osmdroid.tileprovider.tilesource.MapBoxTileSource;
+import org.osmdroid.tileprovider.tilesource.MapQuestTileSource;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
+import org.osmdroid.util.BoundingBox;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
+import org.osmdroid.views.MapController;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
+import org.osmdroid.views.overlay.TilesOverlay;
+>>>>>>> master
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+<<<<<<< HEAD
 public class MainActivity extends AppCompatActivity {
+=======
+import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+import static java.security.AccessController.getContext;
+
+public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener {
+>>>>>>> master
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Basic map stuff
+    // Map stuff, Overlays
 
     private MapView mMapView;
     private MapController mMapController;
     private Location lastLocation;
+<<<<<<< HEAD
     private final int ZOOM_LEVEL = 19;
+=======
+>>>>>>> master
     private MyLocationNewOverlay mLocationOverlay;
+    private CompassOverlay mCompassOverlay;
+    private ScaleBarOverlay mScaleBarOverlay;
+    private RotationGestureOverlay mRotationGestureOverlay;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
 
     ImageButton menuButton;
     ImageButton helmetButton;
-
+    ImageButton centerMap;
     RelativeLayout neuRoute;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For permission request
 
@@ -80,24 +130,38 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity_LOG";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
 
     LocationManager locationManager;
 
+    public static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
+            0, 19, 256, ".png", new String[] {
+            "http://a.tile.openstreetmap.org/",
+            "http://b.tile.openstreetmap.org/",
+            "http://c.tile.openstreetmap.org/" },
+            "© OpenStreetMap contributors");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Case-Code required for onRequestPermissionResult-Method which executes functionality
+        // based on activity lifecycle
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         myCase = 1;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Log.i(TAG,"OnCreate called");
         super.onCreate(savedInstanceState);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Context, Config, ContentView
+        // Set some params (context, DisplayMetrics, Config, ContentView)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        Context ctx = getApplicationContext();
+        final Context ctx = getApplicationContext();
+        final DisplayMetrics dm = ctx.getResources().getDisplayMetrics();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
         setContentView(R.layout.activity_main);
@@ -105,7 +169,9 @@ public class MainActivity extends AppCompatActivity {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         mMapView = findViewById(R.id.map);
+<<<<<<< HEAD
 
 
         mMapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -114,32 +180,90 @@ public class MainActivity extends AppCompatActivity {
 
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
+=======
 
+        mMapView.setTileSource(HTTP_MAPNIK);
+
+        //**************************************************************************************
+        // ALTERNATIVE MAP TILE PROVIDERS
+        /**final MapBoxTileSource tileSource = new MapBoxTileSource();
+         tileSource.retrieveAccessToken(ctx);
+         tileSource.retrieveMapBoxMapId(ctx);
+         mMapView.setTileSource(tileSource);*/
+>>>>>>> master
+
+        /**final ITileSource tileSource = new HEREWeGoTileSource(ctx);
+         mMapView.setTileSource(tileSource);*/
+        //**************************************************************************************
+
+        //Set compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
+        //                       java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
+        this.mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
+                mMapView);
 
         // MyLocationNewOverlay constitutes an alternative to definition of  a custom resource
         // proxy (DefaultResourceProxyImpl is deprecated)
-        mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
-        mLocationOverlay.enableFollowLocation();
+        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
+
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // MyLocationONewOverlayParameters.
+        // --> enableMyLocation: Enable receiving location updates from the provided
+        //                          IMyLocationProvider and show your location on the maps.
+        // --> enableFollowLocation: Enables "follow" functionality.
+        // --> setEnableAutoStop: if true, when the user pans the map, follow my location will
+        //                          automatically disable if false, when the user pans the map,
+        //                           the map will continue to follow current location
         mLocationOverlay.enableMyLocation();
+<<<<<<< HEAD
         mMapController.animateTo(mLocationOverlay.getMyLocation());
 
+=======
+        mLocationOverlay.enableFollowLocation();
+        mLocationOverlay.setEnableAutoStop(true);
 
-        // Rotate map via gesture
-        mMapView.getOverlays().add(new RotationGestureOverlay(mMapView));
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
+        setLocationMarker();
 
-        //Enable & add compass
-        CompassOverlay compassOverlay = new CompassOverlay(this, mMapView);
-        compassOverlay.enableCompass();
-        mMapView.getOverlays().add(compassOverlay);
+        mRotationGestureOverlay = new RotationGestureOverlay(mMapView);
+        mRotationGestureOverlay.setEnabled(true);
 
-        // TODO soft-code compass location in relation to width & height
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int height = displaymetrics.heightPixels;
-        int width = displaymetrics.widthPixels;
+        /**
+         // ScaleBar (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
+         //            java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
+         mScaleBarOverlay = new ScaleBarOverlay(mMapView);
+         mScaleBarOverlay.setCentred(true);
+         mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
+         */
+>>>>>>> master
+
+        // self-explanatory
+        mMapController = (MapController) mMapView.getController();
+        mMapController.setZoom(15);
+        // Disable zoom buttons
+        mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+        // Gesture zooming
+        mMapView.setMultiTouchControls(true);
+        mMapView.setFlingEnabled(true);
+
+        // self-explanatory
+        mMapView.setTilesScaledToDpi(true);
+
+        // Add overlays
+        mMapView.getOverlays().add(this.mLocationOverlay);
+        mMapView.getOverlays().add(this.mCompassOverlay);
+        //mMapView.getOverlays().add(this.mScaleBarOverlay);
+        mMapView.getOverlays().add(this.mRotationGestureOverlay);
+
+        mLocationOverlay.setOptionsMenuEnabled(true);
+        mCompassOverlay.enableCompass();
+        mRotationGestureOverlay.setEnabled(true);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Coordinates currently only optimized for Theresa's device --> needs work
-        compassOverlay.setCompassCenter(325,130);
+        //mCompassOverlay.setCompassCenter(((dm.widthPixels/5)*2),((dm.heightPixels)/8)*5);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -165,41 +289,58 @@ public class MainActivity extends AppCompatActivity {
         if (lastLocation != null)
             updateLoc(lastLocation);
 
+<<<<<<< HEAD
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
         // setLocationMarker();
 
 
+=======
+>>>>>>> master
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
 
-        // (1): Burger Menu
+        // (1): Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
-        menuButton = findViewById(R.id.burger_menu);
-         menuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent launchActivityIntent = new Intent(MainActivity.this,
-                        MenuActivity.class);
-                startActivity(launchActivityIntent);
-            }
-        });
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
 
         // (2): Helmet
 
         helmetButton = findViewById(R.id.helmet_icon);
         helmetButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-        Intent launchActivityIntent = new Intent(MainActivity.this,
-        HelmetActivity.class);
-        startActivity(launchActivityIntent);
-        }
+            @Override
+            public void onClick(View v) {
+                Intent launchActivityIntent = new Intent(MainActivity.this,
+                        HelmetActivity.class);
+                startActivity(launchActivityIntent);
+            }
         });
 
+        // (3): CenterMap
 
-        // (3): Neue Route
+        centerMap = findViewById(R.id.center_button);
+
+        centerMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "centerMap clicked ");
+                if (lastLocation != null) {
+                    GeoPoint myPosition = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
+                    mMapView.getController().animateTo(myPosition);
+                }
+            }
+        });
+
+        // (4): Neue Route
 
         neuRoute = findViewById(R.id.route_button);
         neuRoute.setOnClickListener(new View.OnClickListener() {
@@ -215,9 +356,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+<<<<<<< HEAD
     // Changes the default location marker and navigation arrow to a custom icon
+=======
+    /** public void cacheTiles() {
+
+     CacheManager cacheManager = new CacheManager(mMapView);
+     BoundingBox boundingBox = new BoundingBox(52.4344418, 13.2827911,
+     latitude+0.5, longitude+0.5);
+
+     cacheManager.downloadAreaAsync(MainActivity.this, boundingBox, 15, 15);
+
+     }*/
+>>>>>>> master
 
     public void setLocationMarker() {
+
 
         // Set current location marker icon to custom icon
 
@@ -229,14 +383,24 @@ public class MainActivity extends AppCompatActivity {
 
         // Set navigation arrow icon to custom icon
 
+<<<<<<< HEAD
         Drawable currentArrowDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
         Bitmap currentArrowIcon = null;
         if (currentArrowDraw != null) {
             currentArrowIcon = ((BitmapDrawable) currentArrowDraw).getBitmap();
         }
         mLocationOverlay.setPersonIcon(currentIcon);
+=======
+        /**Drawable currentArrowDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
+         Bitmap currentArrowIcon = null;
+         if (currentArrowDraw != null) {
+         currentArrowIcon = ((BitmapDrawable) currentArrowDraw).getBitmap();
+         }
 
-        mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);
+         mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);*/
+>>>>>>> master
+
+        mLocationOverlay.setPersonIcon(currentIcon);
 
         mLocationOverlay.setDrawAccuracyEnabled(true);
 
@@ -248,6 +412,15 @@ public class MainActivity extends AppCompatActivity {
 
         super.onStart();
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // MyLocationONewOverlayParameters.
+        // --> enableMyLocation: Enable receiving location updates from the provided
+        //                          IMyLocationProvider and show your location on the maps.
+        // --> enableFollowLocation: Enables "follow" functionality.
+        mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableFollowLocation();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
         // setLocationMarker();
@@ -256,11 +429,30 @@ public class MainActivity extends AppCompatActivity {
 
     public void onResume(){
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Case-Code required for onRequestPermissionResult-Method which executes functionality
+        // based on activity lifecycle
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         myCase = 2;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Log.i(TAG,"OnResume called");
 
         super.onResume();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // MyLocationONewOverlayParameters.
+        // --> enableMyLocation: Enable receiving location updates from the provided
+        //                          IMyLocationProvider and show your location on the maps.
+        // --> enableFollowLocation: Enables "follow" functionality.
+        mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableFollowLocation();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // Call function for setting custom icons for current location person marker
+        setLocationMarker();
+
+        //cacheTiles(lastLocation.getLatitude(), lastLocation.getLongitude());
 
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
@@ -269,25 +461,45 @@ public class MainActivity extends AppCompatActivity {
             } catch (SecurityException se) {
                 se.printStackTrace();
             }
-        } /**else {
-            PermissionHandler.askPermission(MainActivity.this);
-        }*/
+        }
 
 
 
+<<<<<<< HEAD
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
         // setLocationMarker();
         Log.i(TAG,"OnResume finished");
         }
+=======
+    }
+>>>>>>> master
 
     public void onPause(){
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Case-Code required for onRequestPermissionResult-Method which executes functionality
+        // based on activity lifecycle
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         myCase = 3;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Log.i(TAG,"OnPause called");
 
         super.onPause();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // MyLocationONewOverlayParameters.
+        // --> enableMyLocation: Enable receiving location updates from the provided
+        //                          IMyLocationProvider and show your location on the maps.
+        // --> enableFollowLocation: Enables "follow" functionality.
+        mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableFollowLocation();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // Call function for setting custom icons for current location person marker + navigation
+        // arrow
+        setLocationMarker();
 
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
@@ -295,17 +507,18 @@ public class MainActivity extends AppCompatActivity {
             } catch (SecurityException se) {
                 se.printStackTrace();
             }
-        } /** else {
-            PermissionHandler.askPermission(MainActivity.this);
-        }*/
+        }
 
         Log.i(TAG,"OnPause finished");
 
+<<<<<<< HEAD
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
         // setLocationMarker();
 
 
+=======
+>>>>>>> master
     }
 
     @Override
@@ -392,5 +605,90 @@ public class MainActivity extends AppCompatActivity {
         }
 
     };
+
+    // Navigation Drawer
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+   /* @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+    // rechtes Toolbar icon
+   /* public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }*/
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_history) {
+            // Handle the camera action
+        } else if (id == R.id.nav_democraphic_data) {
+            // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("message/rfc822");
+            i.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.feedbackReceiver)});
+            i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.demoDataHeader));
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.demoDataMail));
+            try {
+                startActivity(Intent.createChooser(i, "Send Data..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (id == R.id.nav_feedback) {
+            // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("message/rfc822");
+            i.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.feedbackReceiver)});
+            i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackMail));
+            try {
+                startActivity(Intent.createChooser(i, "Send mail..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (id == R.id.nav_setting) {
+
+        } else if (id == R.id.nav_infoMCC){
+            Intent intent = new Intent (MainActivity.this, WebActivity.class);
+            startActivity(intent);
+            /*WebView webview = new WebView(this);
+            setContentView(webview);
+            webview.loadUrl(getString(R.string.mccPageDE));
+            /*Intent intent = new Intent (MainActivity.this, HelmetActivity.class);
+            startActivity(intent);*/
+        } else if (id == R.id.nav_infoSimRa){
+            Intent intent = new Intent (MainActivity.this, StartActivity.class);
+            startActivity(intent);
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
 
 }
