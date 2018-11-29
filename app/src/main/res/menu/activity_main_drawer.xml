@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view" >
+
+    <group>
+        <item
+            android:id="@+id/nav_history"
+            android:icon="@drawable/ic_list_black_24dp"
+            android:title="History" />
+        <item
+            android:id="@+id/nav_democraphic_data"
+            android:icon="@drawable/ic_face_black_24dp"
+            android:title="Demograpic Data" />
+        <item
+            android:id="@+id/nav_feedback"
+            android:icon="@drawable/ic_content_paste_black_24dp"
+            android:title="Feedback" />
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="Settings" />
+    </group>
+
+</menu>

@@ -3,4 +3,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+<<<<<<< HEAD
+=======
+    <color name="cursorAccent">#4db6ac</color>
+    <color name="controlNormal">#4db6ac</color>
+    <color name="controlActivated">#4db6ac</color>
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 </resources>

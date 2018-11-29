@@ -5,14 +5,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+<<<<<<< HEAD
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+=======
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+<<<<<<< HEAD
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
@@ -21,6 +25,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+=======
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +49,7 @@ import android.view.*;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+<<<<<<< HEAD
 import org.osmdroid.tileprovider.cachemanager.CacheManager;
 import org.osmdroid.tileprovider.tilesource.HEREWeGoTileSource;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
@@ -42,16 +59,22 @@ import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.BoundingBox;
+=======
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
+<<<<<<< HEAD
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
+=======
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -61,6 +84,7 @@ import java.util.LinkedList;
 
 import static java.security.AccessController.getContext;
 
+<<<<<<< HEAD
 public class MainActivity extends AppCompatActivity {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,11 +107,38 @@ public class MainActivity extends AppCompatActivity {
     RelativeLayout neuRoute;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=======
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Basic map stuff
+
+    private final GeoPoint tuBerlin =
+            new GeoPoint(52.51101, 13.3226082);
+    private MapView mMapView;
+    private MapController mMapController;
+    private Location lastLocation;
+    private boolean which = false;
+    private boolean whichTwo = false;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // CLICKABLES --> INTENTS
+
+    //ImageButton menuButton;
+    ImageButton helmetButton;
+
+    RelativeLayout neuRoute;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
     // For permission request
 
     private final int LOCATION_ACCESS_CODE = 1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<<<<<<< HEAD
     // Case-Switch for onPermissionResult
 
     private static int myCase;
@@ -107,10 +158,29 @@ public class MainActivity extends AppCompatActivity {
             "http://b.tile.openstreetmap.org/",
             "http://c.tile.openstreetmap.org/" },
             "© OpenStreetMap contributors");
+=======
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+
+    String PROVIDER = LocationManager.GPS_PROVIDER;
+    //String PROVIDER = LocationManager.NETWORK_PROVIDER;
+
+    LocationManager locationManager;
+    double myLatitude, myLongitude;
+
+    //TextView textLatitude, textLongitude, textLog;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Location updates: http://android-er.blogspot.com/2012/05/location-updates-from-gpsprovider-and.html
+    LinkedList<Location> locList;
+    final static int LOG_SIZE = 5;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+<<<<<<< HEAD
         Configuration.getInstance().setUserAgentValue(getPackageName());
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -219,10 +289,44 @@ public class MainActivity extends AppCompatActivity {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+=======
+        super.onCreate(savedInstanceState);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Context, Config, ContentView
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        Context ctx = getApplicationContext();
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        setContentView(R.layout.activity_main);
+
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Location updates: http://android-er.blogspot.com/2012/05/location-updates-from-gpsprovider-and.html
+
+        locList = new LinkedList<Location>();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
 
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // If user wants to record new route, check location tracking permission
+        // --> if permission hasn't been granted, request permission
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        getLocationWrapper();
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+
+<<<<<<< HEAD
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
                 lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -283,6 +387,56 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // (4): Neue Route
+=======
+        try {
+            updateLoc(lastLocation);
+        } catch(NullPointerException npe) {
+            npe.printStackTrace();
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //Map configuration
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        mMapView = findViewById(R.id.map);
+
+        // Get Tiles from MAPNIK (DEFAULT_TILE_SOURCE = MAPNIK)
+        mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+
+        // Disable zoom buttons
+        mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+
+        // Enable touch controls
+        mMapView.setMultiTouchControls(true);
+
+        // Set user agent for OSM maps. Gets banned if abused.
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+        
+        mMapController = (MapController) mMapView.getController();
+        mMapController.setZoom(15);
+        GeoPoint gPt = tuBerlin;
+        mMapController.setCenter(gPt);
+
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // CLICKABLES
+
+        // (1): Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        // (2): Start Neue Route
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 
         neuRoute = findViewById(R.id.route_button);
         neuRoute.setOnClickListener(new View.OnClickListener() {
@@ -294,6 +448,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+<<<<<<< HEAD
         Log.i(TAG,"On Create finished");
 
     }
@@ -432,6 +587,125 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(TAG,"On Pause finished");
 
+=======
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Wrapper for location functionality called in onCreate()
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private void getLocationWrapper() {
+
+        int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showMessageOKCancel(getString(R.string.permissionFineLocation), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                                        LOCATION_ACCESS_CODE);
+                            }
+                        });
+                return;
+            }
+            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_ACCESS_CODE);
+            return;
+
+        } /**Toast.makeText(MainActivity.this, "Du hast " +
+                    "die nötige Erlaubnis bereits erteilt (1).", Toast.LENGTH_SHORT).show();*/
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+        lastLocation = locationManager.getLastKnownLocation(PROVIDER);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        }
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Wrapper for location functionality called in onResume()
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private void updateLocationWrapper() {
+
+       int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showMessageOKCancel(getString(R.string.permissionFineLocation), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                                        LOCATION_ACCESS_CODE);
+                            }
+                        });
+                return;
+            }
+            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_ACCESS_CODE);
+            return;
+
+        }
+
+         /**Toast.makeText(MainActivity.this, "Du hast " +
+                "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();*/
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+        locationManager.requestLocationUpdates(PROVIDER, 0, 0, myLocationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Wrapper for location functionality called in onPause()
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private void removeUpdatesWrapper() {
+
+        int hasFineLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showMessageOKCancel(getString(R.string.permissionFineLocation), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                                        LOCATION_ACCESS_CODE);
+                            }
+                        });
+                return;
+            }
+            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_ACCESS_CODE);
+            return;
+
+        }
+
+        /**Toast.makeText(MainActivity.this, "Du hast " +
+                "die nötige Erlaubnis bereits erteilt. (2)", Toast.LENGTH_SHORT).show();*/
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+        locationManager.removeUpdates(myLocationListener);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(MainActivity.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
     }
 
     @Override
@@ -439,6 +713,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case LOCATION_ACCESS_CODE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+<<<<<<< HEAD
                     // Check where we're at: case 1 = onCreate, case 2 = onResume, case 3 = onPause
                     switch(myCase) {
                         case 1:
@@ -463,6 +738,19 @@ public class MainActivity extends AppCompatActivity {
                                 se.printStackTrace();
                             }
                             break;
+=======
+                    // Permission Granted
+
+                    // super non-elegant case distinction
+                    if (!which & !whichTwo) {
+                        getLocationWrapper();
+                        which = true;
+                    } else if (which & !whichTwo){
+                        updateLocationWrapper();
+                        whichTwo = true;
+                    } else {
+                        removeUpdatesWrapper();
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
                     }
 
                 } else {
@@ -477,15 +765,84 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+<<<<<<< HEAD
+=======
+    public void onResume(){
+        super.onResume();
+
+        updateLocationWrapper();
+
+        }
+
+    public void onPause(){
+
+        super.onPause();
+
+        removeUpdatesWrapper();
+
+    }
+
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
     // Writes longitude & latitude values into text views
 
     private void updateLoc(Location loc){
 
+<<<<<<< HEAD
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Update location: http://android-er.blogspot.com/2012/05/update-location-on-openstreetmap.html
         GeoPoint locGeoPoint = new GeoPoint(loc.getLatitude(), loc.getLongitude());
         mMapController.setCenter(locGeoPoint);
         mMapView.invalidate();
+=======
+        //textLatitude.setText("Latitude: " + loc.getLatitude());
+        //textLongitude.setText("Longitude: " + loc.getLongitude());
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Location updates: http://android-er.blogspot.com/2012/05/location-updates-from-gpsprovider-and.html
+
+        locList.add(loc);
+
+        //maintain the LOG_SIZE
+        if (locList.size() > LOG_SIZE) {
+            locList.remove();
+        }
+
+        String locLog = "\n LOCATION LOG (last " + LOG_SIZE + " logs)\n";
+        for(int i = 0; i < locList.size(); i++){
+            if(locList.get(i) != null){
+
+                String formatedTime = (new SimpleDateFormat("mm:ss:SSS")).format(locList.get(i).getTime());
+
+                locLog += "\n--- " + i + " ---\n"
+                        + "@ " + formatedTime + "\n"
+                        + "Latitude: " + locList.get(i).getLatitude() + "\n"
+                        + "Longitude: " + locList.get(i).getLongitude() + "\n"
+                        + "Time: " +  String.valueOf(locList.get(i).getTime()) + "\n"
+                        + "Provider: " + locList.get(i).getProvider() + "\n";
+
+                if(locList.get(i).hasAltitude()){
+                    locLog += "Altitude: " + locList.get(i).getAltitude() + "\n";
+                }
+
+                if(locList.get(i).hasAccuracy()){
+                    locLog += "Accuracy: " + locList.get(i).getAccuracy() + "(m)\n";
+                }
+
+                if(locList.get(i).hasBearing()){
+                    locLog += "Bearing: " + locList.get(i).getBearing() + "(m)\n";
+                }
+
+                if(locList.get(i).hasSpeed()){
+                    locLog += "Speed: " + locList.get(i).getSpeed() + "(m)\n";
+                }
+
+            }
+
+        }
+
+        //textLog.setText(locLog);
+
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     }
@@ -519,4 +876,83 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
+<<<<<<< HEAD
+=======
+    // Navigation Drawer
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+   /* @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    // rechtes Toolbar icon
+   /* public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }*/
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_history) {
+            // Handle the camera action
+        } else if (id == R.id.nav_democraphic_data) {
+            // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("message/rfc822");
+            i.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.feedbackReceiver)});
+            i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.demoDataHeader));
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.demoDataMail));
+            try {
+                startActivity(Intent.createChooser(i, "Send Data..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (id == R.id.nav_feedback) {
+            // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("message/rfc822");
+            i.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.feedbackReceiver)});
+            i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackMail));
+            try {
+                startActivity(Intent.createChooser(i, "Send mail..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (id == R.id.nav_setting) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 }
