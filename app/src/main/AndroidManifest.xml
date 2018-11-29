@@ -21,6 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+<<<<<<< HEAD
 
         <meta-data android:name="MAPBOX_MAPID" android:value="mapbox.mapbox-light-v9" />
         <meta-data android:name="MAPBOX_ACCESS_TOKEN" android:value="pk.eyJ1IjoibWVlcmthdG1lIiwiYSI6ImNqb3IzanczdjBhcmEzd285bGN3M2tmYzYifQ.dK_okt0sWZHXc5zwSE4RzQ"/>
@@ -45,6 +46,22 @@
         <activity android:name=".HelmetActivity" />
         <activity android:name=".RouteActivity" />
         <activity android:name=".SaveActivity"></activity>
+=======
+        <activity android:name=".StartActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
+        <meta-data
+        android:name="preloaded_fonts"
+        android:resource="@array/preloaded_fonts" />
+        <activity android:name=".MainActivity"/>
+        <activity android:name=".MenuActivity" />
+        <activity android:name=".HelmetActivity" />
+        <activity android:name=".RouteActivity" />
+
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
     </application>
 
 </manifest>

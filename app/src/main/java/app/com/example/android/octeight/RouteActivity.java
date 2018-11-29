@@ -1,5 +1,6 @@
 package app.com.example.android.octeight;
 
+<<<<<<< HEAD
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -395,4 +396,16 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
 
     };
 
+=======
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+
+public class RouteActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_route);
+    }
+>>>>>>> 2fa3540a022f2370b17f27566dea5db54031cc47
 }
