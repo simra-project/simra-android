@@ -1,15 +1,10 @@
 package app.com.example.android.octeight;
 
-import android.app.Activity;
-import android.app.Dialog;
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,55 +14,32 @@ import android.preference.PreferenceManager;
 
 import android.support.design.widget.NavigationView;
 
-import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.osmdroid.config.Configuration;
 
-import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
-
-import org.osmdroid.tileprovider.cachemanager.CacheManager;
-import org.osmdroid.tileprovider.tilesource.HEREWeGoTileSource;
-import org.osmdroid.tileprovider.tilesource.ITileSource;
-import org.osmdroid.tileprovider.tilesource.MapBoxTileSource;
-import org.osmdroid.tileprovider.tilesource.MapQuestTileSource;
-import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.tileprovider.tilesource.XYTileSource;
-import org.osmdroid.util.BoundingBox;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.CustomZoomButtonsController;
-import org.osmdroid.views.MapController;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.ScaleBarOverlay;
-import org.osmdroid.views.overlay.TilesOverlay;
 
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
@@ -78,13 +50,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-import static java.security.AccessController.getContext;
-
-public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener {
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,22 +58,21 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     private MapView mMapView;
     private MapController mMapController;
-    private Location lastLocation;
+    private Location currentLocation;
 
     private final int ZOOM_LEVEL = 19;
 
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
-    private ScaleBarOverlay mScaleBarOverlay;
     private RotationGestureOverlay mRotationGestureOverlay;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
 
-    ImageButton menuButton;
     ImageButton helmetButton;
     ImageButton centerMap;
     RelativeLayout neuRoute;
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For permission request
@@ -118,6 +83,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     // Case-Switch for onPermissionResult
 
     private static int myCase;
+
+    //
+    private Context ctx;
 
     // Log tag:
 
@@ -138,8 +106,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Configuration.getInstance().setUserAgentValue(getPackageName());
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Case-Code required for onRequestPermissionResult-Method which executes functionality
         // based on activity lifecycle
@@ -150,12 +116,38 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         Log.i(TAG,"OnCreate called");
         super.onCreate(savedInstanceState);
 
+        // set up location manager to get location updates
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Check whether FINE_LOCATION permission is not granted
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
+            // in an AlertDialog and request access to FINE_LOCATION
+
+            // The message to be shown in the AlertDialog
+            String rationaleMessage = "Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen" +
+                    "können und deine Fahrt zu speichern.";
+
+            // The OK-Button fires a requestPermissions
+            DialogInterface.OnClickListener rationaleOnClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_ACCESS_CODE);
+                }
+            };
+            showMessageOK(rationaleMessage, rationaleOnClickListener);
+
+        }
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Set some params (context, DisplayMetrics, Config, ContentView)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        final Context ctx = getApplicationContext();
-        final DisplayMetrics dm = ctx.getResources().getDisplayMetrics();
+        ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
         setContentView(R.layout.activity_main);
@@ -165,8 +157,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         mMapView = findViewById(R.id.map);
-
-
 
         mMapView.setTileSource(TileSourceFactory.MAPNIK);
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
@@ -214,11 +204,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
 
         mLocationOverlay.enableFollowLocation();
-        mLocationOverlay.setEnableAutoStop(true);
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
-        setLocationMarker();
+        //setLocationMarker();
 
         mRotationGestureOverlay = new RotationGestureOverlay(mMapView);
         mRotationGestureOverlay.setEnabled(true);
@@ -254,53 +243,54 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mCompassOverlay.enableCompass();
         mRotationGestureOverlay.setEnabled(true);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        // Coordinates currently only optimized for Theresa's device --> needs work
-        //mCompassOverlay.setCompassCenter(((dm.widthPixels/5)*2),((dm.heightPixels)/8)*5);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+            // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
+            // in an AlertDialog and request access to FINE_LOCATION
 
-        if(PermissionHandler.permissionGrantCheck(this)) {
-            try {
-                lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            } catch (SecurityException se) {
-                se.printStackTrace();
-            }
-        } else {
-            PermissionHandler.askPermission(MainActivity.this);
+            // The message to be shown in the AlertDialog
+            String rationaleMessage = "Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen" +
+                    "können und deine Fahrt zu speichern.";
+
+            // The OK-Button fires a requestPermissions
+            DialogInterface.OnClickListener rationaleOnClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_ACCESS_CODE);
+                }
+            };
+            showMessageOK(rationaleMessage, rationaleOnClickListener);
+
+
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+        /*
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
 
-        if (lastLocation != null)
-            updateLoc(lastLocation);
-
-
-        // Call function for setting custom icons for current location person marker + navigation
-        // arrow
-        // setLocationMarker();
+        if (currentLocation != null)
+            updateLoc(currentLocation);
+        */
 
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
 
         // (1): Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
 
@@ -324,8 +314,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "centerMap clicked ");
-                if (lastLocation != null) {
-                    GeoPoint myPosition = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
+                if (currentLocation != null) {
+                    GeoPoint myPosition = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
                     mMapView.getController().animateTo(myPosition);
                 }
             }
@@ -347,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     }
 
-
+    /*
     // Changes the default location marker and navigation arrow to a custom icon
     public void setLocationMarker() {
 
@@ -363,14 +353,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // Set navigation arrow icon to custom icon
 
 
-        /**Drawable currentArrowDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
-         Bitmap currentArrowIcon = null;
-         if (currentArrowDraw != null) {
-         currentArrowIcon = ((BitmapDrawable) currentArrowDraw).getBitmap();
-         }
-
-         mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);*/
-
         mLocationOverlay.setPersonIcon(currentIcon);
 
         mLocationOverlay.setDrawAccuracyEnabled(true);
@@ -378,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mMapView.getOverlays().add(mLocationOverlay);
 
     }
-
+    */
     public void onStart() {
 
         super.onStart();
@@ -394,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
-        setLocationMarker();
+        //setLocationMarker();
 
     }
 
@@ -421,9 +403,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Call function for setting custom icons for current location person marker
-        setLocationMarker();
+        //setLocationMarker();
 
-        //cacheTiles(lastLocation.getLatitude(), lastLocation.getLongitude());
+        //cacheTiles(currentLocation.getLatitude(), currentLocation.getLongitude());
 
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
@@ -460,7 +442,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         // Call function for setting custom icons for current location person marker + navigation
         // arrow
-        setLocationMarker();
+        //setLocationMarker();
 
         if(PermissionHandler.permissionGrantCheck(this)) {
             try {
@@ -473,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         Log.i(TAG,"OnPause finished");
 
     }
-
+/*
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
@@ -483,7 +465,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                     switch(myCase) {
                         case 1:
                             try {
-                                lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                                currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                             } catch (SecurityException se) {
                                 se.printStackTrace();
                             }
@@ -529,14 +511,14 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     }
-
+*/
     private LocationListener myLocationListener
             = new LocationListener(){
 
         @Override
         public void onLocationChanged(Location location) {
             // TODO Auto-generated method stub
-            updateLoc(location);
+            //updateLoc(location);
         }
 
         @Override
@@ -563,7 +545,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -638,10 +620,39 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             startActivity(intent);
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
 
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    // Create an AlertDialog with an OK Button displaying a message
+    private void showMessageOK(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(MainActivity.this)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("OK", okListener)
+                .create()
+                .show();
+    }
 }
