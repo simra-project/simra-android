@@ -6,6 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,6 +24,7 @@ import android.support.design.widget.NavigationView;
 
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -30,6 +38,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.osmdroid.config.Configuration;
@@ -50,7 +59,13 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 
-public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener {
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener, SensorEventListener {
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,6 +73,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     private MapView mMapView;
     private MapController mMapController;
+    private Location lastLocation;
+    private Location currentLocation;
+
     private final int ZOOM_LEVEL = 19;
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
@@ -70,12 +88,22 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             "http://c.tile.openstreetmap.org/" },
             "© OpenStreetMap contributors");
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Sensor stuff
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private SensorManager mSensorManager;
+
+    private Sensor myAcc;
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
 
     private ImageButton helmetButton;
     private ImageButton centerMap;
-    private RelativeLayout neuRoute;
+    private RelativeLayout startBtn;
+    private RelativeLayout stopBtn;
+
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,6 +122,16 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Boolean routing = false;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Save sensor data
+
+    ArrayList<Float> xList = new ArrayList<>();
+
+    ArrayList<Float> yList = new ArrayList<>();
+
+    ArrayList<Float> zList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -248,15 +286,28 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             }
         });
 
-        // (4): Neue Route
+        // (4): Neue Route / Start Button
 
-        neuRoute = findViewById(R.id.route_button);
-        neuRoute.setOnClickListener(new View.OnClickListener() {
+        startBtn = findViewById(R.id.start_button);
+        stopBtn = findViewById(R.id.stop_button);
+        startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent launchActivityIntent = new Intent(MainActivity.this,
-                        RouteActivity.class);
-                startActivity(launchActivityIntent);
+                stopBtn.setVisibility(View.VISIBLE);
+                startBtn.setVisibility(View.INVISIBLE);
+                routing =true;
+                routeFunctionality();
+            }
+        });
+
+        // (5): Aufzeichnung stoppen / Stop Button
+
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startBtn.setVisibility(View.VISIBLE);
+                stopBtn.setVisibility(View.INVISIBLE);
+                routing =false;
             }
         });
 
@@ -267,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     public void onResume(){
 
@@ -280,16 +332,11 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().load(this, prefs);
 
-        try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-            // locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        } catch ( SecurityException se ) {
-            Log.d(TAG, "onStart() permission not granted yet");
-        }
 
         // Refresh the osmdroid configuration on resuming.
         mMapView.onResume(); //needed for compass and icons
 
+        if (routing) mSensorManager.registerListener(this, myAcc, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -307,8 +354,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().save(this, prefs);
 
-        // Refresh the osmdroid configuration on pausing.
-        mMapView.onPause(); //needed for compass and icons
+            // Refresh the osmdroid configuration on pausing.
+            mMapView.onPause(); //needed for compass and icons
 
         Log.i(TAG,"OnPause finished");
     }
@@ -395,6 +442,191 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 .create()
                 .show();
     }
+
+    private void routeFunctionality (){
+
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+
+        // MyLocationNewOverlay constitutes an alternative to definition of  a custom resource
+        // proxy (DefaultResourceProxyImpl is deprecated)
+        // mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
+        mLocationOverlay.enableFollowLocation();
+        mLocationOverlay.enableMyLocation();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Sensor-related configuration
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        myAcc = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        // accDat = findViewById(R.id.acc_dat);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        try {
+            if (PermissionHandler.permissionGrantCheck(this)) {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
+                lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            }
+        } catch (SecurityException se) {
+
+            se.printStackTrace();
+
+        }
+
+        try {
+            updateLoc(lastLocation);
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+        }
+
+
+    }
+
+    public void setLocationMarker() {
+
+        // Set current location marker icon to custom icon
+
+        Drawable currentDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
+        Bitmap currentIcon = null;
+        if (currentDraw != null) {
+            currentIcon = ((BitmapDrawable) currentDraw).getBitmap();
+        }
+
+        // Set navigation arrow icon to custom icon
+
+        Drawable currentArrowDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
+        Bitmap currentArrowIcon = null;
+        if (currentArrowDraw != null) {
+            currentArrowIcon = ((BitmapDrawable) currentArrowDraw).getBitmap();
+        }
+
+        mLocationOverlay.setPersonIcon(currentIcon);
+
+        mLocationOverlay.setDirectionArrow(currentIcon, currentArrowIcon);
+
+        mLocationOverlay.setDrawAccuracyEnabled(true);
+
+        mMapView.getOverlays().add(mLocationOverlay);
+
+    }
+
+
+    public final void onSensorChanged(SensorEvent event) {
+        // The accelerometer returns 3 values, one for each axis.
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
+
+        // Add the accelerometer data to the respective ArrayLists.
+        xList.add(x);
+
+        yList.add(y);
+
+        zList.add(z);
+
+        // Show the values on screen (for demonstration purposes only)
+        // accDat.setText("x: " + x + "\ny: " + y + "\nz: " + z);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    public void saveRouteData() {
+
+        String xString = xList.toString();
+        create(this, "x_accelerometer.csv", xString);
+        isFilePresent(this, "x_accelerometer.csv");
+
+        String yString = yList.toString();
+        create(this, "y_accelerometer.csv", yString);
+        isFilePresent(this, "y_accelerometer.csv");
+
+        String zString = zList.toString();
+        create(this, "z_accelerometer.csv", zString);
+        isFilePresent(this, "y_accelerometer.csv");
+
+    }
+
+    private boolean create(Context context, String fileName, String jsonString) {
+
+        try {
+            FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+            if (jsonString != null) {
+                fos.write(jsonString.getBytes());
+            }
+            fos.close();
+            return true;
+        } catch (FileNotFoundException fileNotFound) {
+            return false;
+        } catch (IOException ioException) {
+            return false;
+        }
+
+    }
+
+    public boolean isFilePresent(Context context, String fileName) {
+        String path = context.getFilesDir().getAbsolutePath() + "/" + fileName;
+        File file = new File(path);
+        Log.i(ROUTE_ACT, path);
+        return file.exists();
+    }
+
+
+
+
+
+    // Writes longitude & latitude values into text views
+
+    private void updateLoc(Location loc) {
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Update location: http://android-er.blogspot.com/2012/05/update-location-on-openstreetmap.html
+        GeoPoint locGeoPoint = new GeoPoint(loc.getLatitude(), loc.getLongitude());
+        mMapController.setCenter(locGeoPoint);
+        mMapView.invalidate();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    }
+
+    private LocationListener myLocationListener
+            = new LocationListener() {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            // TODO Auto-generated method stub
+            updateLoc(location);
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // TODO Auto-generated method stub
+
+        }
+
+    };
 
     @Override
     public void onLocationChanged(Location location) { }
