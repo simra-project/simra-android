@@ -293,10 +293,15 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopBtn.setVisibility(View.VISIBLE);
+               /* stopBtn.setVisibility(View.VISIBLE);
                 startBtn.setVisibility(View.INVISIBLE);
-                routing =true;
-                routeFunctionality();
+                routing = true;
+                routeFunctionality(); */
+
+               Intent intent = new Intent (MainActivity.this, RouteActivity.class);
+               startActivity(intent);
+               // finish() to prevent the User from not saving the Data
+               finish();
             }
         });
 
@@ -579,12 +584,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     public boolean isFilePresent(Context context, String fileName) {
         String path = context.getFilesDir().getAbsolutePath() + "/" + fileName;
         File file = new File(path);
-        Log.i(ROUTE_ACT, path);
+        Log.i(TAG, path);
         return file.exists();
     }
-
-
-
 
 
     // Writes longitude & latitude values into text views
