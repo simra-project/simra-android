@@ -59,20 +59,24 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     private MapView mMapView;
     private MapController mMapController;
-    private Location currentLocation;
-
     private final int ZOOM_LEVEL = 19;
-
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
     private RotationGestureOverlay mRotationGestureOverlay;
+    private LocationManager locationManager;
+    private static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
+            0, 19, 256, ".png", new String[] {
+            "http://a.tile.openstreetmap.org/",
+            "http://b.tile.openstreetmap.org/",
+            "http://c.tile.openstreetmap.org/" },
+            "© OpenStreetMap contributors");
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
 
-    ImageButton helmetButton;
-    ImageButton centerMap;
-    RelativeLayout neuRoute;
+    private ImageButton helmetButton;
+    private ImageButton centerMap;
+    private RelativeLayout neuRoute;
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,38 +85,19 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     private final int LOCATION_ACCESS_CODE = 1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Case-Switch for onPermissionResult
-
-    private static int myCase;
-
-    //
+    // Context of application environment
     private Context ctx;
 
-    // Log tag:
-
+    // Log tag
     private static final String TAG = "MainActivity_LOG";
 
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-
-    LocationManager locationManager;
-
-    public static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
-            0, 19, 256, ".png", new String[] {
-            "http://a.tile.openstreetmap.org/",
-            "http://b.tile.openstreetmap.org/",
-            "http://c.tile.openstreetmap.org/" },
-            "© OpenStreetMap contributors");
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Case-Code required for onRequestPermissionResult-Method which executes functionality
-        // based on activity lifecycle
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        myCase = 1;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Log.i(TAG,"OnCreate called");
         super.onCreate(savedInstanceState);
@@ -120,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // set up location manager to get location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Check whether FINE_LOCATION permission is not granted
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -158,17 +142,12 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         mMapView = findViewById(R.id.map);
-
-        mMapView.setTileSource(TileSourceFactory.MAPNIK);
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mMapView.setMultiTouchControls(true); // gesture zooming
         mMapView.setFlingEnabled(true);
-
+        mMapView.setTileSource(HTTP_MAPNIK);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
-
-
-        mMapView.setTileSource(HTTP_MAPNIK);
 
         //**************************************************************************************
         // ALTERNATIVE MAP TILE PROVIDERS
@@ -187,8 +166,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         this.mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
                 mMapView);
 
-        // MyLocationNewOverlay constitutes an alternative to definition of  a custom resource
-        // proxy (DefaultResourceProxyImpl is deprecated)
+        // Sets the icon to device location.
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
 
 
@@ -202,58 +180,35 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //                           the map will continue to follow current location
         mLocationOverlay.enableMyLocation();
 
+
+        // move map to the last known location
         try {
             mMapController.animateTo(new GeoPoint((locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()),
                     (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude())));
         } catch (RuntimeException re) {
-
+            Log.d(TAG, re.getMessage());
         }
 
+        // move map to current location
         mMapController.animateTo(mLocationOverlay.getMyLocation());
 
-
+        // the map will follow the user until the user scrolls in the UI
         mLocationOverlay.enableFollowLocation();
 
-        // Call function for setting custom icons for current location person marker + navigation
-        // arrow
-        //setLocationMarker();
-
+        // enables map rotation with gestures
         mRotationGestureOverlay = new RotationGestureOverlay(mMapView);
         mRotationGestureOverlay.setEnabled(true);
 
-        /**
-         // ScaleBar (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
-         //            java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
-         mScaleBarOverlay = new ScaleBarOverlay(mMapView);
-         mScaleBarOverlay.setCentred(true);
-         mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
-         */
-
-
-
-        // self-explanatory
+        // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
 
         // Add overlays
         mMapView.getOverlays().add(this.mLocationOverlay);
         mMapView.getOverlays().add(this.mCompassOverlay);
-        //mMapView.getOverlays().add(this.mScaleBarOverlay);
         mMapView.getOverlays().add(this.mRotationGestureOverlay);
 
         mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
-        mRotationGestureOverlay.setEnabled(true);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-        /*
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Obtaining location: http://android-er.blogspot.com/2012/05/obtaining-user-location.html
-
-        if (currentLocation != null)
-            updateLoc(currentLocation);
-        */
-
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
@@ -291,12 +246,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             public void onClick(View v) {
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
-                /*
-                if (currentLocation != null) {
-                    GeoPoint myPosition = new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
-                    mMapView.getController().animateTo(myPosition);
-                }
-                */
             }
         });
 
@@ -316,79 +265,21 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     }
 
-    /*
-    // Changes the default location marker and navigation arrow to a custom icon
-    public void setLocationMarker() {
-
-
-        // Set current location marker icon to custom icon
-
-        Drawable currentDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.bicycle5, null);
-        Bitmap currentIcon = null;
-        if (currentDraw != null) {
-            currentIcon = ((BitmapDrawable) currentDraw).getBitmap();
-        }
-
-        // Set navigation arrow icon to custom icon
-
-
-        mLocationOverlay.setPersonIcon(currentIcon);
-
-        mLocationOverlay.setDrawAccuracyEnabled(true);
-
-        mMapView.getOverlays().add(mLocationOverlay);
-
-    }
-    */
-    public void onStart() {
-
-        super.onStart();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // MyLocationONewOverlayParameters.
-        // --> enableMyLocation: Enable receiving location updates from the provided
-        //                          IMyLocationProvider and show your location on the maps.
-        // --> enableFollowLocation: Enables "follow" functionality.
-        // mLocationOverlay.enableMyLocation();
-        // mLocationOverlay.enableFollowLocation();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        // Call function for setting custom icons for current location person marker + navigation
-        // arrow
-        //setLocationMarker();
-
-    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public void onResume(){
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Case-Code required for onRequestPermissionResult-Method which executes functionality
-        // based on activity lifecycle
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        myCase = 2;
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Log.i(TAG,"OnResume called");
 
         super.onResume();
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // MyLocationONewOverlayParameters.
-        // --> enableMyLocation: Enable receiving location updates from the provided
-        //                          IMyLocationProvider and show your location on the maps.
-        // --> enableFollowLocation: Enables "follow" functionality.
-        // mLocationOverlay.enableMyLocation();
-        // mLocationOverlay.enableFollowLocation();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         // Load Configuration with changes from onCreate
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().load(this, prefs);
-
-        // Call function for setting custom icons for current location person marker
-        //setLocationMarker();
-
-        //cacheTiles(currentLocation.getLatitude(), currentLocation.getLongitude());
 
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
@@ -402,28 +293,16 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     public void onPause(){
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Case-Code required for onRequestPermissionResult-Method which executes functionality
-        // based on activity lifecycle
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        myCase = 3;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Log.i(TAG,"OnPause called");
 
         super.onPause();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // MyLocationONewOverlayParameters.
-        // --> enableMyLocation: Enable receiving location updates from the provided
-        //                          IMyLocationProvider and show your location on the maps.
-        // --> enableFollowLocation: Enables "follow" functionality.
-        // mLocationOverlay.enableMyLocation();
-        // mLocationOverlay.enableFollowLocation();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Load Configuration with changes from onCreate
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -433,68 +312,13 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mMapView.onPause(); //needed for compass and icons
 
         Log.i(TAG,"OnPause finished");
-
-    }
-/*
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case LOCATION_ACCESS_CODE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Check where we're at: case 1 = onCreate, case 2 = onResume, case 3 = onPause
-                    switch(myCase) {
-                        case 1:
-                            try {
-                                currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            } catch (SecurityException se) {
-                                se.printStackTrace();
-                            }
-                            break;
-                        case 2:
-                            try {
-                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
-                                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
-                            } catch (SecurityException se) {
-                                se.printStackTrace();
-                            }
-                            break;
-                        case 3:
-                            try {
-                                locationManager.removeUpdates(myLocationListener);
-                            } catch (SecurityException se) {
-                                se.printStackTrace();
-                            }
-                            break;
-                    }
-
-                } else {
-                    // Permission Denied
-                    Toast.makeText(MainActivity.this, "Zugriff auf Standortdaten " +
-                            "wurde abgelehnt.", Toast.LENGTH_SHORT)
-                            .show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
     }
 
-    // Writes longitude & latitude values into text views
-
-    private void updateLoc(Location loc){
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Update location: http://android-er.blogspot.com/2012/05/update-location-on-openstreetmap.html
-        GeoPoint locGeoPoint = new GeoPoint(loc.getLatitude(), loc.getLongitude());
-        mMapController.setCenter(locGeoPoint);
-        mMapView.invalidate();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    }
-*/
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Navigation Drawer
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -505,24 +329,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         }
     }
 
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-    // rechtes Toolbar icon
-   /* public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -577,26 +383,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         return true;
     }
 
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Create an AlertDialog with an OK Button displaying a message
     private void showMessageOK(String message, DialogInterface.OnClickListener okListener) {
@@ -607,4 +396,17 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 .create()
                 .show();
     }
+
+    @Override
+    public void onLocationChanged(Location location) { }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) { }
+
+    @Override
+    public void onProviderEnabled(String provider) { }
+
+    @Override
+    public void onProviderDisabled(String provider) { }
+
 }
