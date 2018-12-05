@@ -48,7 +48,6 @@
         <activity android:name=".MainActivity"/>
         <activity android:name=".MenuActivity" />
         <activity android:name=".HelmetActivity" />
-        <activity android:name=".RouteActivity" />
         <activity android:name=".SaveActivity"/>
         <activity android:name=".WebActivity"/>
     </application>
