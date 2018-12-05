@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     private Sensor myAcc;
 
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Save sensor data
 
