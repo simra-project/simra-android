@@ -324,7 +324,6 @@ public class RouteActivity extends AppCompatActivity implements SensorEventListe
         setLocationMarker();
 
         mSensorManager.registerListener(this, myAcc, SensorManager.SENSOR_DELAY_NORMAL);
-        // mSensorManager.registerLis
 
     }
 
