@@ -6,6 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -30,12 +34,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.osmdroid.config.Configuration;
 
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
@@ -51,7 +55,12 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 
-public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener {
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener, SensorEventListener {
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,12 +80,33 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             "http://c.tile.openstreetmap.org/" },
             "© OpenStreetMap contributors");
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Sensor stuff
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private SensorManager mSensorManager;
+
+    private Sensor myAcc;
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Save sensor data
+
+    private ArrayList<Float> xList = new ArrayList<>();
+    private ArrayList<Float> yList = new ArrayList<>();
+    private ArrayList<Float> zList = new ArrayList<>();
+
+    private Boolean recording = false;
+
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
 
     private ImageButton helmetButton;
     private ImageButton centerMap;
-    private RelativeLayout neuRoute;
+    private RelativeLayout startBtn;
+    private RelativeLayout stopBtn;
+
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,6 +178,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mMapView.setTileSource(HTTP_MAPNIK);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
+
+
 
         //**************************************************************************************
         // ALTERNATIVE MAP TILE PROVIDERS
@@ -249,15 +281,29 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             }
         });
 
-        // (4): Neue Route
+        // (4): Neue Route / Start Button
 
-        neuRoute = findViewById(R.id.route_button);
-        neuRoute.setOnClickListener(new View.OnClickListener() {
+        startBtn = findViewById(R.id.start_button);
+        startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent launchActivityIntent = new Intent(MainActivity.this,
-                        RouteActivity.class);
-                startActivity(launchActivityIntent);
+                stopBtn.setVisibility(View.VISIBLE);
+                startBtn.setVisibility(View.INVISIBLE);
+                recording = true;
+                routeFunctionality();
+
+            }
+        });
+
+        // (5): Aufzeichnung stoppen / Stop Button
+        stopBtn = findViewById(R.id.stop_button);
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveRouteData();
+                startBtn.setVisibility(View.VISIBLE);
+                stopBtn.setVisibility(View.INVISIBLE);
+                recording = false;
             }
         });
 
@@ -280,6 +326,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // Load Configuration with changes from onCreate
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().load(this, prefs);
+
+        if (recording) {
+            mSensorManager.registerListener(this, myAcc, SensorManager.SENSOR_DELAY_NORMAL);
+        }
 
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
@@ -397,6 +447,14 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 .show();
     }
 
+    private void routeFunctionality (){
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Sensor-related configuration
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        myAcc = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    }
+
     @Override
     public void onLocationChanged(Location location) { }
 
@@ -409,4 +467,52 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     @Override
     public void onProviderDisabled(String provider) { }
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+        // The accelerometer returns 3 values, one for each axis.
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
+
+        // Add the accelerometer data to the respective ArrayLists.
+        xList.add(x);
+        yList.add(y);
+        zList.add(z);
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+    public void saveRouteData() {
+
+        String xString = xList.toString();
+        create(this, "x_accelerometer.csv", xString);
+
+        String yString = yList.toString();
+        create(this, "y_accelerometer.csv", yString);
+
+        String zString = zList.toString();
+        create(this, "z_accelerometer.csv", zString);
+
+    }
+
+    private boolean create(Context context, String fileName, String jsonString) {
+
+        try {
+            FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+            if (jsonString != null) {
+                fos.write(jsonString.getBytes());
+            }
+            fos.close();
+            return true;
+        } catch (FileNotFoundException fileNotFound) {
+            return false;
+        } catch (IOException ioException) {
+            return false;
+        }
+
+    }
 }

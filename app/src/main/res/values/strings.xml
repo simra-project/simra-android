@@ -18,4 +18,6 @@
     <string name="permissionFineLocation">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten.</string>
     <string name="mccPageDE">https://www.mcc.tu-berlin.de/menue/aktuelles/</string>
     <string name="mccPageEN">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/</string>
+    <string name="startButtonText">Aufzeichnung \n starten</string>
+    <string name="stopButtonText">Aufzeichnung \n stoppen</string>
 </resources>
