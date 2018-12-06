@@ -27,6 +27,10 @@ public class AccelerometerFunct implements SensorEventListener {
 
     public SensorManager accSensorManager;
 
+    // the time at which recording begins (in millis) will be handed over from MainActivity
+    // as soon as startRecording-button is pressed.
+    public long myRecordingTimeVar = 0L;
+
     boolean recording;
 
     public ArrayList<Float> xList = new ArrayList<>();
@@ -47,10 +51,19 @@ public class AccelerometerFunct implements SensorEventListener {
             float y = event.values[1];
             float z = event.values[2];
 
-            // Add the accelerometer data to the respective ArrayLists.
-            xList.add(x);
-            yList.add(y);
-            zList.add(z);
+            // Check if the determined recording time interval has elapsed, if so, write data
+            // into lists & reset the variable
+            if(System.currentTimeMillis() == (myRecordingTimeVar + Constants.ACC_FREQUENCY)) {
+
+                // Add the accelerometer data to the respective ArrayLists.
+                xList.add(x);
+                yList.add(y);
+                zList.add(z);
+
+                // Reset the time variable
+                myRecordingTimeVar = System.currentTimeMillis();
+
+            }
 
         }
 
