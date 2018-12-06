@@ -59,11 +59,11 @@
         <activity android:name=".WebActivity" />
 
         <service
-            android:name=".AccelerometerService"
+            android:name=".Constants"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Constants"
+            android:name=".AccelerometerService"
             android:enabled="true"
             android:exported="true"></service>
     </application>

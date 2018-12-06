@@ -14,9 +14,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 
 import android.support.v4.app.ActivityCompat;
@@ -37,6 +39,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.osmdroid.config.Configuration;
 
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
@@ -55,9 +59,16 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener {
@@ -83,7 +94,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     // Instance of class encapsulating accelerometer sensor functionality
 
-    AccelerometerService myAccService = new AccelerometerService();
+    //AccelerometerService myAccService;
+
+    AccelerometerFunct accFunct = null;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -121,6 +134,21 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         Log.i(TAG,"OnCreate called");
         super.onCreate(savedInstanceState);
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Set some params (context, DisplayMetrics, Config, ContentView)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        ctx = getApplicationContext();
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+        setContentView(R.layout.activity_main);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Instantiate AccelerometerFunct-instance for accelerometer data recording
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        accFunct = new AccelerometerFunct(this);
+
         // set up location manager to get location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -145,15 +173,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             };
             showMessageOK(rationaleMessage, rationaleOnClickListener);
         }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Set some params (context, DisplayMetrics, Config, ContentView)
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        ctx = getApplicationContext();
-        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-        Configuration.getInstance().setUserAgentValue(getPackageName());
-        setContentView(R.layout.activity_main);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //Map configuration
@@ -266,33 +285,94 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             }
         });
 
-        // (4): Neue Route / Start Button
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // (4): NEUE ROUTE / START BUTTON
 
         startBtn = findViewById(R.id.start_button);
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopBtn.setVisibility(View.VISIBLE);
-                startBtn.setVisibility(View.INVISIBLE);
-                recording = true;
-                routeFunctionality();
 
+                // show stop button, hide start button
+                showStop();
+
+                // start recording accelerometer data
+                accFunct.recording = true;
+
+                // set recording to true to enable the appropriate showing/hiding of buttons
+                // in other phases of the lifecycle
+
+                recording = true;
+
+                //routeFunctionality();
             }
         });
 
-        // (5): Aufzeichnung stoppen / Stop Button
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // (5): AUFZEICHNUNG STOPPEN / STOP-BUTTON
+
         stopBtn = findViewById(R.id.stop_button);
         stopBtn.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                saveRouteData();
-                startBtn.setVisibility(View.VISIBLE);
-                stopBtn.setVisibility(View.INVISIBLE);
+
+                // stop recording accelerometer data
+                accFunct.recording = false;
+
+                try {
+
+                    // write accelerometer data recorded during route
+                    // into csv file in internal storage
+                    accFunct.saveRouteData();
+
+                } catch (IOException ioe) {
+
+                    ioe.printStackTrace();
+                }
+
+                // unregister accelerometer sensor listener
+                // @TODO (is this necessary? where else to unregister? - unregistering the
+                // listener in onPause as demonstrated in most examples is not an option
+                // as we want to keep recording when screen is turned off!)
+                accFunct.unregister();
+
+                // show start button, hide stop button
+                showStart();
+
+                // set recording to false to enable the appropriate showing/hiding of buttons
+                // in other phases of the lifecycle
                 recording = false;
             }
         });
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         Log.i(TAG,"OnCreate finished");
+
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    // Switching between buttons:
+
+    // (1) start visible, stop invisible
+
+    public void showStart() {
+
+        stopBtn.setVisibility(View.INVISIBLE);
+        startBtn.setVisibility(View.VISIBLE);
+
+    }
+
+    // (2) stop visible, start invisible
+
+    public void showStop() {
+
+        stopBtn.setVisibility(View.VISIBLE);
+        startBtn.setVisibility(View.INVISIBLE);
 
     }
 
@@ -310,13 +390,11 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().load(this, prefs);
 
-        if (recording) {
-            myAccService.accSensorManager.registerListener((SensorEventListener) this,
-                    myAccService.myAccSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        }
+        accFunct.register();
 
         try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
+                    0, this);
             // locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
         } catch ( SecurityException se ) {
             Log.d(TAG, "onStart() permission not granted yet");
@@ -334,6 +412,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         Log.i(TAG,"OnPause called");
 
         super.onPause();
+
+        accFunct.register();
 
         // Load Configuration with changes from onCreate
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -423,15 +503,13 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 .show();
     }
 
-    private void routeFunctionality (){
+    /**private void routeFunctionality (){
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Sensor-related configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        myAccService.accSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        myAccService.myAccSensor = myAccService.accSensorManager
-                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-    }
+
+    }*/
 
     @Override
     public void onLocationChanged(Location location) { }
@@ -445,19 +523,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     @Override
     public void onProviderDisabled(String provider) { }
 
+    //@RequiresApi(api = Build.VERSION_CODES.O)
 
-    public void saveRouteData() {
 
-        String xString = myAccService.xList.toString();
-        create(this, "x_accelerometer.csv", xString);
-
-        String yString = myAccService.yList.toString();
-        create(this, "y_accelerometer.csv", yString);
-
-        String zString = myAccService.zList.toString();
-        create(this, "z_accelerometer.csv", zString);
-
-    }
 
     private boolean create(Context context, String fileName, String jsonString) {
 
