@@ -9,6 +9,7 @@ import android.hardware.SensorManager;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -44,7 +45,7 @@ public class AccelerometerFunct implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if(recording) {
+        while(recording) {
 
             // The accelerometer returns 3 values, one for each axis.
             float x = event.values[0];
@@ -89,7 +90,9 @@ public class AccelerometerFunct implements SensorEventListener {
         accSensorManager.unregisterListener(this);
     }
 
-    public void saveRouteData() throws IOException {
+    public void saveRouteData() {
+
+        FileOutputStream fos = null;
 
         /**String xString = myAccService.xList.toString();
          create(this, "x_accelerometer.csv", xString);
@@ -100,19 +103,31 @@ public class AccelerometerFunct implements SensorEventListener {
          String zString = myAccService.zList.toString();
          create(this, "z_accelerometer.csv", zString);*/
 
-        FileOutputStream fos = ctx.openFileOutput("accData.csv", Context.MODE_PRIVATE);
+        try {
+
+            fos = ctx.openFileOutput("accData.csv", Context.MODE_PRIVATE);
+
+        } catch (FileNotFoundException fnfe) {
+
+            fnfe.printStackTrace();
+
+        }
 
         try (OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
             CSVPrinter csvPrinter = new CSVPrinter(osw, CSVFormat.DEFAULT.withHeader("x-axis", "y-axis",
                     "z-axis"));
             for(int i = 0; i < xList.size(); i++) {
                 csvPrinter.printRecord(xList.get(i),
-                        yList.get(i),
-                        zList.get(i));
+                                        yList.get(i),
+                                        zList.get(i));
 
             }
             csvPrinter.flush();
             csvPrinter.close();
+
+        } catch (IOException ioe) {
+
+            ioe.printStackTrace();
         }
     }
 
