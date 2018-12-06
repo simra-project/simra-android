@@ -69,6 +69,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener {
@@ -95,14 +96,12 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     // Instance of class encapsulating accelerometer sensor functionality
 
     //AccelerometerService myAccService;
-
     AccelerometerFunct accFunct = null;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Data structures for saving GPS information
-    private ArrayList<Float> xCoord = new ArrayList<>();
-    private ArrayList<Float> yCoord = new ArrayList<>();
+    private ArrayList<MyGeoPoint> geoDat = new ArrayList<>();
 
     private Boolean recording = false;
 
@@ -116,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For permission request
-
     private final int LOCATION_ACCESS_CODE = 1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,8 +144,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Instantiate AccelerometerFunct-instance for accelerometer data recording
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         accFunct = new AccelerometerFunct(this);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // set up location manager to get location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -306,10 +304,12 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
                 // set recording to true to enable the appropriate showing/hiding of buttons
                 // in other phases of the lifecycle
-
                 recording = true;
 
-                //routeFunctionality();
+                // call method for recording GPS data
+                if(PermissionHandler.permissionGrantCheck(ctx)) {
+                    recordGPSData(System.currentTimeMillis());
+                }
             }
         });
 
@@ -330,16 +330,12 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 // stop recording accelerometer data
                 accFunct.recording = false;
 
-                try {
-
                     // write accelerometer data recorded during route
                     // into csv file in internal storage
                     accFunct.saveRouteData();
 
-                } catch (IOException ioe) {
-
-                    ioe.printStackTrace();
-                }
+                // call method for saving GPS data
+                saveGPSData();
 
                 // unregister accelerometer sensor listener
                 // @TODO (is this necessary? where else to unregister? - unregistering the
@@ -386,7 +382,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     public void onResume(){
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         Log.i(TAG,"OnResume called");
 
         super.onResume();
@@ -526,13 +521,101 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 .show();
     }
 
-    /**private void routeFunctionality (){
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Sensor-related configuration
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public void recordGPSData(long startTime) throws SecurityException {
+
+        // save the time we start recording permanently for calculating diffTime (time between
+        // start of recording and time of recording a specific location)
+        // ---> THIS VARIABLE STAYS THE SAME THROUGHOUT THE RECORDING OF ONE ROUTE.
+        long recordingStartTime = startTime;
+
+        // save the time we start recording one for ensuring we record location once specified
+        // time intervals have elapsed;
+        // ---> THIS VARIABLE IS UPDATED AFTER EVERY RECORDING
+        long timeVar = startTime;
+
+        // we keep recording until the stop button has been pressed.
+        while(recording) {
+
+            // CASE 1: one minute has elapsed; we record
+            //          a) latitude,
+            //          b) longitude,
+            //          c) time since we first started recording,
+            //          d) TimeStamp.
+            // ..... for last known location.
+            if (System.currentTimeMillis() == (timeVar + Constants.GPS_TIME_FREQUENCY)) {
+
+                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                MyGeoPoint mgp = new MyGeoPoint(location.getLatitude(),
+                                                location.getLongitude(),
+                                                (location.getTime() - recordingStartTime),
+                                                new Timestamp(location.getTime()));
+
+                geoDat.add(mgp);
+
+                // update time variable
+                timeVar = System.currentTimeMillis();
+            }
+
+            // CASE 2: three seconds have elapsed; we record
+            //          a) latitude,
+            //          b) longitude,
+            //          c) time since we first started recording.
+            // ..... for last known location.
+            else if (System.currentTimeMillis() == (startTime + Constants.GPS_FREQUENCY)) {
+
+                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                MyGeoPoint mgp = new MyGeoPoint(location.getLatitude(),
+                        location.getLongitude(),
+                        (location.getTime() - recordingStartTime));
+
+                geoDat.add(mgp);
+
+                // update time variable
+                timeVar = System.currentTimeMillis();
+            }
+
+        }
+
+    }
 
 
-    }*/
+    public void saveGPSData() {
+
+        FileOutputStream fos = null;
+
+        try {
+
+            fos = ctx.openFileOutput("accData.csv", Context.MODE_PRIVATE);
+
+        } catch (FileNotFoundException fnfe) {
+
+            fnfe.printStackTrace();
+
+        }
+
+        try (OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
+            CSVPrinter csvPrinter = new CSVPrinter(osw, CSVFormat.DEFAULT.withHeader("longitude", "latitude",
+                    "time since start of recording", "timestamp"));
+            for (int i = 0; i < geoDat.size(); i++) {
+                csvPrinter.printRecord(geoDat.get(i).lat,
+                        geoDat.get(i).lon,
+                        geoDat.get(i).timeDiff,
+                        geoDat.get(i).timeStamp);
+            }
+            csvPrinter.flush();
+            csvPrinter.close();
+
+        } catch (IOException ioe) {
+
+            ioe.printStackTrace();
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
     public void onLocationChanged(Location location) { }
@@ -546,22 +629,4 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     @Override
     public void onProviderDisabled(String provider) { }
 
-    //@RequiresApi(api = Build.VERSION_CODES.O)
-
-    private boolean create(Context context, String fileName, String jsonString) {
-
-        try {
-            FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
-            if (jsonString != null) {
-                fos.write(jsonString.getBytes());
-            }
-            fos.close();
-            return true;
-        } catch (FileNotFoundException fileNotFound) {
-            return false;
-        } catch (IOException ioException) {
-            return false;
-        }
-
-    }
 }
