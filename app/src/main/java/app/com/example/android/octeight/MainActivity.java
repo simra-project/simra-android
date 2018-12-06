@@ -297,6 +297,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 // show stop button, hide start button
                 showStop();
 
+                // hand start time of recording over to AccelerometerFunct-instance to enable
+                // recording at the intended intervals
+                accFunct.myRecordingTimeVar = System.currentTimeMillis();
+
                 // start recording accelerometer data
                 accFunct.recording = true;
 
@@ -318,6 +322,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
             @Override
             public void onClick(View v) {
+
+                // set recording to false to enable the appropriate showing/hiding of buttons
+                // in all phases of the lifecycle
+                recording = false;
 
                 // stop recording accelerometer data
                 accFunct.recording = false;
@@ -342,9 +350,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 // show start button, hide stop button
                 showStart();
 
-                // set recording to false to enable the appropriate showing/hiding of buttons
-                // in other phases of the lifecycle
-                recording = false;
             }
         });
 
@@ -358,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     // Switching between buttons:
 
-    // (1) start visible, stop invisible
+    // (1) start button visible, stop button invisible
 
     public void showStart() {
 
@@ -367,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     }
 
-    // (2) stop visible, start invisible
+    // (2) stop button visible, start button invisible
 
     public void showStop() {
 
@@ -386,10 +391,19 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         super.onResume();
 
+        // Ensure the button that matches current state is presented.
+        // @TODO für MARK: doesn't seem to work yet, when display is rotated "Neue Route" is always presented
+        if(recording) {
+            showStop();
+        } else {
+            showStart();
+        }
+
         // Load Configuration with changes from onCreate
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().load(this, prefs);
 
+        // register listener for accelerometer functionality
         accFunct.register();
 
         try {
@@ -413,6 +427,15 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         super.onPause();
 
+        // Ensure the button that matches current state is presented.
+        // @TODO für MARK: doesn't seem to work yet, when display is rotated "Neue Route" is always presented
+        if(recording) {
+            showStop();
+        } else {
+            showStart();
+        }
+
+        // register listener for accelerometer functionality
         accFunct.register();
 
         // Load Configuration with changes from onCreate
@@ -524,8 +547,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     public void onProviderDisabled(String provider) { }
 
     //@RequiresApi(api = Build.VERSION_CODES.O)
-
-
 
     private boolean create(Context context, String fileName, String jsonString) {
 
