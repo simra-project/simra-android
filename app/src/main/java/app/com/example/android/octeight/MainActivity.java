@@ -14,8 +14,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 
 import android.support.annotation.RequiresApi;
@@ -71,8 +73,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener {
+
+    public static ExecutorService myEx;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
@@ -132,6 +138,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         Log.i(TAG,"OnCreate called");
         super.onCreate(savedInstanceState);
 
+        myEx = Executors.newFixedThreadPool(4);
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Set some params (context, DisplayMetrics, Config, ContentView)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Instantiate AccelerometerFunct-instance for accelerometer data recording
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        accFunct = new AccelerometerFunct(this);
+        accFunct = new AccelerometerFunct(this, myEx);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // set up location manager to get location updates
@@ -295,21 +303,24 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 // show stop button, hide start button
                 showStop();
 
-                // hand start time of recording over to AccelerometerFunct-instance to enable
-                // recording at the intended intervals
-                accFunct.myRecordingTimeVar = System.currentTimeMillis();
+                stopBtn.setVisibility(View.VISIBLE);
+                startBtn.setVisibility(View.INVISIBLE);
 
-                // start recording accelerometer data
-                accFunct.recording = true;
+                        // hand start time of recording over to AccelerometerFunct-instance to enable
+                        // recording at the intended intervals
+                        accFunct.myRecordingTimeVar = System.currentTimeMillis();
 
-                // set recording to true to enable the appropriate showing/hiding of buttons
-                // in other phases of the lifecycle
-                recording = true;
+                        // start recording accelerometer data
+                        accFunct.recording = true;
 
-                // call method for recording GPS data
-                if(PermissionHandler.permissionGrantCheck(ctx)) {
-                    recordGPSData(System.currentTimeMillis());
-                }
+                        // set recording to true to enable the appropriate showing/hiding of buttons
+                        // in other phases of the lifecycle
+                        recording = true;
+
+                        // call method for recording GPS data
+                        if (PermissionHandler.permissionGrantCheck(ctx)) {
+                            myEx.execute(() -> recordGPSData(System.currentTimeMillis()));
+                        }
             }
         });
 
@@ -323,28 +334,28 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             @Override
             public void onClick(View v) {
 
-                // set recording to false to enable the appropriate showing/hiding of buttons
-                // in all phases of the lifecycle
-                recording = false;
+                showStart();
 
                 // stop recording accelerometer data
                 accFunct.recording = false;
 
-                    // write accelerometer data recorded during route
-                    // into csv file in internal storage
-                    accFunct.saveRouteData();
+                // set recording to false to enable the appropriate showing/hiding of buttons
+                // in all phases of the lifecycle
+                recording = false;
 
-                // call method for saving GPS data
+                accFunct.saveRouteData();
+
+                //myEx.execute(() -> accFunct.saveRouteData());
+
                 saveGPSData();
+
+                //myEx.execute(() -> saveGPSData());
 
                 // unregister accelerometer sensor listener
                 // @TODO (is this necessary? where else to unregister? - unregistering the
                 // listener in onPause as demonstrated in most examples is not an option
                 // as we want to keep recording when screen is turned off!)
                 accFunct.unregister();
-
-                // show start button, hide stop button
-                showStart();
 
             }
         });
@@ -363,8 +374,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     public void showStart() {
 
-        stopBtn.setVisibility(View.INVISIBLE);
         startBtn.setVisibility(View.VISIBLE);
+        stopBtn.setVisibility(View.INVISIBLE);
 
     }
 
@@ -424,11 +435,11 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         // Ensure the button that matches current state is presented.
         // @TODO für MARK: doesn't seem to work yet, when display is rotated "Neue Route" is always presented
-        if(recording) {
+        /**if(recording) {
             showStop();
         } else {
             showStart();
-        }
+        }*/
 
         // register listener for accelerometer functionality
         accFunct.register();
@@ -523,7 +534,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public void recordGPSData(long startTime) throws SecurityException {
+    public synchronized void recordGPSData(long startTime) throws SecurityException {
 
         // save the time we start recording permanently for calculating diffTime (time between
         // start of recording and time of recording a specific location)
@@ -582,14 +593,13 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     }
 
-
-    public void saveGPSData() {
+    public synchronized void saveGPSData() {
 
         FileOutputStream fos = null;
 
         try {
 
-            fos = ctx.openFileOutput("accData.csv", Context.MODE_PRIVATE);
+            fos = ctx.openFileOutput("gpsData.csv", Context.MODE_PRIVATE);
 
         } catch (FileNotFoundException fnfe) {
 

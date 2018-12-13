@@ -1,5 +1,6 @@
 package app.com.example.android.octeight;
 
+import android.app.usage.UsageEvents;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
 
 public class AccelerometerFunct implements SensorEventListener {
 
@@ -27,6 +29,8 @@ public class AccelerometerFunct implements SensorEventListener {
     public Sensor myAccSensor;
 
     public SensorManager accSensorManager;
+
+    public static ExecutorService myEx;
 
     // the time at which recording begins (in millis) will be handed over from MainActivity
     // as soon as startRecording-button is pressed.
@@ -44,6 +48,13 @@ public class AccelerometerFunct implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+
+        myEx.execute(() -> recordData(event));
+
+
+    }
+
+    public synchronized void recordData(SensorEvent event) {
 
         while(recording) {
 
@@ -75,11 +86,12 @@ public class AccelerometerFunct implements SensorEventListener {
 
     }
 
-    public AccelerometerFunct(Context ctx) {
+    public AccelerometerFunct(Context ctx, ExecutorService exec) {
         this.ctx = ctx;
         this.accSensorManager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
         this.myAccSensor = this.accSensorManager
                 .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        myEx = exec;
     }
 
     public void register(){
@@ -90,7 +102,7 @@ public class AccelerometerFunct implements SensorEventListener {
         accSensorManager.unregisterListener(this);
     }
 
-    public void saveRouteData() {
+    public synchronized void saveRouteData() {
 
         FileOutputStream fos = null;
 
