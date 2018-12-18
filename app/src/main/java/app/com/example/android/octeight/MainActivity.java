@@ -49,6 +49,7 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -245,9 +246,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               /* stopBtn.setVisibility(View.VISIBLE);
-                startBtn.setVisibility(View.INVISIBLE);*/
-
+                stopBtn.setVisibility(View.VISIBLE);
+                startBtn.setVisibility(View.INVISIBLE);
                 recording = true;
                 routeFunctionality();
 
@@ -406,19 +406,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
     }
-
-    @Override
-    public void onLocationChanged(Location location) { }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) { }
-
-    @Override
-    public void onProviderEnabled(String provider) { }
-
-    @Override
-    public void onProviderDisabled(String provider) { }
-
 
     public void saveRouteData() {
 
