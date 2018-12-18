@@ -44,17 +44,17 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
+        String caller     = getIntent().getStringExtra("caller");
+        if (caller == null){
+            caller = "NoCaller";
+        }
 
-        SharedPreferences pref = getSharedPreferences("first_time", MODE_PRIVATE);
-
-        Log.d(TAG, "isFirstTime: " + String.valueOf(isFirstTime()));
 
         // first start, show your dialog | first-run code goes here
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationaleDE), LOCATION_ACCESS_CODE);
 
         if (!(isFirstTime())&&(ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED)){
-            Log.d(TAG, "isFirstTime: " + String.valueOf(isFirstTime()));
+                == PackageManager.PERMISSION_GRANTED)&&(!caller.equals("MainActivity"))){
             Intent intent = new Intent(StartActivity.this, MainActivity.class);
             startActivity(intent);
             finish();

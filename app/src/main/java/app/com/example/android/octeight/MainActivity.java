@@ -377,7 +377,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             startActivity(intent);*/
         } else if (id == R.id.nav_infoSimRa){
             Intent intent = new Intent (MainActivity.this, StartActivity.class);
+            intent.putExtra("caller", "MainActivity");
             startActivity(intent);
+            finish();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
