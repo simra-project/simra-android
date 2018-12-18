@@ -16,8 +16,8 @@
     <string name="demoDataMail">Name: \nAlter: \nBeruf: \nFahrradtyp: Bsp. Rennrad\nDurchschnittlich wöchentlich zurückgelegte Kilometeranzahl mit dem Rad: </string>
     <string name="feedbackMail"> </string>
     <string name="permissionFineLocation">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten.</string>
-    <string name="mccPageDE">https://www.mcc.tu-berlin.de/menue/aktuelles/</string>
-    <string name="mccPageEN">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/</string>
+    <string name="mccPageDE">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
+    <string name="mccPageEN">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
     <string name="startButtonText">Aufzeichnung \n starten</string>
     <string name="stopButtonText">Aufzeichnung \n stoppen</string>
     <string name="permissionRequestRationaleDE">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>

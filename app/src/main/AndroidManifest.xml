@@ -52,7 +52,8 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".MenuActivity" />
         <activity android:name=".HelmetActivity" />
         <activity android:name=".SaveActivity" />
