@@ -1,6 +1,7 @@
 package app.com.example.android.octeight;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -53,8 +54,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener, SensorEventListener {
-
+public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
@@ -74,23 +74,18 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             "© OpenStreetMap contributors");
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Sensor stuff
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private SensorManager mSensorManager;
+    // Instance of class encapsulating accelerometer sensor functionality
 
-    private Sensor myAcc;
-
+    AccelerometerService myAccService = new AccelerometerService();
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Save sensor data
 
-    private ArrayList<Float> xList = new ArrayList<>();
-    private ArrayList<Float> yList = new ArrayList<>();
-    private ArrayList<Float> zList = new ArrayList<>();
+    // Data structures for saving GPS information
+    private ArrayList<Float> xCoord = new ArrayList<>();
+    private ArrayList<Float> yCoord = new ArrayList<>();
 
     private Boolean recording = false;
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
@@ -99,8 +94,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     private ImageButton centerMap;
     private RelativeLayout startBtn;
     private RelativeLayout stopBtn;
-
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For permission request
@@ -114,11 +107,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     // Log tag
     private static final String TAG = "MainActivity_LOG";
 
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -127,29 +118,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         // set up location manager to get location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        // Check whether FINE_LOCATION permission is not granted
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
-            // in an AlertDialog and request access to FINE_LOCATION
-
-            // The message to be shown in the AlertDialog
-            String rationaleMessage = "Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen" +
-                    "können und deine Fahrt zu speichern.";
-
-            // The OK-Button fires a requestPermissions
-            DialogInterface.OnClickListener rationaleOnClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(MainActivity.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_ACCESS_CODE);
-                }
-            };
-            showMessageOK(rationaleMessage, rationaleOnClickListener);
-
-        }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Set some params (context, DisplayMetrics, Config, ContentView)
@@ -172,16 +140,16 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
 
-
-
         //**************************************************************************************
         // ALTERNATIVE MAP TILE PROVIDERS
+
+        // (1) MapBox
         /**final MapBoxTileSource tileSource = new MapBoxTileSource();
          tileSource.retrieveAccessToken(ctx);
          tileSource.retrieveMapBoxMapId(ctx);
          mMapView.setTileSource(tileSource);*/
 
-
+        // (2) HERE we go
         /**final ITileSource tileSource = new HEREWeGoTileSource(ctx);
          mMapView.setTileSource(tileSource);*/
         //**************************************************************************************
@@ -194,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // Sets the icon to device location.
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
 
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // MyLocationONewOverlayParameters.
         // --> enableMyLocation: Enable receiving location updates from the provided
@@ -204,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //                          automatically disable if false, when the user pans the map,
         //                           the map will continue to follow current location
         mLocationOverlay.enableMyLocation();
-
 
         // move map to the last known location
         try {
@@ -248,7 +214,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
 
         // (2): Helmet
 
@@ -306,8 +271,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public void onResume(){
 
@@ -322,7 +285,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         Configuration.getInstance().load(this, prefs);
 
         if (recording) {
-            mSensorManager.registerListener(this, myAcc, SensorManager.SENSOR_DELAY_NORMAL);
+            myAccService.accSensorManager.registerListener((SensorEventListener) this,
+                    myAccService.myAccSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
         try {
@@ -338,9 +302,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
     public void onPause(){
 
@@ -359,8 +320,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Navigation Drawer
     @Override
@@ -372,7 +331,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             super.onBackPressed();
         }
     }
-
 
     @SuppressWarnings("StatementWithEmptyBody")
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -428,8 +386,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Create an AlertDialog with an OK Button displaying a message
     private void showMessageOK(String message, DialogInterface.OnClickListener okListener) {
@@ -445,8 +401,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Sensor-related configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        myAcc = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        myAccService.accSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        myAccService.myAccSensor = myAccService.accSensorManager
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
     }
 
     @Override
@@ -461,34 +419,16 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     @Override
     public void onProviderDisabled(String provider) { }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
 
-        // The accelerometer returns 3 values, one for each axis.
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
-
-        // Add the accelerometer data to the respective ArrayLists.
-        xList.add(x);
-        yList.add(y);
-        zList.add(z);
-
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
     public void saveRouteData() {
 
-        String xString = xList.toString();
+        String xString = myAccService.xList.toString();
         create(this, "x_accelerometer.csv", xString);
 
-        String yString = yList.toString();
+        String yString = myAccService.yList.toString();
         create(this, "y_accelerometer.csv", yString);
 
-        String zString = zList.toString();
+        String zString = myAccService.zList.toString();
         create(this, "z_accelerometer.csv", zString);
 
     }
