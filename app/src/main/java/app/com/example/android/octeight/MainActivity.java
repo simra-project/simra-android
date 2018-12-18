@@ -126,29 +126,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // set up location manager to get location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        /*
-        // Check whether FINE_LOCATION permission is not granted
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
-            // in an AlertDialog and request access to FINE_LOCATION
-
-            // The message to be shown in the AlertDialog
-            String rationaleMessage = "Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen" +
-                    "können und deine Fahrt zu speichern.";
-
-            // The OK-Button fires a requestPermissions
-            DialogInterface.OnClickListener rationaleOnClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(MainActivity.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_ACCESS_CODE);
-                }
-            };
-            showMessageOK(rationaleMessage, rationaleOnClickListener);
-        }
-        */
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Set some params (context, DisplayMetrics, Config, ContentView)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
