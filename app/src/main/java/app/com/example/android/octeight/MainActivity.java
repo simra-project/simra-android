@@ -76,6 +76,27 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    // SharedPreferences for storing last location, editor for editing sharedPrefs
+
+    SharedPreferences sharedPrefs;
+
+    SharedPreferences.Editor editor;
+
+    // Custom method for saving double values in sharedPreferences (not possible by default)
+
+    SharedPreferences.Editor putDouble(final SharedPreferences.Editor edit,
+                                       final String key, final double value) {
+        return edit.putLong(key, Double.doubleToRawLongBits(value));
+    }
+
+    // Custom method for retrieving double values from sharedPreferences (not possible by default)
+
+    double getDouble(final SharedPreferences prefs, final String key, final double defaultValue) {
+        return Double.longBitsToDouble(prefs.getLong(key, Double.doubleToLongBits(defaultValue)));
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Instance of class encapsulating accelerometer sensor functionality
 
     AccelerometerService myAccService = new AccelerometerService();
@@ -173,16 +194,29 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //                           the map will continue to follow current location
         mLocationOverlay.enableMyLocation();
 
-        // move map to the last known location
-        try {
-            mMapController.animateTo(new GeoPoint((locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()),
-                    (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude())));
-        } catch (RuntimeException re) {
-            Log.d(TAG, re.getMessage());
-        }
+        // If app has been used before and therefore a last known location is available in sharedPrefs,
+        // animate the map to that location.
+        // Move map to last location known by locationManager if app is started for the first time.
 
-        // move map to current location
-        mMapController.animateTo(mLocationOverlay.getMyLocation());
+        if(sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_latitude")) {
+
+            GeoPoint lastLoc = new GeoPoint(
+                    Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")),
+                    Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")));
+
+            mMapController.animateTo(lastLoc);
+
+        }  else {
+
+            try {
+                mMapController.animateTo(new GeoPoint((locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()),
+                        (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude())));
+            } catch (RuntimeException re) {
+                Log.d(TAG, re.getMessage());
+                // move map to current location
+                mMapController.animateTo(mLocationOverlay.getMyLocation());
+            }
+        }
 
         // the map will follow the user until the user scrolls in the UI
         mLocationOverlay.enableFollowLocation();
@@ -201,6 +235,14 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // Initialize sharedPreferences
+
+        sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
+
+        editor = sharedPrefs.edit();
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
@@ -250,7 +292,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 startBtn.setVisibility(View.INVISIBLE);
                 recording = true;
                 routeFunctionality();
-
             }
         });
 
@@ -317,6 +358,28 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mMapView.onPause(); //needed for compass and icons
 
         Log.i(TAG,"OnPause finished");
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public void onStop(){
+
+        Log.i(TAG,"OnStop called");
+
+        super.onStop();
+
+        try {
+            editor.putString("lastLoc_latitude", String.valueOf(locationManager
+                    .getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()));
+            editor.putString("lastLoc_longitude", String.valueOf(locationManager
+                    .getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude()));
+        } catch (SecurityException se) {
+            se.printStackTrace();
+        }
+
+        Log.i(TAG,"OnStop finished");
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
