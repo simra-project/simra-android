@@ -162,6 +162,14 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // Initialize sharedPreferences
+
+        sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
+
+        editor = sharedPrefs.edit();
+
         //**************************************************************************************
         // ALTERNATIVE MAP TILE PROVIDERS
 
@@ -214,9 +222,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             } catch (RuntimeException re) {
                 Log.d(TAG, re.getMessage());
                 // move map to current location
-                mMapController.animateTo(mLocationOverlay.getMyLocation());
             }
         }
+
+        mMapController.animateTo(mLocationOverlay.getMyLocation());
 
         // the map will follow the user until the user scrolls in the UI
         mLocationOverlay.enableFollowLocation();
@@ -235,14 +244,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        // Initialize sharedPreferences
-
-        sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
-        editor = sharedPrefs.edit();
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
