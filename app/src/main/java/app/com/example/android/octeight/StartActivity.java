@@ -37,6 +37,8 @@ public class StartActivity extends AppCompatActivity {
 
     private Boolean firstTime = null;
 
+    private String caller = null;
+
 
 
     @Override
@@ -44,7 +46,7 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        String caller     = getIntent().getStringExtra("caller");
+        caller     = getIntent().getStringExtra("caller");
         if (caller == null){
             caller = "NoCaller";
         }
@@ -62,17 +64,19 @@ public class StartActivity extends AppCompatActivity {
 
 
 
-            // Runnable that starts MainActivity after defined time (TIME_OUT)
-            startActivityRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    Intent i = new Intent(StartActivity.this, MainActivity.class);
-                    startActivity(i);
-                    // finish() to prevent going back to StartActivity, when the Back Button is pressed
-                    // in MainActivity
-                    finish();
-                }
-            };
+            if (!caller.equals("MainActivity")) {
+                // Runnable that starts MainActivity after defined time (TIME_OUT)
+                startActivityRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent i = new Intent(StartActivity.this, MainActivity.class);
+                        startActivity(i);
+                        // finish() to prevent going back to StartActivity, when the Back Button is pressed
+                        // in MainActivity
+                        finish();
+                    }
+                };
+            }
             // create Handler and make it run the Runnable after TIME_OUT
             startActivityHandler = new Handler();
             startActivityHandler.postDelayed(startActivityRunnable, TIME_OUT);
@@ -86,7 +90,11 @@ public class StartActivity extends AppCompatActivity {
                     // remove the Callback of the Runnable to the Handler to prevent second start of
                     // MainActivity
                     startActivityHandler.removeCallbacks(startActivityRunnable);
-                    startActivity(intent);
+                    if(caller.equals("MainActivity")){
+                        returnToMain();
+                    } else {
+                        startActivity(intent);
+                    }
                     // finish() to prevent going back to StartActivity, when the Back Button is pressed
                     // in MainActivity
                     finish();
@@ -94,6 +102,11 @@ public class StartActivity extends AppCompatActivity {
             });
         }
     }
+
+    public void returnToMain(){
+        super.onBackPressed();
+    }
+
 
     private void permissionRequest(final String requestedPermission, String rationaleMessage, final int accessCode){
         // Check whether FINE_LOCATION permission is not granted

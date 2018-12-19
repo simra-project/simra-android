@@ -379,7 +379,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             Intent intent = new Intent (MainActivity.this, StartActivity.class);
             intent.putExtra("caller", "MainActivity");
             startActivity(intent);
-            finish();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -387,17 +386,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         return true;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Create an AlertDialog with an OK Button displaying a message
-    private void showMessageOK(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(MainActivity.this)
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("OK", okListener)
-                .create()
-                .show();
-    }
 
     private void routeFunctionality (){
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
