@@ -5,29 +5,18 @@ import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.database.SQLException;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Messenger;
-import android.os.PowerManager;
 import android.os.Process;
 import android.util.Log;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -111,7 +100,7 @@ public class GPSService extends Service implements LocationListener {
             e.printStackTrace();
         }
 
-        //Executor service for DB inserts
+        // Executor service for DB inserts
         executor = Executors.newSingleThreadExecutor();
     }
 
@@ -133,33 +122,30 @@ public class GPSService extends Service implements LocationListener {
     @Override
     public void onDestroy() {
 
-        //stop requesting location updates
+        // Stop requesting location updates
         locationManager.removeUpdates(this);
 
-        //Prevent new tasks from being added to thread
+        // Prevent new tasks from being added to thread
         executor.shutdown();
         Log.d(TAG, "GPSExecutor shutdown is called");
 
-        //Create new thread to wait for accExecutor to clear queue and wait for termination
-        new Thread(new Runnable() {
-
-            public void run() {
-                try {
-                    //Wait for all tasks to finish before we proceed
-                    while (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                        Log.i(TAG, "Waiting for current tasks to finish");
-                    }
-                    Log.i(TAG, "No queue to clear");
-                } catch (InterruptedException e) {
-                    Log.e(TAG, "Exception caught while waiting for finishing accExecutor tasks");
-                    executor.shutdownNow();
-                    Thread.currentThread().interrupt();
+        // Create new thread to wait for accExecutor to clear queue and wait for termination
+        new Thread(() -> {
+            try {
+                // Wait for all tasks to finish before we proceed
+                while (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                    Log.i(TAG, "Waiting for current tasks to finish");
                 }
+                Log.i(TAG, "No queue to clear");
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Exception caught while waiting for finishing accExecutor tasks");
+                executor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
 
-                if (executor.isTerminated()) {
-                    //Stop everything else once the task queue is clear
-                    stopForeground(true);
-                }
+            if (executor.isTerminated()) {
+                // Stop everything else once the task queue is clear
+                stopForeground(true);
             }
         }).start();
     }
@@ -188,7 +174,7 @@ public class GPSService extends Service implements LocationListener {
     class InsertHandler implements Runnable {
 
 
-        //Store the current sensor array values into THIS objects arrays, and db insert from this object
+        // Store the current sensor array values into THIS objects arrays, and db insert from this object
         public InsertHandler(){
         }
 
