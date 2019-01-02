@@ -62,10 +62,9 @@
             android:name=".Constants"
             android:enabled="true"
             android:exported="true" />
-        <service
-            android:name=".AccelerometerService"
-            android:enabled="true"
-            android:exported="true"></service>
+        <service android:name=".AccService" />
+        <service android:name=".GPSService" />
+
     </application>
 
 </manifest>
