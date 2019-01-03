@@ -6,21 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 
 import android.support.v4.app.ActivityCompat;
@@ -38,11 +30,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.osmdroid.config.Configuration;
 
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
@@ -61,18 +50,6 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -99,13 +76,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Service encapsulating accelerometer sensor recording functionality
-    Intent accService;
-    // Service encapsulating location recording functionality
-    Intent gpsService;
+    Intent recService;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Data structures for saving GPS information
-    private ArrayList<MyGeoPoint> geoDat = new ArrayList<>();
 
     private Boolean recording = false;
 
@@ -148,16 +120,16 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         setContentView(R.layout.activity_main);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Prepare AccService for accelerometer data recording
-        accService = new Intent(this, AccService.class);
-        // Prepare GPSService for location data recording
-        // gpsService = new Intent(this, GPSService.class);
+        // Prepare RecorderService for accelerometer and location data recording
+        recService = new Intent(this, RecorderService.class);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // set up location manager to get location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        // Check whether FINE_LOCATION permission is not granted
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // FINE_LOCATION permission check
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -180,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //Map configuration
+        // Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         mMapView = findViewById(R.id.map);
@@ -205,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
          mMapView.setTileSource(tileSource);*/
         //**************************************************************************************
 
-        //Set compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
+        // Set compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
         //                       java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
         this.mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
                 mMapView);
@@ -221,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // --> setEnableAutoStop: if true, when the user pans the map, follow my location will
         //                          automatically disable if false, when the user pans the map,
         //                           the map will continue to follow current location
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         mLocationOverlay.enableMyLocation();
 
         // move map to the last known location
@@ -254,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // (1): Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -291,8 +265,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         // (4): NEUE ROUTE / START BUTTON
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         startBtn = findViewById(R.id.start_button);
         startBtn.setOnClickListener(new View.OnClickListener() {
@@ -304,11 +278,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 stopBtn.setVisibility(View.VISIBLE);
                 startBtn.setVisibility(View.INVISIBLE);
 
-                // start AccService for accelerometer data recording
-                startService(accService);
-
-                // start GPSService for location data recording
-                // startService(gpsService);
+                // start RecorderService for accelerometer data recording
+                startService(recService);
 
                 recording = true;
 
@@ -316,8 +287,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         // (5): AUFZEICHNUNG STOPPEN / STOP-BUTTON
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         stopBtn = findViewById(R.id.stop_button);
         stopBtn.setOnClickListener(new View.OnClickListener() {
@@ -327,15 +298,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
                 showStart();
 
-                // stop AccService which is recording accelerometer data
-                stopService(accService);
-
-                // stop GPSService which is recording location data
-                //stopService(gpsService);
+                // stop RecorderService which is recording accelerometer data
+                stopService(recService);
 
                 recording = false;
-
-                //myEx.execute(() -> saveGPSData());
 
                 // unregister accelerometer sensor listener
                 // @TODO (is this necessary? where else to unregister? - unregistering the
@@ -344,15 +310,13 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             }
         });
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         Log.i(TAG,"OnCreate finished");
 
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Switching between buttons:
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // (1) start button visible, stop button invisible
 
@@ -376,7 +340,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     public void onResume(){
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Log.i(TAG,"OnResume called");
 
         super.onResume();
@@ -397,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
                     0, this);
-            // locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
         } catch ( SecurityException se ) {
             Log.d(TAG, "onStart() permission not granted yet");
         }
@@ -436,8 +399,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Navigation Drawer
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -502,8 +465,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Create an AlertDialog with an OK Button displaying a message
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private void showMessageOK(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(MainActivity.this)
                 .setMessage(message)
@@ -514,98 +477,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    public synchronized void recordGPSData(long startTime) throws SecurityException {
-
-        // save the time we start recording permanently for calculating diffTime (time between
-        // start of recording and time of recording a specific location)
-        // ---> THIS VARIABLE STAYS THE SAME THROUGHOUT THE RECORDING OF ONE ROUTE.
-        long recordingStartTime = startTime;
-
-        // save the time we start recording one for ensuring we record location once specified
-        // time intervals have elapsed;
-        // ---> THIS VARIABLE IS UPDATED AFTER EVERY RECORDING
-        long timeVar = startTime;
-
-        // we keep recording until the stop button has been pressed.
-        while(recording) {
-
-            // CASE 1: one minute has elapsed; we record
-            //          a) latitude,
-            //          b) longitude,
-            //          c) time since we first started recording,
-            //          d) TimeStamp.
-            // ..... for last known location.
-            if (System.currentTimeMillis() == (timeVar + Constants.GPS_TIME_FREQUENCY)) {
-
-                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-                MyGeoPoint mgp = new MyGeoPoint(location.getLatitude(),
-                                                location.getLongitude(),
-                                                (location.getTime() - recordingStartTime),
-                                                new Timestamp(location.getTime()));
-
-                geoDat.add(mgp);
-
-                // update time variable
-                timeVar = System.currentTimeMillis();
-            }
-
-            // CASE 2: three seconds have elapsed; we record
-            //          a) latitude,
-            //          b) longitude,
-            //          c) time since we first started recording.
-            // ..... for last known location.
-            else if (System.currentTimeMillis() == (startTime + Constants.GPS_FREQUENCY)) {
-
-                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-                MyGeoPoint mgp = new MyGeoPoint(location.getLatitude(),
-                        location.getLongitude(),
-                        (location.getTime() - recordingStartTime));
-
-                geoDat.add(mgp);
-
-                // update time variable
-                timeVar = System.currentTimeMillis();
-            }
-
-        }
-
-    }
-
-    public synchronized void saveGPSData() {
-
-        FileOutputStream fos = null;
-
-        try {
-
-            fos = ctx.openFileOutput("gpsData.csv", Context.MODE_PRIVATE);
-
-        } catch (FileNotFoundException fnfe) {
-
-            fnfe.printStackTrace();
-
-        }
-
-        try (OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
-            CSVPrinter csvPrinter = new CSVPrinter(osw, CSVFormat.DEFAULT.withHeader("longitude", "latitude",
-                    "time since start of recording", "timestamp"));
-            for (int i = 0; i < geoDat.size(); i++) {
-                csvPrinter.printRecord(geoDat.get(i).lat,
-                        geoDat.get(i).lon,
-                        geoDat.get(i).timeDiff,
-                        geoDat.get(i).timeStamp);
-            }
-            csvPrinter.flush();
-            csvPrinter.close();
-
-        } catch (IOException ioe) {
-
-            ioe.printStackTrace();
-        }
-    }
-
+    // LocationListener Methods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override

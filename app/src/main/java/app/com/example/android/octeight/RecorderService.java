@@ -26,14 +26,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class AccService extends Service implements SensorEventListener, LocationListener {
+public class RecorderService extends Service implements SensorEventListener, LocationListener {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Properties
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public static final String TAG = "TAG:";
-    public static final int SCREEN_OFF_RECEIVER_DELAY = 100;
     final short ACC_POLL_FREQUENCY = 20;
     private long lastAccUpdate = 0;
     private long lastGPSUpdate = 0;
@@ -41,8 +40,7 @@ public class AccService extends Service implements SensorEventListener, Location
     long startTime;
     final short GPS_POLL_FREQUENCY = 3000;
     private SensorManager sensorManager = null;
-    ExecutorService accExecutor;
-    ExecutorService gpsExecutor;
+    ExecutorService executor;
     Sensor accelerometer;
     float[] accelerometerMatrix = new float[3];
     private File accFile;
@@ -61,30 +59,25 @@ public class AccService extends Service implements SensorEventListener, Location
 
         curTime = System.currentTimeMillis();
 
-        // only allow one update every ACC_POLL_FREQUENCY (convert from ms to nano for comparison).
-        if((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) {
-
-            lastAccUpdate = curTime;
-
-            //write data to file in background thread
+            // Write data to file in background thread
             try{
-                Runnable insertAccHandler = new InsertAccHandler(accelerometerMatrix);
-                accExecutor.execute(insertAccHandler);
+                Runnable insertHandler = new InsertHandler(accelerometerMatrix);
+                executor.execute(insertHandler);
             } catch (Exception e) {
                 Log.e(TAG, "insertData: " + e.getMessage(), e);
             }
-        }
+        /*
         if ((curTime - lastGPSUpdate) >= GPS_POLL_FREQUENCY){
             lastGPSUpdate = curTime;
             //write data to file in background thread
             try{
-                Log.d(TAG, "AccService executing gpsExecutor");
+                Log.d(TAG, "RecorderService executing gpsExecutor");
                 Runnable insertGPSHandler = new InsertGPSHandler();
                 gpsExecutor.execute(insertGPSHandler);
             } catch (Exception e) {
                 Log.e(TAG, "insertData: " + e.getMessage(), e);
             }
-        }
+        }*/
 
     }
 
@@ -103,9 +96,6 @@ public class AccService extends Service implements SensorEventListener, Location
     public void onLocationChanged(Location location) {
         Log.d(TAG, "GPSService onLocationChanged() fired ");
         lastLocation = location;
-
-        // curTime = System.currentTimeMillis();
-        Log.d(TAG, "GPSService curTime: " + curTime);
     }
 
     @Override
@@ -133,19 +123,20 @@ public class AccService extends Service implements SensorEventListener, Location
         super.onCreate();
         startTime = System.currentTimeMillis();
 
+        // Prepare the accelerometer sensor
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+        // Request location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this);
 
-
-        String date = DateFormat.getDateTimeInstance().format(new Date())+".csv";
-        accFile = getFileStreamPath("acc"+date);
-        gpsFile = getFileStreamPath("gps"+date);
-
+        // Create files to write gps and accelerometer data
         try {
+            String date = DateFormat.getDateTimeInstance().format(new Date())+".csv";
+            accFile = getFileStreamPath("acc"+date);
+            gpsFile = getFileStreamPath("gps"+date);
             accFile.createNewFile();
             appendToFile("X, Y, Z, curTime, diffTime, date", accFile);
             gpsFile.createNewFile();
@@ -153,9 +144,8 @@ public class AccService extends Service implements SensorEventListener, Location
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //Executor service for DB inserts
-        accExecutor = Executors.newSingleThreadExecutor();
-        gpsExecutor = Executors.newSingleThreadExecutor();
+        // Executor service for writing data
+        executor = Executors.newSingleThreadExecutor();
 
     }
 
@@ -165,59 +155,42 @@ public class AccService extends Service implements SensorEventListener, Location
         super.onStartCommand(intent, flags, startId);
 
         startForeground(Process.myPid(), new Notification());
+        // Register Accelerometer sensor
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this);
 
-        /*
-        //Message handler for progress dialog
-        Bundle extras = intent.getExtras();
-        messageHandler = (Messenger) extras.get("MESSENGER");
-        */
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        //Show dialog
-        // sendMessage("SHOW");
 
-        //Unregister receiver and listener prior to accExecutor shutdown
+        // Unregister receiver and listener prior to gpsExecutor shutdown
         sensorManager.unregisterListener(this);
 
-        //stop requesting location updates
+        // Stop requesting location updates
         locationManager.removeUpdates(this);
 
-        //Prevent new tasks from being added to thread
-        accExecutor.shutdown();
-        gpsExecutor.shutdown();
-        //Log.d(TAG, "AccExecutor shutdown is called");
+        // Prevent new tasks from being added to thread
+        executor.shutdown();
 
-
-        //Create new thread to wait for accExecutor to clear queue and wait for termination
-        new Thread(new Runnable() {
-
-            public void run() {
-                try {
-                    //Wait for all tasks to finish before we proceed
-                    while ((!accExecutor.awaitTermination(1, TimeUnit.SECONDS))&&(!gpsExecutor.awaitTermination(1, TimeUnit.SECONDS))) {
-                        Log.i(TAG, "Waiting for current tasks to finish");
-                    }
-                    Log.i(TAG, "No queue to clear");
-                } catch (InterruptedException e) {
-                    Log.e(TAG, "Exception caught while waiting for finishing accExecutor tasks");
-                    accExecutor.shutdownNow();
-                    gpsExecutor.shutdownNow();
-                    Thread.currentThread().interrupt();
+        // Create new thread to wait for gpsExecutor to clear queue and wait for termination
+        new Thread(() -> {
+            try {
+                // Wait for all tasks to finish before we proceed
+                while (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                    Log.i(TAG, "Waiting for current tasks to finish");
                 }
+                Log.i(TAG, "No queue to clear");
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Exception caught while waiting for finishing gpsExecutor tasks");
+                executor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
 
-                if (accExecutor.isTerminated() && gpsExecutor.isTerminated()) {
-                    //Stop everything else once the task queue is clear
-                    stopForeground(true);
+            if (executor.isTerminated()) {
+                // Stop everything else once the task queue is clear
+                stopForeground(true);
 
-                    //Dismiss progress dialog
-                    //sendMessage("HIDE");
-                }
             }
         }).start();
 
@@ -243,20 +216,54 @@ public class AccService extends Service implements SensorEventListener, Location
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Runnables
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    class InsertAccHandler implements Runnable {
+    class InsertHandler implements Runnable {
 
         final float[] accelerometerMatrix;
 
-        //Store the current sensor array values into THIS objects arrays, and db insert from this object
-        public InsertAccHandler(float[] accelerometerMatrix) {
+        // Store the current sensor array values into THIS objects arrays, and db insert from this object
+        public InsertHandler(float[] accelerometerMatrix) {
 
             this.accelerometerMatrix = accelerometerMatrix;
         }
 
+        // Record location data
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        @SuppressLint("MissingPermission")
         public void run() {
 
+            if((curTime - lastGPSUpdate) >= GPS_POLL_FREQUENCY) {
+                lastGPSUpdate = curTime;
+
+                if (lastLocation == null){
+                    lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                }
+                if (lastLocation == null){
+                    lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
+                if (lastLocation == null){
+                    lastLocation = new Location(LocationManager.GPS_PROVIDER);
+                }
 
 
+                String str = String.valueOf(lastLocation.getLongitude()) + ", " +
+                        String.valueOf(lastLocation.getLatitude()) + ", " +
+                        (curTime - startTime) + ", " +
+                        (curTime - lastGPSUpdate) + ", " +
+                        DateFormat.getDateTimeInstance().format(new Date());
+                Log.d(TAG, "GPSService InsertAccHandler run(): " + str);
+
+                try {
+                    appendToFile(str, gpsFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // Record accelerometer data
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            if((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) {
+            lastAccUpdate = curTime;
             String str = String.valueOf(accelerometerMatrix[0]) + ", " +
                     String.valueOf(accelerometerMatrix[1]) + ", " +
                     String.valueOf(accelerometerMatrix[2]) + ", " +
@@ -269,6 +276,8 @@ public class AccService extends Service implements SensorEventListener, Location
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
 
 
         }
@@ -276,45 +285,4 @@ public class AccService extends Service implements SensorEventListener, Location
 
     }
 
-    class InsertGPSHandler implements Runnable {
-
-
-        //Store the current sensor array values into THIS objects arrays, and db insert from this object
-        public InsertGPSHandler(){
-        }
-
-        @SuppressLint("MissingPermission")
-        public void run() {
-
-
-            if (lastLocation == null){
-                lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            }
-            if (lastLocation == null){
-                lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            }
-            if (lastLocation == null){
-                lastLocation = new Location(LocationManager.GPS_PROVIDER);
-            }
-
-
-            String str = String.valueOf(lastLocation.getLongitude()) + ", " +
-                    String.valueOf(lastLocation.getLatitude()) + ", " +
-                    (curTime - startTime) + ", " +
-                    (curTime - lastGPSUpdate) + ", " +
-                    DateFormat.getDateTimeInstance().format(new Date());
-            Log.d(TAG, "GPSService InsertAccHandler run(): " + str);
-
-            try {
-                appendToFile(str, gpsFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-
-        }
-
-
-    }
 }
