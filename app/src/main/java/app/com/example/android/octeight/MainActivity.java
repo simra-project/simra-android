@@ -44,19 +44,9 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-<<<<<<< HEAD
-
-import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-=======
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
->>>>>>> master
+
 
 public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener {
 
@@ -133,33 +123,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // set up location manager to get location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-<<<<<<< HEAD
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // FINE_LOCATION permission check
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
-            // in an AlertDialog and request access to FINE_LOCATION
-
-            // The message to be shown in the AlertDialog
-            String rationaleMessage = "Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen" +
-                    "können und deine Fahrt zu speichern.";
-
-            // The OK-Button fires a requestPermissions
-            DialogInterface.OnClickListener rationaleOnClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(MainActivity.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_ACCESS_CODE);
-                }
-            };
-            showMessageOK(rationaleMessage, rationaleOnClickListener);
-        }
-
-=======
->>>>>>> master
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -474,108 +437,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         return true;
     }
 
-<<<<<<< HEAD
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Create an AlertDialog with an OK Button displaying a message
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private void showMessageOK(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(MainActivity.this)
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("OK", okListener)
-                .create()
-                .show();
-    }
-=======
->>>>>>> master
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // LocationListener Methods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-<<<<<<< HEAD
-=======
-    public void saveRouteData() {
-
-        String xString = myAccService.xList.toString();
-        create(this, "x_accelerometer.csv", xString);
-
-        String yString = myAccService.yList.toString();
-        create(this, "y_accelerometer.csv", yString);
-
-        String zString = myAccService.zList.toString();
-        create(this, "z_accelerometer.csv", zString);
-
-    }
-
-    private boolean create(Context context, String fileName, String jsonString) {
-
-        try {
-            FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
-            if (jsonString != null) {
-                fos.write(jsonString.getBytes());
-            }
-            fos.close();
-            return true;
-        } catch (FileNotFoundException fileNotFound) {
-            return false;
-        } catch (IOException ioException) {
-            return false;
-        }
-
-    }
-
-
-    public boolean isFilePresent(Context context, String fileName) {
-        String path = context.getFilesDir().getAbsolutePath() + "/" + fileName;
-        File file = new File(path);
-        Log.i(TAG, path);
-        return file.exists();
-    }
-
-
-    // Writes longitude & latitude values into text views
-
-    private void updateLoc(Location loc) {
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Update location: http://android-er.blogspot.com/2012/05/update-location-on-openstreetmap.html
-        GeoPoint locGeoPoint = new GeoPoint(loc.getLatitude(), loc.getLongitude());
-        mMapController.setCenter(locGeoPoint);
-        mMapView.invalidate();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    }
-
-    private LocationListener myLocationListener
-            = new LocationListener() {
-
-        @Override
-        public void onLocationChanged(Location location) {
-            // TODO Auto-generated method stub
-            updateLoc(location);
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // TODO Auto-generated method stub
-
-        }
-
-    };
-
->>>>>>> master
     @Override
     public void onLocationChanged(Location location) { }
 
@@ -587,9 +452,4 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     @Override
     public void onProviderDisabled(String provider) { }
-
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> master
