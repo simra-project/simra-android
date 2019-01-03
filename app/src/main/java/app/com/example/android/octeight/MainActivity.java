@@ -1,6 +1,7 @@
 package app.com.example.android.octeight;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,11 +10,10 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -22,7 +22,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-
 import android.support.v7.widget.Toolbar;
 
 import android.util.Log;
@@ -33,25 +32,31 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.osmdroid.config.Configuration;
-
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
-
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+<<<<<<< HEAD
 
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+=======
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+>>>>>>> master
 
 public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener {
 
@@ -102,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -127,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // set up location manager to get location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+<<<<<<< HEAD
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // FINE_LOCATION permission check
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -151,6 +158,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             showMessageOK(rationaleMessage, rationaleOnClickListener);
         }
 
+=======
+>>>>>>> master
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -456,6 +465,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             startActivity(intent);*/
         } else if (id == R.id.nav_infoSimRa){
             Intent intent = new Intent (MainActivity.this, StartActivity.class);
+            intent.putExtra("caller", "MainActivity");
             startActivity(intent);
         }
 
@@ -464,6 +474,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         return true;
     }
 
+<<<<<<< HEAD
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Create an AlertDialog with an OK Button displaying a message
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -475,11 +486,96 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 .create()
                 .show();
     }
+=======
+>>>>>>> master
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // LocationListener Methods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+<<<<<<< HEAD
+=======
+    public void saveRouteData() {
+
+        String xString = myAccService.xList.toString();
+        create(this, "x_accelerometer.csv", xString);
+
+        String yString = myAccService.yList.toString();
+        create(this, "y_accelerometer.csv", yString);
+
+        String zString = myAccService.zList.toString();
+        create(this, "z_accelerometer.csv", zString);
+
+    }
+
+    private boolean create(Context context, String fileName, String jsonString) {
+
+        try {
+            FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+            if (jsonString != null) {
+                fos.write(jsonString.getBytes());
+            }
+            fos.close();
+            return true;
+        } catch (FileNotFoundException fileNotFound) {
+            return false;
+        } catch (IOException ioException) {
+            return false;
+        }
+
+    }
+
+
+    public boolean isFilePresent(Context context, String fileName) {
+        String path = context.getFilesDir().getAbsolutePath() + "/" + fileName;
+        File file = new File(path);
+        Log.i(TAG, path);
+        return file.exists();
+    }
+
+
+    // Writes longitude & latitude values into text views
+
+    private void updateLoc(Location loc) {
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Update location: http://android-er.blogspot.com/2012/05/update-location-on-openstreetmap.html
+        GeoPoint locGeoPoint = new GeoPoint(loc.getLatitude(), loc.getLongitude());
+        mMapController.setCenter(locGeoPoint);
+        mMapView.invalidate();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    }
+
+    private LocationListener myLocationListener
+            = new LocationListener() {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            // TODO Auto-generated method stub
+            updateLoc(location);
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // TODO Auto-generated method stub
+
+        }
+
+    };
+
+>>>>>>> master
     @Override
     public void onLocationChanged(Location location) { }
 
@@ -492,4 +588,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     @Override
     public void onProviderDisabled(String provider) { }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> master
