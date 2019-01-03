@@ -47,6 +47,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private File gpsFile;
     LocationManager locationManager;
     Location lastLocation;
+    String recordedAccData = "";
+    String recordedGPSData = "";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // SensorEventListener Methods
@@ -59,13 +61,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         curTime = System.currentTimeMillis();
 
-            // Write data to file in background thread
-            try{
-                Runnable insertHandler = new InsertHandler(accelerometerMatrix);
-                executor.execute(insertHandler);
-            } catch (Exception e) {
-                Log.e(TAG, "insertData: " + e.getMessage(), e);
-            }
+        // Write data to file in background thread
+        try{
+            Runnable insertHandler = new InsertHandler(accelerometerMatrix);
+            executor.execute(insertHandler);
+        } catch (Exception e) {
+            Log.e(TAG, "insertData: " + e.getMessage(), e);
+        }
         /*
         if ((curTime - lastGPSUpdate) >= GPS_POLL_FREQUENCY){
             lastGPSUpdate = curTime;
@@ -94,7 +96,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "GPSService onLocationChanged() fired ");
         lastLocation = location;
     }
 
@@ -138,9 +139,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             accFile = getFileStreamPath("acc"+date);
             gpsFile = getFileStreamPath("gps"+date);
             accFile.createNewFile();
-            appendToFile("X, Y, Z, curTime, diffTime, date", accFile);
+            appendToFile("X, Y, Z, curTime, diffTime, date"+System.getProperty("line.separator"), accFile);
             gpsFile.createNewFile();
-            appendToFile("lon, lat, time, diff, date", gpsFile);
+            appendToFile("lon, lat, time, diff, date"+System.getProperty("line.separator"), gpsFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -194,6 +195,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             }
         }).start();
 
+        try {
+            appendToFile(recordedAccData, accFile);
+            appendToFile(recordedGPSData, gpsFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -206,7 +214,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private void appendToFile(String str, File file) throws IOException {
         FileOutputStream writer = openFileOutput(file.getName(), MODE_APPEND);
         writer.write(str.getBytes());
-        writer.write(System.getProperty("line.separator").getBytes());
+        //writer.write(System.getProperty("line.separator").getBytes());
         writer.flush();
         writer.close();
     }
@@ -245,38 +253,34 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 }
 
 
-                String str = String.valueOf(lastLocation.getLongitude()) + ", " +
+                String gpsData = String.valueOf(lastLocation.getLongitude()) + ", " +
                         String.valueOf(lastLocation.getLatitude()) + ", " +
                         (curTime - startTime) + ", " +
                         (curTime - lastGPSUpdate) + ", " +
                         DateFormat.getDateTimeInstance().format(new Date());
-                Log.d(TAG, "GPSService InsertAccHandler run(): " + str);
+                gpsData = gpsData+System.getProperty("line.separator");
 
-                try {
-                    appendToFile(str, gpsFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                recordedGPSData = recordedGPSData.concat(gpsData);
+
             }
 
             // Record accelerometer data
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             if((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) {
-            lastAccUpdate = curTime;
-            String str = String.valueOf(accelerometerMatrix[0]) + ", " +
-                    String.valueOf(accelerometerMatrix[1]) + ", " +
-                    String.valueOf(accelerometerMatrix[2]) + ", " +
-                    (curTime - startTime) + ", " +
-                    (curTime - lastAccUpdate) + ", " +
-                    DateFormat.getDateTimeInstance().format(new Date());
+                lastAccUpdate = curTime;
+                String accData = String.valueOf(accelerometerMatrix[0]) + ", " +
+                        String.valueOf(accelerometerMatrix[1]) + ", " +
+                        String.valueOf(accelerometerMatrix[2]) + ", " +
+                        (curTime - startTime) + ", " +
+                        (curTime - lastAccUpdate) + ", " +
+                        DateFormat.getDateTimeInstance().format(new Date());
+                accData = accData+System.getProperty("line.separator");
 
-            try {
-                appendToFile(str, accFile);
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                recordedAccData = recordedAccData.concat(accData);
+
             }
-        }
 
 
 
