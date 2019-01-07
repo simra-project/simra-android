@@ -78,12 +78,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     SharedPreferences.Editor editor;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-<<<<<<< HEAD
-
-    // Instance of class encapsulating accelerometer sensor functionality
-
-=======
->>>>>>> master
     // Service encapsulating accelerometer sensor recording functionality
     Intent recService;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -193,7 +187,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // If app has been used before and therefore a last known location is available in sharedPrefs,
         // animate the map to that location.
         // Move map to last location known by locationManager if app is started for the first time.
-<<<<<<< HEAD
         if(sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_longitude")) {
             GeoPoint lastLoc = new GeoPoint(
                     Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")),
@@ -201,18 +194,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             mMapController.animateTo(lastLoc);
         } else {
 
-=======
-
-        if(sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_longitude")) {
-
-            GeoPoint lastLoc = new GeoPoint(
-                    Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")),
-                    Double.parseDouble(sharedPrefs.getString("lastLoc_longitude", "")));
-
-            mMapController.animateTo(lastLoc);
-
-        } else {
->>>>>>> master
             try {
                 mMapController.animateTo(new GeoPoint(mLocationOverlay.getLastFix().getLatitude(),
                         mLocationOverlay.getLastFix().getLongitude()));
@@ -422,19 +403,13 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         super.onStop();
 
         try {
-<<<<<<< HEAD
             final Location myLocation = mLocationOverlay.getLastFix();
             if (myLocation != null) {
                 editor.putString("lastLoc_latitude", String.valueOf(myLocation.getLatitude()));
                 editor.putString("lastLoc_longitude", String.valueOf(myLocation.getLongitude()));
                 editor.apply();
             }
-=======
-            editor.putString("lastLoc_latitude", String.valueOf(locationManager
-                    .getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()));
-            editor.putString("lastLoc_longitude", String.valueOf(locationManager
-                    .getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude()));
->>>>>>> master
+
         } catch (Exception se) {
             se.printStackTrace();
         }
