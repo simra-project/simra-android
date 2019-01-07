@@ -398,6 +398,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    @SuppressLint("MissingPermission")
     public void onStop(){
 
         Log.i(TAG,"OnStop called");
@@ -409,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                     .getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()));
             editor.putString("lastLoc_longitude", String.valueOf(locationManager
                     .getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude()));
-        } catch (SecurityException se) {
+        } catch (Exception se) {
             se.printStackTrace();
         }
 
