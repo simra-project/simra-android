@@ -70,8 +70,22 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             "© OpenStreetMap contributors");
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    // SharedPreferences for storing last location, editor for editing sharedPrefs
+
+    SharedPreferences sharedPrefs;
+
+    SharedPreferences.Editor editor;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    // Instance of class encapsulating accelerometer sensor functionality
+
+    AccelerometerService myAccService = new AccelerometerService();
+
     // Service encapsulating accelerometer sensor recording functionality
     Intent recService;
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private Boolean recording = false;
@@ -135,6 +149,14 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // Initialize sharedPreferences
+
+        sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
+
+        editor = sharedPrefs.edit();
+
         //**************************************************************************************
         // ALTERNATIVE MAP TILE PROVIDERS
 
@@ -168,15 +190,29 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         mLocationOverlay.enableMyLocation();
 
-        // move map to the last known location
-        try {
-            mMapController.animateTo(new GeoPoint((locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()),
-                    (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude())));
-        } catch (RuntimeException re) {
-            Log.d(TAG, re.getMessage());
+        // If app has been used before and therefore a last known location is available in sharedPrefs,
+        // animate the map to that location.
+        // Move map to last location known by locationManager if app is started for the first time.
+
+        if(sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_latitude")) {
+
+            GeoPoint lastLoc = new GeoPoint(
+                    Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")),
+                    Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")));
+
+            mMapController.animateTo(lastLoc);
+
+        }  else {
+
+            try {
+                mMapController.animateTo(new GeoPoint((locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()),
+                        (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude())));
+            } catch (RuntimeException re) {
+                Log.d(TAG, re.getMessage());
+                // move map to current location
+            }
         }
 
-        // move map to current location
         mMapController.animateTo(mLocationOverlay.getMyLocation());
 
         // the map will follow the user until the user scrolls in the UI
@@ -254,6 +290,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 startService(recService);
 
                 recording = true;
+
+                //routeFunctionality();
 
             }
         });
@@ -371,6 +409,27 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public void onStop(){
+
+        Log.i(TAG,"OnStop called");
+
+        super.onStop();
+
+        try {
+            editor.putString("lastLoc_latitude", String.valueOf(locationManager
+                    .getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()));
+            editor.putString("lastLoc_longitude", String.valueOf(locationManager
+                    .getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude()));
+        } catch (SecurityException se) {
+            se.printStackTrace();
+        }
+
+        Log.i(TAG,"OnStop finished");
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Navigation Drawer
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
