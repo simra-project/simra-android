@@ -78,14 +78,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     SharedPreferences.Editor editor;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Instance of class encapsulating accelerometer sensor functionality
-
-    AccelerometerService myAccService = new AccelerometerService();
-
     // Service encapsulating accelerometer sensor recording functionality
     Intent recService;
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private Boolean recording = false;
@@ -194,22 +188,20 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // animate the map to that location.
         // Move map to last location known by locationManager if app is started for the first time.
 
-        if(sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_latitude")) {
+        if(sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_longitude")) {
 
             GeoPoint lastLoc = new GeoPoint(
                     Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")),
-                    Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")));
+                    Double.parseDouble(sharedPrefs.getString("lastLoc_longitude", "")));
 
             mMapController.animateTo(lastLoc);
 
-        }  else {
-
+        } else {
             try {
                 mMapController.animateTo(new GeoPoint((locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()),
                         (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude())));
             } catch (RuntimeException re) {
                 Log.d(TAG, re.getMessage());
-                // move map to current location
             }
         }
 
@@ -237,6 +229,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // CLICKABLES
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (1): Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -248,8 +241,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (2): Helmet
-
         helmetButton = findViewById(R.id.helmet_icon);
         helmetButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -260,8 +253,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             }
         });
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (3): CenterMap
-
         centerMap = findViewById(R.id.center_button);
 
         centerMap.setOnClickListener(new View.OnClickListener() {
@@ -274,8 +267,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (4): NEUE ROUTE / START BUTTON
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         startBtn = findViewById(R.id.start_button);
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -290,16 +281,11 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 startService(recService);
 
                 recording = true;
-
-                //routeFunctionality();
-
             }
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (5): AUFZEICHNUNG STOPPEN / STOP-BUTTON
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         stopBtn = findViewById(R.id.stop_button);
         stopBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -347,6 +333,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Lifecycle (onResume onPause onStop):
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public void onResume(){
 
@@ -429,7 +417,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Navigation Drawer
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
