@@ -187,19 +187,16 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // If app has been used before and therefore a last known location is available in sharedPrefs,
         // animate the map to that location.
         // Move map to last location known by locationManager if app is started for the first time.
-
         if(sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_longitude")) {
-
             GeoPoint lastLoc = new GeoPoint(
                     Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")),
                     Double.parseDouble(sharedPrefs.getString("lastLoc_longitude", "")));
-
             mMapController.animateTo(lastLoc);
-
         } else {
+
             try {
-                mMapController.animateTo(new GeoPoint((locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()),
-                        (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude())));
+                mMapController.animateTo(new GeoPoint(mLocationOverlay.getLastFix().getLatitude(),
+                        mLocationOverlay.getLastFix().getLongitude()));
             } catch (RuntimeException re) {
                 Log.d(TAG, re.getMessage());
             }
@@ -406,10 +403,13 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         super.onStop();
 
         try {
-            editor.putString("lastLoc_latitude", String.valueOf(locationManager
-                    .getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()));
-            editor.putString("lastLoc_longitude", String.valueOf(locationManager
-                    .getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude()));
+            final Location myLocation = mLocationOverlay.getLastFix();
+            if (myLocation != null) {
+                editor.putString("lastLoc_latitude", String.valueOf(myLocation.getLatitude()));
+                editor.putString("lastLoc_longitude", String.valueOf(myLocation.getLongitude()));
+                editor.apply();
+            }
+
         } catch (Exception se) {
             se.printStackTrace();
         }
