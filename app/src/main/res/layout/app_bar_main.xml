@@ -113,6 +113,7 @@
             android:textStyle="bold"
             />
     </RelativeLayout>
+
     <TextView android:id="@+id/copyright_text"
         android:text="@string/osmCopyrightDE"
         android:layout_width="wrap_content"
