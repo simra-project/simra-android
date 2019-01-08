@@ -86,7 +86,7 @@
         android:layout_height="85dp"
         android:background="@drawable/rounded_corners"
         android:visibility="invisible"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@id/copyright_text"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"
         >
@@ -113,4 +113,15 @@
             android:textStyle="bold"
             />
     </RelativeLayout>
+    <TextView android:id="@+id/copyright_text"
+        android:text="@string/osmCopyrightDE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="1"
+        android:textSize="15dp"
+        android:textColor="@color/white"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:autoLink="web"
+        />
 </RelativeLayout>
