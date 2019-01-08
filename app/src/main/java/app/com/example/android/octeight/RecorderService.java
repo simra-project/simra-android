@@ -18,6 +18,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.os.Process;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -38,7 +39,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     // Properties
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public static final String TAG = "TAG:";
+    public static final String TAG = "RecorderService_LOG:";
     final short ACC_POLL_FREQUENCY = 20;
     private long lastAccUpdate = 0;
     private long lastGPSUpdate = 0;
@@ -46,6 +47,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     long startTime;
     final short GPS_POLL_FREQUENCY = 3000;
     private SensorManager sensorManager = null;
+    private PowerManager.WakeLock wakeLock = null;
     ExecutorService executor;
     Sensor accelerometer;
     float[] accelerometerMatrix = new float[3];
@@ -154,6 +156,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         } catch (IOException e) {
             e.printStackTrace();
         }
+        PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG + ":RecorderService");
         // Executor service for writing data
         executor = Executors.newSingleThreadExecutor();
 
@@ -172,6 +176,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         super.onStartCommand(intent, flags, startId);
 
         startForeground(Process.myPid(), new Notification());
+        wakeLock.acquire();
+
         // Register Accelerometer sensor
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 
@@ -205,6 +211,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             }
 
             if (executor.isTerminated()) {
+                wakeLock.release();
                 // Stop everything else once the task queue is clear
                 stopForeground(true);
 
@@ -264,13 +271,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     lastLocation = new Location(LocationManager.GPS_PROVIDER);
                 }
 
-
                 String str = String.valueOf(lastLocation.getLongitude()) + ", " +
                         String.valueOf(lastLocation.getLatitude()) + ", " +
                         (curTime - startTime) + ", " +
                         (curTime - lastGPSUpdate) + ", " +
                         DateFormat.getDateTimeInstance().format(new Date());
-                Log.d(TAG, "GPSService InsertAccHandler run(): " + str);
+                // Log.d(TAG, "GPSService InsertAccHandler run(): " + str);
 
                 try {
                     appendToFile(str, gpsFile);
