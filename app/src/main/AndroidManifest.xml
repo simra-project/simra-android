@@ -64,7 +64,6 @@
             android:enabled="true"
             android:exported="true" />
         <service android:name=".RecorderService" />
-        <service android:name=".GPSService" />
 
     </application>
 
