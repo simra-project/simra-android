@@ -21,6 +21,6 @@
     <string name="startButtonText">Aufzeichnung \n starten</string>
     <string name="stopButtonText">Aufzeichnung \n stoppen</string>
     <string name="permissionRequestRationaleDE">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
-    <string name="osmCopyrightDE">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors</string>
-
+    <string name="osmCopyrightEN">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
+    <string name="osmCopyrightDE">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
 </resources>
