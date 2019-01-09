@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "app.com.example.android.octeight"
-        minSdkVersion 24
+        minSdkVersion 23
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -40,5 +40,5 @@ dependencies {
     api 'org.osmdroid:osmdroid-wms:6.0.3'
     api 'org.osmdroid:osmdroid-mapsforge:6.0.3'
     api 'org.osmdroid:osmdroid-geopackage:6.0.3'
-    compile 'com.github.MKergall:osmbonuspack:6.5.2'
+    api 'com.github.MKergall:osmbonuspack:6.5.3'
 }
