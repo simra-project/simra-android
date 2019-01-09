@@ -149,6 +149,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this);
 
+        // Queues for storing acc data
         accXQueue = new LinkedList<>();
         accYQueue = new LinkedList<>();
         accZQueue = new LinkedList<>();
