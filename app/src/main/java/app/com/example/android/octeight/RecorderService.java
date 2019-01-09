@@ -28,7 +28,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -58,7 +61,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     int notificationId = 1337;
     NotificationManagerCompat notificationManager;
 
-
+    Queue<Float> accXQueue;
+    Queue<Float> accYQueue;
+    Queue<Float> accZQueue;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // SensorEventListener Methods
@@ -143,6 +148,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this);
+
+        accXQueue = new LinkedList<>();
+        accYQueue = new LinkedList<>();
+        accZQueue = new LinkedList<>();
 
         // Create files to write gps and accelerometer data
         try {
@@ -289,18 +298,67 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             if((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) {
-            lastAccUpdate = curTime;
-            String str = String.valueOf(accelerometerMatrix[0]) + ", " +
-                    String.valueOf(accelerometerMatrix[1]) + ", " +
-                    String.valueOf(accelerometerMatrix[2]) + ", " +
-                    (curTime - startTime) + ", " +
-                    (curTime - lastAccUpdate) + ", " +
-                    DateFormat.getDateTimeInstance().format(new Date());
 
-            try {
-                appendToFile(str, accFile);
-            } catch (IOException e) {
-                e.printStackTrace();
+            lastAccUpdate = curTime;
+
+            /** Every average is computed over 30 data points, so we want the queues for the
+                three accelerometer values to be of size 30 in order to compute the averages.
+
+                Accordingly, when the queues are shorter we're adding data points.
+             */
+
+            if(accXQueue.size() < 30) {
+
+                accXQueue.add(accelerometerMatrix[0]);
+                accYQueue.add(accelerometerMatrix[1]);
+                accZQueue.add(accelerometerMatrix[2]);
+
+            } else {
+
+                // The queues are of sufficient size, let's compute the averages.
+
+                double xAvg = accXQueue.stream()
+                        .mapToDouble(a -> a)
+                        .average()
+                        .getAsDouble();
+
+                double yAvg = accYQueue.stream()
+                        .mapToDouble(a -> a)
+                        .average()
+                        .getAsDouble();
+
+                double zAvg = accZQueue.stream()
+                        .mapToDouble(a -> a)
+                        .average()
+                        .getAsDouble();
+
+                // Put the averages + time data into a string and append to file.
+
+                String str = String.valueOf(xAvg) + ", " +
+                        String.valueOf(yAvg) + ", " +
+                        String.valueOf(zAvg) + ", " +
+                        (curTime - startTime) + ", " +
+                        (curTime - lastAccUpdate) + ", " +
+                        DateFormat.getDateTimeInstance().format(new Date());
+
+                try {
+                    appendToFile(str, accFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                /** Now remove as many elements from the queues as our moving average step/shift
+                    specifies and therefore enable new data points to come in.
+                 */
+
+                for(int i = 0; i < Constants.MVG_AVG_STEP; i++) {
+
+                    accXQueue.remove();
+                    accYQueue.remove();
+                    accZQueue.remove();
+
+                }
+
             }
             }
         }
@@ -337,5 +395,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         return mBuilder;
 
     }
+
+    //private float getAvgAcc(Collection<Float> )
 
 }
