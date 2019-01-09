@@ -24,11 +24,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.osmdroid.config.Configuration;
@@ -62,12 +64,12 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     private CompassOverlay mCompassOverlay;
     private RotationGestureOverlay mRotationGestureOverlay;
     private LocationManager locationManager;
-    private static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
+   /* private static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
             0, 19, 256, ".png", new String[] {
             "http://a.tile.openstreetmap.org/",
             "http://b.tile.openstreetmap.org/",
             "http://c.tile.openstreetmap.org/" },
-            "© OpenStreetMap contributors");
+            "© OpenStreetMap contributors"); */
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     private ImageButton centerMap;
     private RelativeLayout startBtn;
     private RelativeLayout stopBtn;
+    private TextView copyrightTxt;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For permission request
@@ -139,9 +142,11 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mMapView.setMultiTouchControls(true); // gesture zooming
         mMapView.setFlingEnabled(true);
-        mMapView.setTileSource(HTTP_MAPNIK);
+        // mMapView.setTileSource(HTTP_MAPNIK);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
+        TextView copyrightTxt = (TextView) findViewById(R.id.copyright_text);
+        copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
