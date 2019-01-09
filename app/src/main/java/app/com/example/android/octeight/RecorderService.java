@@ -48,14 +48,32 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private long lastGPSUpdate = 0;
     long curTime;
     long startTime;
-    final short GPS_POLL_FREQUENCY = 3000;
+    final short GPS_POLL_FREQUENCY = Constants.GPS_FREQUENCY;
     private SensorManager sensorManager = null;
     private PowerManager.WakeLock wakeLock = null;
     ExecutorService executor;
     Sensor accelerometer;
     float[] accelerometerMatrix = new float[3];
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Strings for storing data to enable continued use by other activities
+
+    private String accString;
+    private String gpsString;
+
+    public String getGpsString() {
+        return gpsString;
+    }
+
+    public String getAccString() {
+        return accString;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     private File accFile;
     private File gpsFile;
+
     LocationManager locationManager;
     Location lastLocation;
     int notificationId = 1337;
@@ -203,6 +221,23 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Stop requesting location updates
         locationManager.removeUpdates(this);
 
+        // Write String data to files
+        executor.execute( () -> {
+            try {
+                        appendToFile(accString, accFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+        executor.execute( () -> {
+            try {
+                appendToFile(gpsString, gpsFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
         // Prevent new tasks from being added to thread
         executor.shutdown();
 
@@ -248,8 +283,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         writer.close();
     }
 
-
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Runnables
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -288,11 +321,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         DateFormat.getDateTimeInstance().format(new Date());
                 // Log.d(TAG, "GPSService InsertAccHandler run(): " + str);
 
-                try {
-                    appendToFile(str, gpsFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                gpsString += str += '\n';
             }
 
             // Record accelerometer data
@@ -318,20 +347,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 // The queues are of sufficient size, let's compute the averages.
 
-                double xAvg = accXQueue.stream()
-                        .mapToDouble(a -> a)
-                        .average()
-                        .getAsDouble();
-
-                double yAvg = accYQueue.stream()
-                        .mapToDouble(a -> a)
-                        .average()
-                        .getAsDouble();
-
-                double zAvg = accZQueue.stream()
-                        .mapToDouble(a -> a)
-                        .average()
-                        .getAsDouble();
+                float xAvg = computeAverage(accXQueue);
+                float yAvg = computeAverage(accYQueue);
+                float zAvg = computeAverage(accZQueue);
 
                 // Put the averages + time data into a string and append to file.
 
@@ -342,11 +360,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         (curTime - lastAccUpdate) + ", " +
                         DateFormat.getDateTimeInstance().format(new Date());
 
-                try {
-                    appendToFile(str, accFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                accString += str += '\n';
 
                 /** Now remove as many elements from the queues as our moving average step/shift
                     specifies and therefore enable new data points to come in.
@@ -361,8 +375,23 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 }
 
             }
+
             }
         }
+    }
+
+    private float computeAverage(Collection<Float> myVals) {
+
+        float sum = 0;
+
+        for(float f : myVals) {
+
+            sum += f;
+
+        }
+
+        return sum/myVals.size();
+
     }
 
     private NotificationCompat.Builder createNotification() {
@@ -396,7 +425,4 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         return mBuilder;
 
     }
-
-    //private float getAvgAcc(Collection<Float> )
-
 }
