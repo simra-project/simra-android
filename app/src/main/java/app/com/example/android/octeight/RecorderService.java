@@ -94,13 +94,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         curTime = System.currentTimeMillis();
 
-            // Write data to file in background thread
-            try{
-                Runnable insertHandler = new InsertHandler(accelerometerMatrix);
-                executor.execute(insertHandler);
-            } catch (Exception e) {
-                Log.e(TAG, "insertData: " + e.getMessage(), e);
-            }
+        // Write data to file in background thread
+        try{
+            Runnable insertHandler = new InsertHandler(accelerometerMatrix);
+            executor.execute(insertHandler);
+        } catch (Exception e) {
+            Log.e(TAG, "insertData: " + e.getMessage(), e);
+        }
         /*
         if ((curTime - lastGPSUpdate) >= GPS_POLL_FREQUENCY){
             lastGPSUpdate = curTime;
@@ -189,12 +189,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Executor service for writing data
         executor = Executors.newSingleThreadExecutor();
 
-        // Notification
-        NotificationCompat.Builder mBuilder = createNotification();
-        notificationManager = NotificationManagerCompat.from(this);
 
-        // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(notificationId, mBuilder.build());
 
     }
 
@@ -203,7 +198,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        startForeground(Process.myPid(), new Notification());
+
+        Notification notification = createNotification().build();
+
+        notificationManager = NotificationManagerCompat.from(this);
+        // Send the notification.
+        notificationManager.notify(notificationId, notification);
+        startForeground(notificationId, notification);
         wakeLock.acquire();
 
         // Register Accelerometer sensor
@@ -256,9 +257,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             }
 
             if (executor.isTerminated()) {
-                wakeLock.release();
                 // Stop everything else once the task queue is clear
                 stopForeground(true);
+                wakeLock.release();
 
             }
         }).start();
@@ -375,7 +376,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 }
 
             }
-
             }
         }
     }
@@ -401,6 +401,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         */
+        Intent contentIntent = new Intent(this, MainActivity.class);
+        contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, contentIntent, 0);
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -420,7 +423,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 .setContentText("Ihre Fahrt wird aufgezeichnet.")
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 // Set the intent that will fire when the user taps the notification
-                /*.setContentIntent(pendingIntent)*/;
+                .setContentIntent(pendingIntent);
 
         return mBuilder;
 
