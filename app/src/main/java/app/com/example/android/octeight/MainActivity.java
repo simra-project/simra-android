@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
@@ -20,6 +22,7 @@ import android.support.v7.widget.Toolbar;
 
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -32,12 +35,15 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -272,8 +278,13 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 startBtn.setVisibility(View.INVISIBLE);
 
                 // start RecorderService for accelerometer data recording
+                /*
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(recService);
+                } else {
+                    startService(recService);
+                }*/
                 startService(recService);
-
                 recording = true;
             }
         });
@@ -286,11 +297,11 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             @Override
             public void onClick(View v) {
 
+
                 showStart();
 
                 // stop RecorderService which is recording accelerometer data
                 stopService(recService);
-
                 recording = false;
 
                 // unregister accelerometer sensor listener
@@ -373,10 +384,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         // Ensure the button that matches current state is presented.
         // @TODO für MARK: doesn't seem to work yet, when display is rotated "Neue Route" is always presented
         /**if(recording) {
-            showStop();
-        } else {
-            showStart();
-        }*/
+         showStop();
+         } else {
+         showStart();
+         }*/
 
 
 
@@ -414,6 +425,17 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         Log.i(TAG,"OnStop finished");
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Navigation Drawer
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -423,7 +445,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            Intent setIntent = new Intent(Intent.ACTION_MAIN);
+            setIntent.addCategory(Intent.CATEGORY_HOME);
+            setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(setIntent);
         }
     }
 
