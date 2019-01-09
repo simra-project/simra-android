@@ -16,7 +16,7 @@ public class Constants extends Service {
 
     // GPS-Trace: one recording every 3 secs = every 3000 millisecs.
 
-    public static final long GPS_FREQUENCY = 3000;
+    public static final short GPS_FREQUENCY = 3000;
 
     // TimeStamp for GPS: to be recorded every minute = every 60000 millisecs.
 
