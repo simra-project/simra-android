@@ -1,14 +1,17 @@
 package app.com.example.android.octeight;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Service encapsulating accelerometer sensor recording functionality
     Intent recService;
+    RecorderService mBoundService;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private Boolean recording = false;
@@ -338,7 +342,10 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 } else {
                     startService(recService);
                 }*/
-                startService(recService);
+                Intent intent = new Intent(MainActivity.this, RecorderService.class);
+                startService(intent);
+                bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+                //startService(recService);
                 recording = true;
             }
         });
@@ -355,8 +362,29 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 showStart();
 
                 // stop RecorderService which is recording accelerometer data
+                unbindService(mServiceConnection);
                 stopService(recService);
                 recording = false;
+                List<GeoPoint> geoPoints = new ArrayList<>();
+                String gps = mBoundService.getGpsString();
+                String[] gpsArray = gps.split("\\n");
+                for (int i = 0; i < gpsArray.length; i++){
+                    try {
+                        String[] line = gpsArray[i].split(",");
+                        double lat = Double.valueOf(line[1]);
+                        double lon = Double.valueOf(line[0]);
+                        geoPoints.add(new GeoPoint(lat, lon));
+                        Log.d(TAG, "StopButton i = " + i + "lon, lat = " + lon + ", " + lat);
+                    } catch ( Exception e) {
+                        e.printStackTrace();
+                        continue;
+                    }
+                }
+
+                Polyline line = new Polyline();   //see note below!
+                line.setPoints(geoPoints);
+
+                mMapView.getOverlayManager().add(line);
 
                 // unregister accelerometer sensor listener
                 // @TODO (is this necessary? where else to unregister? - unregistering the
@@ -575,4 +603,20 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     @Override
     public void onProviderDisabled(String provider) { }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ServiceConnection for communicating with RecorderService
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            RecorderService.MyBinder myBinder = (RecorderService.MyBinder) service;
+            mBoundService = myBinder.getService();
+        }
+    };
 }
