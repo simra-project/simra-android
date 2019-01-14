@@ -15,6 +15,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -54,6 +56,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     ExecutorService executor;
     Sensor accelerometer;
     float[] accelerometerMatrix = new float[3];
+    Ride ride;
+    private IBinder mBinder = new MyBinder();
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Strings for storing data to enable continued use by other activities
@@ -73,6 +77,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     private File accFile;
     private File gpsFile;
+
+    String date;
 
     LocationManager locationManager;
     Location lastLocation;
@@ -174,9 +180,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         // Create files to write gps and accelerometer data
         try {
-            String date = DateFormat.getDateTimeInstance().format(new Date())+".csv";
-            accFile = getFileStreamPath("acc"+date);
-            gpsFile = getFileStreamPath("gps"+date);
+            date = DateFormat.getDateTimeInstance().format(new Date());
+            accFile = getFileStreamPath("acc"+date + ".csv");
+            gpsFile = getFileStreamPath("gps"+date + ".csv");
             accFile.createNewFile();
             appendToFile("X, Y, Z, curTime, diffTime, date", accFile);
             gpsFile.createNewFile();
@@ -192,6 +198,25 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
 
     }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind()");
+        return mBinder;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        Log.d(TAG, "onRebind()");
+        super.onRebind(intent);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.v(TAG, "onUnbind()");
+        return true;
+    }
+
 
     @SuppressLint("MissingPermission")
     @Override
@@ -221,6 +246,15 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         // Stop requesting location updates
         locationManager.removeUpdates(this);
+
+        // Remove the Notification
+        notificationManager.cancel(notificationId);
+
+        // Create and save the ride
+
+        ride = new Ride(accString, gpsString, date);
+        // Log.d(TAG, accString);
+        // Log.d(TAG, gpsString);
 
         // Write String data to files
         executor.execute( () -> {
@@ -264,17 +298,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             }
         }).start();
 
-        // Remove the Notification
-        notificationManager.cancel(notificationId);
-
     }
 
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 
     private void appendToFile(String str, File file) throws IOException {
         FileOutputStream writer = openFileOutput(file.getName(), MODE_APPEND);
@@ -427,5 +452,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         return mBuilder;
 
+    }
+
+    public class MyBinder extends Binder {
+        RecorderService getService() {
+            return RecorderService.this;
+        }
     }
 }

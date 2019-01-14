@@ -17,6 +17,9 @@ public class Ride {
     int user;
     File sensor;
     LinkedList<AccEvent> events;
+    String accString;
+    String gpsString;
+    String timeStamp;
 
     public Ride (int user, File sensorData){
         user = this.user;
@@ -26,6 +29,13 @@ public class Ride {
         // finish = get last GeoPoint in sensorData
         // duration = last timestamp - first timestamp
         updateEvents();
+    }
+
+    public Ride (String accString, String gpsString, String timeStamp){
+        this.accString = accString;
+        this.gpsString = gpsString;
+        this.timeStamp = timeStamp;
+
     }
 
     private void updateEvents (){
