@@ -20,9 +20,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.Process;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.FloatMath;
 import android.util.Log;
 
 import java.io.File;
@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -45,43 +44,58 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public static final String TAG = "RecorderService_LOG:";
-    final short ACC_POLL_FREQUENCY = 20;
+    final int ACC_POLL_FREQUENCY = Constants.ACC_FREQUENCY;
     private long lastAccUpdate = 0;
+    //private long lastGPSUpdate = 0;
     private long lastGPSUpdate = 0;
+
     long curTime;
     long startTime;
-    final short GPS_POLL_FREQUENCY = Constants.GPS_FREQUENCY;
+    final int GPS_POLL_FREQUENCY = Constants.GPS_FREQUENCY;
     private SensorManager sensorManager = null;
     private PowerManager.WakeLock wakeLock = null;
     ExecutorService executor;
     Sensor accelerometer;
     float[] accelerometerMatrix = new float[3];
-    Ride ride;
     private IBinder mBinder = new MyBinder();
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Strings for storing data to enable continued use by other activities
 
-    private String accString;
-    private String gpsString;
+    private String accString = "";
+    private String gpsString = "";
+    private String accGpsString = "";
 
     public String getGpsString() {
         return gpsString;
     }
-
     public String getAccString() {
         return accString;
     }
+    public String getAccGpsString() { return accGpsString; }
+    public String getDate() { return date; }
+
+    public String mAcceleration = "";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // The ride object which will be created and retrieved by the MainActivity at the end of the
+    // service
+    public Ride getRide() { return new Ride(accGpsString, date); }
 
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // The files which contain accString, gpsString and accGpsString
     private File accFile;
     private File gpsFile;
+    private File accGpsFile;
 
     String date;
 
     LocationManager locationManager;
     Location lastLocation;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // For Managing the notification shown while the service is running
     int notificationId = 1337;
     NotificationManagerCompat notificationManager;
 
@@ -164,7 +178,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         super.onCreate();
         startTime = System.currentTimeMillis();
 
-        // Prepare the accelerometer sensor
+        // Prepare the accelerometer accGpsFile
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
@@ -183,10 +197,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             date = DateFormat.getDateTimeInstance().format(new Date());
             accFile = getFileStreamPath("acc"+date + ".csv");
             gpsFile = getFileStreamPath("gps"+date + ".csv");
-            accFile.createNewFile();
-            appendToFile("X, Y, Z, curTime, diffTime, date", accFile);
-            gpsFile.createNewFile();
-            appendToFile("lon, lat, time, diff, date", gpsFile);
+            accGpsFile = getFileStreamPath("accGps"+date + ".csv");
+            //accFile.createNewFile();
+            //appendToFile("X,Y,Z,curTime,diffTime,date", accFile);
+            //gpsFile.createNewFile();
+            //appendToFile("lat,lon,time,diff,date", gpsFile);
+            accGpsFile.createNewFile();
+            appendToFile("lat,lon,X,Y,Z,time,diff,date"+System.lineSeparator(), accGpsFile);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -194,8 +212,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG + ":RecorderService");
         // Executor service for writing data
         executor = Executors.newSingleThreadExecutor();
-
-
 
     }
 
@@ -223,7 +239,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-
         Notification notification = createNotification().build();
 
         notificationManager = NotificationManagerCompat.from(this);
@@ -232,7 +247,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         startForeground(notificationId, notification);
         wakeLock.acquire();
 
-        // Register Accelerometer sensor
+        // Register Accelerometer accGpsFile
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 
         return START_STICKY;
@@ -250,21 +265,23 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Remove the Notification
         notificationManager.cancel(notificationId);
 
-        // Create and save the ride
+        Log.d(TAG, "onDestroy() mAcceleration: " + mAcceleration);
 
-        ride = new Ride(accString, gpsString, date);
+
+
         // Log.d(TAG, accString);
         // Log.d(TAG, gpsString);
 
         // Write String data to files
         executor.execute( () -> {
             try {
-                        appendToFile(accString, accFile);
+                appendToFile(accGpsString, accGpsFile);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 });
 
+        /*
         executor.execute( () -> {
             try {
                 appendToFile(gpsString, gpsFile);
@@ -272,6 +289,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 e.printStackTrace();
             }
         });
+        */
 
         // Prevent new tasks from being added to thread
         executor.shutdown();
@@ -304,7 +322,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private void appendToFile(String str, File file) throws IOException {
         FileOutputStream writer = openFileOutput(file.getName(), MODE_APPEND);
         writer.write(str.getBytes());
-        writer.write(System.getProperty("line.separator").getBytes());
+        //writer.write(System.getProperty("line.separator").getBytes());
         writer.flush();
         writer.close();
     }
@@ -316,17 +334,18 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         final float[] accelerometerMatrix;
 
-        // Store the current sensor array values into THIS objects arrays, and db insert from this object
+        // Store the current accGpsFile array values into THIS objects arrays, and db insert from this object
         public InsertHandler(float[] accelerometerMatrix) {
 
             this.accelerometerMatrix = accelerometerMatrix;
         }
 
-        // Record location data
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         @SuppressLint("MissingPermission")
         public void run() {
 
+            // Record location data
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            /*
             if((curTime - lastGPSUpdate) >= GPS_POLL_FREQUENCY) {
                 lastGPSUpdate = curTime;
 
@@ -349,13 +368,26 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 gpsString += str += '\n';
             }
+            */
 
-            // Record accelerometer data
+            // Record accelerometer and location data
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             if((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) {
 
-            lastAccUpdate = curTime;
+                double x = accelerometerMatrix[0];
+                double y = accelerometerMatrix[1];
+                double z = accelerometerMatrix[2];
+                double mAccelCurrent = Math.sqrt(x*x+y*y+z*z);
+
+                double mAccel = 0.0d;
+                mAccel = mAccel * 0.9d + mAccelCurrent * 0.1d;
+
+                mAcceleration += String.valueOf(x) + "," + String.valueOf(y) + "," + String.valueOf(z) + ",";
+                mAcceleration += (String.valueOf(mAccel) + "," + String.valueOf(mAccelCurrent));
+                mAcceleration += '\n';
+
+                lastAccUpdate = curTime;
 
             /** Every average is computed over 30 data points, so we want the queues for the
                 three accelerometer values to be of size 30 in order to compute the averages.
@@ -371,6 +403,29 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
             } else {
 
+                // The gps (lat, lon) information are recorded (around) every 3 seconds.
+                // The accGpsFile data (x,y,z) information are recorded 50 times a second.
+                // So the gps changes (around) every 150 lines. We store the gps data
+                // only after the 3 seconds are over.
+                String gps = ",,";
+
+                if((curTime - lastGPSUpdate) >= GPS_POLL_FREQUENCY) {
+                    lastGPSUpdate = curTime;
+
+                    if (lastLocation == null) {
+                        lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    }
+                    if (lastLocation == null) {
+                        lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    }
+                    if (lastLocation == null) {
+                        lastLocation = new Location(LocationManager.GPS_PROVIDER);
+                    }
+
+                    gps = String.valueOf(lastLocation.getLatitude()) + "," +
+                            String.valueOf(lastLocation.getLongitude()) + ",";
+                }
+
                 // The queues are of sufficient size, let's compute the averages.
 
                 float xAvg = computeAverage(accXQueue);
@@ -378,15 +433,19 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 float zAvg = computeAverage(accZQueue);
 
                 // Put the averages + time data into a string and append to file.
-
-                String str = String.valueOf(xAvg) + ", " +
-                        String.valueOf(yAvg) + ", " +
-                        String.valueOf(zAvg) + ", " +
-                        (curTime - startTime) + ", " +
-                        (curTime - lastAccUpdate) + ", " +
+                String str = gps + String.valueOf(xAvg) + "," +
+                        String.valueOf(yAvg) + "," +
+                        String.valueOf(zAvg) + "," +
+                        (curTime - startTime) + "," +
+                        (curTime - lastAccUpdate) + "," +
                         DateFormat.getDateTimeInstance().format(new Date());
 
-                accString += str += '\n';
+
+
+                //accString += str += '\n';
+                //Log.d(TAG, "accString: " + accString);
+                // str += System.getProperty("line.separator");
+                accGpsString += str += System.getProperty("line.separator");
 
                 /** Now remove as many elements from the queues as our moving average step/shift
                     specifies and therefore enable new data points to come in.

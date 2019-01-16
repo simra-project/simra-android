@@ -6,17 +6,17 @@ import android.os.IBinder;
 
 public class Constants extends Service {
 
-    // Accelerometer data gets recorded 50 times per second (every 50000 millisecs).
+    // Accelerometer data gets recorded 50 times per second (every 20 millisecs).
 
-    public static final long ACC_FREQUENCY = 50000;
+    public static final int ACC_FREQUENCY = 20;
 
     // Step size for accelerometer moving average
 
-    public static final int MVG_AVG_STEP = 5;
+    public static final int MVG_AVG_STEP = 6;
 
     // GPS-Trace: one recording every 3 secs = every 3000 millisecs.
 
-    public static final short GPS_FREQUENCY = 3000;
+    public static final int GPS_FREQUENCY = 3000;
 
     // TimeStamp for GPS: to be recorded every minute = every 60000 millisecs.
 

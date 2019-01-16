@@ -53,6 +53,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     SharedPreferences.Editor editor;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Service encapsulating accelerometer sensor recording functionality
+    // Service encapsulating accelerometer accGpsFile recording functionality
     Intent recService;
     RecorderService mBoundService;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,9 +106,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     private RelativeLayout stopBtn;
     private TextView copyrightTxt;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // For permission request
-    private final int LOCATION_ACCESS_CODE = 1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Context of application environment
@@ -159,11 +157,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         // Initialize sharedPreferences
 
         sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
         editor = sharedPrefs.edit();
 
         //**************************************************************************************
@@ -237,8 +233,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
 
+        /*
         List<GeoPoint> geoPoints = new ArrayList<>();
-
 
         File gpsFile = getFileStreamPath("gps09.01.2019 18:06:24.csv");
 
@@ -254,8 +250,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 //Log.d(TAG, line);
                 try {
                     String[] separatedLine = line.split(",");
-                    double longitude = Double.valueOf(separatedLine[0]);
-                    double latitude = Double.valueOf(separatedLine[1]);
+                    double latitude = Double.valueOf(separatedLine[0]);
+                    double longitude = Double.valueOf(separatedLine[1]);
                     geoPoints.add(new GeoPoint(latitude, longitude));
                 } catch (Exception e){
                     e.printStackTrace();
@@ -281,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         });
 
         mMapView.getOverlayManager().add(line);
-
+        */
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
@@ -361,32 +357,46 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
                 showStart();
 
+                // String[] fileNames = ShowRouteUtils.getFiles(MainActivity.this);
+                // File accGpsFile = getFileStreamPath(fileNames[(fileNames.length)-1]);
+
+
+                // List<GeoPoint> geoPoints = new ArrayList<>();
+                // Ride ride = new Ride(mBoundService.getAccGpsString(),mBoundService.getDate());
+                // Polyline line = ride.getRouteLine();
+                // Log.d(TAG, "line = " + Arrays.toString(line.getPoints().toArray()));
+
                 // stop RecorderService which is recording accelerometer data
                 unbindService(mServiceConnection);
                 stopService(recService);
                 recording = false;
-                List<GeoPoint> geoPoints = new ArrayList<>();
+                Intent intent = new Intent (MainActivity.this, HistoryActivity.class);
+                // Log.d(TAG, "point = " + line.getPoints().get(0).toString());
+                intent.putExtra("AccGpsString", mBoundService.getAccGpsString());
+                intent.putExtra("Date", mBoundService.getDate());
+                startActivity(intent);
+                /*
                 String gps = mBoundService.getGpsString();
                 String[] gpsArray = gps.split("\\n");
                 for (int i = 0; i < gpsArray.length; i++){
                     try {
                         String[] line = gpsArray[i].split(",");
-                        double lat = Double.valueOf(line[1]);
-                        double lon = Double.valueOf(line[0]);
+                        double lat = Double.valueOf(line[0]);
+                        double lon = Double.valueOf(line[1]);
                         geoPoints.add(new GeoPoint(lat, lon));
-                        Log.d(TAG, "StopButton i = " + i + "lon, lat = " + lon + ", " + lat);
+                        Log.d(TAG, "StopButton i = " + i + "lat, lon = " + lat + ", " + lon);
                     } catch ( Exception e) {
                         e.printStackTrace();
                         continue;
                     }
                 }
 
-                Polyline line = new Polyline();   //see note below!
+                Polyline line = new Polyline();
                 line.setPoints(geoPoints);
+                */
+                //mMapView.getOverlayManager().add(line);
 
-                mMapView.getOverlayManager().add(line);
-
-                // unregister accelerometer sensor listener
+                // unregister accelerometer accGpsFile listener
                 // @TODO (is this necessary? where else to unregister? - unregistering the
                 // listener in onPause as demonstrated in most examples is not an option
                 // as we want to keep recording when screen is turned off!)
@@ -540,7 +550,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         int id = item.getItemId();
 
         if (id == R.id.nav_history) {
-            // Handle the camera action
+            Intent intent = new Intent (MainActivity.this, HistoryActivity.class);
+            startActivity(intent);            // Handle the camera action
         } else if (id == R.id.nav_democraphic_data) {
             // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
             Intent i = new Intent(Intent.ACTION_SEND);

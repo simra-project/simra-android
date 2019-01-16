@@ -1,10 +1,18 @@
 package app.com.example.android.octeight;
 
+import android.util.Log;
+
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 public class Ride {
 
@@ -15,15 +23,21 @@ public class Ride {
     GeoPoint finish;
     int duration;
     int user;
-    File sensor;
+    File accGpsFile;
     LinkedList<AccEvent> events;
     String accString;
     String gpsString;
+    String accGpsString;
     String timeStamp;
+    static String TAG = "Ride_LOG";
+    Polyline route;
+    Marker[] incidents;
+
+
 
     public Ride (int user, File sensorData){
         user = this.user;
-        sensor = sensorData;
+        accGpsFile = sensorData;
         date =  new Date();
         // start = get first GeoPoint in sensorData
         // finish = get last GeoPoint in sensorData
@@ -31,11 +45,10 @@ public class Ride {
         updateEvents();
     }
 
-    public Ride (String accString, String gpsString, String timeStamp){
-        this.accString = accString;
-        this.gpsString = gpsString;
+    public Ride (String accGpsString, String timeStamp){
+        this.accGpsString = accGpsString;
         this.timeStamp = timeStamp;
-
+        this.route = getRouteLine(accGpsString);
     }
 
     private void updateEvents (){
@@ -43,4 +56,92 @@ public class Ride {
         // search for Events in sensorData
         // add every Event to the List
     }
+
+    public static Polyline getRouteLine(String accGpsString){
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        String[] gpsArray = accGpsString.split("\\n");
+        GeoPoint actualGeoPoint = new GeoPoint(0.0, 0.0);
+        Queue<Float> accXQueue;
+        Queue<Float> accYQueue;
+        Queue<Float> accZQueue;
+
+        for (int i = 0; i < gpsArray.length; i++){
+            String actualLine = gpsArray[i];
+            try {
+                if((actualLine.startsWith(",,"))||(actualLine.split(",").length<8)){
+                    continue;
+                }
+                String[] line = gpsArray[i].split(",");
+                actualGeoPoint.setLatitude(Double.valueOf(line[0]));
+                actualGeoPoint.setLongitude(Double.valueOf(line[1]));
+                geoPoints.add(actualGeoPoint);
+
+
+
+            } catch ( Exception e) {
+                e.printStackTrace();
+            }
+        }
+        Polyline line = new Polyline();
+        line.setPoints(geoPoints);
+        return line;
+    }
+
+    public String getTimeStamp(){
+        return this.timeStamp;
+    }
+    public Polyline getRoute(){ return this.route; }
+
+    public class RoutePart {
+        Queue<Float> accXQueue;
+        Queue<Float> accYQueue;
+        Queue<Float> accZQueue;
+        GeoPoint gps;
+        String timeStamp;
+        double averageX;
+        double averageY;
+        double averageZ;
+
+        public RoutePart(Queue<Float> accXQueue, Queue<Float> accYQueue, Queue<Float> accZQueue, String timeStamp){
+            this.accXQueue = accXQueue;
+            this.accYQueue = accYQueue;
+            this.accZQueue = accZQueue;
+            this.timeStamp = timeStamp;
+
+            computeAverage(accXQueue);
+
+        }
+
+        private double computeAverage(Collection<Float> myVals) {
+
+            double sum = 0;
+
+            for(double f : myVals) {
+
+                sum += f;
+
+            }
+
+            return sum/myVals.size();
+
+        }
+
+
+
+    }
+
+    public class Incident {
+        Polyline incidentRoute;
+        String timestamp;
+        Ride owner;
+        int type;
+
+        public Incident(Polyline incidentRoute, String timestamp, Ride owner){
+            this.incidentRoute = incidentRoute;
+            this.timestamp = timestamp;
+            this.owner = owner;
+        }
+
+    }
+
 }
