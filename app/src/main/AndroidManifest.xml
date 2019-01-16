@@ -12,8 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.location.network" />
@@ -42,9 +41,9 @@
             android:name="HEREWEGO_APPCODE"
             android:value="Dv1l6L3uczbBmhFasUc1Eg" />
 
-        <activity android:name=".StartActivity"
+        <activity
+            android:name=".StartActivity"
             android:launchMode="singleTop">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -56,25 +55,41 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".MenuActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MenuActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".HelmetActivity"
-            android:parentActivityName=".MainActivity"/>
-        <activity android:name=".SaveActivity"
-            android:parentActivityName=".MainActivity"/>
-        <activity android:name=".WebActivity"
-            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".HelmetActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".SaveActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".WebActivity"
+            android:parentActivityName=".MainActivity" />
 
         <service
             android:name=".Constants"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".RecorderService"
-            android:parentActivityName=".MainActivity"/>
+        <service
+            android:name=".RecorderService"
+            android:parentActivityName=".MainActivity" />
 
+        <activity
+            android:name=".HistoryActivity"
+            android:label="@string/title_activity_history"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="app.com.example.android.octeight.MainActivity" />
+        </activity>
+        <activity android:name=".ShowRouteActivity"></activity>
     </application>
 
 </manifest>

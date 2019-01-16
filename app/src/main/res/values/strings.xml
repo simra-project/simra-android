@@ -25,4 +25,5 @@
     <string name="channel_descriptionDE">Fahrt wird aufgezeichnet</string>
     <string name="osmCopyrightEN">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
     <string name="osmCopyrightDE">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
+    <string name="title_activity_history">HistoryActivity</string>
 </resources>
