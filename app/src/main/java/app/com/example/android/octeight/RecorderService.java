@@ -102,6 +102,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     Queue<Float> accXQueue;
     Queue<Float> accYQueue;
     Queue<Float> accZQueue;
+    Queue<Float> accQQueue;
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // SensorEventListener Methods
@@ -191,6 +193,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         accXQueue = new LinkedList<>();
         accYQueue = new LinkedList<>();
         accZQueue = new LinkedList<>();
+        accQQueue = new LinkedList<>();
 
         // Create files to write gps and accelerometer data
         try {
@@ -378,7 +381,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 double x = accelerometerMatrix[0];
                 double y = accelerometerMatrix[1];
                 double z = accelerometerMatrix[2];
-                double mAccelCurrent = Math.sqrt(x*x+y*y+z*z);
+                float mAccelCurrent = (float) Math.sqrt(x*x+y*y+z*z);
 
                 double mAccel = 0.0d;
                 mAccel = mAccel * 0.9d + mAccelCurrent * 0.1d;
@@ -400,6 +403,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 accXQueue.add(accelerometerMatrix[0]);
                 accYQueue.add(accelerometerMatrix[1]);
                 accZQueue.add(accelerometerMatrix[2]);
+                accQQueue.add(mAccelCurrent);
 
             } else {
 
@@ -431,6 +435,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 float xAvg = computeAverage(accXQueue);
                 float yAvg = computeAverage(accYQueue);
                 float zAvg = computeAverage(accZQueue);
+                float qAvg = computeAverage(accQQueue);
 
                 // Put the averages + time data into a string and append to file.
                 String str = gps + String.valueOf(xAvg) + "," +
@@ -445,7 +450,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 //accString += str += '\n';
                 //Log.d(TAG, "accString: " + accString);
                 // str += System.getProperty("line.separator");
-                accGpsString += str += System.getProperty("line.separator");
+
+                accGpsString += str += String.valueOf(qAvg);
+                accGpsString += System.getProperty("line.separator");
 
                 /** Now remove as many elements from the queues as our moving average step/shift
                     specifies and therefore enable new data points to come in.
@@ -456,6 +463,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     accXQueue.remove();
                     accYQueue.remove();
                     accZQueue.remove();
+                    accQQueue.remove();
 
                 }
 
