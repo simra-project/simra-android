@@ -18,21 +18,19 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ShowRouteActivity extends AppCompatActivity {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
     private MapView mMapView;
-    private MapController mMapController;
-    private final int ZOOM_LEVEL = 19;
-    private LocationManager locationManager;
+    private TextView copyrightTxt;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
     private static final String TAG = "ShowRouteActivity_LOG";
 
-    private TextView copyrightTxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +44,7 @@ public class ShowRouteActivity extends AppCompatActivity {
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mMapView.setMultiTouchControls(true); // gesture zooming
         mMapView.setFlingEnabled(true);
-        mMapController = (MapController) mMapView.getController();
+        MapController mMapController = (MapController) mMapView.getController();
         copyrightTxt = (TextView) findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -56,16 +54,24 @@ public class ShowRouteActivity extends AppCompatActivity {
         String accGpsString = getIntent().getStringExtra("AccGpsString");
         String date = getIntent().getStringExtra("Date");
         int state = getIntent().getIntExtra("State", 0);
+
+        // Create a ride object with the accelerometer, gps and time data
         Ride ride = new Ride(accGpsString, date, state);
+        // Get the Route as a Polyline to be displayed on the map
         Polyline route = ride.getRoute();
+        // Get a bounding box of the route so the view can be moved to it and the zoom can be
+        // set accordingly
         double[] bounds = getBoundingBox(route);
         BoundingBox bBox = new BoundingBox(bounds[0],bounds[1],bounds[2],bounds[3]);
-        //bBox.set(52.521271,13.330201,52.507795,13.319687);
+        // Disallow the user to scroll outside the bounding box to prevent her/him from getting lost
         mMapView.setScrollableAreaLimitDouble(bBox);
-        Log.d(TAG, "bBox: " + bBox);
-        Log.d(TAG, "getIntrinsicScreenRect: " + mMapView.getIntrinsicScreenRect(null).toString());
-        mMapView.invalidate();
 
+        // Log.d(TAG, "bBox: " + bBox);
+        // Log.d(TAG, "getIntrinsicScreenRect: " + mMapView.getIntrinsicScreenRect(null).toString());
+
+        mMapView.invalidate();
+        // zoom automatically to the bounding box. Usually the command in the if body should suffice
+        // but osmdroid is buggy and we need the else part to fix it.
         if((mMapView.getIntrinsicScreenRect(null).bottom-mMapView.getIntrinsicScreenRect(null).top) > 0){
             mMapView.zoomToBoundingBox(bBox, false);
         } else {

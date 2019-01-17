@@ -383,11 +383,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 double z = accelerometerMatrix[2];
                 float mAccelCurrent = (float) Math.sqrt(x*x+y*y+z*z);
 
-                double mAccel = 0.0d;
-                mAccel = mAccel * 0.9d + mAccelCurrent * 0.1d;
 
-                mAcceleration += String.valueOf(x) + "," + String.valueOf(y) + "," + String.valueOf(z) + ",";
-                mAcceleration += (String.valueOf(mAccel) + "," + String.valueOf(mAccelCurrent));
+                mAcceleration += String.valueOf(x) + "," + String.valueOf(y) + "," + String.valueOf(z) + ","+ String.valueOf(mAccelCurrent);
                 mAcceleration += '\n';
 
                 lastAccUpdate = curTime;

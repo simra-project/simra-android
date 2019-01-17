@@ -326,23 +326,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             @Override
             public void onClick(View v) {
 
-                String fileName = "accGps17.01.2019 10:47:05.csv";
-                String correctedCSV = ShowRouteUtils.getCsvAsStringFromFile(MainActivity.this, fileName);
-                File file = getFileStreamPath("corrected_"+fileName);
-                FileOutputStream writer = null;
-                try {
-                    writer = openFileOutput(file.getName(), MODE_APPEND);
-                    writer.write(correctedCSV.getBytes());
-                    //writer.write(System.getProperty("line.separator").getBytes());
-                    writer.flush();
-                    writer.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                Log.d(TAG, "writing done");
 
-                // Log.d(TAG, "correctedCSV: " + correctedCSV);
-                /*
+
 
                 // show stop button, hide start button
                 showStop();
@@ -355,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
                 //startService(recService);
                 recording = true;
-                */
+
             }
         });
 
@@ -370,45 +355,23 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
                 showStart();
 
-                // String[] fileNames = ShowRouteUtils.getFiles(MainActivity.this);
-                // File accGpsFile = getFileStreamPath(fileNames[(fileNames.length)-1]);
 
-
-                // List<GeoPoint> geoPoints = new ArrayList<>();
-                // Ride ride = new Ride(mBoundService.getAccGpsString(),mBoundService.getDate());
-                // Polyline line = ride.getRouteLine();
-                // Log.d(TAG, "line = " + Arrays.toString(line.getPoints().toArray()));
-
-                // stop RecorderService which is recording accelerometer data
+                // Stop RecorderService which is recording accelerometer data
                 unbindService(mServiceConnection);
                 stopService(recService);
                 recording = false;
+
+                // Get the recorded files and send them to HistoryActivity for further processing
                 Intent intent = new Intent (MainActivity.this, HistoryActivity.class);
-                // Log.d(TAG, "point = " + line.getPoints().get(0).toString());
+                // AccGpsString contains the accelerometer and location data as well as time data
                 intent.putExtra("AccGpsString", mBoundService.getAccGpsString());
+                // Date in form of system date (day.month.year hour:minute:second if german)
                 intent.putExtra("Date", mBoundService.getDate());
+                // State can be 0 for server processing not started, 1 for started and pending
+                // and 2 for processed by server so the incidents can be annotated by the user
                 intent.putExtra("State", 0); // redundant
                 startActivity(intent);
-                /*
-                String gps = mBoundService.getGpsString();
-                String[] gpsArray = gps.split("\\n");
-                for (int i = 0; i < gpsArray.length; i++){
-                    try {
-                        String[] line = gpsArray[i].split(",");
-                        double lat = Double.valueOf(line[0]);
-                        double lon = Double.valueOf(line[1]);
-                        geoPoints.add(new GeoPoint(lat, lon));
-                        Log.d(TAG, "StopButton i = " + i + "lat, lon = " + lat + ", " + lon);
-                    } catch ( Exception e) {
-                        e.printStackTrace();
-                        continue;
-                    }
-                }
 
-                Polyline line = new Polyline();
-                line.setPoints(geoPoints);
-                */
-                //mMapView.getOverlayManager().add(line);
 
                 // unregister accelerometer accGpsFile listener
                 // @TODO (is this necessary? where else to unregister? - unregistering the

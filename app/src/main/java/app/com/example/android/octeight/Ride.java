@@ -49,6 +49,7 @@ public class Ride {
         updateEvents();
     }
 
+    // This is the constructor that is used for now.
     public Ride (String accGpsString, String timeStamp, int state){
         this.accGpsString = accGpsString;
         this.timeStamp = timeStamp;
@@ -62,6 +63,11 @@ public class Ride {
         // add every Event to the List
     }
 
+    // Takes a String which contains all the data and creates a
+    // PolyLine to be displayed on the map as a route.
+    // Maybe this should happen in RecorderService since we
+    // already loop through all the lines there.
+    // It is not good to do loop here through the data again.
     public static Polyline getRouteLine(String accGpsString){
         List<GeoPoint> geoPoints = new ArrayList<>();
         String[] gpsArray = accGpsString.split("\\n");
@@ -92,6 +98,7 @@ public class Ride {
         return line;
     }
 
+    // ignore for now
     public static Polyline getRouteLine(String accGpsString, Boolean b){
         List<GeoPoint> geoPoints = new ArrayList<>();
         String[] gpsArray = accGpsString.split("\\n");
@@ -123,6 +130,8 @@ public class Ride {
     }
     public Polyline getRoute(){ return this.route; }
 
+    // The idea was to split the route to multiple parts of 3 seconds and than analyse
+    // whether there was a probable incident. Debatable.
     public class RoutePart {
         Queue<Float> accXQueue;
         Queue<Float> accYQueue;
@@ -161,6 +170,7 @@ public class Ride {
 
     }
 
+    // The Idea was that each Ride (or RoutePart) has a couple of Incident objects. Debatable.
     public class Incident {
         Polyline incidentRoute;
         String timestamp;
