@@ -26,4 +26,6 @@
     <string name="osmCopyrightEN">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
     <string name="osmCopyrightDE">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
     <string name="title_activity_history">HistoryActivity</string>
+    <string name="selectedRideInfoDE">Die folgende Fahrt wurde ausgewählt: </string>
+    <string name="errorNoRideSelectedDE">Es wurde keine Fahrt ausgewählt!</string>
 </resources>

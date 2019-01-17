@@ -55,7 +55,8 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         String accGpsString = getIntent().getStringExtra("AccGpsString");
         String date = getIntent().getStringExtra("Date");
-        Ride ride = new Ride(accGpsString, date);
+        int state = getIntent().getIntExtra("State", 0);
+        Ride ride = new Ride(accGpsString, date, state);
         Polyline route = ride.getRoute();
         double[] bounds = getBoundingBox(route);
         BoundingBox bBox = new BoundingBox(bounds[0],bounds[1],bounds[2],bounds[3]);

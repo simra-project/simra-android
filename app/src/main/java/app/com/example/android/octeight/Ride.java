@@ -32,6 +32,10 @@ public class Ride {
     static String TAG = "Ride_LOG";
     Polyline route;
     Marker[] incidents;
+    int state;
+    final int OFFLINE = 0;
+    final int PENDING = 1;
+    final int READY = 2;
 
 
 
@@ -45,10 +49,11 @@ public class Ride {
         updateEvents();
     }
 
-    public Ride (String accGpsString, String timeStamp){
+    public Ride (String accGpsString, String timeStamp, int state){
         this.accGpsString = accGpsString;
         this.timeStamp = timeStamp;
         this.route = getRouteLine(accGpsString);
+        this.state = state;
     }
 
     private void updateEvents (){
@@ -77,6 +82,32 @@ public class Ride {
                 geoPoints.add(actualGeoPoint);
 
 
+
+            } catch ( Exception e) {
+                e.printStackTrace();
+            }
+        }
+        Polyline line = new Polyline();
+        line.setPoints(geoPoints);
+        return line;
+    }
+
+    public static Polyline getRouteLine(String accGpsString, Boolean b){
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        String[] gpsArray = accGpsString.split("\\n");
+        GeoPoint actualGeoPoint = new GeoPoint(0.0, 0.0);
+        Queue<Float> accQQueue;
+
+        for (int i = 0; i < gpsArray.length; i++){
+            String actualLine = gpsArray[i];
+            try {
+                if((actualLine.startsWith(",,"))||(actualLine.split(",").length<8)){
+                    continue;
+                }
+                String[] line = gpsArray[i].split(",");
+                actualGeoPoint.setLatitude(Double.valueOf(line[0]));
+                actualGeoPoint.setLongitude(Double.valueOf(line[1]));
+                geoPoints.add(actualGeoPoint);
 
             } catch ( Exception e) {
                 e.printStackTrace();

@@ -326,23 +326,36 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             @Override
             public void onClick(View v) {
 
+                String fileName = "accGps17.01.2019 10:47:05.csv";
+                String correctedCSV = ShowRouteUtils.getCsvAsStringFromFile(MainActivity.this, fileName);
+                File file = getFileStreamPath("corrected_"+fileName);
+                FileOutputStream writer = null;
+                try {
+                    writer = openFileOutput(file.getName(), MODE_APPEND);
+                    writer.write(correctedCSV.getBytes());
+                    //writer.write(System.getProperty("line.separator").getBytes());
+                    writer.flush();
+                    writer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "writing done");
+
+                // Log.d(TAG, "correctedCSV: " + correctedCSV);
+                /*
+
                 // show stop button, hide start button
                 showStop();
                 stopBtn.setVisibility(View.VISIBLE);
                 startBtn.setVisibility(View.INVISIBLE);
 
                 // start RecorderService for accelerometer data recording
-                /*
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(recService);
-                } else {
-                    startService(recService);
-                }*/
                 Intent intent = new Intent(MainActivity.this, RecorderService.class);
                 startService(intent);
                 bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
                 //startService(recService);
                 recording = true;
+                */
             }
         });
 
@@ -374,6 +387,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 // Log.d(TAG, "point = " + line.getPoints().get(0).toString());
                 intent.putExtra("AccGpsString", mBoundService.getAccGpsString());
                 intent.putExtra("Date", mBoundService.getDate());
+                intent.putExtra("State", 0); // redundant
                 startActivity(intent);
                 /*
                 String gps = mBoundService.getGpsString();
