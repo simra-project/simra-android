@@ -17,6 +17,11 @@ public class HistoryActivity extends AppCompatActivity {
     // Log tag
     private static final String TAG = "HistoryActivity_LOG";
 
+    String accGpsString;
+    String date;
+    int state;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,28 +33,41 @@ public class HistoryActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+                if(getIntent().hasExtra("AccGpsString")){
+                    accGpsString = getIntent().getStringExtra("AccGpsString");
+                    date = getIntent().getStringExtra("Date");
+                    state = getIntent().getIntExtra("State", 0);
+                }
+
+
+                if(accGpsString != null && date != null) {
+                    Snackbar.make(view, getString(R.string.selectedRideInfoDE) + date, Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
+                    intent.putExtra("AccGpsString", accGpsString);
+                    intent.putExtra("Date", date);
+                    intent.putExtra("State", state);
+                    startActivity(intent);
+                } else {
+                    Snackbar.make(view, getString(R.string.errorNoRideSelectedDE) + date, Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+
+
+
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String accGpsString = getIntent().getStringExtra("AccGpsString");
-        String date = getIntent().getStringExtra("Date");
-        Ride ride = new Ride(accGpsString, date);
-
-        if (date != null) {
-            ride = new Ride(accGpsString, date);
-
-            Log.d(TAG, "ride.getTimeStamp(): " + ride.getTimeStamp());
-            Log.d(TAG, "ride.getRouteLine(): " + Arrays.toString(ride.getRoute().getPoints().toArray()));
+        if(getIntent().hasExtra("AccGpsString")){
+            fab.performClick();
+            fab.setPressed(true);
+            fab.invalidate();
+            fab.setPressed(false);
+            fab.invalidate();
         }
 
-        Intent intent = new Intent (HistoryActivity.this, ShowRouteActivity.class);
-        // Log.d(TAG, "point = " + line.getPoints().get(0).toString());
-        intent.putExtra("AccGpsString", accGpsString);
-        intent.putExtra("Date", date);
-        startActivity(intent);
     }
 
 }

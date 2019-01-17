@@ -59,5 +59,48 @@ public class ShowRouteUtils {
 
     }
 
+    public static String getCsvAsStringFromFile(Activity activity, String pathToFile){
+
+        List<GeoPoint> geoPoints = new ArrayList<>();
+
+        File gpsFile = activity.getFileStreamPath(pathToFile);
+
+        //Read text from file
+        String text = "";
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(gpsFile));
+            // br.readLine() to skip the first line which contains the headers
+            String line= br.readLine();
+
+            while ((line = br.readLine()) != null) {
+                //Log.d(TAG, line);
+                try {
+                    String[] separatedLine = line.split(",");
+                    String[] dateAndQ = separatedLine[7].split(":");
+                    String date = dateAndQ[0]+":"+dateAndQ[1]+":"+dateAndQ[2].charAt(0)+dateAndQ[2].charAt(1);
+                    String q = dateAndQ[2].substring(2);
+                    String correctedLine = separatedLine[0]+","+separatedLine[1]+","+separatedLine[2]+","+
+                            separatedLine[3]+","+separatedLine[4]+","+separatedLine[5]+","+separatedLine[6]+","+
+                            date + "," + q + System.lineSeparator();
+
+                    text += correctedLine;
+                } catch (Exception e){
+                    e.printStackTrace();
+                    continue;
+                }
+            }
+            br.close();
+        }
+        catch (IOException e) {
+
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+
+        }
+
+        return text;
+    }
+
 
     }

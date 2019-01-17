@@ -80,7 +80,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // The ride object which will be created and retrieved by the MainActivity at the end of the
     // service
-    public Ride getRide() { return new Ride(accGpsString, date); }
+    public Ride getRide() { return new Ride(accGpsString, date, 0); }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -206,7 +206,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             //gpsFile.createNewFile();
             //appendToFile("lat,lon,time,diff,date", gpsFile);
             accGpsFile.createNewFile();
-            appendToFile("lat,lon,X,Y,Z,time,diff,date"+System.lineSeparator(), accGpsFile);
+            appendToFile("lat,lon,X,Y,Z,time,diff,date,Q"+System.lineSeparator(), accGpsFile);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -451,6 +451,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 //Log.d(TAG, "accString: " + accString);
                 // str += System.getProperty("line.separator");
 
+                str += ",";
                 accGpsString += str += String.valueOf(qAvg);
                 accGpsString += System.getProperty("line.separator");
 
