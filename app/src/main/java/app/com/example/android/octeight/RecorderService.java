@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -22,6 +23,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.FloatMath;
 import android.util.Log;
 
@@ -82,12 +84,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     // service
     public Ride getRide() { return new Ride(accGpsString, date, 0); }
 
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // The files which contain accString, gpsString and accGpsString
     private File accFile;
     private File gpsFile;
     private File accGpsFile;
+    private File metaDataFile;
 
     String date;
 
@@ -106,6 +108,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     Queue<Float> accZQueue;
     Queue<Float> accQQueue;
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // SharedPrefs (same as in MainActivity) to enable continuously increasing unique
+    // code for each ride => connection between
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    SharedPreferences sharedPrefs;
+
+    SharedPreferences.Editor editor;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // SensorEventListener Methods
@@ -181,14 +191,41 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         super.onCreate();
         startTime = System.currentTimeMillis();
 
+        // Initialize sharedPrefs & editor
+        sharedPrefs = getApplicationContext()
+                .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
+
+
+        editor = sharedPrefs.edit();
+
+        // When the user records a route for the first time, the ride key is 0.
+        // For all subsequent rides, the key value increases by one at a time.
+
+        if (! sharedPrefs.contains("RIDE-KEY")) {
+
+            editor.putInt("RIDE-KEY", 0);
+
+        } else {
+
+            int key = sharedPrefs.getInt("RIDE-KEY", 0);
+
+            editor.putInt("RIDE-KEY", key + 1);
+
+            editor.apply();
+
+        }
+
         // Prepare the accelerometer accGpsFile
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         // Request location updates
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this);
+        locationManager = (LocationManager) getSystemService(Context
+                .LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager
+                .GPS_PROVIDER,0,0,this);
+        locationManager.requestLocationUpdates(LocationManager
+                .NETWORK_PROVIDER,0,0,this);
 
         // Queues for storing acc data
         accXQueue = new LinkedList<>();
@@ -198,16 +235,46 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         // Create files to write gps and accelerometer data
         try {
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // COMPLETE DATA FILE (one per ride)
+
             date = DateFormat.getDateTimeInstance().format(new Date());
-            accFile = getFileStreamPath("acc"+date + ".csv");
-            gpsFile = getFileStreamPath("gps"+date + ".csv");
-            accGpsFile = getFileStreamPath("accGps"+date + ".csv");
+            //accFile = getFileStreamPath("acc"+date + ".csv");
+            //gpsFile = getFileStreamPath("gps"+date + ".csv");
+            accGpsFile = getFileStreamPath(sharedPrefs.getInt("RIDE-KEY", 0)
+                    + "_accGps_"
+                    + date + ".csv");
             //accFile.createNewFile();
             //appendToFile("X,Y,Z,curTime,diffTime,date", accFile);
             //gpsFile.createNewFile();
             //appendToFile("lat,lon,time,diff,date", gpsFile);
             accGpsFile.createNewFile();
             appendToFile("lat,lon,X,Y,Z,time,diff,date,Q"+System.lineSeparator(), accGpsFile);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // META-FILE (one per user): contains ...
+            // * the information required to display rides in the ride history (DATE,
+            //   DURATION, ANNOTATED YES/NO)
+            // * the RIDE KEY which allows to identify the file containing the complete data for
+            //   a ride. => Use case: user wants to view a ride from history - retrieve data
+            // * one meta file per user, so we only want to create it if it doesn't exist yet.
+            //   (fileExists is a custom method, can be found at the very bottom of this class)
+
+            if(! fileExists("metaData.csv")) {
+
+                metaDataFile = getFileStreamPath("metaData.csv");
+
+                metaDataFile.createNewFile();
+
+                appendToFile("key, date, duration, annotated"
+                        +System.lineSeparator(), metaDataFile);
+
+            } else {
+
+                metaDataFile = getFileStreamPath("metaData.csv");
+
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -237,7 +304,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         return true;
     }
 
-
     @SuppressLint("MissingPermission")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -252,7 +318,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         wakeLock.acquire();
 
         // Register Accelerometer accGpsFile
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, accelerometer,
+                SensorManager.SENSOR_DELAY_FASTEST);
 
         return START_STICKY;
     }
@@ -271,8 +338,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         Log.d(TAG, "onDestroy() mAcceleration: " + mAcceleration);
 
-
-
         // Log.d(TAG, accString);
         // Log.d(TAG, gpsString);
 
@@ -280,6 +345,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         executor.execute( () -> {
             try {
                 appendToFile(accGpsString, accGpsFile);
+                appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0)) + ","
+                        + date + "," + String.valueOf(System.currentTimeMillis() - startTime) + ","
+                        + "false" + System.lineSeparator(), metaDataFile);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -328,7 +396,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         }
 
     }
-
 
     private void appendToFile(String str, File file) throws IOException {
         FileOutputStream writer = openFileOutput(file.getName(), MODE_APPEND);
@@ -392,8 +459,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 double z = accelerometerMatrix[2];
                 float mAccelCurrent = (float) Math.sqrt(x*x+y*y+z*z);
 
-
-                mAcceleration += String.valueOf(x) + "," + String.valueOf(y) + "," + String.valueOf(z) + ","+ String.valueOf(mAccelCurrent);
+                mAcceleration += String.valueOf(x) + "," + String.valueOf(y) + ","
+                        + String.valueOf(z) + ","+ String.valueOf(mAccelCurrent);
                 mAcceleration += '\n';
 
                 lastAccUpdate = curTime;
@@ -423,13 +490,16 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     lastGPSUpdate = curTime;
 
                     if (lastLocation == null) {
-                        lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        lastLocation = locationManager.getLastKnownLocation(LocationManager
+                                .GPS_PROVIDER);
                     }
                     if (lastLocation == null) {
-                        lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        lastLocation = locationManager.getLastKnownLocation(LocationManager
+                                .NETWORK_PROVIDER);
                     }
                     if (lastLocation == null) {
-                        lastLocation = new Location(LocationManager.GPS_PROVIDER);
+                        lastLocation = new Location(LocationManager
+                                .GPS_PROVIDER);
                     }
 
                     gps = String.valueOf(lastLocation.getLatitude()) + "," +
@@ -450,8 +520,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         (curTime - startTime) + "," +
                         (curTime - lastAccUpdate) + "," +
                         DateFormat.getDateTimeInstance().format(new Date());
-
-
 
                 //accString += str += '\n';
                 //Log.d(TAG, "accString: " + accString);
@@ -533,4 +601,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             return RecorderService.this;
         }
     }
+
+    public boolean fileExists(String fname){
+        File file = getBaseContext().getFileStreamPath(fname);
+        return file.exists();
+    }
+
 }

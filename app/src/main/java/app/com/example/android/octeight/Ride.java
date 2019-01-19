@@ -87,8 +87,6 @@ public class Ride {
                 actualGeoPoint.setLongitude(Double.valueOf(line[1]));
                 geoPoints.add(actualGeoPoint);
 
-
-
             } catch ( Exception e) {
                 e.printStackTrace();
             }
