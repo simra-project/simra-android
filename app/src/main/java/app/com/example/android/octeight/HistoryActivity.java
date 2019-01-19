@@ -31,8 +31,6 @@ public class HistoryActivity extends AppCompatActivity {
      *
      */
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +43,7 @@ public class HistoryActivity extends AppCompatActivity {
         // class) the list item represents.
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
 
@@ -59,7 +58,6 @@ public class HistoryActivity extends AppCompatActivity {
                     // and 2 for processed by server so the incidents can be annotated by the user
                     state = getIntent().getIntExtra("State", 0);
                 }
-
 
                 // Checks whether a ride was selected or not. Maybe it will be possible to select
                 // mutliple rides and push a button to send them all to the server to be analyzed
@@ -76,8 +74,6 @@ public class HistoryActivity extends AppCompatActivity {
                     Snackbar.make(view, getString(R.string.errorNoRideSelectedDE) + date, Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
-
-
 
             }
         });

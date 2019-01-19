@@ -327,8 +327,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             public void onClick(View v) {
 
 
-
-
                 // show stop button, hide start button
                 showStop();
                 stopBtn.setVisibility(View.VISIBLE);
@@ -352,9 +350,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             @Override
             public void onClick(View v) {
 
-
                 showStart();
-
 
                 // Stop RecorderService which is recording accelerometer data
                 unbindService(mServiceConnection);
@@ -365,13 +361,18 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 Intent intent = new Intent (MainActivity.this, HistoryActivity.class);
                 // AccGpsString contains the accelerometer and location data as well as time data
                 intent.putExtra("AccGpsString", mBoundService.getAccGpsString());
+
+                Log.i("REC_CHECK1", String.valueOf(mBoundService.getAccGpsString().length()));
+
                 // Date in form of system date (day.month.year hour:minute:second if german)
                 intent.putExtra("Date", mBoundService.getDate());
+
+                Log.i("REC_CHECK2", mBoundService.getDate());
+
                 // State can be 0 for server processing not started, 1 for started and pending
                 // and 2 for processed by server so the incidents can be annotated by the user
                 intent.putExtra("State", 0); // redundant
                 startActivity(intent);
-
 
                 // unregister accelerometer accGpsFile listener
                 // @TODO (is this necessary? where else to unregister? - unregistering the
