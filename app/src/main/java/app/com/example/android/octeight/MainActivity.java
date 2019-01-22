@@ -33,6 +33,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.osgeo.proj4j.proj.Eckert1Projection;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
@@ -104,8 +105,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     private ImageButton centerMap;
     private RelativeLayout startBtn;
     private RelativeLayout stopBtn;
-    private TextView copyrightTxt;
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Context of application environment
@@ -350,29 +349,35 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             @Override
             public void onClick(View v) {
 
-                showStart();
+                try {
+                    showStart();
 
-                // Stop RecorderService which is recording accelerometer data
-                unbindService(mServiceConnection);
-                stopService(recService);
-                recording = false;
+                    // Stop RecorderService which is recording accelerometer data
+                    unbindService(mServiceConnection);
+                    stopService(recService);
+                    recording = false;
 
-                // Get the recorded files and send them to HistoryActivity for further processing
-                Intent intent = new Intent (MainActivity.this, HistoryActivity.class);
-                // AccGpsString contains the accelerometer and location data as well as time data
-                intent.putExtra("AccGpsString", mBoundService.getAccGpsString());
+                    // Get the recorded files and send them to HistoryActivity for further processing
+                    Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                    // AccGpsString contains the accelerometer and location data as well as time data
+                    intent.putExtra("PathToAccGpsFile", mBoundService.getPathToAccGpsFile());
 
-                Log.i("REC_CHECK1", String.valueOf(mBoundService.getAccGpsString().length()));
+                    // Log.i(TAG, "REC_CHECK1" + String.valueOf(mBoundService.getAccGpsString().length()));
 
-                // Date in form of system date (day.month.year hour:minute:second if german)
-                intent.putExtra("Date", mBoundService.getDate());
+                    Log.d(TAG, "(5) AUFZEICHNUNG STOPPEN / STOP-BUTTON: AccGpsString: " + mBoundService.getAccGpsString());
 
-                Log.i("REC_CHECK2", mBoundService.getDate());
+                    // Date in form of system date (day.month.year hour:minute:second if german)
+                    intent.putExtra("Date", mBoundService.getDate());
 
-                // State can be 0 for server processing not started, 1 for started and pending
-                // and 2 for processed by server so the incidents can be annotated by the user
-                intent.putExtra("State", 0); // redundant
-                startActivity(intent);
+                    Log.i(TAG, "REC_CHECK2" + mBoundService.getDate());
+
+                    // State can be 0 for server processing not started, 1 for started and pending
+                    // and 2 for processed by server so the incidents can be annotated by the user
+                    intent.putExtra("State", 0); // redundant
+                    startActivity(intent);
+                } catch (Exception e){
+                    Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
+                }
 
                 // unregister accelerometer accGpsFile listener
                 // @TODO (is this necessary? where else to unregister? - unregistering the

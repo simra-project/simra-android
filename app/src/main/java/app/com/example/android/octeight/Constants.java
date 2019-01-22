@@ -12,7 +12,7 @@ public class Constants extends Service {
 
     // Step size for accelerometer moving average
 
-    public static final int MVG_AVG_STEP = 6;
+    public static final int MVG_AVG_STEP = 5;
 
     // GPS-Trace: one recording every 3 secs = every 3000 millisecs.
 

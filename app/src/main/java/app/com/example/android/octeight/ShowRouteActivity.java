@@ -17,7 +17,9 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 public class ShowRouteActivity extends AppCompatActivity {
@@ -51,12 +53,14 @@ public class ShowRouteActivity extends AppCompatActivity {
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
 
-        String accGpsString = getIntent().getStringExtra("AccGpsString");
+        String pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         String date = getIntent().getStringExtra("Date");
         int state = getIntent().getIntExtra("State", 0);
+        Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
 
+        File gpsFile = getFileStreamPath(pathToAccGpsFile);
         // Create a ride object with the accelerometer, gps and time data
-        Ride ride = new Ride(accGpsString, date, state);
+        Ride ride = new Ride(gpsFile, date, state);
         // Get the Route as a Polyline to be displayed on the map
         Polyline route = ride.getRoute();
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
@@ -68,6 +72,8 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         // Log.d(TAG, "bBox: " + bBox);
         // Log.d(TAG, "getIntrinsicScreenRect: " + mMapView.getIntrinsicScreenRect(null).toString());
+
+        mMapView.getOverlayManager().add(route);
 
         mMapView.invalidate();
         // zoom automatically to the bounding box. Usually the command in the if body should suffice
@@ -87,7 +93,17 @@ public class ShowRouteActivity extends AppCompatActivity {
             });
         }
 
-        mMapView.getOverlayManager().add(route);
+
+
+
+
+
+        mMapView.setMinZoomLevel(7.0);
+        if(mMapView.getMaxZoomLevel() > 18.0){
+            mMapView.setMaxZoomLevel(18.0);
+        }
+
+
 
     }
 
