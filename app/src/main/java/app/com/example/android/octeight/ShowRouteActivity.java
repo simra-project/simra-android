@@ -1,6 +1,7 @@
 package app.com.example.android.octeight;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -15,11 +16,13 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class ShowRouteActivity extends AppCompatActivity {
@@ -28,6 +31,10 @@ public class ShowRouteActivity extends AppCompatActivity {
     // Map stuff, Overlays
     private MapView mMapView;
     private TextView copyrightTxt;
+
+    ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Our ride
+    Ride ride;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
@@ -60,7 +67,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         File gpsFile = getFileStreamPath(pathToAccGpsFile);
         // Create a ride object with the accelerometer, gps and time data
-        Ride ride = new Ride(gpsFile, date, state);
+        ride = new Ride(gpsFile, date, state);
         // Get the Route as a Polyline to be displayed on the map
         Polyline route = ride.getRoute();
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
@@ -93,16 +100,61 @@ public class ShowRouteActivity extends AppCompatActivity {
             });
         }
 
-
-
-
-
-
         mMapView.setMinZoomLevel(7.0);
         if(mMapView.getMaxZoomLevel() > 18.0){
             mMapView.setMaxZoomLevel(18.0);
         }
 
+        showIncidents();
+
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Event determination and representation happens here
+
+    public void showIncidents() {
+
+        /**for(AccEvent accE : ride.events) {
+
+            Marker marker = new Marker(mMapView);
+
+            ride.incidents.add(marker);
+
+            marker.setPosition(accE.position);
+
+        }*/
+
+        // Create some test data
+
+        List<GeoPoint> testIncidentDat = new ArrayList<>();
+
+        testIncidentDat.add(new GeoPoint(52.517374, 13.338407));
+
+        testIncidentDat.add(new GeoPoint(52.517592, 13.324816));
+
+        testIncidentDat.add(new GeoPoint(52.515625, 13.320117));
+
+        testIncidentDat.add(new GeoPoint(52.507634, 13.320117));
+
+        Drawable accident = getResources().getDrawable(R.drawable.accident);
+
+        Drawable markerDefault = getResources().getDrawable(R.drawable.marker_default);
+
+        for(int i = 0; i < testIncidentDat.size(); i++) {
+
+            Marker incidentMarker = new Marker(mMapView);
+
+            incidentMarker.setPosition(testIncidentDat.get(i));
+
+            incidentMarker.setIcon(markerDefault);
+
+            incidentMarker.setTitle("Vorfall " + i);
+
+            //incidentMarker.setSnippet("Vorfall " + i);
+
+            mMapView.getOverlays().add(incidentMarker);
+
+        }
 
 
     }
