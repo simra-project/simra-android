@@ -89,7 +89,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.com.example.android.octeight.MainActivity" />
         </activity>
-        <activity android:name=".ShowRouteActivity"></activity>
+        <activity android:name=".ShowRouteActivity" />
+        <activity android:name=".IncidentPopUp"
+            android:theme="@style/AppTheme.PopUpWindow"></activity>
     </application>
 
 </manifest>
