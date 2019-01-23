@@ -1,6 +1,8 @@
 package app.com.example.android.octeight;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.os.Build;
@@ -8,7 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.osmdroid.util.BoundingBox;
@@ -18,10 +23,15 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.File;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -126,15 +136,19 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         // Create some test data
 
-        List<GeoPoint> testIncidentDat = new ArrayList<>();
+        List<AccEvent> testIncidentDat = new ArrayList<>();
 
-        testIncidentDat.add(new GeoPoint(52.517374, 13.338407));
+        testIncidentDat.add(new AccEvent(new GeoPoint(52.517374, 13.338407),
+                new Date(), null));
 
-        testIncidentDat.add(new GeoPoint(52.517592, 13.324816));
+        testIncidentDat.add(new AccEvent(new GeoPoint(52.517592, 13.324816),
+                new Date(), null));
 
-        testIncidentDat.add(new GeoPoint(52.515625, 13.320117));
+        testIncidentDat.add(new AccEvent(new GeoPoint(52.515625, 13.320117),
+                new Date(), null));
 
-        testIncidentDat.add(new GeoPoint(52.507634, 13.320117));
+        testIncidentDat.add(new AccEvent(new GeoPoint(52.507634, 13.320117),
+                new Date(), null));
 
         Drawable accident = getResources().getDrawable(R.drawable.accident);
 
@@ -144,11 +158,15 @@ public class ShowRouteActivity extends AppCompatActivity {
 
             Marker incidentMarker = new Marker(mMapView);
 
-            incidentMarker.setPosition(testIncidentDat.get(i));
+            incidentMarker.setPosition(testIncidentDat.get(i).position);
 
             incidentMarker.setIcon(markerDefault);
 
             incidentMarker.setTitle("Vorfall " + i);
+
+            InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble, mMapView,
+                    testIncidentDat.get(i), ShowRouteActivity.this);
+            incidentMarker.setInfoWindow(infoWindow);
 
             //incidentMarker.setSnippet("Vorfall " + i);
 
@@ -187,4 +205,54 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         return result;
     }
+
+    protected class MyInfoWindow extends InfoWindow {
+
+        private AccEvent mAccEvent;
+
+        private Activity motherActivity;
+
+        public MyInfoWindow(int layoutResId, MapView mapView, AccEvent mAccEvent,
+                            Activity motherActivity) {
+            super(layoutResId, mapView);
+            this.mAccEvent = mAccEvent;
+            this.motherActivity = motherActivity;
+        }
+        public void onClose() {
+        }
+
+        public void onOpen(Object arg0) {
+            LinearLayout layout = (LinearLayout) mView.findViewById(R.id.bubble_layout);
+            Button btnMoreInfo = (Button) mView.findViewById(R.id.bubble_moreinfo);
+            TextView txtTitle = (TextView) mView.findViewById(R.id.bubble_title);
+            TextView txtDescription = (TextView) mView.findViewById(R.id.bubble_description);
+            TextView txtSubdescription = (TextView) mView.findViewById(R.id.bubble_subdescription);
+
+            txtTitle.setText("Title of my marker");
+            txtDescription.setText("Click here to view details!");
+            txtSubdescription.setText("You can also edit the subdescription");
+
+            layout.setOnClickListener((View v) -> {
+
+                Intent popUpIntent = new Intent(motherActivity,
+                        IncidentPopUp.class);
+
+                popUpIntent.putExtra("Incident_latitude",
+                        (Serializable) String.valueOf(this.mAccEvent.position.getLatitude()));
+
+                popUpIntent.putExtra("Incident_longitude",
+                        (Serializable) String.valueOf(this.mAccEvent.position.getLongitude()));
+
+                popUpIntent.putExtra("Incident_date",
+                        (Serializable) String.valueOf(this.mAccEvent.date.toString()));
+
+                //popUpIntent.putExtra("Incident_accDat",
+                //        (Serializable) String.valueOf(this.mAccEvent.sensorData.getAbsolutePath()));
+
+                startActivity(popUpIntent);
+
+                });
+        }
+    }
+
 }
