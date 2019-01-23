@@ -364,7 +364,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
                     // Log.i(TAG, "REC_CHECK1" + String.valueOf(mBoundService.getAccGpsString().length()));
 
-                    Log.d(TAG, "(5) AUFZEICHNUNG STOPPEN / STOP-BUTTON: AccGpsString: " + mBoundService.getAccGpsString());
+                    Log.d(TAG, "(5) AUFZEICHNUNG STOPPEN / STOP-BUTTON: AccGpsString: "
+                            + mBoundService.getAccGpsString());
 
                     // Date in form of system date (day.month.year hour:minute:second if german)
                     intent.putExtra("Date", mBoundService.getDate());

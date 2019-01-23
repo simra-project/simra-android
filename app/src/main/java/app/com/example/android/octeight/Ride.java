@@ -43,13 +43,11 @@ public class Ride {
         return this.timeStamp;
     }
     public Polyline getRoute(){ return this.route; }
-    Marker[] incidents;
+    ArrayList<Marker> incidents;
     int state;
     final int OFFLINE = 0;
     final int PENDING = 1;
     final int READY = 2;
-
-
 
     public Ride (int user, File sensorData){
         user = this.user;
@@ -68,6 +66,7 @@ public class Ride {
         this.timeStamp = timeStamp;
         this.route = getRouteLine(accGpsFile);
         this.state = state;
+        incidents = new ArrayList<Marker>();
     }
 
     private void updateEvents (){
