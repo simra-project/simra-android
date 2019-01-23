@@ -249,6 +249,9 @@ public class ShowRouteActivity extends AppCompatActivity {
                 //popUpIntent.putExtra("Incident_accDat",
                 //        (Serializable) String.valueOf(this.mAccEvent.sensorData.getAbsolutePath()));
 
+                popUpIntent.putExtra("Incident_accDat",
+                          (Serializable) "mockSensorDatForIncident.csv");
+
                 startActivity(popUpIntent);
 
                 });

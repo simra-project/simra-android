@@ -121,7 +121,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // SharedPrefs (same as in MainActivity) to enable continuously increasing unique
-    // code for each ride => connection between
+    // code for each ride => connection between meta file and individual ride files
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     SharedPreferences sharedPrefs;
@@ -212,7 +212,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Initialize sharedPrefs & editor
         sharedPrefs = getApplicationContext()
                 .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
 
         editor = sharedPrefs.edit();
 
