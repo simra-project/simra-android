@@ -61,7 +61,7 @@ public class HistoryActivity extends AppCompatActivity {
                 Log.d(TAG, "onCreate(): pathToAccGpsFile: " + pathToAccGpsFile + " date: " + date + " state: " + state);
 
                 // Checks whether a ride was selected or not. Maybe it will be possible to select
-                // mutliple rides and push a button to send them all to the server to be analyzed
+                // multiple rides and push a button to send them all to the server to be analyzed
                 if(accGpsString != null && date != null) {
                     Snackbar.make(view, getString(R.string.selectedRideInfoDE) + date, Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
