@@ -76,6 +76,7 @@ public class ShowRouteActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
 
         File gpsFile = getFileStreamPath(pathToAccGpsFile);
+        // File gpsFile = getFileStreamPath("59_accGps_23.01.2019 09:19:09.csv");
         // Create a ride object with the accelerometer, gps and time data
         ride = new Ride(gpsFile, date, state);
         // Get the Route as a Polyline to be displayed on the map
@@ -111,8 +112,8 @@ public class ShowRouteActivity extends AppCompatActivity {
         }
 
         mMapView.setMinZoomLevel(7.0);
-        if(mMapView.getMaxZoomLevel() > 18.0){
-            mMapView.setMaxZoomLevel(18.0);
+        if(mMapView.getMaxZoomLevel() > 19.0){
+            mMapView.setMaxZoomLevel(19.0);
         }
 
         showIncidents();
@@ -136,6 +137,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         // Create some test data
 
+
         List<AccEvent> testIncidentDat = new ArrayList<>();
 
         testIncidentDat.add(new AccEvent(new GeoPoint(52.517374, 13.338407),
@@ -150,15 +152,25 @@ public class ShowRouteActivity extends AppCompatActivity {
         testIncidentDat.add(new AccEvent(new GeoPoint(52.507634, 13.320117),
                 new Date(), null));
 
+
+
+        testIncidentDat = ride.getEvents();
+        for (int i = 0; i < testIncidentDat.size() ; i++) {
+            Log.d(TAG, String.valueOf(testIncidentDat.get(i).position.getLatitude()));
+        }
+
         Drawable accident = getResources().getDrawable(R.drawable.accident);
 
-        Drawable markerDefault = getResources().getDrawable(R.drawable.marker_default);
+        Drawable markerDefault = getResources().getDrawable(R.drawable.marker_default, null);
 
         for(int i = 0; i < testIncidentDat.size(); i++) {
 
             Marker incidentMarker = new Marker(mMapView);
 
             incidentMarker.setPosition(testIncidentDat.get(i).position);
+
+            Log.d(TAG, "incidentMarker.getPosition().getLatitude(): " + incidentMarker.getPosition().getLatitude());
+            Log.d(TAG, "incidentMarker.getPosition().getLongitude(): " + incidentMarker.getPosition().getLongitude());
 
             incidentMarker.setIcon(markerDefault);
 
@@ -171,6 +183,7 @@ public class ShowRouteActivity extends AppCompatActivity {
             //incidentMarker.setSnippet("Vorfall " + i);
 
             mMapView.getOverlays().add(incidentMarker);
+            mMapView.invalidate();
 
         }
 
@@ -190,15 +203,15 @@ public class ShowRouteActivity extends AppCompatActivity {
         for (int i = 0; i < geoPoints.size(); i++) {
             // Check for south/north
             if (geoPoints.get(i).getLatitude() < result[2]){
-                result[2] = geoPoints.get(i).getLatitude();
+                result[2] = geoPoints.get(i).getLatitude()-0.01;
             } if (geoPoints.get(i).getLatitude() > result[0]){
-                result[0] = geoPoints.get(i).getLatitude();
+                result[0] = geoPoints.get(i).getLatitude()+0.01;
             }
             // Check for west/east
             if (geoPoints.get(i).getLongitude() < result[3]){
-                result[3] = geoPoints.get(i).getLongitude();
+                result[3] = geoPoints.get(i).getLongitude()-0.01;
             } if (geoPoints.get(i).getLongitude() > result[1]){
-                result[1] = geoPoints.get(i).getLongitude();
+                result[1] = geoPoints.get(i).getLongitude()+0.01;
             }
 
         }
