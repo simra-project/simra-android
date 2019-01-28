@@ -28,4 +28,6 @@
     <string name="title_activity_history">HistoryActivity</string>
     <string name="selectedRideInfoDE">Die folgende Fahrt wurde ausgewählt: </string>
     <string name="errorNoRideSelectedDE">Es wurde keine Fahrt ausgewählt!</string>
+    <string name="errorRideTooShortDE">Die Fahrt muss mindestens\n30 Sekunden dauern!</string>
+
 </resources>

@@ -25,6 +25,7 @@ import android.support.v7.widget.Toolbar;
 
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -356,26 +357,31 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                     unbindService(mServiceConnection);
                     stopService(recService);
                     recording = false;
+                    if( mBoundService.getDuration() > Constants.MINIMAL_RIDE_DURATION) {
+                        // Get the recorded files and send them to HistoryActivity for further processing
+                        Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                        // AccGpsString contains the accelerometer and location data as well as time data
+                        intent.putExtra("PathToAccGpsFile", mBoundService.getPathToAccGpsFile());
 
-                    // Get the recorded files and send them to HistoryActivity for further processing
-                    Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                    // AccGpsString contains the accelerometer and location data as well as time data
-                    intent.putExtra("PathToAccGpsFile", mBoundService.getPathToAccGpsFile());
+                        // Log.i(TAG, "REC_CHECK1" + String.valueOf(mBoundService.getAccGpsString().length()));
 
-                    // Log.i(TAG, "REC_CHECK1" + String.valueOf(mBoundService.getAccGpsString().length()));
+                        Log.d(TAG, "(5) AUFZEICHNUNG STOPPEN / STOP-BUTTON: AccGpsString: "
+                                + mBoundService.getAccGpsString());
 
-                    Log.d(TAG, "(5) AUFZEICHNUNG STOPPEN / STOP-BUTTON: AccGpsString: "
-                            + mBoundService.getAccGpsString());
+                        // Date in form of system date (day.month.year hour:minute:second if german)
+                        intent.putExtra("Date", mBoundService.getDate());
 
-                    // Date in form of system date (day.month.year hour:minute:second if german)
-                    intent.putExtra("Date", mBoundService.getDate());
+                        Log.i(TAG, "REC_CHECK2" + mBoundService.getDate());
 
-                    Log.i(TAG, "REC_CHECK2" + mBoundService.getDate());
-
-                    // State can be 0 for server processing not started, 1 for started and pending
-                    // and 2 for processed by server so the incidents can be annotated by the user
-                    intent.putExtra("State", 0); // redundant
-                    startActivity(intent);
+                        // State can be 0 for server processing not started, 1 for started and pending
+                        // and 2 for processed by server so the incidents can be annotated by the user
+                        intent.putExtra("State", 0); // redundant
+                        startActivity(intent);
+                    } else {
+                        Toast toast = Toast.makeText(MainActivity.this,R.string.errorRideTooShortDE, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
                 } catch (Exception e){
                     Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
                 }
