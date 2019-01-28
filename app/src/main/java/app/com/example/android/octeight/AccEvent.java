@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.LinkedList;
 
 public class AccEvent {
+    long timeStamp;
     GeoPoint position;
     Date date;
     File sensorData;
@@ -29,8 +30,9 @@ public class AccEvent {
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         Log.d(TAG, "eventLine: " + Arrays.toString(eventLine));
         //String dateString = format.format(new Date());
+        this.timeStamp = Long.valueOf(eventLine[5]);
         try {
-            this.date = format.parse ( eventLine[5] );
+            this.date = format.parse ( eventLine[6] );
             // Log.d(TAG, "this.date: " + this.date);
         } catch (ParseException e) {
             e.printStackTrace();

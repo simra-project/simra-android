@@ -284,7 +284,7 @@ public class Ride {
             accEvents.add(new AccEvent(thisLine.split(",")));
             accEvents.add(new AccEvent(thisLine.split(",")));
 
-        String[] template = {"0.0","0.0","0.0","0.0","0.0","d"};
+        String[] template = {"0.0","0.0","0.0","0.0","0.0","0","d"};
         events.add(template);
         events.add(template);
         events.add(template);
@@ -300,17 +300,19 @@ public class Ride {
             System.out.println("outer thisLine: " + thisLine);
             System.out.println("outer nextLine: " + nextLine);
             String[] currentLine = thisLine.split(",");
-            // currentLine = {lat, lon, maxXDelta, maxYDelta, maxZDelta, date}
-            partOfRide = new String[6];
+            // currentLine = {lat, lon, maxXDelta, maxYDelta, maxZDelta, timeStamp, date}
+            partOfRide = new String[7];
             String lat = currentLine[0];
             String lon = currentLine[1];
+            String timeStamp = currentLine[5];
             String date = currentLine[7];
             partOfRide[0] = lat; // lat
             partOfRide[1] = lon; // lon
             partOfRide[2] = "0"; // maxXDelta
             partOfRide[3] = "0"; // maxYDelta
             partOfRide[4] = "0"; // maxZDelta
-            partOfRide[5] = date; // date
+            partOfRide[5] = timeStamp; // timeStamp
+            partOfRide[6] = date; // date
 
             double maxX = Double.valueOf(currentLine[2]);
             double minX = Double.valueOf(currentLine[2]);

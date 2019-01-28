@@ -192,9 +192,6 @@ public class ShowRouteActivity extends AppCompatActivity {
                 new Date(), null));
 
         testIncidentDat = ride.getEvents();
-        for (int i = 0; i < testIncidentDat.size() ; i++) {
-            Log.d(TAG, String.valueOf(testIncidentDat.get(i).position.getLatitude()));
-        }
 
         Drawable accident = getResources().getDrawable(R.drawable.accident);
 
@@ -208,8 +205,6 @@ public class ShowRouteActivity extends AppCompatActivity {
 
             incidentMarker.setPosition(currentLocHelper);
 
-            Log.d(TAG, "incidentMarker.getPosition().getLatitude(): " + incidentMarker.getPosition().getLatitude());
-            Log.d(TAG, "incidentMarker.getPosition().getLongitude(): " + incidentMarker.getPosition().getLongitude());
 
             incidentMarker.setIcon(markerDefault);
 
@@ -255,7 +250,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         List<Address> address = new ArrayList<>();
 
-        String adressForLocation = "";
+        String addressForLocation = "";
 
         try {
 
@@ -276,7 +271,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
                 Address location = address.get(0);
 
-                adressForLocation = location.getAddressLine(0);
+                addressForLocation = location.getAddressLine(0);
 
                 // Generate GeoPoint address result
 
@@ -291,7 +286,7 @@ public class ShowRouteActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        return adressForLocation;
+        return addressForLocation;
 
     }
 
@@ -308,15 +303,15 @@ public class ShowRouteActivity extends AppCompatActivity {
         for (int i = 0; i < geoPoints.size(); i++) {
             // Check for south/north
             if (geoPoints.get(i).getLatitude() < result[2]){
-                result[2] = geoPoints.get(i).getLatitude()-0.005;
+                result[2] = geoPoints.get(i).getLatitude();
             } if (geoPoints.get(i).getLatitude() > result[0]){
-                result[0] = geoPoints.get(i).getLatitude()+0.005;
+                result[0] = geoPoints.get(i).getLatitude();
             }
             // Check for west/east
             if (geoPoints.get(i).getLongitude() < result[3]){
-                result[3] = geoPoints.get(i).getLongitude()-0.01;
+                result[3] = geoPoints.get(i).getLongitude();
             } if (geoPoints.get(i).getLongitude() > result[1]){
-                result[1] = geoPoints.get(i).getLongitude()+0.01;
+                result[1] = geoPoints.get(i).getLongitude();
             }
 
         }
