@@ -76,9 +76,15 @@ public class ShowRouteActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
 
         File gpsFile = getFileStreamPath(pathToAccGpsFile);
-        // File gpsFile = getFileStreamPath("59_accGps_23.01.2019 09:19:09.csv");
-        // Create a ride object with the accelerometer, gps and time data
-        ride = new Ride(gpsFile, date, state);
+        // File gpsFile = getFileStreamPath("59_accGps_23.01.2019 09_19_09.csv");
+        // File gpsFile = getFileStreamPath("95_accGps_28.01.2019 10:42:05.csv");
+
+        try {
+            // Create a ride object with the accelerometer, gps and time data
+            ride = new Ride(gpsFile, date, state);
+        } catch (NullPointerException nE){
+            nE.printStackTrace();
+        }
         // Get the Route as a Polyline to be displayed on the map
         Polyline route = ride.getRoute();
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
@@ -203,9 +209,9 @@ public class ShowRouteActivity extends AppCompatActivity {
         for (int i = 0; i < geoPoints.size(); i++) {
             // Check for south/north
             if (geoPoints.get(i).getLatitude() < result[2]){
-                result[2] = geoPoints.get(i).getLatitude()-0.01;
+                result[2] = geoPoints.get(i).getLatitude()-0.005;
             } if (geoPoints.get(i).getLatitude() > result[0]){
-                result[0] = geoPoints.get(i).getLatitude()+0.01;
+                result[0] = geoPoints.get(i).getLatitude()+0.005;
             }
             // Check for west/east
             if (geoPoints.get(i).getLongitude() < result[3]){

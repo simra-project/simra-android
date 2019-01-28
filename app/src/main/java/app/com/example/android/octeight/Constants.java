@@ -22,6 +22,9 @@ public class Constants extends Service {
 
     public static final long GPS_TIME_FREQUENCY = 60000;
 
+    // The minimal duration of a ride in milliseconds
+    public static final int MINIMAL_RIDE_DURATION = 3000;
+
     public Constants() {
     }
 

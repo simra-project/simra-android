@@ -1,6 +1,7 @@
 package app.com.example.android.octeight;
 
 import android.app.Activity;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 
 import org.osmdroid.util.GeoPoint;
@@ -116,7 +117,7 @@ public class Ride {
 
     public ArrayList<AccEvent> findAccEvents() {
 
-
+/*
         BufferedReader br = null;
         String thisLine = null;
         String nextLine = null;
@@ -251,13 +252,162 @@ public class Ride {
         }} catch(Exception e) {
             e.printStackTrace();
         }
-        /*
-        for (int i = 0; i < ride.size() ; i++) {
-            accEvents.add(new AccEvent(ride.get(i)));
-        }*/
+
 
         Log.d(TAG, "findAccEvents(): " + Arrays.deepToString(ride.toArray()));
         return accEvents;
+        */
+
+        BufferedReader br = null;
+        String thisLine = null;
+        String nextLine = null;
+        try {
+            br = new BufferedReader(new FileReader(accGpsFile));
+            br.readLine();
+            thisLine = br.readLine();
+            nextLine = br.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        String[] partOfRide;
+        // Each String[] in ride is a part of the ride which is ca. 3 seconds long.
+        ArrayList<String[]> ride = new ArrayList<>();
+        ArrayList<AccEvent> accEvents = new ArrayList<>(6);
+        ArrayList<String[]> events = new ArrayList<>(6);
+
+            accEvents.add(new AccEvent(thisLine.split(",")));
+            accEvents.add(new AccEvent(thisLine.split(",")));
+            accEvents.add(new AccEvent(thisLine.split(",")));
+            accEvents.add(new AccEvent(thisLine.split(",")));
+            accEvents.add(new AccEvent(thisLine.split(",")));
+            accEvents.add(new AccEvent(thisLine.split(",")));
+
+        String[] template = {"0.0","0.0","0.0","0.0","0.0","d"};
+        events.add(template);
+        events.add(template);
+        events.add(template);
+        events.add(template);
+        events.add(template);
+        events.add(template);
+
+        boolean newSubPart = false;
+        // Loops through all lines. If the line starts with lat and lon, it is consolidated into
+        // a part of a ride together with the subsequent lines that don't have lat and lon.
+        // Then, it takes the top two X-, Y- and Z-deltas and creates AccEvents from them.
+        while ( (thisLine != null )&&(!newSubPart)) {
+            System.out.println("outer thisLine: " + thisLine);
+            System.out.println("outer nextLine: " + nextLine);
+            String[] currentLine = thisLine.split(",");
+            // currentLine = {lat, lon, maxXDelta, maxYDelta, maxZDelta, date}
+            partOfRide = new String[6];
+            String lat = currentLine[0];
+            String lon = currentLine[1];
+            String date = currentLine[7];
+            partOfRide[0] = lat; // lat
+            partOfRide[1] = lon; // lon
+            partOfRide[2] = "0"; // maxXDelta
+            partOfRide[3] = "0"; // maxYDelta
+            partOfRide[4] = "0"; // maxZDelta
+            partOfRide[5] = date; // date
+
+            double maxX = Double.valueOf(currentLine[2]);
+            double minX = Double.valueOf(currentLine[2]);
+            double maxY = Double.valueOf(currentLine[3]);
+            double minY = Double.valueOf(currentLine[3]);
+            double maxZ = Double.valueOf(currentLine[4]);
+            double minZ = Double.valueOf(currentLine[4]);
+            thisLine = nextLine;
+            try {
+                nextLine = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(thisLine.startsWith(",,")){
+                newSubPart = true;
+            }
+
+            while ((thisLine!= null) && newSubPart) {
+                System.out.println("inner thisLine: " + thisLine);
+                System.out.println("inner nextLine: " + nextLine);
+
+                currentLine = thisLine.split(",");
+                if (Double.valueOf(currentLine[2]) >= maxX){
+                    maxX = Double.valueOf(currentLine[2]);
+                } else if (Double.valueOf(currentLine[2]) < minX){
+                    minX =  Double.valueOf(currentLine[2]);
+                }
+                if (Double.valueOf(currentLine[3]) >= maxY){
+                    maxY = Double.valueOf(currentLine[3]);
+                } else if (Double.valueOf(currentLine[3]) < minY){
+                    minY =  Double.valueOf(currentLine[3]);
+                }
+                if (Double.valueOf(currentLine[4]) >= maxZ){
+                    maxZ = Double.valueOf(currentLine[4]);
+                } else if (Double.valueOf(currentLine[4]) < minZ){
+                    minZ =  Double.valueOf(currentLine[4]);
+                }
+                thisLine = nextLine;
+                try {
+                    nextLine = br.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(thisLine == nextLine);
+                if(thisLine != null && !thisLine.startsWith(",,")){
+                    newSubPart = false;
+                }
+            }
+
+
+            double maxXDelta = Math.abs(maxX - minX);
+            double maxYDelta = Math.abs(maxY - minY);
+            double maxZDelta = Math.abs(maxZ - minZ);
+
+            partOfRide[2] = String.valueOf(maxXDelta);
+            partOfRide[3] = String.valueOf(maxYDelta);
+            partOfRide[4] = String.valueOf(maxZDelta);
+
+            ride.add(partOfRide);
+
+            boolean eventAdded = false;
+            // Check whether actualX is one of the top 2 events
+            if (maxXDelta > Double.valueOf(events.get(0)[2]) && !eventAdded){
+                events.set(0, partOfRide);
+                accEvents.set(0, new AccEvent(partOfRide));
+                eventAdded = true;
+            } else if (maxXDelta > Double.valueOf(events.get(1)[2]) && !eventAdded) {
+                events.set(1, partOfRide);
+                accEvents.set(1, new AccEvent(partOfRide));
+                eventAdded = true;
+            }
+            // Check whether actualY is one of the top 2 events
+            if (maxYDelta > Double.valueOf(events.get(2)[3]) && !eventAdded){
+                events.set(2, partOfRide);
+                accEvents.set(2, new AccEvent(partOfRide));
+                eventAdded = true;
+            } else if (maxYDelta > Double.valueOf(events.get(3)[3]) && !eventAdded) {
+                events.set(3, partOfRide);
+                accEvents.set(3, new AccEvent(partOfRide));
+                eventAdded = true;
+            }
+            // Check whether actualZ is one of the top 2 events
+            if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded){
+                events.set(4, partOfRide);
+                accEvents.set(4, new AccEvent(partOfRide));
+            } else if (maxZDelta > Double.valueOf(events.get(5)[4]) && !eventAdded) {
+                events.set(5, partOfRide);
+                accEvents.set(5, new AccEvent(partOfRide));
+            }
+
+            if(nextLine == null){
+                break;
+            }
+        }
+        Log.d(TAG, "findAccEvents(): " + Arrays.deepToString(ride.toArray()));
+        return accEvents;
+
 
     }
 

@@ -84,6 +84,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public String getAccGpsString() { return accGpsString; }
     public String getPathToAccGpsFile() { return pathToAccGpsFile; }
     public String getDate() { return date; }
+    public double getDuration() { return (curTime - startTime); }
 
     public String mAcceleration = "";
 
@@ -215,24 +216,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         editor = sharedPrefs.edit();
 
-        // When the user records a route for the first time, the ride key is 0.
-        // For all subsequent rides, the key value increases by one at a time.
-
-        if (! sharedPrefs.contains("RIDE-KEY")) {
-
-            editor.putInt("RIDE-KEY", 0);
-
-            editor.apply();
-
-        } else {
-
-            int key = sharedPrefs.getInt("RIDE-KEY", 0);
-
-            editor.putInt("RIDE-KEY", key + 1);
-
-            editor.apply();
-
-        }
 
         // Prepare the accelerometer accGpsFile
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -252,53 +235,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         accZQueue = new LinkedList<>();
         // accQQueue = new LinkedList<>();
 
-        // Create files to write gps and accelerometer data
-        try {
+        date = DateFormat.getDateTimeInstance().format(new Date());
+        pathToAccGpsFile = sharedPrefs.getInt("RIDE-KEY", 0)
+                + "_accGps_"
+                + date + ".csv";
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // COMPLETE DATA FILE (one per ride)
 
-            date = DateFormat.getDateTimeInstance().format(new Date());
-            //accFile = getFileStreamPath("acc"+date + ".csv");
-            //gpsFile = getFileStreamPath("gps"+date + ".csv");
-            pathToAccGpsFile = sharedPrefs.getInt("RIDE-KEY", 0)
-                    + "_accGps_"
-                    + date + ".csv";
-            accGpsFile = getFileStreamPath(pathToAccGpsFile);
-            //accFile.createNewFile();
-            //appendToFile("X,Y,Z,curTime,diffTime,date", accFile);
-            //gpsFile.createNewFile();
-            //appendToFile("lat,lon,time,diff,date", gpsFile);
-            accGpsFile.createNewFile();
-            appendToFile("lat,lon,X,Y,Z,time,diff,date"+System.lineSeparator(), accGpsFile);
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // META-FILE (one per user): contains ...
-            // * the information required to display rides in the ride history (DATE,
-            //   DURATION, ANNOTATED YES/NO)
-            // * the RIDE KEY which allows to identify the file containing the complete data for
-            //   a ride. => Use case: user wants to view a ride from history - retrieve data
-            // * one meta file per user, so we only want to create it if it doesn't exist yet.
-            //   (fileExists is a custom method, can be found at the very bottom of this class)
-
-            if(!fileExists("metaData.csv")) {
-
-                metaDataFile = getFileStreamPath("metaData.csv");
-
-                metaDataFile.createNewFile();
-
-                appendToFile("key, date, duration, annotated"
-                        +System.lineSeparator(), metaDataFile);
-
-            } else {
-
-                metaDataFile = getFileStreamPath("metaData.csv");
-
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG + ":RecorderService");
         // Executor service for writing data
@@ -347,6 +289,87 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onDestroy() {
 
+        if((curTime - startTime) > Constants.MINIMAL_RIDE_DURATION) {
+
+            // When the user records a route for the first time, the ride key is 0.
+            // For all subsequent rides, the key value increases by one at a time.
+
+            if (!sharedPrefs.contains("RIDE-KEY")) {
+
+                editor.putInt("RIDE-KEY", 0);
+
+                editor.apply();
+
+            } else {
+
+                int key = sharedPrefs.getInt("RIDE-KEY", 0);
+
+                editor.putInt("RIDE-KEY", key + 1);
+
+                editor.apply();
+
+            }
+
+            // Create files to write gps and accelerometer data
+            try {
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // COMPLETE DATA FILE (one per ride)
+
+                //accFile = getFileStreamPath("acc"+date + ".csv");
+                //gpsFile = getFileStreamPath("gps"+date + ".csv");
+
+                accGpsFile = getFileStreamPath(pathToAccGpsFile);
+                //accFile.createNewFile();
+                //appendToFile("X,Y,Z,curTime,diffTime,date", accFile);
+                //gpsFile.createNewFile();
+                //appendToFile("lat,lon,time,diff,date", gpsFile);
+                accGpsFile.createNewFile();
+                appendToFile("lat,lon,X,Y,Z,time,diff,date"+System.lineSeparator(), accGpsFile);
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // META-FILE (one per user): contains ...
+                // * the information required to display rides in the ride history (DATE,
+                //   DURATION, ANNOTATED YES/NO)
+                // * the RIDE KEY which allows to identify the file containing the complete data for
+                //   a ride. => Use case: user wants to view a ride from history - retrieve data
+                // * one meta file per user, so we only want to create it if it doesn't exist yet.
+                //   (fileExists is a custom method, can be found at the very bottom of this class)
+
+                if(!fileExists("metaData.csv")) {
+
+                    metaDataFile = getFileStreamPath("metaData.csv");
+
+                    metaDataFile.createNewFile();
+
+                    appendToFile("key, date, duration, annotated"
+                            +System.lineSeparator(), metaDataFile);
+
+                } else {
+
+                    metaDataFile = getFileStreamPath("metaData.csv");
+
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+
+            // Write String data to files
+            try {
+                appendToFile(accGpsString, accGpsFile);
+                appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0)) + ","
+                        + date + "," + String.valueOf(System.currentTimeMillis() - startTime) + ","
+                        + "false" + System.lineSeparator(), metaDataFile);
+            } catch (IOException e) {
+                Log.d(TAG, "Error while writing the file: " + e.getMessage());
+                e.printStackTrace();
+            }
+            Log.d(TAG, "onDestroy() accGpsString successfully written");
+        }
+
         // Prevent new tasks from being added to thread
         executor.shutdown();
 
@@ -360,20 +383,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         notificationManager.cancel(notificationId);
 
         Log.d(TAG, "onDestroy() writing accGpsString");
-
-        // Write String data to files
-        try {
-            appendToFile(accGpsString, accGpsFile);
-            appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0)) + ","
-                    + date + "," + String.valueOf(System.currentTimeMillis() - startTime) + ","
-                    + "false" + System.lineSeparator(), metaDataFile);
-        } catch (IOException e) {
-            Log.d(TAG, "Error while writing the file: " + e.getMessage());
-            e.printStackTrace();
-        }
-        Log.d(TAG, "onDestroy() accGpsString successfully written");
-
-
         // Log.d(TAG, accString);
         // Log.d(TAG, gpsString);
 
