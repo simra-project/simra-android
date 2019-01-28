@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.location.LocationManager;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
@@ -34,6 +36,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 public class ShowRouteActivity extends AppCompatActivity {
 
@@ -49,6 +55,22 @@ public class ShowRouteActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
     private static final String TAG = "ShowRouteActivity_LOG";
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // GEOCODER --> obtain GeoPoint from address
+
+    ExecutorService pool;
+
+    GeocoderNominatim geocoderNominatim;
+
+    GeoPoint destCoords = null;
+
+    List<Address> destination;
+
+    String myLoc = null;
+
+    final String userAgent = "SimRa/alpha";
 
 
     @Override
@@ -116,8 +138,19 @@ public class ShowRouteActivity extends AppCompatActivity {
             mMapView.setMaxZoomLevel(19.0);
         }
 
-        showIncidents();
+        // Thread pool to avoid NetworkOnMainThreadException when establishing a server
+        // connection during creation of GeocoderNominatim
 
+        pool = Executors.newFixedThreadPool(2);
+
+        pool.execute(new SimpleThreadFactory().newThread(() ->
+
+                geocoderNominatim = new GeocoderNominatim(userAgent)
+
+        ));
+
+        showIncidents();
+        
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,8 +185,6 @@ public class ShowRouteActivity extends AppCompatActivity {
         testIncidentDat.add(new AccEvent(new GeoPoint(52.507634, 13.320117),
                 new Date(), null));
 
-
-
         testIncidentDat = ride.getEvents();
         for (int i = 0; i < testIncidentDat.size() ; i++) {
             Log.d(TAG, String.valueOf(testIncidentDat.get(i).position.getLatitude()));
@@ -167,17 +198,28 @@ public class ShowRouteActivity extends AppCompatActivity {
 
             Marker incidentMarker = new Marker(mMapView);
 
-            incidentMarker.setPosition(testIncidentDat.get(i).position);
+            GeoPoint currentLocHelper = testIncidentDat.get(i).position;
+
+            incidentMarker.setPosition(currentLocHelper);
 
             Log.d(TAG, "incidentMarker.getPosition().getLatitude(): " + incidentMarker.getPosition().getLatitude());
             Log.d(TAG, "incidentMarker.getPosition().getLongitude(): " + incidentMarker.getPosition().getLongitude());
 
             incidentMarker.setIcon(markerDefault);
 
+            String addressForLoc = "";
+
+            try {
+                addressForLoc = pool.submit(() -> getAddressFromLocation(currentLocHelper)).get();
+            } catch(Exception ex) {
+                ex.printStackTrace();
+
+            }
+
             incidentMarker.setTitle("Vorfall " + i);
 
             InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble, mMapView,
-                    testIncidentDat.get(i), ShowRouteActivity.this);
+                    testIncidentDat.get(i), addressForLoc, ShowRouteActivity.this);
             incidentMarker.setInfoWindow(infoWindow);
 
             //incidentMarker.setSnippet("Vorfall " + i);
@@ -187,6 +229,63 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         }
 
+        //*****************************************************************
+        // Shutdown pool and await termination to make sure the program
+        // doesn't continue without the relevant work being completed
+
+        pool.shutdown();
+
+        try {
+            pool.awaitTermination(2, TimeUnit.SECONDS);
+        } catch(InterruptedException ie) {
+            ie.printStackTrace();
+        }
+
+    }
+
+    // Generate a new GeoPoint from address String via Geocoding
+
+    public String getAddressFromLocation(GeoPoint incidentLoc) {
+
+        List<Address> address = new ArrayList<>();
+
+        String adressForLocation = "";
+
+        try {
+
+            // This is the actual geocoding
+
+            address = geocoderNominatim.getFromLocation(incidentLoc.getLatitude(),
+                    incidentLoc.getLongitude(),1);
+
+            if(address.size() == 0) {
+
+                Log.i("getFromLoc", "Couldn't find an address for input geoPoint");
+
+            } else {
+
+                Log.i("getFromLoc", address.get(0).toString());
+
+                // Get address result from geocoding result
+
+                Address location = address.get(0);
+
+                adressForLocation = location.getAddressLine(0);
+
+                // Generate GeoPoint address result
+
+                /**Log.i("StartStop", "Latitude: " +
+                        destCoords.getLatitude() + ", Longitude: " + destCoords.getLongitude());
+
+                myLoc = location.toString();*/
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return adressForLocation;
 
     }
 
@@ -225,10 +324,13 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         private Activity motherActivity;
 
+        private String addressForLoc;
+
         public MyInfoWindow(int layoutResId, MapView mapView, AccEvent mAccEvent,
-                            Activity motherActivity) {
+                            String addressForLoc, Activity motherActivity) {
             super(layoutResId, mapView);
             this.mAccEvent = mAccEvent;
+            this.addressForLoc = addressForLoc;
             this.motherActivity = motherActivity;
         }
         public void onClose() {
@@ -241,8 +343,8 @@ public class ShowRouteActivity extends AppCompatActivity {
             TextView txtDescription = (TextView) mView.findViewById(R.id.bubble_description);
             TextView txtSubdescription = (TextView) mView.findViewById(R.id.bubble_subdescription);
 
-            txtTitle.setText("Title of my marker");
-            txtDescription.setText("Click here to view details!");
+            txtTitle.setText("Incident identifiziert!");
+            txtDescription.setText(addressForLoc);
             txtSubdescription.setText("You can also edit the subdescription");
 
             layout.setOnClickListener((View v) -> {
@@ -270,5 +372,22 @@ public class ShowRouteActivity extends AppCompatActivity {
                 });
         }
     }
+
+    // Thread factory implementation: to enable setting priority before new thread is returned
+
+    class SimpleThreadFactory implements ThreadFactory {
+
+        public Thread newThread(Runnable r) {
+
+            Thread myThread = new Thread(r);
+
+            myThread.setPriority(Thread.MIN_PRIORITY);
+
+            return myThread;
+
+        }
+
+    }
+
 
 }
