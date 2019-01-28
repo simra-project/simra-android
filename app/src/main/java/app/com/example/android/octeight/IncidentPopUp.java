@@ -2,9 +2,11 @@ package app.com.example.android.octeight;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.EditText;
@@ -59,6 +61,10 @@ public class IncidentPopUp extends AppCompatActivity {
         int height = dm.heightPixels;
 
         getWindow().setLayout((int)(width*.8), (int) (height*.6));
+
+        Log.i("WIDTH_DP", String.valueOf(IncidentPopUp.pxToDp(width)*.8));
+
+        Log.i("HEIGHT_DP", String.valueOf(IncidentPopUp.pxToDp(height)*.8));
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -150,5 +156,15 @@ public class IncidentPopUp extends AppCompatActivity {
         writer.close();
     }
 
+
+    public static int dpToPx(int dp)
+    {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    public static int pxToDp(int px)
+    {
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
+    }
 
 }
