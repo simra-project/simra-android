@@ -94,8 +94,10 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         String pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         String date = getIntent().getStringExtra("Date");
+        // Log.d(TAG, "onCreate() date: " + date);
         int state = getIntent().getIntExtra("State", 0);
-        Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
+        // Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
+        String timeStamp = getIntent().getStringExtra("TimeStamp");
 
         File gpsFile = getFileStreamPath(pathToAccGpsFile);
         // File gpsFile = getFileStreamPath("59_accGps_23.01.2019 09_19_09.csv");
@@ -103,10 +105,11 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         try {
             // Create a ride object with the accelerometer, gps and time data
-            ride = new Ride(gpsFile, date, state);
+            ride = new Ride(gpsFile, timeStamp, date, state);
         } catch (NullPointerException nE){
             nE.printStackTrace();
         }
+
         // Get the Route as a Polyline to be displayed on the map
         Polyline route = ride.getRoute();
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
@@ -178,7 +181,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
 
         List<AccEvent> testIncidentDat = new ArrayList<>();
-
+        /*
         testIncidentDat.add(new AccEvent(new GeoPoint(52.517374, 13.338407),
                 new Date(), null));
 
@@ -190,7 +193,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         testIncidentDat.add(new AccEvent(new GeoPoint(52.507634, 13.320117),
                 new Date(), null));
-
+        */
         testIncidentDat = ride.getEvents();
 
         Drawable accident = getResources().getDrawable(R.drawable.accident);
@@ -204,7 +207,6 @@ public class ShowRouteActivity extends AppCompatActivity {
             GeoPoint currentLocHelper = testIncidentDat.get(i).position;
 
             incidentMarker.setPosition(currentLocHelper);
-
 
             incidentMarker.setIcon(markerDefault);
 
@@ -265,7 +267,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
             } else {
 
-                Log.i("getFromLoc", address.get(0).toString());
+                // Log.i("getFromLoc", address.get(0).toString());
 
                 // Get address result from geocoding result
 
@@ -359,6 +361,7 @@ public class ShowRouteActivity extends AppCompatActivity {
                 popUpIntent.putExtra("Incident_longitude",
                         (Serializable) String.valueOf(this.mAccEvent.position.getLongitude()));
 
+                // Log.d(TAG, "this.mAccEvent.date: " + this.mAccEvent.date);
                 popUpIntent.putExtra("Incident_date",
                         (Serializable) String.valueOf(this.mAccEvent.date.toString()));
 

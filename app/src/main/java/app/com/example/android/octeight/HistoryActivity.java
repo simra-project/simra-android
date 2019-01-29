@@ -18,6 +18,7 @@ public class HistoryActivity extends AppCompatActivity {
     String pathToAccGpsFile = "";
     String date = "";
     int state = 0;
+    String timeStamp = "";
 
     /**
      * @TODO: When this Activity gets started automatically after the route recording is finished,
@@ -52,13 +53,15 @@ public class HistoryActivity extends AppCompatActivity {
                 if(getIntent().hasExtra("PathToAccGpsFile")){
                     // AccGpsString contains the accelerometer and location data as well as time data
                     pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
+                    // TimeStamp is the duration of the ride in MS
+                    timeStamp = getIntent().getStringExtra("TimeStamp");
                     // Date in form of system date (day.month.year hour:minute:second if german)
                     date = getIntent().getStringExtra("Date");
                     // State can be 0 for server processing not started, 1 for started and pending
                     // and 2 for processed by server so the incidents can be annotated by the user
                     state = getIntent().getIntExtra("State", 0);
                 }
-                Log.d(TAG, "onCreate(): pathToAccGpsFile: " + pathToAccGpsFile + " date: " + date + " state: " + state);
+                // Log.d(TAG, "onCreate(): pathToAccGpsFile: " + pathToAccGpsFile + " date: " + date + " state: " + state);
 
                 // Checks whether a ride was selected or not. Maybe it will be possible to select
                 // multiple rides and push a button to send them all to the server to be analyzed
@@ -68,6 +71,8 @@ public class HistoryActivity extends AppCompatActivity {
                     // Start ShowRouteActivity with the selected Ride.
                     Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
                     intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
+                    // Log.d(TAG, "onClick() date: " + date);
+                    intent.putExtra("TimeStamp", timeStamp);
                     intent.putExtra("Date", date);
                     intent.putExtra("State", state);
                     startActivity(intent);
@@ -83,7 +88,7 @@ public class HistoryActivity extends AppCompatActivity {
         // Press immediately the button, if HistoryActivity was created automatically after the
         // recording of a route has finished
         if(getIntent().hasExtra("PathToAccGpsFile")){
-            Log.d(TAG, "getIntent.hasExtra(\"PathToAccGpsFile\"");
+            // Log.d(TAG, "getIntent.hasExtra(\"PathToAccGpsFile\")");
             fab.performClick();
             fab.setPressed(true);
             fab.invalidate();
