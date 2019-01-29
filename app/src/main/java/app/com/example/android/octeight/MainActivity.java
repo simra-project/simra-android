@@ -370,8 +370,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
                         // Date in form of system date (day.month.year hour:minute:second if german)
                         intent.putExtra("Date", mBoundService.getDate());
+                        intent.putExtra("TimeStamp", String.valueOf(mBoundService.getDuration()));
 
-                        Log.i(TAG, "REC_CHECK2" + mBoundService.getDate());
+                        // Log.i(TAG, "REC_CHECK2" + mBoundService.getDate());
 
                         // State can be 0 for server processing not started, 1 for started and pending
                         // and 2 for processed by server so the incidents can be annotated by the user

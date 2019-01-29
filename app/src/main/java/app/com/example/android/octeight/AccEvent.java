@@ -28,11 +28,11 @@ public class AccEvent {
     public AccEvent(String[] eventLine){
         this.position = new GeoPoint(Double.valueOf(eventLine[0]), Double.valueOf(eventLine[1]));
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        Log.d(TAG, "eventLine: " + Arrays.toString(eventLine));
+        // Log.d(TAG, "eventLine: " + Arrays.toString(eventLine));
         //String dateString = format.format(new Date());
         this.timeStamp = Long.valueOf(eventLine[5]);
         try {
-            this.date = format.parse ( eventLine[6] );
+            this.date = format.parse ( eventLine[7] );
             // Log.d(TAG, "this.date: " + this.date);
         } catch (ParseException e) {
             e.printStackTrace();

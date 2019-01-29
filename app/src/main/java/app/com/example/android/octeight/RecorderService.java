@@ -93,7 +93,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     // service
     public Ride getRide() {
         File accGpsFile = getFileStreamPath(pathToAccGpsFile);
-        return new Ride(accGpsFile, date, 0);
+        return new Ride(accGpsFile, String.valueOf((curTime - startTime)), date, 0);
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -367,7 +367,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 Log.d(TAG, "Error while writing the file: " + e.getMessage());
                 e.printStackTrace();
             }
-            Log.d(TAG, "onDestroy() accGpsString successfully written");
+            // Log.d(TAG, "onDestroy() accGpsString successfully written");
         }
 
         // Prevent new tasks from being added to thread
@@ -382,7 +382,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Remove the Notification
         notificationManager.cancel(notificationId);
 
-        Log.d(TAG, "onDestroy() writing accGpsString");
+        // Log.d(TAG, "onDestroy() writing accGpsString");
         // Log.d(TAG, accString);
         // Log.d(TAG, gpsString);
 

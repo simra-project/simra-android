@@ -14,6 +14,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -64,14 +66,22 @@ public class Ride {
     }
 
     // This is the constructor that is used for now.
-    public Ride (File accGpsFile, String timeStamp, int state){
+    public Ride (File accGpsFile, String timeStamp, String date, int state){
         // this.pathToAccGpsFile = pathToAccGpsFile;
         this.accGpsFile = accGpsFile;
         this.timeStamp = timeStamp;
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        try {
+            this.date = format.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         this.route = getRouteLine(accGpsFile);
         this.state = state;
         this.events = findAccEvents();
         incidents = new ArrayList<Marker>();
+
     }
 
     private void updateEvents (){
@@ -277,6 +287,7 @@ public class Ride {
         ArrayList<AccEvent> accEvents = new ArrayList<>(6);
         ArrayList<String[]> events = new ArrayList<>(6);
 
+            // Log.d(TAG, "findAccEvents() thisLine: " + thisLine);
             accEvents.add(new AccEvent(thisLine.split(",")));
             accEvents.add(new AccEvent(thisLine.split(",")));
             accEvents.add(new AccEvent(thisLine.split(",")));
@@ -297,14 +308,13 @@ public class Ride {
         // a part of a ride together with the subsequent lines that don't have lat and lon.
         // Then, it takes the top two X-, Y- and Z-deltas and creates AccEvents from them.
         while ( (thisLine != null )&&(!newSubPart)) {
-            System.out.println("outer thisLine: " + thisLine);
-            System.out.println("outer nextLine: " + nextLine);
             String[] currentLine = thisLine.split(",");
             // currentLine = {lat, lon, maxXDelta, maxYDelta, maxZDelta, timeStamp, date}
-            partOfRide = new String[7];
+            partOfRide = new String[8];
             String lat = currentLine[0];
             String lon = currentLine[1];
             String timeStamp = currentLine[5];
+            String diff = currentLine[6];
             String date = currentLine[7];
             partOfRide[0] = lat; // lat
             partOfRide[1] = lon; // lon
@@ -312,7 +322,8 @@ public class Ride {
             partOfRide[3] = "0"; // maxYDelta
             partOfRide[4] = "0"; // maxZDelta
             partOfRide[5] = timeStamp; // timeStamp
-            partOfRide[6] = date; // date
+            partOfRide[6] = diff; // diff
+            partOfRide[7] = date; // date
 
             double maxX = Double.valueOf(currentLine[2]);
             double minX = Double.valueOf(currentLine[2]);
@@ -331,8 +342,6 @@ public class Ride {
             }
 
             while ((thisLine!= null) && newSubPart) {
-                System.out.println("inner thisLine: " + thisLine);
-                System.out.println("inner nextLine: " + nextLine);
 
                 currentLine = thisLine.split(",");
                 if (Double.valueOf(currentLine[2]) >= maxX){
@@ -407,7 +416,7 @@ public class Ride {
                 break;
             }
         }
-        Log.d(TAG, "findAccEvents(): " + Arrays.deepToString(ride.toArray()));
+        // Log.d(TAG, "findAccEvents(): " + Arrays.deepToString(ride.toArray()));
         return accEvents;
 
 
