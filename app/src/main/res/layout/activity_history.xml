@@ -7,6 +7,7 @@
     tools:context=".HistoryActivity">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/toolbarLay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -20,7 +21,15 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_history" />
+    <ListView    android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@color/colorPrimary"
+        android:dividerHeight="1dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarLay">
+    </ListView>
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

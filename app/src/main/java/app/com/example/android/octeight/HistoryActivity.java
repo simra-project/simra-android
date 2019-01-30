@@ -8,6 +8,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -19,6 +28,16 @@ public class HistoryActivity extends AppCompatActivity {
     String date = "";
     int state = 0;
     String timeStamp = "";
+
+    ListView listView;
+    private File metaDataFile;
+    ArrayList<String> ridesList = new ArrayList<>();
+    String[] actuellLine;
+    String [] ridesArr;
+    String [] testFahrten = {"0,30.01.2019 11:01:40,6501,false",
+                    "1,30.01.2019 11:12:30,6003,false",
+                    "2,30.01.2019 11:17:21,4590,false",
+                    "3,30.01.2019 11:49:18,3244,false"};
 
     /**
      * @TODO: When this Activity gets started automatically after the route recording is finished,
@@ -37,6 +56,65 @@ public class HistoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_history);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        listView = (ListView) findViewById(R.id.listView);
+        try{
+
+            if(!fileExists("metaData.csv")) {
+
+                Log.d(TAG, "!fileExists");
+
+                metaDataFile = getFileStreamPath("metaData.csv");
+
+                metaDataFile.createNewFile();
+
+                appendToFile("key, date, duration, annotated"
+                        +System.lineSeparator(), metaDataFile);
+
+                appendToFile("0,30.01.2019 11:01:40,6501,false"
+                        +System.lineSeparator(), metaDataFile);
+
+                appendToFile("1,30.01.2019 11:12:30,6003,false"
+                        +System.lineSeparator(), metaDataFile);
+
+                appendToFile("2,30.01.2019 11:17:21,4590,true"
+                        +System.lineSeparator(), metaDataFile);
+
+                appendToFile( "3,30.01.2019 11:49:18,3244,false"
+                        +System.lineSeparator(), metaDataFile);
+
+            } else {
+
+
+
+                Log.d(TAG, "!fileExists else");
+                metaDataFile = getFileStreamPath("metaData.csv");
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
+            // br.readLine() to skip the first line which contains the headers
+            String line= br.readLine();
+
+            while ((line = br.readLine()) != null) {
+                // Log.d(TAG, line);
+                actuellLine = line.split(",");
+                String todo = "Muss noch kommentiert werden\n";
+                if (actuellLine[3].contains("true")) todo = "Fertig kommentiert\n";
+                ridesList.add(todo +actuellLine[1] +  "\tID: " + actuellLine[0] + "\tLänge: " + Integer.parseInt(actuellLine[2])/1000 + "Sec");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        ridesArr = ridesList.toArray(new String[ridesList.size()]);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
+        listView.setAdapter(adapter);
+
 
         // This button will change. Every list item needs its own button (maybe they can
         // be created dynamically) where ShowRouteActivity gets started with the "Ride" (see Ride
@@ -95,7 +173,18 @@ public class HistoryActivity extends AppCompatActivity {
             fab.setPressed(false);
             fab.invalidate();
         }
-
     }
 
+    private void appendToFile(String str, File file) throws IOException {
+        FileOutputStream writer = openFileOutput(file.getName(), MODE_APPEND);
+        writer.write(str.getBytes());
+        //writer.write(System.getProperty("line.separator").getBytes());
+        writer.flush();
+        writer.close();
+    }
+
+    public boolean fileExists(String fname){
+        File file = getBaseContext().getFileStreamPath(fname);
+        return file.exists();
+    }
 }
