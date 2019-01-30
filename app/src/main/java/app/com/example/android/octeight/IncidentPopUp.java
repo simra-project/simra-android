@@ -62,10 +62,12 @@ public class IncidentPopUp extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, incidentTypes);
         typSpinner.setAdapter(adapter);
 
+        locationSpinner = (Spinner) findViewById(R.id.locationSpinner);
+
         seekBarTextView = (TextView) findViewById(R.id.seekBarText);
-        locationSpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 seekBar = (SeekBar) findViewById(R.id.seekBar);
                 seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
@@ -86,9 +88,13 @@ public class IncidentPopUp extends AppCompatActivity {
                     }
                 });
             }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
         });
 
-        locationSpinner = (Spinner) findViewById(R.id.locationSpinner);
         incidentTypeTextView = (TextView) findViewById(R.id.incidentTypeText);
         String[] locations = {"Hosentasche", "Lenker", "Jackentasche", "Hand", "Rucksack"};
         ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, locations);
