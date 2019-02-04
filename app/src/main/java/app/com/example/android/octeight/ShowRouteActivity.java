@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.mapsforge.map.scalebar.DefaultMapScaleBar;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
@@ -29,10 +32,12 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.File;
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +47,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 public class ShowRouteActivity extends AppCompatActivity {
+
+    String startTime = "";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
@@ -76,6 +83,7 @@ public class ShowRouteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate() started");
         setContentView(R.layout.activity_show_route);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Map configuration
@@ -93,19 +101,21 @@ public class ShowRouteActivity extends AppCompatActivity {
         mMapView.setTilesScaledToDpi(true);
 
         String pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
-        String date = getIntent().getStringExtra("Date");
+        // String date = getIntent().getStringExtra("Date");
+        startTime = getIntent().getStringExtra("StartTime");
         // Log.d(TAG, "onCreate() date: " + date);
         int state = getIntent().getIntExtra("State", 0);
         // Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
-        String timeStamp = getIntent().getStringExtra("TimeStamp");
+        String duration = getIntent().getStringExtra("Duration");
 
         File gpsFile = getFileStreamPath(pathToAccGpsFile);
         // File gpsFile = getFileStreamPath("59_accGps_23.01.2019 09_19_09.csv");
         // File gpsFile = getFileStreamPath("95_accGps_28.01.2019 10:42:05.csv");
 
+        Log.d(TAG, "creating ride objects");
         try {
             // Create a ride object with the accelerometer, gps and time data
-            ride = new Ride(gpsFile, timeStamp, date, state);
+            ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, this);
         } catch (NullPointerException nE){
             nE.printStackTrace();
         }
@@ -114,8 +124,7 @@ public class ShowRouteActivity extends AppCompatActivity {
         Polyline route = ride.getRoute();
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
         // set accordingly
-        double[] bounds = getBoundingBox(route);
-        BoundingBox bBox = new BoundingBox(bounds[0],bounds[1],bounds[2],bounds[3]);
+        BoundingBox bBox = getBoundingBox(route);
         // Disallow the user to scroll outside the bounding box to prevent her/him from getting lost
         mMapView.setScrollableAreaLimitDouble(bBox);
 
@@ -159,13 +168,16 @@ public class ShowRouteActivity extends AppCompatActivity {
         ));
 
         showIncidents();
-        
+        Log.d(TAG, "onCreate() finished");
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Event determination and representation happens here
 
     public void showIncidents() {
+        Log.d(TAG, "showIncidents()");
+
 
         /**for(AccEvent accE : ride.events) {
 
@@ -180,31 +192,31 @@ public class ShowRouteActivity extends AppCompatActivity {
         // Create some test data
 
 
-        List<AccEvent> testIncidentDat = new ArrayList<>();
+        List<AccEvent> incidentDat = new ArrayList<>();
         /*
-        testIncidentDat.add(new AccEvent(new GeoPoint(52.517374, 13.338407),
+        incidentDat.add(new AccEvent(new GeoPoint(52.517374, 13.338407),
                 new Date(), null));
 
-        testIncidentDat.add(new AccEvent(new GeoPoint(52.517592, 13.324816),
+        incidentDat.add(new AccEvent(new GeoPoint(52.517592, 13.324816),
                 new Date(), null));
 
-        testIncidentDat.add(new AccEvent(new GeoPoint(52.515625, 13.320117),
+        incidentDat.add(new AccEvent(new GeoPoint(52.515625, 13.320117),
                 new Date(), null));
 
-        testIncidentDat.add(new AccEvent(new GeoPoint(52.507634, 13.320117),
+        incidentDat.add(new AccEvent(new GeoPoint(52.507634, 13.320117),
                 new Date(), null));
         */
-        testIncidentDat = ride.getEvents();
+        incidentDat = ride.getEvents();
 
-        Drawable accident = getResources().getDrawable(R.drawable.accident);
+        Drawable accident = getResources().getDrawable(R.drawable.accident, null);
 
         Drawable markerDefault = getResources().getDrawable(R.drawable.marker_default, null);
 
-        for(int i = 0; i < testIncidentDat.size(); i++) {
+        for(int i = 0; i < incidentDat.size(); i++) {
 
             Marker incidentMarker = new Marker(mMapView);
 
-            GeoPoint currentLocHelper = testIncidentDat.get(i).position;
+            GeoPoint currentLocHelper = incidentDat.get(i).position;
 
             incidentMarker.setPosition(currentLocHelper);
 
@@ -219,10 +231,19 @@ public class ShowRouteActivity extends AppCompatActivity {
 
             }
 
+            // DateFormat format = android.text.format.DateFormat.getDateFormat(getApplicationContext());
+            // Date date = incidentDat.get(i).date;
+            // String date = format.format(incidentDat.get(i).date);
+
+
+
             incidentMarker.setTitle("Vorfall " + i);
 
+            long millis = Long.valueOf(startTime);
+            String time = DateUtils.formatDateTime(this, millis, DateUtils.FORMAT_SHOW_TIME);
+
             InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble, mMapView,
-                    testIncidentDat.get(i), addressForLoc, ShowRouteActivity.this);
+                    incidentDat.get(i), time + " " +addressForLoc, ShowRouteActivity.this);
             incidentMarker.setInfoWindow(infoWindow);
 
             //incidentMarker.setSnippet("Vorfall " + i);
@@ -271,6 +292,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
                 // Get address result from geocoding result
 
+                Log.d(TAG, Arrays.deepToString(address.toArray()));
                 Address location = address.get(0);
 
                 addressForLocation = location.getAddressLine(0);
@@ -295,30 +317,30 @@ public class ShowRouteActivity extends AppCompatActivity {
     // Returns the longitudes of the southern- and northernmost points
     // as well as the latitudes of the western- and easternmost points
     // in a double Array {South, North, West, East}
-    static double[] getBoundingBox(Polyline pl){
+    static BoundingBox getBoundingBox(Polyline pl){
 
         // {North, East, South, West}
         ArrayList<GeoPoint> geoPoints = pl.getPoints();
 
-        double[] result = {geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude(), geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude()};
+        double[] border = {geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude(), geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude()};
 
         for (int i = 0; i < geoPoints.size(); i++) {
             // Check for south/north
-            if (geoPoints.get(i).getLatitude() < result[2]){
-                result[2] = geoPoints.get(i).getLatitude();
-            } if (geoPoints.get(i).getLatitude() > result[0]){
-                result[0] = geoPoints.get(i).getLatitude();
+            if (geoPoints.get(i).getLatitude() < border[2]){
+                border[2] = geoPoints.get(i).getLatitude();
+            } if (geoPoints.get(i).getLatitude() > border[0]){
+                border[0] = geoPoints.get(i).getLatitude();
             }
             // Check for west/east
-            if (geoPoints.get(i).getLongitude() < result[3]){
-                result[3] = geoPoints.get(i).getLongitude();
-            } if (geoPoints.get(i).getLongitude() > result[1]){
-                result[1] = geoPoints.get(i).getLongitude();
+            if (geoPoints.get(i).getLongitude() < border[3]){
+                border[3] = geoPoints.get(i).getLongitude();
+            } if (geoPoints.get(i).getLongitude() > border[1]){
+                border[1] = geoPoints.get(i).getLongitude();
             }
 
         }
 
-        return result;
+        return new BoundingBox(border[0],border[1],border[2],border[3]);
     }
 
     protected class MyInfoWindow extends InfoWindow {
@@ -346,7 +368,7 @@ public class ShowRouteActivity extends AppCompatActivity {
             TextView txtDescription = (TextView) mView.findViewById(R.id.bubble_description);
             TextView txtSubdescription = (TextView) mView.findViewById(R.id.bubble_subdescription);
 
-            txtTitle.setText("Incident identifiziert!");
+            txtTitle.setText(getString(R.string.incidentDetectedDE));
             txtDescription.setText(addressForLoc);
             txtSubdescription.setText("You can also edit the subdescription");
 
@@ -363,7 +385,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
                 // Log.d(TAG, "this.mAccEvent.date: " + this.mAccEvent.date);
                 popUpIntent.putExtra("Incident_date",
-                        (Serializable) String.valueOf(this.mAccEvent.date.toString()));
+                        (Serializable) String.valueOf(this.mAccEvent.getTimeStamp()));
 
                 //popUpIntent.putExtra("Incident_accDat",
                 //        (Serializable) String.valueOf(this.mAccEvent.sensorData.getAbsolutePath()));
@@ -378,7 +400,6 @@ public class ShowRouteActivity extends AppCompatActivity {
     }
 
     // Thread factory implementation: to enable setting priority before new thread is returned
-
     class SimpleThreadFactory implements ThreadFactory {
 
         public Thread newThread(Runnable r) {
@@ -392,6 +413,5 @@ public class ShowRouteActivity extends AppCompatActivity {
         }
 
     }
-
 
 }
