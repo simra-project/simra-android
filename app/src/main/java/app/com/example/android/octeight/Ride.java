@@ -1,94 +1,56 @@
 package app.com.example.android.octeight;
 
-import android.app.Activity;
-import android.support.design.widget.Snackbar;
+import android.content.Context;
 import android.util.Log;
 
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 public class Ride {
 
     static int nextID = 0;
     final int id = nextID++;
-    Date date;
-    GeoPoint start;
-    GeoPoint finish;
-    int duration;
-    int user;
     File accGpsFile;
     ArrayList<AccEvent> events;
     public ArrayList<AccEvent> getEvents() { return events; }
-    String accString;
-    String gpsString;
-    String accGpsString;
-    String pathToAccGpsFile;
-    String timeStamp;
+    String duration;
+    String startTime;
+    Context context;
     static String TAG = "Ride_LOG";
     Polyline route;
-    public String getTimeStamp(){
-        return this.timeStamp;
+    public String getDuration(){
+        return duration;
     }
     public Polyline getRoute(){ return this.route; }
-    ArrayList<Marker> incidents;
     int state;
-    final int OFFLINE = 0;
-    final int PENDING = 1;
-    final int READY = 2;
+    final int ANNOTATION_NOT_STARTED = 0;
+    final int ANNOTATION_NOT_FINISHED = 1;
+    final int ANNOTATION_FINISHED = 2;
 
-    public Ride (int user, File sensorData){
-        user = this.user;
-        accGpsFile = sensorData;
-        date =  new Date();
-        // start = get first GeoPoint in sensorData
-        // finish = get last GeoPoint in sensorData
-        // duration = last timestamp - first timestamp
-        updateEvents();
-    }
 
     // This is the constructor that is used for now.
-    public Ride (File accGpsFile, String timeStamp, String date, int state){
-        // this.pathToAccGpsFile = pathToAccGpsFile;
+    public Ride (File accGpsFile, String duration, String startTime, /*String date,*/ int state, Context context){
         this.accGpsFile = accGpsFile;
-        this.timeStamp = timeStamp;
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        try {
-            this.date = format.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        this.duration = duration;
+        this.startTime = startTime;
+
 
         this.route = getRouteLine(accGpsFile);
         this.state = state;
         this.events = findAccEvents();
-        incidents = new ArrayList<Marker>();
+        this.context = context;
 
     }
 
-    private void updateEvents (){
-        events = new ArrayList<AccEvent>() ;
-        // search for Events in sensorData
-        // add every Event to the List
-    }
 
     // Takes a File which contains all the data and creates a
     // PolyLine to be displayed on the map as a route.
@@ -287,7 +249,6 @@ public class Ride {
         ArrayList<AccEvent> accEvents = new ArrayList<>(6);
         ArrayList<String[]> events = new ArrayList<>(6);
 
-            // Log.d(TAG, "findAccEvents() thisLine: " + thisLine);
             accEvents.add(new AccEvent(thisLine.split(",")));
             accEvents.add(new AccEvent(thisLine.split(",")));
             accEvents.add(new AccEvent(thisLine.split(",")));
@@ -295,7 +256,7 @@ public class Ride {
             accEvents.add(new AccEvent(thisLine.split(",")));
             accEvents.add(new AccEvent(thisLine.split(",")));
 
-        String[] template = {"0.0","0.0","0.0","0.0","0.0","0","d"};
+        String[] template = {"0.0","0.0","0.0","0.0","0.0","0"};
         events.add(template);
         events.add(template);
         events.add(template);
@@ -309,21 +270,18 @@ public class Ride {
         // Then, it takes the top two X-, Y- and Z-deltas and creates AccEvents from them.
         while ( (thisLine != null )&&(!newSubPart)) {
             String[] currentLine = thisLine.split(",");
-            // currentLine = {lat, lon, maxXDelta, maxYDelta, maxZDelta, timeStamp, date}
-            partOfRide = new String[8];
+            // currentLine: {lat, lon, maxXDelta, maxYDelta, maxZDelta, timeStamp}
+            partOfRide = new String[6];
             String lat = currentLine[0];
             String lon = currentLine[1];
             String timeStamp = currentLine[5];
-            String diff = currentLine[6];
-            String date = currentLine[7];
+
             partOfRide[0] = lat; // lat
             partOfRide[1] = lon; // lon
             partOfRide[2] = "0"; // maxXDelta
             partOfRide[3] = "0"; // maxYDelta
             partOfRide[4] = "0"; // maxZDelta
             partOfRide[5] = timeStamp; // timeStamp
-            partOfRide[6] = diff; // diff
-            partOfRide[7] = date; // date
 
             double maxX = Double.valueOf(currentLine[2]);
             double minX = Double.valueOf(currentLine[2]);
@@ -382,99 +340,55 @@ public class Ride {
 
             ride.add(partOfRide);
 
-            boolean eventAdded = false;
+            // Checks whether there is a minimum of <threshold> milliseconds
+            // between the actual event and the top 6 events so far.
+            int threshold = 15000; // 15 seconds
+            long minTimeDelta = 999999999;
+            for (int i = 0; i < events.size(); i++) {
+                long actualTimeDelta = Long.valueOf(partOfRide[5]) - Long.valueOf(events.get(i)[5]);
+                if (actualTimeDelta < minTimeDelta) {
+                    minTimeDelta = actualTimeDelta;
+                }
+            }
+            boolean enoughTimePassed = minTimeDelta > threshold;
+
             // Check whether actualX is one of the top 2 events
-            if (maxXDelta > Double.valueOf(events.get(0)[2]) && !eventAdded){
+            boolean eventAdded = false;
+            if (maxXDelta > Double.valueOf(events.get(0)[2]) && !eventAdded && enoughTimePassed ){
+
                 events.set(0, partOfRide);
                 accEvents.set(0, new AccEvent(partOfRide));
                 eventAdded = true;
-            } else if (maxXDelta > Double.valueOf(events.get(1)[2]) && !eventAdded) {
+            } else if (maxXDelta > Double.valueOf(events.get(1)[2]) && !eventAdded && enoughTimePassed ) {
+
                 events.set(1, partOfRide);
                 accEvents.set(1, new AccEvent(partOfRide));
                 eventAdded = true;
-            }
+               }
             // Check whether actualY is one of the top 2 events
-            if (maxYDelta > Double.valueOf(events.get(2)[3]) && !eventAdded){
+            if (maxYDelta > Double.valueOf(events.get(2)[3]) && !eventAdded && enoughTimePassed){
+
                 events.set(2, partOfRide);
                 accEvents.set(2, new AccEvent(partOfRide));
                 eventAdded = true;
-            } else if (maxYDelta > Double.valueOf(events.get(3)[3]) && !eventAdded) {
+
+            } else if (maxYDelta > Double.valueOf(events.get(3)[3]) && !eventAdded && enoughTimePassed) {
                 events.set(3, partOfRide);
                 accEvents.set(3, new AccEvent(partOfRide));
                 eventAdded = true;
             }
             // Check whether actualZ is one of the top 2 events
-            if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded){
-                events.set(4, partOfRide);
-                accEvents.set(4, new AccEvent(partOfRide));
-            } else if (maxZDelta > Double.valueOf(events.get(5)[4]) && !eventAdded) {
+            if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded && enoughTimePassed){
                 events.set(5, partOfRide);
                 accEvents.set(5, new AccEvent(partOfRide));
-            }
+                }
 
             if(nextLine == null){
                 break;
             }
         }
-        // Log.d(TAG, "findAccEvents(): " + Arrays.deepToString(ride.toArray()));
         return accEvents;
 
-
-    }
-
-
-    // The idea was to split the route to multiple parts of 3 seconds and than analyse
-    // whether there was a probable incident. Debatable.
-    public class RoutePart {
-        Queue<Float> accXQueue;
-        Queue<Float> accYQueue;
-        Queue<Float> accZQueue;
-        GeoPoint gps;
-        String timeStamp;
-        double averageX;
-        double averageY;
-        double averageZ;
-
-        public RoutePart(Queue<Float> accXQueue, Queue<Float> accYQueue, Queue<Float> accZQueue, String timeStamp){
-            this.accXQueue = accXQueue;
-            this.accYQueue = accYQueue;
-            this.accZQueue = accZQueue;
-            this.timeStamp = timeStamp;
-
-            computeAverage(accXQueue);
-
-        }
-
-        private double computeAverage(Collection<Float> myVals) {
-
-            double sum = 0;
-
-            for(double f : myVals) {
-
-                sum += f;
-
-            }
-
-            return sum/myVals.size();
-
-        }
-
-
-
-    }
-
-    // The Idea was that each Ride (or RoutePart) has a couple of Incident objects. Debatable.
-    public class Incident {
-        Polyline incidentRoute;
-        String timestamp;
-        Ride owner;
-        int type;
-
-        public Incident(Polyline incidentRoute, String timestamp, Ride owner){
-            this.incidentRoute = incidentRoute;
-            this.timestamp = timestamp;
-            this.owner = owner;
-        }
 
     }
 
