@@ -360,22 +360,18 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                     if( mBoundService.getDuration() > Constants.MINIMAL_RIDE_DURATION) {
                         // Get the recorded files and send them to HistoryActivity for further processing
                         Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                        // AccGpsString contains the accelerometer and location data as well as time data
+                        // The file under PathToAccGpsFile contains the accelerometer and location data
+                        // as well as time data
                         intent.putExtra("PathToAccGpsFile", mBoundService.getPathToAccGpsFile());
 
-                        // Log.i(TAG, "REC_CHECK1" + String.valueOf(mBoundService.getAccGpsString().length()));
 
-                        Log.d(TAG, "(5) AUFZEICHNUNG STOPPEN / STOP-BUTTON: AccGpsString: "
-                                + mBoundService.getAccGpsString());
+                        // timestamp in ms from 1970
+                        intent.putExtra("Duration", String.valueOf(mBoundService.getDuration()));
+                        intent.putExtra("StartTime", String.valueOf(mBoundService.getStartTime()));
 
-                        // Date in form of system date (day.month.year hour:minute:second if german)
-                        intent.putExtra("Date", mBoundService.getDate());
-                        intent.putExtra("TimeStamp", String.valueOf(mBoundService.getDuration()));
 
-                        // Log.i(TAG, "REC_CHECK2" + mBoundService.getDate());
-
-                        // State can be 0 for server processing not started, 1 for started and pending
-                        // and 2 for processed by server so the incidents can be annotated by the user
+                        // State can be 0 not annotated, 1 for started but not sent
+                        // and 2 for annotated and sent to the server
                         intent.putExtra("State", 0); // redundant
                         startActivity(intent);
                     } else {

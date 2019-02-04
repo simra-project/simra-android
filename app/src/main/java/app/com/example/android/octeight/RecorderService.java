@@ -59,6 +59,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     long curTime;
     long startTime;
+    long endTime;
     final int GPS_POLL_FREQUENCY = Constants.GPS_FREQUENCY;
     private SensorManager sensorManager = null;
     private PowerManager.WakeLock wakeLock = null;
@@ -83,9 +84,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     }
     public String getAccGpsString() { return accGpsString; }
     public String getPathToAccGpsFile() { return pathToAccGpsFile; }
-    public String getDate() { return date; }
     public double getDuration() { return (curTime - startTime); }
-
+    public long getTimeStamp() { return curTime; }
+    public long getEndTime() { return endTime; }
+    public long getStartTime() { return startTime; }
     public String mAcceleration = "";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,7 +95,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     // service
     public Ride getRide() {
         File accGpsFile = getFileStreamPath(pathToAccGpsFile);
-        return new Ride(accGpsFile, String.valueOf((curTime - startTime)), date, 0);
+        return new Ride(accGpsFile, String.valueOf(startTime), String.valueOf((curTime - startTime)), 0, this);
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -102,8 +104,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     // private File gpsFile;
     private File accGpsFile;
     private File metaDataFile;
-
-    String date;
 
     LocationManager locationManager;
     Location lastLocation;
@@ -144,7 +144,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
             lastAccUpdate = curTime;
             // Write data to file in background thread
-            try{
+            try {
                 Runnable insertHandler = new InsertHandler(accelerometerMatrix);
                 executor.execute(insertHandler);
             } catch (Exception e) {
@@ -235,10 +235,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         accZQueue = new LinkedList<>();
         // accQQueue = new LinkedList<>();
 
-        date = DateFormat.getDateTimeInstance().format(new Date());
+        // date = DateFormat.getDateTimeInstance().format(new Date());
         pathToAccGpsFile = sharedPrefs.getInt("RIDE-KEY", 0)
                 + "_accGps_"
-                + date + ".csv";
+                + startTime +/*date +*/ ".csv";
 
 
         PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -288,6 +288,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public void onDestroy() {
+        endTime = curTime;
 
         if((curTime - startTime) > Constants.MINIMAL_RIDE_DURATION) {
 
@@ -325,7 +326,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 //gpsFile.createNewFile();
                 //appendToFile("lat,lon,time,diff,date", gpsFile);
                 accGpsFile.createNewFile();
-                appendToFile("lat,lon,X,Y,Z,time,diff,date"+System.lineSeparator(), accGpsFile);
+                appendToFile("lat,lon,X,Y,Z,timeStamp"+System.lineSeparator(), accGpsFile);
 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // META-FILE (one per user): contains ...
@@ -342,7 +343,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                     metaDataFile.createNewFile();
 
-                    appendToFile("key, date, duration, annotated"
+                    appendToFile("key, startTime, endTime, annotated"
                             +System.lineSeparator(), metaDataFile);
 
                 } else {
@@ -361,7 +362,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             try {
                 appendToFile(accGpsString, accGpsFile);
                 appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0)) + ","
-                        + date + "," + String.valueOf(System.currentTimeMillis() - startTime) + ","
+                        + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
                         + "false" + System.lineSeparator(), metaDataFile);
             } catch (IOException e) {
                 Log.d(TAG, "Error while writing the file: " + e.getMessage());
@@ -419,21 +420,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             }
         }).start();
 
-        /*
-        try {
-            appendToFile(recordedAccData, accFile);
-            appendToFile(recordedGPSData, gpsFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
     }
 
     private void appendToFile(String str, File file) throws IOException {
         FileOutputStream writer = openFileOutput(file.getName(), MODE_APPEND);
         writer.write(str.getBytes());
-        //writer.write(System.getProperty("line.separator").getBytes());
         writer.flush();
         writer.close();
     }
@@ -551,15 +542,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 String str = gps + String.valueOf(xAvg) + "," +
                         String.valueOf(yAvg) + "," +
                         String.valueOf(zAvg) + "," +
-                        (curTime - startTime) + "," +
-                        (curTime - lastAccUpdate) + "," +
-                        DateFormat.getDateTimeInstance().format(new Date());
+                        curTime;
 
-                //accString += str += '\n';
-                //Log.d(TAG, "accString: " + accString);
-                // str += System.getProperty("line.separator");
-
-                // str += ",";
                 accGpsString += str /*+= String.valueOf(qAvg)*/;
                 accGpsString += System.getProperty("line.separator");
 

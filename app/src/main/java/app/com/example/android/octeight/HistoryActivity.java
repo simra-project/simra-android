@@ -2,7 +2,6 @@ package app.com.example.android.octeight;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import java.util.Date;
+
 public class HistoryActivity extends AppCompatActivity {
 
     // Log tag
@@ -32,7 +33,8 @@ public class HistoryActivity extends AppCompatActivity {
     String pathToAccGpsFile = "";
     String date = "";
     int state = 0;
-    String timeStamp = "";
+    String duration = "";
+    String startTime = "";
 
     ListView listView;
     private File metaDataFile;
@@ -48,8 +50,9 @@ public class HistoryActivity extends AppCompatActivity {
      * the route gets shown immediately by calling ShowRouteActivity.
      * Otherwise, this activity has to scan for saved rides (maybe as files in the internal storage
      * or as entries in sharedPreference) and display them in a list.
-     * <p>
+     *
      * The user must be able to select a ride which should start the ShowRouteActivity with that ride.
+     *
      */
 
     @Override
@@ -163,13 +166,13 @@ public class HistoryActivity extends AppCompatActivity {
                 Log.d(TAG, "onClick()");
                 // Checks if HistoryActivity was started by the user or by the app after a route
                 // recording was finished
-                if (getIntent().hasExtra("PathToAccGpsFile")) {
+                if(getIntent().hasExtra("PathToAccGpsFile")){
                     // AccGpsString contains the accelerometer and location data as well as time data
                     pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
                     // TimeStamp is the duration of the ride in MS
-                    timeStamp = getIntent().getStringExtra("TimeStamp");
-                    // Date in form of system date (day.month.year hour:minute:second if german)
-                    date = getIntent().getStringExtra("Date");
+                    duration = getIntent().getStringExtra("Duration");
+                    // The time in which the ride started in ms from 1970
+                    startTime = getIntent().getStringExtra("StartTime");
                     // State can be 0 for server processing not started, 1 for started and pending
                     // and 2 for processed by server so the incidents can be annotated by the user
                     state = getIntent().getIntExtra("State", 0);
@@ -178,19 +181,18 @@ public class HistoryActivity extends AppCompatActivity {
 
                 // Checks whether a ride was selected or not. Maybe it will be possible to select
                 // multiple rides and push a button to send them all to the server to be analyzed
-                if (accGpsString != null && date != null) {
-                    Snackbar.make(view, getString(R.string.selectedRideInfoDE) + date, Snackbar.LENGTH_LONG)
+                if(accGpsString != null && startTime != "") {
+                    Snackbar.make(view, getString(R.string.selectedRideInfoDE) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                     // Start ShowRouteActivity with the selected Ride.
                     Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
                     intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
-                    // Log.d(TAG, "onClick() date: " + date);
-                    intent.putExtra("TimeStamp", timeStamp);
-                    intent.putExtra("Date", date);
+                    intent.putExtra("Duration", duration);
+                    intent.putExtra("StartTime", startTime);
                     intent.putExtra("State", state);
                     startActivity(intent);
                 } else {
-                    Snackbar.make(view, getString(R.string.errorNoRideSelectedDE) + date, Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, getString(R.string.errorNoRideSelectedDE) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
 
