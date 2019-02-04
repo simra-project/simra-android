@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 public class ShowRouteActivity extends AppCompatActivity {
 
     String startTime = "";
+    String timeStamp = "";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
@@ -109,7 +110,7 @@ public class ShowRouteActivity extends AppCompatActivity {
         String duration = getIntent().getStringExtra("Duration");
 
         File gpsFile = getFileStreamPath(pathToAccGpsFile);
-        // File gpsFile = getFileStreamPath("59_accGps_23.01.2019 09_19_09.csv");
+        // File gpsFile = getFileStreamPath("59_accGps_23.01.2019 09_19_09_epoch.csv");
         // File gpsFile = getFileStreamPath("95_accGps_28.01.2019 10:42:05.csv");
 
         Log.d(TAG, "creating ride objects");
@@ -241,9 +242,10 @@ public class ShowRouteActivity extends AppCompatActivity {
 
             long millis = Long.valueOf(startTime);
             String time = DateUtils.formatDateTime(this, millis, DateUtils.FORMAT_SHOW_TIME);
+            Log.d(TAG, "startTime: " + time);
 
             InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble, mMapView,
-                    incidentDat.get(i), time + " " +addressForLoc, ShowRouteActivity.this);
+                    incidentDat.get(i), addressForLoc, ShowRouteActivity.this);
             incidentMarker.setInfoWindow(infoWindow);
 
             //incidentMarker.setSnippet("Vorfall " + i);
@@ -369,7 +371,10 @@ public class ShowRouteActivity extends AppCompatActivity {
             TextView txtSubdescription = (TextView) mView.findViewById(R.id.bubble_subdescription);
 
             txtTitle.setText(getString(R.string.incidentDetectedDE));
-            txtDescription.setText(addressForLoc);
+            long millis = Long.valueOf(this.mAccEvent.getTimeStamp());
+            String time = DateUtils.formatDateTime(ShowRouteActivity.this, millis, DateUtils.FORMAT_SHOW_TIME);
+
+            txtDescription.setText(time + " " +addressForLoc);
             txtSubdescription.setText("You can also edit the subdescription");
 
             layout.setOnClickListener((View v) -> {

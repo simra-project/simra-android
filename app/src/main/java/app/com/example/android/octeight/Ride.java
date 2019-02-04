@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -269,9 +270,8 @@ public class Ride {
         // Then, it takes the top two X-, Y- and Z-deltas and creates AccEvents from them.
         while ( (thisLine != null )&&(!newSubPart)) {
             String[] currentLine = thisLine.split(",");
-            Log.d(TAG, "currentLine: " + Arrays.toString(currentLine));
             // currentLine: {lat, lon, maxXDelta, maxYDelta, maxZDelta, timeStamp}
-            partOfRide = new String[8];
+            partOfRide = new String[6];
             String lat = currentLine[0];
             String lon = currentLine[1];
             String timeStamp = currentLine[5];
@@ -340,35 +340,48 @@ public class Ride {
 
             ride.add(partOfRide);
 
-            boolean eventAdded = false;
+            // Checks whether there is a minimum of <threshold> milliseconds
+            // between the actual event and the top 6 events so far.
+            int threshold = 15000; // 15 seconds
+            long minTimeDelta = 999999999;
+            for (int i = 0; i < events.size(); i++) {
+                long actualTimeDelta = Long.valueOf(partOfRide[5]) - Long.valueOf(events.get(i)[5]);
+                if (actualTimeDelta < minTimeDelta) {
+                    minTimeDelta = actualTimeDelta;
+                }
+            }
+            boolean enoughTimePassed = minTimeDelta > threshold;
+
             // Check whether actualX is one of the top 2 events
-            if (maxXDelta > Double.valueOf(events.get(0)[2]) && !eventAdded){
+            boolean eventAdded = false;
+            if (maxXDelta > Double.valueOf(events.get(0)[2]) && !eventAdded && enoughTimePassed ){
+
                 events.set(0, partOfRide);
                 accEvents.set(0, new AccEvent(partOfRide));
                 eventAdded = true;
-            } else if (maxXDelta > Double.valueOf(events.get(1)[2]) && !eventAdded) {
+            } else if (maxXDelta > Double.valueOf(events.get(1)[2]) && !eventAdded && enoughTimePassed ) {
+
                 events.set(1, partOfRide);
                 accEvents.set(1, new AccEvent(partOfRide));
                 eventAdded = true;
-            }
+               }
             // Check whether actualY is one of the top 2 events
-            if (maxYDelta > Double.valueOf(events.get(2)[3]) && !eventAdded){
+            if (maxYDelta > Double.valueOf(events.get(2)[3]) && !eventAdded && enoughTimePassed){
+
                 events.set(2, partOfRide);
                 accEvents.set(2, new AccEvent(partOfRide));
                 eventAdded = true;
-            } else if (maxYDelta > Double.valueOf(events.get(3)[3]) && !eventAdded) {
+
+            } else if (maxYDelta > Double.valueOf(events.get(3)[3]) && !eventAdded && enoughTimePassed) {
                 events.set(3, partOfRide);
                 accEvents.set(3, new AccEvent(partOfRide));
                 eventAdded = true;
             }
             // Check whether actualZ is one of the top 2 events
-            if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded){
-                events.set(4, partOfRide);
-                accEvents.set(4, new AccEvent(partOfRide));
-            } else if (maxZDelta > Double.valueOf(events.get(5)[4]) && !eventAdded) {
+            if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded && enoughTimePassed){
                 events.set(5, partOfRide);
                 accEvents.set(5, new AccEvent(partOfRide));
-            }
+                }
 
             if(nextLine == null){
                 break;

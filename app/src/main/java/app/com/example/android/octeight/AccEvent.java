@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.osmdroid.util.GeoPoint;
 
+import java.util.Arrays;
 import java.util.Date;
 
 public class AccEvent {
