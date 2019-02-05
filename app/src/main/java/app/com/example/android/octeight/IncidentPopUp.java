@@ -69,6 +69,7 @@ public class IncidentPopUp extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 seekBar = (SeekBar) findViewById(R.id.seekBar);
+                seekBarTextView.setText("Intensität: 0 von 5");
                 seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {

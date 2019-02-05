@@ -2,6 +2,7 @@ package app.com.example.android.octeight;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -74,19 +76,19 @@ public class HistoryActivity extends AppCompatActivity {
 
                 metaDataFile.createNewFile();
 
-                appendToFile("key, date, duration, annotated"
+                appendToFile("key, startTime, endTime, annotated"
                         + System.lineSeparator(), metaDataFile);
 
-                appendToFile("0,30.01.2019 11:01:40,6501,false"
+                appendToFile("0,1549113603,1549114203,false"
                         + System.lineSeparator(), metaDataFile);
 
-                appendToFile("1,30.01.2019 11:12:30,6003,false"
+                appendToFile("1,1549114203,1549114503,false"
                         + System.lineSeparator(), metaDataFile);
 
-                appendToFile("2,30.01.2019 11:17:21,4590,true"
+                appendToFile("2,1549373703,1549374003,true"
                         + System.lineSeparator(), metaDataFile);
 
-                appendToFile("3,30.01.2019 11:49:18,3244,false"
+                appendToFile("3,1549374003,1549374123,false"
                         + System.lineSeparator(), metaDataFile);
 
             } else {
@@ -142,8 +144,8 @@ public class HistoryActivity extends AppCompatActivity {
                             Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
                             intent.putExtra("PathToAccGpsFile", dirFiles[i]);
                             // Log.d(TAG, "onClick() date: " + date);
-                            intent.putExtra("TimeStamp", getMillis(ridesList.get(position)[1]));
-                            intent.putExtra("Date", ridesList.get(position)[1]);
+                            intent.putExtra("Duration", ridesList.get(position)[1]);
+                            intent.putExtra("StartTime", ridesList.get(position)[2]);
                             intent.putExtra("State", ridesList.get(position)[3]);
                             startActivity(intent);
                         }
@@ -228,10 +230,11 @@ public class HistoryActivity extends AppCompatActivity {
     private String listToTextShape (String[] item){
         String todo = "Muss noch kommentiert werden\n";
         if (item[3].contains("true")) todo = "Fertig kommentiert\n";
-        return (todo + item[1] + "\tID: " + item[0] + "\tLänge: " + Integer.parseInt(item[2]) / 1000 + "Sec");
+        return todo + new Date( Long.getLong(item[1]) ).toString() + "\tID: " + item[0] + "\tLänge: " + ( Long.getLong(item[2]) - Long.getLong(item[1]) ) / 1000 + "Sec";
+        // requires API 26 (Java 8) Date.from(Instant.ofEpochMilli( Long.getLong(item[0]) )).toString()
     }
 
-    private Long getMillis (String dateStr){
+  /*  private Long getMillis (String dateStr){
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss");
         Date date = null;
         try {
@@ -240,5 +243,5 @@ public class HistoryActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return date.getTime();
-    }
+    }*/
 }
