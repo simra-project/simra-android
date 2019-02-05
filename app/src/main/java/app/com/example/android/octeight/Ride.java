@@ -361,7 +361,7 @@ public class Ride {
                 accEvents.set(0, new AccEvent(partOfRide));
 
                 events.set(1, temp);
-                accEvents.set(1, new AccEvent(partOfRide));
+                accEvents.set(1, new AccEvent(temp));
                 eventAdded = true;
             } else if (maxXDelta > Double.valueOf(events.get(1)[2]) && !eventAdded && enoughTimePassed ) {
 
@@ -370,13 +370,13 @@ public class Ride {
                 eventAdded = true;
                }
             // Check whether actualY is one of the top 2 events
-            if (maxYDelta > Double.valueOf(events.get(2)[3]) && !eventAdded && enoughTimePassed){
+            else if (maxYDelta > Double.valueOf(events.get(2)[3]) && !eventAdded && enoughTimePassed){
 
                 String[] temp = events.get(2);
                 events.set(2, partOfRide);
                 accEvents.set(2, new AccEvent(partOfRide));
                 events.set(3, temp);
-                accEvents.set(3, new AccEvent(partOfRide));
+                accEvents.set(3, new AccEvent(temp));
                 eventAdded = true;
 
             } else if (maxYDelta > Double.valueOf(events.get(3)[3]) && !eventAdded && enoughTimePassed) {
@@ -385,12 +385,12 @@ public class Ride {
                 eventAdded = true;
             }
             // Check whether actualZ is one of the top 2 events
-            if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded && enoughTimePassed){
+            else if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded && enoughTimePassed){
                 String[] temp = events.get(4);
                 events.set(4, partOfRide);
                 accEvents.set(4, new AccEvent(partOfRide));
                 events.set(5, temp);
-                accEvents.set(5, new AccEvent(partOfRide));
+                accEvents.set(5, new AccEvent(temp));
 
                 } else if (maxZDelta > Double.valueOf(events.get(5)[4]) && !eventAdded && enoughTimePassed) {
                 events.set(5, partOfRide);
@@ -401,6 +401,10 @@ public class Ride {
             if(nextLine == null){
                 break;
             }
+        }
+        for (int i = 0; i < accEvents.size() ; i++) {
+            Log.d(TAG, "accEvents.get(" + i + ") Position: " + (accEvents.get(i).position.toString())
+                    + " timeStamp: " + (accEvents.get(i).timeStamp));
         }
         return accEvents;
 
