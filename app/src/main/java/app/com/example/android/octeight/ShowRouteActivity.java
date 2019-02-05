@@ -244,7 +244,7 @@ public class ShowRouteActivity extends AppCompatActivity {
             String time = DateUtils.formatDateTime(this, millis, DateUtils.FORMAT_SHOW_TIME);
 
             InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble, mMapView,
-                    incidentDat.get(i), addressForLoc, ShowRouteActivity.this);
+                    incidentDat.get(i), addressForLoc, ShowRouteActivity.this, ride);
             incidentMarker.setInfoWindow(infoWindow);
 
             //incidentMarker.setSnippet("Vorfall " + i);
@@ -351,12 +351,15 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         private String addressForLoc;
 
+        private Ride ride;
+
         public MyInfoWindow(int layoutResId, MapView mapView, AccEvent mAccEvent,
-                            String addressForLoc, Activity motherActivity) {
+                            String addressForLoc, Activity motherActivity, Ride ride) {
             super(layoutResId, mapView);
             this.mAccEvent = mAccEvent;
             this.addressForLoc = addressForLoc;
             this.motherActivity = motherActivity;
+            this.ride = ride;
         }
         public void onClose() {
         }
@@ -395,6 +398,8 @@ public class ShowRouteActivity extends AppCompatActivity {
 
                 popUpIntent.putExtra("Incident_accDat",
                           (Serializable) "mockSensorDatForIncident.csv");
+
+                popUpIntent.putExtra("ID", ride.getId());
 
                 startActivity(popUpIntent);
 

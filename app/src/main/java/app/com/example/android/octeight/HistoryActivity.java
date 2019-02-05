@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import java.util.Date;
@@ -40,7 +41,7 @@ public class HistoryActivity extends AppCompatActivity {
 
     ListView listView;
     private File metaDataFile;
-    ArrayList<String[]> ridesList = new ArrayList<String[]>();
+    ArrayList<String[]> ridesList = new ArrayList<>();
     String[] ridesArr;
     String[] testFahrten = {"0,30.01.2019 11:01:40,6501,false",
             "1,30.01.2019 11:12:30,6003,false",
@@ -117,9 +118,14 @@ public class HistoryActivity extends AppCompatActivity {
 
         //ridesArr = ridesList.toArray(new String[ridesList.size()]);
         ridesArr = new String[ridesList.size()];
+        Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
+        Log.d(TAG, "ridesList: " + Arrays.deepToString(ridesList.toArray()));
         for (String[] i : ridesList){
+            Log.d(TAG, "String[] i : ridesList: " + Arrays.toString(i));
             ridesArr[Integer.parseInt(i[0])] = listToTextShape(i);
+            Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
         }
+        Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
         listView.setAdapter(adapter);
 
@@ -127,26 +133,36 @@ public class HistoryActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // gets the files in the directory
-                File fileDirectory = new File(Environment.getDataDirectory() + "");
                 // lists all the files into an array
-                File[] dirFiles = fileDirectory.listFiles();
+                File[] dirFiles = getFilesDir().listFiles();
+                Log.d(TAG, "dirFiles: " + Arrays.deepToString(dirFiles));
                 String clicked = (String) listView.getItemAtPosition(position);
 
+                String prefix = "/data/user/0/app.com.example.android.octeight/files/";
                 clicked = clicked.split("ID: ")[1].split(" ")[0];
-
+                clicked = prefix + clicked;
+                Log.d(TAG, "clicked: " + clicked);
                 if (dirFiles.length != 0) {
                     // loops through the array of files, outputting the name to console
                     for (int i = 0; i < dirFiles.length; i++) {
 
                         String fileOutput = dirFiles[i].toString();
+                        Log.d(TAG, "fileOutput: " + fileOutput);
+
+
                         if (fileOutput.startsWith(clicked+"_")){
                             // Start ShowRouteActivity with the selected Ride.
                             Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
-                            intent.putExtra("PathToAccGpsFile", dirFiles[i]);
+                            intent.putExtra("PathToAccGpsFile", dirFiles[i].getPath().replace(prefix, ""));
                             // Log.d(TAG, "onClick() date: " + date);
-                            intent.putExtra("Duration", ridesList.get(position)[1]);
+                            intent.putExtra("Duration", String.valueOf(Long.valueOf(ridesList.get(position)[2])-Long.valueOf(ridesList.get(position)[1])));
                             intent.putExtra("StartTime", ridesList.get(position)[2]);
                             intent.putExtra("State", ridesList.get(position)[3]);
+                            Log.d(TAG, intent.getStringExtra("PathToAccGpsFile"));
+                            Log.d(TAG, intent.getStringExtra("Duration"));
+                            Log.d(TAG, intent.getStringExtra("StartTime"));
+                            Log.d(TAG, intent.getStringExtra("State"));
+
                             startActivity(intent);
                         }
                     }
@@ -229,8 +245,15 @@ public class HistoryActivity extends AppCompatActivity {
 
     private String listToTextShape (String[] item){
         String todo = "Muss noch kommentiert werden\n";
-        if (item[3].contains("true")) todo = "Fertig kommentiert\n";
-        return todo + new Date( Long.getLong(item[1]) ).toString() + "\tID: " + item[0] + "\tLänge: " + ( Long.getLong(item[2]) - Long.getLong(item[1]) ) / 1000 + "Sec";
+        if (item[3].contains("true")){
+            todo = "Fertig kommentiert\n";
+        }
+        String result = todo + new Date( Long.valueOf(item[1]) ).toString()
+                + "\tID: " + item[0]
+                + " Länge: " + ( Long.valueOf(item[2]) - Long.valueOf(item[1]) ) / 1000
+                + "Sec";
+
+        return result;
         // requires API 26 (Java 8) Date.from(Instant.ofEpochMilli( Long.getLong(item[0]) )).toString()
     }
 
