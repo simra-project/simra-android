@@ -17,8 +17,12 @@ import java.util.List;
 
 public class Ride {
 
-    static int nextID = 0;
-    final int id = nextID++;
+    private String id = "";
+
+    public String getId() {
+        return id;
+    }
+
     File accGpsFile;
     ArrayList<AccEvent> events;
     public ArrayList<AccEvent> getEvents() { return events; }
@@ -48,6 +52,9 @@ public class Ride {
         this.state = state;
         this.events = findAccEvents();
         this.context = context;
+        String prefix = "/data/user/0/app.com.example.android.octeight/files/";
+        String path = accGpsFile.getPath().replace(prefix, "");
+        this.id = path.split("_")[0];
 
     }
 

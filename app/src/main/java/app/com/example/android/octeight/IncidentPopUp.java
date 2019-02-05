@@ -106,12 +106,13 @@ public class IncidentPopUp extends AppCompatActivity {
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+        /*
         // Initialize sharedPrefs & editor (required for obtaining current ride key)
         sharedPrefs = getApplicationContext()
                 .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
 
         editor = sharedPrefs.edit();
-
+        */
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Scale the activity so that it is smaller than the activity which called it
@@ -146,7 +147,7 @@ public class IncidentPopUp extends AppCompatActivity {
          + latitude, longitude, date, path to file containing relevant acc data from intent extras
          */
 
-        String key = String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0));
+        // String key = String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0));
 
         Bundle incData = getIntent().getExtras();
 
@@ -163,6 +164,9 @@ public class IncidentPopUp extends AppCompatActivity {
         String date = (String) getIntent().getExtras().getSerializable("Incident_date");
 
         String pathToAccDat = (String) getIntent().getExtras().getSerializable("Incident_accDat");
+
+        String key = getIntent().getStringExtra("ID");
+        // String id =
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
