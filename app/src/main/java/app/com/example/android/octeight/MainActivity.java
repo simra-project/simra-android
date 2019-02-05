@@ -362,7 +362,11 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                         Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
                         // The file under PathToAccGpsFile contains the accelerometer and location data
                         // as well as time data
-                        intent.putExtra("PathToAccGpsFile", mBoundService.getPathToAccGpsFile());
+                        // intent.putExtra("PathToAccGpsFile", mBoundService.getPathToAccGpsFile());
+                        // intent.putExtra("PathToAccGpsFile", "7_accGps_1549365838012.csv");
+                        intent.putExtra("PathToAccGpsFile", "59_accGps_23.01.2019 09_19_09_epoch.csv");
+
+
 
 
                         // timestamp in ms from 1970
