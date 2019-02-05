@@ -1,14 +1,17 @@
 package app.com.example.android.octeight;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
@@ -22,6 +25,7 @@ import android.support.v7.widget.Toolbar;
 
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +34,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.osgeo.proj4j.proj.Eckert1Projection;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
@@ -42,7 +47,16 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -78,8 +92,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     SharedPreferences.Editor editor;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Service encapsulating accelerometer sensor recording functionality
+    // Service encapsulating accelerometer accGpsFile recording functionality
     Intent recService;
+    RecorderService mBoundService;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private Boolean recording = false;
@@ -91,11 +106,6 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     private ImageButton centerMap;
     private RelativeLayout startBtn;
     private RelativeLayout stopBtn;
-    private TextView copyrightTxt;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // For permission request
-    private final int LOCATION_ACCESS_CODE = 1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Context of application environment
@@ -147,11 +157,9 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         // Initialize sharedPreferences
 
         sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
         editor = sharedPrefs.edit();
 
         //**************************************************************************************
@@ -225,6 +233,52 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
 
+        /*
+        List<GeoPoint> geoPoints = new ArrayList<>();
+
+        File gpsFile = getFileStreamPath("gps09.01.2019 18:06:24.csv");
+
+        //Read text from file
+        StringBuilder text = new StringBuilder();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(gpsFile));
+            // br.readLine() to skip the first line which contains the headers
+            String line= br.readLine();
+
+            while ((line = br.readLine()) != null) {
+                //Log.d(TAG, line);
+                try {
+                    String[] separatedLine = line.split(",");
+                    double latitude = Double.valueOf(separatedLine[0]);
+                    double longitude = Double.valueOf(separatedLine[1]);
+                    geoPoints.add(new GeoPoint(latitude, longitude));
+                } catch (Exception e){
+                    e.printStackTrace();
+                    continue;
+                }
+            }
+            br.close();
+        }
+        catch (IOException e) {
+
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+        }
+
+        Polyline line = new Polyline();   //see note below!
+        line.setPoints(geoPoints);
+        line.setOnClickListener(new Polyline.OnClickListener() {
+            @Override
+            public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos) {
+                Toast.makeText(mapView.getContext(), "polyline with " + polyline.getPoints().size() + "pts was tapped", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
+
+        mMapView.getOverlayManager().add(line);
+        */
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -272,20 +326,19 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             @Override
             public void onClick(View v) {
 
+
                 // show stop button, hide start button
                 showStop();
                 stopBtn.setVisibility(View.VISIBLE);
                 startBtn.setVisibility(View.INVISIBLE);
 
                 // start RecorderService for accelerometer data recording
-                /*
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(recService);
-                } else {
-                    startService(recService);
-                }*/
-                startService(recService);
+                Intent intent = new Intent(MainActivity.this, RecorderService.class);
+                startService(intent);
+                bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+                //startService(recService);
                 recording = true;
+
             }
         });
 
@@ -297,14 +350,40 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
             @Override
             public void onClick(View v) {
 
+                try {
+                    showStart();
 
-                showStart();
+                    // Stop RecorderService which is recording accelerometer data
+                    unbindService(mServiceConnection);
+                    stopService(recService);
+                    recording = false;
+                    if( mBoundService.getDuration() > Constants.MINIMAL_RIDE_DURATION) {
+                        // Get the recorded files and send them to HistoryActivity for further processing
+                        Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                        // The file under PathToAccGpsFile contains the accelerometer and location data
+                        // as well as time data
+                        intent.putExtra("PathToAccGpsFile", mBoundService.getPathToAccGpsFile());
 
-                // stop RecorderService which is recording accelerometer data
-                stopService(recService);
-                recording = false;
 
-                // unregister accelerometer sensor listener
+                        // timestamp in ms from 1970
+                        intent.putExtra("Duration", String.valueOf(mBoundService.getDuration()));
+                        intent.putExtra("StartTime", String.valueOf(mBoundService.getStartTime()));
+
+
+                        // State can be 0 not annotated, 1 for started but not sent
+                        // and 2 for annotated and sent to the server
+                        intent.putExtra("State", 0); // redundant
+                        startActivity(intent);
+                    } else {
+                        Toast toast = Toast.makeText(MainActivity.this,R.string.errorRideTooShortDE, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                } catch (Exception e){
+                    Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
+                }
+
+                // unregister accelerometer accGpsFile listener
                 // @TODO (is this necessary? where else to unregister? - unregistering the
                 // listener in onPause as demonstrated in most examples is not an option
                 // as we want to keep recording when screen is turned off!)
@@ -458,7 +537,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         int id = item.getItemId();
 
         if (id == R.id.nav_history) {
-            // Handle the camera action
+            Intent intent = new Intent (MainActivity.this, HistoryActivity.class);
+            startActivity(intent);            // Handle the camera action
         } else if (id == R.id.nav_democraphic_data) {
             // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
             Intent i = new Intent(Intent.ACTION_SEND);
@@ -521,4 +601,20 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
     @Override
     public void onProviderDisabled(String provider) { }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ServiceConnection for communicating with RecorderService
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            RecorderService.MyBinder myBinder = (RecorderService.MyBinder) service;
+            mBoundService = myBinder.getService();
+        }
+    };
 }
