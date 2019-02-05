@@ -13,6 +13,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -182,7 +183,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public void onLocationChanged(Location location) {
-        lastLocation = location;
+        if (location.getAccuracy() < 10.0){
+            lastLocation = location;
+        }
     }
 
     @Override
@@ -225,9 +228,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         locationManager = (LocationManager) getSystemService(Context
                 .LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager
-                .GPS_PROVIDER,0,0,this);
-        locationManager.requestLocationUpdates(LocationManager
-                .NETWORK_PROVIDER,0,0,this);
+                .GPS_PROVIDER,3000,1.0f,this);
+        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this);
 
         // Queues for storing acc data
         accXQueue = new LinkedList<>();
