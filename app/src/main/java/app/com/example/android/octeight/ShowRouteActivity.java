@@ -242,7 +242,6 @@ public class ShowRouteActivity extends AppCompatActivity {
 
             long millis = Long.valueOf(startTime);
             String time = DateUtils.formatDateTime(this, millis, DateUtils.FORMAT_SHOW_TIME);
-            Log.d(TAG, "startTime: " + time);
 
             InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble, mMapView,
                     incidentDat.get(i), addressForLoc, ShowRouteActivity.this);
@@ -294,7 +293,6 @@ public class ShowRouteActivity extends AppCompatActivity {
 
                 // Get address result from geocoding result
 
-                Log.d(TAG, Arrays.deepToString(address.toArray()));
                 Address location = address.get(0);
 
                 addressForLocation = location.getAddressLine(0);
@@ -342,7 +340,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         }
 
-        return new BoundingBox(border[0],border[1],border[2],border[3]);
+        return new BoundingBox(border[0]+0.001,border[1]+0.001,border[2]-0.001,border[3]-0.001);
     }
 
     protected class MyInfoWindow extends InfoWindow {
