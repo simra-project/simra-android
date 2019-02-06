@@ -90,7 +90,7 @@
                 android:value="app.com.example.android.octeight.MainActivity" />
         </activity>
         <activity android:name=".ShowRouteActivity" />
-        <activity android:name=".IncidentPopUp"
+        <activity android:name=".IncidentPopUpActivity"
             android:theme="@style/AppTheme.PopUpWindow"></activity>
     </application>
 

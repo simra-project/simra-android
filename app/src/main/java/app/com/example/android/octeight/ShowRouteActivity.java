@@ -1,12 +1,9 @@
 package app.com.example.android.octeight;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
-import android.location.LocationManager;
-import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
@@ -18,8 +15,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.mapsforge.map.scalebar.DefaultMapScaleBar;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
@@ -32,15 +27,8 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.File;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -381,7 +369,7 @@ public class ShowRouteActivity extends AppCompatActivity {
             layout.setOnClickListener((View v) -> {
 
                 Intent popUpIntent = new Intent(motherActivity,
-                        IncidentPopUp.class);
+                        IncidentPopUpActivity.class);
 
                 popUpIntent.putExtra("Incident_latitude",
                         (Serializable) String.valueOf(this.mAccEvent.position.getLatitude()));
