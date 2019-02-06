@@ -1,5 +1,6 @@
 package app.com.example.android.octeight;
 
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -13,14 +14,18 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
@@ -33,7 +38,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-
 public class ShowRouteActivity extends AppCompatActivity {
 
     String startTime = "";
@@ -43,6 +47,9 @@ public class ShowRouteActivity extends AppCompatActivity {
     // Map stuff, Overlays
     private MapView mMapView;
     private TextView copyrightTxt;
+    private RelativeLayout addIncBttn;
+    private RelativeLayout exitAddIncBttn;
+    private RelativeLayout doneButton;
 
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Our ride
@@ -69,6 +76,20 @@ public class ShowRouteActivity extends AppCompatActivity {
     final String userAgent = "SimRa/alpha";
 
 
+    public MapView getmMapView() {
+        return mMapView;
+    }
+
+    public void setmMapView(MapView mMapView) {
+        this.mMapView = mMapView;
+    }
+
+    MapEventsOverlay overlayEvents;
+
+    Drawable markerDefault;
+
+    Drawable custMarker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +106,14 @@ public class ShowRouteActivity extends AppCompatActivity {
         MapController mMapController = (MapController) mMapView.getController();
         copyrightTxt = (TextView) findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
+
+
+        addIncBttn = findViewById(R.id.addIncident);
+        addIncBttn.setVisibility(View.VISIBLE);
+        exitAddIncBttn = findViewById(R.id.exitAddIncident);
+        exitAddIncBttn.setVisibility(View.INVISIBLE);
+
+        doneButton = findViewById(R.id.doneButton);
 
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
@@ -145,18 +174,101 @@ public class ShowRouteActivity extends AppCompatActivity {
             mMapView.setMaxZoomLevel(19.0);
         }
 
-        // Thread pool to avoid NetworkOnMainThreadException when establishing a server
-        // connection during creation of GeocoderNominatim
 
-        pool = Executors.newFixedThreadPool(2);
+        // Set the icon for marker representation to Osmdroid's default
 
-        pool.execute(new SimpleThreadFactory().newThread(() ->
+        markerDefault = getResources().getDrawable(R.drawable.marker_default, null);
 
-                geocoderNominatim = new GeocoderNominatim(userAgent)
+        // A different image for custom markers, for better demonstration
 
-        ));
+        custMarker = getResources().getDrawable(R.drawable.cust_marker, null);
 
-        showIncidents();
+        // Call function for drawing markers for all AccEvents in ride, now encapsulated in
+        // MarkerFunct class for better readability
+
+        pool = Executors.newFixedThreadPool(4);
+
+        // Create an instance of MarkerFunct-class which provides all functionality related to
+        // incident markers
+
+        MarkerFunct myMarkerFunct = new MarkerFunct(this);
+
+        // Show all the incidents present in our ride object
+
+        myMarkerFunct.showIncidents();
+
+        // Functionality for 'edit mode', i.e. the mode in which users can put their own incidents
+        // onto the map
+
+        addIncBttn.setOnClickListener((View v) -> {
+
+            addIncBttn.setVisibility(View.INVISIBLE);
+            exitAddIncBttn.setVisibility(View.VISIBLE);
+
+            MapEventsReceiver mReceive = new MapEventsReceiver() {
+                @Override
+                public boolean singleTapConfirmedHelper(GeoPoint p) {
+
+                    // Call custom marker adding functionality which enables the user to put
+                    // markers on the map
+
+                    myMarkerFunct.addCustMarker(p);
+
+                    return true;
+
+                }
+
+                @Override
+                public boolean longPressHelper(GeoPoint p) {
+
+                    // Call custom marker adding functionality which enables the user to put
+                    // markers on the map
+
+                    myMarkerFunct.addCustMarker(p);
+
+                    return true;
+                    // DateFormat format = android.text.format.DateFormat.getDateFormat(getApplicationContext());
+                    // Date date = incidentDat.get(i).date;
+                    // String date = format.format(incidentDat.get(i).date);
+
+
+                }
+            };
+
+            overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
+            mMapView.getOverlays().add(overlayEvents);
+            mMapView.invalidate();
+
+        });
+
+        exitAddIncBttn.setOnClickListener((View v) -> {
+
+            addIncBttn.setVisibility(View.VISIBLE);
+            exitAddIncBttn.setVisibility(View.INVISIBLE);
+
+            mMapView.getOverlays().remove(overlayEvents);
+
+        });
+
+        doneButton.setOnClickListener((View v) -> {
+
+            //*****************************************************************
+            // Shutdown pool and await termination to make sure the program
+            // doesn't continue without the relevant work being completed
+
+            pool.shutdown();
+
+            try {
+                pool.awaitTermination(2, TimeUnit.SECONDS);
+            } catch(InterruptedException ie) {
+                ie.printStackTrace();
+            }
+
+            // @TODO exit activity
+
+        });
+
+
         Log.d(TAG, "onCreate() finished");
 
     }
@@ -164,7 +276,7 @@ public class ShowRouteActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Event determination and representation happens here
 
-    public void showIncidents() {
+  /**  public void showIncidents() {
         Log.d(TAG, "showIncidents()");
 
 
@@ -176,7 +288,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
             marker.setPosition(accE.position);
 
-        }*/
+        }
 
         // Create some test data
 
@@ -194,7 +306,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         incidentDat.add(new AccEvent(new GeoPoint(52.507634, 13.320117),
                 new Date(), null));
-        */
+
         incidentDat = ride.getEvents();
 
         Drawable accident = getResources().getDrawable(R.drawable.accident, null);
@@ -290,7 +402,7 @@ public class ShowRouteActivity extends AppCompatActivity {
                 /**Log.i("StartStop", "Latitude: " +
                         destCoords.getLatitude() + ", Longitude: " + destCoords.getLongitude());
 
-                myLoc = location.toString();*/
+                myLoc = location.toString();
 
             }
 
@@ -300,7 +412,7 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         return addressForLocation;
 
-    }
+    }*/
 
     // Returns the longitudes of the southern- and northernmost points
     // as well as the latitudes of the western- and easternmost points
@@ -331,7 +443,7 @@ public class ShowRouteActivity extends AppCompatActivity {
         return new BoundingBox(border[0]+0.001,border[1]+0.001,border[2]-0.001,border[3]-0.001);
     }
 
-    protected class MyInfoWindow extends InfoWindow {
+    /**protected class MyInfoWindow extends InfoWindow {
 
         private AccEvent mAccEvent;
 
@@ -408,6 +520,6 @@ public class ShowRouteActivity extends AppCompatActivity {
 
         }
 
-    }
+    }*/
 
 }
