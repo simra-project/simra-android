@@ -4,6 +4,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import java.text.SimpleDateFormat;
+
 public class Constants extends Service {
 
     // Accelerometer data gets recorded 50 times per second (every 20 millisecs).
@@ -24,6 +26,14 @@ public class Constants extends Service {
 
     // The minimal duration of a ride in milliseconds
     public static final int MINIMAL_RIDE_DURATION = 3000;
+
+    public static final SimpleDateFormat DATE_PATTERN_SHORT = new SimpleDateFormat("dd.MM.yyyy");
+
+    public static final String SERVICE_URL = "http://vm1.mcc.tu-berlin.de:8080/resource/";
+
+    public static final String UPLOAD_HASH_SUFFIX = "mcc_simra";
+
+
 
     public Constants() {
     }

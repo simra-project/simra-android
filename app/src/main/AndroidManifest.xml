@@ -79,6 +79,9 @@
         <service
             android:name=".RecorderService"
             android:parentActivityName=".MainActivity" />
+        <service
+            android:name=".UploadService"
+            android:parentActivityName=".MainActivity" />
 
         <activity
             android:name=".HistoryActivity"
