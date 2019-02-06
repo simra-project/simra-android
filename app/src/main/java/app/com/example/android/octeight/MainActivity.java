@@ -9,10 +9,8 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
@@ -34,30 +32,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.osgeo.proj4j.proj.Eckert1Projection;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -94,7 +79,8 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Service encapsulating accelerometer accGpsFile recording functionality
     Intent recService;
-    RecorderService mBoundService;
+    RecorderService mBoundRecorderService;
+    UploadService mBoundUploadService;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private Boolean recording = false;
@@ -301,9 +287,14 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         helmetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent launchActivityIntent = new Intent(MainActivity.this,
-                        HelmetActivity.class);
-                startActivity(launchActivityIntent);
+
+                Intent intent = new Intent(MainActivity.this, UploadService.class);
+                intent.putExtra("PathToAccGpsFile", "metaData.csv");
+                startService(intent);
+                bindService(intent, mUploadServiceConnection, Context.BIND_AUTO_CREATE);
+                //Intent launchActivityIntent = new Intent(MainActivity.this,
+                        //HelmetActivity.class);
+                //startActivity(launchActivityIntent);
             }
         });
 
@@ -335,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                 // start RecorderService for accelerometer data recording
                 Intent intent = new Intent(MainActivity.this, RecorderService.class);
                 startService(intent);
-                bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+                bindService(intent, mRecorderServiceConnection, Context.BIND_AUTO_CREATE);
                 //startService(recService);
                 recording = true;
 
@@ -354,15 +345,15 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
                     showStart();
 
                     // Stop RecorderService which is recording accelerometer data
-                    unbindService(mServiceConnection);
+                    unbindService(mRecorderServiceConnection);
                     stopService(recService);
                     recording = false;
-                    if( mBoundService.getDuration() > Constants.MINIMAL_RIDE_DURATION) {
+                    if( mBoundRecorderService.getDuration() > Constants.MINIMAL_RIDE_DURATION) {
                         // Get the recorded files and send them to HistoryActivity for further processing
                         Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
                         // The file under PathToAccGpsFile contains the accelerometer and location data
                         // as well as time data
-                        intent.putExtra("PathToAccGpsFile", mBoundService.getPathToAccGpsFile());
+                        intent.putExtra("PathToAccGpsFile", mBoundRecorderService.getPathToAccGpsFile());
                         // intent.putExtra("PathToAccGpsFile", "7_accGps_1549365838012.csv");
                         // intent.putExtra("PathToAccGpsFile", "59_accGps_23.01.2019 09_19_09_epoch.csv");
 
@@ -370,11 +361,11 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
 
                         // timestamp in ms from 1970
-                        intent.putExtra("Duration", String.valueOf(mBoundService.getDuration()));
-                        intent.putExtra("StartTime", String.valueOf(mBoundService.getStartTime()));
+                        intent.putExtra("Duration", String.valueOf(mBoundRecorderService.getDuration()));
+                        intent.putExtra("StartTime", String.valueOf(mBoundRecorderService.getStartTime()));
 
 
-                        // State can be 0 not annotated, 1 for started but not sent
+                        // State can be 0 for not annotated, 1 for started but not sent
                         // and 2 for annotated and sent to the server
                         intent.putExtra("State", 0); // redundant
                         startActivity(intent);
@@ -609,7 +600,7 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
+    private ServiceConnection mRecorderServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -618,7 +609,23 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             RecorderService.MyBinder myBinder = (RecorderService.MyBinder) service;
-            mBoundService = myBinder.getService();
+            mBoundRecorderService = myBinder.getService();
+        }
+    };
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ServiceConnection for communicating with RecorderService
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private ServiceConnection mUploadServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            UploadService.MyBinder myBinder = (UploadService.MyBinder) service;
+            mBoundUploadService = myBinder.getService();
         }
     };
 }
