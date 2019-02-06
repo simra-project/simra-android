@@ -51,7 +51,7 @@ class MyInfoWindow extends InfoWindow {
         layout.setOnClickListener((View v) -> {
 
             Intent popUpIntent = new Intent(motherActivity,
-                    IncidentPopUp.class);
+                    IncidentPopUpActivity.class);
 
             popUpIntent.putExtra("Incident_latitude",
                     (Serializable) String.valueOf(this.mAccEvent.position.getLatitude()));
