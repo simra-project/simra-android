@@ -105,13 +105,18 @@ public class MarkerFunct {
 
         Log.i("WRAPPED_GP_LIST", closestOnRoute.toString());
 
-        AccEvent newAcc = new AccEvent(closestOnRoute);
+        String[] eventLine = new String[6];
+        eventLine[0] = String.valueOf(closestOnRoute.getLatitude());
+        eventLine[1] = String.valueOf(closestOnRoute.getLongitude());
+        eventLine[5] = "0";
+
+        AccEvent newAcc = new AccEvent(eventLine);
 
         Log.i("NEW_ACC", newAcc.toString());
 
         mother.ride.getEvents().add(newAcc);
 
-        setMarker(new AccEvent(closestOnRoute));
+        setMarker(new AccEvent(eventLine));
 
         mother.getmMapView().invalidate();
 
