@@ -61,7 +61,7 @@ class MyInfoWindow extends InfoWindow {
 
             // Log.d(TAG, "this.mAccEvent.date: " + this.mAccEvent.date);
             popUpIntent.putExtra("Incident_date",
-                    (Serializable) String.valueOf(this.mAccEvent.date.toString()));
+                    (Serializable) String.valueOf(this.mAccEvent.getTimeStamp()));
 
             //popUpIntent.putExtra("Incident_accDat",
             //        (Serializable) String.valueOf(this.mAccEvent.sensorData.getAbsolutePath()));
