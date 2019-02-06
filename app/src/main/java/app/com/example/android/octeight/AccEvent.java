@@ -21,5 +21,8 @@ public class AccEvent {
         this.timeStamp = Long.valueOf(eventLine[5]);
     }
 
+    public AccEvent(GeoPoint gp) {
+        this.position = gp;
+    }
 
 }
