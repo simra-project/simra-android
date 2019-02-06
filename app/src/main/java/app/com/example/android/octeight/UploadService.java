@@ -58,7 +58,7 @@ public class UploadService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         new UpdateTask(intent.getStringExtra("PathToAccGpsFile")).execute();
-
+        stopSelf();
         return Service.START_STICKY;
     }
 
@@ -123,7 +123,7 @@ public class UploadService extends Service {
 
                 if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
-                Log.d(TAG, response.body().string());
+                Log.d(TAG, "Response Message: " + response.message());
             }
         }
 
