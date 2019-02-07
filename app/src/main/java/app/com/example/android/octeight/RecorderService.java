@@ -183,7 +183,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public void onLocationChanged(Location location) {
-        if (location.getAccuracy() < 10.0){
+        if (location.getAccuracy() < 20.0){
             lastLocation = location;
         }
     }
