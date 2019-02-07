@@ -1,7 +1,9 @@
 package app.com.example.android.octeight;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
@@ -57,7 +59,9 @@ public class UploadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        new UpdateTask(intent.getStringExtra("PathToAccGpsFile")).execute();
+        // new UpdateTask(intent.getStringExtra("PathToAccGpsFile")).execute();
+        new UpdateTask(this).execute();
+
         stopSelf();
         return Service.START_STICKY;
     }
@@ -71,20 +75,114 @@ public class UploadService extends Service {
     private class UpdateTask extends AsyncTask<String, String, String> {
 
         private String path;
+        private Context context;
 
-        private UpdateTask(String path) {
-            this.path = path;
+        private UpdateTask(/*String path, */Context context) {
+            // this.path = path;
+            this.context = context;
         }
 
         protected String doInBackground(String... urls) {
 
+            Log.d(TAG, "doInBackground()");
+
             try {
-                makePost(path);
+                // makePost(path);
+                uploadAllFilesTestPhase(context);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             return null;
+        }
+
+        private void uploadAllFilesTestPhase(Context context) throws IOException {
+
+            String id;
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // SharedPrefs (same as in MainActivity) for unique user id (only in test phase).
+            // ID is used as prefix for each file. Server creates a directory for each id.
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            SharedPreferences sharedPrefs = getApplicationContext()
+                    .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+
+            if (sharedPrefs.contains("USER-ID")) {
+
+                id = sharedPrefs.getString("USER-ID", "00000000");
+
+            } else {
+
+                id = String.valueOf(System.currentTimeMillis());
+
+                editor.putString("USER-ID", id);
+
+                editor.apply();
+            }
+
+            makePostTestPhase("metaData.csv", id);
+
+            makePostTestPhase("incidentData.csv", id);
+
+            String prefix = Constants.APP_PATH + "shared_prefs/";
+            String path = prefix + "simraPrefs.xml";
+
+            makePostTestPhase(path, id);
+
+            File[] dirFiles = getFilesDir().listFiles();
+
+            for (int i = 0; i < dirFiles.length; i++) {
+                path = dirFiles[i].getPath().replace(prefix, "");
+                makePostTestPhase(path, id);
+            }
+
+
+        }
+
+
+
+        private void makePostTestPhase(String pathToFile, String id) throws IOException {
+
+            Log.d(TAG, "pathToFile: " + pathToFile + " id: " + id);
+            File file = getFileStreamPath(pathToFile);
+            final StringBuilder fileContent = new StringBuilder();
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));) {
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    fileContent.append(line);
+                    fileContent.append(System.lineSeparator());
+                }
+
+            } catch (IOException e) {
+                throw e;
+            }
+
+
+            String key = id + "_" + pathToFile;
+
+            RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), fileContent.toString());
+
+            Date dateToday = new Date();
+            String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
+
+            Log.d(TAG, "clientHash: " + clientHash);
+
+            Request request = new Request.Builder()
+                    .url(Constants.SERVICE_URL + key + "?clientHash=" + clientHash)
+                    .post(requestBody)
+                    .build();
+
+            try (Response response = client.newCall(request).execute()) {
+
+                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+                Log.d(TAG, "Response Message: " + response.message());
+            }
         }
 
         private void makePost(String pathToFile) throws IOException {

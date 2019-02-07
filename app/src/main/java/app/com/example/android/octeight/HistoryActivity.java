@@ -138,7 +138,7 @@ public class HistoryActivity extends AppCompatActivity {
                 Log.d(TAG, "dirFiles: " + Arrays.deepToString(dirFiles));
                 String clicked = (String) listView.getItemAtPosition(position);
 
-                String prefix = "/data/user/0/app.com.example.android.octeight/files/";
+                String prefix = Constants.APP_PATH + "files/";
                 clicked = clicked.split("ID: ")[1].split(" ")[0];
                 clicked = prefix + clicked;
                 Log.d(TAG, "clicked: " + clicked);
