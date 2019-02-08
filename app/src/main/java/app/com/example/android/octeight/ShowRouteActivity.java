@@ -38,7 +38,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-public class ShowRouteActivity extends AppCompatActivity {
+
+public class ShowRouteActivity extends BaseActivity {
 
     String startTime = "";
     String timeStamp = "";

@@ -27,7 +27,7 @@ import java.util.Date;
 
 import java.util.Date;
 
-public class HistoryActivity extends AppCompatActivity {
+public class HistoryActivity extends BaseActivity {
 
     // Log tag
     private static final String TAG = "HistoryActivity_LOG";
