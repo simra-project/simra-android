@@ -123,19 +123,20 @@ public class UploadService extends Service {
                 editor.apply();
             }
 
-            makePostTestPhase("metaData.csv", id);
+            // makePostTestPhase("metaData.csv", id);
 
-            makePostTestPhase("incidentData.csv", id);
+            // makePostTestPhase("incidentData.csv", id);
 
-            String prefix = Constants.APP_PATH + "shared_prefs/";
-            String path = prefix + "simraPrefs.xml";
+            String path = Constants.APP_PATH + "shared_prefs/simraPrefs.xml";
 
             makePostTestPhase(path, id);
 
             File[] dirFiles = getFilesDir().listFiles();
 
             for (int i = 0; i < dirFiles.length; i++) {
-                path = dirFiles[i].getPath().replace(prefix, "");
+
+                path = dirFiles[i].getName()/*.getPath().replace(prefix, "")*/;
+                Log.d(TAG, "path: " + path);
                 makePostTestPhase(path, id);
             }
 
@@ -147,7 +148,19 @@ public class UploadService extends Service {
         private void makePostTestPhase(String pathToFile, String id) throws IOException {
 
             Log.d(TAG, "pathToFile: " + pathToFile + " id: " + id);
-            File file = getFileStreamPath(pathToFile);
+            File file;
+            // Log.d(TAG, "File.pathSeparator: " + File.pathSeparator);
+            if(pathToFile.contains(File.separator)){
+                //Log.d(TAG, "pathToFile contains pathSeparator!");
+                file = new File(pathToFile);
+            } else {
+                file = getFileStreamPath(pathToFile);
+
+            }
+            if(file.isDirectory()){
+                return;
+            }
+            //
             final StringBuilder fileContent = new StringBuilder();
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));) {
@@ -167,13 +180,14 @@ public class UploadService extends Service {
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), fileContent.toString());
 
+            Log.d(TAG, "sending file to server: " + fileContent.toString());
             Date dateToday = new Date();
             String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
 
             Log.d(TAG, "clientHash: " + clientHash);
 
             Request request = new Request.Builder()
-                    .url(Constants.SERVICE_URL + key + "?clientHash=" + clientHash)
+                    .url(Constants.SERVICE_URL + key.replace(Constants.APP_PATH + "shared_prefs/", "") + "?clientHash=" + clientHash)
                     .post(requestBody)
                     .build();
 
