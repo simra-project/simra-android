@@ -22,7 +22,7 @@ import android.widget.Button;
  * TODO: migrate permission request and map loading from MainActivity to StartActivity
  */
 
-public class StartActivity extends AppCompatActivity {
+public class StartActivity extends BaseActivity {
 
     private static int TIME_OUT = 10000; //Time to launch the another activity
     Button next;
