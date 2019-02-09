@@ -42,7 +42,7 @@ public class HistoryActivity extends BaseActivity {
     String date = "";
     int state = 0;
     String duration = "";
-    String startTime = "";
+    String startTime = "0";
 
     ListView listView;
     private File metaDataFile;
@@ -187,6 +187,7 @@ public class HistoryActivity extends BaseActivity {
             public void onClick(View view) {
 
                 Log.d(TAG, "onClick()");
+
                 // Checks if HistoryActivity was started by the user or by the app after a route
                 // recording was finished
                 if(getIntent().hasExtra("PathToAccGpsFile")){
@@ -279,4 +280,8 @@ public class HistoryActivity extends BaseActivity {
         }
         return date.getTime();
     }*/
+
+  public void startShowRouteWithSelectedRide(){
+
+  }
 }

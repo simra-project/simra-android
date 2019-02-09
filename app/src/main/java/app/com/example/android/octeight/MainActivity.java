@@ -307,6 +307,23 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             public void onClick(View v) {
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
+                String[] bla = new String[4];
+                bla[5] = "bla";
+                /*
+                try {
+                    String[] bla = new String[4];
+                    bla[5] = "bla";
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "e.toString(): " + e.toString());
+                    String stackTrace = "\n";
+                    for (int i = 0; i < e.getStackTrace().length; i++) {
+                        stackTrace += e.getStackTrace()[i].toString() + "\n";
+                    }
+                    Log.d(TAG, "stackTrace: " + stackTrace);
+                    Log.d(TAG, "e.getCause(): " + e.getCause());
+                    // throw e;
+                }*/
             }
         });
 
@@ -519,10 +536,14 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent setIntent = new Intent(Intent.ACTION_MAIN);
-            setIntent.addCategory(Intent.CATEGORY_HOME);
-            setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(setIntent);
+            if (recording) {
+                Intent setIntent = new Intent(Intent.ACTION_MAIN);
+                setIntent.addCategory(Intent.CATEGORY_HOME);
+                setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(setIntent);
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 

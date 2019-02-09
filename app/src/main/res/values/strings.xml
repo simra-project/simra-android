@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">SimBetaRa</string>
+    <string name="app_name">SimRa (Beta)</string>
     <string name="welcome_header">Welcome to SimRa!</string>
     <string name="welcome_text">Thanks for helping, keeping the street save.</string>
     <string name="welcome_text2">But keep in mind, its just a Beta App.</string>

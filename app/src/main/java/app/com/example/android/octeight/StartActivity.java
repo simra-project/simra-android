@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -39,6 +41,7 @@ public class StartActivity extends BaseActivity {
 
     private String caller = null;
 
+    public boolean sendErrorPermitted = false;
 
 
     @Override
@@ -46,9 +49,36 @@ public class StartActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
+        Log.d(TAG, "onCreate() started");
+
         caller     = getIntent().getStringExtra("caller");
         if (caller == null){
             caller = "NoCaller";
+        }
+
+        SharedPreferences sharedPrefs = getApplicationContext()
+                .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+
+        if (sharedPrefs.contains("NEW-UNSENT-ERROR")) {
+            Log.d(TAG, "sharedPrefs.contains(\"NEW-UNSENT-ERROR\"): " + sharedPrefs.contains("NEW-UNSENT-ERROR"));
+            boolean newErrorsExist = sharedPrefs.getBoolean("NEW-UNSENT-ERROR", true);
+            Log.d(TAG, "newErrorsExist: " + newErrorsExist);
+            if(newErrorsExist){
+                sendErrorPermitted = getDialogValueBack(this);
+                if (sendErrorPermitted) {
+                    Intent intent = new Intent(this, UploadService.class);
+                    intent.putExtra("CRASH_REPORT", sendErrorPermitted);
+                    startService(intent);
+                }
+
+            }
+
+        } else {
+
+            editor.putBoolean("NEW-UNSENT-ERROR", false);
+            editor.commit();
         }
 
 
@@ -103,6 +133,8 @@ public class StartActivity extends BaseActivity {
         }
     }
 
+
+
     public void returnToMain(){
         super.onBackPressed();
     }
@@ -145,6 +177,35 @@ public class StartActivity extends BaseActivity {
                 .show();
     }
 
+
+    // Create an AlertDialog with an Ok and Cancel Button displaying a message
+    private void askUserToSendError() {
+        // setup the alert builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Ups!");
+        builder.setMessage("Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?");
+
+        // add the buttons
+        builder.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                sendErrorPermitted = true;
+            }
+        });
+        // builder.setNeutralButton("Immer", null);
+        builder.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                sendErrorPermitted = false;
+            }
+        });
+
+        // create and show the alert dialog
+        AlertDialog dialog = builder.create();
+        Log.d(TAG, "showing dialog");
+        dialog.show();
+    }
+
     /**
      * Checks if the user is opening the app for the first time.
      * Note that this method should be placed inside an activity and it can be called multiple times.
@@ -161,6 +222,46 @@ public class StartActivity extends BaseActivity {
             }
         }
         return firstTime;
+    }
+
+        public boolean getDialogValueBack(Context context) {
+
+            final Handler handler = new Handler()
+            {
+                @Override
+                public void handleMessage(Message mesg)
+                {
+                    throw new RuntimeException();
+                }
+            };
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(context);
+            alert.setTitle("Ups!");
+            alert.setMessage("Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?");
+            alert.setPositiveButton("Ja", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int id)
+                {
+                    sendErrorPermitted = true;
+                    handler.sendMessage(handler.obtainMessage());
+                }
+            });
+            alert.setNegativeButton("Nein", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int id)
+                {
+                    sendErrorPermitted = false;
+                    handler.sendMessage(handler.obtainMessage());
+                }
+            });
+            alert.show();
+
+            try{ Looper.loop(); }
+            catch(RuntimeException e){}
+
+            return sendErrorPermitted;
+
+
     }
 }
 
