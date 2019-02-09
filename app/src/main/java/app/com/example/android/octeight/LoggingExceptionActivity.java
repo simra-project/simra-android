@@ -1,87 +1,166 @@
 package app.com.example.android.octeight;
 
 import android.app.Activity;
-import android.app.Service;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Date;
 
-import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class UploadService extends Service {
+public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
 
-    public static final String TAG = "UploadService_LOG:";
-    private IBinder mBinder = new UploadService.MyBinder();
+    private final static String TAG = LoggingExceptionActivity.class.getSimpleName()+"_LOG";
+    private final Activity context;
+    private final Thread.UncaughtExceptionHandler rootHandler;
+    RecorderService mBoundRecorderService;
+    UploadService mBoundUploadService;
     private OkHttpClient client = new OkHttpClient();
 
 
-    @Override
-    public void onCreate() {
-
-        Log.d(TAG, "onCreate()");
-
+    public LoggingExceptionActivity(Activity context) {
+        this.attachBaseContext(context);
+        this.context = context;
+        // we should store the current exception handler -- to invoke it for all not handled exceptions ...
+        rootHandler = Thread.getDefaultUncaughtExceptionHandler();
+        // we replace the exception handler now with us -- we will properly dispatch the exceptions ...
+        Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        Log.d(TAG, "onBind()");
-        return mBinder;
-    }
+    public void uncaughtException(final Thread thread, final Throwable ex) {
+        try {
+            Log.d(TAG, "called for " + ex.getClass());
+            // assume we would write each error in one file ...
 
-    @Override
-    public void onRebind(Intent intent) {
-        Log.d(TAG, "onRebind()");
-        super.onRebind(intent);
-    }
+            File f = new File(context.getFilesDir(), "CRASH_REPORT" + new Date().toString() + ".txt");
+            // log this exception ...
 
-    @Override
-    public boolean onUnbind(Intent intent) {
-        Log.v(TAG, "onUnbind()");
-        return true;
-    }
+            String stackTrace = "";
+            for (int i = 0; i < ex.getStackTrace().length; i++) {
+                stackTrace += ex.getStackTrace()[i] + "\n";
+            }
+            String causeTrace = "";
+            if(ex.getCause() != null) {
+                for (int i = 0; i < ex.getCause().getStackTrace().length; i++) {
+                    stackTrace += ex.getCause().getStackTrace()[i] + "\n";
+                }
+            }
+            String errorReport = "Exception in: " + context.getClass().getName()
+                    + " " + ex.getClass().getName() + "\n" +
+                    ex.getMessage() + "\n" +
+                    stackTrace + "\n" +
+                    causeTrace + "\n" +
+                    System.currentTimeMillis() + "\n" +
+                    Build.VERSION.RELEASE + "\n" +
+                    Build.DEVICE + "\n" +
+                    Build.MODEL + "\n" +
+                    Build.PRODUCT;
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+            FileUtils.writeStringToFile(f, errorReport, (Charset) null);
 
-        // new UpdateTask(intent.getStringExtra("PathToAccGpsFile")).execute();
-        new UpdateTask(this, intent).execute();
+            SharedPreferences sharedPrefs = getApplicationContext()
+                    .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
 
-        stopSelf();
-        return Service.START_STICKY;
-    }
+            SharedPreferences.Editor editor = sharedPrefs.edit();
 
-    public class MyBinder extends Binder {
-        UploadService getService() {
-            return UploadService.this;
+            editor.putBoolean("NEW-UNSENT-ERROR", true);
+            editor.commit();
+
+            restartApp();
+            // new UpdateTask(this).execute();
+
+            /*
+            //Intent errorIntent = new Intent(LoggingExceptionActivity.this, this.context.getClass());
+            // Intent errorIntent = new Intent();
+
+            Intent errorIntent = new Intent(context, UploadService.class);
+
+            // errorIntent.putExtra("CRASH_REPORT", f.getAbsolutePath());
+            Log.d(TAG, "errorIntent:" + errorIntent.toString());
+            // errorIntent.setAction ("app.com.example.android.octeight.UploadService"); // see step 5.
+            // errorIntent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK);
+            errorIntent.setFlags (Intent.FLAG_FROM_BACKGROUND);
+            context.startService(errorIntent);
+            context.bindService(errorIntent, mUploadServiceConnection, Context.BIND_AUTO_CREATE);
+            */
+        } catch (Exception e) {
+            Log.e(TAG, "Exception Logger failed!", e);
         }
+
     }
+
+    private void restartApp() {
+        Intent intent = new Intent(getApplicationContext(), StartActivity.class);
+        int mPendingIntentId = 1337;
+        PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+        System.exit(0);
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ServiceConnection for communicating with RecorderService
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private ServiceConnection mRecorderServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            RecorderService.MyBinder myBinder = (RecorderService.MyBinder) service;
+            mBoundRecorderService = myBinder.getService();
+        }
+    };
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ServiceConnection for communicating with RecorderService
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private ServiceConnection mUploadServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            UploadService.MyBinder myBinder = (UploadService.MyBinder) service;
+            mBoundUploadService = myBinder.getService();
+        }
+    };
 
     private class UpdateTask extends AsyncTask<String, String, String> {
 
         private String path;
         private Context context;
-        private Intent intent;
 
-        private UpdateTask(/*String path, */Context context, Intent intent) {
+        private UpdateTask(/*String path, */Context context) {
             // this.path = path;
             this.context = context;
-            this.intent = intent;
         }
 
         protected String doInBackground(String... urls) {
@@ -125,7 +204,6 @@ public class UploadService extends Service {
                 editor.apply();
             }
 
-            boolean sendCrashReportPermitted = intent.getBooleanExtra("CRASH_REPORT", false);
             // makePostTestPhase("metaData.csv", id);
 
             // makePostTestPhase("incidentData.csv", id);
@@ -140,21 +218,8 @@ public class UploadService extends Service {
 
                 path = dirFiles[i].getName()/*.getPath().replace(prefix, "")*/;
                 Log.d(TAG, "path: " + path);
-                if (path.startsWith("CRASH")){
-                    if (sendCrashReportPermitted){
-                        makePostTestPhase(path, id);
-                    } else {
-                        continue;
-                    }
-
-                } else {
-                    makePostTestPhase(path, id);
-                }
+                makePostTestPhase(path, id);
             }
-
-            editor.putBoolean("NEW-UNSENT-ERROR", false);
-            editor.commit();
-
 
 
         }
@@ -256,4 +321,5 @@ public class UploadService extends Service {
         }
 
     }
+
 }

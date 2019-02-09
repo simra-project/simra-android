@@ -88,7 +88,6 @@ public class Ride {
             }
             br.close();
         } catch (Exception e) {
-            Log.d(TAG, e.toString());
             e.printStackTrace();
         }
         return polyLine;
