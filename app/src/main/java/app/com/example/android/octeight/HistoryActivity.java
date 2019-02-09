@@ -185,42 +185,7 @@ public class HistoryActivity extends BaseActivity {
 
             @Override
             public void onClick(View view) {
-
-                Log.d(TAG, "onClick()");
-
-                // Checks if HistoryActivity was started by the user or by the app after a route
-                // recording was finished
-                if(getIntent().hasExtra("PathToAccGpsFile")){
-                    // AccGpsString contains the accelerometer and location data as well as time data
-                    pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
-                    // TimeStamp is the duration of the ride in MS
-                    duration = getIntent().getStringExtra("Duration");
-                    // The time in which the ride started in ms from 1970
-                    startTime = getIntent().getStringExtra("StartTime");
-                    // State can be 0 for server processing not started, 1 for started and pending
-                    // and 2 for processed by server so the incidents can be annotated by the user
-                    state = getIntent().getIntExtra("State", 0);
-                }
-                // Log.d(TAG, "onCreate(): pathToAccGpsFile: " + pathToAccGpsFile + " date: " + date + " state: " + state);
-
-                // Checks whether a ride was selected or not. Maybe it will be possible to select
-                // multiple rides and push a button to send them all to the server to be analyzed
-                if(accGpsString != null && startTime != "") {
-                    Snackbar.make(view, getString(R.string.selectedRideInfoDE) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                    // Start ShowRouteActivity with the selected Ride.
-                    Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
-                    intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
-                    intent.putExtra("Duration", duration);
-                    intent.putExtra("StartTime", startTime);
-                    intent.putExtra("State", state);
-                    startActivity(intent);
-                } else {
-                    Snackbar.make(view, getString(R.string.errorNoRideSelectedDE) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-
-            }
+}
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -228,11 +193,14 @@ public class HistoryActivity extends BaseActivity {
         // recording of a route has finished
         if (getIntent().hasExtra("PathToAccGpsFile")) {
             // Log.d(TAG, "getIntent.hasExtra(\"PathToAccGpsFile\")");
+            /*
             fab.performClick();
             fab.setPressed(true);
             fab.invalidate();
             fab.setPressed(false);
             fab.invalidate();
+            */
+            startShowRouteWithSelectedRide();
         }
     }
 
@@ -282,6 +250,41 @@ public class HistoryActivity extends BaseActivity {
     }*/
 
   public void startShowRouteWithSelectedRide(){
+
+      Log.d(TAG, "onClick()");
+
+      // Checks if HistoryActivity was started by the user or by the app after a route
+      // recording was finished
+      if(getIntent().hasExtra("PathToAccGpsFile")){
+          // AccGpsString contains the accelerometer and location data as well as time data
+          pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
+          // TimeStamp is the duration of the ride in MS
+          duration = getIntent().getStringExtra("Duration");
+          // The time in which the ride started in ms from 1970
+          startTime = getIntent().getStringExtra("StartTime");
+          // State can be 0 for server processing not started, 1 for started and pending
+          // and 2 for processed by server so the incidents can be annotated by the user
+          state = getIntent().getIntExtra("State", 0);
+      }
+      // Log.d(TAG, "onCreate(): pathToAccGpsFile: " + pathToAccGpsFile + " date: " + date + " state: " + state);
+
+      // Checks whether a ride was selected or not. Maybe it will be possible to select
+      // multiple rides and push a button to send them all to the server to be analyzed
+      if(accGpsString != null && startTime != "") {
+          // Snackbar.make(view, getString(R.string.selectedRideInfoDE) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
+             //     .setAction("Action", null).show();
+          // Start ShowRouteActivity with the selected Ride.
+          Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
+          intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
+          intent.putExtra("Duration", duration);
+          intent.putExtra("StartTime", startTime);
+          intent.putExtra("State", state);
+          startActivity(intent);
+      } else {
+          //Snackbar.make(view, getString(R.string.errorNoRideSelectedDE) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
+            //      .setAction("Action", null).show();
+      }
+
 
   }
 }

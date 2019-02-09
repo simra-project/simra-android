@@ -140,18 +140,39 @@ public class UploadService extends Service {
 
                 path = dirFiles[i].getName()/*.getPath().replace(prefix, "")*/;
                 Log.d(TAG, "path: " + path);
+                // if the file is a crash log...
                 if (path.startsWith("CRASH")){
+                    // ... and we have the permission to send them to the server...
                     if (sendCrashReportPermitted){
+                        // ... send crash log to server
                         makePostTestPhase(path, id);
                     } else {
                         continue;
                     }
 
                 } else {
+                    // send csv to server
                     makePostTestPhase(path, id);
                 }
             }
 
+            // Loop through all internal files in /files and delete
+            // all crash logs.
+            if(sendCrashReportPermitted){
+
+                for (int i = 0; i < dirFiles.length; i++) {
+                    path = dirFiles[i].getName();
+                    if (path.startsWith("CRASH")){
+
+                        boolean deleted = context.deleteFile(path);
+                        Log.d(TAG, path + " deleted: " + deleted);
+                    }
+                }
+            }
+
+            // set the boolean "NEW-UNSENT-ERROR" in simraPrefs.xml to false
+            // so that the StartActivity doesn't think there are still unsent
+            // crash logs.
             editor.putBoolean("NEW-UNSENT-ERROR", false);
             editor.commit();
 
