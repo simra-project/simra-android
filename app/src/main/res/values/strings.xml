@@ -8,9 +8,9 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">MCC TU Berlin</string>
-    <string name="nav_header_subtitle">simra@mcc.tu-berlin.de</string>
+    <string name="nav_header_subtitle">ask@mcc.tu-berlin.de</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="feedbackReceiver">mb@mcc.tu-berlin.de</string>
+    <string name="feedbackReceiver">ask@mcc.tu-berlin.de</string>
     <string name="demoDataHeader">SimRa Teilnehmerdaten</string>
     <string name="feedbackHeader">SimRa Feedback</string>
     <string name="demoDataMail">Name: \nAlter: \nBeruf: \nFahrradtyp: Bsp. Rennrad\nDurchschnittlich wöchentlich zurückgelegte Kilometeranzahl mit dem Rad: </string>

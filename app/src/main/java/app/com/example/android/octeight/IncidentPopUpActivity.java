@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class IncidentPopUpActivity extends AppCompatActivity {
+public class IncidentPopUpActivity extends BaseActivity {
 
     EditText incidentDescription;
 

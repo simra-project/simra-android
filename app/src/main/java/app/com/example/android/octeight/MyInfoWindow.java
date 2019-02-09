@@ -15,6 +15,10 @@ import java.io.Serializable;
 
 class MyInfoWindow extends InfoWindow {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Log tag
+    private static final String TAG = "MyInfoWindow_LOG";
+
     private AccEvent mAccEvent;
 
     private Activity motherActivity;
@@ -43,7 +47,10 @@ class MyInfoWindow extends InfoWindow {
 
         txtTitle.setText(motherActivity.getString(R.string.incidentDetectedDE));
         long millis = Long.valueOf(this.mAccEvent.getTimeStamp());
-        String time = DateUtils.formatDateTime(motherActivity, millis, DateUtils.FORMAT_SHOW_TIME);
+        String time = "";
+        if (millis > 1337){
+            time = DateUtils.formatDateTime(motherActivity, millis, DateUtils.FORMAT_SHOW_TIME);
+        }
 
         txtDescription.setText(time + " " + addressForLoc);
         txtSubdescription.setText("You can also edit the subdescription");
@@ -68,6 +75,11 @@ class MyInfoWindow extends InfoWindow {
 
             popUpIntent.putExtra("Incident_accDat",
                     (Serializable) "mockSensorDatForIncident.csv");
+
+            popUpIntent.putExtra("ID",
+                    this.ride.getId());
+
+
 
             motherActivity.startActivity(popUpIntent);
 

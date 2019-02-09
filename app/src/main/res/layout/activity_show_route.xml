@@ -80,7 +80,7 @@
 
     </RelativeLayout>
 
-
+    <!--
     <RelativeLayout
         android:id="@+id/doneButton"
         android:layout_width="100dp"
@@ -103,6 +103,7 @@
             />
 
     </RelativeLayout>
+    -->
 
     <TextView
         android:id="@+id/copyright_text"

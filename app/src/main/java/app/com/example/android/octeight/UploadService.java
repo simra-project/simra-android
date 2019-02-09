@@ -30,7 +30,6 @@ public class UploadService extends Service {
     private OkHttpClient client = new OkHttpClient();
 
 
-
     @Override
     public void onCreate() {
 

@@ -47,7 +47,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-public class MainActivity extends AppCompatActivity implements OnNavigationItemSelectedListener, LocationListener {
+public class MainActivity extends BaseActivity implements OnNavigationItemSelectedListener, LocationListener {
 
     public static ExecutorService myEx;
 

@@ -13,6 +13,7 @@ public class AccEvent {
     Date date;
     String TAG = "AccEvent_LOG";
 
+
     public long getTimeStamp(){ return this.timeStamp; }
 
 
