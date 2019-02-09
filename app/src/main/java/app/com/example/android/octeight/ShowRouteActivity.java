@@ -91,6 +91,8 @@ public class ShowRouteActivity extends BaseActivity {
 
     Drawable custMarker;
 
+    boolean addCustomMarkerMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,7 +116,7 @@ public class ShowRouteActivity extends BaseActivity {
         exitAddIncBttn = findViewById(R.id.exitAddIncident);
         exitAddIncBttn.setVisibility(View.INVISIBLE);
 
-        doneButton = findViewById(R.id.doneButton);
+        // doneButton = findViewById(R.id.doneButton);
 
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
@@ -145,7 +147,7 @@ public class ShowRouteActivity extends BaseActivity {
         // set accordingly
         BoundingBox bBox = getBoundingBox(route);
         // Disallow the user to scroll outside the bounding box to prevent her/him from getting lost
-        mMapView.setScrollableAreaLimitDouble(bBox);
+        // mMapView.setScrollableAreaLimitDouble(bBox);
 
         // Log.d(TAG, "bBox: " + bBox);
         // Log.d(TAG, "getIntrinsicScreenRect: " + mMapView.getIntrinsicScreenRect(null).toString());
@@ -187,17 +189,72 @@ public class ShowRouteActivity extends BaseActivity {
         // Call function for drawing markers for all AccEvents in ride, now encapsulated in
         // MarkerFunct class for better readability
 
+        Log.d(TAG, "setting up Executors");
         pool = Executors.newFixedThreadPool(4);
 
         // Create an instance of MarkerFunct-class which provides all functionality related to
         // incident markers
-
+        Log.d(TAG, "creating MarkerFunct object");
         MarkerFunct myMarkerFunct = new MarkerFunct(this);
 
         // Show all the incidents present in our ride object
-
+        Log.d(TAG, "showing all incidents");
         myMarkerFunct.showIncidents();
 
+        addCustomMarkerMode = false;
+
+        Log.d(TAG, "setting up mReceive");
+
+        MapEventsReceiver mReceive = new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+
+                if (addCustomMarkerMode){
+                    // Call custom marker adding functionality which enables the user to put
+                    // markers on the map
+
+                    myMarkerFunct.addCustMarker(p);
+                    exitAddIncBttn.performClick();
+                    return true;
+                } else {
+                    // myMarkerFunct.closeAllInfoWindows();
+                    InfoWindow.closeAllInfoWindowsOn(mMapView);
+                    return false;
+                }
+
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+
+
+                if (addCustomMarkerMode){
+
+                    // Call custom marker adding functionality which enables the user to put
+                    // markers on the map
+
+                    myMarkerFunct.addCustMarker(p);
+                    exitAddIncBttn.performClick();
+                    return true;
+
+                }
+
+                return false;
+                // DateFormat format = android.text.format.DateFormat.getDateFormat(getApplicationContext());
+                // Date date = incidentDat.get(i).date;
+                // String date = format.format(incidentDat.get(i).date);
+
+
+            }
+        };
+
+
+        overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
+        mMapView.getOverlays().add(overlayEvents);
+        mMapView.invalidate();
+
+
+        Log.d(TAG, "setting up clickListeners");
         // Functionality for 'edit mode', i.e. the mode in which users can put their own incidents
         // onto the map
 
@@ -205,40 +262,11 @@ public class ShowRouteActivity extends BaseActivity {
 
             addIncBttn.setVisibility(View.INVISIBLE);
             exitAddIncBttn.setVisibility(View.VISIBLE);
+            ShowRouteActivity.this.addCustomMarkerMode = true;
 
-            MapEventsReceiver mReceive = new MapEventsReceiver() {
-                @Override
-                public boolean singleTapConfirmedHelper(GeoPoint p) {
-
-                    // Call custom marker adding functionality which enables the user to put
-                    // markers on the map
-
-                    myMarkerFunct.addCustMarker(p);
-
-                    return true;
-
-                }
-
-                @Override
-                public boolean longPressHelper(GeoPoint p) {
-
-                    // Call custom marker adding functionality which enables the user to put
-                    // markers on the map
-
-                    myMarkerFunct.addCustMarker(p);
-
-                    return true;
-                    // DateFormat format = android.text.format.DateFormat.getDateFormat(getApplicationContext());
-                    // Date date = incidentDat.get(i).date;
-                    // String date = format.format(incidentDat.get(i).date);
-
-
-                }
-            };
-
-            overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
-            mMapView.getOverlays().add(overlayEvents);
-            mMapView.invalidate();
+            // overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
+            // mMapView.getOverlays().add(overlayEvents);
+            // mMapView.invalidate();
 
         });
 
@@ -246,11 +274,12 @@ public class ShowRouteActivity extends BaseActivity {
 
             addIncBttn.setVisibility(View.VISIBLE);
             exitAddIncBttn.setVisibility(View.INVISIBLE);
-
-            mMapView.getOverlays().remove(overlayEvents);
+            ShowRouteActivity.this.addCustomMarkerMode = false;
+            // mMapView.getOverlays().remove(overlayEvents);
 
         });
 
+        /*
         doneButton.setOnClickListener((View v) -> {
 
             //*****************************************************************
@@ -268,10 +297,27 @@ public class ShowRouteActivity extends BaseActivity {
             // @TODO exit activity
 
         });
-
+        */
 
         Log.d(TAG, "onCreate() finished");
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy()");
+        super.onDestroy();
+        //*****************************************************************
+        // Shutdown pool and await termination to make sure the program
+        // doesn't continue without the relevant work being completed
+
+        pool.shutdown();
+
+        try {
+            pool.awaitTermination(2, TimeUnit.SECONDS);
+        } catch(InterruptedException ie) {
+            ie.printStackTrace();
+        }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

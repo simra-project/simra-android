@@ -18,14 +18,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class HistoryActivity extends BaseActivity {
 
@@ -244,14 +249,21 @@ public class HistoryActivity extends BaseActivity {
     }
 
     private String listToTextShape (String[] item){
-        String todo = "Muss noch kommentiert werden\n";
-        if (item[3].contains("true")){
-            todo = "Fertig kommentiert\n";
+        String todo = "Muss noch kommentiert und gesendet werden\n";
+        if (item[3].equals("2")){
+            todo = "Fertig kommentiert und gesendet\n";
         }
+
+
+        long millis = Long.valueOf(item[2]) - Long.valueOf(item[1]);
+        String prettyDuration = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
+                TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
+
         String result = todo + new Date( Long.valueOf(item[1]) ).toString()
                 + "\tID: " + item[0]
-                + " Länge: " + ( Long.valueOf(item[2]) - Long.valueOf(item[1]) ) / 1000
-                + "Sec";
+                + " Fahrtdauer: " + prettyDuration;
+
 
         return result;
         // requires API 26 (Java 8) Date.from(Instant.ofEpochMilli( Long.getLong(item[0]) )).toString()
