@@ -3,6 +3,7 @@ package app.com.example.android.octeight;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Address;
+import android.text.LoginFilter;
 import android.text.format.DateUtils;
 import android.util.Log;
 
@@ -12,7 +13,14 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -22,11 +30,17 @@ import java.util.concurrent.ThreadFactory;
 
 public class MarkerFunct {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Log tag
+    private static final String TAG = "MarkerFunct_LOG";
+
     ShowRouteActivity mother;
 
     ExecutorService pool;
 
     List<AccEvent> incidentDat;
+
+    ArrayList<Marker> markers = new ArrayList<>();
 
     GeocoderNominatim geocoderNominatim;
 
@@ -63,10 +77,36 @@ public class MarkerFunct {
     public void showIncidents() {
 
         for(AccEvent accEvent : mother.ride.getEvents()) {
-
+            Log.d(TAG, "setting Marker at: " + accEvent.position.toString());
             setMarker(accEvent);
-
         }
+        //try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File("incidentData.csv"))));) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(mother.getFileStreamPath("incidentData.csv")));) {
+
+
+
+        reader.readLine();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] actualIncident = line.split(",");
+                String[] eventLine = new String[6];
+                Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident) + " id: " + mother.ride.getId());
+                if(actualIncident[0].equals(mother.ride.getId())){
+                    Log.d(TAG, "custom incident found! actualIncident: " + Arrays.toString(actualIncident));
+                    eventLine[0] = actualIncident[1];
+                    eventLine[1] = actualIncident[2];
+                    eventLine[5] = actualIncident[3];
+                    AccEvent accEvent = new AccEvent(eventLine);
+                    setMarker(accEvent);
+                }
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
 
     }
 
@@ -108,7 +148,7 @@ public class MarkerFunct {
         String[] eventLine = new String[6];
         eventLine[0] = String.valueOf(closestOnRoute.getLatitude());
         eventLine[1] = String.valueOf(closestOnRoute.getLongitude());
-        eventLine[5] = "0";
+        eventLine[5] = "1337";
 
         AccEvent newAcc = new AccEvent(eventLine);
 
@@ -148,6 +188,7 @@ public class MarkerFunct {
 
         String addressForLoc = "";
 
+        Log.d(TAG, "Getting AddressFromLocation; currentLocHelper: " + currentLocHelper.toString());
         try {
             addressForLoc = pool.submit(() -> getAddressFromLocation(currentLocHelper)).get();
         } catch (Exception ex) {
@@ -158,6 +199,7 @@ public class MarkerFunct {
         long millis = Long.valueOf(startTime);
         String time = DateUtils.formatDateTime(mother, millis, DateUtils.FORMAT_SHOW_TIME);
 
+        Log.d(TAG, "setting up InfoWindow with address: " + addressForLoc);
         InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble,
                 mother.getmMapView(),
                 event, addressForLoc, mother, mother.ride);
@@ -165,9 +207,12 @@ public class MarkerFunct {
 
         //incidentMarker.setSnippet("Vorfall " + i);
 
+
+
+        markers.add(incidentMarker);
+
         mother.getmMapView().getOverlays().add(incidentMarker);
         mother.getmMapView().invalidate();
-
     }
 
     // Generate a new GeoPoint from address String via Geocoding
@@ -195,6 +240,8 @@ public class MarkerFunct {
 
                 // Get address result from geocoding result
 
+                Log.d(TAG, "address.get(0): " + address.get(0).toString());
+
                 Address location = address.get(0);
 
                 addressForLocation = location.getAddressLine(0);
@@ -211,8 +258,16 @@ public class MarkerFunct {
             e.printStackTrace();
         }
 
+        Log.d(TAG, "returning addressForLocation: " + addressForLocation);
         return addressForLocation;
 
+    }
+
+    // Closes all InfoWindows.
+    public void closeAllInfoWindows(){
+        for (int i = 0; i < markers.size(); i++) {
+            markers.get(i).closeInfoWindow();
+        }
     }
 
     // Thread factory implementation: to enable setting priority before new thread is returned

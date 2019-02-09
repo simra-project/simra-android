@@ -351,29 +351,29 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 e.printStackTrace();
             }
 
-
-
             // Write String data to files
             try {
                 appendToFile(accGpsString, accGpsFile);
                 appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY",0)) + ","
                         + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
-                        + "false" + System.lineSeparator(), metaDataFile);
+                        + "0" + System.lineSeparator(), metaDataFile);
             } catch (IOException e) {
                 Log.d(TAG, "Error while writing the file: " + e.getMessage());
                 e.printStackTrace();
             }
             // Log.d(TAG, "onDestroy() accGpsString successfully written");
+
+            // When the user records a route for the first time, the ride key is 0.
+            // For all subsequent rides, the key value increases by one at a time.
+
+            int key = sharedPrefs.getInt("RIDE-KEY", 0);
+
+            editor.putInt("RIDE-KEY", key + 1);
+
+            editor.apply();
         }
 
-        // When the user records a route for the first time, the ride key is 0.
-        // For all subsequent rides, the key value increases by one at a time.
 
-        int key = sharedPrefs.getInt("RIDE-KEY", 0);
-
-        editor.putInt("RIDE-KEY", key + 1);
-
-        editor.apply();
 
         // Prevent new tasks from being added to thread
         executor.shutdown();
