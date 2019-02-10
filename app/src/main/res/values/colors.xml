@@ -8,4 +8,5 @@
     <color name="controlActivated">#4db6ac</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="light_grey">#CDCDCD</color>
 </resources>
