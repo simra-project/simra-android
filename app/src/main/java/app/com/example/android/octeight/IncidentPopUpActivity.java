@@ -94,7 +94,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         incidentTypeTextView = (TextView) findViewById(R.id.incidentTypeText);
         seekBarTextView = (TextView) findViewById(R.id.seekBarText);
         seekBarTextView.setText("Intensität: 0 von 5");
-        ArrayAdapter<String> typAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, incidentTypes);
+        ArrayAdapter<String> typAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, incidentTypes);
         incidentTypSpinner.setAdapter(typAdapter);
         incidentTypSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
             @Override
@@ -134,7 +134,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         locationSpinner = (Spinner) findViewById(R.id.locationSpinner);
         locationTextView = (TextView) findViewById(R.id.locationText);
-        ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, locations);
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, locations);
         locationSpinner.setAdapter(locationAdapter);
         AdapterView.OnItemSelectedListener locationListener = new AdapterView.OnItemSelectedListener() {
             @Override
