@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -33,8 +34,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     SeekBar seekBar;
     TextView seekBarTextView;
     EditText incidentDescription;
-    RelativeLayout doneButton;
-    RelativeLayout backButton;
+    LinearLayout doneButton;
+    LinearLayout backButton;
     // Strings for the File
     String incTypStr;
     String locStr;
