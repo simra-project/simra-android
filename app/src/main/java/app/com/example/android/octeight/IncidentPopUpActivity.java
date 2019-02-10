@@ -34,10 +34,15 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     TextView seekBarTextView;
     EditText incidentDescription;
     RelativeLayout doneButton;
+    RelativeLayout backButton;
     // Strings for the File
     String incTypStr;
     String locStr;
     String incDescStr = " ";
+    // Bools to check if ready
+    Boolean ready = false;
+    Boolean incTypBool = false;
+    Boolean locBool = false;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
@@ -115,11 +120,14 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
                     }
                 });
+                incTypBool = true;
+                if (locBool && incTypBool == true ) ready = true;
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                incTypBool = false;
+                ready = false;
             }
         });
 
@@ -134,11 +142,14 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 // Log.i("TAG", "locationTextView.setText : " + locTxt);
                 locStr = locations[position];
                 locationTextView.setText(getString(R.string.locationSpinnerDE) + "\t" + locStr);
+                locBool = true;
+                if (incTypBool && locBool == true ) ready = true;
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                locBool = false;
+                ready = false;
             }
         };
         locationSpinner.setOnItemSelectedListener(locationListener);
@@ -158,7 +169,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         incidentDescription = findViewById(R.id.ziel_eingabe);
 
-        doneButton = findViewById(R.id.weiter_button);
+        doneButton = findViewById(R.id.speichern_button);
+        backButton = findViewById(R.id.zurück_button);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -221,7 +233,12 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
 
                 }
-                return;
+                if (ready){
+                    finish();
+                }else{
+                    Toast.makeText(this, getString(R.string.notReadyDE), Toast.LENGTH_SHORT).show();
+                    ready = true;
+                }
 
             });
 
@@ -234,6 +251,13 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 return;
             });
         }
+
+        backButton.setOnClickListener((View v) -> {
+
+            Toast.makeText(this, getString(R.string.notsafeDE), Toast.LENGTH_SHORT).show();
+            finish();
+
+        });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

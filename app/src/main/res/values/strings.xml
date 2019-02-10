@@ -36,5 +36,5 @@
     <string name="descriptionDE">Was genau ist vorgefallen?</string>
     <string name="notReadyDE">Wollen sie die Bearbeitung unfertig beenden?</string>
     <string name="noIntentExtrasDE">Leider ist ein Fehler aufgetreten, bitte versuchen sie es erneut.</string>
-
+    <string name="notsafeDE">Mögliche Eingaben wurden nicht gespeichert.</string>
 </resources>
