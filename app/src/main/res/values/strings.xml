@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">SimRa (Beta)</string>
+    <string name="app_name">SimBetaRa</string>
     <string name="welcome_header">Welcome to SimRa!</string>
     <string name="welcome_text">Thanks for helping, keeping the street save.</string>
     <string name="welcome_text2">But keep in mind, its just a Beta App.</string>
@@ -8,9 +8,9 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">MCC TU Berlin</string>
-    <string name="nav_header_subtitle">ask@mcc.tu-berlin.de</string>
+    <string name="nav_header_subtitle">simra@mcc.tu-berlin.de</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="feedbackReceiver">ask@mcc.tu-berlin.de</string>
+    <string name="feedbackReceiver">mb@mcc.tu-berlin.de</string>
     <string name="demoDataHeader">SimRa Teilnehmerdaten</string>
     <string name="feedbackHeader">SimRa Feedback</string>
     <string name="demoDataMail">Name: \nAlter: \nBeruf: \nFahrradtyp: Bsp. Rennrad\nDurchschnittlich wöchentlich zurückgelegte Kilometeranzahl mit dem Rad: </string>
@@ -30,5 +30,31 @@
     <string name="errorNoRideSelectedDE">Es wurde keine Fahrt ausgewählt!</string>
     <string name="errorRideTooShortDE">Die Fahrt muss mindestens\n30 Sekunden dauern!</string>
     <string name="incidentDetectedDE"> Ereignis entdeckt!</string>
+    <string name="noHistoryDE"> Es wurden keine Fahrten gefunden.</string>
+    <string name="nextPatchDE"> Diese Funktion wird leider erst mit dem nächsten Patch veröffentlicht.</string>
+    <string name="locationSpinnerDE">Ort des Handys während der Fahrt: </string>
+    <string name="descriptionDE">Was genau ist vorgefallen?</string>
+    <string name="notReadyDE">Wollen sie die Bearbeitung unfertig beenden?</string>
+    <string name="noIntentExtrasDE">Leider ist ein Fehler aufgetreten, bitte versuchen sie es erneut.</string>
+    <string name="annotation_titleDE">Was ist hier passiert?</string>
+    <string name="incident_typeDE">Art des Ereignisses</string>
+    <string name="descriptionBodyDE">Hier beschreiben was passiert ist</string>
+    <string name="incidentType1_DE">Nichts</string>
+    <string name="incidentType2_DE">Dooring</string>
+    <string name="incidentType3_DE">Hindernis im Weg (z.B. Passant)</string>
+    <string name="incidentType4_DE">Von einem Fahrzeug geschnitten</string>
+    <string name="incidentType5_DE">Sonstiges (Bitte unten angeben)</string>
+    <string name="locationType1_DE">Hosentasche</string>
+    <string name="locationType2_DE">Lenker</string>
+    <string name="locationType3_DE">Jackentasche</string>
+    <string name="locationType4_DE">Hand</string>
+    <string name="locationType5_DE">Rucksack</string>
+    <string name="locationType6_DE">Sonstiges (Bitte unten angeben)</string>
+    <string name="doneEditingIncidentDE">Fertig</string>
+    <string name="editingIncidentAbortedDE">Ereignis wurde nicht gespeichert.</string>
+    <string name="editingIncidentCompletedDE">Ereignis wurde gespeichert.</string>
+    <string name="cancelDE">Abbrechen</string>
+
+
 
 </resources>
