@@ -105,17 +105,15 @@
     </RelativeLayout>
     -->
 
-    <TextView
-        android:id="@+id/copyright_text"
+
+    <TextView android:id="@+id/copyright_text"
+        android:text="@string/osmCopyrightDE"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="10dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="16dp"
-        android:text="@string/osmCopyrightDE"
-        android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginRight="5dp"
+        />
 
 </RelativeLayout>

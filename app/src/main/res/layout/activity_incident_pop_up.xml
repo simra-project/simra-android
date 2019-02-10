@@ -36,36 +36,5 @@
 
     <include layout="@layout/content_scrolling" />
 
-    <RelativeLayout
-        android:id="@+id/weiter_button"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="74dp"
-        android:layout_marginLeft="49dp"
-        android:layout_marginRight="49dp"
-        android:background="@drawable/rounded_sub">
-
-        <ImageView
-            android:layout_width="60dp"
-            android:layout_height="58dp"
-            android:layout_alignParentLeft="true"
-            android:background="@drawable/route_arrow"
-            android:gravity="center_vertical" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:fontFamily="@font/assistant_extralight"
-            android:gravity="center_vertical"
-            android:text="Absenden"
-            android:textColor="#041035"
-            android:textSize="22dp"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
-
 
 </android.support.design.widget.CoordinatorLayout>
