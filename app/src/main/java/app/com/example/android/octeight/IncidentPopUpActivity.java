@@ -2,35 +2,34 @@ package app.com.example.android.octeight;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class IncidentPopUpActivity extends BaseActivity {
+public class IncidentPopUpActivity extends AppCompatActivity {
 
-    EditText incidentDescription;
+    String[] incidentTypes = new String[4];
+    String[] locations = new String[5];
+    LinearLayout doneButton;
+    LinearLayout backButton;
 
-    RelativeLayout doneButton;
-
-    Spinner typSpinner;
-    TextView incidentTypeTextView;
-    Spinner locationSpinner;
-    TextView locationTextView;
-    SeekBar seekBar;
-    TextView seekBarTextView;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Log tag
+    private static final String TAG = "IncidentPopUpActivity_LOG";
 
     // File containing incident data (one per user, analogous to meta file)
 
@@ -48,70 +47,7 @@ public class IncidentPopUpActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_incident_pop_up);
-
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //init the spinners
-        typSpinner = (Spinner) findViewById(R.id.incidentTypeSpinner);
-        incidentTypeTextView = (TextView) findViewById(R.id.incidentTypeText);
-        String[] incidentTypes = {"Fehler", "offene Türe", "Bodenunebenheit", "Unfall", "parkendes Auto", "Personen"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, incidentTypes);
-        typSpinner.setAdapter(adapter);
-
-        locationSpinner = (Spinner) findViewById(R.id.locationSpinner);
-
-        seekBarTextView = (TextView) findViewById(R.id.seekBarText);
-        locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                seekBar = (SeekBar) findViewById(R.id.seekBar);
-                seekBarTextView.setText("Intensität: 0 von 5");
-                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        if (position != 0){
-                            seekBarTextView.setText("Intensität: " + progress + " von 5");
-                        }
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        incidentTypeTextView = (TextView) findViewById(R.id.incidentTypeText);
-        String[] locations = {"Hosentasche", "Lenker", "Jackentasche", "Hand", "Rucksack"};
-        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, locations);
-        locationSpinner.setAdapter(adapter);
-
-        seekBar = (SeekBar) findViewById(R.id.seekBar);
-
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        /*
-        // Initialize sharedPrefs & editor (required for obtaining current ride key)
-        sharedPrefs = getApplicationContext()
-                .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
-        editor = sharedPrefs.edit();
-        */
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        setContentView(R.layout.incident_popup_layout);
 
         // Scale the activity so that it is smaller than the activity which called it
         // (ShowRouteActivity), floating on top of it (ShowRouteActivity is still visible
@@ -120,92 +56,97 @@ public class IncidentPopUpActivity extends BaseActivity {
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-        int width = dm.widthPixels;
-        int height = dm.heightPixels;
+        incidentTypes = getResources().getStringArray(R.array.incidenttypelist);
+        locations = getResources().getStringArray(R.array.locations);
 
-        getWindow().setLayout((int) (width * .8), (int) (height * .6));
 
-        Log.i("WIDTH_DP", String.valueOf(IncidentPopUpActivity.pxToDp(width)*.8));
+        final Spinner incidentTypeSpinner = (Spinner) findViewById(R.id.incidentTypeSpinner);
 
-        Log.i("HEIGHT_DP", String.valueOf(IncidentPopUpActivity.pxToDp(height)*.8));
+        final Spinner locationTypeSpinner = (Spinner) findViewById(R.id.locationSpinner);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        final EditText incidentDescription = (EditText) findViewById(R.id.EditTextDescriptionBody);
 
-        // Find relevant views, set onClickListener
+        doneButton = findViewById(R.id.save_button);
+        backButton = findViewById(R.id.back_button);
 
-        incidentDescription = findViewById(R.id.ziel_eingabe);
+        if (getIntent().getExtras() != null) {
 
-        doneButton = findViewById(R.id.weiter_button);
+            String lat = (String) getIntent().getExtras().getSerializable("Incident_latitude");
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            String lon = (String) getIntent().getExtras().getSerializable("Incident_longitude");
 
-        /** Get all the incident information we want to store in our file from different sources:
-         + ride identification key from shared preferences
-         + incident description: from editText (user input)
-         + latitude, longitude, date, path to file containing relevant acc data from intent extras
-         */
+            String date = (String) getIntent().getExtras().getSerializable("Incident_date");
 
-        // String key = String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0));
+            String pathToAccDat = (String) getIntent().getExtras().getSerializable("Incident_accDat");
 
-        Bundle incData = getIntent().getExtras();
+            String key = getIntent().getStringExtra("ID");
 
-        if (incData == null) {
 
-            return;
+            // onClick-behavior for 'Done inserting description'-button: save incident
+            // data to file.
 
-        }
+            doneButton.setOnClickListener((View v) -> {
 
-        String lat = (String) getIntent().getExtras().getSerializable("Incident_latitude");
+                String incidentType = incidentTypeSpinner.getSelectedItem().toString();
+                String locationType = locationTypeSpinner.getSelectedItem().toString();
+                String description = incidentDescription.getText().toString();
 
-        String lon = (String) getIntent().getExtras().getSerializable("Incident_longitude");
-
-        String date = (String) getIntent().getExtras().getSerializable("Incident_date");
-
-        String pathToAccDat = (String) getIntent().getExtras().getSerializable("Incident_accDat");
-
-        String key = getIntent().getStringExtra("ID");
-        // String id =
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        // onClick-behavior for 'Done inserting description'-button: save incident
-        // data to file.
-
-        doneButton.setOnClickListener((View v) -> {
-
-            String incDesc = incidentDescription.getText().toString();
-
-            try {
-
-                if (!fileExists("incidentData.csv")) {
-
-                    incidentFile = getFileStreamPath("incidentData.csv");
-
-                    incidentFile.createNewFile();
-
-                    appendToFile("key, lat, lon, date, path_to_AccFile, description"
-                            + System.lineSeparator(), incidentFile);
-
-                    appendToFile(key + "," + lat + "," + lon + "," + date + ","
-                            + pathToAccDat + "," + incDesc
-                            + System.lineSeparator(), incidentFile);
-
-                } else {
-
-                    incidentFile = getFileStreamPath("incidentData.csv");
-
-                    appendToFile(key + "," + lat + "," + lon + "," + date + ","
-                            + pathToAccDat + "," + incDesc
-                            + System.lineSeparator(), incidentFile);
-
+                // Instead of writing the String selected items in the spinner,
+                // we use an int tosave disk space and bandwidth
+                int incidentIndex = 0;
+                for (int i = 0; i < incidentTypes.length; i++) {
+                    if (incidentType.equals(incidentTypes[i])) {
+                        incidentIndex = i;
+                    }
+                }
+                int locationIndex = 0;
+                for (int i = 0; i < locations.length; i++) {
+                    if (locationType.equals(locations[i])) {
+                        locationIndex = i;
+                    }
                 }
 
-            } catch (IOException ioe) {
+
+                try {
+
+                    incidentFile = getFileStreamPath("incidentData.csv");
+
+                    if (!fileExists("incidentData.csv")) {
+
+                        incidentFile.createNewFile();
+
+                        appendToFile("key,lat,lon,date,path_to_AccFile,incidentType,phoneLocation,description"
+                                + System.lineSeparator(), incidentFile);
+
+                    }
+
+                    appendToFile(key + "," + lat + "," + lon + "," + date + ","
+                            + pathToAccDat + "," + incidentIndex + "," + locationIndex + "," + description
+                            + System.lineSeparator(), incidentFile);
+
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+                Toast.makeText(this, getString(R.string.editingIncidentCompletedDE), Toast.LENGTH_SHORT).show();
+                finish();
+
+            });
 
 
-            }
+            backButton.setOnClickListener((View v) -> {
+                Toast.makeText(this, getString(R.string.editingIncidentAbortedDE), Toast.LENGTH_SHORT).show();
 
-        });
+                finish();
+            });
+
+        } else {
+            Log.i("TAG", "getIntent().getExtras() == null");
+            doneButton.setOnClickListener((View v) -> {
+                Toast.makeText(this, getString(R.string.noIntentExtrasDE), Toast.LENGTH_SHORT).show();
+                return;
+            });
+        }
+
 
     }
 
@@ -220,17 +161,6 @@ public class IncidentPopUpActivity extends BaseActivity {
         //writer.write(System.getProperty("line.separator").getBytes());
         writer.flush();
         writer.close();
-    }
-
-
-    public static int dpToPx(int dp)
-    {
-        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
-    }
-
-    public static int pxToDp(int px)
-    {
-        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
 }

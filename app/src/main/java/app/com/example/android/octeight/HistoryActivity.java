@@ -48,10 +48,6 @@ public class HistoryActivity extends BaseActivity {
     private File metaDataFile;
     ArrayList<String[]> ridesList = new ArrayList<>();
     String[] ridesArr;
-    String[] testFahrten = {"0,30.01.2019 11:01:40,6501,false",
-            "1,30.01.2019 11:12:30,6003,false",
-            "2,30.01.2019 11:17:21,4590,false",
-            "3,30.01.2019 11:49:18,3244,false"};
 
     /**
      * @TODO: When this Activity gets started automatically after the route recording is finished,
