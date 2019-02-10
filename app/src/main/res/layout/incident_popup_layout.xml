@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ScrollView01"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:scrollbars="vertical">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:orientation="vertical"
+        android:layout_height="fill_parent">
+
+        <!--Put form controls here-->
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+        <TextView
+            android:id="@+id/ActivityTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/annotation_titleDE"
+            android:textSize="11pt"
+            android:textStyle="bold">
+
+        </TextView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/DropDown1Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/incident_typeDE"
+            android:textSize="10pt">
+        </TextView>
+
+        <Spinner
+            android:id="@+id/incidentTypeSpinner"
+            android:layout_height="wrap_content"
+            android:prompt="@string/incidentType1_DE"
+            android:layout_width="fill_parent"
+            android:entries="@array/incidenttypelist">
+        </Spinner>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+        <TextView
+            android:id="@+id/DropDown2Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/locationSpinnerDE"
+            android:textSize="10pt">
+        </TextView>
+
+        <Spinner
+            android:id="@+id/locationSpinner"
+            android:layout_height="wrap_content"
+            android:prompt="@string/locationType1_DE"
+            android:layout_width="fill_parent"
+            android:entries="@array/locations"/>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+        <TextView
+            android:id="@+id/DescriptionTextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/descriptionDE"
+            android:textSize="10pt">
+        </TextView>
+        <EditText
+            android:id="@+id/EditTextDescriptionBody"
+            android:layout_height="wrap_content"
+            android:hint="@string/descriptionBodyDE"
+            android:inputType="textMultiLine"
+            android:lines="5"
+            android:layout_width="fill_parent">
+        </EditText>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <!--
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@color/light_grey"
+            android:backgroundTint="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:drawableEnd="@drawable/save_icon"
+            android:paddingRight="50dp"
+            android:paddingLeft="50dp"
+            android:text="@string/doneEditingIncidentDE"
+            tools:text="@string/doneEditingIncidentDE" />
+            -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <LinearLayout
+                android:id="@+id/back_button"
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_weight="1"
+                android:weightSum="7"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/ripple_effect"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5"
+                    android:fontFamily="@font/assistant_extralight"
+                    android:gravity="center"
+                    android:text="@string/cancelDE"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="2"
+                    android:background="@drawable/cancel_icon_640" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/save_button"
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_weight="1"
+                android:weightSum="7"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/ripple_effect"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5"
+                    android:fontFamily="@font/assistant_extralight"
+                    android:gravity="center"
+                    android:text="@string/doneEditingIncidentDE"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="2"
+                    android:background="@drawable/ok_icon_640" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+</ScrollView>

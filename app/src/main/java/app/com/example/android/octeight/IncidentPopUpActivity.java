@@ -2,13 +2,12 @@ package app.com.example.android.octeight;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -65,7 +64,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_incident_pop_up);
+        setContentView(R.layout.incident_popup_layout);
 
         // Scale the activity so that it is smaller than the activity which called it
         // (ShowRouteActivity), floating on top of it (ShowRouteActivity is still visible
@@ -74,116 +73,18 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-        // int width = dm.widthPixels;
-        // int height = dm.heightPixels;
+        incidentTypes = getResources().getStringArray(R.array.incidenttypelist);
+        locations = getResources().getStringArray(R.array.locations);
 
-        getWindow().setLayout((int) (dm.widthPixels * .8), (int) (dm.heightPixels * .8));
 
-        Log.i("WIDTH_DP", String.valueOf(IncidentPopUpActivity.pxToDp(dm.widthPixels) * .8));
+        final Spinner incidentTypeSpinner = (Spinner) findViewById(R.id.incidentTypeSpinner);
 
-        Log.i("HEIGHT_DP", String.valueOf(IncidentPopUpActivity.pxToDp(dm.heightPixels) * .8));
+        final Spinner locationTypeSpinner = (Spinner) findViewById(R.id.locationSpinner);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        final EditText incidentDescription = (EditText) findViewById(R.id.EditTextDescriptionBody);
 
-        incTypStr = incidentTypes[0];
-        locStr = locations[0];
-
-        //init the spinners
-        incidentTypSpinner = (Spinner) findViewById(R.id.incidentTypeSpinner);
-        incidentTypeTextView = (TextView) findViewById(R.id.incidentTypeText);
-        seekBarTextView = (TextView) findViewById(R.id.seekBarText);
-        seekBarTextView.setText("Intensität: 0 von 5");
-        ArrayAdapter<String> typAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, incidentTypes);
-        incidentTypSpinner.setAdapter(typAdapter);
-        incidentTypSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                incTypStr = incidentTypes[position];
-                incidentTypeTextView.setText("Typ:\t" + incTypStr);
-                seekBar = (SeekBar) findViewById(R.id.seekBar);
-                seekBarTextView.setText("Intensität:\t0 von 5");
-                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        if (position != 0) {
-                            seekBarTextView.setText("Intensität:\t" + (progress + 35) / 25 + " von 5");
-                        }
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
-                    }
-                });
-                incTypBool = true;
-                if (locBool && incTypBool == true ) ready = true;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                incTypBool = false;
-                ready = false;
-            }
-        });
-
-        locationSpinner = (Spinner) findViewById(R.id.locationSpinner);
-        locationTextView = (TextView) findViewById(R.id.locationText);
-        ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, locations);
-        locationSpinner.setAdapter(locationAdapter);
-        AdapterView.OnItemSelectedListener locationListener = new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // String locTxt = getString(R.string.locationSpinnerDE) + locations[position];
-                // Log.i("TAG", "locationTextView.setText : " + locTxt);
-                locStr = locations[position];
-                locationTextView.setText(getString(R.string.locationSpinnerDE) + "\t" + locStr);
-                locBool = true;
-                if (incTypBool && locBool == true ) ready = true;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                locBool = false;
-                ready = false;
-            }
-        };
-        locationSpinner.setOnItemSelectedListener(locationListener);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        /*
-        // Initialize sharedPrefs & editor (required for obtaining current ride key)
-        sharedPrefs = getApplicationContext()
-                .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
-        editor = sharedPrefs.edit();
-        */
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        // Find relevant views, set onClickListener
-
-        incidentDescription = findViewById(R.id.ziel_eingabe);
-
-        doneButton = findViewById(R.id.speichern_button);
-        backButton = findViewById(R.id.zurück_button);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        /** Get all the incident information we want to store in our file from different sources:
-         + ride identification key from shared preferences
-         + incident description: from editText (user input)
-         + latitude, longitude, date, path to file containing relevant acc data from intent extras
-         */
-
-        // String key = String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0));
-
-        // Bundle incData = getIntent().getExtras();
+        doneButton = findViewById(R.id.save_button);
+        backButton = findViewById(R.id.back_button);
 
         if (getIntent().getExtras() != null) {
 
@@ -203,62 +104,67 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
             doneButton.setOnClickListener((View v) -> {
 
-                incDescStr = incidentDescription.getText().toString();
+                String incidentType = incidentTypeSpinner.getSelectedItem().toString();
+                String locationType = locationTypeSpinner.getSelectedItem().toString();
+                String description = incidentDescription.getText().toString();
+
+                // Instead of writing the String selected items in the spinner,
+                // we use an int tosave disk space and bandwidth
+                int incidentIndex = 0;
+                for (int i = 0; i < incidentTypes.length; i++) {
+                    if (incidentType.equals(incidentTypes[i])) {
+                        incidentIndex = i;
+                    }
+                }
+                int locationIndex = 0;
+                for (int i = 0; i < locations.length; i++) {
+                    if (locationType.equals(locations[i])) {
+                        locationIndex = i;
+                    }
+                }
+
 
                 try {
-
-                    if (!fileExists("incidentData.csv")) {
-
-                        incidentFile = getFileStreamPath("incidentData.csv");
-
-                        incidentFile.createNewFile();
 
                         appendToFile("key, lat, lon, date, path_to_AccFile, incidentType, Smartphone Location, description"
                                 + System.lineSeparator(), incidentFile);
 
-                        appendToFile(key + "," + lat + "," + lon + "," + date + ","
-                                + pathToAccDat + "," + incTypStr + "," + locStr+ "," + incDescStr
-                                + System.lineSeparator(), incidentFile);
+                    if (!fileExists("incidentData.csv")) {
 
-                    } else {
+                        incidentFile.createNewFile();
 
-                        incidentFile = getFileStreamPath("incidentData.csv");
-
-                        appendToFile(key + "," + lat + "," + lon + "," + date + ","
-                                + pathToAccDat + "," + incTypStr + "," + locStr+ "," + incDescStr
+                        appendToFile("key,lat,lon,date,path_to_AccFile,incidentType,phoneLocation,description"
                                 + System.lineSeparator(), incidentFile);
 
                     }
 
+                    appendToFile(key + "," + lat + "," + lon + "," + date + ","
+                            + pathToAccDat + "," + incidentIndex + "," + locationIndex + "," + description
+                            + System.lineSeparator(), incidentFile);
+
                 } catch (IOException ioe) {
-
-
+                    ioe.printStackTrace();
                 }
-                if (ready){
-                    finish();
-                }else{
-                    Toast.makeText(this, getString(R.string.notReadyDE), Toast.LENGTH_SHORT).show();
-                    ready = true;
-                }
+                Toast.makeText(this, getString(R.string.editingIncidentCompletedDE), Toast.LENGTH_SHORT).show();
+                finish();
 
             });
 
 
+            backButton.setOnClickListener((View v) -> {
+                Toast.makeText(this, getString(R.string.editingIncidentAbortedDE), Toast.LENGTH_SHORT).show();
 
-        }else{
+                finish();
+            });
+
+        } else {
             Log.i("TAG", "getIntent().getExtras() == null");
             doneButton.setOnClickListener((View v) -> {
-                Toast.makeText(this, getString(R.string.noIntentExtrasDE), Toast.LENGTH_SHORT);
+                Toast.makeText(this, getString(R.string.noIntentExtrasDE), Toast.LENGTH_SHORT).show();
                 return;
             });
         }
 
-        backButton.setOnClickListener((View v) -> {
-
-            Toast.makeText(this, getString(R.string.notsafeDE), Toast.LENGTH_SHORT).show();
-            finish();
-
-        });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -277,15 +183,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         //writer.write(System.getProperty("line.separator").getBytes());
         writer.flush();
         writer.close();
-    }
-
-
-    public static int dpToPx(int dp) {
-        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
-    }
-
-    public static int pxToDp(int px) {
-        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
 }
