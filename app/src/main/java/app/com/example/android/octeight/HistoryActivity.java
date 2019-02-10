@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -229,8 +232,6 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
             @Override
             public void onClick(View view) {
 
-                startShowRouteWithSelectedRide();
-
             }
         });
 
@@ -248,11 +249,14 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
 
         {
             // Log.d(TAG, "getIntent.hasExtra(\"PathToAccGpsFile\")");
+            /*
             fab.performClick();
             fab.setPressed(true);
             fab.invalidate();
             fab.setPressed(false);
             fab.invalidate();
+            */
+            startShowRouteWithSelectedRide();
         }
 
     }
@@ -271,9 +275,9 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
     }
 
     private String listToTextShape (String[] item){
-        String todo = "Muss noch kommentiert und gesendet werden\n";
+        String todo = getString(R.string.newRideInHistoryActivityDE);
         if (item[3].equals("2")){
-            todo = "Fertig kommentiert und gesendet\n";
+            todo = "";
         }
 
 
@@ -282,8 +286,10 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
                 TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
                 TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
 
-        String result = todo + new Date( Long.valueOf(item[1]) ).toString()
-                + "\tID: " + item[0]
+        String startDateOfRide = DateUtils.formatDateTime(this, Long.valueOf(item[1]), DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE |
+                DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NUMERIC_DATE);
+
+        String result = "#" + item[0] + " " + todo + " " + startDateOfRide
                 + " Fahrtdauer: " + prettyDuration;
 
 
@@ -300,8 +306,8 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent intent = new Intent(HistoryActivity.this, MainActivity.class);
-            startActivity(intent);
+
+            finish();
         }
     }
 

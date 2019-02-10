@@ -137,22 +137,6 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
         }
     };
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // ServiceConnection for communicating with RecorderService
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private ServiceConnection mUploadServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            UploadService.MyBinder myBinder = (UploadService.MyBinder) service;
-            mBoundUploadService = myBinder.getService();
-        }
-    };
-
     private class UpdateTask extends AsyncTask<String, String, String> {
 
         private String path;

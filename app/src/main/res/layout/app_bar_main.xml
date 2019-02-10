@@ -75,7 +75,7 @@
             android:layout_marginRight="30dp"
 
             android:fontFamily="@font/assistant_extralight"
-            android:text="Neue Route"
+            android:text="@string/startRecordingDE"
             android:textColor="#FEFEFE"
             android:textSize="24dp"
             android:textStyle="bold" />
@@ -107,7 +107,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginRight="30dp"
             android:fontFamily="@font/assistant_extralight"
-            android:text="Aufzeichnung \n stoppen"
+            android:text="@string/endRecordingDE"
             android:textColor="#FEFEFE"
             android:textSize="24dp"
             android:textStyle="bold"

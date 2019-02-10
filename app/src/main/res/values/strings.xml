@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">SimBetaRa</string>
+    <string name="app_name">SimRa (Beta)</string>
     <string name="welcome_header">Welcome to SimRa!</string>
     <string name="welcome_text">Thanks for helping, keeping the street save.</string>
     <string name="welcome_text2">But keep in mind, its just a Beta App.</string>
@@ -25,7 +25,7 @@
     <string name="channel_descriptionDE">Fahrt wird aufgezeichnet</string>
     <string name="osmCopyrightEN">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
     <string name="osmCopyrightDE">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
-    <string name="title_activity_history">HistoryActivity</string>
+    <string name="title_activity_historyDE">Meine Fahrten</string>
     <string name="selectedRideInfoDE">Die folgende Fahrt wurde ausgewählt: </string>
     <string name="errorNoRideSelectedDE">Es wurde keine Fahrt ausgewählt!</string>
     <string name="errorRideTooShortDE">Die Fahrt muss mindestens\n30 Sekunden dauern!</string>
@@ -57,6 +57,9 @@
     <string name="addIncidentDE">Ereignis\nhinzufügen</string>
     <string name="uploadIncidentDE">Fahrt\nhochladen</string>
     <string name="uploadLoadingFilesDE">Die Fahrt wird hochgeladen</string>
+    <string name="newRideInHistoryActivityDE">Neue Fahrt! Bitte bearbeiten.\n</string>
+    <string name="startRecordingDE">Aufzeichnung\nstarten</string>
+    <string name="endRecordingDE">Aufzeichnung\nbeenden</string>
 
 
 

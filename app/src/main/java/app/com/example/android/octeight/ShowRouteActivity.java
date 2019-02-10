@@ -275,10 +275,13 @@ public class ShowRouteActivity extends BaseActivity {
         });
 
         uploadButton.setOnClickListener((View v) -> {
+
+
+
             Intent intent = new Intent(this, UploadService.class);
             intent.putExtra("Ride_Key", ride.getId());
             startService(intent);
-            Toast.makeText(this, getString(R.string.editingIncidentCompletedDE), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.uploadLoadingFilesDE), Toast.LENGTH_SHORT).show();
             finish();
             // mMapView.getOverlays().remove(overlayEvents);
 
