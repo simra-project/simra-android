@@ -14,23 +14,34 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class IncidentPopUpActivity extends BaseActivity {
+public class IncidentPopUpActivity extends AppCompatActivity {
 
-    EditText incidentDescription;
-
-    RelativeLayout doneButton;
-
-    Spinner typSpinner;
+    Spinner incidentTypSpinner;
+    String[] incidentTypes = {"kein Vorfall", "offene Türe", "Bodenunebenheit", "Unfall", "parkendes Auto", "Personen"};
+    // String[] incidentTypes = getResources().getStringArray(R.array.incidentTypesDE);
     TextView incidentTypeTextView;
     Spinner locationSpinner;
+    String[] locations = {"Hosentasche", "Lenker", "Jackentasche", "Hand", "Rucksack"};
+    // String[] locations = getResources().getStringArray(R.array.locationsDE);
     TextView locationTextView;
     SeekBar seekBar;
     TextView seekBarTextView;
+    EditText incidentDescription;
+    RelativeLayout doneButton;
+    // Strings for the File
+    String incTypStr;
+    String locStr;
+    String incDescStr = " ";
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Log tag
+    private static final String TAG = "IncidentPopUpActivity_LOG";
 
     // File containing incident data (one per user, analogous to meta file)
 
@@ -50,29 +61,47 @@ public class IncidentPopUpActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_incident_pop_up);
 
+        // Scale the activity so that it is smaller than the activity which called it
+        // (ShowRouteActivity), floating on top of it (ShowRouteActivity is still visible
+        // in the background thanks to the custom style 'PopUpWindow' in styles.xml)
+
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        // int width = dm.widthPixels;
+        // int height = dm.heightPixels;
+
+        getWindow().setLayout((int) (dm.widthPixels * .8), (int) (dm.heightPixels * .8));
+
+        Log.i("WIDTH_DP", String.valueOf(IncidentPopUpActivity.pxToDp(dm.widthPixels) * .8));
+
+        Log.i("HEIGHT_DP", String.valueOf(IncidentPopUpActivity.pxToDp(dm.heightPixels) * .8));
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        incTypStr = incidentTypes[0];
+        locStr = locations[0];
 
         //init the spinners
-        typSpinner = (Spinner) findViewById(R.id.incidentTypeSpinner);
+        incidentTypSpinner = (Spinner) findViewById(R.id.incidentTypeSpinner);
         incidentTypeTextView = (TextView) findViewById(R.id.incidentTypeText);
-        String[] incidentTypes = {"Fehler", "offene Türe", "Bodenunebenheit", "Unfall", "parkendes Auto", "Personen"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, incidentTypes);
-        typSpinner.setAdapter(adapter);
-
-        locationSpinner = (Spinner) findViewById(R.id.locationSpinner);
-
         seekBarTextView = (TextView) findViewById(R.id.seekBarText);
-        locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        seekBarTextView.setText("Intensität: 0 von 5");
+        ArrayAdapter<String> typAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, incidentTypes);
+        incidentTypSpinner.setAdapter(typAdapter);
+        incidentTypSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                incTypStr = incidentTypes[position];
+                incidentTypeTextView.setText("Typ:\t" + incTypStr);
                 seekBar = (SeekBar) findViewById(R.id.seekBar);
-                seekBarTextView.setText("Intensität: 0 von 5");
+                seekBarTextView.setText("Intensität:\t0 von 5");
                 seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        if (position != 0){
-                            seekBarTextView.setText("Intensität: " + progress + " von 5");
+                        if (position != 0) {
+                            seekBarTextView.setText("Intensität:\t" + (progress + 35) / 25 + " von 5");
                         }
                     }
 
@@ -94,13 +123,25 @@ public class IncidentPopUpActivity extends BaseActivity {
             }
         });
 
-        incidentTypeTextView = (TextView) findViewById(R.id.incidentTypeText);
-        String[] locations = {"Hosentasche", "Lenker", "Jackentasche", "Hand", "Rucksack"};
-        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, locations);
-        locationSpinner.setAdapter(adapter);
+        locationSpinner = (Spinner) findViewById(R.id.locationSpinner);
+        locationTextView = (TextView) findViewById(R.id.locationText);
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, locations);
+        locationSpinner.setAdapter(locationAdapter);
+        AdapterView.OnItemSelectedListener locationListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // String locTxt = getString(R.string.locationSpinnerDE) + locations[position];
+                // Log.i("TAG", "locationTextView.setText : " + locTxt);
+                locStr = locations[position];
+                locationTextView.setText(getString(R.string.locationSpinnerDE) + "\t" + locStr);
+            }
 
-        seekBar = (SeekBar) findViewById(R.id.seekBar);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+        };
+        locationSpinner.setOnItemSelectedListener(locationListener);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -111,24 +152,6 @@ public class IncidentPopUpActivity extends BaseActivity {
 
         editor = sharedPrefs.edit();
         */
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        // Scale the activity so that it is smaller than the activity which called it
-        // (ShowRouteActivity), floating on top of it (ShowRouteActivity is still visible
-        // in the background thanks to the custom style 'PopUpWindow' in styles.xml)
-
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-        int width = dm.widthPixels;
-        int height = dm.heightPixels;
-
-        getWindow().setLayout((int) (width * .8), (int) (height * .6));
-
-        Log.i("WIDTH_DP", String.valueOf(IncidentPopUpActivity.pxToDp(width)*.8));
-
-        Log.i("HEIGHT_DP", String.valueOf(IncidentPopUpActivity.pxToDp(height)*.8));
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Find relevant views, set onClickListener
@@ -147,65 +170,74 @@ public class IncidentPopUpActivity extends BaseActivity {
 
         // String key = String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0));
 
-        Bundle incData = getIntent().getExtras();
+        // Bundle incData = getIntent().getExtras();
 
-        if (incData == null) {
+        if (getIntent().getExtras() != null) {
 
-            return;
+            String lat = (String) getIntent().getExtras().getSerializable("Incident_latitude");
 
+            String lon = (String) getIntent().getExtras().getSerializable("Incident_longitude");
+
+            String date = (String) getIntent().getExtras().getSerializable("Incident_date");
+
+            String pathToAccDat = (String) getIntent().getExtras().getSerializable("Incident_accDat");
+
+            String key = getIntent().getStringExtra("ID");
+
+
+            // onClick-behavior for 'Done inserting description'-button: save incident
+            // data to file.
+
+            doneButton.setOnClickListener((View v) -> {
+
+                incDescStr = incidentDescription.getText().toString();
+
+                try {
+
+                    if (!fileExists("incidentData.csv")) {
+
+                        incidentFile = getFileStreamPath("incidentData.csv");
+
+                        incidentFile.createNewFile();
+
+                        appendToFile("key, lat, lon, date, path_to_AccFile, incidentType, Smartphone Location, description"
+                                + System.lineSeparator(), incidentFile);
+
+                        appendToFile(key + "," + lat + "," + lon + "," + date + ","
+                                + pathToAccDat + "," + incTypStr + "," + locStr+ "," + incDescStr
+                                + System.lineSeparator(), incidentFile);
+
+                    } else {
+
+                        incidentFile = getFileStreamPath("incidentData.csv");
+
+                        appendToFile(key + "," + lat + "," + lon + "," + date + ","
+                                + pathToAccDat + "," + incTypStr + "," + locStr+ "," + incDescStr
+                                + System.lineSeparator(), incidentFile);
+
+                    }
+
+                } catch (IOException ioe) {
+
+
+                }
+                return;
+
+            });
+
+
+
+        }else{
+            Log.i("TAG", "getIntent().getExtras() == null");
+            doneButton.setOnClickListener((View v) -> {
+                Toast.makeText(this, getString(R.string.noIntentExtrasDE), Toast.LENGTH_SHORT);
+                return;
+            });
         }
-
-        String lat = (String) getIntent().getExtras().getSerializable("Incident_latitude");
-
-        String lon = (String) getIntent().getExtras().getSerializable("Incident_longitude");
-
-        String date = (String) getIntent().getExtras().getSerializable("Incident_date");
-
-        String pathToAccDat = (String) getIntent().getExtras().getSerializable("Incident_accDat");
-
-        String key = getIntent().getStringExtra("ID");
-        // String id =
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        // onClick-behavior for 'Done inserting description'-button: save incident
-        // data to file.
 
-        doneButton.setOnClickListener((View v) -> {
-
-            String incDesc = incidentDescription.getText().toString();
-
-            try {
-
-                if (!fileExists("incidentData.csv")) {
-
-                    incidentFile = getFileStreamPath("incidentData.csv");
-
-                    incidentFile.createNewFile();
-
-                    appendToFile("key, lat, lon, date, path_to_AccFile, description"
-                            + System.lineSeparator(), incidentFile);
-
-                    appendToFile(key + "," + lat + "," + lon + "," + date + ","
-                            + pathToAccDat + "," + incDesc
-                            + System.lineSeparator(), incidentFile);
-
-                } else {
-
-                    incidentFile = getFileStreamPath("incidentData.csv");
-
-                    appendToFile(key + "," + lat + "," + lon + "," + date + ","
-                            + pathToAccDat + "," + incDesc
-                            + System.lineSeparator(), incidentFile);
-
-                }
-
-            } catch (IOException ioe) {
-
-
-            }
-
-        });
 
     }
 
@@ -223,13 +255,11 @@ public class IncidentPopUpActivity extends BaseActivity {
     }
 
 
-    public static int dpToPx(int dp)
-    {
+    public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
-    public static int pxToDp(int px)
-    {
+    public static int pxToDp(int px) {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
