@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="locationsDE">
-        "Hosentasche", "Lenker", "Jackentasche", "Hand", "Rucksack"
+    <string-array name="incidenttypelist">
+        <item>@string/incidentType1_DE</item>
+        <item>@string/incidentType2_DE</item>
+        <item>@string/incidentType3_DE</item>
+        <item>@string/incidentType4_DE</item>
+        <item>@string/incidentType5_DE</item>
+
+    </string-array>
+    <string-array name="locations">
+        <item>@string/locationType1_DE</item>
+        <item>@string/locationType2_DE</item>
+        <item>@string/locationType3_DE</item>
+        <item>@string/locationType4_DE</item>
+        <item>@string/locationType5_DE</item>
+        <item>@string/locationType6_DE</item>
     </string-array>
 </resources>
