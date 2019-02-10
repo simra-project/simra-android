@@ -3,6 +3,7 @@ package app.com.example.android.octeight;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.widget.ImageButton;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.support.v7.app.AppCompatActivity;
@@ -51,6 +52,7 @@ public class ShowRouteActivity extends BaseActivity {
     private RelativeLayout addIncBttn;
     private RelativeLayout exitAddIncBttn;
     private RelativeLayout doneButton;
+
 
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Our ride
@@ -155,28 +157,19 @@ public class ShowRouteActivity extends BaseActivity {
         mMapView.getOverlayManager().add(route);
 
         mMapView.invalidate();
-        // zoom automatically to the bounding box. Usually the command in the if body should suffice
-        // but osmdroid is buggy and we need the else part to fix it.
-        if((mMapView.getIntrinsicScreenRect(null).bottom-mMapView.getIntrinsicScreenRect(null).top) > 0){
-            mMapView.zoomToBoundingBox(bBox, false);
-        } else {
-            ViewTreeObserver vto = mMapView.getViewTreeObserver();
-            vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        zoomToBBox(bBox);
 
-                @Override
-                public void onGlobalLayout() {
-                    mMapView.zoomToBoundingBox(bBox, false);
-                    ViewTreeObserver vto2 = mMapView.getViewTreeObserver();
-                    vto2.removeOnGlobalLayoutListener(this);
-                }
-            });
-        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // (3): CenterMap
+        ImageButton centerMap = findViewById(R.id.bounding_box_center_button);
 
-        mMapView.setMinZoomLevel(7.0);
-        if(mMapView.getMaxZoomLevel() > 19.0){
-            mMapView.setMaxZoomLevel(19.0);
-        }
-
+        centerMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "boundingBoxCenterMap clicked ");
+                zoomToBBox(bBox);
+            }
+        });
 
         // Set the icon for marker representation to Osmdroid's default
 
@@ -488,6 +481,30 @@ public class ShowRouteActivity extends BaseActivity {
         }
 
         return new BoundingBox(border[0]+0.001,border[1]+0.001,border[2]-0.001,border[3]-0.001);
+    }
+
+    public void zoomToBBox(BoundingBox bBox){
+        // zoom automatically to the bounding box. Usually the command in the if body should suffice
+        // but osmdroid is buggy and we need the else part to fix it.
+        if((mMapView.getIntrinsicScreenRect(null).bottom-mMapView.getIntrinsicScreenRect(null).top) > 0){
+            mMapView.zoomToBoundingBox(bBox, false);
+        } else {
+            ViewTreeObserver vto = mMapView.getViewTreeObserver();
+            vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                @Override
+                public void onGlobalLayout() {
+                    mMapView.zoomToBoundingBox(bBox, false);
+                    ViewTreeObserver vto2 = mMapView.getViewTreeObserver();
+                    vto2.removeOnGlobalLayoutListener(this);
+                }
+            });
+        }
+
+        mMapView.setMinZoomLevel(7.0);
+        if(mMapView.getMaxZoomLevel() > 19.0){
+            mMapView.setMaxZoomLevel(19.0);
+        }
     }
 
     /**protected class MyInfoWindow extends InfoWindow {

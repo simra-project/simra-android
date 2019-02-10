@@ -22,27 +22,10 @@ import java.io.IOException;
 
 public class IncidentPopUpActivity extends AppCompatActivity {
 
-    Spinner incidentTypSpinner;
-    String[] incidentTypes = {"kein Vorfall", "offene Türe", "Bodenunebenheit", "Unfall", "parkendes Auto", "Personen"};
-    // String[] incidentTypes = getResources().getStringArray(R.array.incidentTypesDE);
-    TextView incidentTypeTextView;
-    Spinner locationSpinner;
-    String[] locations = {"Hosentasche", "Lenker", "Jackentasche", "Hand", "Rucksack"};
-    // String[] locations = getResources().getStringArray(R.array.locationsDE);
-    TextView locationTextView;
-    SeekBar seekBar;
-    TextView seekBarTextView;
-    EditText incidentDescription;
+    String[] incidentTypes = new String[4];
+    String[] locations = new String[5];
     LinearLayout doneButton;
     LinearLayout backButton;
-    // Strings for the File
-    String incTypStr;
-    String locStr;
-    String incDescStr = " ";
-    // Bools to check if ready
-    Boolean ready = false;
-    Boolean incTypBool = false;
-    Boolean locBool = false;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
@@ -126,8 +109,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
                 try {
 
-                        appendToFile("key, lat, lon, date, path_to_AccFile, incidentType, Smartphone Location, description"
-                                + System.lineSeparator(), incidentFile);
+                    incidentFile = getFileStreamPath("incidentData.csv");
 
                     if (!fileExists("incidentData.csv")) {
 
@@ -164,10 +146,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 return;
             });
         }
-
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
     }
