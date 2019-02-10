@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class HistoryActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -300,15 +301,22 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
         return file.exists();
     }
 
-    private String listToTextShape(String[] item) {
-        String todo = "Muss noch kommentiert werden\n";
-        if (item[3].contains("true")) {
-            todo = "Fertig kommentiert\n";
+    private String listToTextShape (String[] item){
+        String todo = "Muss noch kommentiert und gesendet werden\n";
+        if (item[3].equals("2")){
+            todo = "Fertig kommentiert und gesendet\n";
         }
-        String result = todo + new Date(Long.valueOf(item[1])).toString()
+
+
+        long millis = Long.valueOf(item[2]) - Long.valueOf(item[1]);
+        String prettyDuration = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
+                TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
+
+        String result = todo + new Date( Long.valueOf(item[1]) ).toString()
                 + "\tID: " + item[0]
-                + " Länge: " + (Long.valueOf(item[2]) - Long.valueOf(item[1])) / 1000
-                + "Sec";
+                + " Fahrtdauer: " + prettyDuration;
+
 
         return result;
         // requires API 26 (Java 8) Date.from(Instant.ofEpochMilli( Long.getLong(item[0]) )).toString()
