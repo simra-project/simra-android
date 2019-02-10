@@ -51,9 +51,13 @@
     <string name="locationType5_DE">Rucksack</string>
     <string name="locationType6_DE">Sonstiges (Bitte unten angeben)</string>
     <string name="doneEditingIncidentDE">Fertig</string>
-    <string name="editingIncidentAbortedDE">Ereignis wurde nicht gespeichert.</string>
-    <string name="editingIncidentCompletedDE">Ereignis wurde gespeichert.</string>
+    <string name="editingIncidentAbortedDE">Ereignis wurde nicht gespeichert</string>
+    <string name="editingIncidentCompletedDE">Ereignis wurde gespeichert</string>
     <string name="cancelDE">Abbrechen</string>
+    <string name="addIncidentDE">Ereignis\nhinzufügen</string>
+    <string name="uploadIncidentDE">Fahrt\nhochladen</string>
+    <string name="uploadLoadingFilesDE">Die Fahrt wird hochgeladen</string>
+
 
 
 

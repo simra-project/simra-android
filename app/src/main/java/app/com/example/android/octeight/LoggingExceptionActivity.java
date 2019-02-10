@@ -79,7 +79,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
                     Build.MODEL + "\n" +
                     Build.PRODUCT;
 
-            FileUtils.writeStringToFile(f, errorReport, (Charset) null);
+            FileUtils.writeStringToFile(f, errorReport, null);
 
             SharedPreferences sharedPrefs = getApplicationContext()
                     .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);

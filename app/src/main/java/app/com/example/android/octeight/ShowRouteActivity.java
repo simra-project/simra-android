@@ -51,7 +51,7 @@ public class ShowRouteActivity extends BaseActivity {
     private TextView copyrightTxt;
     private RelativeLayout addIncBttn;
     private RelativeLayout exitAddIncBttn;
-    private RelativeLayout doneButton;
+    private RelativeLayout uploadButton;
 
 
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,6 +117,8 @@ public class ShowRouteActivity extends BaseActivity {
         addIncBttn.setVisibility(View.VISIBLE);
         exitAddIncBttn = findViewById(R.id.exitAddIncident);
         exitAddIncBttn.setVisibility(View.INVISIBLE);
+        uploadButton = findViewById(R.id.uploadIncident);
+        uploadButton.setVisibility(View.VISIBLE);
 
         // doneButton = findViewById(R.id.doneButton);
 
@@ -272,6 +274,15 @@ public class ShowRouteActivity extends BaseActivity {
 
         });
 
+        uploadButton.setOnClickListener((View v) -> {
+            Intent intent = new Intent(this, UploadService.class);
+            intent.putExtra("Ride_Key", ride.getId());
+            startService(intent);
+            Toast.makeText(this, getString(R.string.editingIncidentCompletedDE), Toast.LENGTH_SHORT).show();
+            finish();
+            // mMapView.getOverlays().remove(overlayEvents);
+
+        });
         /*
         doneButton.setOnClickListener((View v) -> {
 
