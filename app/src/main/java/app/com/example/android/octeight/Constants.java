@@ -25,7 +25,7 @@ public class Constants extends Service {
     public static final long GPS_TIME_FREQUENCY = 60000;
 
     // The minimal duration of a ride in milliseconds
-    public static final int MINIMAL_RIDE_DURATION = 3000;
+    public static final int MINIMAL_RIDE_DURATION = 30000;
 
     public static final SimpleDateFormat DATE_PATTERN_SHORT = new SimpleDateFormat("dd.MM.yyyy");
 

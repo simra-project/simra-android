@@ -264,9 +264,10 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             public void onClick(View v) {
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
+                /*
                 String[] bla = new String[4];
                 bla[5] = "bla";
-                /*
+
                 try {
                     String[] bla = new String[4];
                     bla[5] = "bla";
@@ -509,13 +510,42 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_history) {
+        if (id == R.id.nav_main) {
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        }
+        else if (id == R.id.nav_history) {
             Intent intent = new Intent (MainActivity.this, HistoryActivity.class);
             startActivity(intent);            // Handle the camera action
         } else if (id == R.id.nav_democraphic_data) {
             // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType("message/rfc822");
+            SharedPreferences sharedPrefs = getApplicationContext()
+                    .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            String user_id = "";
+
+
+            if (sharedPrefs.contains("USER-ID")) {
+
+                user_id = sharedPrefs.getString("USER-ID", "00000000");
+
+            } else {
+
+                user_id = String.valueOf(System.currentTimeMillis());
+
+                editor.putString("USER-ID", user_id);
+
+                editor.apply();
+            }
+            TextView tv1 = (TextView)findViewById(R.id.textViewId);
+
+            tv1.setText(id);
+
             i.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.demoDataHeader));
             i.putExtra(Intent.EXTRA_TEXT, getString(R.string.demoDataMail));
