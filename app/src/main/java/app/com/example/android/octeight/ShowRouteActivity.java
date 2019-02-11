@@ -129,7 +129,7 @@ public class ShowRouteActivity extends BaseActivity {
         // String date = getIntent().getStringExtra("Date");
         startTime = getIntent().getStringExtra("StartTime");
         // Log.d(TAG, "onCreate() date: " + date);
-        int state = getIntent().getIntExtra("State", 0);
+        int state = getIntent().getIntExtra("State",0);
         // Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
         String duration = getIntent().getStringExtra("Duration");
 
@@ -276,7 +276,19 @@ public class ShowRouteActivity extends BaseActivity {
 
         uploadButton.setOnClickListener((View v) -> {
 
-
+            File[] dirFiles = getFilesDir().listFiles();
+            if (dirFiles.length != 0) {
+                for (int i = 0; i < dirFiles.length; i++) {
+                    String nameOfFileToBeRenamed = dirFiles[i].getName();
+                    String newNameOfFile = nameOfFileToBeRenamed.replace(".csv","_2.csv");
+                    String path = Constants.APP_PATH + "files/";
+                    Log.d(TAG, "nameOfFileToBeRenamed: " + nameOfFileToBeRenamed + " newNameOfFile: " + newNameOfFile);
+                    if (nameOfFileToBeRenamed.startsWith(ride.getId()+"_") && !nameOfFileToBeRenamed.endsWith("_2.csv")) {
+                        Log.d(TAG, "Renaming");
+                        dirFiles[i].renameTo(new File(path+newNameOfFile));
+                    }
+                }
+            }
 
             Intent intent = new Intent(this, UploadService.class);
             intent.putExtra("Ride_Key", ride.getId());
