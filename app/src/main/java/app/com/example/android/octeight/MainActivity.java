@@ -542,13 +542,10 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
                 editor.apply();
             }
-            TextView tv1 = (TextView)findViewById(R.id.textViewId);
-
-            tv1.setText(id);
 
             i.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.demoDataHeader));
-            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.demoDataMail));
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.demoDataMail)+ "\n id: " + user_id);
             try {
                 startActivity(Intent.createChooser(i, "Send Data..."));
             } catch (android.content.ActivityNotFoundException ex) {
