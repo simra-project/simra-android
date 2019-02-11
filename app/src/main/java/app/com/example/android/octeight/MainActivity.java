@@ -219,52 +219,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
 
-        /*
-        List<GeoPoint> geoPoints = new ArrayList<>();
-
-        File gpsFile = getFileStreamPath("gps09.01.2019 18:06:24.csv");
-
-        //Read text from file
-        StringBuilder text = new StringBuilder();
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(gpsFile));
-            // br.readLine() to skip the first line which contains the headers
-            String line= br.readLine();
-
-            while ((line = br.readLine()) != null) {
-                //Log.d(TAG, line);
-                try {
-                    String[] separatedLine = line.split(",");
-                    double latitude = Double.valueOf(separatedLine[0]);
-                    double longitude = Double.valueOf(separatedLine[1]);
-                    geoPoints.add(new GeoPoint(latitude, longitude));
-                } catch (Exception e){
-                    e.printStackTrace();
-                    continue;
-                }
-            }
-            br.close();
-        }
-        catch (IOException e) {
-
-            e.printStackTrace();
-            Log.d(TAG, e.getMessage());
-        }
-
-        Polyline line = new Polyline();   //see note below!
-        line.setPoints(geoPoints);
-        line.setOnClickListener(new Polyline.OnClickListener() {
-            @Override
-            public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos) {
-                Toast.makeText(mapView.getContext(), "polyline with " + polyline.getPoints().size() + "pts was tapped", Toast.LENGTH_LONG).show();
-                return false;
-            }
-        });
-
-        mMapView.getOverlayManager().add(line);
-        */
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -288,13 +242,16 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             @Override
             public void onClick(View v) {
 
+                /*
                 Intent intent = new Intent(MainActivity.this, UploadService.class);
                 intent.putExtra("PathToAccGpsFile", "metaData.csv");
                 startService(intent);
                 bindService(intent, mUploadServiceConnection, Context.BIND_AUTO_CREATE);
-                //Intent launchActivityIntent = new Intent(MainActivity.this,
-                        //HelmetActivity.class);
-                //startActivity(launchActivityIntent);
+
+                Intent launchActivityIntent = new Intent(MainActivity.this,
+                        HelmetActivity.class);
+                startActivity(launchActivityIntent);
+                */
             }
         });
 
@@ -582,7 +539,8 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             }
 
         } else if (id == R.id.nav_setting) {
-
+            Intent intent = new Intent (MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_infoMCC){
             Intent intent = new Intent (MainActivity.this, WebActivity.class);
             startActivity(intent);

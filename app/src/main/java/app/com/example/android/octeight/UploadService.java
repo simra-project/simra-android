@@ -217,7 +217,7 @@ public class UploadService extends Service {
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), fileContent.toString());
 
-            Log.d(TAG, "sending file to server: " + fileContent.toString());
+            Log.d(TAG, "sending file with following key to server: " + key);
             Date dateToday = new Date();
             String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
 
@@ -261,6 +261,8 @@ public class UploadService extends Service {
             Date dateToday = new Date();
             String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
 
+            Log.d(TAG, "dateToday: " + dateToday.toString());
+            Log.d(TAG, "beforeHash: " + (Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX));
             Log.d(TAG, "clientHash: " + clientHash);
 
             Request request = new Request.Builder()

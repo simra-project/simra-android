@@ -39,7 +39,7 @@ import java.util.Date;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class HistoryActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class HistoryActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     // Log tag
     private static final String TAG = "HistoryActivity_LOG";
@@ -118,10 +118,7 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
             ridesArr = new String[ridesList.size()];
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             Log.d(TAG, "ridesList: " + Arrays.deepToString(ridesList.toArray()));
-            for (
-                    String[] i : ridesList)
-
-            {
+            for (String[] i : ridesList) {
                 Log.d(TAG, "String[] i : ridesList: " + Arrays.toString(i));
                 ridesArr[Integer.parseInt(i[0])] = listToTextShape(i);
                 Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
@@ -140,11 +137,10 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
                     File[] dirFiles = getFilesDir().listFiles();
                     Log.d(TAG, "dirFiles: " + Arrays.deepToString(dirFiles));
                     String clicked = (String) listView.getItemAtPosition(position);
-
-                    String prefix = "/data/user/0/app.com.example.android.octeight/files/";
-                    clicked = clicked.split("ID: ")[1].split(" ")[0];
-                    clicked = prefix + clicked;
                     Log.d(TAG, "clicked: " + clicked);
+                    String prefix = Constants.APP_PATH + "files/";
+                    clicked = String.valueOf(clicked.charAt(1));
+                    clicked = prefix + clicked;
                     if (dirFiles.length != 0) {
                         // loops through the array of files, outputting the name to console
                         for (int i = 0; i < dirFiles.length; i++) {
@@ -179,42 +175,8 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
 
             Log.d(TAG, "metaData.csv don't exists");
 
-            //Code für einen Testfall in dem automatisch Daten für das metaData File erstellt werden:
-            /*
-            try {
 
-                metaDataFile = getFileStreamPath("metaData.csv");
-                metaDataFile.createNewFile();
-
-                appendToFile("key, startTime, endTime, annotated"
-                        + System.lineSeparator(), metaDataFile);
-
-                appendToFile("0,1549113603,1549114203,false"
-                        + System.lineSeparator(), metaDataFile);
-
-                appendToFile("1,1549114203,1549114503,false"
-                        + System.lineSeparator(), metaDataFile);
-
-                appendToFile("2,1549373703,1549374003,true"
-                        + System.lineSeparator(), metaDataFile);
-
-                appendToFile("3,1549374003,1549374123,false"
-                        + System.lineSeparator(), metaDataFile);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            */
-
-            Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), (getString(R.string.noHistoryDE)), Snackbar.LENGTH_LONG).setAction("refresh", new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // TODO
-                    // searching for accData and generating / upadting the metaData File
-                    Toast.makeText(getApplicationContext(), getString(R.string.nextPatchDE), Toast.LENGTH_LONG).show();
-
-                }
-            });
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), (getString(R.string.noHistoryDE)), Snackbar.LENGTH_LONG);
             snackbar.show();
 
         }
@@ -234,19 +196,13 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
 
             }
         });
+        fab.hide();
 
-        getSupportActionBar().
-
-                setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Press immediately the button, if HistoryActivity was created automatically after the
         // recording of a route has finished
-        if (
-
-                getIntent().
-
-                        hasExtra("PathToAccGpsFile"))
-
+        if (getIntent().hasExtra("PathToAccGpsFile"))
         {
             // Log.d(TAG, "getIntent.hasExtra(\"PathToAccGpsFile\")");
             /*
@@ -275,7 +231,18 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
     }
 
     private String listToTextShape (String[] item){
+        Log.d(TAG, "listToTextShape item: " + Arrays.toString(item));
         String todo = getString(R.string.newRideInHistoryActivityDE);
+
+        File[] dirFiles = getFilesDir().listFiles();
+        if (dirFiles.length != 0) {
+            for (int i = 0; i < dirFiles.length; i++) {
+                if(dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_2.csv")){
+                    Log.d(TAG, "dirFiles[i].getName().endsWith: " + dirFiles[i].getName());
+                    todo = "";
+                }
+            }
+        }
         if (item[3].equals("2")){
             todo = "";
         }
@@ -348,8 +315,8 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
             }
 
         } else if (id == R.id.nav_setting) {
-            Toast.makeText(getApplicationContext(), getString(R.string.nextPatchDE), Toast.LENGTH_LONG).show();
-
+            Intent intent = new Intent (HistoryActivity.this, SettingsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_infoMCC) {
             Intent intent = new Intent(HistoryActivity.this, WebActivity.class);
             startActivity(intent);

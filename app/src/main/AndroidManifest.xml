@@ -71,6 +71,9 @@
         <activity
             android:name=".WebActivity"
             android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity" />
 
         <service
             android:name=".Constants"
