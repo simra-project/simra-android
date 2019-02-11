@@ -1,16 +1,16 @@
 <resources>
 
     <string name="app_name">SimRa (Beta)</string>
-    <string name="welcome_header">Welcome to SimRa!</string>
-    <string name="welcome_text">Thanks for helping, keeping the street save.</string>
-    <string name="welcome_text2">But keep in mind, its just a Beta App.</string>
-    <string name="welcome_text3">sincerely TTMüller</string>
+    <string name="welcome_headerDE">Willkommen bei SimRa!</string>
+    <string name="welcome_textDE">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
+    <string name="welcome_text2DE">Die App ist noch in der Betaphase. Wir freuen uns auf Euer Feedback.</string>
+    <string name="welcome_text3DE">Mit freundlichen Grüßen,\ndas SimRa-Team.</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">MCC TU Berlin</string>
-    <string name="nav_header_subtitle">simra@mcc.tu-berlin.de</string>
+    <string name="nav_header_subtitle">ask@mcc.tu-berlin.de</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="feedbackReceiver">mb@mcc.tu-berlin.de</string>
+    <string name="feedbackReceiver">ask@mcc.tu-berlin.de</string>
     <string name="demoDataHeader">SimRa Teilnehmerdaten</string>
     <string name="feedbackHeader">SimRa Feedback</string>
     <string name="demoDataMail">Name: \nAlter: \nBeruf: \nFahrradtyp: Bsp. Rennrad\nDurchschnittlich wöchentlich zurückgelegte Kilometeranzahl mit dem Rad: </string>
@@ -29,7 +29,7 @@
     <string name="selectedRideInfoDE">Die folgende Fahrt wurde ausgewählt: </string>
     <string name="errorNoRideSelectedDE">Es wurde keine Fahrt ausgewählt!</string>
     <string name="errorRideTooShortDE">Die Fahrt muss mindestens\n30 Sekunden dauern!</string>
-    <string name="incidentDetectedDE"> Ereignis entdeckt!</string>
+    <string name="incidentDetectedDE"> Ereignis annotieren.</string>
     <string name="noHistoryDE"> Es wurden keine Fahrten gefunden.</string>
     <string name="nextPatchDE"> Diese Funktion wird leider erst mit dem nächsten Patch veröffentlicht.</string>
     <string name="locationSpinnerDE">Ort des Handys während der Fahrt: </string>
@@ -60,8 +60,7 @@
     <string name="newRideInHistoryActivityDE">Neue Fahrt! Bitte bearbeiten.\n</string>
     <string name="startRecordingDE">Aufzeichnung\nstarten</string>
     <string name="endRecordingDE">Aufzeichnung\nbeenden</string>
-
-
+    <string name="nav_main">Start</string>
 
 
 </resources>

@@ -283,7 +283,10 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_history) {
+        if (id == R.id.nav_main) {
+            finish();
+        }
+        else if (id == R.id.nav_history) {
             DrawerLayout drawer = findViewById(R.id.drawer_layout);
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);

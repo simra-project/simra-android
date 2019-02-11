@@ -4,6 +4,9 @@
     tools:showIn="navigation_view" >
 
     <group>
+        <item android:id="@+id/nav_main"
+            android:icon="@drawable/helmet"
+            android:title="@string/nav_main"/>
         <item
             android:id="@+id/nav_history"
             android:icon="@drawable/ic_list_black_24dp"
