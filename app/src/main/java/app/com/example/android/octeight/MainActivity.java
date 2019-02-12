@@ -541,7 +541,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             i.setType("message/rfc822");
             i.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
-            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackMail));
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackMail)+ "\n id: " + getUniqueUserID(this));
             try {
                 startActivity(Intent.createChooser(i, "Send mail..."));
             } catch (android.content.ActivityNotFoundException ex) {
@@ -554,11 +554,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         } else if (id == R.id.nav_infoMCC){
             Intent intent = new Intent (MainActivity.this, WebActivity.class);
             startActivity(intent);
-            /*WebView webview = new WebView(this);
-            setContentView(webview);
-            webview.loadUrl(getString(R.string.mccPageDE));
-            /*Intent intent = new Intent (MainActivity.this, HelmetActivity.class);
-            startActivity(intent);*/
         } else if (id == R.id.nav_infoSimRa){
             Intent intent = new Intent (MainActivity.this, StartActivity.class);
             intent.putExtra("caller", "MainActivity");
@@ -599,22 +594,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         public void onServiceConnected(ComponentName name, IBinder service) {
             RecorderService.MyBinder myBinder = (RecorderService.MyBinder) service;
             mBoundRecorderService = myBinder.getService();
-        }
-    };
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // ServiceConnection for communicating with RecorderService
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private ServiceConnection mUploadServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            UploadService.MyBinder myBinder = (UploadService.MyBinder) service;
-            mBoundUploadService = myBinder.getService();
         }
     };
 }
