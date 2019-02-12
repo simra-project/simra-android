@@ -13,7 +13,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -24,9 +23,8 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.FloatMath;
 import android.util.Log;
+import app.com.example.android.octeight.Utils;
 
 import org.osmdroid.util.GeoPoint;
 
@@ -46,6 +44,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static app.com.example.android.octeight.Utils.appendToFile;
+import static app.com.example.android.octeight.Utils.fileExists;
+
 public class RecorderService extends Service implements SensorEventListener, LocationListener {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,42 +55,69 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     public static final String TAG = "RecorderService_LOG:";
     final int ACC_POLL_FREQUENCY = Constants.ACC_FREQUENCY;
-    private long lastAccUpdate = 0;
-    //private long lastGPSUpdate = 0;
-    private long lastGPSUpdate = 0;
-
+    final int GPS_POLL_FREQUENCY = Constants.GPS_FREQUENCY;
+    public String mAcceleration = "";
     long curTime;
     long startTime;
     long endTime;
-    final int GPS_POLL_FREQUENCY = Constants.GPS_FREQUENCY;
-    private SensorManager sensorManager = null;
-    private PowerManager.WakeLock wakeLock = null;
     ExecutorService executor;
     Sensor accelerometer;
     float[] accelerometerMatrix = new float[3];
-    private IBinder mBinder = new MyBinder();
     String pathToAccGpsFile = "";
+    LocationManager locationManager;
+    Location lastLocation;
+    String recordedAccData = "";
+    String recordedGPSData = "";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Strings for storing data to enable continued use by other activities
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // For Managing the notification shown while the service is running
+    int notificationId = 1337;
+    NotificationManagerCompat notificationManager;
+    Queue<Float> accXQueue;
+    Queue<Float> accYQueue;
+    Queue<Float> accZQueue;
+    SharedPreferences sharedPrefs;
+    SharedPreferences.Editor editor;
+    private long lastAccUpdate = 0;
+    //private long lastGPSUpdate = 0;
+    private long lastGPSUpdate = 0;
+    private SensorManager sensorManager = null;
+    private PowerManager.WakeLock wakeLock = null;
+    private IBinder mBinder = new MyBinder();
     private String accString = "";
     private String gpsString = "";
     private String accGpsString = "";
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // The files which contain accString, gpsString and accGpsString
+    // private File accFile;
+    // private File gpsFile;
     public String getGpsString() {
         return gpsString;
     }
+
     public String getAccString() {
         return accString;
     }
+
     public String getAccGpsString() { return accGpsString; }
+
     public String getPathToAccGpsFile() { return pathToAccGpsFile; }
+
     public double getDuration() { return (curTime - startTime); }
+
     public long getTimeStamp() { return curTime; }
+
     public long getEndTime() { return endTime; }
+    // Queue<Float> accQQueue;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // SharedPrefs (same as in MainActivity) to enable continuously increasing unique
+    // code for each ride => connection between meta file and individual ride files
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     public long getStartTime() { return startTime; }
-    public String mAcceleration = "";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // The ride object which will be created and retrieved by the MainActivity at the end of the
@@ -98,37 +126,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         File accGpsFile = getFileStreamPath(pathToAccGpsFile);
         return new Ride(accGpsFile, String.valueOf(startTime), String.valueOf((curTime - startTime)), 0, this);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // The files which contain accString, gpsString and accGpsString
-    // private File accFile;
-    // private File gpsFile;
-    private File accGpsFile;
-    private File metaDataFile;
-
-    LocationManager locationManager;
-    Location lastLocation;
-    String recordedAccData = "";
-    String recordedGPSData = "";
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // For Managing the notification shown while the service is running
-    int notificationId = 1337;
-    NotificationManagerCompat notificationManager;
-
-    Queue<Float> accXQueue;
-    Queue<Float> accYQueue;
-    Queue<Float> accZQueue;
-    // Queue<Float> accQQueue;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // SharedPrefs (same as in MainActivity) to enable continuously increasing unique
-    // code for each ride => connection between meta file and individual ride files
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    SharedPreferences sharedPrefs;
-
-    SharedPreferences.Editor editor;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // SensorEventListener Methods
@@ -304,64 +301,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         if((curTime - startTime) > Constants.MINIMAL_RIDE_DURATION) {
 
-
-
-            // Create files to write gps and accelerometer data
-            try {
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // COMPLETE DATA FILE (one per ride)
-
-                //accFile = getFileStreamPath("acc"+date + ".csv");
-                //gpsFile = getFileStreamPath("gps"+date + ".csv");
-
-                accGpsFile = getFileStreamPath(pathToAccGpsFile);
-                //accFile.createNewFile();
-                //appendToFile("X,Y,Z,curTime,diffTime,date", accFile);
-                //gpsFile.createNewFile();
-                //appendToFile("lat,lon,time,diff,date", gpsFile);
-                accGpsFile.createNewFile();
-                appendToFile("lat,lon,X,Y,Z,timeStamp"+System.lineSeparator(), accGpsFile);
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // META-FILE (one per user): contains ...
-                // * the information required to display rides in the ride history (DATE,
-                //   DURATION, ANNOTATED YES/NO)
-                // * the RIDE KEY which allows to identify the file containing the complete data for
-                //   a ride. => Use case: user wants to view a ride from history - retrieve data
-                // * one meta file per user, so we only want to create it if it doesn't exist yet.
-                //   (fileExists is a custom method, can be found at the very bottom of this class)
-
-                if(!fileExists("metaData.csv")) {
-
-                    metaDataFile = getFileStreamPath("metaData.csv");
-
-                    metaDataFile.createNewFile();
-
-                    appendToFile("key, startTime, endTime, annotated"
-                            +System.lineSeparator(), metaDataFile);
-
-                } else {
-
-                    metaDataFile = getFileStreamPath("metaData.csv");
-
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            // Create head of the csv-file
+            appendToFile("lat,lon,X,Y,Z,timeStamp"+System.lineSeparator(), pathToAccGpsFile, this);
 
             // Write String data to files
-            try {
-                appendToFile(accGpsString, accGpsFile);
-                appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY",0)) + ","
-                        + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
-                        + "0" + System.lineSeparator(), metaDataFile);
-            } catch (IOException e) {
-                Log.d(TAG, "Error while writing the file: " + e.getMessage());
-                e.printStackTrace();
-            }
-            // Log.d(TAG, "onDestroy() accGpsString successfully written");
+            appendToFile(accGpsString, pathToAccGpsFile, this);
+            appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY",0)) + ","
+                    + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
+                    + "0" + System.lineSeparator(), "metaData.csv", this);
 
             // When the user records a route for the first time, the ride key is 0.
             // For all subsequent rides, the key value increases by one at a time.
@@ -426,11 +373,53 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     }
 
-    private void appendToFile(String str, File file) throws IOException {
-        FileOutputStream writer = openFileOutput(file.getName(), MODE_APPEND);
-        writer.write(str.getBytes());
-        writer.flush();
-        writer.close();
+    private float computeAverage(Collection<Float> myVals) {
+
+        float sum = 0;
+
+        for(float f : myVals) {
+
+            sum += f;
+
+        }
+
+        return sum/myVals.size();
+
+    }
+
+    private NotificationCompat.Builder createNotification() {
+        String CHANNEL_ID = "RecorderServiceNotification";
+        /*
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        */
+        Intent contentIntent = new Intent(this, MainActivity.class);
+        contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, contentIntent, 0);
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_nameDE);
+            String description = getString(R.string.channel_descriptionDE);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.helmet)
+                .setContentTitle("Aufzeichnung der Fahrt")
+                .setContentText("Ihre Fahrt wird aufgezeichnet.")
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                // Set the intent that will fire when the user taps the notification
+                .setContentIntent(pendingIntent);
+
+        return mBuilder;
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -569,64 +558,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         }
     }
 
-    private float computeAverage(Collection<Float> myVals) {
-
-        float sum = 0;
-
-        for(float f : myVals) {
-
-            sum += f;
-
-        }
-
-        return sum/myVals.size();
-
-    }
-
-    private NotificationCompat.Builder createNotification() {
-        String CHANNEL_ID = "RecorderServiceNotification";
-        /*
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        */
-        Intent contentIntent = new Intent(this, MainActivity.class);
-        contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, contentIntent, 0);
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.channel_nameDE);
-            String description = getString(R.string.channel_descriptionDE);
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.helmet)
-                .setContentTitle("Aufzeichnung der Fahrt")
-                .setContentText("Ihre Fahrt wird aufgezeichnet.")
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(pendingIntent);
-
-        return mBuilder;
-
-    }
-
     public class MyBinder extends Binder {
         RecorderService getService() {
             return RecorderService.this;
         }
     }
 
-    public boolean fileExists(String fname){
-        File file = getBaseContext().getFileStreamPath(fname);
-        return file.exists();
-    }
 
 }

@@ -20,6 +20,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static app.com.example.android.octeight.Utils.appendToFile;
+import static app.com.example.android.octeight.Utils.fileExists;
+
 public class IncidentPopUpActivity extends AppCompatActivity {
 
     String[] incidentTypes = new String[4];
@@ -30,19 +33,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
     private static final String TAG = "IncidentPopUpActivity_LOG";
-
-    // File containing incident data (one per user, analogous to meta file)
-
-    private File incidentFile;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // SharedPrefs (same as in MainActivity) to enable continuously increasing unique
-    // code for each ride => connection between incident file and individual ride files
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    SharedPreferences sharedPrefs;
-
-    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,25 +50,21 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         locations = getResources().getStringArray(R.array.locations);
 
 
-        final Spinner incidentTypeSpinner = (Spinner) findViewById(R.id.incidentTypeSpinner);
+        final Spinner incidentTypeSpinner =  findViewById(R.id.incidentTypeSpinner);
 
-        final Spinner locationTypeSpinner = (Spinner) findViewById(R.id.locationSpinner);
+        final Spinner locationTypeSpinner = findViewById(R.id.locationSpinner);
 
-        final EditText incidentDescription = (EditText) findViewById(R.id.EditTextDescriptionBody);
+        final EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
 
         doneButton = findViewById(R.id.save_button);
         backButton = findViewById(R.id.back_button);
 
         if (getIntent().getExtras() != null) {
 
-            String lat = (String) getIntent().getExtras().getSerializable("Incident_latitude");
-
-            String lon = (String) getIntent().getExtras().getSerializable("Incident_longitude");
-
-            String date = (String) getIntent().getExtras().getSerializable("Incident_date");
-
-            String pathToAccDat = (String) getIntent().getExtras().getSerializable("Incident_accDat");
-
+            String lat = getIntent().getStringExtra("Incident_latitude");
+            String lon = getIntent().getStringExtra("Incident_longitude");
+            String date = getIntent().getStringExtra("Incident_timeStamp");
+            String pathToAccDat = getIntent().getStringExtra("Incident_accDat");
             String key = getIntent().getStringExtra("ID");
 
 
@@ -92,7 +78,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 String description = incidentDescription.getText().toString();
 
                 // Instead of writing the String selected items in the spinner,
-                // we use an int tosave disk space and bandwidth
+                // we use an int to save disk space and bandwidth
                 int incidentIndex = 0;
                 for (int i = 0; i < incidentTypes.length; i++) {
                     if (incidentType.equals(incidentTypes[i])) {
@@ -106,33 +92,18 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     }
                 }
 
+                // Write the incident to incidentData.csv
+                appendToFile(key + "," + lat + "," + lon + "," + date + "," + pathToAccDat
+                        + "," + incidentIndex + "," + locationIndex + "," + description
+                        + System.lineSeparator(), "incidentData.csv", this);
 
-                try {
 
-                    incidentFile = getFileStreamPath("incidentData.csv");
-
-                    if (!fileExists("incidentData.csv")) {
-
-                        incidentFile.createNewFile();
-
-                        appendToFile("key,lat,lon,date,path_to_AccFile,incidentType,phoneLocation,description"
-                                + System.lineSeparator(), incidentFile);
-
-                    }
-
-                    appendToFile(key + "," + lat + "," + lon + "," + date + ","
-                            + pathToAccDat + "," + incidentIndex + "," + locationIndex + "," + description
-                            + System.lineSeparator(), incidentFile);
-
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
                 Toast.makeText(this, getString(R.string.editingIncidentCompletedDE), Toast.LENGTH_SHORT).show();
                 finish();
 
             });
 
-
+            // Return to ShowRouteActivity without saving the annotated incidents
             backButton.setOnClickListener((View v) -> {
                 Toast.makeText(this, getString(R.string.editingIncidentAbortedDE), Toast.LENGTH_SHORT).show();
 
@@ -150,17 +121,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
     }
 
-    public boolean fileExists(String fname) {
-        File file = getBaseContext().getFileStreamPath(fname);
-        return file.exists();
-    }
 
-    private void appendToFile(String str, File file) throws IOException {
-        FileOutputStream writer = openFileOutput(file.getName(), MODE_APPEND);
-        writer.write(str.getBytes());
-        //writer.write(System.getProperty("line.separator").getBytes());
-        writer.flush();
-        writer.close();
-    }
 
 }

@@ -3,25 +3,19 @@ package app.com.example.android.octeight;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-
-import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.Date;
 
 import okhttp3.MediaType;
@@ -30,13 +24,15 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static app.com.example.android.octeight.Utils.appendToFile;
+import static app.com.example.android.octeight.Utils.getUniqueUserID;
+import static app.com.example.android.octeight.Utils.lookUpSharedPrefs;
+
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
 
     private final static String TAG = LoggingExceptionActivity.class.getSimpleName()+"_LOG";
     private final Activity context;
     private final Thread.UncaughtExceptionHandler rootHandler;
-    RecorderService mBoundRecorderService;
-    UploadService mBoundUploadService;
     private OkHttpClient client = new OkHttpClient();
 
 
@@ -55,7 +51,6 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
             Log.d(TAG, "called for " + ex.getClass());
             // assume we would write each error in one file ...
 
-            File f = new File(context.getFilesDir(), "CRASH_REPORT" + new Date().toString() + ".txt");
             // log this exception ...
 
             String stackTrace = "";
@@ -79,7 +74,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
                     Build.MODEL + "\n" +
                     Build.PRODUCT;
 
-            FileUtils.writeStringToFile(f, errorReport, null);
+            appendToFile(errorReport, "CRASH_REPORT" + new Date().toString() + ".txt", this);
 
             SharedPreferences sharedPrefs = getApplicationContext()
                     .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
@@ -90,22 +85,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
             editor.commit();
 
             restartApp();
-            // new UpdateTask(this).execute();
 
-            /*
-            //Intent errorIntent = new Intent(LoggingExceptionActivity.this, this.context.getClass());
-            // Intent errorIntent = new Intent();
-
-            Intent errorIntent = new Intent(context, UploadService.class);
-
-            // errorIntent.putExtra("CRASH_REPORT", f.getAbsolutePath());
-            Log.d(TAG, "errorIntent:" + errorIntent.toString());
-            // errorIntent.setAction ("app.com.example.android.octeight.UploadService"); // see step 5.
-            // errorIntent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK);
-            errorIntent.setFlags (Intent.FLAG_FROM_BACKGROUND);
-            context.startService(errorIntent);
-            context.bindService(errorIntent, mUploadServiceConnection, Context.BIND_AUTO_CREATE);
-            */
         } catch (Exception e) {
             Log.e(TAG, "Exception Logger failed!", e);
         }
@@ -121,21 +101,6 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
         System.exit(0);
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // ServiceConnection for communicating with RecorderService
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private ServiceConnection mRecorderServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            RecorderService.MyBinder myBinder = (RecorderService.MyBinder) service;
-            mBoundRecorderService = myBinder.getService();
-        }
-    };
 
     private class UpdateTask extends AsyncTask<String, String, String> {
 
@@ -161,48 +126,19 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
             return null;
         }
 
+        // Upload all files to the backend
         private void uploadAllFilesTestPhase(Context context) throws IOException {
-
-            String id;
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // SharedPrefs (same as in MainActivity) for unique user id (only in test phase).
-            // ID is used as prefix for each file. Server creates a directory for each id.
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            SharedPreferences sharedPrefs = getApplicationContext()
-                    .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
-            SharedPreferences.Editor editor = sharedPrefs.edit();
-
-            if (sharedPrefs.contains("USER-ID")) {
-
-                id = sharedPrefs.getString("USER-ID", "00000000");
-
-            } else {
-
-                id = String.valueOf(System.currentTimeMillis());
-
-                editor.putString("USER-ID", id);
-
-                editor.apply();
-            }
-
-            // makePostTestPhase("metaData.csv", id);
-
-            // makePostTestPhase("incidentData.csv", id);
 
             String path = Constants.APP_PATH + "shared_prefs/simraPrefs.xml";
 
-            makePostTestPhase(path, id);
+            makePostTestPhase(path, getUniqueUserID(context));
 
             File[] dirFiles = getFilesDir().listFiles();
 
             for (int i = 0; i < dirFiles.length; i++) {
-
                 path = dirFiles[i].getName()/*.getPath().replace(prefix, "")*/;
                 Log.d(TAG, "path: " + path);
-                makePostTestPhase(path, id);
+                makePostTestPhase(path, getUniqueUserID(context));
             }
 
 

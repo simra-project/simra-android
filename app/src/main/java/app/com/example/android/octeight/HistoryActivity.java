@@ -39,6 +39,8 @@ import java.util.Date;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import static app.com.example.android.octeight.Utils.fileExists;
+
 public class HistoryActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     // Log tag
@@ -94,9 +96,9 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             }
         });
 
-        listView = (ListView) findViewById(R.id.listView);
+        listView = findViewById(R.id.listView);
 
-        if (fileExists("metaData.csv")) {
+        if (fileExists("metaData.csv", this)) {
 
             metaDataFile = getFileStreamPath("metaData.csv");
             Log.d(TAG, "fileExists: metaData.csv: " + metaDataFile.toString());
@@ -204,30 +206,10 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         // recording of a route has finished
         if (getIntent().hasExtra("PathToAccGpsFile"))
         {
-            // Log.d(TAG, "getIntent.hasExtra(\"PathToAccGpsFile\")");
-            /*
-            fab.performClick();
-            fab.setPressed(true);
-            fab.invalidate();
-            fab.setPressed(false);
-            fab.invalidate();
-            */
+
             startShowRouteWithSelectedRide();
         }
 
-    }
-
-    private void appendToFile(String str, File file) throws IOException {
-        FileOutputStream writer = openFileOutput(file.getName(), MODE_APPEND);
-        writer.write(str.getBytes());
-        //writer.write(System.getProperty("line.separator").getBytes());
-        writer.flush();
-        writer.close();
-    }
-
-    public boolean fileExists(String fname) {
-        File file = getBaseContext().getFileStreamPath(fname);
-        return file.exists();
     }
 
     private String listToTextShape (String[] item){

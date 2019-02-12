@@ -1,31 +1,24 @@
 package app.com.example.android.octeight;
 
-import android.app.Activity;
-import android.content.Context;
+
 import android.location.Address;
-import android.text.LoginFilter;
 import android.text.format.DateUtils;
 import android.util.Log;
 
-import org.mapsforge.map.android.view.MapView;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 public class MarkerFunct {
@@ -34,20 +27,20 @@ public class MarkerFunct {
     // Log tag
     private static final String TAG = "MarkerFunct_LOG";
 
-    ShowRouteActivity mother;
+    private ShowRouteActivity mother;
 
-    ExecutorService pool;
+    private ExecutorService pool;
 
-    List<AccEvent> incidentDat;
+    private List<AccEvent> incidentDat;
 
-    ArrayList<Marker> markers = new ArrayList<>();
+    private ArrayList<Marker> markers = new ArrayList<>();
 
-    GeocoderNominatim geocoderNominatim;
+    private GeocoderNominatim geocoderNominatim;
 
-    final String userAgent = "SimRa/alpha";
+    private final String userAgent = "SimRa/alpha";
 
-    String startTime = "";
-    String timeStamp = "";
+    String startTime;
+    String timeStamp;
 
     boolean custom = false;
 
@@ -80,7 +73,6 @@ public class MarkerFunct {
             Log.d(TAG, "setting Marker at: " + accEvent.position.toString());
             setMarker(accEvent);
         }
-        //try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File("incidentData.csv"))));) {
         try (BufferedReader reader = new BufferedReader(new FileReader(mother.getFileStreamPath("incidentData.csv")));) {
 
 

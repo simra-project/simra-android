@@ -61,20 +61,19 @@ class MyInfoWindow extends InfoWindow {
                     IncidentPopUpActivity.class);
 
             popUpIntent.putExtra("Incident_latitude",
-                    (Serializable) String.valueOf(this.mAccEvent.position.getLatitude()));
+                    String.valueOf(this.mAccEvent.position.getLatitude()));
 
             popUpIntent.putExtra("Incident_longitude",
-                    (Serializable) String.valueOf(this.mAccEvent.position.getLongitude()));
+                    String.valueOf(this.mAccEvent.position.getLongitude()));
 
-            // Log.d(TAG, "this.mAccEvent.date: " + this.mAccEvent.date);
-            popUpIntent.putExtra("Incident_date",
-                    (Serializable) String.valueOf(this.mAccEvent.getTimeStamp()));
+            popUpIntent.putExtra("Incident_timeStamp",
+                    String.valueOf(this.mAccEvent.getTimeStamp()));
 
             //popUpIntent.putExtra("Incident_accDat",
-            //        (Serializable) String.valueOf(this.mAccEvent.sensorData.getAbsolutePath()));
+            //        String.valueOf(this.mAccEvent.sensorData.getAbsolutePath()));
 
             popUpIntent.putExtra("Incident_accDat",
-                    (Serializable) "mockSensorDatForIncident.csv");
+                     "mockSensorDatForIncident.csv");
 
             popUpIntent.putExtra("ID",
                     this.ride.getId());
