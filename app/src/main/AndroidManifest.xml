@@ -60,15 +60,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MenuActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".HelmetActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".SaveActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity
             android:name=".WebActivity"
             android:parentActivityName=".MainActivity" />
         <activity

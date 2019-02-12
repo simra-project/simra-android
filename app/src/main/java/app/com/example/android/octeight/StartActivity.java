@@ -18,6 +18,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import static app.com.example.android.octeight.Utils.appendToFile;
+import static app.com.example.android.octeight.Utils.fileExists;
+
 /**
  * Shows general info about the app and starts the MainActivity once the okay-Button is pressed
  * or TIME_OUT/1000 seconds are passed.
@@ -51,7 +54,7 @@ public class StartActivity extends BaseActivity {
 
         Log.d(TAG, "onCreate() started");
 
-        caller     = getIntent().getStringExtra("caller");
+        caller = getIntent().getStringExtra("caller");
         if (caller == null){
             caller = "NoCaller";
         }
@@ -61,10 +64,10 @@ public class StartActivity extends BaseActivity {
 
         SharedPreferences.Editor editor = sharedPrefs.edit();
 
+        // Look up whether there are unsent crash logs and ask the user for a permission to
+        // send them to the server. If the user gives permission, upload the crash report(s).
         if (sharedPrefs.contains("NEW-UNSENT-ERROR")) {
-            Log.d(TAG, "sharedPrefs.contains(\"NEW-UNSENT-ERROR\"): " + sharedPrefs.contains("NEW-UNSENT-ERROR"));
             boolean newErrorsExist = sharedPrefs.getBoolean("NEW-UNSENT-ERROR", true);
-            Log.d(TAG, "newErrorsExist: " + newErrorsExist);
             if(newErrorsExist){
                 sendErrorPermitted = getDialogValueBack(this);
                 if (sendErrorPermitted) {
@@ -76,13 +79,11 @@ public class StartActivity extends BaseActivity {
             }
 
         } else {
-
             editor.putBoolean("NEW-UNSENT-ERROR", false);
             editor.commit();
         }
 
 
-        // first start, show your dialog | first-run code goes here
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationaleDE), LOCATION_ACCESS_CODE);
 
         if (!(isFirstTime())&&(ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -92,9 +93,30 @@ public class StartActivity extends BaseActivity {
             finish();
         } else {
 
+            // First start, show your dialog | first-run code goes here
+            if (isFirstTime() && !caller.equals("MainActivity")) {
+                if (!fileExists("incidentData.csv", this)) {
 
+                    appendToFile("key,lat,lon,date,path_to_AccFile,incidentType,phoneLocation,description"
+                            + System.lineSeparator(), "incidentData.csv", this);
 
-            if (!caller.equals("MainActivity")) {
+                }
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // META-FILE (one per user): contains ...
+                // * the information required to display rides in the ride history (See RecorderService)
+                //   (DATE,START TIME, END TIME, ANNOTATED TRUE/FALSE)
+                // * the RIDE KEY which allows to identify the file containing the complete data for
+                //   a ride. => Use case: user wants to view a ride from history - retrieve data
+                // * one meta file per user, so we only want to create it if it doesn't exist yet.
+                //   (fileExists and appendToFile can be found in the Utils.java class)
+
+                if(!fileExists("metaData.csv", this)) {
+                    appendToFile("key, startTime, endTime, annotated"
+                            +System.lineSeparator(), "metaData.csv", this);
+
+                }
+
                 // Runnable that starts MainActivity after defined time (TIME_OUT)
                 startActivityRunnable = new Runnable() {
                     @Override

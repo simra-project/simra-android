@@ -36,7 +36,6 @@ public class Constants extends Service {
     public static final String APP_PATH = "/data/user/0/app.com.example.android.octeight/";
 
 
-
     public Constants() {
     }
 

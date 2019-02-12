@@ -1,6 +1,5 @@
 package app.com.example.android.octeight;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.webkit.WebView;
 

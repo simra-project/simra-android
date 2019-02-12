@@ -1,6 +1,5 @@
 package app.com.example.android.octeight;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
 
-import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,26 +31,21 @@ public class UploadService extends Service {
 
     @Override
     public void onCreate() {
-
         Log.d(TAG, "onCreate()");
-
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG, "onBind()");
         return mBinder;
     }
 
     @Override
     public void onRebind(Intent intent) {
-        Log.d(TAG, "onRebind()");
         super.onRebind(intent);
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.v(TAG, "onUnbind()");
         return true;
     }
 

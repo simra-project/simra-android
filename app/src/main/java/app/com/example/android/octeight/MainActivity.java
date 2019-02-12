@@ -46,6 +46,8 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static app.com.example.android.octeight.Utils.getUniqueUserID;
+
 
 public class MainActivity extends BaseActivity implements OnNavigationItemSelectedListener, LocationListener {
 
@@ -523,29 +525,10 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType("message/rfc822");
-            SharedPreferences sharedPrefs = getApplicationContext()
-                    .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
-            SharedPreferences.Editor editor = sharedPrefs.edit();
-            String user_id = "";
-
-
-            if (sharedPrefs.contains("USER-ID")) {
-
-                user_id = sharedPrefs.getString("USER-ID", "00000000");
-
-            } else {
-
-                user_id = String.valueOf(System.currentTimeMillis());
-
-                editor.putString("USER-ID", user_id);
-
-                editor.apply();
-            }
 
             i.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.demoDataHeader));
-            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.demoDataMail)+ "\n id: " + user_id);
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.demoDataMail)+ "\n id: " + getUniqueUserID(this));
             try {
                 startActivity(Intent.createChooser(i, "Send Data..."));
             } catch (android.content.ActivityNotFoundException ex) {
