@@ -46,7 +46,7 @@ class MyInfoWindow extends InfoWindow {
         TextView txtSubdescription = (TextView) mView.findViewById(R.id.bubble_subdescription);
 
         txtTitle.setText(motherActivity.getString(R.string.incidentDetectedDE));
-        long millis = Long.valueOf(this.mAccEvent.getTimeStamp());
+        long millis = this.mAccEvent.getTimeStamp();
         String time = "";
         if (millis > 1337){
             time = DateUtils.formatDateTime(motherActivity, millis, DateUtils.FORMAT_SHOW_TIME);

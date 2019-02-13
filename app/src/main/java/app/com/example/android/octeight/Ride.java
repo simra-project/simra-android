@@ -10,10 +10,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static app.com.example.android.octeight.Utils.appendToFile;
 
 public class Ride {
 
@@ -55,6 +58,17 @@ public class Ride {
         String prefix = "/data/user/0/app.com.example.android.octeight/files/";
         String path = accGpsFile.getPath().replace(prefix, "");
         this.id = path.split("_")[0];
+
+        String pathToAccEventsOfRide = "accEvents#" + id + ".csv";
+        String content = "key,lat,lon,ts,incidentType,phoneLocation,description";
+        content += System.lineSeparator();
+        for (int i = 0; i < events.size(); i++) {
+            AccEvent actualAccEvent = events.get(i);
+            content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + ",,," + System.lineSeparator();
+        }
+
+        appendToFile(content, pathToAccEventsOfRide, context);
+
 
     }
 

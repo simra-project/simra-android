@@ -2,6 +2,7 @@ package app.com.example.android.octeight;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -29,10 +30,11 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     String[] locations = new String[5];
     LinearLayout doneButton;
     LinearLayout backButton;
+    Boolean incidentSaved = false;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
-    private static final String TAG = "IncidentPopUpActivity_LOG";
+    private static final String TAG = "IncidentPopUpAct_LOG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
+        getWindow().getDecorView().setBackgroundColor(Color.TRANSPARENT);
 
         incidentTypes = getResources().getStringArray(R.array.incidenttypelist);
         locations = getResources().getStringArray(R.array.locations);
@@ -97,30 +100,29 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                         + "," + incidentIndex + "," + locationIndex + "," + description
                         + System.lineSeparator(), "incidentData.csv", this);
 
-
-                Toast.makeText(this, getString(R.string.editingIncidentCompletedDE), Toast.LENGTH_SHORT).show();
+                incidentSaved = true;
                 finish();
 
             });
 
             // Return to ShowRouteActivity without saving the annotated incidents
             backButton.setOnClickListener((View v) -> {
-                Toast.makeText(this, getString(R.string.editingIncidentAbortedDE), Toast.LENGTH_SHORT).show();
-
+                incidentSaved = false;
                 finish();
             });
 
-        } else {
-            Log.i("TAG", "getIntent().getExtras() == null");
-            doneButton.setOnClickListener((View v) -> {
-                Toast.makeText(this, getString(R.string.noIntentExtrasDE), Toast.LENGTH_SHORT).show();
-                return;
-            });
         }
-
 
     }
 
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy() called");
+        if(incidentSaved){
+            Toast.makeText(this, getString(R.string.editingIncidentCompletedDE), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, getString(R.string.editingIncidentAbortedDE), Toast.LENGTH_SHORT).show();
+        }
+    }
 }

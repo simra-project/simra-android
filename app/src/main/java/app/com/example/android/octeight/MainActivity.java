@@ -266,6 +266,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             public void onClick(View v) {
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
+                mMapController.setZoom(ZOOM_LEVEL);
                 /*
                 String[] bla = new String[4];
                 bla[5] = "bla";

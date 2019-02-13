@@ -53,9 +53,7 @@ public class MarkerFunct {
         this.incidentDat = mother.ride.getEvents();
 
         pool.execute(new SimpleThreadFactory().newThread(() ->
-
                 geocoderNominatim = new GeocoderNominatim(userAgent)
-
         ));
 
         this.startTime = mother.startTime;
@@ -69,7 +67,7 @@ public class MarkerFunct {
 
     public void showIncidents() {
 
-        for(AccEvent accEvent : mother.ride.getEvents()) {
+        for(AccEvent accEvent : incidentDat) {
             Log.d(TAG, "setting Marker at: " + accEvent.position.toString());
             setMarker(accEvent);
         }

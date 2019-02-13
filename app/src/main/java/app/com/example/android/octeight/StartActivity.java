@@ -97,7 +97,7 @@ public class StartActivity extends BaseActivity {
             if (isFirstTime() && !caller.equals("MainActivity")) {
                 if (!fileExists("incidentData.csv", this)) {
 
-                    appendToFile("key,lat,lon,date,path_to_AccFile,incidentType,phoneLocation,description"
+                    appendToFile("key,lat,lon,ts,path_to_AccFile,incidentType,phoneLocation,description"
                             + System.lineSeparator(), "incidentData.csv", this);
 
                 }
