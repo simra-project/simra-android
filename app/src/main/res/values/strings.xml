@@ -32,7 +32,7 @@
     <string name="incidentDetectedDE"> Ereignis annotieren.</string>
     <string name="noHistoryDE"> Es wurden keine Fahrten gefunden.</string>
     <string name="nextPatchDE"> Diese Funktion wird leider erst mit dem nächsten Patch veröffentlicht.</string>
-    <string name="locationSpinnerDE">Ort des Handys während der Fahrt: </string>
+    <string name="locationSpinnerDE">Ort des Handys während der Fahrt </string>
     <string name="descriptionDE">Was genau ist vorgefallen?</string>
     <string name="notReadyDE">Wollen sie die Bearbeitung unfertig beenden?</string>
     <string name="noIntentExtrasDE">Leider ist ein Fehler aufgetreten, bitte versuchen sie es erneut.</string>

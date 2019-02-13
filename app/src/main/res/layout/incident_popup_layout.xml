@@ -6,16 +6,25 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_gravity="center_horizontal"
-    android:scrollbars="vertical">
+    android:scrollbars="vertical"
+    android:requiresFadingEdge="vertical"
+    android:fadingEdgeLength="80dp"
+    android:background="@drawable/rounded_white"
+    >
+
     <LinearLayout
         android:layout_width="fill_parent"
-        android:orientation="vertical"
-        android:layout_height="fill_parent">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
 
         <!--Put form controls here-->
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
+
         <TextView
             android:id="@+id/ActivityTitle"
             android:layout_width="wrap_content"
@@ -35,51 +44,52 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/incident_typeDE"
-            android:textSize="10pt">
-        </TextView>
+            android:textSize="10pt"></TextView>
 
         <Spinner
             android:id="@+id/incidentTypeSpinner"
-            android:layout_height="wrap_content"
-            android:prompt="@string/incidentType1_DE"
             android:layout_width="fill_parent"
-            android:entries="@array/incidenttypelist">
-        </Spinner>
+            android:layout_height="wrap_content"
+            android:entries="@array/incidenttypelist"
+            android:prompt="@string/incidentType1_DE"></Spinner>
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="10dp" />
+
         <TextView
             android:id="@+id/DropDown2Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/locationSpinnerDE"
-            android:textSize="10pt">
-        </TextView>
+            android:textSize="10pt"></TextView>
 
         <Spinner
             android:id="@+id/locationSpinner"
-            android:layout_height="wrap_content"
-            android:prompt="@string/locationType1_DE"
             android:layout_width="fill_parent"
-            android:entries="@array/locations"/>
+            android:layout_height="wrap_content"
+            android:entries="@array/locations"
+            android:prompt="@string/locationType1_DE" />
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
+
         <TextView
             android:id="@+id/DescriptionTextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/descriptionDE"
-            android:textSize="10pt">
-        </TextView>
+            android:textSize="10pt"></TextView>
+
         <EditText
             android:id="@+id/EditTextDescriptionBody"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:hint="@string/descriptionBodyDE"
             android:inputType="textMultiLine"
-            android:lines="5"
-            android:layout_width="fill_parent">
-        </EditText>
+            android:lines="5"></EditText>
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
@@ -103,19 +113,21 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="2">
+
             <LinearLayout
                 android:id="@+id/back_button"
-                android:orientation="horizontal"
                 android:layout_width="0dp"
                 android:layout_height="70dp"
+                android:layout_marginEnd="5dp"
                 android:layout_weight="1"
-                android:weightSum="7"
-                android:layout_marginRight="5dp"
                 android:background="@drawable/ripple_effect"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:orientation="horizontal"
+                android:weightSum="7">
 
                 <TextView
                     android:layout_width="0dp"
@@ -139,15 +151,15 @@
 
             <LinearLayout
                 android:id="@+id/save_button"
-                android:orientation="horizontal"
                 android:layout_width="0dp"
                 android:layout_height="70dp"
+                android:layout_marginStart="5dp"
                 android:layout_weight="1"
-                android:weightSum="7"
-                android:layout_marginLeft="5dp"
                 android:background="@drawable/ripple_effect"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:orientation="horizontal"
+                android:weightSum="7">
 
                 <TextView
                     android:layout_width="0dp"

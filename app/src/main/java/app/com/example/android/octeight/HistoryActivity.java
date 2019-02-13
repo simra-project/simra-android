@@ -101,9 +101,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         if (fileExists("metaData.csv", this)) {
 
             metaDataFile = getFileStreamPath("metaData.csv");
-            Log.d(TAG, "fileExists: metaData.csv: " + metaDataFile.toString());
             try {
-
                 BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
                 // br.readLine() to skip the first line which contains the headers
                 String line = br.readLine();
@@ -118,12 +116,9 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
             //ridesArr = ridesList.toArray(new String[ridesList.size()]);
             ridesArr = new String[ridesList.size()];
-            Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             Log.d(TAG, "ridesList: " + Arrays.deepToString(ridesList.toArray()));
             for (String[] i : ridesList) {
-                Log.d(TAG, "String[] i : ridesList: " + Arrays.toString(i));
                 ridesArr[Integer.parseInt(i[0])] = listToTextShape(i);
-                Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             }
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
@@ -176,7 +171,6 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         } else {
 
             Log.d(TAG, "metaData.csv don't exists");
-
 
             Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), (getString(R.string.noHistoryDE)), Snackbar.LENGTH_LONG);
             snackbar.show();
