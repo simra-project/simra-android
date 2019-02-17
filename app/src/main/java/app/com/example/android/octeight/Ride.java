@@ -59,7 +59,7 @@ public class Ride {
         String path = accGpsFile.getPath().replace(prefix, "");
         this.id = path.split("_")[0];
 
-        String pathToAccEventsOfRide = "accEvents#" + id + ".csv";
+        String pathToAccEventsOfRide = "accEvents" + id + ".csv";
         String content = "key,lat,lon,ts,incidentType,phoneLocation,description";
         content += System.lineSeparator();
         for (int i = 0; i < events.size(); i++) {

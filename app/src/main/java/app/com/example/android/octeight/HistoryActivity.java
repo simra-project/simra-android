@@ -1,8 +1,16 @@
 package app.com.example.android.octeight;
 
+import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -20,6 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -46,6 +55,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
     // Log tag
     private static final String TAG = "HistoryActivity_LOG";
 
+    boolean exitWhenDone = false;
     String accGpsString = "";
     String pathToAccGpsFile = "";
     String date = "";
@@ -57,6 +67,9 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
     private File metaDataFile;
     ArrayList<String[]> ridesList = new ArrayList<>();
     String[] ridesArr;
+
+    UploadService mBoundUploadService;
+
 
     /**
      * @TODO: When this Activity gets started automatically after the route recording is finished,
@@ -177,22 +190,100 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
         }
 
-
-        // This button will change. Every list item needs its own button (maybe they can
-        // be created dynamically) where ShowRouteActivity gets started with the "Ride" (see Ride
-        // class) the list item represents.
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        Log.d(TAG, "fab" + fab);
-        fab.setOnClickListener(new View.OnClickListener()
-
-        {
-
+        RelativeLayout justUploadButton = findViewById(R.id.justUpload);
+        Log.d(TAG, "justUploadButton" + justUploadButton);
+        justUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                File[] dirFiles = getFilesDir().listFiles();
+                ArrayList<String> ridesToUpload = new ArrayList<>();
+                if (dirFiles.length != 0) {
+                    for (int i = 0; i < dirFiles.length; i++) {
+                        String nameOfFileToBeRenamed = dirFiles[i].getName();
+                        String newNameOfFile = nameOfFileToBeRenamed.replace("_1.csv", "_2.csv");
+                        String path = Constants.APP_PATH + "files/";
+                        Log.d(TAG, "nameOfFileToBeRenamed: " + nameOfFileToBeRenamed + " newNameOfFile: " + newNameOfFile);
+                        if (nameOfFileToBeRenamed.endsWith("_1.csv")) {
+                            Log.d(TAG, "Renaming");
+                            dirFiles[i].renameTo(new File(path + newNameOfFile));
+                            ridesToUpload.add(newNameOfFile);
+                        }
+                    }
+                }
+
+                if (ridesToUpload.size() > 0){
+                    Intent intent = new Intent(HistoryActivity.this, UploadService.class);
+                    intent.putStringArrayListExtra("RidesToUpload", ridesToUpload);
+                    startService(intent);
+                    bindService(intent, mUploadServiceConnection, Context.BIND_AUTO_CREATE);
+
+
+                    ProgressDialog pd;
+
+                    pd = new ProgressDialog(HistoryActivity.this);
+                    pd.setTitle(getString(R.string.progressDialogTitleDE));
+                    pd.setMessage(getString(R.string.progressDialogTextDE));
+                    pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    pd.setCancelable(false);
+                    pd.setIndeterminate(false);
+                    pd.setProgressPercentFormat(null);
+                    pd.setProgressNumberFormat(null);
+                    // Put a cancel button in progress dialog
+                    pd.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.uploadInBackgroundDE), new DialogInterface.OnClickListener() {
+                        // Set a click listener for progress dialog cancel button
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // dismiss the progress dialog
+                            pd.dismiss();
+                        }
+                    });
+                    pd.show();
+
+                    // TODO: this runnable / handler never finishes
+                    final Handler handler = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+
+                            if (mBoundUploadService != null) {
+                                int currentNumberOfTasks = mBoundUploadService.getNumberOfTasks();
+                                pd.setProgress(Math.round(100 - 100 * ((float)currentNumberOfTasks / (float)ridesToUpload.size())));
+                                if (currentNumberOfTasks == 0) {
+                                    unbindService(mUploadServiceConnection);
+                                    pd.dismiss();
+                                    Toast.makeText(HistoryActivity.this, getString(R.string.uploadRidesSuccessfulDE), Toast.LENGTH_SHORT).show();
+                                    handler.removeCallbacks(this);
+                                    if(exitWhenDone){
+                                        finishAndRemoveTask();                                    }
+                                } else {
+                                    handler.postDelayed(this, 1000);
+                                }
+
+                            } else {
+                                handler.postDelayed(this, 1000);
+                            }
+                        }
+                    };
+                    handler.post(runnable);
+
+                } else {
+                    Toast.makeText(HistoryActivity.this, getString(R.string.noFilesToBeUploadedDE), Toast.LENGTH_LONG).show();
+                }
             }
         });
-        fab.hide();
+
+
+        RelativeLayout uploadAndExitButton = findViewById(R.id.uploadAndExit);
+        Log.d(TAG, "uploadAndExitButton" + uploadAndExitButton);
+        uploadAndExitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                exitWhenDone = true;
+                justUploadButton.performClick();
+                HistoryActivity.this.moveTaskToBack(true);
+            }
+        });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -204,6 +295,10 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             startShowRouteWithSelectedRide();
         }
 
+    }
+
+    private void stopTask(Handler handler, Runnable runnable){
+        handler.removeCallbacks(runnable);
     }
 
     private String listToTextShape (String[] item){
@@ -359,4 +454,20 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
 
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ServiceConnection for communicating with RecorderService
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private ServiceConnection mUploadServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected() called");
+            UploadService.MyBinder myBinder = (UploadService.MyBinder) service;
+            mBoundUploadService = myBinder.getService();
+        }
+    };
 }

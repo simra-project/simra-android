@@ -267,10 +267,10 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
                 mMapController.setZoom(ZOOM_LEVEL);
-                /*
+
                 String[] bla = new String[4];
                 bla[5] = "bla";
-
+                /*
                 try {
                     String[] bla = new String[4];
                     bla[5] = "bla";
@@ -304,7 +304,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 // start RecorderService for accelerometer data recording
                 Intent intent = new Intent(MainActivity.this, RecorderService.class);
                 startService(intent);
-                bindService(intent, mRecorderServiceConnection, Context.BIND_AUTO_CREATE);
+                bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
                 //startService(recService);
                 recording = true;
 
