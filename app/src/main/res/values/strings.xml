@@ -21,8 +21,10 @@
     <string name="startButtonText">Aufzeichnung \n starten</string>
     <string name="stopButtonText">Aufzeichnung \n stoppen</string>
     <string name="permissionRequestRationaleDE">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
-    <string name="channel_nameDE">Aufzeichnung</string>
-    <string name="channel_descriptionDE">Fahrt wird aufgezeichnet</string>
+    <string name="recorder_channel_nameDE">Aufzeichnung</string>
+    <string name="upload_channel_nameDE">Hochladen</string>
+    <string name="recorder_channel_descriptionDE">Fahrt wird aufgezeichnet</string>
+    <string name="upload_channel_descriptionDE">Fahrten werden hochgeladen</string>
     <string name="osmCopyrightEN">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
     <string name="osmCopyrightDE">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
     <string name="title_activity_historyDE">Meine Fahrten</string>
@@ -55,12 +57,20 @@
     <string name="editingIncidentCompletedDE">Ereignis wurde gespeichert</string>
     <string name="cancelDE">Abbrechen</string>
     <string name="addIncidentDE">Ereignis\nhinzufügen</string>
-    <string name="uploadIncidentDE">Fahrt\nhochladen</string>
-    <string name="uploadLoadingFilesDE">Die Fahrt wird hochgeladen</string>
+    <string name="uploadAndExitDE">Hochladen &amp;\nApp beenden</string>
+    <string name="saveIncidentDE">Speichern &amp;\nZurück</string>
+    <string name="savedRideDE">Die Fahrt wurde gespeichert</string>
+    <string name="uploadRidesSuccessfulDE">Hochladen erfolgreich!</string>
+    <string name="noFilesToBeUploadedDE">Alle bearbeiteten Fahrten wurden\nbereits hochgeladen.</string>
+    <string name="justUploadDE">Hochladen</string>
+    <string name="progressDialogTitleDE">Hochladen</string>
+    <string name="progressDialogTextDE">Bitte warten. Fahrten werden hochgeladen.</string>
+
     <string name="newRideInHistoryActivityDE">Neue Fahrt! Bitte bearbeiten.\n</string>
     <string name="startRecordingDE">Aufzeichnung\nstarten</string>
     <string name="endRecordingDE">Aufzeichnung\nbeenden</string>
     <string name="nav_main">Start</string>
+    <string name="uploadInBackgroundDE">Im Hintergrund ausführen</string>
 
 
 </resources>

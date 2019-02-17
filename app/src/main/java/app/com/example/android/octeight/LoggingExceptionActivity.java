@@ -31,12 +31,12 @@ import static app.com.example.android.octeight.Utils.lookUpSharedPrefs;
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
 
     private final static String TAG = LoggingExceptionActivity.class.getSimpleName()+"_LOG";
-    private final Activity context;
+    private final Context context;
     private final Thread.UncaughtExceptionHandler rootHandler;
     private OkHttpClient client = new OkHttpClient();
 
 
-    public LoggingExceptionActivity(Activity context) {
+    public LoggingExceptionActivity(Context context) {
         this.attachBaseContext(context);
         this.context = context;
         // we should store the current exception handler -- to invoke it for all not handled exceptions ...

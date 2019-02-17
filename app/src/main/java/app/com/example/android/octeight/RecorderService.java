@@ -24,28 +24,16 @@ import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
-import app.com.example.android.octeight.Utils;
 
-import org.osmdroid.util.GeoPoint;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
-import static app.com.example.android.octeight.Utils.fileExists;
 
 public class RecorderService extends Service implements SensorEventListener, LocationListener {
 
@@ -400,8 +388,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.channel_nameDE);
-            String description = getString(R.string.channel_descriptionDE);
+            CharSequence name = getString(R.string.recorder_channel_nameDE);
+            String description = getString(R.string.recorder_channel_descriptionDE);
             int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
