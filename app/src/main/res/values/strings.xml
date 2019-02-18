@@ -49,8 +49,9 @@
     <string name="locationType2">Lenker</string>
     <string name="locationType3">Jackentasche</string>
     <string name="locationType4">Hand</string>
-    <string name="locationType5">Rucksack</string>
-    <string name="locationType6">Sonstiges (Bitte unten angeben)</string>
+    <string name="locationType5">Satteltasche</string>
+    <string name="locationType6">Rucksack</string>
+    <string name="locationType7">Sonstiges (Bitte unten angeben)</string>
     <string name="doneEditingIncident">Fertig</string>
     <string name="editingIncidentAborted">Ereignis wurde nicht gespeichert</string>
     <string name="editingIncidentCompleted">Ereignis wurde gespeichert</string>

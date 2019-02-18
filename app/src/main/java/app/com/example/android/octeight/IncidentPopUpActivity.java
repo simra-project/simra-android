@@ -34,7 +34,7 @@ import static app.com.example.android.octeight.Utils.overWriteFile;
 public class IncidentPopUpActivity extends AppCompatActivity {
 
     String[] incidentTypes = new String[4];
-    String[] locations = new String[5];
+    String[] locations = new String[6];
     LinearLayout doneButton;
     LinearLayout backButton;
     Boolean incidentSaved = false;
