@@ -266,13 +266,14 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
                 mMapController.setZoom(ZOOM_LEVEL);
-
+                /*
                 String[] bla = new String[4];
                 bla[5] = "bla";
-                /*
+
                 try {
                     String[] bla = new String[4];
                     bla[5] = "bla";
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d(TAG, "e.toString(): " + e.toString());

@@ -135,8 +135,8 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                     String clicked = (String) listView.getItemAtPosition(position);
                     Log.d(TAG, "clicked: " + clicked);
                     String prefix = Constants.APP_PATH + "files/";
-                    clicked = String.valueOf(clicked.charAt(1));
-                    clicked = prefix + clicked;
+                    String key = clicked.replace("#","").split(" ")[0];
+                    clicked = prefix + key;
                     if (dirFiles.length != 0) {
                         // loops through the array of files, outputting the name to console
                         for (int i = 0; i < dirFiles.length; i++) {
@@ -234,7 +234,8 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
                             if (mBoundUploadService != null) {
                                 int currentNumberOfTasks = mBoundUploadService.getNumberOfTasks();
-                                pd.setProgress(Math.round(100 - 100 * ((float)currentNumberOfTasks / (float)ridesToUpload.size())));
+                                pd.setProgress(Math.round(100 - 100 * ((float)currentNumberOfTasks / (float)(ridesToUpload.size()*2))));
+                                Log.d(TAG, ""+currentNumberOfTasks);
                                 if (currentNumberOfTasks == 0) {
                                     unbindService(mUploadServiceConnection);
                                     pd.dismiss();

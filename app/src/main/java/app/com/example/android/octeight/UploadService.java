@@ -195,7 +195,7 @@ public class UploadService extends Service {
             } else {
                 ArrayList<String> ridesToUpload;
                 ridesToUpload = intent.getStringArrayListExtra("RidesToUpload");
-                UploadService.this.setNumberOfTasks(ridesToUpload.size());
+                UploadService.this.setNumberOfTasks((ridesToUpload.size()*2));
                 // For each ride to upload...
                 for (int i = 0; i < ridesToUpload.size(); i++) {
                     // ... find the corresponding ride csv file ...
@@ -204,6 +204,9 @@ public class UploadService extends Service {
                         if(ridesToUpload.get(i).equals(nameOfFile)) {
                             // ... and upload.
                             makePostTestPhase(nameOfFile, id);
+                            String key = ridesToUpload.get(i).split("_")[0];
+                            String accEventName = "accEvents"+key+".csv";
+                            makePostTestPhase(accEventName, id);
                         }
                     }
                 }
