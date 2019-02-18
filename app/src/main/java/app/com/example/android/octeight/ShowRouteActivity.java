@@ -161,7 +161,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         // (2) Custom, not yet annotated
 
-        editCustMarker = getResources().getDrawable(R.drawable.edit_event_black, null);
+        editCustMarker = getResources().getDrawable(R.drawable.edit_event_grun, null);
 
         // (3) Automatically recognized, annotated
 
@@ -169,7 +169,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         // (4) Custom, not yet annotated
 
-        editDoneCust = getResources().getDrawable(R.drawable.event_annotated_black, null);
+        editDoneCust = getResources().getDrawable(R.drawable.event_annotated_grun, null);
 
         // Call function for drawing markers for all AccEvents in ride, now encapsulated in
         // MarkerFunct class for better readability
