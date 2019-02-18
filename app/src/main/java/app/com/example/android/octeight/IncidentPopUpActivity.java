@@ -28,10 +28,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.overWriteFile;
 
 public class IncidentPopUpActivity extends AppCompatActivity {
 
@@ -40,6 +42,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     LinearLayout doneButton;
     LinearLayout backButton;
     Boolean incidentSaved = false;
+    String key;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
@@ -89,7 +92,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             String lon = getIntent().getStringExtra("Incident_longitude");
             String date = getIntent().getStringExtra("Incident_timeStamp");
             String pathToAccDat = getIntent().getStringExtra("Incident_accDat");
-            String key = getIntent().getStringExtra("ID");
+            key = getIntent().getStringExtra("ID");
 
             // onClick-behavior for 'Done inserting description'-button: save incident
             // data to file.
@@ -124,7 +127,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
                 } else {
 
-                    overwriteIncidentFile(key + "," + lat + "," + lon + "," + date + ","
+                    String incidentKey = "";
+                    overwriteIncidentFile(incidentKey,key + "," + lat + "," + lon + "," + date + ","
                             + pathToAccDat + "," + incidentIndex + "," + locationIndex + "," + description);
 
                 }
@@ -214,19 +218,32 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
     }
 
-    public void overwriteIncidentFile(String newAnnotation) {
+    public void overwriteIncidentFile(String incidentKey, String newAnnotation) {
 
-        List<String> fileContent = new ArrayList<>(Files.readAllLines("incidentData.csv",
-                StandardCharsets.UTF_8));
+        String path = "accEvents"+key+".csv";
+        String contentOfNewFile = "";
+        try (BufferedReader reader = new BufferedReader(new FileReader(getFileStreamPath(path)));) {
 
-        for (int i = 0; i < fileContent.size(); i++) {
-            if (fileContent.get(i).equals("old line")) {
-                fileContent.set(i, "new line");
-                break;
+            contentOfNewFile += reader.readLine();
+            contentOfNewFile += System.lineSeparator();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] oldIncident = line.split(",");
+                if(oldIncident[0].equals(incidentKey)){
+                    contentOfNewFile += newAnnotation;
+                    contentOfNewFile += System.lineSeparator();
+                    Log.d(TAG, "overwriting \"" + line + "\" with \"" + contentOfNewFile);
+                } else {
+                    contentOfNewFile += line;
+                    contentOfNewFile += System.lineSeparator();
+                }
+
             }
-        }
 
-        Files.write(FILE_PATH, fileContent, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        overWriteFile(contentOfNewFile,path,this);
 
     }
 
