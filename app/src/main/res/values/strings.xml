@@ -1,6 +1,7 @@
-<resources>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:locale="de">
 
-    <string name="app_name">SimRa (Beta)</string>
     <string name="welcome_header">Willkommen bei SimRa!</string>
     <string name="welcome_text">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
     <string name="welcome_text2">Die App ist noch in der Betaphase. Wir freuen uns auf Euer Feedback.</string>
@@ -11,7 +12,7 @@
     <string name="nav_header_subtitle">ask@mcc.tu-berlin.de</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="feedbackReceiver">ask@mcc.tu-berlin.de</string>
-    <string name="demoDataHeader">SimRa Teilnehmerdaten</string>
+    <string name="demoDataHeader">SimRa User Data</string>
     <string name="feedbackHeader">SimRa Feedback</string>
     <string name="demoDataMail">Name: \nAlter: \nBeruf: \nFahrradtyp: Bsp. Rennrad\nDurchschnittlich wöchentlich zurückgelegte Kilometeranzahl mit dem Rad: </string>
     <string name="feedbackMail"> </string>
@@ -63,12 +64,20 @@
     <string name="justUpload">Hochladen</string>
     <string name="progressDialogTitle">Hochladen</string>
     <string name="progressDialogText">Bitte warten. Fahrten werden hochgeladen.</string>
-
     <string name="newRideInHistoryActivity">Neue Fahrt! Bitte bearbeiten.\n</string>
     <string name="startRecording">Aufzeichnung\nstarten</string>
     <string name="endRecording">Aufzeichnung\nbeenden</string>
     <string name="nav_main">Start</string>
     <string name="uploadInBackground">Im Hintergrund ausführen</string>
+    <string name="app_name">SimRa (Beta)</string>
+    <string name="simra_news">SimRa Aktuelles</string>
+    <string name="mcc_news">MCC Aktuelles</string>
+    <string name="settings">Einstellungen</string>
+    <string name="imprint">Impressum</string>
+    <string name="feedback">Feedback</string>
+    <string name="profile">Profil</string>
+    <string name="history">Verlauf</string>
+    <string name="ride_length">Fahrtdauer</string>
 
 
 </resources>

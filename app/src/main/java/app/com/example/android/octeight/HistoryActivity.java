@@ -314,7 +314,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                 DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NUMERIC_DATE);
 
         String result = "#" + item[0] + " " + todo + " " + startDateOfRide
-                + " Fahrtdauer: " + prettyDuration;
+                + " " +getString(R.string.ride_length)+ " : " + prettyDuration;
 
 
         return result;
