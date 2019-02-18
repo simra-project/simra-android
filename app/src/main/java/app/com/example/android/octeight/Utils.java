@@ -69,10 +69,10 @@ public class Utils {
         // Only checking for empty strings, which means we are retaining
         // events that were labeled as 'nothing happened'
 
-        if((incidentProps[4] == "") && (incidentProps[5] == "") &&
-                (incidentProps[6] == "")) {
+        if((incidentProps[4] != "") || (incidentProps[5] != "") ||
+                (incidentProps[6] != "")) {
 
-            return false;
+            return true;
 
         } else {
 
