@@ -122,20 +122,9 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     }
                 }
 
-                if(previousAnnotation == null) {
+                overwriteIncidentFile(rideID, incidentKey, incidentKey+ "," + lat + "," + lon + "," + date + ","
+                         + incidentIndex + "," + locationIndex + "," + description);
 
-                    // Write the incident to accEvents[rideID].csv
-                    appendToFile(incidentKey + "," + lat + "," + lon + "," + date + "," + pathToAccDat
-                            + "," + incidentIndex + "," + locationIndex + "," + description
-                            + System.lineSeparator(), "incidentData.csv", this);
-
-                } else {
-
-                    String incidentKey = "";
-                    overwriteIncidentFile(rideID, incidentKey, incidentKey+ "," + lat + "," + lon + "," + date + ","
-                            + pathToAccDat + "," + incidentIndex + "," + locationIndex + "," + description);
-
-                }
 
                 incidentSaved = true;
 
