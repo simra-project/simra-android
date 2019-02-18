@@ -32,10 +32,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     LinearLayout backButton;
     Boolean incidentSaved = false;
 
-    Spinner incidentTypeSpinner;
-    Spinner locationTypeSpinner;
-    EditText incidentDescription;
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
     private static final String TAG = "IncidentPopUpAct_LOG";
@@ -57,11 +53,11 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         locations = getResources().getStringArray(R.array.locations);
 
 
-        incidentTypeSpinner =  findViewById(R.id.incidentTypeSpinner);
+        final Spinner incidentTypeSpinner =  findViewById(R.id.incidentTypeSpinner);
 
-        locationTypeSpinner = findViewById(R.id.locationSpinner);
+        final Spinner locationTypeSpinner = findViewById(R.id.locationSpinner);
 
-        incidentDescription = findViewById(R.id.EditTextDescriptionBody);
+        final EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
 
         doneButton = findViewById(R.id.save_button);
         backButton = findViewById(R.id.back_button);
