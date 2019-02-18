@@ -3,9 +3,9 @@
     tools:locale="en">
     <string name="app_name">SimRa (Beta)</string>
     <string name="welcome_header">Welcome to SimRa!</string>
-    <string name="welcome_text">Thank You for supporting the SimRa project.</string>
-    <string name="welcome_text2">The app is still a beta. We are looking forward to Your feedback.</string>
-    <string name="welcome_text3">Yours sincerely, SimRa team</string>
+    <string name="welcome_text">Thank you for supporting the SimRa project.</string>
+    <string name="welcome_text2">The app is still in beta. We are looking forward to your feedback.</string>
+    <string name="welcome_text3">Best, the SimRa team</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">MCC TU Berlin</string>
@@ -35,7 +35,7 @@
     <string name="nextPatch">"This feature will be available in the future."</string>
     <string name="locationSpinner">"Location of the phone during the ride "</string>
     <string name="description">What exactly happened?</string>
-    <string name="notReady">Do you want to leave editing unfinished?</string>
+    <string name="notReady">Do you want to leave the annotation unfinished?</string>
     <string name="noIntentExtras">An error occurred. Please try again later.</string>
     <string name="annotation_title">What happened here?</string>
     <string name="incident_type">Incident Type</string>
@@ -60,12 +60,12 @@
     <string name="saveIncident">Save &amp;\nReturn</string>
     <string name="savedRide">Ride saved</string>
     <string name="uploadRidesSuccessful">Upload successful!</string>
-    <string name="noFilesToBeUploaded">All edited rides were\nalready updated.</string>
+    <string name="noFilesToBeUploaded">All annotated rides were\nalready uploaded.</string>
     <string name="justUpload">Upload</string>
     <string name="progressDialogTitle">Upload</string>
     <string name="progressDialogText">Uploading rides. Please wait.</string>
 
-    <string name="newRideInHistoryActivity">New ride! Please edit.\n</string>
+    <string name="newRideInHistoryActivity">New ride! Please annotate.\n</string>
     <string name="startRecording">Start\nRecording</string>
     <string name="endRecording">End\nRecording</string>
     <string name="nav_main">Start</string>
@@ -78,6 +78,8 @@
     <string name="profile">Profile</string>
     <string name="history">History</string>
     <string name="ride_length">ride duration</string>
+    <string name="sendErrorTitle">Whoops!</string>
+    <string name="sendErrorMessage">Seems like an error occurred during your last session. Would you like to send a report to help us improve the app?</string>
 
 
 </resources>
