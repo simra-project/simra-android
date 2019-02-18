@@ -335,9 +335,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                         // intent.putExtra("PathToAccGpsFile", "7_accGps_1549365838012.csv");
                         // intent.putExtra("PathToAccGpsFile", "59_accGps_23.01.2019 09_19_09_epoch.csv");
 
-
-
-
                         // timestamp in ms from 1970
                         intent.putExtra("Duration", String.valueOf(mBoundRecorderService.getDuration()));
                         intent.putExtra("StartTime", String.valueOf(mBoundRecorderService.getStartTime()));

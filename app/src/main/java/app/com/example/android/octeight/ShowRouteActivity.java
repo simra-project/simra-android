@@ -1,5 +1,7 @@
 package app.com.example.android.octeight;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.widget.ImageButton;
 import android.graphics.drawable.Drawable;
@@ -21,7 +23,11 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,12 +55,10 @@ public class ShowRouteActivity extends BaseActivity {
     // Log tag
     private static final String TAG = "ShowRouteActivity_LOG";
 
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // GEOCODER --> obtain GeoPoint from address
 
     ExecutorService pool;
-
 
     public MapView getmMapView() {
         return mMapView;
@@ -66,11 +70,20 @@ public class ShowRouteActivity extends BaseActivity {
 
     MapEventsOverlay overlayEvents;
 
-    Drawable markerDefault;
+    // Marker-icons for different types/states of events:
+    // Automatically detected/custom; to be annotated/already annotated
 
-    Drawable custMarker;
+    Drawable editMarkerDefault;
+
+    Drawable editCustMarker;
+
+    Drawable editDoneDefault;
+
+    Drawable editDoneCust;
 
     boolean addCustomMarkerMode;
+
+    MarkerFunct myMarkerFunct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,14 +101,12 @@ public class ShowRouteActivity extends BaseActivity {
         copyrightTxt = (TextView) findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
-
         addIncBttn = findViewById(R.id.addIncident);
         addIncBttn.setVisibility(View.VISIBLE);
         exitAddIncBttn = findViewById(R.id.exitAddIncident);
         exitAddIncBttn.setVisibility(View.INVISIBLE);
         uploadButton = findViewById(R.id.uploadIncident);
         uploadButton.setVisibility(View.VISIBLE);
-
 
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
@@ -110,6 +121,7 @@ public class ShowRouteActivity extends BaseActivity {
         File gpsFile = getFileStreamPath(pathToAccGpsFile);
 
         Log.d(TAG, "creating ride objects");
+
         try {
             // Create a ride object with the accelerometer, gps and time data
             ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, this);
@@ -140,13 +152,23 @@ public class ShowRouteActivity extends BaseActivity {
             }
         });
 
-        // Set the icon for marker representation to Osmdroid's default
+        // Set the icons for event markers
 
-        markerDefault = getResources().getDrawable(R.drawable.marker_default, null);
+        // (1) Automatically recognized, not yet annotated
 
-        // A different image for custom markers, for better demonstration
+        editMarkerDefault = getResources().getDrawable(R.drawable.edit_event_bunt, null);
 
-        custMarker = getResources().getDrawable(R.drawable.cust_marker, null);
+        // (2) Custom, not yet annotated
+
+        editCustMarker = getResources().getDrawable(R.drawable.edit_event_black, null);
+
+        // (3) Automatically recognized, annotated
+
+        editDoneDefault = getResources().getDrawable(R.drawable.event_annotated_bunt, null);
+
+        // (4) Custom, not yet annotated
+
+        editDoneCust = getResources().getDrawable(R.drawable.event_annotated_black, null);
 
         // Call function for drawing markers for all AccEvents in ride, now encapsulated in
         // MarkerFunct class for better readability
@@ -157,7 +179,7 @@ public class ShowRouteActivity extends BaseActivity {
         // Create an instance of MarkerFunct-class which provides all functionality related to
         // incident markers
         Log.d(TAG, "creating MarkerFunct object");
-        MarkerFunct myMarkerFunct = new MarkerFunct(this);
+        myMarkerFunct = new MarkerFunct(this);
 
         // Show all the incidents present in our ride object
         Log.d(TAG, "showing all incidents");
@@ -196,16 +218,15 @@ public class ShowRouteActivity extends BaseActivity {
                     myMarkerFunct.addCustMarker(p);
                     exitAddIncBttn.performClick();
                     return true;
+
                 }
                 return false;
             }
         };
 
-
         overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
         mMapView.getOverlays().add(overlayEvents);
         mMapView.invalidate();
-
 
         Log.d(TAG, "setting up clickListeners");
         // Functionality for 'edit mode', i.e. the mode in which users can put their own incidents
@@ -259,6 +280,77 @@ public class ShowRouteActivity extends BaseActivity {
 
         Log.d(TAG, "onCreate() finished");
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+
+            if (resultCode == Activity.RESULT_OK) {
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // Load existing accEvent-File
+
+                //String id = this.ride.getId();
+
+                //String pathToAccEventsOfRide = "accEvents#" + id + ".csv";
+
+               /** String pathToIncidents = "incidentData.csv";
+
+                if (new File(pathToIncidents).exists()) {
+
+                    BufferedReader reader = null;
+
+                    try {
+
+                        reader = new BufferedReader(new FileReader(pathToIncidents));
+
+                    } catch (FileNotFoundException fnfe) {
+
+                        Log.i("LOAD ACC EVENTS FILE", "AccEvents file not found");
+
+                    }
+                    try {
+
+                        reader.readLine(); // this will read the first line
+
+                        String line = null;
+
+                        while ((line = reader.readLine()) != null) { //loop will run from 2nd line
+
+                            String[] incidentProps = line.split(",");
+
+                            boolean annotated = checkForAnnotation(incidentProps);
+
+                            myMarkerFunct.setMarker(new AccEvent(Integer.valueOf(incidentProps[0]),
+                                    Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
+                                    Long.parseLong(incidentProps[3]),
+                                    annotated));
+
+                        }
+
+
+                    } catch (IOException ioe) {
+
+                        Log.i("READ ACC EVENTS FILE", "Problems reading AccEvents file");
+
+                    }
+
+                }*/
+
+               String result = data.getStringExtra("result");
+
+                String[] incidentProps = result.split(",");
+
+                boolean annotated = checkForAnnotation(incidentProps);
+
+                myMarkerFunct.setMarker(new AccEvent(Integer.valueOf(incidentProps[0]),
+                        Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
+                        Long.parseLong(incidentProps[3]),
+                        annotated));
+            }
+        }
     }
 
     @Override
@@ -329,6 +421,22 @@ public class ShowRouteActivity extends BaseActivity {
         if(mMapView.getMaxZoomLevel() > 19.0){
             mMapView.setMaxZoomLevel(19.0);
         }
+    }
+
+    // Check if an accEvent has already been annotated based on one line of the accEvents csv file.
+
+    public boolean checkForAnnotation(String[] incidentProps) {
+
+        if((incidentProps[4] != "" && incidentProps[4] != "0") || (incidentProps[6] != "")) {
+
+            return true;
+
+        } else {
+
+            return false;
+
+        }
+
     }
 
 }

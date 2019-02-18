@@ -25,15 +25,19 @@ class MyInfoWindow extends InfoWindow {
 
     private String addressForLoc;
 
-    private Ride ride;
+    private String rideID;
+
+    private int key;
 
     public MyInfoWindow(int layoutResId, MapView mapView, AccEvent mAccEvent,
-                        String addressForLoc, Activity motherActivity, Ride ride) {
+                        String addressForLoc, Activity motherActivity, String rideID,
+                        int key) {
         super(layoutResId, mapView);
         this.mAccEvent = mAccEvent;
         this.addressForLoc = addressForLoc;
         this.motherActivity = motherActivity;
-        this.ride = ride;
+        this.rideID = rideID;
+        this.key = key;
     }
     public void onClose() {
     }
@@ -76,11 +80,11 @@ class MyInfoWindow extends InfoWindow {
                      "mockSensorDatForIncident.csv");
 
             popUpIntent.putExtra("ID",
-                    this.ride.getId());
+                    this.rideID);
 
+            popUpIntent.putExtra("Key", this.key);
 
-
-            motherActivity.startActivity(popUpIntent);
+            motherActivity.startActivityForResult(popUpIntent, 1);
 
         });
     }

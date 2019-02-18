@@ -42,8 +42,6 @@ public class MarkerFunct {
     String startTime;
     String timeStamp;
 
-    boolean custom = false;
-
     public MarkerFunct(ShowRouteActivity mother) {
 
         this.mother = mother;
@@ -69,10 +67,10 @@ public class MarkerFunct {
 
         for(AccEvent accEvent : incidentDat) {
             Log.d(TAG, "setting Marker at: " + accEvent.position.toString());
+
             setMarker(accEvent);
         }
         try (BufferedReader reader = new BufferedReader(new FileReader(mother.getFileStreamPath("incidentData.csv")));) {
-
 
 
         reader.readLine();
@@ -101,8 +99,6 @@ public class MarkerFunct {
     }
 
     public void addCustMarker(GeoPoint p) {
-
-        custom = true;
 
         GeoPoint closestOnRoute;
 
@@ -150,10 +146,6 @@ public class MarkerFunct {
 
         mother.getmMapView().invalidate();
 
-        custom = false;
-
-        //showIncidents();
-
     }
 
     public void setMarker(AccEvent event) {
@@ -164,16 +156,37 @@ public class MarkerFunct {
 
         incidentMarker.setPosition(currentLocHelper);
 
-        // Different marker icons for automatically detected & custom incidents, for testing/
-        // demonstration purposes
+        /** Different marker icons for ....
+         * A) annotated y/n
+         * B) default/custom
+         */
 
-        if (! custom) {
+        if (! event.annotated) {
 
-            incidentMarker.setIcon(mother.markerDefault);
+            // custom events can be detected via their timeStamp
+
+            if (! (event.timeStamp == 1337)) {
+
+                incidentMarker.setIcon(mother.editMarkerDefault);
+
+            } else {
+
+                incidentMarker.setIcon(mother.editCustMarker);
+            }
 
         } else {
 
-            incidentMarker.setIcon(mother.custMarker);
+            // custom events can be detected via their timeStamp
+
+            if (! (event.timeStamp == 1337)) {
+
+                incidentMarker.setIcon(mother.editDoneDefault);
+
+            } else {
+
+                incidentMarker.setIcon(mother.editDoneCust);
+            }
+
         }
 
         String addressForLoc = "";
@@ -192,12 +205,10 @@ public class MarkerFunct {
         Log.d(TAG, "setting up InfoWindow with address: " + addressForLoc);
         InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble,
                 mother.getmMapView(),
-                event, addressForLoc, mother, mother.ride);
+                event, addressForLoc, mother, mother.ride.getId(), event.key);
         incidentMarker.setInfoWindow(infoWindow);
 
         //incidentMarker.setSnippet("Vorfall " + i);
-
-
 
         markers.add(incidentMarker);
 
