@@ -22,6 +22,17 @@ public class Utils {
         }
     }
 
+    public static void overWriteFile(String content, String fileName,  Context context) {
+        try {
+            FileOutputStream writer = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+            writer.write(content.getBytes());
+            writer.flush();
+            writer.close();
+        } catch (IOException ioe){
+            ioe.printStackTrace();
+        }
+    }
+
     public static boolean fileExists(String fileName, Context context) {
         return context.getFileStreamPath(fileName).exists();
     }
