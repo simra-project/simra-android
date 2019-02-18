@@ -1,15 +1,19 @@
 package app.com.example.android.octeight;
 
+import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
+import android.os.Handler;
+import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -17,26 +21,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import static app.com.example.android.octeight.Utils.fileExists;
@@ -46,6 +41,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
     // Log tag
     private static final String TAG = "HistoryActivity_LOG";
 
+    boolean exitWhenDone = false;
     String accGpsString = "";
     String pathToAccGpsFile = "";
     String date = "";
@@ -57,6 +53,9 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
     private File metaDataFile;
     ArrayList<String[]> ridesList = new ArrayList<>();
     String[] ridesArr;
+
+    UploadService mBoundUploadService;
+
 
     /**
      * @TODO: When this Activity gets started automatically after the route recording is finished,
@@ -172,27 +171,105 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
             Log.d(TAG, "metaData.csv don't exists");
 
-            Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), (getString(R.string.noHistoryDE)), Snackbar.LENGTH_LONG);
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), (getString(R.string.noHistory)), Snackbar.LENGTH_LONG);
             snackbar.show();
 
         }
 
-
-        // This button will change. Every list item needs its own button (maybe they can
-        // be created dynamically) where ShowRouteActivity gets started with the "Ride" (see Ride
-        // class) the list item represents.
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        Log.d(TAG, "fab" + fab);
-        fab.setOnClickListener(new View.OnClickListener()
-
-        {
-
+        RelativeLayout justUploadButton = findViewById(R.id.justUpload);
+        Log.d(TAG, "justUploadButton" + justUploadButton);
+        justUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                File[] dirFiles = getFilesDir().listFiles();
+                ArrayList<String> ridesToUpload = new ArrayList<>();
+                if (dirFiles.length != 0) {
+                    for (int i = 0; i < dirFiles.length; i++) {
+                        String nameOfFileToBeRenamed = dirFiles[i].getName();
+                        String newNameOfFile = nameOfFileToBeRenamed.replace("_1.csv", "_2.csv");
+                        String path = Constants.APP_PATH + "files/";
+                        Log.d(TAG, "nameOfFileToBeRenamed: " + nameOfFileToBeRenamed + " newNameOfFile: " + newNameOfFile);
+                        if (nameOfFileToBeRenamed.endsWith("_1.csv")) {
+                            Log.d(TAG, "Renaming");
+                            dirFiles[i].renameTo(new File(path + newNameOfFile));
+                            ridesToUpload.add(newNameOfFile);
+                        }
+                    }
+                }
+
+                if (ridesToUpload.size() > 0){
+                    Intent intent = new Intent(HistoryActivity.this, UploadService.class);
+                    intent.putStringArrayListExtra("RidesToUpload", ridesToUpload);
+                    startService(intent);
+                    bindService(intent, mUploadServiceConnection, Context.BIND_AUTO_CREATE);
+
+
+                    ProgressDialog pd;
+
+                    pd = new ProgressDialog(HistoryActivity.this);
+                    pd.setTitle(getString(R.string.progressDialogTitle));
+                    pd.setMessage(getString(R.string.progressDialogText));
+                    pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    pd.setCancelable(false);
+                    pd.setIndeterminate(false);
+                    pd.setProgressPercentFormat(null);
+                    pd.setProgressNumberFormat(null);
+                    // Put a cancel button in progress dialog
+                    pd.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.uploadInBackground), new DialogInterface.OnClickListener() {
+                        // Set a click listener for progress dialog cancel button
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // dismiss the progress dialog
+                            pd.dismiss();
+                        }
+                    });
+                    pd.show();
+
+                    // TODO: this runnable / handler never finishes
+                    final Handler handler = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+
+                            if (mBoundUploadService != null) {
+                                int currentNumberOfTasks = mBoundUploadService.getNumberOfTasks();
+                                pd.setProgress(Math.round(100 - 100 * ((float)currentNumberOfTasks / (float)ridesToUpload.size())));
+                                if (currentNumberOfTasks == 0) {
+                                    unbindService(mUploadServiceConnection);
+                                    pd.dismiss();
+                                    Toast.makeText(HistoryActivity.this, getString(R.string.uploadRidesSuccessful), Toast.LENGTH_SHORT).show();
+                                    handler.removeCallbacks(this);
+                                    if(exitWhenDone){
+                                        finishAndRemoveTask();                                    }
+                                } else {
+                                    handler.postDelayed(this, 1000);
+                                }
+
+                            } else {
+                                handler.postDelayed(this, 1000);
+                            }
+                        }
+                    };
+                    handler.post(runnable);
+
+                } else {
+                    Toast.makeText(HistoryActivity.this, getString(R.string.noFilesToBeUploaded), Toast.LENGTH_LONG).show();
+                }
             }
         });
-        fab.hide();
+
+
+        RelativeLayout uploadAndExitButton = findViewById(R.id.uploadAndExit);
+        Log.d(TAG, "uploadAndExitButton" + uploadAndExitButton);
+        uploadAndExitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                exitWhenDone = true;
+                justUploadButton.performClick();
+                HistoryActivity.this.moveTaskToBack(true);
+            }
+        });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -206,9 +283,13 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
     }
 
+    private void stopTask(Handler handler, Runnable runnable){
+        handler.removeCallbacks(runnable);
+    }
+
     private String listToTextShape (String[] item){
         Log.d(TAG, "listToTextShape item: " + Arrays.toString(item));
-        String todo = getString(R.string.newRideInHistoryActivityDE);
+        String todo = getString(R.string.newRideInHistoryActivity);
 
         File[] dirFiles = getFilesDir().listFiles();
         if (dirFiles.length != 0) {
@@ -233,7 +314,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                 DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NUMERIC_DATE);
 
         String result = "#" + item[0] + " " + todo + " " + startDateOfRide
-                + " Fahrtdauer: " + prettyDuration;
+                + " " +getString(R.string.ride_length)+ " : " + prettyDuration;
 
 
         return result;
@@ -343,7 +424,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         // Checks whether a ride was selected or not. Maybe it will be possible to select
         // multiple rides and push a button to send them all to the server to be analyzed
         if(accGpsString != null && startTime != "") {
-            // Snackbar.make(view, getString(R.string.selectedRideInfoDE) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
+            // Snackbar.make(view, getString(R.string.selectedRideInfo) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
             //     .setAction("Action", null).show();
             // Start ShowRouteActivity with the selected Ride.
             Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
@@ -353,10 +434,26 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             intent.putExtra("State", state);
             startActivity(intent);
         } else {
-            //Snackbar.make(view, getString(R.string.errorNoRideSelectedDE) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
+            //Snackbar.make(view, getString(R.string.errorNoRideSelected) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
             //      .setAction("Action", null).show();
         }
 
 
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ServiceConnection for communicating with RecorderService
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private ServiceConnection mUploadServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected() called");
+            UploadService.MyBinder myBinder = (UploadService.MyBinder) service;
+            mBoundUploadService = myBinder.getService();
+        }
+    };
 }

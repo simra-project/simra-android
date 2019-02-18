@@ -12,7 +12,6 @@ import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -84,7 +83,7 @@ public class StartActivity extends BaseActivity {
         }
 
 
-        permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationaleDE), LOCATION_ACCESS_CODE);
+        permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
 
         if (!(isFirstTime())&&(ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED)&&(!caller.equals("MainActivity"))){
@@ -258,8 +257,8 @@ public class StartActivity extends BaseActivity {
             };
 
             AlertDialog.Builder alert = new AlertDialog.Builder(context);
-            alert.setTitle("Ups!");
-            alert.setMessage("Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?");
+            alert.setTitle(getString(R.string.sendErrorTitle));
+            alert.setMessage(getString(R.string.sendErrorMessage));
             alert.setPositiveButton("Ja", new DialogInterface.OnClickListener()
             {
                 public void onClick(DialogInterface dialog, int id)

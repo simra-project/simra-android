@@ -1,0 +1,85 @@
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:locale="en">
+    <string name="app_name">SimRa (Beta)</string>
+    <string name="welcome_header">Welcome to SimRa!</string>
+    <string name="welcome_text">Thank you for supporting the SimRa project.</string>
+    <string name="welcome_text2">The app is still in beta. We are looking forward to your feedback.</string>
+    <string name="welcome_text3">Best, the SimRa team</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">MCC TU Berlin</string>
+    <string name="nav_header_subtitle">ask@mcc.tu-berlin.de</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="feedbackReceiver">ask@mcc.tu-berlin.de</string>
+    <string name="demoDataHeader">SimRa user data</string>
+    <string name="feedbackHeader">SimRa Feedback</string>
+    <string name="demoDataMail">Name: \nAge: \nJob: \nBike type: e.g. mountain bike\nAverage ride distance: </string>
+    <string name="feedbackMail"> </string>
+    <string name="permissionFineLocation">In order to continue, please allow SimRa to access your location.</string>
+    <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
+    <string name="startButtonText">Start \n Recording</string>
+    <string name="stopButtonText">End \n Recording</string>
+    <string name="permissionRequestRationale">This app needs permission to access your location data in order to show you your location on the map and to record your rides.</string>
+    <string name="recorder_channel_name">Recording</string>
+    <string name="upload_channel_name">Uploading</string>
+    <string name="recorder_channel_description">Recording ride</string>
+    <string name="upload_channel_description">Uploading rides</string>
+    <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
+    <string name="title_activity_history">My Rides</string>
+    <string name="selectedRideInfo">The following ride has been chosen:</string>
+    <string name="errorNoRideSelected">No ride has been chosen!</string>
+    <string name="errorRideTooShort">The rides must be at\nleast 30 seconds long!</string>
+    <string name="incidentDetected">"annotate incident."</string>
+    <string name="noHistory">"No rides found."</string>
+    <string name="nextPatch">"This feature will be available in the future."</string>
+    <string name="locationSpinner">"Location of the phone during the ride "</string>
+    <string name="description">What exactly happened?</string>
+    <string name="notReady">Do you want to leave the annotation unfinished?</string>
+    <string name="noIntentExtras">An error occurred. Please try again later.</string>
+    <string name="annotation_title">What happened here?</string>
+    <string name="incident_type">Incident Type</string>
+    <string name="descriptionBody">Describe here what happened</string>
+    <string name="incidentType1">Nothing</string>
+    <string name="incidentType2">Dooring</string>
+    <string name="incidentType3">Path obstructed (e.g. a dog)</string>
+    <string name="incidentType4">Right/Left hook by car</string>
+    <string name="incidentType5">Other (Please specify below)</string>
+    <string name="locationType1">Pocket</string>
+    <string name="locationType2">Handlebar</string>
+    <string name="locationType3">Jacket pocket</string>
+    <string name="locationType4">Hand</string>
+    <string name="locationType5">Backpack</string>
+    <string name="locationType6">Other (Please specify below)</string>
+    <string name="doneEditingIncident">Done</string>
+    <string name="editingIncidentAborted">Incident description not saved</string>
+    <string name="editingIncidentCompleted">Incident description saved</string>
+    <string name="cancel">Cancel</string>
+    <string name="addIncident">Add\nIncident</string>
+    <string name="uploadAndExit">Upload &amp;\nexit app</string>
+    <string name="saveIncident">Save &amp;\nReturn</string>
+    <string name="savedRide">Ride saved</string>
+    <string name="uploadRidesSuccessful">Upload successful!</string>
+    <string name="noFilesToBeUploaded">All annotated rides were\nalready uploaded.</string>
+    <string name="justUpload">Upload</string>
+    <string name="progressDialogTitle">Upload</string>
+    <string name="progressDialogText">Uploading rides. Please wait.</string>
+
+    <string name="newRideInHistoryActivity">New ride! Please annotate.\n</string>
+    <string name="startRecording">Start\nRecording</string>
+    <string name="endRecording">End\nRecording</string>
+    <string name="nav_main">Start</string>
+    <string name="uploadInBackground">Run in background</string>
+    <string name="simra_news">SimRa News</string>
+    <string name="mcc_news">MCC News</string>
+    <string name="settings">Settings</string>
+    <string name="imprint">Imprint</string>
+    <string name="feedback">Feedback</string>
+    <string name="profile">Profile</string>
+    <string name="history">History</string>
+    <string name="ride_length">ride duration</string>
+    <string name="sendErrorTitle">Whoops!</string>
+    <string name="sendErrorMessage">Seems like an error occurred during your last session. Would you like to send a report to help us improve the app?</string>
+
+
+</resources>

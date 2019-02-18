@@ -75,7 +75,7 @@
             android:layout_marginRight="30dp"
 
             android:fontFamily="@font/assistant_extralight"
-            android:text="@string/startRecordingDE"
+            android:text="@string/startRecording"
             android:textColor="#FEFEFE"
             android:textSize="24dp"
             android:textStyle="bold" />
@@ -107,7 +107,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginRight="30dp"
             android:fontFamily="@font/assistant_extralight"
-            android:text="@string/endRecordingDE"
+            android:text="@string/endRecording"
             android:textColor="#FEFEFE"
             android:textSize="24dp"
             android:textStyle="bold"
@@ -115,7 +115,7 @@
     </RelativeLayout>
 
     <TextView android:id="@+id/copyright_text"
-        android:text="@string/osmCopyrightDE"
+        android:text="@string/osmCopyright"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="10dp"

@@ -46,7 +46,7 @@ public class ShowRouteActivity extends BaseActivity {
     private TextView copyrightTxt;
     private RelativeLayout addIncBttn;
     private RelativeLayout exitAddIncBttn;
-    private RelativeLayout uploadButton;
+    private RelativeLayout saveButton;
 
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Our ride
@@ -106,8 +106,8 @@ public class ShowRouteActivity extends BaseActivity {
         addIncBttn.setVisibility(View.VISIBLE);
         exitAddIncBttn = findViewById(R.id.exitAddIncident);
         exitAddIncBttn.setVisibility(View.INVISIBLE);
-        uploadButton = findViewById(R.id.uploadIncident);
-        uploadButton.setVisibility(View.VISIBLE);
+        saveButton = findViewById(R.id.saveIncident);
+        saveButton.setVisibility(View.VISIBLE);
 
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
@@ -254,26 +254,27 @@ public class ShowRouteActivity extends BaseActivity {
 
         });
 
-        uploadButton.setOnClickListener((View v) -> {
+        saveButton.setOnClickListener((View v) -> {
 
             File[] dirFiles = getFilesDir().listFiles();
             if (dirFiles.length != 0) {
                 for (int i = 0; i < dirFiles.length; i++) {
                     String nameOfFileToBeRenamed = dirFiles[i].getName();
-                    String newNameOfFile = nameOfFileToBeRenamed.replace(".csv","_2.csv");
+                    String newNameOfFile = nameOfFileToBeRenamed.replace(".csv","_1.csv");
                     String path = Constants.APP_PATH + "files/";
                     Log.d(TAG, "nameOfFileToBeRenamed: " + nameOfFileToBeRenamed + " newNameOfFile: " + newNameOfFile);
-                    if (nameOfFileToBeRenamed.startsWith(ride.getId()+"_") && !nameOfFileToBeRenamed.endsWith("_2.csv")) {
+                    if (nameOfFileToBeRenamed.startsWith(ride.getId()+"_") && !nameOfFileToBeRenamed.endsWith("_1.csv")) {
                         Log.d(TAG, "Renaming");
                         dirFiles[i].renameTo(new File(path+newNameOfFile));
                     }
                 }
             }
-
+            /*
             Intent intent = new Intent(this, UploadService.class);
             intent.putExtra("Ride_Key", ride.getId());
             startService(intent);
-            Toast.makeText(this, getString(R.string.uploadLoadingFilesDE), Toast.LENGTH_SHORT).show();
+            */
+            Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
             finish();
             // mMapView.getOverlays().remove(overlayEvents);
 
