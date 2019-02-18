@@ -18,7 +18,6 @@ import android.support.design.widget.NavigationView.OnNavigationItemSelectedList
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.text.method.LinkMovementMethod;
@@ -268,7 +267,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 mLocationOverlay.enableFollowLocation();
                 mMapController.setZoom(ZOOM_LEVEL);
 
-                String[] bla = new String[4];
+                /*String[] bla = new String[4];
                 bla[5] = "bla";
                 /*
                 try {
@@ -522,9 +521,10 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         else if (id == R.id.nav_history) {
             Intent intent = new Intent (MainActivity.this, HistoryActivity.class);
             startActivity(intent);            // Handle the camera action
-        } else if (id == R.id.nav_democraphic_data) {
-            // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
-            Intent i = new Intent(Intent.ACTION_SEND);
+        } else if (id == R.id.nav_demographics) {
+            Intent intent = new Intent(MainActivity.this, DemographicActivity.class);
+            startActivity(intent);
+            /*Intent i = new Intent(Intent.ACTION_SEND);
             i.setType("message/rfc822");
 
             i.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.feedbackReceiver)});
@@ -534,7 +534,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 startActivity(Intent.createChooser(i, "Send Data..."));
             } catch (android.content.ActivityNotFoundException ex) {
                 Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-            }
+            }*/
 
         } else if (id == R.id.nav_feedback) {
             // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
@@ -550,7 +550,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             }
 
         } else if (id == R.id.nav_setting) {
-            Intent intent = new Intent (MainActivity.this, SettingsActivity.class);
+            Intent intent = new Intent (MainActivity.this, MarkActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_infoMCC){
             Intent intent = new Intent (MainActivity.this, WebActivity.class);
