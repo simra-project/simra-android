@@ -2,6 +2,7 @@ package app.com.example.android.octeight;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -68,8 +69,8 @@ public class Utils {
         // Only checking for empty strings, which means we are retaining
         // events that were labeled as 'nothing happened'
 
-        if((incidentProps[4] == "") && (incidentProps[5] != "") &&
-                (incidentProps[6] != "")) {
+        if((incidentProps[4] == "") && (incidentProps[5] == "") &&
+                (incidentProps[6] == "")) {
 
             return false;
 

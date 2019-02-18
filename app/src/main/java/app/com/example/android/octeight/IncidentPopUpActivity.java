@@ -42,7 +42,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     LinearLayout doneButton;
     LinearLayout backButton;
     Boolean incidentSaved = false;
-    String key;
+    String rideID;
+    String incidentKey;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
@@ -64,8 +65,12 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         incidentTypes = getResources().getStringArray(R.array.incidenttypelist);
         locations = getResources().getStringArray(R.array.locations);
 
+        rideID = getIntent().getStringExtra("Ride_ID");
+
+        incidentKey = getIntent().getStringExtra("Incident_Key");
+
         String[] previousAnnotation = loadPreviousAnnotation
-                (getIntent().getIntExtra("Key",999));
+                (rideID, incidentKey);
 
         final Spinner incidentTypeSpinner =  findViewById(R.id.incidentTypeSpinner);
 
@@ -75,11 +80,11 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         if (previousAnnotation != null) {
 
-            incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[5]));
+            incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[4]));
 
-            locationTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[6]));
+            locationTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[5]));
 
-            incidentDescription.setText(previousAnnotation[7]);
+            incidentDescription.setText(previousAnnotation[6]);
 
         }
 
@@ -92,7 +97,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             String lon = getIntent().getStringExtra("Incident_longitude");
             String date = getIntent().getStringExtra("Incident_timeStamp");
             String pathToAccDat = getIntent().getStringExtra("Incident_accDat");
-            key = getIntent().getStringExtra("ID");
 
             // onClick-behavior for 'Done inserting description'-button: save incident
             // data to file.
@@ -120,22 +124,22 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
                 if(previousAnnotation == null) {
 
-                    // Write the incident to incidentData.csv
-                    appendToFile(key + "," + lat + "," + lon + "," + date + "," + pathToAccDat
+                    // Write the incident to accEvents[rideID].csv
+                    appendToFile(incidentKey + "," + lat + "," + lon + "," + date + "," + pathToAccDat
                             + "," + incidentIndex + "," + locationIndex + "," + description
                             + System.lineSeparator(), "incidentData.csv", this);
 
                 } else {
 
                     String incidentKey = "";
-                    overwriteIncidentFile(incidentKey,key + "," + lat + "," + lon + "," + date + ","
+                    overwriteIncidentFile(rideID, incidentKey, incidentKey+ "," + lat + "," + lon + "," + date + ","
                             + pathToAccDat + "," + incidentIndex + "," + locationIndex + "," + description);
 
                 }
 
                 incidentSaved = true;
 
-                String incidentString = key + "," + lat + "," + lon + "," + date + ","
+                String incidentString = incidentKey + "," + lat + "," + lon + "," + date + ","
                         + "," + incidentIndex + "," + locationIndex + "," + description;
 
                 Intent returnIntent = new Intent();
@@ -168,11 +172,11 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         }
     }
 
-    public String[] loadPreviousAnnotation(int key) {
+    public String[] loadPreviousAnnotation(String rideID, String incidentKey) {
 
         String [] result = null;
 
-        String pathToIncidents = "incidentData.csv";
+        String pathToIncidents = "accEvents" + rideID + ".csv";
 
         if (new File(pathToIncidents).exists()) {
 
@@ -197,7 +201,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
                     String[] incidentProps = line.split(",");
 
-                    if (Integer.parseInt(incidentProps[0]) == key) {
+                    if (incidentProps[0] == incidentKey) {
 
                        result = incidentProps;
 
@@ -218,11 +222,12 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
     }
 
-    public void overwriteIncidentFile(String incidentKey, String newAnnotation) {
+    public void overwriteIncidentFile(String rideID, String incidentKey, String newAnnotation) {
 
-        String path = "accEvents"+key+".csv";
+        String path = "accEvents" + rideID + ".csv";
+
         String contentOfNewFile = "";
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFileStreamPath(path)));) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(getFileStreamPath(path)))) {
 
             contentOfNewFile += reader.readLine();
             contentOfNewFile += System.lineSeparator();
@@ -243,6 +248,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         overWriteFile(contentOfNewFile,path,this);
 
     }
