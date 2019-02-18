@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:scrollbars="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".DemographicActivity"
+    tools:showIn="@layout/activity_demographic">
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
+
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/ActivityTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/demograpic_title"
+            android:textSize="11pt"
+            android:textStyle="bold">
+
+        </TextView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/ageTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="@string/age_titleDE"
+                android:textSize="10pt" />
+
+            <Spinner
+                android:id="@+id/ageSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:focusable="true" />
+        </LinearLayout>
+
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <TextView
+            android:id="@+id/radio1Text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/radio1TextDE"
+            android:textSize="10pt"/>
+
+        <RadioGroup
+            android:id="@+id/genderRadio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/radio1_1" />
+
+            <RadioButton
+                android:id="@+id/radioButton2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/radio1_2" />
+
+            <RadioButton
+                android:id="@+id/radioButton3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/radio1_3" />
+        </RadioGroup>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <TextView
+            android:id="@+id/countryText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/countryTextDE"
+            android:textSize="10pt"/>
+
+        <Spinner
+            android:id="@+id/countrySpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/countries"
+            android:prompt="@string/germany" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+
+        <TextView
+            android:id="@+id/districtText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/districtTextDE"
+            android:textSize="10pt" />
+
+        <Spinner
+            android:id="@+id/districtSpinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/districts"
+            android:prompt="@string/district4_BER" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <TextView
+            android:id="@+id/bicycleTypText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bicycleTypTextDE"
+            android:textSize="10pt"/>
+
+        <Spinner
+            android:id="@+id/bicycleTypeSpinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/bicycleType"
+            android:prompt="@string/bicycleType1DE" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/extraText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/extraTextDE"
+            android:textSize="10pt" />
+
+        <Switch
+            android:id="@+id/extra1Switch"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/extra1SwitchTextDE" />
+
+        <Switch
+            android:id="@+id/extra2Switch"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/extra2SwitchTextDE" />
+
+        <Switch
+            android:id="@+id/extra3Switch"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/extra3SwitchTextDE" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>
