@@ -12,6 +12,8 @@ import static android.content.Context.MODE_APPEND;
 
 public class Utils {
 
+    private static final String TAG = "Utils_LOG";
+
     public static void appendToFile(String content, String fileName, Context context) {
         try {
             FileOutputStream writer = context.openFileOutput(fileName, MODE_APPEND);
@@ -68,15 +70,18 @@ public class Utils {
 
         // Only checking for empty strings, which means we are retaining
         // events that were labeled as 'nothing happened'
+        Log.d(TAG, "checkForAnnotation() incidentProps[4]: " + incidentProps[4] + " length: " + incidentProps[4].length());
+        Log.d(TAG, "checkForAnnotation() incidentProps[5]: " + incidentProps[5] + " length: " + incidentProps[5].length());
+        Log.d(TAG, "checkForAnnotation() incidentProps[6]: " + incidentProps[6] + " length: " + incidentProps[6].length());
 
-        if((incidentProps[4] != "") || (incidentProps[5] != "") ||
-                (incidentProps[6] != "")) {
+        if(!(incidentProps[4].equals("")) || (!(incidentProps[5].equals("")) ||
+                (!(incidentProps[6].equals(""))))) {
 
             return true;
 
         } else {
 
-            return true;
+            return false;
 
         }
 

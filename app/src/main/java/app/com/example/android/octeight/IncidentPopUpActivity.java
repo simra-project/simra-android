@@ -78,7 +78,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         final EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
 
-        if (previousAnnotation != null) {
+        if (previousAnnotation != null && previousAnnotation[4].length()>0 && previousAnnotation[5].length()>0) {
 
             incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[4]));
 
@@ -164,20 +164,22 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     public String[] loadPreviousAnnotation(String rideID, String incidentKey) {
 
         String [] result = null;
+        Log.d(TAG, "loadPreviousAnnotation rideID: " + rideID + " incidentKey: " + incidentKey);
 
         String pathToIncidents = "accEvents" + rideID + ".csv";
 
-        if (new File(pathToIncidents).exists()) {
+        if (fileExists(pathToIncidents, this)) {
 
             BufferedReader reader = null;
 
             try {
 
-                reader = new BufferedReader(new FileReader(pathToIncidents));
+                reader = new BufferedReader(new FileReader(getFileStreamPath(pathToIncidents)));
 
             } catch (FileNotFoundException fnfe) {
 
-                Log.i("LOAD INCIDENT FILE", "Incident file not found");
+                fnfe.printStackTrace();
+                Log.i(TAG, "Incident file not found");
 
             }
             try {
@@ -188,9 +190,9 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
                 while ((line = reader.readLine()) != null) { //loop will run from 2nd line
 
-                    String[] incidentProps = line.split(",");
+                    String[] incidentProps = line.split(",", -1);
 
-                    if (incidentProps[0] == incidentKey) {
+                    if (incidentProps[0].equals(incidentKey)) {
 
                        result = incidentProps;
 
@@ -200,13 +202,16 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
 
             } catch (IOException ioe) {
-
-                Log.i("READ ACC EVENTS FILE", "Problems reading AccEvents file");
+                ioe.printStackTrace();
+                Log.i(TAG, "Problems reading AccEvents file");
 
             }
 
+        } else {
+            Log.d(TAG, "didn't enter if, " + pathToIncidents + " doesn't exist");
         }
 
+        Log.d(TAG, "loadPreviousAnnotation() result: " + Arrays.toString(result));
         return result;
 
     }
@@ -222,7 +227,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             contentOfNewFile += System.lineSeparator();
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] oldIncident = line.split(",");
+                String[] oldIncident = line.split(",",-1);
                 if(oldIncident[0].equals(incidentKey)){
                     contentOfNewFile += newAnnotation;
                     contentOfNewFile += System.lineSeparator();

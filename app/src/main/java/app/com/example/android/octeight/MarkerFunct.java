@@ -108,15 +108,18 @@ public class MarkerFunct {
                     AccEvent accEvent = new AccEvent(eventLine);
                  */
 
-                Log.d("CHECK ANNOTATION", actualIncident.toString());
+                Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident));
 
                 boolean annotated = checkForAnnotation(actualIncident);
+
+                Log.d(TAG, "annotated:" + annotated);
 
                 AccEvent accEvent = new AccEvent(Integer.parseInt(actualIncident[0]),
                         Double.parseDouble(actualIncident[1]),
                         Double.parseDouble(actualIncident[2]),
                         Long.parseLong(actualIncident[3]),annotated);
 
+                Log.d(TAG, "accEvent key: " + accEvent.key + " accEvent.position" + accEvent.position.toString());
                     setMarker(accEvent);
             }
 
