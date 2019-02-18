@@ -18,7 +18,6 @@ import android.support.design.widget.NavigationView.OnNavigationItemSelectedList
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.text.method.LinkMovementMethod;
@@ -348,7 +347,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                         intent.putExtra("State", 0); // redundant
                         startActivity(intent);
                     } else {
-                        Toast toast = Toast.makeText(MainActivity.this,R.string.errorRideTooShortDE, Toast.LENGTH_LONG);
+                        Toast toast = Toast.makeText(MainActivity.this,R.string.errorRideTooShort, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     }

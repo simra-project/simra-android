@@ -388,8 +388,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.recorder_channel_nameDE);
-            String description = getString(R.string.recorder_channel_descriptionDE);
+            CharSequence name = getString(R.string.recorder_channel_name);
+            String description = getString(R.string.recorder_channel_description);
             int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);

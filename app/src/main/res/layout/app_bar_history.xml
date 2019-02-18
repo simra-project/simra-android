@@ -68,7 +68,7 @@
                 android:layout_toEndOf="@+id/upload_button_image"
                 android:layout_alignParentEnd="true"
                 android:fontFamily="@font/assistant_extralight"
-                android:text="@string/justUploadDE"
+                android:text="@string/justUpload"
                 android:textColor="#FEFEFE"
                 android:textAlignment="center"
                 android:textStyle="bold" />
@@ -97,7 +97,7 @@
                 android:layout_toEndOf="@+id/uploadAndExit_button_image"
                 android:layout_alignParentEnd="true"
                 android:fontFamily="@font/assistant_extralight"
-                android:text="@string/uploadAndExitDE"
+                android:text="@string/uploadAndExit"
                 android:textColor="#FEFEFE"
                 android:textAlignment="center"
                 android:textStyle="bold" />

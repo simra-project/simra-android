@@ -1,8 +1,8 @@
 <resources>
 
     <string name="app_name">SimRa (Beta)</string>
-    <string name="welcome_header">Willkommen bei SimRa!</string>
-    <string name="welcome_text">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
+    <string name="welcome_header">Welcome to SimRa!</string>
+    <string name="welcome_text">Thank You for supporting the SimRa project.</string>
     <string name="welcome_text2">Die App ist noch in der Betaphase. Wir freuen uns auf Euer Feedback.</string>
     <string name="welcome_text3">Mit freundlichen Grüßen,\ndas SimRa-Team.</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -16,7 +16,7 @@
     <string name="demoDataMail">Name: \nAlter: \nBeruf: \nFahrradtyp: Bsp. Rennrad\nDurchschnittlich wöchentlich zurückgelegte Kilometeranzahl mit dem Rad: </string>
     <string name="feedbackMail"> </string>
     <string name="permissionFineLocation">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten.</string>
-    <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
+    <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
     <string name="startButtonText">Aufzeichnung \n starten</string>
     <string name="stopButtonText">Aufzeichnung \n stoppen</string>
     <string name="permissionRequestRationale">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
@@ -24,7 +24,7 @@
     <string name="upload_channel_name">Hochladen</string>
     <string name="recorder_channel_description">Fahrt wird aufgezeichnet</string>
     <string name="upload_channel_description">Fahrten werden hochgeladen</string>
-    <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
+    <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
     <string name="title_activity_history">Meine Fahrten</string>
     <string name="selectedRideInfo">Die folgende Fahrt wurde ausgewählt: </string>
     <string name="errorNoRideSelected">Es wurde keine Fahrt ausgewählt!</string>

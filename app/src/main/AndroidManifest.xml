@@ -81,7 +81,7 @@
 
         <activity
             android:name=".HistoryActivity"
-            android:label="@string/title_activity_historyDE"
+            android:label="@string/title_activity_history"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme"
             android:configChanges="orientation|screenSize">
