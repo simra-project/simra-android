@@ -18,7 +18,6 @@ import android.support.design.widget.NavigationView.OnNavigationItemSelectedList
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.text.method.LinkMovementMethod;
@@ -267,10 +266,10 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
                 mMapController.setZoom(ZOOM_LEVEL);
-                /*
+
                 String[] bla = new String[4];
                 bla[5] = "bla";
-
+                /*
                 try {
                     String[] bla = new String[4];
                     bla[5] = "bla";
@@ -304,7 +303,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 // start RecorderService for accelerometer data recording
                 Intent intent = new Intent(MainActivity.this, RecorderService.class);
                 startService(intent);
-                bindService(intent, mRecorderServiceConnection, Context.BIND_AUTO_CREATE);
+                bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
                 //startService(recService);
                 recording = true;
 
@@ -345,7 +344,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                         intent.putExtra("State", 0); // redundant
                         startActivity(intent);
                     } else {
-                        Toast toast = Toast.makeText(MainActivity.this,R.string.errorRideTooShortDE, Toast.LENGTH_LONG);
+                        Toast toast = Toast.makeText(MainActivity.this,R.string.errorRideTooShort, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     }

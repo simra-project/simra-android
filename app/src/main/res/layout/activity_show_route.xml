@@ -34,7 +34,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/addIncidentDE"
+            android:text="@string/addIncident"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:fontFamily="@font/assistant_extralight"
@@ -116,46 +116,46 @@
     -->
 
     <RelativeLayout
-        android:id="@+id/uploadIncident"
+        android:id="@+id/saveIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:background="@drawable/rounded_corners"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_marginEnd="20dp">
 
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:background="@android:drawable/stat_sys_upload" />
+            android:layout_marginStart="10dp"
+            android:background="@android:drawable/ic_menu_save" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/uploadIncidentDE"
-            android:layout_alignParentRight="true"
+            android:text="@string/saveIncident"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:fontFamily="@font/assistant_extralight"
             android:textColor="#FEFEFE"
             android:textStyle="bold"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             />
 
     </RelativeLayout>
 
     <TextView android:id="@+id/copyright_text"
-        android:text="@string/osmCopyrightDE"
+        android:text="@string/osmCopyright"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="10dp"
-        android:layout_alignParentLeft="true"
+        android:textSize="10sp"
+        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
         />
 
 </RelativeLayout>

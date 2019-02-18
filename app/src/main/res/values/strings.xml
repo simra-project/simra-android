@@ -1,66 +1,85 @@
-<resources>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:locale="de">
 
-    <string name="app_name">SimRa (Beta)</string>
-    <string name="welcome_headerDE">Willkommen bei SimRa!</string>
-    <string name="welcome_textDE">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
-    <string name="welcome_text2DE">Die App ist noch in der Betaphase. Wir freuen uns auf Euer Feedback.</string>
-    <string name="welcome_text3DE">Mit freundlichen Grüßen,\ndas SimRa-Team.</string>
+    <string name="welcome_header">Willkommen bei SimRa!</string>
+    <string name="welcome_text">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
+    <string name="welcome_text2">Die App ist noch in der Betaphase. Wir freuen uns auf Euer Feedback.</string>
+    <string name="welcome_text3">Mit freundlichen Grüßen,\ndas SimRa-Team.</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">MCC TU Berlin</string>
     <string name="nav_header_subtitle">ask@mcc.tu-berlin.de</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="feedbackReceiver">ask@mcc.tu-berlin.de</string>
-    <string name="demoDataHeader">SimRa Teilnehmerdaten</string>
+    <string name="demoDataHeader">SimRa User Data</string>
     <string name="feedbackHeader">SimRa Feedback</string>
     <string name="demoDataMail">Name: \nAlter: \nBeruf: \nFahrradtyp: Bsp. Rennrad\nDurchschnittlich wöchentlich zurückgelegte Kilometeranzahl mit dem Rad: </string>
     <string name="feedbackMail"> </string>
     <string name="permissionFineLocation">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten.</string>
-    <string name="mccPageDE">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
-    <string name="mccPageEN">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
+    <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
     <string name="startButtonText">Aufzeichnung \n starten</string>
     <string name="stopButtonText">Aufzeichnung \n stoppen</string>
-    <string name="permissionRequestRationaleDE">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
-    <string name="channel_nameDE">Aufzeichnung</string>
-    <string name="channel_descriptionDE">Fahrt wird aufgezeichnet</string>
-    <string name="osmCopyrightEN">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
-    <string name="osmCopyrightDE">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
-    <string name="title_activity_historyDE">Meine Fahrten</string>
-    <string name="selectedRideInfoDE">Die folgende Fahrt wurde ausgewählt: </string>
-    <string name="errorNoRideSelectedDE">Es wurde keine Fahrt ausgewählt!</string>
-    <string name="errorRideTooShortDE">Die Fahrt muss mindestens\n30 Sekunden dauern!</string>
-    <string name="incidentDetectedDE"> Ereignis annotieren.</string>
-    <string name="noHistoryDE"> Es wurden keine Fahrten gefunden.</string>
-    <string name="nextPatchDE"> Diese Funktion wird leider erst mit dem nächsten Patch veröffentlicht.</string>
-    <string name="locationSpinnerDE">Ort des Handys während der Fahrt </string>
-    <string name="descriptionDE">Was genau ist vorgefallen?</string>
-    <string name="notReadyDE">Wollen sie die Bearbeitung unfertig beenden?</string>
-    <string name="noIntentExtrasDE">Leider ist ein Fehler aufgetreten, bitte versuchen sie es erneut.</string>
-    <string name="annotation_titleDE">Was ist hier passiert?</string>
-    <string name="incident_typeDE">Art des Ereignisses</string>
-    <string name="descriptionBodyDE">Hier beschreiben was passiert ist</string>
-    <string name="incidentType1_DE">Nichts</string>
-    <string name="incidentType2_DE">Dooring</string>
-    <string name="incidentType3_DE">Hindernis im Weg (z.B. Passant)</string>
-    <string name="incidentType4_DE">Von einem Fahrzeug geschnitten</string>
-    <string name="incidentType5_DE">Sonstiges (Bitte unten angeben)</string>
-    <string name="locationType1_DE">Hosentasche</string>
-    <string name="locationType2_DE">Lenker</string>
-    <string name="locationType3_DE">Jackentasche</string>
-    <string name="locationType4_DE">Hand</string>
-    <string name="locationType5_DE">Rucksack</string>
-    <string name="locationType6_DE">Sonstiges (Bitte unten angeben)</string>
-    <string name="doneEditingIncidentDE">Fertig</string>
-    <string name="editingIncidentAbortedDE">Ereignis wurde nicht gespeichert</string>
-    <string name="editingIncidentCompletedDE">Ereignis wurde gespeichert</string>
-    <string name="cancelDE">Abbrechen</string>
-    <string name="addIncidentDE">Ereignis\nhinzufügen</string>
-    <string name="uploadIncidentDE">Fahrt\nhochladen</string>
-    <string name="uploadLoadingFilesDE">Die Fahrt wird hochgeladen</string>
-    <string name="newRideInHistoryActivityDE">Neue Fahrt! Bitte bearbeiten.\n</string>
-    <string name="startRecordingDE">Aufzeichnung\nstarten</string>
-    <string name="endRecordingDE">Aufzeichnung\nbeenden</string>
+    <string name="permissionRequestRationale">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
+    <string name="recorder_channel_name">Aufzeichnung</string>
+    <string name="upload_channel_name">Hochladen</string>
+    <string name="recorder_channel_description">Fahrt wird aufgezeichnet</string>
+    <string name="upload_channel_description">Fahrten werden hochgeladen</string>
+    <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
+    <string name="title_activity_history">Meine Fahrten</string>
+    <string name="selectedRideInfo">Die folgende Fahrt wurde ausgewählt: </string>
+    <string name="errorNoRideSelected">Es wurde keine Fahrt ausgewählt!</string>
+    <string name="errorRideTooShort">Die Fahrt muss mindestens\n30 Sekunden dauern!</string>
+    <string name="incidentDetected"> Ereignis annotieren.</string>
+    <string name="noHistory"> Es wurden keine Fahrten gefunden.</string>
+    <string name="nextPatch"> Diese Funktion wird leider erst mit dem nächsten Patch veröffentlicht.</string>
+    <string name="locationSpinner">Ort des Handys während der Fahrt </string>
+    <string name="description">Was genau ist vorgefallen?</string>
+    <string name="notReady">Wollen sie die Bearbeitung unfertig beenden?</string>
+    <string name="noIntentExtras">Leider ist ein Fehler aufgetreten, bitte versuchen sie es erneut.</string>
+    <string name="annotation_title">Was ist hier passiert?</string>
+    <string name="incident_type">Art des Ereignisses</string>
+    <string name="descriptionBody">Hier beschreiben was passiert ist</string>
+    <string name="incidentType1">Nichts</string>
+    <string name="incidentType2">Dooring</string>
+    <string name="incidentType3">Hindernis im Weg (z.B. Passant)</string>
+    <string name="incidentType4">Von einem Fahrzeug geschnitten</string>
+    <string name="incidentType5">Sonstiges (Bitte unten angeben)</string>
+    <string name="locationType1">Hosentasche</string>
+    <string name="locationType2">Lenker</string>
+    <string name="locationType3">Jackentasche</string>
+    <string name="locationType4">Hand</string>
+    <string name="locationType5">Rucksack</string>
+    <string name="locationType6">Sonstiges (Bitte unten angeben)</string>
+    <string name="doneEditingIncident">Fertig</string>
+    <string name="editingIncidentAborted">Ereignis wurde nicht gespeichert</string>
+    <string name="editingIncidentCompleted">Ereignis wurde gespeichert</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="addIncident">Ereignis\nhinzufügen</string>
+    <string name="uploadAndExit">Hochladen &amp;\nApp beenden</string>
+    <string name="saveIncident">Speichern &amp;\nZurück</string>
+    <string name="savedRide">Die Fahrt wurde gespeichert</string>
+    <string name="uploadRidesSuccessful">Hochladen erfolgreich!</string>
+    <string name="noFilesToBeUploaded">Alle bearbeiteten Fahrten wurden\nbereits hochgeladen.</string>
+    <string name="justUpload">Hochladen</string>
+    <string name="progressDialogTitle">Hochladen</string>
+    <string name="progressDialogText">Bitte warten. Fahrten werden hochgeladen.</string>
+    <string name="newRideInHistoryActivity">Neue Fahrt! Bitte bearbeiten.\n</string>
+    <string name="startRecording">Aufzeichnung\nstarten</string>
+    <string name="endRecording">Aufzeichnung\nbeenden</string>
     <string name="nav_main">Start</string>
+    <string name="uploadInBackground">Im Hintergrund ausführen</string>
+    <string name="app_name">SimRa (Beta)</string>
+    <string name="simra_news">SimRa Aktuelles</string>
+    <string name="mcc_news">MCC Aktuelles</string>
+    <string name="settings">Einstellungen</string>
+    <string name="imprint">Impressum</string>
+    <string name="feedback">Feedback</string>
+    <string name="profile">Profil</string>
+    <string name="history">Verlauf</string>
+    <string name="ride_length">Fahrtdauer</string>
+    <string name="sendErrorTitle">Ups!</string>
+    <string name="sendErrorMessage">Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?</string>
 
 
 </resources>

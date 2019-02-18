@@ -11,6 +11,6 @@ public class WebActivity extends BaseActivity {
         setContentView(R.layout.activity_web);
         WebView myWebView = new WebView(getBaseContext());
         setContentView(myWebView);
-        myWebView.loadUrl(getString(R.string.mccPageDE));
+        myWebView.loadUrl(getString(R.string.mccPage));
     }
 }
