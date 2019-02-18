@@ -49,8 +49,9 @@
     <string name="locationType2">Handlebar</string>
     <string name="locationType3">Jacket pocket</string>
     <string name="locationType4">Hand</string>
-    <string name="locationType5">Backpack</string>
-    <string name="locationType6">Other (Please specify below)</string>
+    <string name="locationType5">Saddlebag</string>
+    <string name="locationType6">Backpack</string>
+    <string name="locationType7">Other (Please specify below)</string>
     <string name="doneEditingIncident">Done</string>
     <string name="editingIncidentAborted">Incident description not saved</string>
     <string name="editingIncidentCompleted">Incident description saved</string>

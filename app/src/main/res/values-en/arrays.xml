@@ -15,5 +15,6 @@
         <item>@string/locationType4</item>
         <item>@string/locationType5</item>
         <item>@string/locationType6</item>
+        <item>@string/locationType7</item>
     </string-array>
 </resources>
