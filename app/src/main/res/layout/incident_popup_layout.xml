@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ScrollView01"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_gravity="center_horizontal"
-    android:background="@drawable/rounded_white"
-    android:fadingEdgeLength="80dp"
-    android:requiresFadingEdge="vertical"
     android:scrollbars="vertical"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".IncidentPopUpActivity">
+    android:requiresFadingEdge="vertical"
+    android:fadingEdgeLength="80dp"
+    android:background="@drawable/rounded_white"
+    >
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
         android:layout_marginStart="5dp"
-        android:background="@android:color/white"
+        android:layout_marginEnd="5dp"
+        android:background="@android:color/transparent"
         android:orientation="vertical">
 
         <!--Put form controls here-->
@@ -45,14 +44,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/incident_typeDE"
-            android:textSize="10pt" />
+            android:textSize="10pt"></TextView>
 
         <Spinner
             android:id="@+id/incidentTypeSpinner"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/ages"
-            android:prompt="@string/incidentType1_DE" />
+            android:entries="@array/incidenttypelist"
+            android:prompt="@string/incidentType1_DE"></Spinner>
 
         <Space
             android:layout_width="match_parent"
@@ -63,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/locationSpinnerDE"
-            android:textSize="10pt" />
+            android:textSize="10pt"></TextView>
 
         <Spinner
             android:id="@+id/locationSpinner"
@@ -81,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/descriptionDE"
-            android:textSize="10pt" />
+            android:textSize="10pt"></TextView>
 
         <EditText
             android:id="@+id/EditTextDescriptionBody"
@@ -89,7 +88,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/descriptionBodyDE"
             android:inputType="textMultiLine"
-            android:lines="5" />
+            android:lines="5"></EditText>
 
         <Space
             android:layout_width="match_parent"
@@ -182,5 +181,7 @@
 
             </LinearLayout>
         </LinearLayout>
+
+
     </LinearLayout>
 </ScrollView>

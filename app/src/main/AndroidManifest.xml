@@ -13,7 +13,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.location.network" />
 
@@ -57,16 +56,16 @@
 
         <activity
             android:name=".MainActivity"
-            android:configChanges="orientation|screenSize"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".WebActivity"
-            android:configChanges="orientation|screenSize"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".SettingsActivity"
-            android:configChanges="orientation|screenSize"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation|screenSize"/>
 
         <service
             android:name=".Constants"
@@ -77,33 +76,24 @@
             android:parentActivityName=".MainActivity" />
         <service
             android:name=".UploadService"
-            android:enabled="true"
-            android:parentActivityName=".HistoryActivity" />
+            android:parentActivityName=".HistoryActivity"
+            android:enabled="true" />
 
         <activity
             android:name=".HistoryActivity"
-            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_historyDE"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.com.example.android.octeight.MainActivity" />
         </activity>
-        <activity
-            android:name=".ShowRouteActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".IncidentPopUpActivity"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.PopUpWindow" />
-        <activity
-            android:name=".DemographicActivity"
-            android:label="@string/title_activity_demographic"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".MarkActivity"
-            android:label="@string/title_activity_mark"></activity>
+        <activity android:name=".ShowRouteActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity android:name=".IncidentPopUpActivity"
+            android:theme="@style/AppTheme.PopUpWindow"
+            android:configChanges="orientation|screenSize"></activity>
     </application>
 
 </manifest>

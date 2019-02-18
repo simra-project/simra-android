@@ -6,8 +6,8 @@
         <item>@string/incidentType3_DE</item>
         <item>@string/incidentType4_DE</item>
         <item>@string/incidentType5_DE</item>
-    </string-array>
 
+    </string-array>
     <string-array name="locations">
         <item>@string/locationType1_DE</item>
         <item>@string/locationType2_DE</item>
@@ -16,42 +16,4 @@
         <item>@string/locationType5_DE</item>
         <item>@string/locationType6_DE</item>
     </string-array>
-
-    <string-array name="ages">
-        <item>1999</item>
-        <item>1998</item>
-    </string-array>
-
-    <string-array name="cities">
-        <item>@string/Berlin</item>
-        <item>@string/London</item>
-    </string-array>
-    <string-array name="bicycleType">
-        <item>@string/bicycleType1DE</item>
-        <item>@string/bicycleType2DE</item>
-        <item>@string/bicycleType3DE</item>
-        <item>@string/bicycleType4DE</item>
-        <item>@string/bicycleType5DE</item>
-    </string-array>
-
-    <string-array name="countries">
-        <item>@string/germany</item>
-        <item>@string/england</item>
-    </string-array>
-
-    <string-array name="districts">
-        <item>@string/district1_BER</item>
-        <item>@string/district2_BER</item>
-        <item>@string/district3_BER</item>
-        <item>@string/district4_BER</item>
-        <item>@string/district5_BER</item>
-        <item>@string/district6_BER</item>
-        <item>@string/district7_BER</item>
-        <item>@string/district8_BER</item>
-        <item>@string/district9_BER</item>
-        <item>@string/district10_BER</item>
-        <item>@string/district11_BER</item>
-        <item>@string/district12_BER</item>
-    </string-array>
-
 </resources>
