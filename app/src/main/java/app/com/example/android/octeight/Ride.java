@@ -50,7 +50,6 @@ public class Ride {
         this.duration = duration;
         this.startTime = startTime;
 
-
         this.route = getRouteLine(accGpsFile);
         this.state = state;
         this.events = findAccEvents();
@@ -62,8 +61,16 @@ public class Ride {
         String pathToAccEventsOfRide = "accEvents#" + id + ".csv";
         String content = "key,lat,lon,ts,incidentType,phoneLocation,description";
         content += System.lineSeparator();
+
         for (int i = 0; i < events.size(); i++) {
+
             AccEvent actualAccEvent = events.get(i);
+
+            // Forwarding the key to the accEvents; from the accEvents, we forward them to
+            // the Info-Windows and from there to IncidentPopUpActivity.
+            //actualAccEvent.setKey(i);
+            // @TODO do AccEvents have to have a key here???
+
             content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + ",,," + System.lineSeparator();
         }
 
@@ -262,7 +269,6 @@ public class Ride {
             e.printStackTrace();
         }
 
-
         String[] partOfRide;
         // Each String[] in ride is a part of the ride which is ca. 3 seconds long.
         ArrayList<String[]> ride = new ArrayList<>();
@@ -310,6 +316,7 @@ public class Ride {
             double maxZ = Double.valueOf(currentLine[4]);
             double minZ = Double.valueOf(currentLine[4]);
             thisLine = nextLine;
+
             try {
                 nextLine = br.readLine();
             } catch (IOException e) {
@@ -348,7 +355,6 @@ public class Ride {
                     newSubPart = false;
                 }
             }
-
 
             double maxXDelta = Math.abs(maxX - minX);
             double maxYDelta = Math.abs(maxY - minY);
@@ -426,6 +432,7 @@ public class Ride {
             Log.d(TAG, "accEvents.get(" + i + ") Position: " + (accEvents.get(i).position.toString())
                     + " timeStamp: " + (accEvents.get(i).timeStamp));
         }
+
         return accEvents;
 
 

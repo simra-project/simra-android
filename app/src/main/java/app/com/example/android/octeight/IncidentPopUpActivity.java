@@ -1,5 +1,7 @@
 package app.com.example.android.octeight;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -17,9 +19,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
@@ -52,12 +61,24 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         incidentTypes = getResources().getStringArray(R.array.incidenttypelist);
         locations = getResources().getStringArray(R.array.locations);
 
+        String[] previousAnnotation = loadPreviousAnnotation
+                (getIntent().getIntExtra("Key",999));
 
         final Spinner incidentTypeSpinner =  findViewById(R.id.incidentTypeSpinner);
 
         final Spinner locationTypeSpinner = findViewById(R.id.locationSpinner);
 
         final EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
+
+        if (previousAnnotation != null) {
+
+            incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[5]));
+
+            locationTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[6]));
+
+            incidentDescription.setText(previousAnnotation[7]);
+
+        }
 
         doneButton = findViewById(R.id.save_button);
         backButton = findViewById(R.id.back_button);
@@ -69,7 +90,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             String date = getIntent().getStringExtra("Incident_timeStamp");
             String pathToAccDat = getIntent().getStringExtra("Incident_accDat");
             String key = getIntent().getStringExtra("ID");
-
 
             // onClick-behavior for 'Done inserting description'-button: save incident
             // data to file.
@@ -95,12 +115,30 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     }
                 }
 
-                // Write the incident to incidentData.csv
-                appendToFile(key + "," + lat + "," + lon + "," + date + "," + pathToAccDat
-                        + "," + incidentIndex + "," + locationIndex + "," + description
-                        + System.lineSeparator(), "incidentData.csv", this);
+                if(previousAnnotation == null) {
+
+                    // Write the incident to incidentData.csv
+                    appendToFile(key + "," + lat + "," + lon + "," + date + "," + pathToAccDat
+                            + "," + incidentIndex + "," + locationIndex + "," + description
+                            + System.lineSeparator(), "incidentData.csv", this);
+
+                } else {
+
+                    overwriteIncidentFile(key + "," + lat + "," + lon + "," + date + ","
+                            + pathToAccDat + "," + incidentIndex + "," + locationIndex + "," + description);
+
+                }
 
                 incidentSaved = true;
+
+                String incidentString = key + "," + lat + "," + lon + "," + date + ","
+                        + "," + incidentIndex + "," + locationIndex + "," + description;
+
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("result", incidentString);
+                setResult(Activity.RESULT_OK, returnIntent);
+                //setResult(Activity.RESULT_CANCELED, returnIntent);
+
                 finish();
 
             });
@@ -125,4 +163,71 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.editingIncidentAbortedDE), Toast.LENGTH_SHORT).show();
         }
     }
+
+    public String[] loadPreviousAnnotation(int key) {
+
+        String [] result = null;
+
+        String pathToIncidents = "incidentData.csv";
+
+        if (new File(pathToIncidents).exists()) {
+
+            BufferedReader reader = null;
+
+            try {
+
+                reader = new BufferedReader(new FileReader(pathToIncidents));
+
+            } catch (FileNotFoundException fnfe) {
+
+                Log.i("LOAD INCIDENT FILE", "Incident file not found");
+
+            }
+            try {
+
+                reader.readLine(); // this will read the first line
+
+                String line = null;
+
+                while ((line = reader.readLine()) != null) { //loop will run from 2nd line
+
+                    String[] incidentProps = line.split(",");
+
+                    if (Integer.parseInt(incidentProps[0]) == key) {
+
+                       result = incidentProps;
+
+                    }
+
+                }
+
+
+            } catch (IOException ioe) {
+
+                Log.i("READ ACC EVENTS FILE", "Problems reading AccEvents file");
+
+            }
+
+        }
+
+        return result;
+
+    }
+
+    public void overwriteIncidentFile(String newAnnotation) {
+
+        List<String> fileContent = new ArrayList<>(Files.readAllLines("incidentData.csv",
+                StandardCharsets.UTF_8));
+
+        for (int i = 0; i < fileContent.size(); i++) {
+            if (fileContent.get(i).equals("old line")) {
+                fileContent.set(i, "new line");
+                break;
+            }
+        }
+
+        Files.write(FILE_PATH, fileContent, StandardCharsets.UTF_8);
+
+    }
+
 }
