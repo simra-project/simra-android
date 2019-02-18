@@ -29,7 +29,7 @@
             android:id="@+id/ActivityTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/annotation_titleDE"
+            android:text="@string/annotation_title"
             android:textSize="11pt"
             android:textStyle="bold">
 
@@ -43,7 +43,7 @@
             android:id="@+id/DropDown1Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/incident_typeDE"
+            android:text="@string/incident_type"
             android:textSize="10pt"></TextView>
 
         <Spinner
@@ -51,7 +51,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:entries="@array/incidenttypelist"
-            android:prompt="@string/incidentType1_DE"></Spinner>
+            android:prompt="@string/incidentType1"></Spinner>
 
         <Space
             android:layout_width="match_parent"
@@ -61,7 +61,7 @@
             android:id="@+id/DropDown2Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/locationSpinnerDE"
+            android:text="@string/locationSpinner"
             android:textSize="10pt"></TextView>
 
         <Spinner
@@ -69,7 +69,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:entries="@array/locations"
-            android:prompt="@string/locationType1_DE" />
+            android:prompt="@string/locationType1" />
 
         <Space
             android:layout_width="match_parent"
@@ -79,14 +79,14 @@
             android:id="@+id/DescriptionTextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/descriptionDE"
+            android:text="@string/description"
             android:textSize="10pt"></TextView>
 
         <EditText
             android:id="@+id/EditTextDescriptionBody"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/descriptionBodyDE"
+            android:hint="@string/descriptionBody"
             android:inputType="textMultiLine"
             android:lines="5"></EditText>
 
@@ -106,8 +106,8 @@
             android:drawableEnd="@drawable/save_icon"
             android:paddingRight="50dp"
             android:paddingLeft="50dp"
-            android:text="@string/doneEditingIncidentDE"
-            tools:text="@string/doneEditingIncidentDE" />
+            android:text="@string/doneEditingIncident"
+            tools:text="@string/doneEditingIncident" />
             -->
 
         <LinearLayout
@@ -135,7 +135,7 @@
                     android:layout_weight="5"
                     android:fontFamily="@font/assistant_extralight"
                     android:gravity="center"
-                    android:text="@string/cancelDE"
+                    android:text="@string/cancel"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -167,7 +167,7 @@
                     android:layout_weight="5"
                     android:fontFamily="@font/assistant_extralight"
                     android:gravity="center"
-                    android:text="@string/doneEditingIncidentDE"
+                    android:text="@string/doneEditingIncident"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     android:textStyle="bold" />

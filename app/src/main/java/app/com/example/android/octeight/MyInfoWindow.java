@@ -11,8 +11,6 @@ import android.widget.TextView;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
-import java.io.Serializable;
-
 class MyInfoWindow extends InfoWindow {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,7 +43,7 @@ class MyInfoWindow extends InfoWindow {
         TextView txtDescription = (TextView) mView.findViewById(R.id.bubble_description);
         TextView txtSubdescription = (TextView) mView.findViewById(R.id.bubble_subdescription);
 
-        txtTitle.setText(motherActivity.getString(R.string.incidentDetectedDE));
+        txtTitle.setText(motherActivity.getString(R.string.incidentDetected));
         long millis = this.mAccEvent.getTimeStamp();
         String time = "";
         if (millis > 1337){

@@ -1,6 +1,5 @@
 package app.com.example.android.octeight;
 
-import android.content.Intent;
 import android.widget.ImageButton;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -252,7 +251,7 @@ public class ShowRouteActivity extends BaseActivity {
             intent.putExtra("Ride_Key", ride.getId());
             startService(intent);
             */
-            Toast.makeText(this, getString(R.string.savedRideDE), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
             finish();
             // mMapView.getOverlays().remove(overlayEvents);
 

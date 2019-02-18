@@ -34,7 +34,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/addIncidentDE"
+            android:text="@string/addIncident"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:fontFamily="@font/assistant_extralight"
@@ -136,7 +136,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/saveIncidentDE"
+            android:text="@string/saveIncident"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:fontFamily="@font/assistant_extralight"
@@ -149,7 +149,7 @@
     </RelativeLayout>
 
     <TextView android:id="@+id/copyright_text"
-        android:text="@string/osmCopyrightDE"
+        android:text="@string/osmCopyright"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="10sp"
