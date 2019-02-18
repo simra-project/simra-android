@@ -11,6 +11,8 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +22,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
+
+import static app.com.example.android.octeight.Utils.appendToFile;
+import static app.com.example.android.octeight.Utils.checkForAnnotation;
+import static app.com.example.android.octeight.Utils.fileExists;
 
 public class MarkerFunct {
 
@@ -31,7 +37,9 @@ public class MarkerFunct {
 
     private ExecutorService pool;
 
-    private List<AccEvent> incidentDat;
+    //private List<AccEvent> incidentDat;
+
+    private String rideID;
 
     private ArrayList<Marker> markers = new ArrayList<>();
 
@@ -42,13 +50,17 @@ public class MarkerFunct {
     String startTime;
     String timeStamp;
 
+    private int numEvents;
+
     public MarkerFunct(ShowRouteActivity mother) {
 
         this.mother = mother;
 
         this.pool = mother.pool;
 
-        this.incidentDat = mother.ride.getEvents();
+        //this.incidentDat = mother.ride.getEvents();
+
+        this.rideID = mother.ride.getId();
 
         pool.execute(new SimpleThreadFactory().newThread(() ->
                 geocoderNominatim = new GeocoderNominatim(userAgent)
@@ -58,6 +70,8 @@ public class MarkerFunct {
 
         this.timeStamp = mother.timeStamp;
 
+        this.numEvents = (mother.ride.events.size() - 1);
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,29 +79,45 @@ public class MarkerFunct {
 
     public void showIncidents() {
 
-        for(AccEvent accEvent : incidentDat) {
+        /**for(AccEvent accEvent : incidentDat) {
             Log.d(TAG, "setting Marker at: " + accEvent.position.toString());
 
             setMarker(accEvent);
-        }
-        try (BufferedReader reader = new BufferedReader(new FileReader(mother.getFileStreamPath("incidentData.csv")));) {
+        }*/
 
+        try (BufferedReader reader = new BufferedReader(new FileReader
+                (mother.getApplicationContext()
+                        .getFileStreamPath("accEvents" + rideID + ".csv")))) {
 
         reader.readLine();
+
             String line;
+
             while ((line = reader.readLine()) != null) {
-                String[] actualIncident = line.split(",");
-                String[] eventLine = new String[6];
-                Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident) + " id: " + mother.ride.getId());
-                if(actualIncident[0].equals(mother.ride.getId())){
-                    Log.d(TAG, "custom incident found! actualIncident: " + Arrays.toString(actualIncident));
+
+                String[] actualIncident = line.split(",", -1);
+
+                /**String[] eventLine = new String[6];
+                //Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident)
+                //        + " id: " + mother.ride.getId());
+                //if(actualIncident[0].equals(mother.ride.getId())){
+                //    Log.d(TAG, "custom incident found! actualIncident: " + Arrays.toString(actualIncident));
                     eventLine[0] = actualIncident[1];
                     eventLine[1] = actualIncident[2];
                     eventLine[5] = actualIncident[3];
                     AccEvent accEvent = new AccEvent(eventLine);
-                    setMarker(accEvent);
-                }
+                 */
 
+                Log.d("CHECK ANNOTATION", actualIncident.toString());
+
+                boolean annotated = checkForAnnotation(actualIncident);
+
+                AccEvent accEvent = new AccEvent(Integer.parseInt(actualIncident[0]),
+                        Double.parseDouble(actualIncident[1]),
+                        Double.parseDouble(actualIncident[2]),
+                        Long.parseLong(actualIncident[3]),annotated);
+
+                    setMarker(accEvent);
             }
 
         } catch (IOException e) {
@@ -131,18 +161,52 @@ public class MarkerFunct {
 
         Log.i("WRAPPED_GP_LIST", closestOnRoute.toString());
 
-        String[] eventLine = new String[6];
+        /**String[] eventLine = new String[6];
         eventLine[0] = String.valueOf(closestOnRoute.getLatitude());
         eventLine[1] = String.valueOf(closestOnRoute.getLongitude());
         eventLine[5] = "1337";
 
-        AccEvent newAcc = new AccEvent(eventLine);
+        AccEvent newAcc = new AccEvent(eventLine);*/
+
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Create a new AccEvent
+
+        int eventCount = this.numEvents + 1;
+
+        AccEvent newAcc = new AccEvent(eventCount, closestOnRoute.getLatitude(),
+                closestOnRoute.getLongitude(), 1337, false);
 
         Log.i("NEW_ACC", newAcc.toString());
 
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Append new acc event to accEvents[rideID].csv
+
+        String pathToAccEventsOfRide = "accEvents" + rideID + ".csv";
+        String header = "key,lat,lon,ts,incidentType,phoneLocation,description";
+        header += System.lineSeparator();
+        String eventLine = eventCount + ","
+                + newAcc.position.getLatitude() + "," + newAcc.position.getLongitude()
+                + "," + newAcc.timeStamp + ",,," + System.lineSeparator();
+
+        if(!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())){
+
+            appendToFile((header + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
+
+            } else {
+
+            appendToFile(eventLine, pathToAccEventsOfRide, mother.getApplicationContext());
+
+        }
+
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Add new AccEvent to ride's AccEvents list
+
         mother.ride.getEvents().add(newAcc);
 
-        setMarker(new AccEvent(eventLine));
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // set Marker for new AccEvent, refresh map
+
+        setMarker(newAcc);
 
         mother.getmMapView().invalidate();
 
@@ -185,6 +249,7 @@ public class MarkerFunct {
             } else {
 
                 incidentMarker.setIcon(mother.editDoneCust);
+
             }
 
         }
@@ -196,7 +261,6 @@ public class MarkerFunct {
             addressForLoc = pool.submit(() -> getAddressFromLocation(currentLocHelper)).get();
         } catch (Exception ex) {
             ex.printStackTrace();
-
         }
 
         long millis = Long.valueOf(startTime);
