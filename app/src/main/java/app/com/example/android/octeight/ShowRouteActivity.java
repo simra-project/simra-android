@@ -33,6 +33,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static app.com.example.android.octeight.Utils.checkForAnnotation;
+
 public class ShowRouteActivity extends BaseActivity {
 
     String startTime = "";
@@ -45,7 +47,6 @@ public class ShowRouteActivity extends BaseActivity {
     private RelativeLayout addIncBttn;
     private RelativeLayout exitAddIncBttn;
     private RelativeLayout uploadButton;
-
 
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Our ride
@@ -282,62 +283,16 @@ public class ShowRouteActivity extends BaseActivity {
 
     }
 
+    // If the user clicks on an InfoWindow and IncidentPopUpActivity for that
+    // event opens, upon closing it again onActivityResult is called and the
+    // displaying of markers is updated if necessary.
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == 1) {
 
             if (resultCode == Activity.RESULT_OK) {
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // Load existing accEvent-File
-
-                //String id = this.ride.getId();
-
-                //String pathToAccEventsOfRide = "accEvents#" + id + ".csv";
-
-               /** String pathToIncidents = "incidentData.csv";
-
-                if (new File(pathToIncidents).exists()) {
-
-                    BufferedReader reader = null;
-
-                    try {
-
-                        reader = new BufferedReader(new FileReader(pathToIncidents));
-
-                    } catch (FileNotFoundException fnfe) {
-
-                        Log.i("LOAD ACC EVENTS FILE", "AccEvents file not found");
-
-                    }
-                    try {
-
-                        reader.readLine(); // this will read the first line
-
-                        String line = null;
-
-                        while ((line = reader.readLine()) != null) { //loop will run from 2nd line
-
-                            String[] incidentProps = line.split(",");
-
-                            boolean annotated = checkForAnnotation(incidentProps);
-
-                            myMarkerFunct.setMarker(new AccEvent(Integer.valueOf(incidentProps[0]),
-                                    Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
-                                    Long.parseLong(incidentProps[3]),
-                                    annotated));
-
-                        }
-
-
-                    } catch (IOException ioe) {
-
-                        Log.i("READ ACC EVENTS FILE", "Problems reading AccEvents file");
-
-                    }
-
-                }*/
 
                String result = data.getStringExtra("result");
 
@@ -349,6 +304,7 @@ public class ShowRouteActivity extends BaseActivity {
                         Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
                         Long.parseLong(incidentProps[3]),
                         annotated));
+
             }
         }
     }
@@ -423,20 +379,5 @@ public class ShowRouteActivity extends BaseActivity {
         }
     }
 
-    // Check if an accEvent has already been annotated based on one line of the accEvents csv file.
-
-    public boolean checkForAnnotation(String[] incidentProps) {
-
-        if((incidentProps[4] != "" && incidentProps[4] != "0") || (incidentProps[6] != "")) {
-
-            return true;
-
-        } else {
-
-            return false;
-
-        }
-
-    }
 
 }
