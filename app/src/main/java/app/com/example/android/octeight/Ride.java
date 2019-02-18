@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
+import static app.com.example.android.octeight.Utils.fileExists;
 
 public class Ride {
 
@@ -62,19 +63,22 @@ public class Ride {
         String content = "key,lat,lon,ts,incidentType,phoneLocation,description";
         content += System.lineSeparator();
 
-        for (int i = 0; i < events.size(); i++) {
+        if(!fileExists(pathToAccEventsOfRide, context)){
+            for (int i = 0; i < events.size(); i++) {
 
-            AccEvent actualAccEvent = events.get(i);
+                AccEvent actualAccEvent = events.get(i);
 
-            // Forwarding the key to the accEvents; from the accEvents, we forward them to
-            // the Info-Windows and from there to IncidentPopUpActivity.
-            //actualAccEvent.setKey(i);
-            // @TODO do AccEvents have to have a key here???
+                // Forwarding the key to the accEvents; from the accEvents, we forward them to
+                // the Info-Windows and from there to IncidentPopUpActivity.
+                //actualAccEvent.setKey(i);
+                // @TODO do AccEvents have to have a key here???
 
-            content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + ",,," + System.lineSeparator();
+                content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + ",,," + System.lineSeparator();
+            }
+
+            appendToFile(content, pathToAccEventsOfRide, context);
         }
 
-        appendToFile(content, pathToAccEventsOfRide, context);
 
 
     }
