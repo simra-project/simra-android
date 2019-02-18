@@ -78,6 +78,8 @@
     <string name="profile">Profil</string>
     <string name="history">Verlauf</string>
     <string name="ride_length">Fahrtdauer</string>
+    <string name="sendErrorTitle">Ups!</string>
+    <string name="sendErrorMessage">Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?</string>
 
 
 </resources>

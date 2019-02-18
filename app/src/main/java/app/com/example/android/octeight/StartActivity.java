@@ -257,8 +257,8 @@ public class StartActivity extends BaseActivity {
             };
 
             AlertDialog.Builder alert = new AlertDialog.Builder(context);
-            alert.setTitle("Ups!");
-            alert.setMessage("Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?");
+            alert.setTitle(getString(R.string.sendErrorTitle));
+            alert.setMessage(getString(R.string.sendErrorMessage));
             alert.setPositiveButton("Ja", new DialogInterface.OnClickListener()
             {
                 public void onClick(DialogInterface dialog, int id)
