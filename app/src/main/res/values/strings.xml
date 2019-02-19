@@ -1,7 +1,6 @@
 <resources
     xmlns:tools="http://schemas.android.com/tools"
     tools:locale="de">
-
     <string name="welcome_header">Willkommen bei SimRa!</string>
     <string name="welcome_text">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
     <string name="welcome_text2">Die App ist noch in der Betaphase. Wir freuen uns auf Euer Feedback.</string>
@@ -81,6 +80,6 @@
     <string name="ride_length">Fahrtdauer</string>
     <string name="sendErrorTitle">Ups!</string>
     <string name="sendErrorMessage">Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?</string>
-
-
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
 </resources>

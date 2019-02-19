@@ -259,7 +259,7 @@ public class StartActivity extends BaseActivity {
             AlertDialog.Builder alert = new AlertDialog.Builder(context);
             alert.setTitle(getString(R.string.sendErrorTitle));
             alert.setMessage(getString(R.string.sendErrorMessage));
-            alert.setPositiveButton("Ja", new DialogInterface.OnClickListener()
+            alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
             {
                 public void onClick(DialogInterface dialog, int id)
                 {
@@ -267,7 +267,7 @@ public class StartActivity extends BaseActivity {
                     handler.sendMessage(handler.obtainMessage());
                 }
             });
-            alert.setNegativeButton("Nein", new DialogInterface.OnClickListener()
+            alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
             {
                 public void onClick(DialogInterface dialog, int id)
                 {
