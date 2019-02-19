@@ -29,7 +29,8 @@
     <string name="title_activity_history">My Rides</string>
     <string name="selectedRideInfo">The following ride has been chosen:</string>
     <string name="errorNoRideSelected">No ride has been chosen!</string>
-    <string name="errorRideTooShort">The rides must be at\nleast 30 seconds long!</string>
+    <string name="errorRideTooShort">The ride must be at\nleast 30 seconds long!</string>
+    <string name="errorRideNotRecorded">The ride was not recorded due to privacy settings!\nRecording starts after 100 feet and 30 seconds</string>
     <string name="incidentDetected">"annotate incident."</string>
     <string name="noHistory">"No rides found."</string>
     <string name="nextPatch">"This feature will be available in the future."</string>
