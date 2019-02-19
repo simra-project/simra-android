@@ -16,7 +16,6 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -24,7 +23,6 @@ import android.support.v7.widget.Toolbar;
 
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -329,7 +327,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                     unbindService(mRecorderServiceConnection);
                     stopService(recService);
                     recording = false;
-                    if(mBoundRecorderService.getRecordingallowed()) {
+                    if(mBoundRecorderService.getRecordingAllowed()) {
                         // Get the recorded files and send them to HistoryActivity for further processing
                         Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
                         // The file under PathToAccGpsFile contains the accelerometer and location data

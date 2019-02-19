@@ -35,14 +35,6 @@ public class Constants extends Service {
 
     public static final String APP_PATH = "/data/user/0/app.com.example.android.octeight/";
 
-    // don't start to record the ride, until user is 30 meters away
-    // from his starting position.
-    public static double PRIVACY_DISTANCE = 30.0;
-
-    // don't start to record the ride, until user 30 seconds passed
-    // from recording start time.
-    public static long PRIVACY_DURATION = 30000;
-
     public Constants() {
     }
 
