@@ -1,7 +1,9 @@
 package app.com.example.android.octeight;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import java.io.File;
@@ -85,6 +87,17 @@ public class Utils {
 
         }
 
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Create an AlertDialog with an OK Button displaying a message
+    public static void showMessageOK(String message, DialogInterface.OnClickListener okListener, Context context) {
+        new AlertDialog.Builder(context)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("OK", okListener)
+                .create()
+                .show();
     }
 
 }

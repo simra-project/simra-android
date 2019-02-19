@@ -33,6 +33,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static app.com.example.android.octeight.Constants.PRIVACY_DISTANCE;
+import static app.com.example.android.octeight.Constants.PRIVACY_DURATION;
 import static app.com.example.android.octeight.Utils.appendToFile;
 
 public class RecorderService extends Service implements SensorEventListener, LocationListener {
@@ -44,7 +46,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public static final String TAG = "RecorderService_LOG:";
     final int ACC_POLL_FREQUENCY = Constants.ACC_FREQUENCY;
     final int GPS_POLL_FREQUENCY = Constants.GPS_FREQUENCY;
-    public String mAcceleration = "";
     long curTime;
     long startTime;
     long endTime;
@@ -54,8 +55,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     String pathToAccGpsFile = "";
     LocationManager locationManager;
     Location lastLocation;
-    String recordedAccData = "";
-    String recordedGPSData = "";
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Strings for storing data to enable continued use by other activities
@@ -68,8 +68,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     Queue<Float> accZQueue;
     SharedPreferences sharedPrefs;
     SharedPreferences.Editor editor;
+    Location startLocation;
+
+    // This is set to true, when recording is allowed according to PRIVACY_DURATION and PRIVACY_DISTANCE
+    private boolean recordingAllowed;
+
     private long lastAccUpdate = 0;
-    //private long lastGPSUpdate = 0;
     private long lastGPSUpdate = 0;
     private SensorManager sensorManager = null;
     private PowerManager.WakeLock wakeLock = null;
@@ -77,10 +81,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private String accString = "";
     private String gpsString = "";
     private String accGpsString = "";
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // The files which contain accString, gpsString and accGpsString
-    // private File accFile;
-    // private File gpsFile;
+
     public String getGpsString() {
         return gpsString;
     }
@@ -94,6 +95,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public String getPathToAccGpsFile() { return pathToAccGpsFile; }
 
     public double getDuration() { return (curTime - startTime); }
+
+    public boolean getRecordingallowed() { return recordingAllowed; }
 
     public long getTimeStamp() { return curTime; }
 
@@ -121,12 +124,22 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        curTime = System.currentTimeMillis();
+
+        // Privacy filter: Set recordingAllowed to true, when enough time (PRIVACY_DURATION) passed
+        // since the user pressed Start Recording AND there is enough distance (PRIVACY_DISTANCE)
+        // between the starting location and the current location.
+        if(!recordingAllowed && startLocation != null && lastLocation!= null){
+            if((startLocation.distanceTo(lastLocation)>=PRIVACY_DISTANCE)
+                    && ((curTime-startTime)>PRIVACY_DURATION)){
+                    recordingAllowed = true;
+            }
+        }
 
         accelerometerMatrix = event.values;
 
-        curTime = System.currentTimeMillis();
 
-        if((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) {
+        if(((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) && recordingAllowed) {
 
             lastAccUpdate = curTime;
             // Write data to file in background thread
@@ -168,7 +181,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public void onLocationChanged(Location location) {
-        if (location.getAccuracy() < 20.0){
+
+        if (location.getAccuracy() < 30.0){
+            if(startLocation == null){
+                startLocation = location;
+            }
             lastLocation = location;
         }
     }
@@ -214,7 +231,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 .LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager
                 .GPS_PROVIDER,3000,1.0f,this);
-        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,3000,1.0f,this);
 
         // Queues for storing acc data
         accXQueue = new LinkedList<>();
@@ -287,7 +304,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public void onDestroy() {
         endTime = curTime;
 
-        if((curTime - startTime) > Constants.MINIMAL_RIDE_DURATION) {
+        // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
+        // with current ride and and sharedPrefs with current ride key. Do these things only,
+        // if recording is allowed (see PRIVACY_DURATION and PRIVACY_DISTANCE in Constants class)
+        if(recordingAllowed) {
 
             // Create head of the csv-file
             appendToFile("lat,lon,X,Y,Z,timeStamp"+System.lineSeparator(), pathToAccGpsFile, this);

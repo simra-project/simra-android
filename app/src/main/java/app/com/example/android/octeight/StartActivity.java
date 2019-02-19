@@ -19,6 +19,7 @@ import android.widget.Button;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.showMessageOK;
 
 /**
  * Shows general info about the app and starts the MainActivity once the okay-Button is pressed
@@ -181,22 +182,11 @@ public class StartActivity extends BaseActivity {
                             new String[]{requestedPermission}, accessCode);
                 }
             };
-            showMessageOK(rationaleMessage, rationaleOnClickListener);
+            showMessageOK(rationaleMessage, rationaleOnClickListener, StartActivity.this);
         }
     }
 
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Create an AlertDialog with an OK Button displaying a message
-    private void showMessageOK(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(StartActivity.this)
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("OK", okListener)
-                .create()
-                .show();
-    }
 
 
     // Create an AlertDialog with an Ok and Cancel Button displaying a message

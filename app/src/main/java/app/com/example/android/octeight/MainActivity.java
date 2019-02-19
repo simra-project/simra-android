@@ -3,6 +3,7 @@ package app.com.example.android.octeight;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -15,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -46,6 +48,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static app.com.example.android.octeight.Utils.getUniqueUserID;
+import static app.com.example.android.octeight.Utils.showMessageOK;
 
 
 public class MainActivity extends BaseActivity implements OnNavigationItemSelectedListener, LocationListener {
@@ -326,7 +329,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                     unbindService(mRecorderServiceConnection);
                     stopService(recService);
                     recording = false;
-                    if( mBoundRecorderService.getDuration() > Constants.MINIMAL_RIDE_DURATION) {
+                    if(mBoundRecorderService.getRecordingallowed()) {
                         // Get the recorded files and send them to HistoryActivity for further processing
                         Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
                         // The file under PathToAccGpsFile contains the accelerometer and location data
@@ -345,9 +348,12 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                         intent.putExtra("State", 0); // redundant
                         startActivity(intent);
                     } else {
-                        Toast toast = Toast.makeText(MainActivity.this,R.string.errorRideTooShort, Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
+                        DialogInterface.OnClickListener errorOnClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        };
+                        showMessageOK(getString(R.string.errorRideNotRecorded),errorOnClickListener, MainActivity.this);
                     }
                 } catch (Exception e){
                     Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
