@@ -304,7 +304,7 @@ public class ShowRouteActivity extends BaseActivity {
                 myMarkerFunct.setMarker(new AccEvent(Integer.valueOf(incidentProps[0]),
                         Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
                         Long.parseLong(incidentProps[3]),
-                        annotated));
+                        annotated), Integer.valueOf(incidentProps[0]));
 
             }
         }

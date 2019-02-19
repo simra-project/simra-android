@@ -1,6 +1,8 @@
 package app.com.example.android.octeight;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.location.Address;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -19,7 +21,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 
@@ -51,6 +55,8 @@ public class MarkerFunct {
     String timeStamp;
 
     private int numEvents;
+
+    private Map<Integer, Marker> markerMap = new HashMap<>();
 
     public MarkerFunct(ShowRouteActivity mother) {
 
@@ -120,18 +126,20 @@ public class MarkerFunct {
                         Long.parseLong(actualIncident[3]),annotated);
 
                 Log.d(TAG, "accEvent key: " + accEvent.key + " accEvent.position" + accEvent.position.toString());
-                    setMarker(accEvent);
+                    setMarker(accEvent, accEvent.key);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
     }
 
     public void addCustMarker(GeoPoint p) {
+
+        // Because custom markers should only be placed on the actual route, after the
+        // user taps onto the map we're determining the GeoPoint on the route that
+        // is clostest to the location the user has actually tapped.
+        // => this is done via the GeoPointWrapper class.
 
         GeoPoint closestOnRoute;
 
@@ -145,9 +153,7 @@ public class MarkerFunct {
 
         Log.i("WRAPPED_GP_LIST", String.valueOf(wrappedGPS.size()));
 
-        Collections.sort(wrappedGPS, new Comparator<GeoPointWrapper>() {
-            @Override
-            public int compare(GeoPointWrapper o1, GeoPointWrapper o2) {
+        Collections.sort(wrappedGPS, (GeoPointWrapper o1, GeoPointWrapper o2) -> {
 
                 if(o1.distToReference < o2.distToReference) return -1;
 
@@ -155,21 +161,13 @@ public class MarkerFunct {
 
                 else return 0;
 
-            }
-        });
+            });
 
         // Collections.sort(wrappedGPS);
 
         closestOnRoute = wrappedGPS.get(0).wrappedGeoPoint;
 
         Log.i("WRAPPED_GP_LIST", closestOnRoute.toString());
-
-        /**String[] eventLine = new String[6];
-        eventLine[0] = String.valueOf(closestOnRoute.getLatitude());
-        eventLine[1] = String.valueOf(closestOnRoute.getLongitude());
-        eventLine[5] = "1337";
-
-        AccEvent newAcc = new AccEvent(eventLine);*/
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Create a new AccEvent
@@ -182,42 +180,94 @@ public class MarkerFunct {
         Log.i("NEW_ACC", newAcc.toString());
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Append new acc event to accEvents[rideID].csv
-
-        String pathToAccEventsOfRide = "accEvents" + rideID + ".csv";
-        String header = "key,lat,lon,ts,incidentType,phoneLocation,description";
-        header += System.lineSeparator();
-        String eventLine = eventCount + ","
-                + newAcc.position.getLatitude() + "," + newAcc.position.getLongitude()
-                + "," + newAcc.timeStamp + ",,," + System.lineSeparator();
-
-        if(!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())){
-
-            appendToFile((header + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
-
-            } else {
-
-            appendToFile(eventLine, pathToAccEventsOfRide, mother.getApplicationContext());
-
-        }
-
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Add new AccEvent to ride's AccEvents list
-
-        mother.ride.getEvents().add(newAcc);
-
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // set Marker for new AccEvent, refresh map
 
-        setMarker(newAcc);
+        setMarker(newAcc, eventCount);
 
         mother.getmMapView().invalidate();
 
+        long sleepTime = 500L;
+
+        try {
+
+            Thread.sleep(sleepTime);
+
+        } catch (InterruptedException ie) {
+
+            // ....
+
+        }
+
+        // Now we display a dialog box to allow the user to decide if she/he is happy
+        // with the location of the custom marker.
+
+        approveCustMarker(newAcc);
+
     }
 
-    public void setMarker(AccEvent event) {
+    public void approveCustMarker(AccEvent newAcc) {
+
+        AlertDialog alertDialog = new AlertDialog.Builder(mother).create();
+        alertDialog.setTitle("Custom Marker Dialog");
+        alertDialog.setMessage("Neuer Marker wurde gesetzt!");
+
+        // NEGATIVE BUTTON: marker wasn't placed in the right location, remove from
+        // map & markerMap.
+        // Removal from ride.events and file not necessary as the new event hasn't been
+        // added to those structures yet.
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Abbrechen",
+                (DialogInterface dialog, int which) -> {
+                    Marker custMarker = markerMap.get(numEvents);
+                    mother.getmMapView().getOverlays().remove(custMarker);
+                    //mother.getmMapView().getOverlayManager().remove(custMarker);
+                    mother.getmMapView().invalidate();
+                    markerMap.remove(custMarker);
+                    numEvents -= 1;
+                });
+
+        // POSITIVE BUTTON: user approves of button. Add to ride.events & file.
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Speichern",
+                (DialogInterface dialog, int which) -> {
+
+                    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // Append new acc event to accEvents[rideID].csv
+
+                    String pathToAccEventsOfRide = "accEvents" + rideID + ".csv";
+                    String header = "key,lat,lon,ts,incidentType,phoneLocation,description";
+                    header += System.lineSeparator();
+                    String eventLine = newAcc.key + ","
+                            + newAcc.position.getLatitude() + "," + newAcc.position.getLongitude()
+                            + "," + newAcc.timeStamp + ",,," + System.lineSeparator();
+
+                    if(!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())){
+
+                        appendToFile((header + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
+
+                    } else {
+
+                        appendToFile(eventLine, pathToAccEventsOfRide, mother.getApplicationContext());
+
+                    }
+
+                    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // Add new AccEvent to ride's AccEvents list
+
+                    mother.ride.getEvents().add(newAcc);
+
+                });
+
+        alertDialog.show();
+
+    }
+
+    public void setMarker(AccEvent event, int accEventKey) {
 
         Marker incidentMarker = new Marker(mother.getmMapView());
+
+        // Add the marker + corresponding key to map so we can manage markers if
+        // necessary (e.g., remove them)
+
+        markerMap.put(accEventKey, incidentMarker);
 
         GeoPoint currentLocHelper = event.position;
 
