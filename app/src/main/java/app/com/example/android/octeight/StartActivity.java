@@ -117,6 +117,19 @@ public class StartActivity extends BaseActivity {
 
                 }
 
+                // Write the default values for privacy duration and distance. These values are
+                // used to determine whether a ride should be saved or not.
+                if (!sharedPrefs.contains("Privacy-Duration")) {
+                    // don't start to record the ride, until user is 30 meters away
+                    // from his starting position.
+                    editor.putLong("Privacy-Duration", 30000);
+                    editor.commit();
+                    // don't start to record the ride, until user 30 seconds passed
+                    // from recording start time.
+                    editor.putFloat("Privacy-Distance", 30.0f);
+                    editor.commit();
+                }
+
                 // Runnable that starts MainActivity after defined time (TIME_OUT)
                 startActivityRunnable = new Runnable() {
                     @Override
