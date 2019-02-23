@@ -278,12 +278,12 @@ public class Ride {
         ArrayList<AccEvent> accEvents = new ArrayList<>(6);
         ArrayList<String[]> events = new ArrayList<>(6);
 
-            accEvents.add(new AccEvent(thisLine.split(",")));
-            accEvents.add(new AccEvent(thisLine.split(",")));
-            accEvents.add(new AccEvent(thisLine.split(",")));
-            accEvents.add(new AccEvent(thisLine.split(",")));
-            accEvents.add(new AccEvent(thisLine.split(",")));
-            accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
 
         String[] template = {"0.0","0.0","0.0","0.0","0.0","0"};
         events.add(template);

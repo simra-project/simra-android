@@ -27,7 +27,7 @@
     <string name="selectedRideInfo">Die folgende Fahrt wurde ausgewählt: </string>
     <string name="errorNoRideSelected">Es wurde keine Fahrt ausgewählt!</string>
     <string name="errorRideTooShort">Die Fahrt muss mindestens\n30 Sekunden dauern!</string>
-    <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um ihre Privatsphäre zu schützen.\nEine Fahrt wird erst nach 30 Metern oder 30 Sekunden aufgenommen.</string>
+    <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um ihre Privatsphäre zu schützen.\nSie können ihre Privatsphäreeinstellungen und Einstellungen anpassen.</string>
     <string name="incidentDetected"> Ereignis annotieren.</string>
     <string name="noHistory"> Es wurden keine Fahrten gefunden.</string>
     <string name="nextPatch"> Diese Funktion wird leider erst mit dem nächsten Patch veröffentlicht.</string>
@@ -150,5 +150,7 @@
     <string name="locationTypeSpinnerTitle">Üblicher Ort des Geräts während der Fahrt:</string>
     <string name="editingProfileAborted">Profildaten wurden nicht gespeichert</string>
     <string name="editingProfileCompleted">Profildaten wurden gespeichert</string>
+    <string name="rideAnnotatedInHistoryActivity">Bearbeitete Fahrt. Bitte hochladen.</string>
+    <string name="rideUploadedInHistoryActivity">Bearbeitete und hochgeladene Fahrt.</string>
 
 </resources>
