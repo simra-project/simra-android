@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.location.network" />
 
@@ -24,6 +25,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+        <activity
+            android:name=".ProfileActivity"
+            android:label="@string/title_activity_profile"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="app.com.example.android.octeight.MainActivity" />
+        </activity>
+
         <meta-data
             android:name="MAPBOX_MAPID"
             android:value="mapbox.mapbox-light-v9" />
@@ -56,17 +67,17 @@
 
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTop" />
         <activity
             android:name=".WebActivity"
-            android:parentActivityName=".MainActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".SettingsActivity"
-            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_settings"
-            android:configChanges="orientation|screenSize"/>
+            android:parentActivityName=".MainActivity" />
 
         <service
             android:name=".Constants"
@@ -77,24 +88,26 @@
             android:parentActivityName=".MainActivity" />
         <service
             android:name=".UploadService"
-            android:parentActivityName=".HistoryActivity"
-            android:enabled="true" />
+            android:enabled="true"
+            android:parentActivityName=".HistoryActivity" />
 
         <activity
             android:name=".HistoryActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_history"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme"
-            android:configChanges="orientation|screenSize">
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.com.example.android.octeight.MainActivity" />
         </activity>
-        <activity android:name=".ShowRouteActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity android:name=".IncidentPopUpActivity"
-            android:theme="@style/AppTheme.PopUpWindow"
-            android:configChanges="orientation|screenSize"></activity>
+        <activity
+            android:name=".ShowRouteActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".IncidentPopUpActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.PopUpWindow" />
     </application>
 
 </manifest>

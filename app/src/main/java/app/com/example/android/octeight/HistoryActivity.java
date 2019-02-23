@@ -153,10 +153,10 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                                 intent.putExtra("Duration", String.valueOf(Long.valueOf(ridesList.get(position)[2]) - Long.valueOf(ridesList.get(position)[1])));
                                 intent.putExtra("StartTime", ridesList.get(position)[2]);
                                 intent.putExtra("State", ridesList.get(position)[3]);
-                                Log.d(TAG, intent.getStringExtra("PathToAccGpsFile"));
-                                Log.d(TAG, intent.getStringExtra("Duration"));
-                                Log.d(TAG, intent.getStringExtra("StartTime"));
-                                Log.d(TAG, intent.getStringExtra("State"));
+                                Log.d(TAG, "pathToAccGpsFile: " +  intent.getStringExtra("PathToAccGpsFile"));
+                                Log.d(TAG, "Duration: " + intent.getStringExtra("Duration"));
+                                Log.d(TAG, "StartTime: " + intent.getStringExtra("StartTime"));
+                                Log.d(TAG, "State: " + intent.getStringExtra("State"));
 
                                 startActivity(intent);
                             }
@@ -169,7 +169,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             });
         } else {
 
-            Log.d(TAG, "metaData.csv don't exists");
+            Log.d(TAG, "metaData.csv doesn't exists");
 
             Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), (getString(R.string.noHistory)), Snackbar.LENGTH_LONG);
             snackbar.show();
@@ -177,7 +177,6 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         }
 
         RelativeLayout justUploadButton = findViewById(R.id.justUpload);
-        Log.d(TAG, "justUploadButton" + justUploadButton);
         justUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -235,7 +234,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                             if (mBoundUploadService != null) {
                                 int currentNumberOfTasks = mBoundUploadService.getNumberOfTasks();
                                 pd.setProgress(Math.round(100 - 100 * ((float)currentNumberOfTasks / (float)(ridesToUpload.size()*2))));
-                                Log.d(TAG, ""+currentNumberOfTasks);
+                                Log.d(TAG, "currentNumberOfTasks: "+currentNumberOfTasks);
                                 if (currentNumberOfTasks == 0) {
                                     unbindService(mUploadServiceConnection);
                                     pd.dismiss();
@@ -262,7 +261,6 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
 
         RelativeLayout uploadAndExitButton = findViewById(R.id.uploadAndExit);
-        Log.d(TAG, "uploadAndExitButton" + uploadAndExitButton);
         uploadAndExitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -350,18 +348,8 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                 drawer.closeDrawer(GravityCompat.START);
             }
         } else if (id == R.id.nav_democraphic_data) {
-            // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
-            Intent i = new Intent(Intent.ACTION_SEND);
-            i.setType("message/rfc822");
-            i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
-            i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.demoDataHeader));
-            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.demoDataMail));
-            try {
-                startActivity(Intent.createChooser(i, "Send Data..."));
-            } catch (android.content.ActivityNotFoundException ex) {
-                Toast.makeText(HistoryActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-            }
-
+            Intent intent = new Intent (HistoryActivity.this, ProfileActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_feedback) {
             // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
             Intent i = new Intent(Intent.ACTION_SEND);
