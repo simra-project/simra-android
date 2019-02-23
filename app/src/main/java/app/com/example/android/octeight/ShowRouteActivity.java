@@ -123,12 +123,10 @@ public class ShowRouteActivity extends BaseActivity {
 
         Log.d(TAG, "creating ride objects");
 
-        try {
-            // Create a ride object with the accelerometer, gps and time data
-            ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, this);
-        } catch (NullPointerException nE){
-            nE.printStackTrace();
-        }
+
+        // Create a ride object with the accelerometer, gps and time data
+        ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, this);
+
 
         // Get the Route as a Polyline to be displayed on the map
         Polyline route = ride.getRoute();
