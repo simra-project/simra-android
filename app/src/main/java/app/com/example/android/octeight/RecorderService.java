@@ -71,7 +71,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
     private boolean recordingAllowed;
-    private double privacyDistance;
+    private float privacyDistance;
     private long privacyDuration;
 
     private long lastAccUpdate = 0;
@@ -131,7 +131,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // since the user pressed Start Recording AND there is enough distance (privacyDistance)
         // between the starting location and the current location.
         if(!recordingAllowed && startLocation != null && lastLocation!= null){
-            if((startLocation.distanceTo(lastLocation)>=privacyDistance)
+            if((startLocation.distanceTo(lastLocation)>=(float) privacyDistance)
                     && ((curTime-startTime)>privacyDuration)){
                     recordingAllowed = true;
             }
@@ -251,8 +251,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             editor.apply();
         }
 
-        privacyDistance = (double) sharedPrefs.getFloat("Privacy-Distance", 0.0f);
-        privacyDuration = sharedPrefs.getLong("Privacy-Duration", 00000);
+        privacyDistance = (float) sharedPrefs.getInt("Privacy-Distance", 30);
+        privacyDuration = (sharedPrefs.getLong("Privacy-Duration", 30)*1000);
+        Log.d(TAG, "privacyDistance: "  + privacyDistance + " privacyDuration: " + privacyDuration);
+
 
         pathToAccGpsFile = sharedPrefs.getInt("RIDE-KEY", 0)
                 + "_accGps_"

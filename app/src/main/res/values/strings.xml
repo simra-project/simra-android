@@ -83,4 +83,10 @@
     <string name="sendErrorMessage">Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="privacyDurationDescription">Verzögerung des Aufnahmestarts\n(in Sekunden)</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="privacy_settings_title">Privatsphäre</string>
+    <string name="privacyDistanceDescription">Verzögerung des Aufnahmestarts\n(in Metern)</string>
+    <string name="settings_title">Einstellungen</string>
+
 </resources>
