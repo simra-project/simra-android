@@ -325,7 +325,7 @@ public class Ride {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if(thisLine.startsWith(",,")){
+            if (thisLine != null && thisLine.startsWith(",,")) {
                 newSubPart = true;
             }
 
@@ -353,7 +353,6 @@ public class Ride {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println(thisLine == nextLine);
                 if(thisLine != null && !thisLine.startsWith(",,")){
                     newSubPart = false;
                 }
