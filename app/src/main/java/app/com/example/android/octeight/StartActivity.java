@@ -122,11 +122,11 @@ public class StartActivity extends BaseActivity {
                 if (!sharedPrefs.contains("Privacy-Duration")) {
                     // don't start to record the ride, until user is 30 meters away
                     // from his starting position.
-                    editor.putLong("Privacy-Duration", 30000);
+                    editor.putLong("Privacy-Duration", 30);
                     editor.commit();
                     // don't start to record the ride, until user 30 seconds passed
                     // from recording start time.
-                    editor.putFloat("Privacy-Distance", 30.0f);
+                    editor.putInt("Privacy-Distance", 30);
                     editor.commit();
                 }
 
