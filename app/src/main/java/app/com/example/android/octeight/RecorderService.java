@@ -73,6 +73,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private boolean recordingAllowed;
     private float privacyDistance;
     private long privacyDuration;
+    private boolean lineAdded;
 
     private long lastAccUpdate = 0;
     private long lastGPSUpdate = 0;
@@ -183,7 +184,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onLocationChanged(Location location) {
 
-        if (location.getAccuracy() < 30.0){
+        if (location.getAccuracy() < 100.0){
             if(startLocation == null){
                 startLocation = location;
             }
@@ -313,7 +314,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
         // with current ride and and sharedPrefs with current ride key. Do these things only,
         // if recording is allowed (see privacyDuration and privacyDistance)
-        if(recordingAllowed) {
+        if(recordingAllowed && lineAdded) {
 
             // Create head of the csv-file
             appendToFile("lat,lon,X,Y,Z,timeStamp"+System.lineSeparator(), pathToAccGpsFile, this);
@@ -553,6 +554,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 accGpsString += str /*+= String.valueOf(qAvg)*/;
                 accGpsString += System.getProperty("line.separator");
+                lineAdded = true;
 
                 /** Now remove as many elements from the queues as our moving average step/shift
                     specifies and therefore enable new data points to come in.

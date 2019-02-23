@@ -30,7 +30,7 @@
     <string name="selectedRideInfo">The following ride has been chosen:</string>
     <string name="errorNoRideSelected">No ride has been chosen!</string>
     <string name="errorRideTooShort">The ride must be at\nleast 30 seconds long!</string>
-    <string name="errorRideNotRecorded">The ride was not recorded due to privacy settings!\nRecording starts after 100 feet and 30 seconds</string>
+    <string name="errorRideNotRecorded">The ride was not recorded due to privacy settings!\nYou can check your privacy settings under settings</string>
     <string name="incidentDetected">"annotate incident."</string>
     <string name="noHistory">"No rides found."</string>
     <string name="nextPatch">"This feature will be available in the future."</string>
@@ -152,4 +152,6 @@
     <string name="locationTypeSpinnerTitle">The usual location of your phone during a ride:</string>
     <string name="editingProfileAborted">Profile data not saved</string>
     <string name="editingProfileCompleted">Profile data saved</string>
+    <string name="rideAnnotatedInHistoryActivity">Annotated ride. Please upload.</string>
+    <string name="rideUploadedInHistoryActivity">Annotated and uploaded ride.</string>
 </resources>

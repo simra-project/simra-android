@@ -98,6 +98,9 @@ public class SettingsActivity extends BaseActivity {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (progress < 3){
+                    seekBar.setProgress(3);
+                }
                 if(unit.equals("ft")){
                     tV.setText(Math.round(seekBar.getProgress()*3.28) + unit + "/" + Math.round(seekBar.getMax()*3.28)+ unit);
 
@@ -114,6 +117,9 @@ public class SettingsActivity extends BaseActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                if (seekBar.getProgress() < 3){
+                    seekBar.setProgress(3);
+                }
                 if(unit.equals("ft")){
                     tV.setText(Math.round(seekBar.getProgress()*3.28) + unit + "/" + Math.round(seekBar.getMax()*3.28)+ unit);
 

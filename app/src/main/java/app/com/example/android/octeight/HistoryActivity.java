@@ -116,8 +116,13 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             //ridesArr = ridesList.toArray(new String[ridesList.size()]);
             ridesArr = new String[ridesList.size()];
             Log.d(TAG, "ridesList: " + Arrays.deepToString(ridesList.toArray()));
+            /*
+            for (int i = 0; i < ridesList.size(); i++) {
+                ridesArr[Integer.valueOf(ridesList.get(i)[0])] = listToTextShape(ridesList.get(i));
+            }
+            */
             for (String[] i : ridesList) {
-                ridesArr[Integer.parseInt(i[0])] = listToTextShape(i);
+                ridesArr[((ridesList.size())-Integer.parseInt(i[0]))-1] = listToTextShape(i);
             }
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
@@ -163,9 +168,6 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                         }
                     }
                 }
-
-                ;
-
             });
         } else {
 
@@ -274,9 +276,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
         // Press immediately the button, if HistoryActivity was created automatically after the
         // recording of a route has finished
-        if (getIntent().hasExtra("PathToAccGpsFile"))
-        {
-
+        if (getIntent().hasExtra("PathToAccGpsFile")) {
             startShowRouteWithSelectedRide();
         }
 
@@ -295,7 +295,10 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             for (int i = 0; i < dirFiles.length; i++) {
                 if(dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_2.csv")){
                     Log.d(TAG, "dirFiles[i].getName().endsWith: " + dirFiles[i].getName());
-                    todo = "";
+                    todo = getString(R.string.rideUploadedInHistoryActivity);
+                } else if(dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_1.csv")){
+                    todo = getString(R.string.rideAnnotatedInHistoryActivity);
+
                 }
             }
         }
