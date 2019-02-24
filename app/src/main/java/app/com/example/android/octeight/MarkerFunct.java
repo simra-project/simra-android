@@ -4,6 +4,7 @@ package app.com.example.android.octeight;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.location.Address;
+import android.os.Handler;
 import android.text.format.DateUtils;
 import android.util.Log;
 
@@ -172,7 +173,7 @@ public class MarkerFunct {
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Create a new AccEvent
 
-        int eventCount = this.numEvents + 1;
+        int eventCount = ++ this.numEvents;
 
         AccEvent newAcc = new AccEvent(eventCount, closestOnRoute.getLatitude(),
                 closestOnRoute.getLongitude(), 1337, false);
@@ -208,8 +209,9 @@ public class MarkerFunct {
     public void approveCustMarker(AccEvent newAcc) {
 
         AlertDialog alertDialog = new AlertDialog.Builder(mother).create();
-        alertDialog.setTitle("Custom Marker Dialog");
-        alertDialog.setMessage("Neuer Marker wurde gesetzt!");
+        alertDialog.setTitle("Neuer Vorfall hinzugefügt!");
+        alertDialog.setMessage("Möchten Sie den Vorfall an diesem " +
+                "Ort speichern?");
 
         // NEGATIVE BUTTON: marker wasn't placed in the right location, remove from
         // map & markerMap.
@@ -217,12 +219,12 @@ public class MarkerFunct {
         // added to those structures yet.
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Abbrechen",
                 (DialogInterface dialog, int which) -> {
-                    Marker custMarker = markerMap.get(numEvents);
+                    Marker custMarker = markerMap.get(this.numEvents);
                     mother.getmMapView().getOverlays().remove(custMarker);
                     //mother.getmMapView().getOverlayManager().remove(custMarker);
                     mother.getmMapView().invalidate();
                     markerMap.remove(custMarker);
-                    numEvents -= 1;
+                    this.numEvents --;
                 });
 
         // POSITIVE BUTTON: user approves of button. Add to ride.events & file.
@@ -256,7 +258,11 @@ public class MarkerFunct {
 
                 });
 
-        alertDialog.show();
+        new Handler().postDelayed( () -> {
+            alertDialog.show();
+
+        },750);
+
 
     }
 
