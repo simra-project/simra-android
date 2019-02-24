@@ -40,7 +40,7 @@
     </style>
 
     <!-- This configures the styles for the pop up window used for incident annotation -->
-    <style name="AppTheme.PopUpWindow" >
+    <style name="AppTheme.PopUpWindow">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowCloseOnTouchOutside">true</item>
         <item name="android:windowBackground">@color/transparent</item>
@@ -48,6 +48,11 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
 </resources>

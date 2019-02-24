@@ -29,7 +29,9 @@ import java.util.List;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
+import static app.com.example.android.octeight.Utils.writeIntToSharePrefs;
 
 public class IncidentPopUpActivity extends AppCompatActivity {
 
@@ -73,6 +75,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         final Spinner locationTypeSpinner = findViewById(R.id.locationSpinner);
 
         final EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
+
+        locationTypeSpinner.setSelection(lookUpIntSharedPrefs("Profile-phoneLocation",0,"simraPrefs",this));
 
         if (previousAnnotation != null && previousAnnotation[4].length()>0 && previousAnnotation[5].length()>0) {
 
@@ -126,6 +130,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
                 String incidentString = incidentKey + "," + lat + "," + lon + "," + date + ","
                         + "," + incidentIndex + "," + locationIndex + "," + description;
+
+                writeIntToSharePrefs("Profile-phoneLocation",locationIndex,"simraPrefs",this);
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("result", incidentString);

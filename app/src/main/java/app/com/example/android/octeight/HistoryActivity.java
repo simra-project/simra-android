@@ -116,8 +116,13 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             //ridesArr = ridesList.toArray(new String[ridesList.size()]);
             ridesArr = new String[ridesList.size()];
             Log.d(TAG, "ridesList: " + Arrays.deepToString(ridesList.toArray()));
+            /*
+            for (int i = 0; i < ridesList.size(); i++) {
+                ridesArr[Integer.valueOf(ridesList.get(i)[0])] = listToTextShape(ridesList.get(i));
+            }
+            */
             for (String[] i : ridesList) {
-                ridesArr[Integer.parseInt(i[0])] = listToTextShape(i);
+                ridesArr[((ridesList.size())-Integer.parseInt(i[0]))-1] = listToTextShape(i);
             }
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
@@ -153,23 +158,20 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                                 intent.putExtra("Duration", String.valueOf(Long.valueOf(ridesList.get(position)[2]) - Long.valueOf(ridesList.get(position)[1])));
                                 intent.putExtra("StartTime", ridesList.get(position)[2]);
                                 intent.putExtra("State", ridesList.get(position)[3]);
-                                Log.d(TAG, intent.getStringExtra("PathToAccGpsFile"));
-                                Log.d(TAG, intent.getStringExtra("Duration"));
-                                Log.d(TAG, intent.getStringExtra("StartTime"));
-                                Log.d(TAG, intent.getStringExtra("State"));
+                                Log.d(TAG, "pathToAccGpsFile: " +  intent.getStringExtra("PathToAccGpsFile"));
+                                Log.d(TAG, "Duration: " + intent.getStringExtra("Duration"));
+                                Log.d(TAG, "StartTime: " + intent.getStringExtra("StartTime"));
+                                Log.d(TAG, "State: " + intent.getStringExtra("State"));
 
                                 startActivity(intent);
                             }
                         }
                     }
                 }
-
-                ;
-
             });
         } else {
 
-            Log.d(TAG, "metaData.csv don't exists");
+            Log.d(TAG, "metaData.csv doesn't exists");
 
             Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), (getString(R.string.noHistory)), Snackbar.LENGTH_LONG);
             snackbar.show();
@@ -177,7 +179,6 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         }
 
         RelativeLayout justUploadButton = findViewById(R.id.justUpload);
-        Log.d(TAG, "justUploadButton" + justUploadButton);
         justUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -235,7 +236,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                             if (mBoundUploadService != null) {
                                 int currentNumberOfTasks = mBoundUploadService.getNumberOfTasks();
                                 pd.setProgress(Math.round(100 - 100 * ((float)currentNumberOfTasks / (float)(ridesToUpload.size()*2))));
-                                Log.d(TAG, ""+currentNumberOfTasks);
+                                Log.d(TAG, "currentNumberOfTasks: "+currentNumberOfTasks);
                                 if (currentNumberOfTasks == 0) {
                                     unbindService(mUploadServiceConnection);
                                     pd.dismiss();
@@ -262,7 +263,6 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
 
         RelativeLayout uploadAndExitButton = findViewById(R.id.uploadAndExit);
-        Log.d(TAG, "uploadAndExitButton" + uploadAndExitButton);
         uploadAndExitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -276,9 +276,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
         // Press immediately the button, if HistoryActivity was created automatically after the
         // recording of a route has finished
-        if (getIntent().hasExtra("PathToAccGpsFile"))
-        {
-
+        if (getIntent().hasExtra("PathToAccGpsFile")) {
             startShowRouteWithSelectedRide();
         }
 
@@ -297,7 +295,10 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             for (int i = 0; i < dirFiles.length; i++) {
                 if(dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_2.csv")){
                     Log.d(TAG, "dirFiles[i].getName().endsWith: " + dirFiles[i].getName());
-                    todo = "";
+                    todo = getString(R.string.rideUploadedInHistoryActivity);
+                } else if(dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_1.csv")){
+                    todo = getString(R.string.rideAnnotatedInHistoryActivity);
+
                 }
             }
         }
@@ -350,18 +351,8 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                 drawer.closeDrawer(GravityCompat.START);
             }
         } else if (id == R.id.nav_democraphic_data) {
-            // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
-            Intent i = new Intent(Intent.ACTION_SEND);
-            i.setType("message/rfc822");
-            i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
-            i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.demoDataHeader));
-            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.demoDataMail));
-            try {
-                startActivity(Intent.createChooser(i, "Send Data..."));
-            } catch (android.content.ActivityNotFoundException ex) {
-                Toast.makeText(HistoryActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-            }
-
+            Intent intent = new Intent (HistoryActivity.this, ProfileActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_feedback) {
             // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
             Intent i = new Intent(Intent.ACTION_SEND);

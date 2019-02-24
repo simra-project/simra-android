@@ -48,11 +48,39 @@ public class Utils {
         return sharedPrefs.getString(key, defValue);
     }
 
+    public static int lookUpIntSharedPrefs(String key, int defValue, String sharedPrefName, Context context){
+        SharedPreferences sharedPrefs = context.getApplicationContext()
+                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
+        return sharedPrefs.getInt(key, defValue);
+    }
+
+    public static long lookUpLongSharedPrefs(String key, long defValue, String sharedPrefName, Context context){
+        SharedPreferences sharedPrefs = context.getApplicationContext()
+                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
+        return sharedPrefs.getLong(key, defValue);
+    }
+
     public static void writeToSharePrefs(String key, String value, String sharedPrefName, Context context){
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString(key, value);
+        editor.apply();
+    }
+
+    public static void writeIntToSharePrefs(String key, int value, String sharedPrefName, Context context){
+        SharedPreferences sharedPrefs = context.getApplicationContext()
+                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putInt(key, value);
+        editor.apply();
+    }
+
+    public static void writeLongToSharePrefs(String key, long value, String sharedPrefName, Context context){
+        SharedPreferences sharedPrefs = context.getApplicationContext()
+                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putLong(key, value);
         editor.apply();
     }
 
