@@ -278,12 +278,12 @@ public class Ride {
         ArrayList<AccEvent> accEvents = new ArrayList<>(6);
         ArrayList<String[]> events = new ArrayList<>(6);
 
-            accEvents.add(new AccEvent(thisLine.split(",")));
-            accEvents.add(new AccEvent(thisLine.split(",")));
-            accEvents.add(new AccEvent(thisLine.split(",")));
-            accEvents.add(new AccEvent(thisLine.split(",")));
-            accEvents.add(new AccEvent(thisLine.split(",")));
-            accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
+        accEvents.add(new AccEvent(thisLine.split(",")));
 
         String[] template = {"0.0","0.0","0.0","0.0","0.0","0"};
         events.add(template);
@@ -325,7 +325,7 @@ public class Ride {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if(thisLine.startsWith(",,")){
+            if (thisLine != null && thisLine.startsWith(",,")) {
                 newSubPart = true;
             }
 
@@ -353,7 +353,6 @@ public class Ride {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println(thisLine == nextLine);
                 if(thisLine != null && !thisLine.startsWith(",,")){
                     newSubPart = false;
                 }

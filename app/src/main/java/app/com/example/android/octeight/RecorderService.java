@@ -33,8 +33,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static app.com.example.android.octeight.Constants.PRIVACY_DISTANCE;
-import static app.com.example.android.octeight.Constants.PRIVACY_DURATION;
 import static app.com.example.android.octeight.Utils.appendToFile;
 
 public class RecorderService extends Service implements SensorEventListener, LocationListener {
@@ -70,8 +68,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences.Editor editor;
     Location startLocation;
 
-    // This is set to true, when recording is allowed according to PRIVACY_DURATION and PRIVACY_DISTANCE
+    // This is set to true, when recording is allowed according to Privacy-Duration and
+    // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
     private boolean recordingAllowed;
+    private float privacyDistance;
+    private long privacyDuration;
+    private boolean lineAdded;
 
     private long lastAccUpdate = 0;
     private long lastGPSUpdate = 0;
@@ -96,7 +98,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     public double getDuration() { return (curTime - startTime); }
 
-    public boolean getRecordingallowed() { return recordingAllowed; }
+    public boolean getRecordingAllowed() { return recordingAllowed; }
 
     public long getTimeStamp() { return curTime; }
 
@@ -126,12 +128,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public void onSensorChanged(SensorEvent event) {
         curTime = System.currentTimeMillis();
 
-        // Privacy filter: Set recordingAllowed to true, when enough time (PRIVACY_DURATION) passed
-        // since the user pressed Start Recording AND there is enough distance (PRIVACY_DISTANCE)
+        // Privacy filter: Set recordingAllowed to true, when enough time (privacyDuration) passed
+        // since the user pressed Start Recording AND there is enough distance (privacyDistance)
         // between the starting location and the current location.
         if(!recordingAllowed && startLocation != null && lastLocation!= null){
-            if((startLocation.distanceTo(lastLocation)>=PRIVACY_DISTANCE)
-                    && ((curTime-startTime)>PRIVACY_DURATION)){
+            if((startLocation.distanceTo(lastLocation)>=(float) privacyDistance)
+                    && ((curTime-startTime)>privacyDuration)){
                     recordingAllowed = true;
             }
         }
@@ -182,7 +184,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onLocationChanged(Location location) {
 
-        if (location.getAccuracy() < 30.0){
+        if (location.getAccuracy() < 100.0){
             if(startLocation == null){
                 startLocation = location;
             }
@@ -250,6 +252,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             editor.apply();
         }
 
+        privacyDistance = (float) sharedPrefs.getInt("Privacy-Distance", 30);
+        privacyDuration = (sharedPrefs.getLong("Privacy-Duration", 30)*1000);
+        Log.d(TAG, "privacyDistance: "  + privacyDistance + " privacyDuration: " + privacyDuration);
+
+
         pathToAccGpsFile = sharedPrefs.getInt("RIDE-KEY", 0)
                 + "_accGps_"
                 + startTime +/*date +*/ ".csv";
@@ -306,8 +313,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
         // with current ride and and sharedPrefs with current ride key. Do these things only,
-        // if recording is allowed (see PRIVACY_DURATION and PRIVACY_DISTANCE in Constants class)
-        if(recordingAllowed) {
+        // if recording is allowed (see privacyDuration and privacyDistance)
+        if(recordingAllowed && lineAdded) {
 
             // Create head of the csv-file
             appendToFile("lat,lon,X,Y,Z,timeStamp"+System.lineSeparator(), pathToAccGpsFile, this);
@@ -547,6 +554,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 accGpsString += str /*+= String.valueOf(qAvg)*/;
                 accGpsString += System.getProperty("line.separator");
+                lineAdded = true;
 
                 /** Now remove as many elements from the queues as our moving average step/shift
                     specifies and therefore enable new data points to come in.
