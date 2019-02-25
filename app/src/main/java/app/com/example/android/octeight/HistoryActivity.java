@@ -35,6 +35,8 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
+import static app.com.example.android.octeight.Utils.overWriteFile;
 
 public class HistoryActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -185,9 +187,45 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
                 File[] dirFiles = getFilesDir().listFiles();
                 ArrayList<String> ridesToUpload = new ArrayList<>();
+                int numberOfRides = 0;
+                long duration = 0;
+                int numberOfIncidents = 0;
+
+                try {
+                    BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
+                    // br.readLine() to skip the first line which contains the headers
+                    String line = br.readLine();
+
+                    while ((line = br.readLine()) != null) {
+                        // Log.d(TAG, line);
+                        String[] actualLine = line.split(",");
+                        duration = duration + (Long.valueOf(actualLine[2])-Long.valueOf(actualLine[1]));
+                        numberOfRides = Integer.valueOf(actualLine[0]);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 if (dirFiles.length != 0) {
                     for (int i = 0; i < dirFiles.length; i++) {
                         String nameOfFileToBeRenamed = dirFiles[i].getName();
+                        if(nameOfFileToBeRenamed.startsWith("accEvents")){
+                            try {
+                                BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(nameOfFileToBeRenamed)));
+                                // br.readLine() to skip the first line which contains the headers
+                                String line = br.readLine();
+
+                                while ((line = br.readLine()) != null) {
+                                    // Log.d(TAG, line);
+                                    String[] actualLine = line.split(",",-1);
+                                    if((!actualLine[4].equals("") && !actualLine[4].equals("0")) && !actualLine[6].equals("")){
+                                        numberOfIncidents++;
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                         String newNameOfFile = nameOfFileToBeRenamed.replace("_1.csv", "_2.csv");
                         String path = Constants.APP_PATH + "files/";
                         Log.d(TAG, "nameOfFileToBeRenamed: " + nameOfFileToBeRenamed + " newNameOfFile: " + newNameOfFile);
@@ -198,8 +236,10 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                         }
                     }
                 }
-
                 if (ridesToUpload.size() > 0){
+                    String demographicHeader = "birth,gender,region,ber,lon,bike,loc,numberOfRides,duration,numberOfIncidents" + System.lineSeparator();
+                    String demographics = getDemographics();
+                    overWriteFile(demographicHeader+demographics+","+numberOfRides + ","+duration + "," + numberOfIncidents,"profile.csv", HistoryActivity.this);
                     Intent intent = new Intent(HistoryActivity.this, UploadService.class);
                     intent.putStringArrayListExtra("RidesToUpload", ridesToUpload);
                     startService(intent);
@@ -280,6 +320,20 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             startShowRouteWithSelectedRide();
         }
 
+    }
+
+    private String getDemographics() {
+
+        int birth = lookUpIntSharedPrefs("Profile-Age",0,"simraPrefs", this);
+        int gender = lookUpIntSharedPrefs("Profile-Gender",0,"simraPrefs", this);
+        int region = lookUpIntSharedPrefs("Profile-Region",0,"simraPrefs", this);
+        int ber = lookUpIntSharedPrefs("Profile-berDistrict",0,"simraPrefs", this);
+        int lon = lookUpIntSharedPrefs("Profile-lonDistrict",0,"simraPrefs", this);
+        int bike = lookUpIntSharedPrefs("Profile-bikeType",0,"simraPrefs", this);
+        int loc = lookUpIntSharedPrefs("Profile-phoneLocation",0,"simraPrefs", this);
+
+
+        return birth + "," + gender + "," + region + "," + ber + "," + lon + "," + bike + "," + loc;
     }
 
     private void stopTask(Handler handler, Runnable runnable){

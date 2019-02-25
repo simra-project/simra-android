@@ -171,7 +171,10 @@ public class UploadService extends Service {
 
             // makePostTestPhase("incidentData.csv", id);
 
+            makePostTestPhase("profile.csv", id);
+
             File[] dirFiles = getFilesDir().listFiles();
+
             Log.d(TAG, "dirFiles: " + Arrays.deepToString(dirFiles));
 
             Log.d(TAG, "sendCrashReportPermitted: " + sendCrashReportPermitted);
