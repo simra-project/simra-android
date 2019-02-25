@@ -110,7 +110,7 @@ public class StartActivity extends BaseActivity {
                 //   a ride. => Use case: user wants to view a ride from history - retrieve data
                 // * one meta file per user, so we only want to create it if it doesn't exist yet.
                 //   (fileExists and appendToFile can be found in the Utils.java class)
-
+                Log.d(TAG, "firstTime. Creating metaData.csv");
                 if(!fileExists("metaData.csv", this)) {
                     appendToFile("key, startTime, endTime, annotated"
                             +System.lineSeparator(), "metaData.csv", this);

@@ -65,10 +65,11 @@ public class SettingsActivity extends BaseActivity {
 
         // Load the privacy option values
         long privacyDuration = lookUpLongSharedPrefs("Privacy-Duration",30,"simraPrefs", this);
-        if(unit.equals("ft")){
-            privacyDuration = Math.round(lookUpLongSharedPrefs("Privacy-Duration",30,"simraPrefs", this)*3.28);
-        }
+
         int privacyDistance = lookUpIntSharedPrefs("Privacy-Distance",30,"simraPrefs", this);
+        if(unit.equals("ft")){
+            privacyDistance = (int)Math.round((lookUpIntSharedPrefs("Privacy-Distance",30,"simraPrefs", this)*3.28));
+        }
 
         // Set the seekBars according to the privacy option values
         durationSeekBar.setProgress((int)privacyDuration);
@@ -98,8 +99,11 @@ public class SettingsActivity extends BaseActivity {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress < 3){
-                    seekBar.setProgress(3);
+
+                if(unit.equals("s")){
+                    if (progress < 3){
+                        seekBar.setProgress(3);
+                    }
                 }
                 if(unit.equals("ft")){
                     tV.setText(Math.round(seekBar.getProgress()*3.28) + unit + "/" + Math.round(seekBar.getMax()*3.28)+ unit);
@@ -117,8 +121,11 @@ public class SettingsActivity extends BaseActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (seekBar.getProgress() < 3){
-                    seekBar.setProgress(3);
+
+                if(unit.equals("s")){
+                    if (seekBar.getProgress() < 3){
+                        seekBar.setProgress(3);
+                    }
                 }
                 if(unit.equals("ft")){
                     tV.setText(Math.round(seekBar.getProgress()*3.28) + unit + "/" + Math.round(seekBar.getMax()*3.28)+ unit);
