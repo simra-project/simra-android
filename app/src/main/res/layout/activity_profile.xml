@@ -9,7 +9,9 @@
     android:scrollbars="vertical"
     android:requiresFadingEdge="vertical"
     android:fadingEdgeLength="80dp"
-    android:id="@+id/activity_profile">
+    android:id="@+id/activity_profile"
+    android:animateLayoutChanges="true"
+    >
 
     <LinearLayout
         android:layout_marginTop="30dp"
@@ -19,7 +21,8 @@
         android:layout_marginStart="50dp"
         android:layout_marginEnd="50dp"
         android:background="@android:color/transparent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:animateLayoutChanges="true">
 
         <TextView
             android:id="@+id/ProfileTitle"
@@ -86,9 +89,11 @@
             android:prompt="@string/pleaseChoose"/>
 
         <Space
+            android:id="@+id/regionDistrictSpace"
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:animateLayoutChanges="true"/>
         <TextView
             android:id="@+id/districtSpinnerTitle"
             android:layout_width="wrap_content"

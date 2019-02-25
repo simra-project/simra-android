@@ -25,15 +25,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity
-            android:name=".ProfileActivity"
-            android:label="@string/title_activity_profile"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="app.com.example.android.octeight.MainActivity" />
-        </activity>
 
         <meta-data
             android:name="MAPBOX_MAPID"
@@ -73,6 +64,16 @@
             android:name=".WebActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ProfileActivity"
+            android:label="@string/title_activity_profile"
+            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="app.com.example.android.octeight.MainActivity" />
+        </activity>
         <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|screenSize"
