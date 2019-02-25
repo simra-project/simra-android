@@ -154,4 +154,6 @@
     <string name="editingProfileCompleted">Profile data saved</string>
     <string name="rideAnnotatedInHistoryActivity">Annotated ride. Please upload.</string>
     <string name="rideUploadedInHistoryActivity">Annotated and uploaded ride.</string>
+    <string name="customIncidentAddedTitle">New incident added!</string>
+    <string name="customIncidentAddedMessage">Did an incident happen here?</string>
 </resources>
