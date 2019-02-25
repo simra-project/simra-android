@@ -1,6 +1,7 @@
 package app.com.example.android.octeight;
 
 import android.content.res.Resources;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,10 +9,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Space;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.Locale;
 
@@ -54,10 +63,16 @@ public class ProfileActivity extends AppCompatActivity {
         Spinner ageGroupSpinner =  findViewById(R.id.ageGroupSpinner);
         Spinner genderSpinner =  findViewById(R.id.genderSpinner);
         Spinner regionSpinner =  findViewById(R.id.regionSpinner);
+        Space regionDistrictSpace = findViewById(R.id.regionDistrictSpace);
+        TextView districtTitle = findViewById(R.id.districtSpinnerTitle);
         Spinner berDistrictSpinner =  findViewById(R.id.districtBERSpinner);
         Spinner lonDistrictSpinner =  findViewById(R.id.districtLONSpinner);
         Spinner bikeSpinner =  findViewById(R.id.bikeTypeSpinner);
         Spinner locationTypeSpinner = findViewById(R.id.locationTypeSpinner);
+
+        // regionDistrictSpace.setVisibility(View.VISIBLE);
+        // regionSpinner.setOnItemClickListener();
+
 
 
         int[] previousProfile = loadPreviousProfile();
@@ -68,10 +83,60 @@ public class ProfileActivity extends AppCompatActivity {
         ageGroupSpinner.setSelection(previousProfile[0]);
         genderSpinner.setSelection(previousProfile[1]);
         regionSpinner.setSelection(previousProfile[2]);
+
         berDistrictSpinner.setSelection(previousProfile[3]);
         lonDistrictSpinner.setSelection(previousProfile[4]);
         bikeSpinner.setSelection(previousProfile[5]);
         locationTypeSpinner.setSelection(previousProfile[6]);
+
+        Log.d(TAG, "previousProfile[2]: " + previousProfile[2]);
+        if(previousProfile[2] == 1){
+            regionDistrictSpace.setVisibility(View.VISIBLE);
+            districtTitle.setVisibility(View.VISIBLE);
+            berDistrictSpinner.setVisibility(View.VISIBLE);
+        } else if (previousProfile[2] == 2){
+            regionDistrictSpace.setVisibility(View.VISIBLE);
+            districtTitle.setVisibility(View.VISIBLE);
+            lonDistrictSpinner.setVisibility(View.VISIBLE);
+        }
+
+        regionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1,
+                                       int arg2, long arg3) {
+                // TODO Auto-generated method stub
+                if(regionSpinner.getSelectedItemId()==1){
+                    regionDistrictSpace.setVisibility(View.VISIBLE);
+                    districtTitle.setVisibility(View.VISIBLE);
+                    berDistrictSpinner.setVisibility(View.VISIBLE);
+                    lonDistrictSpinner.setVisibility(View.GONE);
+                    lonDistrictSpinner.setSelection(0);
+                } else if (regionSpinner.getSelectedItemId()==2){
+                    regionDistrictSpace.setVisibility(View.VISIBLE);
+                    districtTitle.setVisibility(View.VISIBLE);
+                    lonDistrictSpinner.setVisibility(View.VISIBLE);
+                    berDistrictSpinner.setVisibility(View.GONE);
+                    berDistrictSpinner.setSelection(0);
+                } else {
+                    regionDistrictSpace.setVisibility(View.GONE);
+                    districtTitle.setVisibility(View.GONE);
+                    berDistrictSpinner.setVisibility(View.GONE);
+                    berDistrictSpinner.setSelection(0);
+                    lonDistrictSpinner.setVisibility(View.GONE);
+                    lonDistrictSpinner.setSelection(0);
+                }
+                String mSupplier=regionSpinner.getSelectedItem().toString();
+
+                Log.d(TAG,"Selected item :" + mSupplier);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+
+            }
+        });
 
         saveButton.setOnClickListener((View v) -> {
 
