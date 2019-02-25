@@ -7,6 +7,9 @@ import android.location.Address;
 import android.os.Handler;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Window;
+import android.view.WindowManager;
 
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.GeoPoint;
@@ -209,15 +212,14 @@ public class MarkerFunct {
     public void approveCustMarker(AccEvent newAcc) {
 
         AlertDialog alertDialog = new AlertDialog.Builder(mother).create();
-        alertDialog.setTitle("Neuer Vorfall hinzugefügt!");
-        alertDialog.setMessage("Möchten Sie den Vorfall an diesem " +
-                "Ort speichern?");
+        alertDialog.setTitle(mother.getResources().getString(R.string.customIncidentAddedTitle));
+        alertDialog.setMessage(mother.getResources().getString(R.string.customIncidentAddedMessage));
 
         // NEGATIVE BUTTON: marker wasn't placed in the right location, remove from
         // map & markerMap.
         // Removal from ride.events and file not necessary as the new event hasn't been
         // added to those structures yet.
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Abbrechen",
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, mother.getResources().getString(R.string.no),
                 (DialogInterface dialog, int which) -> {
                     Marker custMarker = markerMap.get(this.numEvents);
                     mother.getmMapView().getOverlays().remove(custMarker);
@@ -228,7 +230,7 @@ public class MarkerFunct {
                 });
 
         // POSITIVE BUTTON: user approves of button. Add to ride.events & file.
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Speichern",
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mother.getResources().getString(R.string.yes),
                 (DialogInterface dialog, int which) -> {
 
                     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -257,6 +259,13 @@ public class MarkerFunct {
                     mother.ride.getEvents().add(newAcc);
 
                 });
+
+        Window window = alertDialog.getWindow();
+        WindowManager.LayoutParams wlp = window.getAttributes();
+
+        wlp.gravity = Gravity.BOTTOM;
+        wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        window.setAttributes(wlp);
 
         new Handler().postDelayed( () -> {
             alertDialog.show();
