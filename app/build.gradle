@@ -6,8 +6,8 @@ android {
         applicationId "app.com.example.android.octeight"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 4
-        versionName "4.0"
+        versionCode 5
+        versionName "5.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
