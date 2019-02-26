@@ -1,6 +1,5 @@
 package app.com.example.android.octeight;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -37,16 +36,11 @@ import static app.com.example.android.octeight.Utils.getUniqueUserID;
 
 public class UploadService extends Service {
 
-    Activity activity;
     NotificationManagerCompat notificationManager;
     private PowerManager.WakeLock wakeLock = null;
     // For Managing the notification shown while the service is running
     int notificationId = 1453;
 
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
 
     int numberOfTasks = 0;
     public void decreaseNumberOfTasks(){
@@ -119,12 +113,10 @@ public class UploadService extends Service {
 
     private class UpdateTask extends AsyncTask<String, String, String> {
 
-        private String path;
         private Context context;
         private Intent intent;
 
-        private UpdateTask(/*String path, */Context context, Intent intent) {
-            // this.path = path;
+        private UpdateTask(Context context, Intent intent) {
             this.context = context;
             this.intent = intent;
         }
@@ -134,7 +126,6 @@ public class UploadService extends Service {
             Log.d(TAG, "doInBackground()");
 
             try {
-                // makePost(path);
                 uploadAllFilesTestPhase(context);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -167,9 +158,6 @@ public class UploadService extends Service {
             SharedPreferences.Editor editor = sharedPrefs.edit();
 
             boolean sendCrashReportPermitted = intent.getBooleanExtra("CRASH_REPORT", false);
-            // makePostTestPhase("metaData.csv", id);
-
-            // makePostTestPhase("incidentData.csv", id);
 
             makePostTestPhase("profile.csv", id);
 
@@ -286,59 +274,11 @@ public class UploadService extends Service {
             }
         }
 
-        private void makePost(String pathToFile) throws IOException {
-
-            File file = getFileStreamPath(pathToFile);
-            final StringBuilder fileContent = new StringBuilder();
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));) {
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    fileContent.append(line);
-                    fileContent.append(System.lineSeparator());
-                }
-
-            } catch (IOException e) {
-                throw e;
-            }
-
-
-            String key = pathToFile;
-
-            RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), fileContent.toString());
-
-            Date dateToday = new Date();
-            String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
-
-            Log.d(TAG, "clientHash: " + clientHash);
-
-            Request request = new Request.Builder()
-                    .url(Constants.SERVICE_URL + key + "?clientHash=" + clientHash)
-                    .post(requestBody)
-                    .build();
-
-            try (Response response = client.newCall(request).execute()) {
-
-                if (!response.isSuccessful()){
-                    throw new IOException("Unexpected code " + response);
-                } else {
-                    Log.d(TAG, "Response Message: " + response.message());
-                }
-
-
-            }
-        }
-
     }
 
     private NotificationCompat.Builder createNotification() {
         String CHANNEL_ID = "UploadServiceNotification";
-        /*
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        */
+
         Intent contentIntent = new Intent(this, HistoryActivity.class);
         contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, contentIntent, 0);

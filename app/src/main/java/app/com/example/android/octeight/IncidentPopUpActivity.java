@@ -2,8 +2,6 @@ package app.com.example.android.octeight;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,18 +14,11 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
@@ -103,12 +94,13 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
             doneButton.setOnClickListener((View v) -> {
 
-                String incidentType = incidentTypeSpinner.getSelectedItem().toString();
-                String locationType = locationTypeSpinner.getSelectedItem().toString();
-                String description = incidentDescription.getText().toString();
-
                 // Instead of writing the String selected items in the spinner,
                 // we use an int to save disk space and bandwidth
+                int incidentType = incidentTypeSpinner.getSelectedItemPosition();
+                int locationType = locationTypeSpinner.getSelectedItemPosition();
+                String description = incidentDescription.getText().toString();
+
+                /*
                 int incidentIndex = 0;
                 for (int i = 0; i < incidentTypes.length; i++) {
                     if (incidentType.equals(incidentTypes[i])) {
@@ -121,17 +113,17 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                         locationIndex = i;
                     }
                 }
-
+                */
                 overwriteIncidentFile(rideID, incidentKey, incidentKey+ "," + lat + "," + lon + "," + date + ","
-                         + incidentIndex + "," + locationIndex + "," + description);
+                         + incidentType + "," + locationType + "," + description);
 
 
                 incidentSaved = true;
 
                 String incidentString = incidentKey + "," + lat + "," + lon + "," + date + ","
-                        + "," + incidentIndex + "," + locationIndex + "," + description;
+                        + "," + incidentType + "," + locationType + "," + description;
 
-                writeIntToSharePrefs("Profile-phoneLocation",locationIndex,"simraPrefs",this);
+                writeIntToSharePrefs("Profile-phoneLocation",locationType,"simraPrefs",this);
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("result", incidentString);

@@ -1,15 +1,14 @@
 package app.com.example.android.octeight;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.widget.ImageButton;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,11 +22,7 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,10 +38,8 @@ public class ShowRouteActivity extends BaseActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
     private MapView mMapView;
-    private TextView copyrightTxt;
     private RelativeLayout addIncBttn;
     private RelativeLayout exitAddIncBttn;
-    private RelativeLayout saveButton;
 
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Our ride
@@ -63,10 +56,6 @@ public class ShowRouteActivity extends BaseActivity {
 
     public MapView getmMapView() {
         return mMapView;
-    }
-
-    public void setmMapView(MapView mMapView) {
-        this.mMapView = mMapView;
     }
 
     MapEventsOverlay overlayEvents;
@@ -99,14 +88,14 @@ public class ShowRouteActivity extends BaseActivity {
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mMapView.setMultiTouchControls(true); // gesture zooming
         mMapView.setFlingEnabled(true);
-        copyrightTxt = (TextView) findViewById(R.id.copyright_text);
+        TextView copyrightTxt = (TextView) findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
         addIncBttn = findViewById(R.id.addIncident);
         addIncBttn.setVisibility(View.VISIBLE);
         exitAddIncBttn = findViewById(R.id.exitAddIncident);
         exitAddIncBttn.setVisibility(View.INVISIBLE);
-        saveButton = findViewById(R.id.saveIncident);
+        RelativeLayout saveButton = findViewById(R.id.saveIncident);
         saveButton.setVisibility(View.VISIBLE);
 
         // scales tiles to dpi of current display
@@ -155,7 +144,6 @@ public class ShowRouteActivity extends BaseActivity {
         });
 
         // Set the icons for event markers
-
         // (1) Automatically recognized, not yet annotated
 
         editMarkerDefault = getResources().getDrawable(R.drawable.edit_event_bunt, null);
@@ -251,7 +239,6 @@ public class ShowRouteActivity extends BaseActivity {
             addIncBttn.setVisibility(View.VISIBLE);
             exitAddIncBttn.setVisibility(View.INVISIBLE);
             ShowRouteActivity.this.addCustomMarkerMode = false;
-            // mMapView.getOverlays().remove(overlayEvents);
 
         });
 
@@ -270,14 +257,9 @@ public class ShowRouteActivity extends BaseActivity {
                     }
                 }
             }
-            /*
-            Intent intent = new Intent(this, UploadService.class);
-            intent.putExtra("Ride_Key", ride.getId());
-            startService(intent);
-            */
+
             Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
             finish();
-            // mMapView.getOverlays().remove(overlayEvents);
 
         });
 
@@ -357,9 +339,9 @@ public class ShowRouteActivity extends BaseActivity {
         return new BoundingBox(border[0]+0.001,border[1]+0.001,border[2]-0.001,border[3]-0.001);
     }
 
+    // zoom automatically to the bounding box. Usually the command in the if body should suffice
+    // but osmdroid is buggy and we need the else part to fix it.
     public void zoomToBBox(BoundingBox bBox){
-        // zoom automatically to the bounding box. Usually the command in the if body should suffice
-        // but osmdroid is buggy and we need the else part to fix it.
         if((mMapView.getIntrinsicScreenRect(null).bottom-mMapView.getIntrinsicScreenRect(null).top) > 0){
             mMapView.zoomToBoundingBox(bBox, false);
         } else {
