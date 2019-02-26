@@ -25,6 +25,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+        <activity
+            android:name=".ImpressumActivity"
+            android:label="@string/title_activity_impressum"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <meta-data
             android:name="MAPBOX_MAPID"
@@ -66,9 +70,9 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ProfileActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_profile"
             android:parentActivityName=".MainActivity"
-            android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

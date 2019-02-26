@@ -21,18 +21,18 @@ public class Utils {
             writer.write(content.getBytes());
             writer.flush();
             writer.close();
-        } catch (IOException ioe){
+        } catch (IOException ioe) {
             ioe.printStackTrace();
         }
     }
 
-    public static void overWriteFile(String content, String fileName,  Context context) {
+    public static void overWriteFile(String content, String fileName, Context context) {
         try {
             FileOutputStream writer = context.openFileOutput(fileName, Context.MODE_PRIVATE);
             writer.write(content.getBytes());
             writer.flush();
             writer.close();
-        } catch (IOException ioe){
+        } catch (IOException ioe) {
             ioe.printStackTrace();
         }
     }
@@ -41,25 +41,25 @@ public class Utils {
         return context.getFileStreamPath(fileName).exists();
     }
 
-    public static String lookUpSharedPrefs(String key, String defValue, String sharedPrefName, Context context){
+    public static String lookUpSharedPrefs(String key, String defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         return sharedPrefs.getString(key, defValue);
     }
 
-    public static int lookUpIntSharedPrefs(String key, int defValue, String sharedPrefName, Context context){
+    public static int lookUpIntSharedPrefs(String key, int defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         return sharedPrefs.getInt(key, defValue);
     }
 
-    public static long lookUpLongSharedPrefs(String key, long defValue, String sharedPrefName, Context context){
+    public static long lookUpLongSharedPrefs(String key, long defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         return sharedPrefs.getLong(key, defValue);
     }
 
-    public static void writeToSharePrefs(String key, String value, String sharedPrefName, Context context){
+    public static void writeToSharePrefs(String key, String value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -67,7 +67,7 @@ public class Utils {
         editor.apply();
     }
 
-    public static void writeIntToSharePrefs(String key, int value, String sharedPrefName, Context context){
+    public static void writeIntToSharePrefs(String key, int value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -75,7 +75,7 @@ public class Utils {
         editor.apply();
     }
 
-    public static void writeLongToSharePrefs(String key, long value, String sharedPrefName, Context context){
+    public static void writeLongToSharePrefs(String key, long value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -83,7 +83,7 @@ public class Utils {
         editor.apply();
     }
 
-    public static String getUniqueUserID(Context context){
+    public static String getUniqueUserID(Context context) {
         String id = lookUpSharedPrefs("USER-ID", "0", "simraPrefs", context);
         if (id.equals("0")) {
             id = String.valueOf(System.currentTimeMillis());
@@ -103,7 +103,7 @@ public class Utils {
         Log.d(TAG, "checkForAnnotation() incidentProps[5]: " + incidentProps[5] + " length: " + incidentProps[5].length());
         Log.d(TAG, "checkForAnnotation() incidentProps[6]: " + incidentProps[6] + " length: " + incidentProps[6].length());
 
-        if(!(incidentProps[4].equals("")) || (!(incidentProps[5].equals("")) ||
+        if (!(incidentProps[4].equals("")) || (!(incidentProps[5].equals("")) ||
                 (!(incidentProps[6].equals(""))))) {
 
             return true;

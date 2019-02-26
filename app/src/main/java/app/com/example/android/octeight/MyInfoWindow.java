@@ -37,6 +37,7 @@ class MyInfoWindow extends InfoWindow {
         this.rideID = rideID;
         this.incidentKey = String.valueOf(key);
     }
+
     public void onClose() {
     }
 
@@ -50,7 +51,7 @@ class MyInfoWindow extends InfoWindow {
         txtTitle.setText(motherActivity.getString(R.string.incidentDetected));
         long millis = this.mAccEvent.getTimeStamp();
         String time = "";
-        if (millis > 1337){
+        if (millis > 1337) {
             time = DateUtils.formatDateTime(motherActivity, millis, DateUtils.FORMAT_SHOW_TIME);
         }
 
@@ -75,7 +76,7 @@ class MyInfoWindow extends InfoWindow {
             //        String.valueOf(this.mAccEvent.sensorData.getAbsolutePath()));
 
             popUpIntent.putExtra("Incident_accDat",
-                     "mockSensorDatForIncident.csv");
+                    "mockSensorDatForIncident.csv");
 
             popUpIntent.putExtra("Ride_ID",
                     this.rideID);

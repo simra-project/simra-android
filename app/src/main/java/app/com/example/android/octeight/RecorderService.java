@@ -82,13 +82,21 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private IBinder mBinder = new MyBinder();
     private String accGpsString = "";
 
-    public String getPathToAccGpsFile() { return pathToAccGpsFile; }
+    public String getPathToAccGpsFile() {
+        return pathToAccGpsFile;
+    }
 
-    public double getDuration() { return (curTime - startTime); }
+    public double getDuration() {
+        return (curTime - startTime);
+    }
 
-    public boolean getRecordingAllowed() { return recordingAllowed; }
+    public boolean getRecordingAllowed() {
+        return recordingAllowed;
+    }
 
-    public long getStartTime() { return startTime; }
+    public long getStartTime() {
+        return startTime;
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // The ride object which will be created and retrieved by the MainActivity at the end of the
@@ -109,17 +117,17 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Privacy filter: Set recordingAllowed to true, when enough time (privacyDuration) passed
         // since the user pressed Start Recording AND there is enough distance (privacyDistance)
         // between the starting location and the current location.
-        if(!recordingAllowed && startLocation != null && lastLocation!= null){
-            if((startLocation.distanceTo(lastLocation)>=(float) privacyDistance)
-                    && ((curTime-startTime)>privacyDuration)){
-                    recordingAllowed = true;
+        if (!recordingAllowed && startLocation != null && lastLocation != null) {
+            if ((startLocation.distanceTo(lastLocation) >= (float) privacyDistance)
+                    && ((curTime - startTime) > privacyDuration)) {
+                recordingAllowed = true;
             }
         }
 
         accelerometerMatrix = event.values;
 
 
-        if(((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) && recordingAllowed) {
+        if (((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) && recordingAllowed) {
 
             lastAccUpdate = curTime;
             // Write data to file in background thread
@@ -163,9 +171,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public void onLocationChanged(Location location) {
 
         // Take only GPS fixes that are somewhat accurate to prevent spikes in the route.
-        if (location.getAccuracy() < Constants.GPS_ACCURACY_THRESHOLD){
+        if (location.getAccuracy() < Constants.GPS_ACCURACY_THRESHOLD) {
             // Set start location. Important for privacy distance.
-            if(startLocation == null){
+            if (startLocation == null) {
                 startLocation = location;
             }
             lastLocation = location;
@@ -212,8 +220,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         locationManager = (LocationManager) getSystemService(Context
                 .LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager
-                .GPS_PROVIDER,3000,1.0f,this);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,3000,1.0f,this);
+                .GPS_PROVIDER, 3000, 1.0f, this);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 1.0f, this);
 
         // Queues for storing acc data
         accXQueue = new LinkedList<>();
@@ -234,8 +242,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         // Load the privacy settings
         privacyDistance = (float) sharedPrefs.getInt("Privacy-Distance", 30);
-        privacyDuration = (sharedPrefs.getLong("Privacy-Duration", 30)*1000);
-        Log.d(TAG, "privacyDistance: "  + privacyDistance + " privacyDuration: " + privacyDuration);
+        privacyDuration = (sharedPrefs.getLong("Privacy-Duration", 30) * 1000);
+        Log.d(TAG, "privacyDistance: " + privacyDistance + " privacyDuration: " + privacyDuration);
 
         pathToAccGpsFile = sharedPrefs.getInt("RIDE-KEY", 0)
                 + "_accGps_"
@@ -294,14 +302,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // with current ride and and sharedPrefs with current ride key. Do these things only,
         // if recording is allowed (see privacyDuration and privacyDistance) and we have written some
         // data.
-        if(recordingAllowed && lineAdded) {
+        if (recordingAllowed && lineAdded) {
 
             // Create head of the csv-file
-            appendToFile("lat,lon,X,Y,Z,timeStamp"+System.lineSeparator(), pathToAccGpsFile, this);
+            appendToFile("lat,lon,X,Y,Z,timeStamp" + System.lineSeparator(), pathToAccGpsFile, this);
 
             // Write String data to files
             appendToFile(accGpsString, pathToAccGpsFile, this);
-            appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY",0)) + ","
+            appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0)) + ","
                     + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
                     + "0" + System.lineSeparator(), "metaData.csv", this);
 
@@ -314,7 +322,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
             editor.apply();
         }
-
 
 
         // Prevent new tasks from being added to thread
@@ -370,10 +377,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     private float computeAverage(Collection<Float> myVals) {
         float sum = 0;
-        for(float f : myVals) {
+        for (float f : myVals) {
             sum += f;
         }
-        return sum/myVals.size();
+        return sum / myVals.size();
     }
 
     private NotificationCompat.Builder createNotification() {
@@ -452,9 +459,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             // Log.d(TAG, String.valueOf(curTime));
-                double x = accelerometerMatrix[0];
-                double y = accelerometerMatrix[1];
-                double z = accelerometerMatrix[2];
+            double x = accelerometerMatrix[0];
+            double y = accelerometerMatrix[1];
+            double z = accelerometerMatrix[2];
                 /*
                 float mAccelCurrent = (float) Math.sqrt(x*x+y*y+z*z);
 
@@ -464,14 +471,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 */
 
 
-
             /** Every average is computed over 30 data points, so we want the queues for the
-                three accelerometer values to be of size 30 in order to compute the averages.
+             three accelerometer values to be of size 30 in order to compute the averages.
 
-                Accordingly, when the queues are shorter we're adding data points.
+             Accordingly, when the queues are shorter we're adding data points.
              */
 
-            if(accXQueue.size() < 30) {
+            if (accXQueue.size() < 30) {
 
                 accXQueue.add(accelerometerMatrix[0]);
                 accYQueue.add(accelerometerMatrix[1]);
@@ -486,7 +492,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 // only after the 3 seconds are over.
                 String gps = ",,";
 
-                if((lastAccUpdate - lastGPSUpdate) >= GPS_POLL_FREQUENCY) {
+                if ((lastAccUpdate - lastGPSUpdate) >= GPS_POLL_FREQUENCY) {
                     lastGPSUpdate = lastAccUpdate;
 
                     if (lastLocation == null) {
@@ -524,10 +530,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 lineAdded = true;
 
                 /** Now remove as many elements from the queues as our moving average step/shift
-                    specifies and therefore enable new data points to come in.
+                 specifies and therefore enable new data points to come in.
                  */
 
-                for(int i = 0; i < Constants.MVG_AVG_STEP; i++) {
+                for (int i = 0; i < Constants.MVG_AVG_STEP; i++) {
 
                     accXQueue.remove();
                     accYQueue.remove();

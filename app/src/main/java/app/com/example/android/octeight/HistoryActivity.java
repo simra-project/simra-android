@@ -123,15 +123,13 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             }
             */
             for (String[] i : ridesList) {
-                ridesArr[((ridesList.size())-Integer.parseInt(i[0]))-1] = listToTextShape(i);
+                ridesArr[((ridesList.size()) - Integer.parseInt(i[0])) - 1] = listToTextShape(i);
             }
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
             listView.setAdapter(adapter);
 
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-
-            {
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     // gets the files in the directory
@@ -141,7 +139,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                     String clicked = (String) listView.getItemAtPosition(position);
                     Log.d(TAG, "clicked: " + clicked);
                     String prefix = Constants.APP_PATH + "files/";
-                    String key = clicked.replace("#","").split(" ")[0];
+                    String key = clicked.replace("#", "").split(" ")[0];
                     clicked = prefix + key;
                     if (dirFiles.length != 0) {
                         // loops through the array of files, outputting the name to console
@@ -159,7 +157,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                                 intent.putExtra("Duration", String.valueOf(Long.valueOf(ridesList.get(position)[2]) - Long.valueOf(ridesList.get(position)[1])));
                                 intent.putExtra("StartTime", ridesList.get(position)[2]);
                                 intent.putExtra("State", ridesList.get(position)[3]);
-                                Log.d(TAG, "pathToAccGpsFile: " +  intent.getStringExtra("PathToAccGpsFile"));
+                                Log.d(TAG, "pathToAccGpsFile: " + intent.getStringExtra("PathToAccGpsFile"));
                                 Log.d(TAG, "Duration: " + intent.getStringExtra("Duration"));
                                 Log.d(TAG, "StartTime: " + intent.getStringExtra("StartTime"));
                                 Log.d(TAG, "State: " + intent.getStringExtra("State"));
@@ -198,7 +196,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                     while ((line = br.readLine()) != null) {
                         // Log.d(TAG, line);
                         String[] actualLine = line.split(",");
-                        duration = duration + (Long.valueOf(actualLine[2])-Long.valueOf(actualLine[1]));
+                        duration = duration + (Long.valueOf(actualLine[2]) - Long.valueOf(actualLine[1]));
                         numberOfRides = Integer.valueOf(actualLine[0]);
                     }
                 } catch (Exception e) {
@@ -208,7 +206,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                 if (dirFiles.length != 0) {
                     for (int i = 0; i < dirFiles.length; i++) {
                         String nameOfFileToBeRenamed = dirFiles[i].getName();
-                        if(nameOfFileToBeRenamed.startsWith("accEvents")){
+                        if (nameOfFileToBeRenamed.startsWith("accEvents")) {
                             try {
                                 BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(nameOfFileToBeRenamed)));
                                 // br.readLine() to skip the first line which contains the headers
@@ -216,8 +214,8 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
                                 while ((line = br.readLine()) != null) {
                                     // Log.d(TAG, line);
-                                    String[] actualLine = line.split(",",-1);
-                                    if((!actualLine[4].equals("") && !actualLine[4].equals("0")) && !actualLine[6].equals("")){
+                                    String[] actualLine = line.split(",", -1);
+                                    if ((!actualLine[4].equals("") && !actualLine[4].equals("0")) && !actualLine[6].equals("")) {
                                         numberOfIncidents++;
                                     }
                                 }
@@ -235,10 +233,10 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                         }
                     }
                 }
-                if (ridesToUpload.size() > 0){
+                if (ridesToUpload.size() > 0) {
                     String demographicHeader = "birth,gender,region,ber,lon,bike,loc,numberOfRides,duration,numberOfIncidents" + System.lineSeparator();
                     String demographics = getDemographics();
-                    overWriteFile(demographicHeader+demographics+","+numberOfRides + ","+duration + "," + numberOfIncidents,"profile.csv", HistoryActivity.this);
+                    overWriteFile(demographicHeader + demographics + "," + numberOfRides + "," + duration + "," + numberOfIncidents, "profile.csv", HistoryActivity.this);
                     Intent intent = new Intent(HistoryActivity.this, UploadService.class);
                     intent.putStringArrayListExtra("RidesToUpload", ridesToUpload);
                     startService(intent);
@@ -274,15 +272,16 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
                             if (mBoundUploadService != null) {
                                 int currentNumberOfTasks = mBoundUploadService.getNumberOfTasks();
-                                pd.setProgress(Math.round(100 - 100 * ((float)currentNumberOfTasks / (float)(ridesToUpload.size()*2))));
-                                Log.d(TAG, "currentNumberOfTasks: "+currentNumberOfTasks);
+                                pd.setProgress(Math.round(100 - 100 * ((float) currentNumberOfTasks / (float) (ridesToUpload.size() * 2))));
+                                Log.d(TAG, "currentNumberOfTasks: " + currentNumberOfTasks);
                                 if (currentNumberOfTasks == 0) {
                                     unbindService(mUploadServiceConnection);
                                     pd.dismiss();
                                     Toast.makeText(HistoryActivity.this, getString(R.string.uploadRidesSuccessful), Toast.LENGTH_SHORT).show();
                                     handler.removeCallbacks(this);
-                                    if(exitWhenDone){
-                                        finishAndRemoveTask();                                    }
+                                    if (exitWhenDone) {
+                                        finishAndRemoveTask();
+                                    }
                                 } else {
                                     handler.postDelayed(this, 1000);
                                 }
@@ -323,39 +322,39 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
     private String getDemographics() {
 
-        int birth = lookUpIntSharedPrefs("Profile-Age",0,"simraPrefs", this);
-        int gender = lookUpIntSharedPrefs("Profile-Gender",0,"simraPrefs", this);
-        int region = lookUpIntSharedPrefs("Profile-Region",0,"simraPrefs", this);
-        int ber = lookUpIntSharedPrefs("Profile-berDistrict",0,"simraPrefs", this);
-        int lon = lookUpIntSharedPrefs("Profile-lonDistrict",0,"simraPrefs", this);
-        int bike = lookUpIntSharedPrefs("Profile-bikeType",0,"simraPrefs", this);
-        int loc = lookUpIntSharedPrefs("Profile-phoneLocation",0,"simraPrefs", this);
+        int birth = lookUpIntSharedPrefs("Profile-Age", 0, "simraPrefs", this);
+        int gender = lookUpIntSharedPrefs("Profile-Gender", 0, "simraPrefs", this);
+        int region = lookUpIntSharedPrefs("Profile-Region", 0, "simraPrefs", this);
+        int ber = lookUpIntSharedPrefs("Profile-berDistrict", 0, "simraPrefs", this);
+        int lon = lookUpIntSharedPrefs("Profile-lonDistrict", 0, "simraPrefs", this);
+        int bike = lookUpIntSharedPrefs("Profile-bikeType", 0, "simraPrefs", this);
+        int loc = lookUpIntSharedPrefs("Profile-phoneLocation", 0, "simraPrefs", this);
 
 
         return birth + "," + gender + "," + region + "," + ber + "," + lon + "," + bike + "," + loc;
     }
 
-    private void stopTask(Handler handler, Runnable runnable){
+    private void stopTask(Handler handler, Runnable runnable) {
         handler.removeCallbacks(runnable);
     }
 
-    private String listToTextShape (String[] item){
+    private String listToTextShape(String[] item) {
         Log.d(TAG, "listToTextShape item: " + Arrays.toString(item));
         String todo = getString(R.string.newRideInHistoryActivity);
 
         File[] dirFiles = getFilesDir().listFiles();
         if (dirFiles.length != 0) {
             for (int i = 0; i < dirFiles.length; i++) {
-                if(dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_2.csv")){
+                if (dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_2.csv")) {
                     Log.d(TAG, "dirFiles[i].getName().endsWith: " + dirFiles[i].getName());
                     todo = getString(R.string.rideUploadedInHistoryActivity);
-                } else if(dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_1.csv")){
+                } else if (dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_1.csv")) {
                     todo = getString(R.string.rideAnnotatedInHistoryActivity);
 
                 }
             }
         }
-        if (item[3].equals("2")){
+        if (item[3].equals("2")) {
             todo = "";
         }
 
@@ -369,7 +368,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                 DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NUMERIC_DATE);
 
         String result = "#" + item[0] + " " + todo + " " + startDateOfRide
-                + " " +getString(R.string.ride_length)+ " : " + prettyDuration;
+                + " " + getString(R.string.ride_length) + " : " + prettyDuration;
 
 
         return result;
@@ -397,14 +396,13 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
         if (id == R.id.nav_main) {
             finish();
-        }
-        else if (id == R.id.nav_history) {
+        } else if (id == R.id.nav_history) {
             DrawerLayout drawer = findViewById(R.id.drawer_layout);
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             }
         } else if (id == R.id.nav_democraphic_data) {
-            Intent intent = new Intent (HistoryActivity.this, ProfileActivity.class);
+            Intent intent = new Intent(HistoryActivity.this, ProfileActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_feedback) {
             // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
@@ -420,7 +418,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             }
 
         } else if (id == R.id.nav_setting) {
-            Intent intent = new Intent (HistoryActivity.this, SettingsActivity.class);
+            Intent intent = new Intent(HistoryActivity.this, SettingsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_infoMCC) {
             Intent intent = new Intent(HistoryActivity.this, WebActivity.class);
@@ -447,13 +445,13 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         return date.getTime();
     }*/
 
-    public void startShowRouteWithSelectedRide(){
+    public void startShowRouteWithSelectedRide() {
 
         Log.d(TAG, "onClick()");
 
         // Checks if HistoryActivity was started by the user or by the app after a route
         // recording was finished
-        if(getIntent().hasExtra("PathToAccGpsFile")){
+        if (getIntent().hasExtra("PathToAccGpsFile")) {
             // AccGpsString contains the accelerometer and location data as well as time data
             pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
             // TimeStamp is the duration of the ride in MS
@@ -468,7 +466,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
         // Checks whether a ride was selected or not. Maybe it will be possible to select
         // multiple rides and push a button to send them all to the server to be analyzed
-        if(accGpsString != null && startTime != "") {
+        if (accGpsString != null && startTime != "") {
             // Snackbar.make(view, getString(R.string.selectedRideInfo) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
             //     .setAction("Action", null).show();
             // Start ShowRouteActivity with the selected Ride.
@@ -485,6 +483,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
 
     }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

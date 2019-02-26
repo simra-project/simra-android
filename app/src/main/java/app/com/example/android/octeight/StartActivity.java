@@ -55,7 +55,7 @@ public class StartActivity extends BaseActivity {
         Log.d(TAG, "onCreate() started");
 
         caller = getIntent().getStringExtra("caller");
-        if (caller == null){
+        if (caller == null) {
             caller = "NoCaller";
         }
 
@@ -68,7 +68,7 @@ public class StartActivity extends BaseActivity {
         // send them to the server. If the user gives permission, upload the crash report(s).
         if (sharedPrefs.contains("NEW-UNSENT-ERROR")) {
             boolean newErrorsExist = sharedPrefs.getBoolean("NEW-UNSENT-ERROR", true);
-            if(newErrorsExist){
+            if (newErrorsExist) {
                 sendErrorPermitted = getDialogValueBack(this);
                 if (sendErrorPermitted) {
                     Intent intent = new Intent(this, UploadService.class);
@@ -86,8 +86,8 @@ public class StartActivity extends BaseActivity {
 
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
 
-        if (!(isFirstTime())&&(ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED)&&(!caller.equals("MainActivity"))){
+        if (!(isFirstTime()) && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) && (!caller.equals("MainActivity"))) {
             Intent intent = new Intent(StartActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -111,9 +111,9 @@ public class StartActivity extends BaseActivity {
                 // * one meta file per user, so we only want to create it if it doesn't exist yet.
                 //   (fileExists and appendToFile can be found in the Utils.java class)
                 Log.d(TAG, "firstTime. Creating metaData.csv");
-                if(!fileExists("metaData.csv", this)) {
+                if (!fileExists("metaData.csv", this)) {
                     appendToFile("key, startTime, endTime, annotated"
-                            +System.lineSeparator(), "metaData.csv", this);
+                            + System.lineSeparator(), "metaData.csv", this);
 
                 }
 
@@ -155,7 +155,7 @@ public class StartActivity extends BaseActivity {
                     // remove the Callback of the Runnable to the Handler to prevent second start of
                     // MainActivity
                     startActivityHandler.removeCallbacks(startActivityRunnable);
-                    if(caller.equals("MainActivity")){
+                    if (caller.equals("MainActivity")) {
                         returnToMain();
                     } else {
                         startActivity(intent);
@@ -169,13 +169,12 @@ public class StartActivity extends BaseActivity {
     }
 
 
-
-    public void returnToMain(){
+    public void returnToMain() {
         super.onBackPressed();
     }
 
 
-    private void permissionRequest(final String requestedPermission, String rationaleMessage, final int accessCode){
+    private void permissionRequest(final String requestedPermission, String rationaleMessage, final int accessCode) {
         // Check whether FINE_LOCATION permission is not granted
         if (ContextCompat.checkSelfPermission(StartActivity.this, requestedPermission)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -198,8 +197,6 @@ public class StartActivity extends BaseActivity {
             showMessageOK(rationaleMessage, rationaleOnClickListener, StartActivity.this);
         }
     }
-
-
 
 
     // Create an AlertDialog with an Ok and Cancel Button displaying a message
@@ -233,6 +230,7 @@ public class StartActivity extends BaseActivity {
     /**
      * Checks if the user is opening the app for the first time.
      * Note that this method should be placed inside an activity and it can be called multiple times.
+     *
      * @return boolean
      */
     private boolean isFirstTime() {
@@ -248,42 +246,38 @@ public class StartActivity extends BaseActivity {
         return firstTime;
     }
 
-        public boolean getDialogValueBack(Context context) {
+    public boolean getDialogValueBack(Context context) {
 
-            final Handler handler = new Handler()
-            {
-                @Override
-                public void handleMessage(Message mesg)
-                {
-                    throw new RuntimeException();
-                }
-            };
+        final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message mesg) {
+                throw new RuntimeException();
+            }
+        };
 
-            AlertDialog.Builder alert = new AlertDialog.Builder(context);
-            alert.setTitle(getString(R.string.sendErrorTitle));
-            alert.setMessage(getString(R.string.sendErrorMessage));
-            alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    sendErrorPermitted = true;
-                    handler.sendMessage(handler.obtainMessage());
-                }
-            });
-            alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    sendErrorPermitted = false;
-                    handler.sendMessage(handler.obtainMessage());
-                }
-            });
-            alert.show();
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle(getString(R.string.sendErrorTitle));
+        alert.setMessage(getString(R.string.sendErrorMessage));
+        alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                sendErrorPermitted = true;
+                handler.sendMessage(handler.obtainMessage());
+            }
+        });
+        alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                sendErrorPermitted = false;
+                handler.sendMessage(handler.obtainMessage());
+            }
+        });
+        alert.show();
 
-            try{ Looper.loop(); }
-            catch(RuntimeException e){}
+        try {
+            Looper.loop();
+        } catch (RuntimeException e) {
+        }
 
-            return sendErrorPermitted;
+        return sendErrorPermitted;
 
 
     }

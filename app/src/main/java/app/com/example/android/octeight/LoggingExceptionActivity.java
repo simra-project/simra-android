@@ -28,7 +28,7 @@ import static app.com.example.android.octeight.Utils.getUniqueUserID;
 
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
 
-    private final static String TAG = LoggingExceptionActivity.class.getSimpleName()+"_LOG";
+    private final static String TAG = LoggingExceptionActivity.class.getSimpleName() + "_LOG";
     private final Context context;
     private final Thread.UncaughtExceptionHandler rootHandler;
     private OkHttpClient client = new OkHttpClient();
@@ -56,7 +56,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
                 stackTrace += ex.getStackTrace()[i] + "\n";
             }
             String causeTrace = "";
-            if(ex.getCause() != null) {
+            if (ex.getCause() != null) {
                 for (int i = 0; i < ex.getCause().getStackTrace().length; i++) {
                     stackTrace += ex.getCause().getStackTrace()[i] + "\n";
                 }
@@ -143,20 +143,19 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
         }
 
 
-
         private void makePostTestPhase(String pathToFile, String id) throws IOException {
 
             Log.d(TAG, "pathToFile: " + pathToFile + " id: " + id);
             File file;
             // Log.d(TAG, "File.pathSeparator: " + File.pathSeparator);
-            if(pathToFile.contains(File.separator)){
+            if (pathToFile.contains(File.separator)) {
                 //Log.d(TAG, "pathToFile contains pathSeparator!");
                 file = new File(pathToFile);
             } else {
                 file = getFileStreamPath(pathToFile);
 
             }
-            if(file.isDirectory()){
+            if (file.isDirectory()) {
                 return;
             }
             //

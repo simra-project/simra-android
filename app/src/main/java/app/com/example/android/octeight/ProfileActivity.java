@@ -1,5 +1,7 @@
 package app.com.example.android.octeight;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -18,6 +20,15 @@ public class ProfileActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
     private static final String TAG = "ProfileActivity_LOG";
+    // SharedPreferences
+    /*public static final String PREFERENCES = "simraPrefs" ;
+    public static final String agePrefs = "Profile-Age";
+    public static final String genderPrefs = "Profile-Gender";
+    public static final String regionPrefs = "Profile-Region";
+    public static final String berDistPrefs = "Profile-berDistrict";
+    public static final String lonDistPrefs = "Profile-lonDistrict";
+    public static final String bikePrefs = "Profile-bikeType";
+    public static final String phoneLocPref = "Profile-phoneLocation";*/
 
     // The choosable items in the spinner
     String[] ageGroups = new String[6];
@@ -49,19 +60,28 @@ public class ProfileActivity extends AppCompatActivity {
         phoneLocations = getResources().getStringArray(R.array.locations);
 
         // Building the view
-        Spinner ageGroupSpinner =  findViewById(R.id.ageGroupSpinner);
-        Spinner genderSpinner =  findViewById(R.id.genderSpinner);
-        Spinner regionSpinner =  findViewById(R.id.regionSpinner);
+        Spinner ageGroupSpinner = findViewById(R.id.ageGroupSpinner);
+        Spinner genderSpinner = findViewById(R.id.genderSpinner);
+        Spinner regionSpinner = findViewById(R.id.regionSpinner);
         Space regionDistrictSpace = findViewById(R.id.regionDistrictSpace);
         TextView districtTitle = findViewById(R.id.districtSpinnerTitle);
-        Spinner berDistrictSpinner =  findViewById(R.id.districtBERSpinner);
-        Spinner lonDistrictSpinner =  findViewById(R.id.districtLONSpinner);
-        Spinner bikeSpinner =  findViewById(R.id.bikeTypeSpinner);
+        Spinner berDistrictSpinner = findViewById(R.id.districtBERSpinner);
+        Spinner lonDistrictSpinner = findViewById(R.id.districtLONSpinner);
+        Spinner bikeSpinner = findViewById(R.id.bikeTypeSpinner);
         Spinner locationTypeSpinner = findViewById(R.id.locationTypeSpinner);
 
         // Get the previous saved settings
         int[] previousProfile = loadPreviousProfile();
+        // working with android template
+        /*SharedPreferences sharedpreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
 
+        ageGroupSpinner.setSelection(sharedpreferences.getInt(agePrefs, 0));
+        genderSpinner.setSelection(sharedpreferences.getInt(genderPrefs, 0));
+        regionSpinner.setSelection(sharedpreferences.getInt(regionPrefs,0));
+        berDistrictSpinner.setSelection(sharedpreferences.getInt(berDistPrefs, 0));
+        lonDistrictSpinner.setSelection(sharedpreferences.getInt(lonDistPrefs, 0));
+        bikeSpinner.setSelection(sharedpreferences.getInt(bikePrefs,0));
+        locationTypeSpinner.setSelection(sharedpreferences.getInt(phoneLocPref,0));*/
         ageGroupSpinner.setSelection(previousProfile[0]);
         genderSpinner.setSelection(previousProfile[1]);
         regionSpinner.setSelection(previousProfile[2]);
@@ -72,11 +92,11 @@ public class ProfileActivity extends AppCompatActivity {
         locationTypeSpinner.setSelection(previousProfile[6]);
 
         Log.d(TAG, "previousProfile[2]: " + previousProfile[2]);
-        if(previousProfile[2] == 1){
+        if (previousProfile[2] == 1) {
             regionDistrictSpace.setVisibility(View.VISIBLE);
             districtTitle.setVisibility(View.VISIBLE);
             berDistrictSpinner.setVisibility(View.VISIBLE);
-        } else if (previousProfile[2] == 2){
+        } else if (previousProfile[2] == 2) {
             regionDistrictSpace.setVisibility(View.VISIBLE);
             districtTitle.setVisibility(View.VISIBLE);
             lonDistrictSpinner.setVisibility(View.VISIBLE);
@@ -93,7 +113,7 @@ public class ProfileActivity extends AppCompatActivity {
                                        int arg2, long arg3) {
                 // Selected region is Berlin. Make space, title and berDistrictSpinner visible,
                 // lonDistrictSpinner gone and set the item to default.
-                if(regionSpinner.getSelectedItemId()==1){
+                if (regionSpinner.getSelectedItemId() == 1) {
                     regionDistrictSpace.setVisibility(View.VISIBLE);
                     districtTitle.setVisibility(View.VISIBLE);
                     berDistrictSpinner.setVisibility(View.VISIBLE);
@@ -101,7 +121,7 @@ public class ProfileActivity extends AppCompatActivity {
                     lonDistrictSpinner.setSelection(0);
                     // Selected region is London. Make space, title and lonDistrictSpinner visible,
                     // berDistrictSpinner gone and set the item to default.
-                } else if (regionSpinner.getSelectedItemId()==2){
+                } else if (regionSpinner.getSelectedItemId() == 2) {
                     regionDistrictSpace.setVisibility(View.VISIBLE);
                     districtTitle.setVisibility(View.VISIBLE);
                     lonDistrictSpinner.setVisibility(View.VISIBLE);
@@ -137,13 +157,22 @@ public class ProfileActivity extends AppCompatActivity {
             int bike = bikeSpinner.getSelectedItemPosition();
             int locationType = locationTypeSpinner.getSelectedItemPosition();
 
-            writeIntToSharePrefs("Profile-Age", ageGroup,"simraPrefs", ProfileActivity.this);
-            writeIntToSharePrefs("Profile-Gender", gender,"simraPrefs", ProfileActivity.this);
-            writeIntToSharePrefs("Profile-Region", region,"simraPrefs", ProfileActivity.this);
-            writeIntToSharePrefs("Profile-berDistrict", berDistrict,"simraPrefs", ProfileActivity.this);
-            writeIntToSharePrefs("Profile-lonDistrict", lonDistrict,"simraPrefs", ProfileActivity.this);
-            writeIntToSharePrefs("Profile-bikeType", bike,"simraPrefs", ProfileActivity.this);
-            writeIntToSharePrefs("Profile-phoneLocation", locationType,"simraPrefs", ProfileActivity.this);
+            /*SharedPreferences.Editor editor = sharedpreferences.edit();
+            editor.putInt(agePrefs, ageGroup);
+            editor.putInt(genderPrefs, gender);
+            editor.putInt(regionPrefs, region);
+            editor.putInt(berDistPrefs, berDistrict);
+            editor.putInt(lonDistPrefs, lonDistrict);
+            editor.putInt(bikePrefs, bike);
+            editor.putInt(phoneLocPref, locationType);
+            editor.commit();*/
+            writeIntToSharePrefs("Profile-Age", ageGroup, "simraPrefs", ProfileActivity.this);
+            writeIntToSharePrefs("Profile-Gender", gender, "simraPrefs", ProfileActivity.this);
+            writeIntToSharePrefs("Profile-Region", region, "simraPrefs", ProfileActivity.this);
+            writeIntToSharePrefs("Profile-berDistrict", berDistrict, "simraPrefs", ProfileActivity.this);
+            writeIntToSharePrefs("Profile-lonDistrict", lonDistrict, "simraPrefs", ProfileActivity.this);
+            writeIntToSharePrefs("Profile-bikeType", bike, "simraPrefs", ProfileActivity.this);
+            writeIntToSharePrefs("Profile-phoneLocation", locationType, "simraPrefs", ProfileActivity.this);
 
             /*
             // Instead of writing the String selected items in the spinner,
@@ -231,7 +260,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy() called");
-        if(profileSaved){
+        if (profileSaved) {
             Toast.makeText(this, getString(R.string.editingProfileCompleted), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, getString(R.string.editingProfileAborted), Toast.LENGTH_SHORT).show();
@@ -241,13 +270,13 @@ public class ProfileActivity extends AppCompatActivity {
     private int[] loadPreviousProfile() {
         // {ageGroup, gender, region, berDistrict, lonDistrict, bikeType, phoneLocation}
         int[] result = new int[7];
-        result[0] = lookUpIntSharedPrefs("Profile-Age",0,"simraPrefs", this);
-        result[1] = lookUpIntSharedPrefs("Profile-Gender",0,"simraPrefs", this);
-        result[2] = lookUpIntSharedPrefs("Profile-Region",0,"simraPrefs", this);
-        result[3] = lookUpIntSharedPrefs("Profile-berDistrict",0,"simraPrefs", this);
-        result[4] = lookUpIntSharedPrefs("Profile-lonDistrict",0,"simraPrefs", this);
-        result[5] = lookUpIntSharedPrefs("Profile-bikeType",0,"simraPrefs", this);
-        result[6] = lookUpIntSharedPrefs("Profile-phoneLocation",0,"simraPrefs", this);
+        result[0] = lookUpIntSharedPrefs("Profile-Age", 0, "simraPrefs", this);
+        result[1] = lookUpIntSharedPrefs("Profile-Gender", 0, "simraPrefs", this);
+        result[2] = lookUpIntSharedPrefs("Profile-Region", 0, "simraPrefs", this);
+        result[3] = lookUpIntSharedPrefs("Profile-berDistrict", 0, "simraPrefs", this);
+        result[4] = lookUpIntSharedPrefs("Profile-lonDistrict", 0, "simraPrefs", this);
+        result[5] = lookUpIntSharedPrefs("Profile-bikeType", 0, "simraPrefs", this);
+        result[6] = lookUpIntSharedPrefs("Profile-phoneLocation", 0, "simraPrefs", this);
         return result;
     }
 

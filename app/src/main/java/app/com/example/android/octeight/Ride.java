@@ -26,16 +26,25 @@ public class Ride {
 
     File accGpsFile;
     ArrayList<AccEvent> events;
-    public ArrayList<AccEvent> getEvents() { return events; }
+
+    public ArrayList<AccEvent> getEvents() {
+        return events;
+    }
+
     String duration;
     String startTime;
     Context context;
     static String TAG = "Ride_LOG";
     Polyline route;
-    public String getDuration(){
+
+    public String getDuration() {
         return duration;
     }
-    public Polyline getRoute(){ return this.route; }
+
+    public Polyline getRoute() {
+        return this.route;
+    }
+
     int state;
     final int ANNOTATION_NOT_STARTED = 0;
     final int ANNOTATION_NOT_FINISHED = 1;
@@ -43,7 +52,7 @@ public class Ride {
 
 
     // This is the constructor that is used for now.
-    public Ride (File accGpsFile, String duration, String startTime, /*String date,*/ int state, Context context){
+    public Ride(File accGpsFile, String duration, String startTime, /*String date,*/ int state, Context context) {
         this.accGpsFile = accGpsFile;
         this.duration = duration;
         this.startTime = startTime;
@@ -60,7 +69,7 @@ public class Ride {
         String content = "key,lat,lon,ts,incidentType,phoneLocation,description";
         content += System.lineSeparator();
 
-        if(!fileExists(pathToAccEventsOfRide, context)){
+        if (!fileExists(pathToAccEventsOfRide, context)) {
 
             for (int i = 0; i < events.size(); i++) {
 
@@ -85,25 +94,25 @@ public class Ride {
     // Maybe this should happen in RecorderService since we
     // already loop through all the lines there.
     // It is not good to do loop here through the data again.
-    public static Polyline getRouteLine(File gpsFile){
+    public static Polyline getRouteLine(File gpsFile) {
         List<GeoPoint> geoPoints = new ArrayList<>();
         Polyline polyLine = new Polyline();
 
-        try{
+        try {
             BufferedReader br = new BufferedReader(new FileReader(gpsFile));
             // br.readLine() to skip the first line which contains the headers
-            String line= br.readLine();
+            String line = br.readLine();
 
             while ((line = br.readLine()) != null) {
 
                 try {
-                    if((line.startsWith(",,"))){
+                    if ((line.startsWith(",,"))) {
                         continue;
                     }
                     String[] separatedLine = line.split(",");
-                    GeoPoint actualGeoPoint = new GeoPoint(Double.valueOf(separatedLine[0]),Double.valueOf(separatedLine[1]));
+                    GeoPoint actualGeoPoint = new GeoPoint(Double.valueOf(separatedLine[0]), Double.valueOf(separatedLine[1]));
                     polyLine.addPoint(actualGeoPoint);
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -282,7 +291,7 @@ public class Ride {
         accEvents.add(new AccEvent(thisLine.split(",")));
         accEvents.add(new AccEvent(thisLine.split(",")));
 
-        String[] template = {"0.0","0.0","0.0","0.0","0.0","0"};
+        String[] template = {"0.0", "0.0", "0.0", "0.0", "0.0", "0"};
         events.add(template);
         events.add(template);
         events.add(template);
@@ -294,7 +303,7 @@ public class Ride {
         // Loops through all lines. If the line starts with lat and lon, it is consolidated into
         // a part of a ride together with the subsequent lines that don't have lat and lon.
         // Then, it takes the top two X-, Y- and Z-deltas and creates AccEvents from them.
-        while ( (thisLine != null )&&(!newSubPart)) {
+        while ((thisLine != null) && (!newSubPart)) {
             String[] currentLine = thisLine.split(",");
             // currentLine: {lat, lon, maxXDelta, maxYDelta, maxZDelta, timeStamp}
             partOfRide = new String[6];
@@ -326,23 +335,23 @@ public class Ride {
                 newSubPart = true;
             }
 
-            while ((thisLine!= null) && newSubPart) {
+            while ((thisLine != null) && newSubPart) {
 
                 currentLine = thisLine.split(",");
-                if (Double.valueOf(currentLine[2]) >= maxX){
+                if (Double.valueOf(currentLine[2]) >= maxX) {
                     maxX = Double.valueOf(currentLine[2]);
-                } else if (Double.valueOf(currentLine[2]) < minX){
-                    minX =  Double.valueOf(currentLine[2]);
+                } else if (Double.valueOf(currentLine[2]) < minX) {
+                    minX = Double.valueOf(currentLine[2]);
                 }
-                if (Double.valueOf(currentLine[3]) >= maxY){
+                if (Double.valueOf(currentLine[3]) >= maxY) {
                     maxY = Double.valueOf(currentLine[3]);
-                } else if (Double.valueOf(currentLine[3]) < minY){
-                    minY =  Double.valueOf(currentLine[3]);
+                } else if (Double.valueOf(currentLine[3]) < minY) {
+                    minY = Double.valueOf(currentLine[3]);
                 }
-                if (Double.valueOf(currentLine[4]) >= maxZ){
+                if (Double.valueOf(currentLine[4]) >= maxZ) {
                     maxZ = Double.valueOf(currentLine[4]);
-                } else if (Double.valueOf(currentLine[4]) < minZ){
-                    minZ =  Double.valueOf(currentLine[4]);
+                } else if (Double.valueOf(currentLine[4]) < minZ) {
+                    minZ = Double.valueOf(currentLine[4]);
                 }
                 thisLine = nextLine;
                 try {
@@ -350,7 +359,7 @@ public class Ride {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if(thisLine != null && !thisLine.startsWith(",,")){
+                if (thisLine != null && !thisLine.startsWith(",,")) {
                     newSubPart = false;
                 }
             }
@@ -379,7 +388,7 @@ public class Ride {
 
             // Check whether actualX is one of the top 2 events
             boolean eventAdded = false;
-            if (maxXDelta > Double.valueOf(events.get(0)[2]) && !eventAdded && enoughTimePassed ){
+            if (maxXDelta > Double.valueOf(events.get(0)[2]) && !eventAdded && enoughTimePassed) {
 
                 String[] temp = events.get(0);
                 events.set(0, partOfRide);
@@ -388,14 +397,14 @@ public class Ride {
                 events.set(1, temp);
                 accEvents.set(1, new AccEvent(temp));
                 eventAdded = true;
-            } else if (maxXDelta > Double.valueOf(events.get(1)[2]) && !eventAdded && enoughTimePassed ) {
+            } else if (maxXDelta > Double.valueOf(events.get(1)[2]) && !eventAdded && enoughTimePassed) {
 
                 events.set(1, partOfRide);
                 accEvents.set(1, new AccEvent(partOfRide));
                 eventAdded = true;
-               }
+            }
             // Check whether actualY is one of the top 2 events
-            else if (maxYDelta > Double.valueOf(events.get(2)[3]) && !eventAdded && enoughTimePassed){
+            else if (maxYDelta > Double.valueOf(events.get(2)[3]) && !eventAdded && enoughTimePassed) {
 
                 String[] temp = events.get(2);
                 events.set(2, partOfRide);
@@ -410,24 +419,24 @@ public class Ride {
                 eventAdded = true;
             }
             // Check whether actualZ is one of the top 2 events
-            else if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded && enoughTimePassed){
+            else if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded && enoughTimePassed) {
                 String[] temp = events.get(4);
                 events.set(4, partOfRide);
                 accEvents.set(4, new AccEvent(partOfRide));
                 events.set(5, temp);
                 accEvents.set(5, new AccEvent(temp));
 
-                } else if (maxZDelta > Double.valueOf(events.get(5)[4]) && !eventAdded && enoughTimePassed) {
+            } else if (maxZDelta > Double.valueOf(events.get(5)[4]) && !eventAdded && enoughTimePassed) {
                 events.set(5, partOfRide);
                 accEvents.set(5, new AccEvent(partOfRide));
                 eventAdded = true;
             }
 
-            if(nextLine == null){
+            if (nextLine == null) {
                 break;
             }
         }
-        for (int i = 0; i < accEvents.size() ; i++) {
+        for (int i = 0; i < accEvents.size(); i++) {
             Log.d(TAG, "accEvents.get(" + i + ") Position: " + (accEvents.get(i).position.toString())
                     + " timeStamp: " + (accEvents.get(i).timeStamp));
         }

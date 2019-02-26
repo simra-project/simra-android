@@ -61,15 +61,15 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         String[] previousAnnotation = loadPreviousAnnotation
                 (rideID, incidentKey);
 
-        final Spinner incidentTypeSpinner =  findViewById(R.id.incidentTypeSpinner);
+        final Spinner incidentTypeSpinner = findViewById(R.id.incidentTypeSpinner);
 
         final Spinner locationTypeSpinner = findViewById(R.id.locationSpinner);
 
         final EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
 
-        locationTypeSpinner.setSelection(lookUpIntSharedPrefs("Profile-phoneLocation",0,"simraPrefs",this));
+        locationTypeSpinner.setSelection(lookUpIntSharedPrefs("Profile-phoneLocation", 0, "simraPrefs", this));
 
-        if (previousAnnotation != null && previousAnnotation[4].length()>0 && previousAnnotation[5].length()>0) {
+        if (previousAnnotation != null && previousAnnotation[4].length() > 0 && previousAnnotation[5].length() > 0) {
 
             incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[4]));
 
@@ -114,8 +114,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     }
                 }
                 */
-                overwriteIncidentFile(rideID, incidentKey, incidentKey+ "," + lat + "," + lon + "," + date + ","
-                         + incidentType + "," + locationType + "," + description);
+                overwriteIncidentFile(rideID, incidentKey, incidentKey + "," + lat + "," + lon + "," + date + ","
+                        + incidentType + "," + locationType + "," + description);
 
 
                 incidentSaved = true;
@@ -123,7 +123,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 String incidentString = incidentKey + "," + lat + "," + lon + "," + date + ","
                         + "," + incidentType + "," + locationType + "," + description;
 
-                writeIntToSharePrefs("Profile-phoneLocation",locationType,"simraPrefs",this);
+                writeIntToSharePrefs("Profile-phoneLocation", locationType, "simraPrefs", this);
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("result", incidentString);
@@ -148,7 +148,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy() called");
-        if(incidentSaved){
+        if (incidentSaved) {
             Toast.makeText(this, getString(R.string.editingIncidentCompleted), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, getString(R.string.editingIncidentAborted), Toast.LENGTH_SHORT).show();
@@ -157,7 +157,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
     public String[] loadPreviousAnnotation(String rideID, String incidentKey) {
 
-        String [] result = null;
+        String[] result = null;
         Log.d(TAG, "loadPreviousAnnotation rideID: " + rideID + " incidentKey: " + incidentKey);
 
         String pathToIncidents = "accEvents" + rideID + ".csv";
@@ -188,7 +188,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
                     if (incidentProps[0].equals(incidentKey)) {
 
-                       result = incidentProps;
+                        result = incidentProps;
 
                     }
 
@@ -221,8 +221,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             contentOfNewFile += System.lineSeparator();
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] oldIncident = line.split(",",-1);
-                if(oldIncident[0].equals(incidentKey)){
+                String[] oldIncident = line.split(",", -1);
+                if (oldIncident[0].equals(incidentKey)) {
                     contentOfNewFile += newAnnotation;
                     contentOfNewFile += System.lineSeparator();
                     Log.d(TAG, "overwriting \"" + line + "\" with \"" + contentOfNewFile);
@@ -237,7 +237,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        overWriteFile(contentOfNewFile,path,this);
+        overWriteFile(contentOfNewFile, path, this);
 
     }
 

@@ -12,27 +12,30 @@ public class AccEvent {
     Date date;
     String TAG = "AccEvent_LOG";
     int key = 999;              // when an event doesn't have a key yet, the key is 999
-                                // (can't use 0 because that's an actual valid key)
+    // (can't use 0 because that's an actual valid key)
 
     boolean annotated = false;  // events are labeled as not annotated when first created.
 
-    /**public void setKey(int key) {
+    /**
+     * public void setKey(int key) {
+     * <p>
+     * this.key = key;
+     * <p>
+     * }
+     * <p>
+     * public void setAnnotationStatus(boolean annotated) {
+     * this.annotated = annotated;
+     * }
+     * <p>
+     * public void setAnnotationStatus(boolean annotated) {
+     * this.annotated = annotated;
+     * }
+     */
 
-        this.key = key;
 
+    public long getTimeStamp() {
+        return this.timeStamp;
     }
-
-    public void setAnnotationStatus(boolean annotated) {
-        this.annotated = annotated;
-    }
-
-    public void setAnnotationStatus(boolean annotated) {
-        this.annotated = annotated;
-    }*/
-
-
-
-    public long getTimeStamp(){ return this.timeStamp; }
 
     public AccEvent(String[] eventLine) {
         this.position = new GeoPoint(Double.valueOf(eventLine[0]), Double.valueOf(eventLine[1]));

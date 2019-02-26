@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ScrollView01"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_gravity="center_horizontal"
-    android:scrollbars="vertical"
-    android:requiresFadingEdge="vertical"
-    android:fadingEdgeLength="80dp"
     android:background="@drawable/rounded_white"
-    >
+    android:fadingEdgeLength="80dp"
+    android:requiresFadingEdge="vertical"
+    android:scrollbars="vertical">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -41,14 +39,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/incident_type"
-            android:textSize="10pt"/>
+            android:textSize="10pt" />
 
         <Spinner
             android:id="@+id/incidentTypeSpinner"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:entries="@array/incidenttypelist"
-            android:prompt="@string/incidentType1"/>
+            android:prompt="@string/incidentType1" />
 
         <Space
             android:layout_width="match_parent"
@@ -59,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/locationSpinner"
-            android:textSize="10pt"/>
+            android:textSize="10pt" />
 
         <Spinner
             android:id="@+id/locationSpinner"
@@ -77,7 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/description"
-            android:textSize="10pt"/>
+            android:textSize="10pt" />
 
         <EditText
             android:id="@+id/EditTextDescriptionBody"
@@ -85,7 +83,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/descriptionBody"
             android:inputType="textMultiLine"
-            android:lines="5"/>
+            android:lines="5" />
 
         <Space
             android:layout_width="match_parent"

@@ -104,7 +104,7 @@ public class ShowRouteActivity extends BaseActivity {
         String pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
         // Log.d(TAG, "onCreate() date: " + date);
-        int state = getIntent().getIntExtra("State",0);
+        int state = getIntent().getIntExtra("State", 0);
         // Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
         String duration = getIntent().getStringExtra("Duration");
 
@@ -116,7 +116,7 @@ public class ShowRouteActivity extends BaseActivity {
         // Create a ride object with the accelerometer, gps and time data
         try {
             ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, this);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -183,7 +183,7 @@ public class ShowRouteActivity extends BaseActivity {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
 
-                if (addCustomMarkerMode){
+                if (addCustomMarkerMode) {
                     // Call custom marker adding functionality which enables the user to put
                     // markers on the map
 
@@ -201,7 +201,7 @@ public class ShowRouteActivity extends BaseActivity {
             @Override
             public boolean longPressHelper(GeoPoint p) {
 
-                if (addCustomMarkerMode){
+                if (addCustomMarkerMode) {
 
                     // Call custom marker adding functionality which enables the user to put
                     // markers on the map
@@ -248,12 +248,12 @@ public class ShowRouteActivity extends BaseActivity {
             if (dirFiles.length != 0) {
                 for (int i = 0; i < dirFiles.length; i++) {
                     String nameOfFileToBeRenamed = dirFiles[i].getName();
-                    String newNameOfFile = nameOfFileToBeRenamed.replace(".csv","_1.csv");
+                    String newNameOfFile = nameOfFileToBeRenamed.replace(".csv", "_1.csv");
                     String path = Constants.APP_PATH + "files/";
                     Log.d(TAG, "nameOfFileToBeRenamed: " + nameOfFileToBeRenamed + " newNameOfFile: " + newNameOfFile);
-                    if (nameOfFileToBeRenamed.startsWith(ride.getId()+"_") && !nameOfFileToBeRenamed.endsWith("_1.csv")) {
+                    if (nameOfFileToBeRenamed.startsWith(ride.getId() + "_") && !nameOfFileToBeRenamed.endsWith("_1.csv")) {
                         Log.d(TAG, "Renaming");
-                        dirFiles[i].renameTo(new File(path+newNameOfFile));
+                        dirFiles[i].renameTo(new File(path + newNameOfFile));
                     }
                 }
             }
@@ -278,7 +278,7 @@ public class ShowRouteActivity extends BaseActivity {
 
             if (resultCode == Activity.RESULT_OK) {
 
-               String result = data.getStringExtra("result");
+                String result = data.getStringExtra("result");
 
                 String[] incidentProps = result.split(",");
 
@@ -305,7 +305,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         try {
             pool.awaitTermination(2, TimeUnit.SECONDS);
-        } catch(InterruptedException ie) {
+        } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
     }
@@ -313,7 +313,7 @@ public class ShowRouteActivity extends BaseActivity {
     // Returns the longitudes of the southern- and northernmost points
     // as well as the latitudes of the western- and easternmost points
     // in a double Array {South, North, West, East}
-    static BoundingBox getBoundingBox(Polyline pl){
+    static BoundingBox getBoundingBox(Polyline pl) {
 
         // {North, East, South, West}
         ArrayList<GeoPoint> geoPoints = pl.getPoints();
@@ -322,27 +322,29 @@ public class ShowRouteActivity extends BaseActivity {
 
         for (int i = 0; i < geoPoints.size(); i++) {
             // Check for south/north
-            if (geoPoints.get(i).getLatitude() < border[2]){
+            if (geoPoints.get(i).getLatitude() < border[2]) {
                 border[2] = geoPoints.get(i).getLatitude();
-            } if (geoPoints.get(i).getLatitude() > border[0]){
+            }
+            if (geoPoints.get(i).getLatitude() > border[0]) {
                 border[0] = geoPoints.get(i).getLatitude();
             }
             // Check for west/east
-            if (geoPoints.get(i).getLongitude() < border[3]){
+            if (geoPoints.get(i).getLongitude() < border[3]) {
                 border[3] = geoPoints.get(i).getLongitude();
-            } if (geoPoints.get(i).getLongitude() > border[1]){
+            }
+            if (geoPoints.get(i).getLongitude() > border[1]) {
                 border[1] = geoPoints.get(i).getLongitude();
             }
 
         }
 
-        return new BoundingBox(border[0]+0.001,border[1]+0.001,border[2]-0.001,border[3]-0.001);
+        return new BoundingBox(border[0] + 0.001, border[1] + 0.001, border[2] - 0.001, border[3] - 0.001);
     }
 
     // zoom automatically to the bounding box. Usually the command in the if body should suffice
     // but osmdroid is buggy and we need the else part to fix it.
-    public void zoomToBBox(BoundingBox bBox){
-        if((mMapView.getIntrinsicScreenRect(null).bottom-mMapView.getIntrinsicScreenRect(null).top) > 0){
+    public void zoomToBBox(BoundingBox bBox) {
+        if ((mMapView.getIntrinsicScreenRect(null).bottom - mMapView.getIntrinsicScreenRect(null).top) > 0) {
             mMapView.zoomToBoundingBox(bBox, false);
         } else {
             ViewTreeObserver vto = mMapView.getViewTreeObserver();
@@ -358,7 +360,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
 
         mMapView.setMinZoomLevel(7.0);
-        if(mMapView.getMaxZoomLevel() > 19.0){
+        if (mMapView.getMaxZoomLevel() > 19.0) {
             mMapView.setMaxZoomLevel(19.0);
         }
     }

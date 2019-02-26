@@ -12,9 +12,8 @@
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="@color/colorPrimary"
         android:background="@drawable/border"
-        android:dividerHeight="1dp">
-    </ListView>
+        android:divider="@color/colorPrimary"
+        android:dividerHeight="1dp"></ListView>
 
 </android.support.constraint.ConstraintLayout>
