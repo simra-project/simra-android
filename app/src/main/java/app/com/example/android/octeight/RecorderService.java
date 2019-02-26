@@ -80,35 +80,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private SensorManager sensorManager = null;
     private PowerManager.WakeLock wakeLock = null;
     private IBinder mBinder = new MyBinder();
-    private String accString = "";
-    private String gpsString = "";
     private String accGpsString = "";
-
-    public String getGpsString() {
-        return gpsString;
-    }
-
-    public String getAccString() {
-        return accString;
-    }
-
-    public String getAccGpsString() { return accGpsString; }
 
     public String getPathToAccGpsFile() { return pathToAccGpsFile; }
 
     public double getDuration() { return (curTime - startTime); }
 
     public boolean getRecordingAllowed() { return recordingAllowed; }
-
-    public long getTimeStamp() { return curTime; }
-
-    public long getEndTime() { return endTime; }
-    // Queue<Float> accQQueue;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // SharedPrefs (same as in MainActivity) to enable continuously increasing unique
-    // code for each ride => connection between meta file and individual ride files
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public long getStartTime() { return startTime; }
 
@@ -184,7 +162,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onLocationChanged(Location location) {
 
-        if (location.getAccuracy() < 100.0){
+        // Take only GPS fixes that are somewhat accurate to prevent spikes in the route.
+        if (location.getAccuracy() < Constants.GPS_ACCURACY_THRESHOLD){
+            // Set start location. Important for privacy distance.
             if(startLocation == null){
                 startLocation = location;
             }
@@ -252,21 +232,21 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             editor.apply();
         }
 
+        // Load the privacy settings
         privacyDistance = (float) sharedPrefs.getInt("Privacy-Distance", 30);
         privacyDuration = (sharedPrefs.getLong("Privacy-Duration", 30)*1000);
         Log.d(TAG, "privacyDistance: "  + privacyDistance + " privacyDuration: " + privacyDuration);
-
 
         pathToAccGpsFile = sharedPrefs.getInt("RIDE-KEY", 0)
                 + "_accGps_"
                 + startTime +/*date +*/ ".csv";
 
-
+        // Prevent the App to be killed while recording
         PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG + ":RecorderService");
+
         // Executor service for writing data
         executor = Executors.newSingleThreadExecutor();
-
     }
 
     @Override
@@ -292,10 +272,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
+        // Fire the notification while recording
         Notification notification = createNotification().build();
-
         notificationManager = NotificationManagerCompat.from(this);
-        // Send the notification.
         notificationManager.notify(notificationId, notification);
         startForeground(notificationId, notification);
         wakeLock.acquire();
@@ -313,7 +292,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
         // with current ride and and sharedPrefs with current ride key. Do these things only,
-        // if recording is allowed (see privacyDuration and privacyDistance)
+        // if recording is allowed (see privacyDuration and privacyDistance) and we have written some
+        // data.
         if(recordingAllowed && lineAdded) {
 
             // Create head of the csv-file
@@ -389,26 +369,15 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     }
 
     private float computeAverage(Collection<Float> myVals) {
-
         float sum = 0;
-
         for(float f : myVals) {
-
             sum += f;
-
         }
-
         return sum/myVals.size();
-
     }
 
     private NotificationCompat.Builder createNotification() {
         String CHANNEL_ID = "RecorderServiceNotification";
-        /*
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        */
         Intent contentIntent = new Intent(this, MainActivity.class);
         contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, contentIntent, 0);
@@ -425,15 +394,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+
+        return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.helmet)
                 .setContentTitle("Aufzeichnung der Fahrt")
                 .setContentText("Ihre Fahrt wird aufgezeichnet.")
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent);
-
-        return mBuilder;
 
     }
 
@@ -446,7 +414,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         // Store the current accGpsFile array values into THIS objects arrays, and db insert from this object
         public InsertHandler(float[] accelerometerMatrix) {
-
             this.accelerometerMatrix = accelerometerMatrix;
         }
 

@@ -1,39 +1,21 @@
 package app.com.example.android.octeight;
 
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Locale;
 
 import static app.com.example.android.octeight.Utils.getUniqueUserID;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpLongSharedPrefs;
-import static app.com.example.android.octeight.Utils.lookUpSharedPrefs;
 import static app.com.example.android.octeight.Utils.writeIntToSharePrefs;
 import static app.com.example.android.octeight.Utils.writeLongToSharePrefs;
-import static app.com.example.android.octeight.Utils.writeToSharePrefs;
+
 
 public class SettingsActivity extends BaseActivity {
-
-    private SeekBar durationSeekBar;
-    private SeekBar distanceSeekBar;
-
-    private TextView durationTextView;
-    private TextView distanceTextView;
 
     // Log tag
     private static final String TAG = "SettingsActivity_LOG";
@@ -54,14 +36,13 @@ public class SettingsActivity extends BaseActivity {
             unit = "ft";
         }
 
-
         // Set seekBars
-        this.durationSeekBar = (SeekBar) findViewById(R.id.privacyDurationSeekBar);
-        this.distanceSeekBar = (SeekBar) findViewById(R.id.privacyDistanceSeekBar);
+        SeekBar durationSeekBar = (SeekBar) findViewById(R.id.privacyDurationSeekBar);
+        SeekBar distanceSeekBar = (SeekBar) findViewById(R.id.privacyDistanceSeekBar);
 
         // Set textViews
-        this.durationTextView = (TextView) findViewById(R.id.privacyDurationSeekBarProgress);
-        this.distanceTextView = (TextView) findViewById(R.id.privacyDistanceSeekBarProgress);
+        TextView durationTextView = (TextView) findViewById(R.id.privacyDurationSeekBarProgress);
+        TextView distanceTextView = (TextView) findViewById(R.id.privacyDistanceSeekBarProgress);
 
         // Load the privacy option values
         long privacyDuration = lookUpLongSharedPrefs("Privacy-Duration",30,"simraPrefs", this);
@@ -76,25 +57,24 @@ public class SettingsActivity extends BaseActivity {
         distanceSeekBar.setProgress(privacyDistance);
 
         // Set the textViews according to the values of the corresponding seekBars
-        this.durationTextView.setText(durationSeekBar.getProgress() + "s/" + (durationSeekBar.getMax())+"s");
+        durationTextView.setText(durationSeekBar.getProgress() + "s/" + (durationSeekBar.getMax())+"s");
         if(unit.equals("ft")){
-            this.distanceTextView.setText(Math.round(distanceSeekBar.getProgress()*3.28) + unit + "/" + Math.round(distanceSeekBar.getMax()*3.28)+unit);
+            distanceTextView.setText(Math.round(distanceSeekBar.getProgress()*3.28) + unit + "/" + Math.round(distanceSeekBar.getMax()*3.28)+unit);
         } else {
-            this.distanceTextView.setText(distanceSeekBar.getProgress() + unit + "/" + distanceSeekBar.getMax()+unit);
+            distanceTextView.setText(distanceSeekBar.getProgress() + unit + "/" + distanceSeekBar.getMax()+unit);
 
         }
 
         // Create onSeekBarChangeListeners to change the corresponding options
-        this.durationSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(durationTextView,"s","Privacy-Duration"));
-        this.distanceSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(distanceTextView,unit,"Privacy-Distance"));
+        durationSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(durationTextView,"s","Privacy-Duration"));
+        distanceSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(distanceTextView,unit,"Privacy-Distance"));
 
     }
 
 
-
+    // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)
     private SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener(TextView tV, String unit, String privacyOption) {
         SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-
 
 
             @Override

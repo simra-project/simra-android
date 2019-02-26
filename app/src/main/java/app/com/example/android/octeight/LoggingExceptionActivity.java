@@ -1,6 +1,5 @@
 package app.com.example.android.octeight;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -26,7 +25,6 @@ import okhttp3.Response;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.getUniqueUserID;
-import static app.com.example.android.octeight.Utils.lookUpSharedPrefs;
 
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
 

@@ -1,31 +1,17 @@
 package app.com.example.android.octeight;
 
-import android.content.res.Resources;
-import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.util.Locale;
-
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
-import static app.com.example.android.octeight.Utils.lookUpSharedPrefs;
 import static app.com.example.android.octeight.Utils.writeIntToSharePrefs;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -33,6 +19,7 @@ public class ProfileActivity extends AppCompatActivity {
     // Log tag
     private static final String TAG = "ProfileActivity_LOG";
 
+    // The choosable items in the spinner
     String[] ageGroups = new String[6];
     String[] genders = new String[4];
     String[] regions = new String[3];
@@ -41,11 +28,12 @@ public class ProfileActivity extends AppCompatActivity {
     String[] bikeTypes = new String[5];
     String[] phoneLocations = new String[7];
 
+    // Save and abort button at the bottom of the screen
     LinearLayout saveButton;
     LinearLayout abortButton;
 
+    // Boolean to display a toast to inform the user whether changes were saved or not
     boolean profileSaved = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +48,7 @@ public class ProfileActivity extends AppCompatActivity {
         bikeTypes = getResources().getStringArray(R.array.bikeTypeList);
         phoneLocations = getResources().getStringArray(R.array.locations);
 
+        // Building the view
         Spinner ageGroupSpinner =  findViewById(R.id.ageGroupSpinner);
         Spinner genderSpinner =  findViewById(R.id.genderSpinner);
         Spinner regionSpinner =  findViewById(R.id.regionSpinner);
@@ -70,15 +59,8 @@ public class ProfileActivity extends AppCompatActivity {
         Spinner bikeSpinner =  findViewById(R.id.bikeTypeSpinner);
         Spinner locationTypeSpinner = findViewById(R.id.locationTypeSpinner);
 
-        // regionDistrictSpace.setVisibility(View.VISIBLE);
-        // regionSpinner.setOnItemClickListener();
-
-
-
+        // Get the previous saved settings
         int[] previousProfile = loadPreviousProfile();
-
-        saveButton = findViewById(R.id.done_button);
-        abortButton = findViewById(R.id.abort_button);
 
         ageGroupSpinner.setSelection(previousProfile[0]);
         genderSpinner.setSelection(previousProfile[1]);
@@ -100,18 +82,25 @@ public class ProfileActivity extends AppCompatActivity {
             lonDistrictSpinner.setVisibility(View.VISIBLE);
         }
 
+        saveButton = findViewById(R.id.done_button);
+        abortButton = findViewById(R.id.abort_button);
+
+        // Change the districtSpinner according to the selected region.
         regionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> arg0, View arg1,
                                        int arg2, long arg3) {
-                // TODO Auto-generated method stub
+                // Selected region is Berlin. Make space, title and berDistrictSpinner visible,
+                // lonDistrictSpinner gone and set the item to default.
                 if(regionSpinner.getSelectedItemId()==1){
                     regionDistrictSpace.setVisibility(View.VISIBLE);
                     districtTitle.setVisibility(View.VISIBLE);
                     berDistrictSpinner.setVisibility(View.VISIBLE);
                     lonDistrictSpinner.setVisibility(View.GONE);
                     lonDistrictSpinner.setSelection(0);
+                    // Selected region is London. Make space, title and lonDistrictSpinner visible,
+                    // berDistrictSpinner gone and set the item to default.
                 } else if (regionSpinner.getSelectedItemId()==2){
                     regionDistrictSpace.setVisibility(View.VISIBLE);
                     districtTitle.setVisibility(View.VISIBLE);
@@ -119,6 +108,7 @@ public class ProfileActivity extends AppCompatActivity {
                     berDistrictSpinner.setVisibility(View.GONE);
                     berDistrictSpinner.setSelection(0);
                 } else {
+                    // if "please choose" is chosen, retract everything and set to default.
                     regionDistrictSpace.setVisibility(View.GONE);
                     districtTitle.setVisibility(View.GONE);
                     berDistrictSpinner.setVisibility(View.GONE);
@@ -126,9 +116,6 @@ public class ProfileActivity extends AppCompatActivity {
                     lonDistrictSpinner.setVisibility(View.GONE);
                     lonDistrictSpinner.setSelection(0);
                 }
-                String mSupplier=regionSpinner.getSelectedItem().toString();
-
-                Log.d(TAG,"Selected item :" + mSupplier);
             }
 
             @Override
@@ -138,6 +125,8 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        // When the save button is clicked, the selected items are saved to simraPrefs,
+        // this ProfileActivity gets finished and a toast is shown to the user.
         saveButton.setOnClickListener((View v) -> {
 
             int ageGroup = ageGroupSpinner.getSelectedItemPosition();
@@ -252,9 +241,6 @@ public class ProfileActivity extends AppCompatActivity {
     private int[] loadPreviousProfile() {
         // {ageGroup, gender, region, berDistrict, lonDistrict, bikeType, phoneLocation}
         int[] result = new int[7];
-
-        // String defaultValue = getResources().getString(R.string.pleaseChoose);
-
         result[0] = lookUpIntSharedPrefs("Profile-Age",0,"simraPrefs", this);
         result[1] = lookUpIntSharedPrefs("Profile-Gender",0,"simraPrefs", this);
         result[2] = lookUpIntSharedPrefs("Profile-Region",0,"simraPrefs", this);

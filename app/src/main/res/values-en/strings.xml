@@ -77,7 +77,7 @@
     <string name="imprint">Imprint</string>
     <string name="feedback">Feedback</string>
     <string name="profile">Profile</string>
-    <string name="history">History</string>
+    <string name="history">My Rides</string>
     <string name="ride_length">ride duration</string>
     <string name="sendErrorTitle">Whoops!</string>
     <string name="sendErrorMessage">Seems like an error occurred during your last session. Would you like to send a report to help us improve the app?</string>
