@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_gravity="center_horizontal"
+    android:id="@+id/activity_profile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="vertical"
-    android:requiresFadingEdge="vertical"
+    android:layout_gravity="center_horizontal"
+    android:animateLayoutChanges="true"
     android:fadingEdgeLength="80dp"
-    android:id="@+id/activity_profile"
-    android:animateLayoutChanges="true">
+    android:requiresFadingEdge="vertical"
+    android:scrollbars="vertical">
 
     <LinearLayout
-        android:layout_marginTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginStart="50dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="50dp"
+        android:animateLayoutChanges="true"
         android:background="@android:color/transparent"
-        android:orientation="vertical"
-        android:animateLayoutChanges="true">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/ProfileTitle"
@@ -64,11 +64,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:entries="@array/genderList"
-            android:prompt="@string/pleaseChoose"/>
+            android:prompt="@string/pleaseChoose" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
+
         <TextView
             android:id="@+id/regionSpinnerTitle"
             android:layout_width="wrap_content"
@@ -82,40 +83,43 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:entries="@array/regionList"
-            android:prompt="@string/pleaseChoose"/>
+            android:prompt="@string/pleaseChoose" />
 
         <Space
             android:id="@+id/regionDistrictSpace"
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:visibility="gone"
-            android:animateLayoutChanges="true"/>
+            android:animateLayoutChanges="true"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/districtSpinnerTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
             android:text="@string/districtSpinnerTitle"
             android:textAlignment="center"
             android:textSize="15sp"
-            android:visibility="gone"
-            android:animateLayoutChanges="true"/>
+            android:visibility="gone" />
 
         <Spinner
             android:id="@+id/districtBERSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
             android:entries="@array/districtBERList"
             android:prompt="@string/pleaseChoose"
-            android:visibility="gone"
-            android:animateLayoutChanges="true"/>
+            android:visibility="gone" />
+
         <Spinner
             android:id="@+id/districtLONSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
             android:entries="@array/districtLONList"
             android:prompt="@string/pleaseChoose"
-            android:visibility="gone"
-            android:animateLayoutChanges="true"/>
+            android:visibility="gone" />
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
@@ -133,7 +137,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:entries="@array/bikeTypeList"
-            android:prompt="@string/pleaseChoose"/>
+            android:prompt="@string/pleaseChoose" />
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
@@ -150,7 +155,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:entries="@array/locations"
-            android:prompt="@string/pleaseChoose"/>
+            android:prompt="@string/pleaseChoose" />
 
         <Space
             android:layout_width="match_parent"

@@ -43,13 +43,16 @@ public class UploadService extends Service {
 
 
     int numberOfTasks = 0;
-    public void decreaseNumberOfTasks(){
+
+    public void decreaseNumberOfTasks() {
         numberOfTasks--;
     }
-    public void setNumberOfTasks(int numberOfTasks){
+
+    public void setNumberOfTasks(int numberOfTasks) {
         this.numberOfTasks = numberOfTasks;
     }
-    public int getNumberOfTasks(){
+
+    public int getNumberOfTasks() {
         return this.numberOfTasks;
     }
 
@@ -168,35 +171,35 @@ public class UploadService extends Service {
             Log.d(TAG, "sendCrashReportPermitted: " + sendCrashReportPermitted);
             // If there was a crash and the user permitted to send the crash logs, upload all data
             // in order to enable reconstructing the error.
-            if(sendCrashReportPermitted){
+            if (sendCrashReportPermitted) {
                 String path = Constants.APP_PATH + "shared_prefs/simraPrefs.xml";
                 makePostTestPhase(path, id);
 
                 for (int i = 0; i < dirFiles.length; i++) {
                     path = dirFiles[i].getName();
-                    if(!(new File(path)).isDirectory()){
+                    if (!(new File(path)).isDirectory()) {
                         makePostTestPhase(path, id);
                     }
-                    if (path.startsWith("CRASH")){
+                    if (path.startsWith("CRASH")) {
                         boolean deleted = context.deleteFile(path);
                         Log.d(TAG, path + " deleted: " + deleted);
                     }
                 }
-            // If there wasn't a crash or the user did not gave us the permission, upload
+                // If there wasn't a crash or the user did not gave us the permission, upload
             } else {
                 ArrayList<String> ridesToUpload;
                 ridesToUpload = intent.getStringArrayListExtra("RidesToUpload");
-                UploadService.this.setNumberOfTasks((ridesToUpload.size()*2));
+                UploadService.this.setNumberOfTasks((ridesToUpload.size() * 2));
                 // For each ride to upload...
                 for (int i = 0; i < ridesToUpload.size(); i++) {
                     // ... find the corresponding ride csv file ...
                     for (int j = 0; j < dirFiles.length; j++) {
                         String nameOfFile = dirFiles[j].getName();
-                        if(ridesToUpload.get(i).equals(nameOfFile)) {
+                        if (ridesToUpload.get(i).equals(nameOfFile)) {
                             // ... and upload.
                             makePostTestPhase(nameOfFile, id);
                             String key = ridesToUpload.get(i).split("_")[0];
-                            String accEventName = "accEvents"+key+".csv";
+                            String accEventName = "accEvents" + key + ".csv";
                             makePostTestPhase(accEventName, id);
                         }
                     }
@@ -210,9 +213,7 @@ public class UploadService extends Service {
             editor.commit();
 
 
-
         }
-
 
 
         private void makePostTestPhase(String pathToFile, String id) throws IOException {
@@ -220,14 +221,14 @@ public class UploadService extends Service {
             Log.d(TAG, "pathToFile: " + pathToFile + " id: " + id);
             File file;
             // Log.d(TAG, "File.pathSeparator: " + File.pathSeparator);
-            if(pathToFile.contains(File.separator)){
+            if (pathToFile.contains(File.separator)) {
                 //Log.d(TAG, "pathToFile contains pathSeparator!");
                 file = new File(pathToFile);
             } else {
                 file = getFileStreamPath(pathToFile);
 
             }
-            if(file.isDirectory()){
+            if (file.isDirectory()) {
                 return;
             }
             //

@@ -87,16 +87,16 @@ public class MarkerFunct {
     public void showIncidents() {
 
         /**for(AccEvent accEvent : incidentDat) {
-            Log.d(TAG, "setting Marker at: " + accEvent.position.toString());
+         Log.d(TAG, "setting Marker at: " + accEvent.position.toString());
 
-            setMarker(accEvent);
-        }*/
+         setMarker(accEvent);
+         }*/
 
         try (BufferedReader reader = new BufferedReader(new FileReader
                 (mother.getApplicationContext()
                         .getFileStreamPath("accEvents" + rideID + ".csv")))) {
 
-        reader.readLine();
+            reader.readLine();
 
             String line;
 
@@ -105,14 +105,14 @@ public class MarkerFunct {
                 String[] actualIncident = line.split(",", -1);
 
                 /**String[] eventLine = new String[6];
-                //Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident)
-                //        + " id: " + mother.ride.getId());
-                //if(actualIncident[0].equals(mother.ride.getId())){
-                //    Log.d(TAG, "custom incident found! actualIncident: " + Arrays.toString(actualIncident));
-                    eventLine[0] = actualIncident[1];
-                    eventLine[1] = actualIncident[2];
-                    eventLine[5] = actualIncident[3];
-                    AccEvent accEvent = new AccEvent(eventLine);
+                 //Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident)
+                 //        + " id: " + mother.ride.getId());
+                 //if(actualIncident[0].equals(mother.ride.getId())){
+                 //    Log.d(TAG, "custom incident found! actualIncident: " + Arrays.toString(actualIncident));
+                 eventLine[0] = actualIncident[1];
+                 eventLine[1] = actualIncident[2];
+                 eventLine[5] = actualIncident[3];
+                 AccEvent accEvent = new AccEvent(eventLine);
                  */
 
                 Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident));
@@ -124,10 +124,10 @@ public class MarkerFunct {
                 AccEvent accEvent = new AccEvent(Integer.parseInt(actualIncident[0]),
                         Double.parseDouble(actualIncident[1]),
                         Double.parseDouble(actualIncident[2]),
-                        Long.parseLong(actualIncident[3]),annotated);
+                        Long.parseLong(actualIncident[3]), annotated);
 
                 Log.d(TAG, "accEvent key: " + accEvent.key + " accEvent.position" + accEvent.position.toString());
-                    setMarker(accEvent, accEvent.key);
+                setMarker(accEvent, accEvent.key);
             }
 
         } catch (IOException e) {
@@ -146,7 +146,7 @@ public class MarkerFunct {
 
         List<GeoPointWrapper> wrappedGPS = new ArrayList<>();
 
-        for(GeoPoint thisGP : mother.ride.getRoute().getPoints()) {
+        for (GeoPoint thisGP : mother.ride.getRoute().getPoints()) {
 
             wrappedGPS.add(new GeoPointWrapper(thisGP, p));
 
@@ -156,13 +156,13 @@ public class MarkerFunct {
 
         Collections.sort(wrappedGPS, (GeoPointWrapper o1, GeoPointWrapper o2) -> {
 
-                if(o1.distToReference < o2.distToReference) return -1;
+            if (o1.distToReference < o2.distToReference) return -1;
 
-                if(o1.distToReference > o2.distToReference) return 1;
+            if (o1.distToReference > o2.distToReference) return 1;
 
-                else return 0;
+            else return 0;
 
-            });
+        });
 
         // Collections.sort(wrappedGPS);
 
@@ -173,7 +173,7 @@ public class MarkerFunct {
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Create a new AccEvent
 
-        int eventCount = ++ this.numEvents;
+        int eventCount = ++this.numEvents;
 
         AccEvent newAcc = new AccEvent(eventCount, closestOnRoute.getLatitude(),
                 closestOnRoute.getLongitude(), 1337, false);
@@ -223,7 +223,7 @@ public class MarkerFunct {
                     //mother.getmMapView().getOverlayManager().remove(custMarker);
                     mother.getmMapView().invalidate();
                     markerMap.remove(custMarker);
-                    this.numEvents --;
+                    this.numEvents--;
                 });
 
         // POSITIVE BUTTON: user approves of button. Add to ride.events & file.
@@ -240,7 +240,7 @@ public class MarkerFunct {
                             + newAcc.position.getLatitude() + "," + newAcc.position.getLongitude()
                             + "," + newAcc.timeStamp + ",,," + System.lineSeparator();
 
-                    if(!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())){
+                    if (!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())) {
 
                         appendToFile((header + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
 
@@ -264,10 +264,10 @@ public class MarkerFunct {
         wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
         window.setAttributes(wlp);
 
-        new Handler().postDelayed( () -> {
+        new Handler().postDelayed(() -> {
             alertDialog.show();
 
-        },750);
+        }, 750);
 
 
     }
@@ -290,11 +290,11 @@ public class MarkerFunct {
          * B) default/custom
          */
 
-        if (! event.annotated) {
+        if (!event.annotated) {
 
             // custom events can be detected via their timeStamp
 
-            if (! (event.timeStamp == 1337)) {
+            if (!(event.timeStamp == 1337)) {
 
                 incidentMarker.setIcon(mother.editMarkerDefault);
 
@@ -307,7 +307,7 @@ public class MarkerFunct {
 
             // custom events can be detected via their timeStamp
 
-            if (! (event.timeStamp == 1337)) {
+            if (!(event.timeStamp == 1337)) {
 
                 incidentMarker.setIcon(mother.editDoneDefault);
 
@@ -358,9 +358,9 @@ public class MarkerFunct {
             // This is the actual geocoding
 
             address = geocoderNominatim.getFromLocation(incidentLoc.getLatitude(),
-                    incidentLoc.getLongitude(),1);
+                    incidentLoc.getLongitude(), 1);
 
-            if(address.size() == 0) {
+            if (address.size() == 0) {
 
                 Log.i("getFromLoc", "Couldn't find an address for input geoPoint");
 
@@ -394,7 +394,7 @@ public class MarkerFunct {
     }
 
     // Closes all InfoWindows.
-    public void closeAllInfoWindows(){
+    public void closeAllInfoWindows() {
         for (int i = 0; i < markers.size(); i++) {
             markers.get(i).closeInfoWindow();
         }

@@ -35,8 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="50dp"
-            />
+            android:layout_marginEnd="50dp" />
 
         <TextView
             android:id="@+id/seekBarText"
@@ -66,8 +65,8 @@
             android:id="@+id/eingabeaufforderung"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
             android:fontFamily="@font/assistant_extralight"
             android:text="@string/description"
             android:textColor="#FEFEFE"

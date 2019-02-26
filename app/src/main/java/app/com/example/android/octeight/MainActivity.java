@@ -106,7 +106,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Log.i(TAG,"OnCreate called");
+        Log.i(TAG, "OnCreate called");
         super.onCreate(savedInstanceState);
 
         myEx = Executors.newFixedThreadPool(4);
@@ -184,7 +184,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         // If app has been used before and therefore a last known location is available in sharedPrefs,
         // animate the map to that location.
         // Move map to last location known by locationManager if app is started for the first time.
-        if(sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_longitude")) {
+        if (sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_longitude")) {
             GeoPoint lastLoc = new GeoPoint(
                     Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")),
                     Double.parseDouble(sharedPrefs.getString("lastLoc_longitude", "")));
@@ -325,7 +325,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                     unbindService(mRecorderServiceConnection);
                     stopService(recService);
                     recording = false;
-                    if(mBoundRecorderService.getRecordingAllowed()) {
+                    if (mBoundRecorderService.getRecordingAllowed()) {
                         // Get the recorded files and send them to HistoryActivity for further processing
                         Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
                         // The file under PathToAccGpsFile contains the accelerometer and location data
@@ -349,9 +349,9 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                             public void onClick(DialogInterface dialog, int which) {
                             }
                         };
-                        showMessageOK(getString(R.string.errorRideNotRecorded),errorOnClickListener, MainActivity.this);
+                        showMessageOK(getString(R.string.errorRideNotRecorded), errorOnClickListener, MainActivity.this);
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
                     Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
                 }
 
@@ -362,7 +362,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             }
         });
 
-        Log.i(TAG,"OnCreate finished");
+        Log.i(TAG, "OnCreate finished");
 
     }
 
@@ -392,15 +392,15 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     // Lifecycle (onResume onPause onStop):
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public void onResume(){
+    public void onResume() {
 
-        Log.i(TAG,"OnResume called");
+        Log.i(TAG, "OnResume called");
 
         super.onResume();
 
         // Ensure the button that matches current state is presented.
         // @TODO für MARK: doesn't seem to work yet, when display is rotated "Neue Route" is always presented
-        if(recording) {
+        if (recording) {
             showStop();
         } else {
             showStart();
@@ -415,7 +415,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
                     0, this);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        } catch ( SecurityException se ) {
+        } catch (SecurityException se) {
             Log.d(TAG, "onStart() permission not granted yet");
         }
 
@@ -426,9 +426,9 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public void onPause(){
+    public void onPause() {
 
-        Log.i(TAG,"OnPause called");
+        Log.i(TAG, "OnPause called");
 
         super.onPause();
 
@@ -441,7 +441,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
          }*/
 
 
-
         // Load Configuration with changes from onCreate
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().save(this, prefs);
@@ -449,15 +448,15 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         // Refresh the osmdroid configuration on pausing.
         mMapView.onPause(); //needed for compass and icons
 
-        Log.i(TAG,"OnPause finished");
+        Log.i(TAG, "OnPause finished");
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @SuppressLint("MissingPermission")
-    public void onStop(){
+    public void onStop() {
 
-        Log.i(TAG,"OnStop called");
+        Log.i(TAG, "OnStop called");
 
         super.onStop();
 
@@ -473,11 +472,11 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             se.printStackTrace();
         }
 
-        Log.i(TAG,"OnStop finished");
+        Log.i(TAG, "OnStop finished");
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
                 && keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
@@ -517,20 +516,19 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             }
-        }
-        else if (id == R.id.nav_history) {
-            Intent intent = new Intent (MainActivity.this, HistoryActivity.class);
+        } else if (id == R.id.nav_history) {
+            Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_democraphic_data) {
-            Intent intent = new Intent (MainActivity.this, ProfileActivity.class);
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_feedback) {
             // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType("message/rfc822");
-            i.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.feedbackReceiver)});
+            i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
-            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackMail)+ "\n id: " + getUniqueUserID(this));
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackMail) + "\n id: " + getUniqueUserID(this));
             try {
                 startActivity(Intent.createChooser(i, "Send mail..."));
             } catch (android.content.ActivityNotFoundException ex) {
@@ -538,14 +536,18 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             }
 
         } else if (id == R.id.nav_setting) {
-            Intent intent = new Intent (MainActivity.this, SettingsActivity.class);
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_infoMCC){
-            Intent intent = new Intent (MainActivity.this, WebActivity.class);
+        } else if (id == R.id.nav_infoMCC) {
+            Intent intent = new Intent(MainActivity.this, WebActivity.class);
+            intent.putExtra("URL", getString(R.string.mccPage));
             startActivity(intent);
-        } else if (id == R.id.nav_infoSimRa){
-            Intent intent = new Intent (MainActivity.this, StartActivity.class);
+        } else if (id == R.id.nav_infoSimRa) {
+            Intent intent = new Intent(MainActivity.this, StartActivity.class);
             intent.putExtra("caller", "MainActivity");
+            startActivity(intent);
+        } else if (id == R.id.nav_impressum){
+            Intent intent = new Intent (MainActivity.this, ImpressumActivity.class);
             startActivity(intent);
         }
 
@@ -559,16 +561,20 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
-    public void onLocationChanged(Location location) { }
+    public void onLocationChanged(Location location) {
+    }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) { }
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
 
     @Override
-    public void onProviderEnabled(String provider) { }
+    public void onProviderEnabled(String provider) {
+    }
 
     @Override
-    public void onProviderDisabled(String provider) { }
+    public void onProviderDisabled(String provider) {
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService

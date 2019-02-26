@@ -154,5 +154,6 @@
     <string name="rideUploadedInHistoryActivity">Bearbeitete und hochgeladene Fahrt.</string>
     <string name="customIncidentAddedTitle">Neuer Vorfall hinzugefügt!</string>
     <string name="customIncidentAddedMessage">Ist an diesem Ort ein Ereignis vorgefallen?</string>
+    <string name="title_activity_impressum">ImpressumActivity</string>
 
 </resources>

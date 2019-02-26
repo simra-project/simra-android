@@ -11,14 +11,14 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:elevation="8dp"
-        android:layout_margin="10dp"
         android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
         android:background="@drawable/rounded_corners"
+        android:elevation="8dp"
         android:theme="@style/ToolbarTheme"
         android:titleTextColor="#FEFEFE"
-        app:titleTextAppearance="@style/Toolbar.TitleText"
-        app:popupTheme="@style/AppTheme.PopupOverlay">
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        app:titleTextAppearance="@style/Toolbar.TitleText">
 
         <!--TextView android:id="@+id/welcome_text"
             android:gravity="center"
@@ -31,13 +31,13 @@
             android:textStyle="bold"
             /-->
 
-        <ImageButton android:id="@+id/helmet_icon"
+        <ImageButton
+            android:id="@+id/helmet_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginRight="15dp"
             android:layout_gravity="right"
-            android:background="@drawable/helmet"
-            />
+            android:layout_marginRight="15dp"
+            android:background="@drawable/helmet" />
 
 
     </android.support.v7.widget.Toolbar>
@@ -49,78 +49,81 @@
         android:id="@+id/start_button"
         android:layout_width="250dp"
         android:layout_height="85dp"
-        android:background="@drawable/rounded_corners"
         android:layout_above="@id/copyright_text"
         android:layout_centerHorizontal="true"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:background="@drawable/rounded_corners">
 
 
         <ImageView
             android:id="@+id/route_image"
             android:layout_width="65dp"
             android:layout_height="60dp"
-            android:background="@drawable/route2"
-            android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="15dp" />
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15dp"
+            android:background="@drawable/route2" />
 
         <TextView
             android:id="@+id/route_text"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_alignParentRight="true"
-            android:gravity="center"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
             android:layout_marginRight="30dp"
-
+            android:layout_marginBottom="10dp"
             android:fontFamily="@font/assistant_extralight"
+
+            android:gravity="center"
             android:text="@string/startRecording"
             android:textColor="#FEFEFE"
             android:textSize="24dp"
             android:textStyle="bold" />
 
     </RelativeLayout>
-    <RelativeLayout android:id="@+id/stop_button"
+
+    <RelativeLayout
+        android:id="@+id/stop_button"
         android:layout_width="250dp"
         android:layout_height="85dp"
-        android:background="@drawable/rounded_corners"
-        android:visibility="invisible"
         android:layout_above="@id/copyright_text"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"
-        >
-        <ImageView android:id="@+id/stop_image"
+        android:background="@drawable/rounded_corners"
+        android:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/stop_image"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:background="@drawable/stop"
-            android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
-            />
-        <TextView android:id="@+id/stop_text"
+            android:background="@drawable/stop" />
+
+        <TextView
+            android:id="@+id/stop_text"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_alignParentRight="true"
-            android:gravity="center"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
             android:layout_marginRight="30dp"
+            android:layout_marginBottom="10dp"
             android:fontFamily="@font/assistant_extralight"
+            android:gravity="center"
             android:text="@string/endRecording"
             android:textColor="#FEFEFE"
             android:textSize="24dp"
-            android:textStyle="bold"
-            />
+            android:textStyle="bold" />
     </RelativeLayout>
 
-    <TextView android:id="@+id/copyright_text"
-        android:text="@string/osmCopyright"
+    <TextView
+        android:id="@+id/copyright_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="10dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="5dp"
-        />
+        android:text="@string/osmCopyright"
+        android:textSize="10dp" />
 </RelativeLayout>

@@ -1,6 +1,4 @@
-<resources
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:locale="en">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="en">
     <string name="app_name">SimRa (Beta)</string>
     <string name="welcome_header">Welcome to SimRa!</string>
     <string name="welcome_text">Thank you for supporting the SimRa project.</string>

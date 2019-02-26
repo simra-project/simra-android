@@ -32,7 +32,7 @@ public class SettingsActivity extends BaseActivity {
         // Set the distance measure unit according to locale (foot when english, meter when german)
         String unit = "m";
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
-        if(locale.equals(new Locale("en").getLanguage())){
+        if (locale.equals(new Locale("en").getLanguage())) {
             unit = "ft";
         }
 
@@ -45,29 +45,29 @@ public class SettingsActivity extends BaseActivity {
         TextView distanceTextView = (TextView) findViewById(R.id.privacyDistanceSeekBarProgress);
 
         // Load the privacy option values
-        long privacyDuration = lookUpLongSharedPrefs("Privacy-Duration",30,"simraPrefs", this);
+        long privacyDuration = lookUpLongSharedPrefs("Privacy-Duration", 30, "simraPrefs", this);
 
-        int privacyDistance = lookUpIntSharedPrefs("Privacy-Distance",30,"simraPrefs", this);
-        if(unit.equals("ft")){
-            privacyDistance = (int)Math.round((lookUpIntSharedPrefs("Privacy-Distance",30,"simraPrefs", this)*3.28));
+        int privacyDistance = lookUpIntSharedPrefs("Privacy-Distance", 30, "simraPrefs", this);
+        if (unit.equals("ft")) {
+            privacyDistance = (int) Math.round((lookUpIntSharedPrefs("Privacy-Distance", 30, "simraPrefs", this) * 3.28));
         }
 
         // Set the seekBars according to the privacy option values
-        durationSeekBar.setProgress((int)privacyDuration);
+        durationSeekBar.setProgress((int) privacyDuration);
         distanceSeekBar.setProgress(privacyDistance);
 
         // Set the textViews according to the values of the corresponding seekBars
-        durationTextView.setText(durationSeekBar.getProgress() + "s/" + (durationSeekBar.getMax())+"s");
-        if(unit.equals("ft")){
-            distanceTextView.setText(Math.round(distanceSeekBar.getProgress()*3.28) + unit + "/" + Math.round(distanceSeekBar.getMax()*3.28)+unit);
+        durationTextView.setText(durationSeekBar.getProgress() + "s/" + (durationSeekBar.getMax()) + "s");
+        if (unit.equals("ft")) {
+            distanceTextView.setText(Math.round(distanceSeekBar.getProgress() * 3.28) + unit + "/" + Math.round(distanceSeekBar.getMax() * 3.28) + unit);
         } else {
-            distanceTextView.setText(distanceSeekBar.getProgress() + unit + "/" + distanceSeekBar.getMax()+unit);
+            distanceTextView.setText(distanceSeekBar.getProgress() + unit + "/" + distanceSeekBar.getMax() + unit);
 
         }
 
         // Create onSeekBarChangeListeners to change the corresponding options
-        durationSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(durationTextView,"s","Privacy-Duration"));
-        distanceSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(distanceTextView,unit,"Privacy-Distance"));
+        durationSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(durationTextView, "s", "Privacy-Duration"));
+        distanceSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(distanceTextView, unit, "Privacy-Distance"));
 
     }
 
@@ -80,16 +80,16 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-                if(unit.equals("s")){
-                    if (progress < 3){
+                if (unit.equals("s")) {
+                    if (progress < 3) {
                         seekBar.setProgress(3);
                     }
                 }
-                if(unit.equals("ft")){
-                    tV.setText(Math.round(seekBar.getProgress()*3.28) + unit + "/" + Math.round(seekBar.getMax()*3.28)+ unit);
+                if (unit.equals("ft")) {
+                    tV.setText(Math.round(seekBar.getProgress() * 3.28) + unit + "/" + Math.round(seekBar.getMax() * 3.28) + unit);
 
                 } else {
-                    tV.setText(seekBar.getProgress() + unit + "/" + seekBar.getMax()+ unit);
+                    tV.setText(seekBar.getProgress() + unit + "/" + seekBar.getMax() + unit);
 
                 }
             }
@@ -102,21 +102,22 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
-                if(unit.equals("s")){
-                    if (seekBar.getProgress() < 3){
+                if (unit.equals("s")) {
+                    if (seekBar.getProgress() < 3) {
                         seekBar.setProgress(3);
                     }
                 }
-                if(unit.equals("ft")){
-                    tV.setText(Math.round(seekBar.getProgress()*3.28) + unit + "/" + Math.round(seekBar.getMax()*3.28)+ unit);
+                if (unit.equals("ft")) {
+                    tV.setText(Math.round(seekBar.getProgress() * 3.28) + unit + "/" + Math.round(seekBar.getMax() * 3.28) + unit);
 
                 } else {
-                    tV.setText(seekBar.getProgress() + unit + "/" + seekBar.getMax()+ unit);
+                    tV.setText(seekBar.getProgress() + unit + "/" + seekBar.getMax() + unit);
 
-                }                if(privacyOption.equals("Privacy-Duration")){
-                    writeLongToSharePrefs(privacyOption, (long)seekBar.getProgress(),"simraPrefs", SettingsActivity.this);
-                } else if (privacyOption.equals("Privacy-Distance")){
-                    writeIntToSharePrefs(privacyOption, seekBar.getProgress(),"simraPrefs", SettingsActivity.this);
+                }
+                if (privacyOption.equals("Privacy-Duration")) {
+                    writeLongToSharePrefs(privacyOption, (long) seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
+                } else if (privacyOption.equals("Privacy-Distance")) {
+                    writeIntToSharePrefs(privacyOption, seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
                 } else {
                     Log.e(TAG, "onStopTrackingTouch unknown privacyOption: " + privacyOption);
                 }
