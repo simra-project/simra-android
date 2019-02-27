@@ -12,6 +12,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@drawable/rounded_corners"
         android:elevation="8dp"
+        android:orientation="horizontal"
         android:theme="@style/AppTheme.AppBarOverlay"
         android:titleTextColor="#FEFEFE"
         app:popupTheme="@style/AppTheme.PopupOverlay">
@@ -29,9 +30,9 @@
             android:id="@+id/helmet_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:nextFocusRight="@id/backBtn"
             android:layout_marginRight="15dp"
-            android:background="@drawable/helmet" />
+            android:background="@drawable/helmet"
+            android:nextFocusRight="@id/backBtn" />
 
 
     </android.support.design.widget.AppBarLayout>
