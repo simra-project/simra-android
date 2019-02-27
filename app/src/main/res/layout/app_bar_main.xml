@@ -62,7 +62,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
-            android:background="@drawable/route2" />
+            android:background="@drawable/route" />
 
         <TextView
             android:id="@+id/route_text"
