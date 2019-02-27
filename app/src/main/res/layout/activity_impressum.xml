@@ -7,16 +7,32 @@
     tools:context=".ImpressumActivity">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/rounded_corners"
+        android:elevation="8dp"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:titleTextColor="#FEFEFE"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        <ImageButton
+            android:id="@+id/backBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/ic_arrow_back_black_24dp" />
+
+        <ImageButton
+            android:id="@+id/helmet_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:nextFocusRight="@id/backBtn"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/helmet" />
+
 
     </android.support.design.widget.AppBarLayout>
 

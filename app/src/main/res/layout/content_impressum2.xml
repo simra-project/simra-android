@@ -27,6 +27,9 @@
             android:id="@+id/headerRightOfAccesText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:autoLink="email"
             android:text="@string/headerRightOfAcces"
             android:textSize="12sp" />
 
@@ -42,6 +45,8 @@
             android:id="@+id/headerSubjectOfDataPrivacyText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/headerSubjectOfDataPrivacy"
             android:textSize="12sp" />
 
@@ -59,6 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/headerGeneralDataPrivacy"
             android:textSize="12sp" />
 
@@ -75,6 +81,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/headerExtentOfDataCollectionAndStorage"
             android:textSize="12sp" />
 
@@ -90,6 +97,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/openstreetmap"
             android:textSize="12sp" />
 
@@ -99,5 +107,13 @@
             android:layout_height="wrap_content"
             android:text="@string/osmCopyrightText"
             android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/border"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:text=" "
+            android:textSize="12sp" />
     </LinearLayout>
 </ScrollView>

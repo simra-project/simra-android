@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,21 +12,25 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/headerImpText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
             android:text="@string/impressum"
-            android:textSize="15sp"
-            android:layout_marginEnd="10dp"/>
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/headerTUText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:text="@string/headerAddresseTUBerlin"
             android:textSize="12sp" />
 
@@ -42,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
-            android:text="@string/e_mail_anfrage"
+            android:text="@string/mailRequestTU"
             android:textSize="10sp" />
 
         <TextView
@@ -64,15 +68,16 @@
             android:id="@+id/headerSenatText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/rechtsaufsicht"
-            android:textSize="12sp"
-            android:layout_marginStart="10dp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/senatText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/der_regierende_b_rgermeister_von_berlin_senatskanzlei"
+            android:text="@string/textRechtsaufsicht"
             android:textSize="10sp" />
 
         <TextView
@@ -88,15 +93,16 @@
             android:id="@+id/headerUmsatzText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/umsatzsteueridentifikationsnummer"
-            android:textSize="12sp"
-            android:layout_marginStart="10dp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/UmsatzText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/ust_id_nr_de_811_231_089"
+            android:text="@string/ust"
             android:textSize="10sp" />
 
 
@@ -104,9 +110,10 @@
             android:id="@+id/headerAnsprechPartnerText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/ansprechpartner"
-            android:textSize="12sp"
-            android:layout_marginStart="10dp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/ansprechPartnerText"
@@ -120,16 +127,17 @@
             android:id="@+id/headerHerausgeberText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/herausgeber"
-            android:textSize="12sp"
-            android:layout_marginStart="10dp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/herausgeberText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autoLink="email"
-            android:text="@string/prof_dr_ing_david_bermbach_einsteinufer_17_sekr_en17_10587_berlin_telefon_49_0_30_314_0_e_mail_simra_mcc_gmail_com"
+            android:text="@string/headerHerausgeber"
             android:textSize="10sp" />
 
 
@@ -137,9 +145,10 @@
             android:id="@+id/headerDisclaimerText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/headerDisclaimer"
-            android:textSize="12sp"
-            android:layout_marginStart="10dp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/disclaimerText"
@@ -152,9 +161,10 @@
             android:id="@+id/headerLinksText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/verweise_und_links"
-            android:textSize="12sp"
-            android:layout_marginStart="10dp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/linksText"
@@ -167,9 +177,10 @@
             android:id="@+id/headerTUCopyRightText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/urheber_und_kennzeichenrecht"
-            android:textSize="12sp"
-            android:layout_marginStart="10dp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/tUCopyRightText"
@@ -183,9 +194,10 @@
             android:id="@+id/headerPrivacyText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/headerPrivacy"
-            android:textSize="12sp"
-            android:layout_marginStart="10dp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/privacyText"
@@ -199,18 +211,28 @@
             android:id="@+id/headerfurtherText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/weitere_informationen_zum_thema_datenschutz_an_der_tu_berlin"
-            android:textSize="12sp"
-            android:layout_marginStart="10dp"/>
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/headerFurther"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/headerDSBText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/datenschutzerkl_rung_datenschutzbeauftragte_der_tu_berlin"
-            android:textSize="12sp"
             android:layout_marginStart="10dp"
             android:clickable="true"
-            android:focusable="true"/>
+            android:focusable="true"
+            android:text="@string/datenschutzerkl_rung_datenschutzbeauftragte_der_tu_berlin"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/border"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:text=" "
+            android:textSize="12sp" />
+
     </LinearLayout>
-</ScrollView>
+</android.support.v4.widget.NestedScrollView>
