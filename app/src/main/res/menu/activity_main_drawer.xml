@@ -36,6 +36,14 @@
             android:id="@+id/nav_impressum"
             android:icon="@drawable/ic_info_black_24dp"
             android:title="@string/imprint" />
+        <item
+            android:id="@+id/nav_credits"
+            android:icon="@drawable/ic_copyright_black_24dp"
+            android:title="@string/credits" />
+        <item
+            android:id="@+id/nav_data"
+            android:icon="@drawable/ic_security_black_24dp"
+            android:title="@string/data" />
     </group>
 
 </menu>

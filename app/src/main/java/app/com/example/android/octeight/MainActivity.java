@@ -546,8 +546,14 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             Intent intent = new Intent(MainActivity.this, StartActivity.class);
             intent.putExtra("caller", "MainActivity");
             startActivity(intent);
-        } else if (id == R.id.nav_impressum){
-            Intent intent = new Intent (MainActivity.this, ImpressumActivity.class);
+        } else if (id == R.id.nav_impressum) {
+            Intent intent = new Intent(MainActivity.this, ImpressumActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_credits) {
+            Intent intent = new Intent(MainActivity.this, CreditsActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_data) {
+            Intent intent = new Intent(MainActivity.this, Impressum2Activity.class);
             startActivity(intent);
         }
 
