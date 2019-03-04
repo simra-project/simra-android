@@ -37,6 +37,7 @@
     <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">21sp</item>
         <item name="android:textStyle">italic</item>
+        <item name="android:textColorPrimary">@android:color/holo_blue_light</item>
     </style>
 
     <!-- This configures the styles for the pop up window used for incident annotation -->

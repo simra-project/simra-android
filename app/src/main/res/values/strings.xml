@@ -228,5 +228,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="smashiconCredit">Icon made by Smashicon from www.flaticon.com .</string>
     <string name="pixelCredit">Icon made by Pixel perfect from www.flaticon.com .</string>
     <string name="icons8Credit">Icon made by Icons8 from https://icons8.com .</string>
+    <string name="credits">Credits</string>
+    <string name="data">Datenschutz</string>
 
 </resources>
