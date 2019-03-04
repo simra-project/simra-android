@@ -233,5 +233,6 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="data">Datenschutz</string>
     <string name="title_activity_test5">Test5Activity</string>
     <string name="privacyButton">Weitere Informationen zum Datenschutz</string>
+    <string name="bycicleCreditTxt">Icon made by Nikita Golubev from www.flaticon.com .</string>
 
 </resources>
