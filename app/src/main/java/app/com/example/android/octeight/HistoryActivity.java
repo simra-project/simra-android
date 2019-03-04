@@ -422,13 +422,12 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             startActivity(intent);
         } else if (id == R.id.nav_infoMCC) {
             Intent intent = new Intent(HistoryActivity.this, WebActivity.class);
-            intent.putExtra("URL", getString(R.string.mccPage));
             startActivity(intent);
         } else if (id == R.id.nav_infoSimRa) {
             Intent intent = new Intent(HistoryActivity.this, StartActivity.class);
             intent.putExtra("caller", "MainActivity");
             startActivity(intent);
-        }else if (id == R.id.nav_impressum) {
+        } else if (id == R.id.nav_impressum) {
             Intent intent = new Intent(HistoryActivity.this, ImpressumActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_credits) {

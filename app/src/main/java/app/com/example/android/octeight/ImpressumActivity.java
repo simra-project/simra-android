@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +19,9 @@ import static app.com.example.android.octeight.Utils.writeToSharePrefs;
 
 public class ImpressumActivity extends AppCompatActivity {
 
-Button privacyBtn;
+    Button privacyBtn;
+    ImageButton backBtn;
+    TextView toolbarTxt;
     private Context context;
 
     @Override
@@ -28,14 +31,28 @@ Button privacyBtn;
         context = getApplicationContext();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        toolbarTxt = findViewById(R.id.toolbar_title);
+        toolbarTxt.setText(R.string.imprint);
+
+        backBtn = findViewById(R.id.back_button);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           finish();
+                                       }
+                                   }
+        );
         privacyBtn = findViewById(R.id.privacyButton);
         privacyBtn.setOnClickListener(new View.OnClickListener() {
-                                              @Override
-                                              public void onClick(View v) {
-                                                  Intent intent = new Intent (ImpressumActivity.this, Impressum2Activity.class);
-                                                  startActivity(intent);
-                                              }
+                                          @Override
+                                          public void onClick(View v) {
+                                              Intent intent = new Intent(ImpressumActivity.this, Impressum2Activity.class);
+                                              startActivity(intent);
                                           }
+                                      }
         );
 
         FloatingActionButton fab = findViewById(R.id.fab);

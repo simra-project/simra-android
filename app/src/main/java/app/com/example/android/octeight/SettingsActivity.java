@@ -2,7 +2,10 @@ package app.com.example.android.octeight;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -19,12 +22,29 @@ public class SettingsActivity extends BaseActivity {
 
     // Log tag
     private static final String TAG = "SettingsActivity_LOG";
+    ImageButton backBtn;
+    TextView toolbarTxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        toolbarTxt = findViewById(R.id.toolbar_title);
+        toolbarTxt.setText(R.string.settings);
 
+        backBtn = findViewById(R.id.back_button);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           finish();
+                                       }
+                                   }
+        );
         // Unique user id (bottom right of the screen)
         TextView tv1 = findViewById(R.id.textViewId);
         tv1.setText("id: " + getUniqueUserID(this));
