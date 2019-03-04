@@ -11,13 +11,13 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
         android:background="@drawable/rounded_corners"
         android:elevation="8dp"
-        android:theme="@style/ToolbarTheme"
+        android:theme="@style/AppTheme.AppBarOverlay"
         android:titleTextColor="#FEFEFE"
         app:popupTheme="@style/AppTheme.PopupOverlay"
-        app:titleTextAppearance="@style/Toolbar.TitleText">
+        app:titleTextAppearance="@style/Toolbar.TitleText" >
 
 
         <ImageButton
@@ -28,16 +28,23 @@
             android:layout_marginRight="15dp"
             android:background="@drawable/helmet" />
 
+
     </android.support.v7.widget.Toolbar>
 
-    <include layout="@layout/content_impressum2" />
+    <include layout="@layout/content_impressum2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="50dp"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </android.support.design.widget.CoordinatorLayout>

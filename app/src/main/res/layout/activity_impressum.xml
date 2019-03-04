@@ -6,45 +6,45 @@
     android:layout_height="match_parent"
     tools:context=".ImpressumActivity">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appBar"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_margin="10dp"
         android:background="@drawable/rounded_corners"
         android:elevation="8dp"
-        android:orientation="horizontal"
         android:theme="@style/AppTheme.AppBarOverlay"
         android:titleTextColor="#FEFEFE"
-        app:popupTheme="@style/AppTheme.PopupOverlay">
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        app:titleTextAppearance="@style/Toolbar.TitleText" >
 
-
-        <ImageButton
-            android:id="@+id/backBtn"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="15dp"
-            android:background="@drawable/ic_arrow_back_black_24dp" />
 
         <ImageButton
             android:id="@+id/helmet_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_gravity="right"
             android:layout_marginRight="15dp"
-            android:background="@drawable/helmet"
-            android:nextFocusRight="@id/backBtn" />
+            android:background="@drawable/helmet" />
 
 
-    </android.support.design.widget.AppBarLayout>
+    </android.support.v7.widget.Toolbar>
 
-    <include layout="@layout/content_impressum" />
+    <include
+        layout="@layout/content_impressum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="50dp"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </android.support.design.widget.CoordinatorLayout>

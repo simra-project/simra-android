@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,7 +18,7 @@ import static app.com.example.android.octeight.Utils.writeToSharePrefs;
 
 public class ImpressumActivity extends AppCompatActivity {
 
-TextView furtherReading;
+Button privacyBtn;
     private Context context;
 
     @Override
@@ -27,8 +28,8 @@ TextView furtherReading;
         context = getApplicationContext();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        furtherReading = findViewById(R.id.headerDSBText);
-        furtherReading.setOnClickListener(new View.OnClickListener() {
+        privacyBtn = findViewById(R.id.privacyButton);
+        privacyBtn.setOnClickListener(new View.OnClickListener() {
                                               @Override
                                               public void onClick(View v) {
                                                   Intent intent = new Intent (ImpressumActivity.this, Impressum2Activity.class);
