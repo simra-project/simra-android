@@ -15,6 +15,7 @@
     <string name="feedbackMail"> </string>
     <string name="permissionFineLocation">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten.</string>
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
+    <string name="dsbContact">https://www.tu-berlin.de/allgemeine_seiten/e_mail_anfrage/parameter/mobil/id/141314/?no_cache=1&amp;ask_mail=XHzLwAANlp3Iq7tw1i0B%2F1ZZPCqSMY443IwjBNB1a4lD6OfrRJfJHXOx5r3yL9Ga&amp;ask_name=DATENSCHUTZBEAUFTRAGTE</string>
     <string name="startButtonText">Aufzeichnung \n starten</string>
     <string name="stopButtonText">Aufzeichnung \n stoppen</string>
     <string name="permissionRequestRationale">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
@@ -154,8 +155,8 @@
     <string name="rideUploadedInHistoryActivity">Bearbeitete und hochgeladene Fahrt.</string>
     <string name="customIncidentAddedTitle">Neuer Vorfall hinzugefügt!</string>
     <string name="customIncidentAddedMessage">Ist an diesem Ort ein Ereignis vorgefallen?</string>
-    <string name="title_activity_impressum">ImpressumActivity</string>
-    <string name="title_activity_impressum2">Impressum2Activity</string>
+    <string name="title_activity_impressum">Impressum</string>
+    <string name="title_activity_impressum2">Datenschutz</string>
     <string name="headerSubjectOfDataPrivacy">Gegenstand des Datenschutzes</string>
     <string name="textRightOfAcces">Sie erhalten jederzeit ohne Angabe von Gründen kostenfrei Auskunft über Ihre bei uns gespeicherten Daten. Hierzu wenden Sie sich bitte an die im Impressum angegebene Kontaktadresse. \n
         Gerne stehen wir Ihnen für weitergehende Fragen zu unseren Datenschutzhinweisen zur Verfügung. Beschwerderecht Sollten Sie Anhaltspunkte dafür erkennen, dass wir mit Ihren Daten nicht datenschutzgerecht umgehen, können Sie sich jederzeit an die behördliche Datenschutzbeauftragte der Technische Universität Berlin wenden: \n
@@ -223,12 +224,14 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="umsatzsteueridentifikationsnummer">Umsatzsteueridentifikationsnummer</string>
     <string name="openstreetmap">OpenStreetMap</string>
     <string name="osmCopyrightText">Wir verwenden in unserer Applikation die Karten von OpenStreetMap, einen Dienst der OpenStreetMap Foundation, St John’s Innovation Centre, Cowley Road, Cambridge, CB 4 0 WS, United Kingdom, nachfolgend \"OpenStreetMap\" genannt, ein. In unsere Applikation ist der Dienst OpenStreetMap eingebunden , deswegen wird durch OpenStreetMap ein Cookie auf Ihrem Endgerät gespeichert. Hierdurch werden Ihre Nutzereinstellungen und Nutzerdaten zum Zwecke der Anzeige der Seite bzw. zur Gewährleistung der Funktionalität von OpenStreetMap verarbeitet. Durch diese Verarbeitung kann OpenStreetMap erkennen, von welcher Anwendung Ihre Anfrage gesendet worden ist und an welche IP- Adresse die Daten übermittelt werden sollen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f) DSGVO. Unser berechtigtes Interesse liegt Betrieb unserer Applikation. Sofern Sie mit dieser Verarbeitung nicht einverstanden sind, wenden Sie sich bitte an die oben genannten Ansprechpartner. OpenStreetMap bietet unter https://wiki.osmfoundation.org/wiki/Privacy_Policy weitere Informationen zur Erhebung und Nutzung der Daten sowie zu Ihren Rechten und Möglichkeiten zum Schutz Ihrer Privatsphäre an.</string>
-    <string name="title_activity_credits">CreditsActivity</string>
+    <string name="title_activity_credits">Credits</string>
     <string name="freepikCredit">Icon made by Freepik from www.flaticon.com .</string>
     <string name="smashiconCredit">Icon made by Smashicon from www.flaticon.com .</string>
     <string name="pixelCredit">Icon made by Pixel perfect from www.flaticon.com .</string>
     <string name="icons8Credit">Icon made by Icons8 from https://icons8.com .</string>
     <string name="credits">Credits</string>
     <string name="data">Datenschutz</string>
+    <string name="title_activity_test5">Test5Activity</string>
+    <string name="privacyButton">Weitere Informationen zum Datenschutz</string>
 
 </resources>

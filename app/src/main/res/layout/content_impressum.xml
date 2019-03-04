@@ -207,23 +207,16 @@
             android:textSize="10sp" />
 
 
-        <TextView
-            android:id="@+id/headerfurtherText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:text="@string/headerFurther"
-            android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/headerDSBText"
+        <Button
+            android:id="@+id/privacyButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_margin="10dp"
             android:clickable="true"
             android:focusable="true"
-            android:text="@string/datenschutzerkl_rung_datenschutzbeauftragte_der_tu_berlin"
+            android:text="@string/privacyButton"
             android:textSize="12sp" />
 
         <TextView

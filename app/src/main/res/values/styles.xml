@@ -34,7 +34,7 @@
     </style>
 
     <!-- This configures the styles for the title within the Toolbar  -->
-    <style name=".TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">21sp</item>
         <item name="android:textStyle">italic</item>
         <item name="android:textColorPrimary">@android:color/holo_blue_light</item>

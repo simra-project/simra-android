@@ -26,10 +26,6 @@
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
         <activity
-            android:name=".CreditsActivity"
-            android:label="@string/title_activity_credits"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity
             android:name=".Impressum2Activity"
             android:label="@string/title_activity_impressum2"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -121,6 +117,10 @@
             android:name=".IncidentPopUpActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.PopUpWindow" />
+        <activity
+            android:name=".CreditsActivity"
+            android:label="@string/title_activity_credits"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
