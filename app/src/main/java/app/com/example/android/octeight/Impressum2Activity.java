@@ -7,8 +7,15 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 public class Impressum2Activity extends AppCompatActivity {
+
+
+    ImageButton backBtn;
+    TextView toolbarTxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,6 +23,20 @@ public class Impressum2Activity extends AppCompatActivity {
         setContentView(R.layout.activity_impressum2);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        toolbarTxt = findViewById(R.id.toolbar_title);
+        toolbarTxt.setText(R.string.title_activity_impressum2);
+
+        backBtn = findViewById(R.id.back_button);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           finish();
+                                       }
+                                   }
+        );
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

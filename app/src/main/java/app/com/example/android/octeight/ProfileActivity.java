@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.Spinner;
@@ -42,6 +44,8 @@ public class ProfileActivity extends AppCompatActivity {
     // Save and abort button at the bottom of the screen
     LinearLayout saveButton;
     LinearLayout abortButton;
+    ImageButton backBtn;
+    TextView toolbarTxt;
 
     // Boolean to display a toast to inform the user whether changes were saved or not
     boolean profileSaved = false;
@@ -50,6 +54,23 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        toolbarTxt = findViewById(R.id.toolbar_title);
+        toolbarTxt.setText(R.string.profile);
+
+        backBtn = findViewById(R.id.back_button);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           finish();
+                                       }
+                                   }
+        );
 
         ageGroups = getResources().getStringArray(R.array.ageGroupList);
         genders = getResources().getStringArray(R.array.genderList);
