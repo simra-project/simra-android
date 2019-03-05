@@ -69,21 +69,22 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         final Switch scarinessSwitch = findViewById(R.id.scarinessSwitch);
         String[] checkBoxValues = {"0","0","0","0","0","0","0","0","0"};
         if (previousAnnotation != null) {
-            incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[4]));
+            incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[8]));
 
             // Load checkboxValues
             int count = involvedCheckBoxesLinearLayout.getChildCount();
             // Iterate through all children of involvedCheckBoxesLinearLayout
             for (int i = 0; i < count; i++) {
-                CheckBox cb = (CheckBox) involvedCheckBoxesLinearLayout.getChildAt(i);
-                // if (v instanceof CheckBox) {
+                View v = involvedCheckBoxesLinearLayout.getChildAt(i);
+                Log.d(TAG, "v.getClass(): " + v.getClass().getName());
+                if (v instanceof CheckBox) {
                     if (previousAnnotation[9+i].length()>0) {
                         if (previousAnnotation[9 + i].equals("1")) {
-                            cb.setChecked(true);
-                            checkBoxValues[i] = "1";
+                            Log.d(TAG, ((CheckBox) v).getText().toString()+" was checked before.");
+                            ((CheckBox)v).setChecked(true);
                         }
                     }
-                // }
+                }
             }
             if(previousAnnotation[18].length()>0){
                 if(previousAnnotation[18].equals("1")){
@@ -120,6 +121,17 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 if (scarinessSwitch.isChecked()){
                     scariness = 1;
                 }
+                // Load checkboxValues
+                int count = involvedCheckBoxesLinearLayout.getChildCount();
+                // Iterate through all children of involvedCheckBoxesLinearLayout
+                for (int i = 0; i < count; i++) {
+                    View w = involvedCheckBoxesLinearLayout.getChildAt(i);
+                    Log.d(TAG, "w.getClass(): " + w.getClass().getName());
+                    if (w instanceof CheckBox && ((CheckBox) w).isChecked()) {
+                        Log.d(TAG, ((CheckBox) v).getText().toString()+" is checked now.");
+                        checkBoxValues[i] = "1";
+                    }
+                }
 
                 /*
                 int incidentIndex = 0;
@@ -135,14 +147,15 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     }
                 }
                 */
+
+
+                String incidentString = incidentKey + "," + lat + "," + lon + "," + ts + ","
+                        + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[","").replace("]","") + "," + scariness + "," + description;
+
                 overwriteIncidentFile(rideID, incidentKey, incidentKey + "," + lat + "," + lon + "," + ts + ","
                         + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[","").replace("]","") + "," + scariness + "," + description);
 
                 incidentSaved = true;
-
-                String incidentString = incidentKey + "," + lat + "," + lon + "," + ts + ","
-                        + "," + incidentType + "," + locationType + "," + description;
-
                 // writeIntToSharePrefs("Settings-PhoneLocation", locationType, "simraPrefs", this);
 
                 Intent returnIntent = new Intent();
@@ -151,7 +164,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 //setResult(Activity.RESULT_CANCELED, returnIntent);
 
                 finish();
-
             });
 
             // Return to ShowRouteActivity without saving the annotated incidents
