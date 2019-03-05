@@ -58,6 +58,7 @@
             android:textSize="10pt" />
 
         <LinearLayout
+            android:id="@+id/involvedCheckboxes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:baselineAligned="false"

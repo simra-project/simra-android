@@ -341,7 +341,7 @@ public class MarkerFunct {
         Log.d(TAG, "setting up InfoWindow with address: " + addressForLoc);
         InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble,
                 mother.getmMapView(),
-                event, addressForLoc, mother, mother.ride.getId(), event.key);
+                event, addressForLoc, mother, event.key);
         incidentMarker.setInfoWindow(infoWindow);
 
         //incidentMarker.setSnippet("Vorfall " + i);

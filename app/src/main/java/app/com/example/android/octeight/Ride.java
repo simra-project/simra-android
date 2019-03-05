@@ -15,6 +15,7 @@ import java.util.List;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 
 public class Ride {
 
@@ -37,6 +38,11 @@ public class Ride {
     static String TAG = "Ride_LOG";
     Polyline route;
 
+    int bike;
+    int child;
+    int trailer;
+    int pLoc;
+
     public String getDuration() {
         return duration;
     }
@@ -52,13 +58,16 @@ public class Ride {
 
 
     // This is the constructor that is used for now.
-    public Ride(File accGpsFile, String duration, String startTime, /*String date,*/ int state, Context context) {
+    public Ride(File accGpsFile, String duration, String startTime, /*String date,*/ int state, int bike, int child, int trailer, int pLoc, Context context) {
         this.accGpsFile = accGpsFile;
         this.duration = duration;
         this.startTime = startTime;
-
         this.route = getRouteLine(accGpsFile);
         this.state = state;
+        this.bike = bike;
+        this.child = child;
+        this.trailer = trailer;
+        this.pLoc = pLoc;
         this.events = findAccEvents();
         this.context = context;
         String prefix = "/data/user/0/app.com.example.android.octeight/files/";
@@ -80,7 +89,7 @@ public class Ride {
                 //actualAccEvent.setKey(i);
                 // @TODO do AccEvents have to have a key here???
 
-                content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + ",,,,,,,,,,,,,,,," + System.lineSeparator();
+                content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + ",,,,,,,,,,,," + System.lineSeparator();
             }
 
             appendToFile(content, pathToAccEventsOfRide, context);

@@ -19,7 +19,7 @@ class MyInfoWindow extends InfoWindow {
 
     private AccEvent mAccEvent;
 
-    private Activity motherActivity;
+    private ShowRouteActivity motherActivity;
 
     private String addressForLoc;
 
@@ -27,14 +27,16 @@ class MyInfoWindow extends InfoWindow {
 
     private String incidentKey;
 
+
+
     public MyInfoWindow(int layoutResId, MapView mapView, AccEvent mAccEvent,
-                        String addressForLoc, Activity motherActivity, String rideID,
+                        String addressForLoc, ShowRouteActivity motherActivity,
                         int key) {
         super(layoutResId, mapView);
         this.mAccEvent = mAccEvent;
         this.addressForLoc = addressForLoc;
         this.motherActivity = motherActivity;
-        this.rideID = rideID;
+        this.rideID = motherActivity.ride.getId();
         this.incidentKey = String.valueOf(key);
     }
 
@@ -71,6 +73,18 @@ class MyInfoWindow extends InfoWindow {
 
             popUpIntent.putExtra("Incident_timeStamp",
                     String.valueOf(this.mAccEvent.getTimeStamp()));
+
+            popUpIntent.putExtra("Incident_bike",
+                    String.valueOf(motherActivity.ride.bike));
+
+            popUpIntent.putExtra("Incident_child",
+                    String.valueOf(motherActivity.ride.child));
+
+            popUpIntent.putExtra("Incident_trailer",
+                    String.valueOf(motherActivity.ride.trailer));
+
+            popUpIntent.putExtra("Incident_pLoc",
+                    String.valueOf(motherActivity.ride.pLoc));
 
             //popUpIntent.putExtra("Incident_accDat",
             //        String.valueOf(this.mAccEvent.sensorData.getAbsolutePath()));
