@@ -35,7 +35,7 @@ public class SettingsActivity extends BaseActivity {
         toolbar.setTitle("");
         toolbar.setSubtitle("");
         toolbarTxt = findViewById(R.id.toolbar_title);
-        toolbarTxt.setText(R.string.settings);
+        toolbarTxt.setText(R.string.title_activity_settings);
 
         backBtn = findViewById(R.id.back_button);
         backBtn.setOnClickListener(new View.OnClickListener() {

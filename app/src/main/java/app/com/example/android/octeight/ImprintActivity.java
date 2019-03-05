@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -13,13 +12,13 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static app.com.example.android.octeight.Utils.getUniqueUserID;
 import static app.com.example.android.octeight.Utils.lookUpSharedPrefs;
 import static app.com.example.android.octeight.Utils.writeToSharePrefs;
 
-public class ImpressumActivity extends AppCompatActivity {
+public class ImprintActivity extends AppCompatActivity {
 
     Button privacyBtn;
+    Button creditsBtn;
     ImageButton backBtn;
     TextView toolbarTxt;
     private Context context;
@@ -27,7 +26,7 @@ public class ImpressumActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_impressum);
+        setContentView(R.layout.activity_imprint);
         context = getApplicationContext();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -49,7 +48,16 @@ public class ImpressumActivity extends AppCompatActivity {
         privacyBtn.setOnClickListener(new View.OnClickListener() {
                                           @Override
                                           public void onClick(View v) {
-                                              Intent intent = new Intent(ImpressumActivity.this, Impressum2Activity.class);
+                                              Intent intent = new Intent(ImprintActivity.this, PrivacyActivity.class);
+                                              startActivity(intent);
+                                          }
+                                      }
+        );
+        creditsBtn = findViewById(R.id.creditsButton);
+        creditsBtn.setOnClickListener(new View.OnClickListener() {
+                                          @Override
+                                          public void onClick(View v) {
+                                              Intent intent = new Intent(ImprintActivity.this, CreditsActivity.class);
                                               startActivity(intent);
                                           }
                                       }
@@ -63,11 +71,11 @@ public class ImpressumActivity extends AppCompatActivity {
                 i.setType("message/rfc822");
                 i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
                 i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
-                i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackMail) + "\n id: " + getUniqueUserID(context));
+                i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackReceiver) + "\n id: " + getUniqueUserID(context));
                 try {
                     startActivity(Intent.createChooser(i, "Send mail..."));
                 } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(ImpressumActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ImprintActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                 }
             }
         });

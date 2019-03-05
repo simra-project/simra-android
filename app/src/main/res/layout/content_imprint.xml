@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".ImpressumActivity"
-    tools:showIn="@layout/activity_impressum">
+    tools:context=".ImprintActivity"
+    tools:showIn="@layout/activity_imprint">
 
 
     <LinearLayout
@@ -196,7 +196,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
-            android:text="@string/headerPrivacy"
+            android:text="@string/title_activity_privacy"
             android:textSize="12sp" />
 
         <TextView
@@ -218,11 +218,20 @@
             android:text="@string/privacyButton"
             android:textSize="12sp" />
 
+        <Button
+            android:id="@+id/creditsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/title_activity_credits"
+            android:textSize="12sp" />
+
         <TextView
             android:id="@+id/border"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginStart="10dp"
+            android:layout_height="20dp"
             android:text=" "
             android:textSize="12sp" />
 
