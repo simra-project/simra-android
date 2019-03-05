@@ -22,12 +22,11 @@ import java.util.Arrays;
 import static app.com.example.android.octeight.Utils.fileExists;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
-import static app.com.example.android.octeight.Utils.writeIntToSharePrefs;
 
 public class IncidentPopUpActivity extends AppCompatActivity {
 
-    String[] incidentTypes = new String[4];
-    String[] locations = new String[6];
+    String[] incidentTypes = new String[9];
+    String[] locations = new String[7];
     LinearLayout doneButton;
     LinearLayout backButton;
     Boolean incidentSaved = false;
@@ -52,7 +51,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         getWindow().getDecorView().setBackgroundColor(Color.TRANSPARENT);
 
         incidentTypes = getResources().getStringArray(R.array.incidenttypelist);
-        locations = getResources().getStringArray(R.array.locations);
+        locations = getResources().getStringArray(R.array.phoneLocations);
 
         rideID = getIntent().getStringExtra("Ride_ID");
 
@@ -63,11 +62,11 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         final Spinner incidentTypeSpinner = findViewById(R.id.incidentTypeSpinner);
 
-        final Spinner locationTypeSpinner = findViewById(R.id.locationSpinner);
+        final Spinner locationTypeSpinner = findViewById(R.id.phoneLocationSpinner);
 
         final EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
 
-        locationTypeSpinner.setSelection(lookUpIntSharedPrefs("Profile-phoneLocation", 0, "simraPrefs", this));
+        locationTypeSpinner.setSelection(lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this));
 
         if (previousAnnotation != null && previousAnnotation[4].length() > 0 && previousAnnotation[5].length() > 0) {
 
@@ -123,7 +122,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 String incidentString = incidentKey + "," + lat + "," + lon + "," + date + ","
                         + "," + incidentType + "," + locationType + "," + description;
 
-                writeIntToSharePrefs("Profile-phoneLocation", locationType, "simraPrefs", this);
+                // writeIntToSharePrefs("Settings-PhoneLocation", locationType, "simraPrefs", this);
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("result", incidentString);

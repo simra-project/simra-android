@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:entries="@array/regionList"
             android:prompt="@string/pleaseChoose" />
-
+        <!--
         <Space
             android:id="@+id/regionDistrictSpace"
             android:layout_width="match_parent"
@@ -157,6 +157,26 @@
             android:entries="@array/locations"
             android:prompt="@string/pleaseChoose" />
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+        -->
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+        <TextView
+            android:id="@+id/experienceSpinnerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/experienceSpinnerTitle"
+            android:textAlignment="center"
+            android:textSize="15sp" />
+        <Spinner
+            android:id="@+id/experienceSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/experienceList"
+            android:prompt="@string/pleaseChoose" />
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />

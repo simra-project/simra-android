@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -19,6 +20,11 @@ public class SettingsActivity extends BaseActivity {
 
     // Log tag
     private static final String TAG = "SettingsActivity_LOG";
+
+    // Bike Type and Phone Location Items
+
+    Spinner bikeTypeSpinner;
+    Spinner phoneLocationSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +75,18 @@ public class SettingsActivity extends BaseActivity {
         durationSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(durationTextView, "s", "Privacy-Duration"));
         distanceSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(distanceTextView, unit, "Privacy-Distance"));
 
+        // Bike Type and Phone Location Spinners
+
+        bikeTypeSpinner = findViewById(R.id.bikeTypeSpinner);
+        phoneLocationSpinner = findViewById(R.id.locationTypeSpinner);
+
+
+        // Load previous settings
+        int bikeType = lookUpIntSharedPrefs("Settings-BikeType", 0, "simraPrefs", this);
+        int phoneLocation = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this);
+
+        bikeTypeSpinner.setSelection(bikeType);
+        phoneLocationSpinner.setSelection(phoneLocation);
     }
 
 
@@ -132,5 +150,9 @@ public class SettingsActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy()");
+
+        writeIntToSharePrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
+        writeIntToSharePrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
+
     }
 }
