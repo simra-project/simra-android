@@ -26,12 +26,12 @@
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
         <activity
-            android:name=".Impressum2Activity"
-            android:label="@string/title_activity_impressum2"
+            android:name=".PrivacyActivity"
+            android:label="@string/title_activity_privacy"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ImpressumActivity"
-            android:label="@string/title_activity_impressum"
+            android:name=".ImprintActivity"
+            android:label="@string/title_activity_imprint"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data

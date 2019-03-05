@@ -1,7 +1,6 @@
 package app.com.example.android.octeight;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -61,7 +60,7 @@ public class ProfileActivity extends AppCompatActivity {
         toolbar.setTitle("");
         toolbar.setSubtitle("");
         toolbarTxt = findViewById(R.id.toolbar_title);
-        toolbarTxt.setText(R.string.profile);
+        toolbarTxt.setText(R.string.title_activity_profile);
 
         backBtn = findViewById(R.id.back_button);
         backBtn.setOnClickListener(new View.OnClickListener() {

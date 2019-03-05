@@ -7,13 +7,11 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">MCC TU Berlin</string>
-    <string name="nav_header_subtitle">ask@mcc.tu-berlin.de</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="feedbackReceiver">ask@mcc.tu-berlin.de</string>
     <string name="demoDataHeader">SimRa user data</string>
     <string name="feedbackHeader">SimRa Feedback</string>
     <string name="demoDataMail">Name: \nAge: \nJob: \nBike type: e.g. mountain bike\nAverage ride distance: </string>
-    <string name="feedbackMail"> </string>
     <string name="permissionFineLocation">In order to continue, please allow SimRa to access your location.</string>
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
     <string name="startButtonText">Start \n Recording</string>
@@ -56,7 +54,7 @@
     <string name="editingIncidentCompleted">Incident description saved</string>
     <string name="cancel">Cancel</string>
     <string name="addIncident">Add\nIncident</string>
-    <string name="uploadAndExit">Upload &amp;\nexit app</string>
+    <string name="uploadAndExit">Upload &amp; exit app</string>
     <string name="saveIncident">Save &amp;\nReturn</string>
     <string name="savedRide">Ride saved</string>
     <string name="uploadRidesSuccessful">Upload successful!</string>
@@ -71,11 +69,8 @@
     <string name="uploadInBackground">Run in background</string>
     <string name="simra_news">SimRa News</string>
     <string name="mcc_news">MCC News</string>
-    <string name="settings">Settings</string>
     <string name="imprint">Imprint</string>
     <string name="feedback">Feedback</string>
-    <string name="profile">Profile</string>
-    <string name="history">My Rides</string>
     <string name="ride_length">ride duration</string>
     <string name="sendErrorTitle">Whoops!</string>
     <string name="sendErrorMessage">Seems like an error occurred during your last session. Would you like to send a report to help us improve the app?</string>
@@ -85,8 +80,6 @@
     <string name="title_activity_settings">Settings</string>
     <string name="privacy_settings_title">Privacy</string>
     <string name="privacyDistanceDescription">The delay after which the recording starts\n(in Feet)</string>
-    <string name="settings_title">Settings</string>
-    <string name="profile_title">Profile</string>
     <string name="title_activity_profile">Profile</string>
     <string name="ageGroupSpinnerTitle">Year of Birth</string>
     <string name="genderSpinnerTitle">Gender</string>
@@ -154,4 +147,104 @@
     <string name="rideUploadedInHistoryActivity">Annotated and uploaded ride.</string>
     <string name="customIncidentAddedTitle">New incident added!</string>
     <string name="customIncidentAddedMessage">Did an incident happen here?</string>
+    <string name="mailRequestTU"><a href="https://www.tu-berlin.de/allgemeine_seiten/contact/parameter/en/id/16/?no_cache=1&amp;ask_name=Pressestelle&amp;ask_mail=XH4N4AAD0Pm6SW%2BAqRiyNWi2wtI5xLDRrsckIn8nzonCUl%2B95CeT8w%3D%3D">Mail Request</a></string>
+    <string name="bycicleCreditTxt">Icon made by Nikita Golubev from www.flaticon.com .</string>
+    <string name="freepikCredit">Icon made by Freepik from www.flaticon.com .</string>
+    <string name="smashiconCredit">Icon made by Smashicon from www.flaticon.com .</string>
+    <string name="pixelCredit">Icon made by Pixel perfect from www.flaticon.com .</string>
+    <string name="icons8Credit">Icon made by Icons8 from https://icons8.com .</string>
+    <string name="privacyButton">Further information about data privacy</string>
+    <string name="impressum">imprint</string>
+    <string name="osmCopyrightText">n our application we use the maps of OpenStreetMap, an OpenStreetMap Foundation service, St John\'s Innovation Center, Cowley Road, Cambridge, CB 4 0 WS, United Kingdom, hereinafter referred to as \"OpenStreetMap\". In our application, the service OpenStreetMap is involved, so is stored by OpenStreetMap a cookie on your device. This will process your user settings and user data for the purpose of displaying the page or ensuring the functionality of OpenStreetMap.
+        Through this processing, OpenStreetMap can recognize from which application your request has been sent and to which IP address the data should be transmitted. Legal basis is Art. 6 para. 1 lit. f) GDPR. Our legitimate interest lies in the operation of our application. If you do not agree with this processing, please contact the above mentioned contact persons. OpenStreetMap provides more information at https://wiki.osmfoundation.org/wiki/Privacy_Policy to collect and use the data, and to protect your rights and privacy.</string>
+    <string name="descriptionUpload">Upload</string>
+    <string name="descriptionExit">Exit</string>
+    <string name="dsbContact">https://www.tu-berlin.de/allgemeine_seiten/contact/parameter/en/id/141314/?no_cache=1&amp;ask_mail=XH42VwAGY4UY%2FsBThz469wu5C%2FkG22St45NcTUgQYpTRCgWF30y04Y642h8HsYQv&amp;ask_name=DATENSCHUTZBEAUFTRAGTE</string>
+    <string name="title_activity_imprint">Imprint</string>
+    <string name="title_activity_privacy">Data Privacy</string>
+    <string name="headerSubjectOfDataPrivacy">Subject of Data Privacy</string>
+    <string name="textRightOfAcces">You can retrieve information about your stored personal data without giving reasons at any time free of charge. Please contact the address provided in the legal details of the website. We will be pleased to assist you if you have any further questions about our data privacy information.
+        Right of Complaint
+        Should you have reason to believe that we are not adhering to this data privacy statement, you can contact the data protection officer at Technische Universität Berlin at any time:
+
+        Annette Hiller
+        Data Protection Officer of Technischen Universität Berlin
+        Straße des 17. Juni 135, 10623 Berlin,
+        Room H 1038
+        Tel.:  +49 30 314 21784
+        Fax:  +49 30 314 28033
+        Email: datenschutzbeauftragte@tu-berlin.de
+
+        You also have the right to contact the local controlling authority:
+
+        Berliner Beauftragte für Datenschutz und Informationsfreiheit
+        Friedrichstr. 219 / visitor entrance via Puttkamerstr. 16 -18
+        10969 Berlin
+        Tel.: +49 30 13889-0
+        Fax: +49 30 2155050
+        Email: mailbox@datenschutz-berlin.de</string>
+    <string name="headerRightOfAcces">Right of Access to Personal Data</string>
+    <string name="headerDataPrivacy">Data Privacy Statement</string>
+    <string name="textSubjectOfDataPrivacy">Data privacy covers personal data. According to art. 4 par. 1 of DSGVO this are data referring to an identified or identifiable individual, hence all data which could be used to identify you. This applies for data such as name, private address, e-mail address, telephone number but also to usage data such as your IP address.
+        Of course Technische Universität Berlin observes the legal requirements of data privacy and other applicable regulations.
+        We are committed to ensure that you can trust us concerning your personal data. Therefore transfers of personal or sensitive data are encrypted.  In addition our websites are protected against damage and unauthorised access by technical measures.</string>
+    <string name="headerGeneralDataPrivacy">General Data Privacy</string>
+    <string name="textGeneralDataPrivacy">(1) If you visit a TUB website or download data of these sites, the following information will be stored in a log file: your IP address, date and time of the site access, visited website resp. name of the downloaded file, amount of transferred data, “user agent-string” of your web browser, the website from which you were referred to the current website or file and a status notification of successful or unsuccessful access. The non-anonymised data will be deleted after two weeks and will not be archived.
+        (2) This data will only be used for non-commercial purposes: it will only be reviewed manually if necessary for fault analysis, optimisation or investigation of abuse or performance issues.
+        (3) For data collection and storage we employ cookies. Cookies are small data packets consisting of text and are stored by your web browser upon website visit. They cause no harm on your device – neither do cookies contain viruses nor do they give us the option to spy on you. We employ two types of cookies: session cookies and permanent cookies. Session cookies are deleted when you close your web browser. Permanent cookies have a maximum life time – in our case up to one day.
+        Cookies are employed to ensure an optimal usage of the websites for visitors and editors. The employed cookies are not used for the tracing of personal user activities or analysis of behaviour. They are only employed where there is a technical requirement or they make more sense than other techniques such as the recognition of the login status of visitors and editors or the storage of information such as “display mobile version of the website”. The usage of the websites is possible without cookies most of the time.
+        For features resp. sites which require a login the employment of cookies is necessary.
+        You can configure your web browser to delete stored cookies.
+        (4) Within TUB websites external websites or services are embedded in some cases. The integrated search function refers to a website of the Google for example. In this case only the search terms are transferred.
+        With techniques like “iframes” external website contents are embedded at certain points. The providers of the websites may register, store and as the case may be process and relay your data.
+        At the very most, these data are so-called traffic data, that is information collected by external service providers as can be collected from visiting any regular website, e.g. the IP address, the approximate location, the browser used, the website you are coming from and so on. In no way are personal information or data collected unless you have voluntarily submitted these via a web form.</string>
+    <string name="headerExtentOfDataCollectionAndStorage">Extent of Data Collection and Storage</string>
+    <string name="textExtentOfDataCollectionAndStorage">Please refer to the section on our General Data Policy (see above, regarding login data and cookies) and the chapter on Usage Data (below, further information about cookies andusing Mamoto).
+        For the usage of our websites active registration of your personal data is not necessary in general. For TU Berlin to fulfil requested services, we require personal data in some cases. This applies especially for the individual replying to e-mails, provision of special services or applications.
+        If you entrust us with the supply of a service, we will only register and store your personal data as required for the supply of the service.
+        In some exceptions, e.g. for event registrations, you will be asked whether your data can be stored beyond the event date in order to inform you of similar events. No disadvantages result if you decline this request.
+        You can revoke your consent at any time and without giving reasons and demand the deletion of your data.
+        If you sign up for a newsletter with your e-mail address, we will use your e-mail address in order to inform you within the newsletter until you unsubscribe the newsletter.</string>
+    <string name="textPrivacy">Sofern innerhalb des Internetangebotes die Möglichkeit zur Eingabe persönlicher oder geschäftlicher Daten (Emailadressen, Namen, Anschriften) besteht, so erfolgt die Preisgabe dieser Daten seitens des Nutzers auf ausdrücklich freiwilliger Basis. Die Inanspruchnahme und Bezahlung aller angebotenen Dienste ist - soweit technisch möglich und zumutbar - auch ohne Angabe solcher Daten bzw. unter Angabe anonymisierter Daten oder eines Pseudonyms gestattet.
+        Die Nutzung der im Rahmen des Impressums oder vergleichbarer Angaben veröffentlichten Kontaktdaten wie Postanschriften, Telefon- und Faxnummern sowie Emailadressen durch Dritte zur Übersendung von nicht ausdrücklich angeforderten Informationen ist nicht gestattet. Rechtliche Schritte gegen die Versender von so genannten Spam-Mails bei Verstößen gegen dieses Verbot sind ausdrücklich vorbehalten.</string>
+    <string name="textTUCopyRight">Der Herausgeber ist bestrebt, in allen Publikationen die Urheberrechte der verwendeten Bilder, Grafiken, Ton- und Videodokumente sowie Texte zu beachten, von ihm selbst erstellte Bilder, Grafiken, Ton- und Videodokumente sowie Texte zu nutzen oder auf lizenzfreie Grafiken, Ton- und Videodokumente sowie Texte zurückzugreifen. Alle innerhalb des Internetangebotes genannten und ggf. durch Dritte geschützten Marken- und Warenzeichen unterliegen uneingeschränkt den Bestimmungen des jeweils gültigen Kennzeichenrechts und den Besitzrechten der jeweiligen eingetragenen Eigentümer.
+        Allein aufgrund der bloßen Nennung ist nicht der Schluss zu ziehen, dass Markenzeichen nicht durch Rechte Dritter geschützt sind! Das Copyright für veröffentlichte, vom Herausgeber selbst erstellte Inhalte und Objekte bleibt allein beim Herausgeber der Seiten.
+        Eine Vervielfältigung, Verarbeitung, Einspeicherung oder Verwendung solcher Grafiken, Ton- und Videodokumente sowie Texte in anderen elektronischen oder gedruckten Publikationen ist ohne ausdrückliche Zustimmung des Autors nicht gestattet. Unberührt davon bleibt das Kopieren und Herunterladen für den privaten, wissenschaftlichen und nicht kommerziellen Gebrauch. Wir erlauben ausdrücklich und begrüßen das Zitieren unserer Dokumente und Webseiten sowie das Setzen von Links auf unsere Website.</string>
+    <string name="urheber_und_kennzeichenrecht">Urheber- und Kennzeichenrecht</string>
+    <string name="textLinks">Bei direkten oder indirekten Verweisen auf fremde Webseiten (\"Hyperlinks\"), die außerhalb des Verantwortungsbereiches des Herausgebers liegen, würde eine Haftungsverpflichtung ausschließlich in dem Fall in Kraft treten, in dem der Herausgeber von den Inhalten Kenntnis hat und es ihm technisch möglich und zumutbar wäre, die Nutzung im Falle rechtswidriger Inhalte zu verhindern. Der Herausgeber erklärt hiermit ausdrücklich, dass zum Zeitpunkt der Linksetzung keine illegalen Inhalte auf den zu verlinkenden Seiten erkennbar waren.
+        Auf die aktuelle und zukünftige Gestaltung, die Inhalte oder die Urheberschaft der verlinkten/verknüpften Seiten hat der Herausgeber keinerlei Einfluss. Deshalb distanziert er sich hiermit ausdrücklich von allen Inhalten aller verlinkten /verknüpften Seiten,
+        die nach der Linksetzung verändert wurden. Diese Feststellung gilt für alle innerhalb des eigenen Internetangebotes gesetzten Links und Verweise sowie für Fremdeinträge in vom Autor eingerichteten Gästebüchern, Diskussionsforen, Linkverzeichnissen, Mailinglisten und in allen anderen Formen von Datenbanken, auf deren Inhalt externe Schreibzugriffe möglich sind. Für illegale, fehlerhafte oder unvollständige Inhalte und insbesondere für Schäden,
+        die aus der Nutzung oder Nichtnutzung solcherart dargebotener Informationen entstehen, haftet allein der Anbieter der Seite, auf welche verwiesen wurde, nicht derjenige, der über Links auf die jeweilige Veröffentlichung lediglich verweist.</string>
+    <string name="verweise_und_links">Verweise und Links</string>
+    <string name="textDisclaimer">Die Inhalte dieser Applikation werden mit größtmöglicher Sorgfalt recherchiert und implementiert. Fehler im Bearbeitungsvorgang sind dennoch nicht auszuschließen. Bei Hinweisen und Korrekturen wenden Sie sich bitte an die genannten Ansprechpartner. Der Herausgeber übernimmt keinerlei Gewähr für die Aktualität, Korrektheit, Vollständigkeit oder Qualität der bereitgestellten Informationen.
+        Haftungsansprüche gegen den Herausgeber, welche sich auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung oder Nichtnutzung der dargebotenen Informationen bzw. durch die Nutzung fehlerhafter und unvollständiger Informationen verursacht wurden, sind grundsätzlich ausgeschlossen, sofern seitens des Herausgebers kein nachweislich vorsätzliches oder grob fahrlässiges Verschulden vorliegt. Alle Angebote sind freibleibend und unverbindlich.
+        Der Herausgeber behält es sich ausdrücklich vor, Teile der Applikation oder das gesamte Angebot ohne gesonderte Ankündigung zu verändern, zu ergänzen, zu löschen oder die Veröffentlichung zeitweise oder endgültig einzustellen.</string>
+    <string name="headerDisclaimer">Haftungsausschluss</string>
+    <string name="headerHerausgeber"><p>Prof. Dr.&#8211;Ing. David Bermbach\n
+        Einsteinufer 17 Sekr.EN17 \n
+        10587 Berlin \n
+        Telefon: +49 (0)30 314&#8211;0 \n
+        E-Mail: simra.mcc@gmail.com</p></string>
+    <string name="herausgeber">Herausgeber</string>
+    <string name="textCallCenterTUBerlin">
+        Das Call Center der TU Berlin \n
+        <p>Telefonvermittlung und Auskunftsdienst Telefon: +49 (0)30 314&#8211;0 (extern) oder &#8211;8 (intern) \n
+        Sprechzeiten: Mo-Do 8&#8211;16 Uhr, Fr 8&#8211;15 Uhr \n
+        Weitere Kontaktmöglichkeiten finden Sie unter https://www.tu-berlin.de/servicemenue/kontakt/.</p></string>
+    <string name="ansprechpartner">Ansprechpartner</string>
+    <string name="ust">USt-Id-Nr.: DE 811 231 089</string>
+    <string name="https_www_berlin_de_rbmskzl" translatable="false">https://www.berlin.de/rbmskzl/</string>
+    <string name="textRechtsaufsicht">Der Regierende Bürgermeister von Berlin - Senatskanzlei</string>
+    <string name="rechtsaufsicht">Rechtsaufsicht</string>
+    <string name="textSupplementAddresseTUBerlin">Die Technische Universität Berlin ist eine Körperschaft öffentlichen Rechts gemäß §§ 1 und 2 des Berliner Hochschulgesetzes (BerlHG) und zugleich eine staatliche Einrichtung. Sie wird durch den Präsidenten gesetzlich vertreten. Der Name \"Technische Universität Berlin\" wird nicht ins Englische übersetzt.</string>
+    <string name="www_tu_berlin_de">www.tu-berlin.de/menue/home/parameter/en/</string>
+    <string name="textAddresseTUBerlin">Technische Universität Berlin \n
+        Der Präsident \n
+        Prof. Dr. Christian Thomsen\n
+        Straße des 17. Juni 135 \n
+        10623 Berlin \n
+        Telefon: +49 (0)30 314&#8211;0</string>
+    <string name="headerAddresseTUBerlin">Zentrale Adresse der TU Berlin</string>
+    <string name="umsatzsteueridentifikationsnummer">Umsatzsteueridentifikationsnummer</string>
+    <string name="title_activity_credits">Credits</string>
 </resources>
