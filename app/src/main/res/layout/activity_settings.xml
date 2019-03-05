@@ -89,6 +89,47 @@
             android:text="30/50"
             android:textAlignment="center"
             android:textSize="15sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/bikeTypeSpinnerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bikeTypeSpinnerTitle"
+            android:textAlignment="center"
+            android:textSize="15sp" />
+
+        <Spinner
+            android:id="@+id/bikeTypeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/bikeTypeList"
+            android:prompt="@string/pleaseChoose" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/locationTypeSpinnerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/locationTypeSpinnerTitle"
+            android:textSize="15sp" />
+
+        <Spinner
+            android:id="@+id/locationTypeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/phoneLocations"
+            android:prompt="@string/pleaseChoose" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
     </LinearLayout>
 
     <RelativeLayout

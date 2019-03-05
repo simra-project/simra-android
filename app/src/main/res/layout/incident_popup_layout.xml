@@ -60,10 +60,10 @@
             android:textSize="10pt" />
 
         <Spinner
-            android:id="@+id/locationSpinner"
+            android:id="@+id/phoneLocationSpinner"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/locations"
+            android:entries="@array/phoneLocations"
             android:prompt="@string/locationType1" />
 
         <Space

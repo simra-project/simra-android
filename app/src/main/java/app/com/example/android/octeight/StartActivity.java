@@ -95,12 +95,6 @@ public class StartActivity extends BaseActivity {
 
             // First start, show your dialog | first-run code goes here
             if (isFirstTime() && !caller.equals("MainActivity")) {
-                if (!fileExists("incidentData.csv", this)) {
-
-                    appendToFile("key,lat,lon,ts,path_to_AccFile,incidentType,phoneLocation,description"
-                            + System.lineSeparator(), "incidentData.csv", this);
-
-                }
 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // META-FILE (one per user): contains ...

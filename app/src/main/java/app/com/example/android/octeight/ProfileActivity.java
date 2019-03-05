@@ -30,14 +30,6 @@ public class ProfileActivity extends AppCompatActivity {
     public static final String bikePrefs = "Profile-bikeType";
     public static final String phoneLocPref = "Profile-phoneLocation";*/
 
-    // The choosable items in the spinner
-    String[] ageGroups = new String[6];
-    String[] genders = new String[4];
-    String[] regions = new String[3];
-    String[] berDistricts = new String[13];
-    String[] lonDistricts = new String[34];
-    String[] bikeTypes = new String[5];
-    String[] phoneLocations = new String[7];
 
     // Save and abort button at the bottom of the screen
     LinearLayout saveButton;
@@ -51,24 +43,11 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        ageGroups = getResources().getStringArray(R.array.ageGroupList);
-        genders = getResources().getStringArray(R.array.genderList);
-        regions = getResources().getStringArray(R.array.regionList);
-        berDistricts = getResources().getStringArray(R.array.districtBERList);
-        lonDistricts = getResources().getStringArray(R.array.districtLONList);
-        bikeTypes = getResources().getStringArray(R.array.bikeTypeList);
-        phoneLocations = getResources().getStringArray(R.array.locations);
-
         // Building the view
         Spinner ageGroupSpinner = findViewById(R.id.ageGroupSpinner);
         Spinner genderSpinner = findViewById(R.id.genderSpinner);
         Spinner regionSpinner = findViewById(R.id.regionSpinner);
-        Space regionDistrictSpace = findViewById(R.id.regionDistrictSpace);
-        TextView districtTitle = findViewById(R.id.districtSpinnerTitle);
-        Spinner berDistrictSpinner = findViewById(R.id.districtBERSpinner);
-        Spinner lonDistrictSpinner = findViewById(R.id.districtLONSpinner);
-        Spinner bikeSpinner = findViewById(R.id.bikeTypeSpinner);
-        Spinner locationTypeSpinner = findViewById(R.id.locationTypeSpinner);
+        Spinner experienceSpinner = findViewById(R.id.experienceSpinner);
 
         // Get the previous saved settings
         int[] previousProfile = loadPreviousProfile();
@@ -85,65 +64,11 @@ public class ProfileActivity extends AppCompatActivity {
         ageGroupSpinner.setSelection(previousProfile[0]);
         genderSpinner.setSelection(previousProfile[1]);
         regionSpinner.setSelection(previousProfile[2]);
+        experienceSpinner.setSelection(previousProfile[3]);
 
-        berDistrictSpinner.setSelection(previousProfile[3]);
-        lonDistrictSpinner.setSelection(previousProfile[4]);
-        bikeSpinner.setSelection(previousProfile[5]);
-        locationTypeSpinner.setSelection(previousProfile[6]);
-
-        Log.d(TAG, "previousProfile[2]: " + previousProfile[2]);
-        if (previousProfile[2] == 1) {
-            regionDistrictSpace.setVisibility(View.VISIBLE);
-            districtTitle.setVisibility(View.VISIBLE);
-            berDistrictSpinner.setVisibility(View.VISIBLE);
-        } else if (previousProfile[2] == 2) {
-            regionDistrictSpace.setVisibility(View.VISIBLE);
-            districtTitle.setVisibility(View.VISIBLE);
-            lonDistrictSpinner.setVisibility(View.VISIBLE);
-        }
 
         saveButton = findViewById(R.id.done_button);
         abortButton = findViewById(R.id.abort_button);
-
-        // Change the districtSpinner according to the selected region.
-        regionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> arg0, View arg1,
-                                       int arg2, long arg3) {
-                // Selected region is Berlin. Make space, title and berDistrictSpinner visible,
-                // lonDistrictSpinner gone and set the item to default.
-                if (regionSpinner.getSelectedItemId() == 1) {
-                    regionDistrictSpace.setVisibility(View.VISIBLE);
-                    districtTitle.setVisibility(View.VISIBLE);
-                    berDistrictSpinner.setVisibility(View.VISIBLE);
-                    lonDistrictSpinner.setVisibility(View.GONE);
-                    lonDistrictSpinner.setSelection(0);
-                    // Selected region is London. Make space, title and lonDistrictSpinner visible,
-                    // berDistrictSpinner gone and set the item to default.
-                } else if (regionSpinner.getSelectedItemId() == 2) {
-                    regionDistrictSpace.setVisibility(View.VISIBLE);
-                    districtTitle.setVisibility(View.VISIBLE);
-                    lonDistrictSpinner.setVisibility(View.VISIBLE);
-                    berDistrictSpinner.setVisibility(View.GONE);
-                    berDistrictSpinner.setSelection(0);
-                } else {
-                    // if "please choose" is chosen, retract everything and set to default.
-                    regionDistrictSpace.setVisibility(View.GONE);
-                    districtTitle.setVisibility(View.GONE);
-                    berDistrictSpinner.setVisibility(View.GONE);
-                    berDistrictSpinner.setSelection(0);
-                    lonDistrictSpinner.setVisibility(View.GONE);
-                    lonDistrictSpinner.setSelection(0);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-
-            }
-        });
 
         // When the save button is clicked, the selected items are saved to simraPrefs,
         // this ProfileActivity gets finished and a toast is shown to the user.
@@ -152,10 +77,7 @@ public class ProfileActivity extends AppCompatActivity {
             int ageGroup = ageGroupSpinner.getSelectedItemPosition();
             int gender = genderSpinner.getSelectedItemPosition();
             int region = regionSpinner.getSelectedItemPosition();
-            int berDistrict = berDistrictSpinner.getSelectedItemPosition();
-            int lonDistrict = lonDistrictSpinner.getSelectedItemPosition();
-            int bike = bikeSpinner.getSelectedItemPosition();
-            int locationType = locationTypeSpinner.getSelectedItemPosition();
+            int experience = experienceSpinner.getSelectedItemPosition();
 
             /*SharedPreferences.Editor editor = sharedpreferences.edit();
             editor.putInt(agePrefs, ageGroup);
@@ -169,10 +91,7 @@ public class ProfileActivity extends AppCompatActivity {
             writeIntToSharePrefs("Profile-Age", ageGroup, "simraPrefs", ProfileActivity.this);
             writeIntToSharePrefs("Profile-Gender", gender, "simraPrefs", ProfileActivity.this);
             writeIntToSharePrefs("Profile-Region", region, "simraPrefs", ProfileActivity.this);
-            writeIntToSharePrefs("Profile-berDistrict", berDistrict, "simraPrefs", ProfileActivity.this);
-            writeIntToSharePrefs("Profile-lonDistrict", lonDistrict, "simraPrefs", ProfileActivity.this);
-            writeIntToSharePrefs("Profile-bikeType", bike, "simraPrefs", ProfileActivity.this);
-            writeIntToSharePrefs("Profile-phoneLocation", locationType, "simraPrefs", ProfileActivity.this);
+            writeIntToSharePrefs("Profile-Experience", experience, "simraPrefs", ProfileActivity.this);
 
             /*
             // Instead of writing the String selected items in the spinner,
@@ -268,15 +187,12 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private int[] loadPreviousProfile() {
-        // {ageGroup, gender, region, berDistrict, lonDistrict, bikeType, phoneLocation}
-        int[] result = new int[7];
+        // {ageGroup, gender, region, experience}
+        int[] result = new int[5];
         result[0] = lookUpIntSharedPrefs("Profile-Age", 0, "simraPrefs", this);
         result[1] = lookUpIntSharedPrefs("Profile-Gender", 0, "simraPrefs", this);
         result[2] = lookUpIntSharedPrefs("Profile-Region", 0, "simraPrefs", this);
-        result[3] = lookUpIntSharedPrefs("Profile-berDistrict", 0, "simraPrefs", this);
-        result[4] = lookUpIntSharedPrefs("Profile-lonDistrict", 0, "simraPrefs", this);
-        result[5] = lookUpIntSharedPrefs("Profile-bikeType", 0, "simraPrefs", this);
-        result[6] = lookUpIntSharedPrefs("Profile-phoneLocation", 0, "simraPrefs", this);
+        result[3] = lookUpIntSharedPrefs("Profile-Experience", 0, "simraPrefs", this);
         return result;
     }
 

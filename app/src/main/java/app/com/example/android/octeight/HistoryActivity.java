@@ -234,7 +234,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
                     }
                 }
                 if (ridesToUpload.size() > 0) {
-                    String demographicHeader = "birth,gender,region,ber,lon,bike,loc,numberOfRides,duration,numberOfIncidents" + System.lineSeparator();
+                    String demographicHeader = "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents" + System.lineSeparator();
                     String demographics = getDemographics();
                     overWriteFile(demographicHeader + demographics + "," + numberOfRides + "," + duration + "," + numberOfIncidents, "profile.csv", HistoryActivity.this);
                     Intent intent = new Intent(HistoryActivity.this, UploadService.class);
@@ -325,13 +325,8 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         int birth = lookUpIntSharedPrefs("Profile-Age", 0, "simraPrefs", this);
         int gender = lookUpIntSharedPrefs("Profile-Gender", 0, "simraPrefs", this);
         int region = lookUpIntSharedPrefs("Profile-Region", 0, "simraPrefs", this);
-        int ber = lookUpIntSharedPrefs("Profile-berDistrict", 0, "simraPrefs", this);
-        int lon = lookUpIntSharedPrefs("Profile-lonDistrict", 0, "simraPrefs", this);
-        int bike = lookUpIntSharedPrefs("Profile-bikeType", 0, "simraPrefs", this);
-        int loc = lookUpIntSharedPrefs("Profile-phoneLocation", 0, "simraPrefs", this);
-
-
-        return birth + "," + gender + "," + region + "," + ber + "," + lon + "," + bike + "," + loc;
+        int experience = lookUpIntSharedPrefs("Profile-Experience", 0, "simraPrefs", this);
+        return birth + "," + gender + "," + region + "," + experience;
     }
 
     private void stopTask(Handler handler, Runnable runnable) {
