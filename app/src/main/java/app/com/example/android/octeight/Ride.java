@@ -66,7 +66,7 @@ public class Ride {
         this.id = path.split("_")[0];
 
         String pathToAccEventsOfRide = "accEvents" + id + ".csv";
-        String content = "key,lat,lon,ts,incidentType,phoneLocation,description";
+        String content = "key,lat,lon,ts,bike,child,trailer,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
         content += System.lineSeparator();
 
         if (!fileExists(pathToAccEventsOfRide, context)) {
@@ -80,7 +80,7 @@ public class Ride {
                 //actualAccEvent.setKey(i);
                 // @TODO do AccEvents have to have a key here???
 
-                content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + ",,," + System.lineSeparator();
+                content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + ",,,,,,,,,,,,,,,," + System.lineSeparator();
             }
 
             appendToFile(content, pathToAccEventsOfRide, context);
