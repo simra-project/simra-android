@@ -101,11 +101,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // The ride object which will be created and retrieved by the MainActivity at the end of the
     // service
+    /*
     public Ride getRide() {
         File accGpsFile = getFileStreamPath(pathToAccGpsFile);
         return new Ride(accGpsFile, String.valueOf(startTime), String.valueOf((curTime - startTime)), 0, this);
     }
-
+    */
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // SensorEventListener Methods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
