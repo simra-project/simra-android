@@ -8,9 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -32,6 +34,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     Boolean incidentSaved = false;
     String rideID;
     String incidentKey;
+    String[] previousAnnotation;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
@@ -57,13 +60,38 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         incidentKey = getIntent().getStringExtra("Incident_Key");
 
-        String[] previousAnnotation = loadPreviousAnnotation
+        previousAnnotation = loadPreviousAnnotation
                 (rideID, incidentKey);
 
         final Spinner incidentTypeSpinner = findViewById(R.id.incidentTypeSpinner);
-
+        final LinearLayout involvedCheckBoxesLinearLayout = findViewById(R.id.involvedCheckboxes);
         final EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
+        final Switch scarinessSwitch = findViewById(R.id.scarinessSwitch);
+        String[] checkBoxValues = {"0","0","0","0","0","0","0","0","0"};
+        if (previousAnnotation != null) {
+            incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[4]));
 
+            // Load checkboxValues
+            int count = involvedCheckBoxesLinearLayout.getChildCount();
+            // Iterate through all children of involvedCheckBoxesLinearLayout
+            for (int i = 0; i < count; i++) {
+                CheckBox cb = (CheckBox) involvedCheckBoxesLinearLayout.getChildAt(i);
+                // if (v instanceof CheckBox) {
+                    if (previousAnnotation[9+i].length()>0) {
+                        if (previousAnnotation[9 + i].equals("1")) {
+                            cb.setChecked(true);
+                            checkBoxValues[i] = "1";
+                        }
+                    }
+                // }
+            }
+            if(previousAnnotation[18].length()>0){
+                if(previousAnnotation[18].equals("1")){
+                    scarinessSwitch.setChecked(true);
+                }
+            }
+            incidentDescription.setText(previousAnnotation[19]);
+        }
 
         doneButton = findViewById(R.id.save_button);
         backButton = findViewById(R.id.back_button);
@@ -72,7 +100,11 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
             String lat = getIntent().getStringExtra("Incident_latitude");
             String lon = getIntent().getStringExtra("Incident_longitude");
-            String date = getIntent().getStringExtra("Incident_timeStamp");
+            String ts = getIntent().getStringExtra("Incident_timeStamp");
+            String bike = getIntent().getStringExtra("Incident_bike");
+            String child = getIntent().getStringExtra("Incident_child");
+            String trailer = getIntent().getStringExtra("Incident_trailer");
+            String pLoc = getIntent().getStringExtra("Incident_pLoc");
             String pathToAccDat = getIntent().getStringExtra("Incident_accDat");
 
             // onClick-behavior for 'Done inserting description'-button: save incident
@@ -83,8 +115,11 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 // Instead of writing the String selected items in the spinner,
                 // we use an int to save disk space and bandwidth
                 int incidentType = incidentTypeSpinner.getSelectedItemPosition();
-                int locationType = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs",this);
                 String description = incidentDescription.getText().toString();
+                int scariness = 0;
+                if (scarinessSwitch.isChecked()){
+                    scariness = 1;
+                }
 
                 /*
                 int incidentIndex = 0;
@@ -100,13 +135,12 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     }
                 }
                 */
-                overwriteIncidentFile(rideID, incidentKey, incidentKey + "," + lat + "," + lon + "," + date + ","
-                        + incidentType + "," + locationType + "," + description);
-
+                overwriteIncidentFile(rideID, incidentKey, incidentKey + "," + lat + "," + lon + "," + ts + ","
+                        + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[","").replace("]","") + "," + scariness + "," + description);
 
                 incidentSaved = true;
 
-                String incidentString = incidentKey + "," + lat + "," + lon + "," + date + ","
+                String incidentString = incidentKey + "," + lat + "," + lon + "," + ts + ","
                         + "," + incidentType + "," + locationType + "," + description;
 
                 // writeIntToSharePrefs("Settings-PhoneLocation", locationType, "simraPrefs", this);

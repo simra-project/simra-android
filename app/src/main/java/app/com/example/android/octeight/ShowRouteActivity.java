@@ -29,6 +29,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static app.com.example.android.octeight.Utils.checkForAnnotation;
+import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 
 public class ShowRouteActivity extends BaseActivity {
 
@@ -111,11 +112,15 @@ public class ShowRouteActivity extends BaseActivity {
         File gpsFile = getFileStreamPath(pathToAccGpsFile);
 
         Log.d(TAG, "creating ride objects");
+        int bike = lookUpIntSharedPrefs("Settings-BikeType",0,"simraPrefs",this);
+        int child = lookUpIntSharedPrefs("Settings-Child",0,"simraPrefs",this);
+        int trailer = lookUpIntSharedPrefs("Settings-Trailer",0,"simraPrefs",this);
+        int pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation",0,"simraPrefs",this);
 
 
         // Create a ride object with the accelerometer, gps and time data
         try {
-            ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, this);
+            ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, this);
         } catch (Exception e) {
             e.printStackTrace();
         }
