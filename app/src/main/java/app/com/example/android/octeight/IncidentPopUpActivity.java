@@ -62,21 +62,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         final Spinner incidentTypeSpinner = findViewById(R.id.incidentTypeSpinner);
 
-        final Spinner locationTypeSpinner = findViewById(R.id.phoneLocationSpinner);
-
         final EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
 
-        locationTypeSpinner.setSelection(lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this));
-
-        if (previousAnnotation != null && previousAnnotation[4].length() > 0 && previousAnnotation[5].length() > 0) {
-
-            incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[4]));
-
-            locationTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[5]));
-
-            incidentDescription.setText(previousAnnotation[6]);
-
-        }
 
         doneButton = findViewById(R.id.save_button);
         backButton = findViewById(R.id.back_button);
@@ -96,7 +83,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 // Instead of writing the String selected items in the spinner,
                 // we use an int to save disk space and bandwidth
                 int incidentType = incidentTypeSpinner.getSelectedItemPosition();
-                int locationType = locationTypeSpinner.getSelectedItemPosition();
+                int locationType = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs",this);
                 String description = incidentDescription.getText().toString();
 
                 /*

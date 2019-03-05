@@ -127,4 +127,15 @@
         <item>@string/tandemBike</item>
         <item>@string/otherBike</item>
     </string-array>
+    <string-array name="involvedTypeList">
+        <item>@string/involvedType1</item>
+        <item>@string/involvedType2</item>
+        <item>@string/involvedType3</item>
+        <item>@string/involvedType4</item>
+        <item>@string/involvedType5</item>
+        <item>@string/involvedType6</item>
+        <item>@string/involvedType7</item>
+        <item>@string/involvedType8</item>
+        <item>@string/involvedType9</item>
+    </string-array>
 </resources>

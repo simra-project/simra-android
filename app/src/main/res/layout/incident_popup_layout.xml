@@ -35,7 +35,6 @@
             android:layout_height="20dp" />
 
         <TextView
-            android:id="@+id/DropDown1Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/incident_type"
@@ -50,8 +49,89 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="10dp" />
+            android:layout_height="20dp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/involved_type"
+            android:textSize="10pt" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="vertical"
+                android:weightSum="2">
+            <CheckBox android:id="@+id/involvedType7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/involvedType7" />
+            <CheckBox android:id="@+id/involvedType8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/involvedType8" />
+            <CheckBox android:id="@+id/involvedType4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/involvedType4" />
+            <CheckBox android:id="@+id/involvedType1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/involvedType1" />
+            <CheckBox android:id="@+id/involvedType5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/involvedType5" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="vertical"
+                android:weightSum="2">
+                <CheckBox android:id="@+id/involvedType3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/involvedType3" />
+                <CheckBox android:id="@+id/involvedType2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/involvedType2" />
+                <CheckBox android:id="@+id/involvedType6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/involvedType6" />
+                <CheckBox android:id="@+id/involvedType9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/involvedType9" />
+            </LinearLayout>
+        </LinearLayout>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            >
+            <Switch
+            android:id="@+id/scarinessSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/scarinessString"/>
+        </RelativeLayout>
+
+        <!--
         <TextView
             android:id="@+id/DropDown2Title"
             android:layout_width="wrap_content"
@@ -69,7 +149,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
-
+        -->
         <TextView
             android:id="@+id/DescriptionTextTitle"
             android:layout_width="wrap_content"
@@ -173,9 +253,7 @@
                     android:layout_gravity="center"
                     android:layout_weight="2"
                     android:background="@drawable/ok_icon_640" />
-
             </LinearLayout>
         </LinearLayout>
-
     </LinearLayout>
 </ScrollView>
