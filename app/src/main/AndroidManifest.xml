@@ -26,6 +26,16 @@
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
         <activity
+            android:name=".RideSettingsActivity"
+            android:label="@string/title_activity_ride_settings"
+            android:parentActivityName=".ShowRouteActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="app.com.example.android.octeight.ShowRouteActivity" />
+        </activity>
+        <activity
             android:name=".Impressum2Activity"
             android:label="@string/title_activity_impressum2"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -120,7 +130,7 @@
         <activity
             android:name=".CreditsActivity"
             android:label="@string/title_activity_credits"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

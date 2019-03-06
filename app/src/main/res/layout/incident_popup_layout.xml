@@ -122,14 +122,27 @@
             android:layout_height="10dp" />
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            >
-            <Switch
-            android:id="@+id/scarinessSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/scarinessString"/>
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/scarinessString"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/scarinessString"/>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/scarinessString"
+                android:gravity="center">
+                <ToggleButton
+                android:id="@+id/scarinessToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/scarinessString"
+                android:textOn="@string/yes"
+                android:textOff="@string/no"/>
+            </RelativeLayout>
         </RelativeLayout>
 
         <!--

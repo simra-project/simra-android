@@ -211,6 +211,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="regionSpinnerTitle">Region</string>
     <string name="experienceSpinnerTitle">Erfahrung als Fahrradfahrer</string>
     <string name="involved_type">Beteiligte Verkehrsteilnehmer</string>
-    <string name="scarinessString">Diese Erfahrung war beängstigend\u0020</string>
+    <string name="scarinessString">Diese Erfahrung war beängstigend:</string>
+    <string name="title_activity_ride_settings">RideSettingsActivity</string>
 
 </resources>
