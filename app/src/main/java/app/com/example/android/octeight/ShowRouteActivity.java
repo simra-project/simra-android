@@ -1,9 +1,15 @@
 package app.com.example.android.octeight;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -117,6 +123,11 @@ public class ShowRouteActivity extends BaseActivity {
         int trailer = lookUpIntSharedPrefs("Settings-Trailer",0,"simraPrefs",this);
         int pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation",0,"simraPrefs",this);
 
+        Intent rideSettings = new Intent(ShowRouteActivity.this, RideSettingsActivity.class);
+        // startActivity(rideSettings);
+        getDialogValueBack(this);
+
+        Log.d(TAG, "onCreate() continues.");
 
         // Create a ride object with the accelerometer, gps and time data
         try {
@@ -370,5 +381,38 @@ public class ShowRouteActivity extends BaseActivity {
         }
     }
 
+    public boolean getDialogValueBack(Context context) {
+
+        final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message mesg) {
+                throw new RuntimeException();
+            }
+        };
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle(getString(R.string.sendErrorTitle));
+        alert.setMessage(getString(R.string.sendErrorMessage));
+        alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                handler.sendMessage(handler.obtainMessage());
+            }
+        });
+        alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                handler.sendMessage(handler.obtainMessage());
+            }
+        });
+        alert.show();
+
+        try {
+            Looper.loop();
+        } catch (RuntimeException e) {
+        }
+
+        return true;
+
+
+    }
 
 }
