@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/toolbar_height"
+    android:layout_margin="10dp"
+    android:background="@drawable/rounded_corners"
+    android:elevation="8dp"
+    android:theme="@style/AppTheme.AppBarOverlay"
+    app:popupTheme="@style/AppTheme.PopupOverlay">
+
+    <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="left"
+        android:layout_marginLeft="15dp"
+        android:background="@drawable/ic_arrow_back_blue_24dp" />
+
+    <TextView
+        android:id="@+id/toolbar_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginRight="15dp"
+        android:text="@string/title_activity_imprint"
+        android:textColor="@android:color/holo_blue_light"
+        android:textSize="21sp"
+        android:textStyle="italic" />
+
+
+    <ImageButton
+        android:id="@+id/helmet_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="right"
+        android:layout_marginRight="15dp"
+        android:background="@drawable/helmet" />
+
+
+</android.support.v7.widget.Toolbar>

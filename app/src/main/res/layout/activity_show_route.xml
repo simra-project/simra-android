@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,27 +15,27 @@
         android:id="@+id/addIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
+        android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
         android:background="@drawable/rounded_corners">
 
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:background="@drawable/tap_64" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginTop="5dp"
             android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
             android:fontFamily="@font/assistant_extralight"
             android:text="@string/addIncident"
             android:textColor="#FEFEFE"
@@ -46,10 +47,10 @@
         android:id="@+id/exitAddIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="20dp"
+        android:layout_alignParentTop="true"
         android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/rounded_white">
 
         <ImageView
@@ -65,8 +66,8 @@
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginTop="5dp"
             android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
             android:fontFamily="@font/assistant_extralight"
             android:text="Hinzufügen\n beenden"
             android:textColor="#000000"
@@ -78,10 +79,10 @@
         android:id="@+id/bounding_box_center_button"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="85dp"
+        android:layout_alignParentTop="true"
         android:layout_marginRight="15dp"
+        android:layout_marginTop="85dp"
         android:background="@drawable/my_center" />
 
     <!--
@@ -113,10 +114,10 @@
         android:id="@+id/saveIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="20dp"
+        android:layout_alignParentEnd="true"
         android:layout_marginBottom="20dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/rounded_corners">
 
         <ImageView
@@ -132,8 +133,8 @@
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginTop="5dp"
             android:layout_marginEnd="10dp"
+            android:layout_marginTop="5dp"
             android:fontFamily="@font/assistant_extralight"
             android:text="@string/saveIncident"
             android:textColor="#FEFEFE"
@@ -145,8 +146,8 @@
         android:id="@+id/copyright_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
         android:layout_marginEnd="5dp"
         android:text="@string/osmCopyright"
         android:textSize="10sp" />
