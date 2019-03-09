@@ -1,23 +1,27 @@
 package app.com.example.android.octeight;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.design.button.MaterialButton;
 import android.support.v7.app.AlertDialog;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.BoundingBox;
@@ -35,7 +39,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static app.com.example.android.octeight.Utils.checkForAnnotation;
+import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
+import static app.com.example.android.octeight.Utils.writeBooleanToSharePrefs;
+import static app.com.example.android.octeight.Utils.writeIntToSharePrefs;
 
 public class ShowRouteActivity extends BaseActivity {
 
@@ -71,16 +78,18 @@ public class ShowRouteActivity extends BaseActivity {
     // Automatically detected/custom; to be annotated/already annotated
 
     Drawable editMarkerDefault;
-
     Drawable editCustMarker;
-
     Drawable editDoneDefault;
-
     Drawable editDoneCust;
-
     boolean addCustomMarkerMode;
-
     MarkerFunct myMarkerFunct;
+    AlertDialog alertDialog;
+
+    int bike;
+    int child;
+    int trailer;
+    int pLoc;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,21 +120,21 @@ public class ShowRouteActivity extends BaseActivity {
         String pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
         // Log.d(TAG, "onCreate() date: " + date);
-        int state = getIntent().getIntExtra("State", 0);
+        int state = 0; //getIntent().getIntExtra("State", 0);
         // Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
         String duration = getIntent().getStringExtra("Duration");
 
         File gpsFile = getFileStreamPath(pathToAccGpsFile);
 
         Log.d(TAG, "creating ride objects");
-        int bike = lookUpIntSharedPrefs("Settings-BikeType",0,"simraPrefs",this);
-        int child = lookUpIntSharedPrefs("Settings-Child",0,"simraPrefs",this);
-        int trailer = lookUpIntSharedPrefs("Settings-Trailer",0,"simraPrefs",this);
-        int pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation",0,"simraPrefs",this);
+        bike = lookUpIntSharedPrefs("Settings-BikeType",0,"simraPrefs",this);
+        child = lookUpIntSharedPrefs("Settings-Child",0,"simraPrefs",this);
+        trailer = lookUpIntSharedPrefs("Settings-Trailer",0,"simraPrefs",this);
+        pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation",0,"simraPrefs",this);
 
-        Intent rideSettings = new Intent(ShowRouteActivity.this, RideSettingsActivity.class);
-        // startActivity(rideSettings);
-        getDialogValueBack(this);
+        if (lookUpBooleanSharedPrefs("Settings-ShowRideSettingsDialog",true,"simraPrefs",ShowRouteActivity.this)) {
+            showCustomViewAlertDialog();
+        }
 
         Log.d(TAG, "onCreate() continues.");
 
@@ -279,6 +288,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         });
 
+
         Log.d(TAG, "onCreate() finished");
 
     }
@@ -381,7 +391,8 @@ public class ShowRouteActivity extends BaseActivity {
         }
     }
 
-    public boolean getDialogValueBack(Context context) {
+    // Show how to add custom view in android alert dialog.
+    private void showCustomViewAlertDialog() {
 
         final Handler handler = new Handler() {
             @Override
@@ -390,29 +401,101 @@ public class ShowRouteActivity extends BaseActivity {
             }
         };
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(context);
-        alert.setTitle(getString(R.string.sendErrorTitle));
-        alert.setMessage(getString(R.string.sendErrorMessage));
-        alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                handler.sendMessage(handler.obtainMessage());
+        // Store the created AlertDialog instance.
+        // Because only AlertDialog has cancel method.
+        alertDialog = null;
+
+        // Create a alert dialog builder.
+        final AlertDialog.Builder builder = new AlertDialog.Builder(ShowRouteActivity.this);
+
+        // Get custom login form view.
+        View settingsView = getLayoutInflater().inflate(R.layout.activity_ride_settings, null);
+
+        // Set above view in alert dialog.
+        builder.setView(settingsView);
+
+        // Bike Type and Phone Location Spinners
+
+        Spinner bikeTypeSpinner = settingsView.findViewById(R.id.bikeTypeSpinnerRideSettings);
+        Spinner phoneLocationSpinner = settingsView.findViewById(R.id.locationTypeSpinnerRideSettings);
+
+        CheckBox childCheckBoxButton = settingsView.findViewById(R.id.childCheckBoxRideSettings);
+        CheckBox trailerCheckBoxButton = settingsView.findViewById(R.id.trailerCheckBoxRideSettings);
+
+        CheckBox rememberMyChoiceCheckBox = settingsView.findViewById(R.id.rememberMyChoice);
+        CheckBox doNotShowAgainCheckBox = settingsView.findViewById(R.id.doNotShowAgain);
+
+        bikeTypeSpinner.setSelection(bike);
+        phoneLocationSpinner.setSelection(pLoc);
+
+        // Load previous child and trailer settings
+
+        if (child == 1){
+            childCheckBoxButton.setChecked(true);
+        }
+
+        childCheckBoxButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    child = 1;
+                } else {
+                    child = 0;
+                }
             }
         });
-        alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                handler.sendMessage(handler.obtainMessage());
+
+        if (trailer == 1){
+            trailerCheckBoxButton.setChecked(true);
+        }
+        trailerCheckBoxButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    trailer = 1;
+                } else {
+                    trailer = 0;
+                }
             }
         });
-        alert.show();
+        // doneButton click listener.
+        MaterialButton doneButton = (MaterialButton) settingsView.findViewById(R.id.done_button);
+
+        doneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    bike = bikeTypeSpinner.getSelectedItemPosition();
+                    pLoc = phoneLocationSpinner.getSelectedItemPosition();
+                    if (rememberMyChoiceCheckBox.isChecked()) {
+                        writeIntToSharePrefs("Settings-BikeType",bike, "simraPrefs", ShowRouteActivity.this);
+                        writeIntToSharePrefs("Settings-PhoneLocation",pLoc, "simraPrefs", ShowRouteActivity.this);
+                        writeIntToSharePrefs("Settings-Child", child, "simraPrefs", ShowRouteActivity.this);
+                        writeIntToSharePrefs("Settings-Trailer", trailer, "simraPrefs", ShowRouteActivity.this);
+                    }
+                    if (doNotShowAgainCheckBox.isChecked()) {
+                        writeBooleanToSharePrefs("Settings-ShowRideSettingsDialog",false,"simraPrefs",ShowRouteActivity.this);
+                    }
+                    // Close Alert Dialog.
+                    handler.sendMessage(handler.obtainMessage());
+                    alertDialog.cancel();
+                } catch(Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        builder.setCancelable(false);
+        alertDialog = builder.create();
+        alertDialog.show();
 
         try {
             Looper.loop();
         } catch (RuntimeException e) {
+            e.printStackTrace();
         }
 
-        return true;
-
-
     }
+
 
 }

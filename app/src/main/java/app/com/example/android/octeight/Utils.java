@@ -58,6 +58,11 @@ public class Utils {
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         return sharedPrefs.getLong(key, defValue);
     }
+    public static boolean lookUpBooleanSharedPrefs(String key, boolean defValue, String sharedPrefName, Context context) {
+        SharedPreferences sharedPrefs = context.getApplicationContext()
+                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
+        return sharedPrefs.getBoolean(key, defValue);
+    }
 
     public static void writeToSharePrefs(String key, String value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
@@ -83,6 +88,14 @@ public class Utils {
         editor.apply();
     }
 
+    public static void writeBooleanToSharePrefs(String key, boolean value, String sharedPrefName, Context context) {
+        SharedPreferences sharedPrefs = context.getApplicationContext()
+                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
     public static String getUniqueUserID(Context context) {
         String id = lookUpSharedPrefs("USER-ID", "0", "simraPrefs", context);
         if (id.equals("0")) {
@@ -94,25 +107,23 @@ public class Utils {
 
 
     // Check if an accEvent has already been annotated based on one line of the accEvents csv file.
+    // Returns true, if accEvent was already annotated.
 
     public static boolean checkForAnnotation(String[] incidentProps) {
 
         // Only checking for empty strings, which means we are retaining
         // events that were labeled as 'nothing happened'
-        Log.d(TAG, "checkForAnnotation() incidentProps[4]: " + incidentProps[4] + " length: " + incidentProps[4].length());
-        Log.d(TAG, "checkForAnnotation() incidentProps[5]: " + incidentProps[5] + " length: " + incidentProps[5].length());
-        Log.d(TAG, "checkForAnnotation() incidentProps[6]: " + incidentProps[6] + " length: " + incidentProps[6].length());
+        Log.d(TAG, "checkForAnnotation() incidentProps[10]: " + incidentProps[10] + " length: " + incidentProps[10].length());
+        Log.d(TAG, "checkForAnnotation() incidentProps[11]: " + incidentProps[11] + " length: " + incidentProps[11].length());
+        Log.d(TAG, "checkForAnnotation() incidentProps[12]: " + incidentProps[12] + " length: " + incidentProps[12].length());
+        Log.d(TAG, "checkForAnnotation() incidentProps[18]: " + incidentProps[18] + " length: " + incidentProps[18].length());
+        Log.d(TAG, "checkForAnnotation() incidentProps[19]: " + incidentProps[19] + " length: " + incidentProps[19].length());
 
-        if (!(incidentProps[4].equals("")) || (!(incidentProps[5].equals("")) ||
-                (!(incidentProps[6].equals(""))))) {
-
-            return true;
-
-        } else {
-
-            return false;
-
-        }
+        return !incidentProps[10].equals("") || !incidentProps[11].equals("") ||
+                !incidentProps[12].equals("") || !incidentProps[13].equals("") ||
+                !incidentProps[14].equals("") || !incidentProps[15].equals("") ||
+                !incidentProps[16].equals("") || !incidentProps[17].equals("") ||
+                !incidentProps[18].equals("") || !incidentProps[19].equals("");
 
     }
 

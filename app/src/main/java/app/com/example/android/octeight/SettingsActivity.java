@@ -3,15 +3,22 @@ package app.com.example.android.octeight;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Locale;
 
 import static app.com.example.android.octeight.Utils.getUniqueUserID;
+import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpLongSharedPrefs;
+import static app.com.example.android.octeight.Utils.writeBooleanToSharePrefs;
 import static app.com.example.android.octeight.Utils.writeIntToSharePrefs;
 import static app.com.example.android.octeight.Utils.writeLongToSharePrefs;
 
@@ -21,10 +28,31 @@ public class SettingsActivity extends BaseActivity {
     // Log tag
     private static final String TAG = "SettingsActivity_LOG";
 
-    // Bike Type and Phone Location Items
+    long privacyDuration;
+    int privacyDistance;
+    int child;
+    int trailer;
+    boolean showRideSettings;
 
+    // Bike Type and Phone Location Items
     Spinner bikeTypeSpinner;
     Spinner phoneLocationSpinner;
+
+    // Child and Trailer
+    CheckBox childCheckBox;
+    CheckBox trailerCheckBox;
+
+    // Ride settings are shown before annotating a ride if checked
+    CheckBox showRideSettingsCheckBox;
+
+    // Save and abort button at the bottom of the screen
+    LinearLayout doneButton;
+    LinearLayout abortButton;
+
+    // Boolean to display a toast to inform the user whether changes were saved or not
+    boolean profileSaved = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +62,7 @@ public class SettingsActivity extends BaseActivity {
         // Unique user id (bottom right of the screen)
         TextView tv1 = findViewById(R.id.textViewId);
         tv1.setText("id: " + getUniqueUserID(this));
+
 
         // Set the distance measure unit according to locale (foot when english, meter when german)
         String unit = "m";
@@ -51,9 +80,9 @@ public class SettingsActivity extends BaseActivity {
         TextView distanceTextView = (TextView) findViewById(R.id.privacyDistanceSeekBarProgress);
 
         // Load the privacy option values
-        long privacyDuration = lookUpLongSharedPrefs("Privacy-Duration", 30, "simraPrefs", this);
+        privacyDuration = lookUpLongSharedPrefs("Privacy-Duration", 30, "simraPrefs", this);
 
-        int privacyDistance = lookUpIntSharedPrefs("Privacy-Distance", 30, "simraPrefs", this);
+        privacyDistance = lookUpIntSharedPrefs("Privacy-Distance", 30, "simraPrefs", this);
         if (unit.equals("ft")) {
             privacyDistance = (int) Math.round((lookUpIntSharedPrefs("Privacy-Distance", 30, "simraPrefs", this) * 3.28));
         }
@@ -80,15 +109,80 @@ public class SettingsActivity extends BaseActivity {
         bikeTypeSpinner = findViewById(R.id.bikeTypeSpinner);
         phoneLocationSpinner = findViewById(R.id.locationTypeSpinner);
 
+        childCheckBox = findViewById(R.id.childCheckBox);
+        trailerCheckBox = findViewById(R.id.trailerCheckBox);
 
-        // Load previous settings
+        // CheckBox for showing ride settings before annotating a ride.
+        showRideSettingsCheckBox = findViewById(R.id.showRideSettingsCheckBox);
+
+        doneButton = findViewById(R.id.done_button);
+        abortButton = findViewById(R.id.abort_button);
+
+
+        // Load previous bikeType and phoneLocation settings
         int bikeType = lookUpIntSharedPrefs("Settings-BikeType", 0, "simraPrefs", this);
         int phoneLocation = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this);
 
         bikeTypeSpinner.setSelection(bikeType);
         phoneLocationSpinner.setSelection(phoneLocation);
-    }
 
+        // Load previous child and trailer settings
+        child = lookUpIntSharedPrefs("Settings-Child", 0, "simraPrefs", this);
+        trailer = lookUpIntSharedPrefs("Settings-Trailer", 0, "simraPrefs", this);
+
+        if (child == 1){
+            childCheckBox.setChecked(true);
+        }
+        childCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    child = 1;
+                } else {
+                    child = 0;
+                }
+            }
+        });
+
+        if (trailer == 1){
+            trailerCheckBox.setChecked(true);
+        }
+        trailerCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    trailer = 1;
+                } else {
+                    trailer = 0;
+                }
+            }
+        });
+
+        showRideSettings = lookUpBooleanSharedPrefs("Settings-ShowRideSettingsDialog",true,"simraPrefs", SettingsActivity.this);
+
+        if (!showRideSettings){
+            showRideSettingsCheckBox.setChecked(false);
+        }
+
+
+        doneButton.setOnClickListener((View v) -> {
+            writeLongToSharePrefs("Privacy-Duration", privacyDuration, "simraPrefs", SettingsActivity.this);
+            writeIntToSharePrefs("Privacy-Distance", privacyDistance, "simraPrefs", SettingsActivity.this);
+            writeIntToSharePrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
+            writeIntToSharePrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
+            writeIntToSharePrefs("Settings-Child", child, "simraPrefs", SettingsActivity.this);
+            writeIntToSharePrefs("Settings-Trailer", trailer, "simraPrefs", SettingsActivity.this);
+            writeBooleanToSharePrefs("Settings-ShowRideSettingsDialog",showRideSettingsCheckBox.isChecked(),"simraPrefs",SettingsActivity.this);
+            profileSaved = true;
+            finish();
+        });
+
+        // Return without saving the profile
+        abortButton.setOnClickListener((View v) -> {
+        profileSaved = false;
+        finish();
+        });
+    }
 
     // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)
     private SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener(TextView tV, String unit, String privacyOption) {
@@ -133,9 +227,11 @@ public class SettingsActivity extends BaseActivity {
 
                 }
                 if (privacyOption.equals("Privacy-Duration")) {
-                    writeLongToSharePrefs(privacyOption, (long) seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
+                    privacyDuration = seekBar.getProgress();
+                    //writeLongToSharePrefs(privacyOption, (long) seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
                 } else if (privacyOption.equals("Privacy-Distance")) {
-                    writeIntToSharePrefs(privacyOption, seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
+                    privacyDistance = seekBar.getProgress();
+                    // writeIntToSharePrefs(privacyOption, seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
                 } else {
                     Log.e(TAG, "onStopTrackingTouch unknown privacyOption: " + privacyOption);
                 }
@@ -146,13 +242,15 @@ public class SettingsActivity extends BaseActivity {
     }
 
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy()");
-
-        writeIntToSharePrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
-        writeIntToSharePrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
-
+        Log.d(TAG, "onDestroy() called");
+        if (profileSaved) {
+            Toast.makeText(this, getString(R.string.settingsSaved), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, getString(R.string.settingsNotSaved), Toast.LENGTH_SHORT).show();
+        }
     }
 }

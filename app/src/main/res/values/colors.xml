@@ -8,8 +8,8 @@
     <color name="controlNormal">#4db6ac</color>
     <color name="controlActivated">#4db6ac</color>
     <color name="white">#FFFFFF</color>
-    <color name="light_grey">#d3d3d3</color>
-    <color name="grey">#d3d3d3</color>
+    <color name="light_grey">#e6e6e6</color>
+    <color name="grey">#a6a6a6</color>
     <color name="black">#000000</color>
     <color name="transparent">#bd000000</color>
     <color name="simraDarkBlue">#041035</color>

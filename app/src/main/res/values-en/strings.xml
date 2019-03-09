@@ -34,7 +34,7 @@
     <string name="noHistory">"No rides found."</string>
     <string name="nextPatch">"This feature will be available in the future."</string>
     <string name="locationSpinner">"Location of the phone during the ride "</string>
-    <string name="description">Additional Comment (Optional)</string>
+    <string name="description">Optional Comment</string>
     <string name="notReady">Do you want to leave the annotation unfinished?</string>
     <string name="noIntentExtras">An error occurred. Please try again later.</string>
     <string name="annotation_title">What happened here?</string>
@@ -132,5 +132,15 @@
     <string name="regionSpinnerTitle">Region</string>
     <string name="experienceSpinnerTitle">Experience as a Cyclist</string>
     <string name="involved_type">other road user involved</string>
-    <string name="scarinessString">This experience was scary:</string>
+    <string name="scarinessString">This experience was scary</string>
+    <string name="rideSettingsTitle">Ride Settings</string>
+    <string name="settingsSaved">Settings saved</string>
+    <string name="settingsNotSaved">Settings not saved</string>
+    <string name="ride_settings_title">Ride Settings</string>
+    <string name="childString">There is a child on the bicycle</string>
+    <string name="trailerString">A trailer is attached to the bicycle</string>
+    <string name="ride_settings_description">Below, you can find the settings chosen for this ride. You can change them here, or in the settings menu.</string>
+    <string name="rememberMyChoice">Remember My Choice</string>
+    <string name="doNotShowAgain">Don\'t show this again</string>
+    <string name="showRideSettings">Show me the ride settings before annotating a ride.</string>
 </resources>
