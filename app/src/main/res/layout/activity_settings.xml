@@ -1,355 +1,370 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
     android:id="@+id/activity_settings"
-    android:layout_width="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".SettingsActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+<android.support.v4.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
     android:fadingEdgeLength="80dp"
+    android:layout_margin="10dp"
     android:requiresFadingEdge="vertical"
     android:scrollbars="vertical"
     >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="5dp"
-        android:background="@android:color/transparent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/SettingsTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_title"
-            android:textSize="25sp"
-            android:textStyle="bold" />
         <LinearLayout
-            android:id="@+id/privacySettingsLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="center_horizontal">
-        <Space
-            android:id="@+id/settingsSpace1"
-            android:layout_width="match_parent"
-            android:layout_height="25dp" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="5dp"
+            android:background="@android:color/transparent"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/PrivacySettingsTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/privacy_settings_title"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <Space
-            android:id="@+id/settingsSpace2"
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
-
-        <TextView
-            android:id="@+id/privacyDurationSeekBarTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/privacyDurationDescription"
-            android:textAlignment="center"
-            android:textSize="15sp" />
-
-        <SeekBar
-            android:id="@+id/privacyDurationSeekBar"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:max="50"
-            android:progress="30" />
-
-        <TextView
-            android:id="@+id/privacyDurationSeekBarProgress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="30/50"
-            android:textAlignment="center"
-            android:textSize="15sp" />
-
-        <Space
-            android:id="@+id/settingsSpace3"
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
-
-        <TextView
-            android:id="@+id/privacyDistanceSeekBarTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/privacyDistanceDescription"
-            android:textAlignment="center"
-            android:textSize="15sp" />
-
-        <SeekBar
-            android:id="@+id/privacyDistanceSeekBar"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:max="50"
-            android:progress="30" />
-
-        <TextView
-            android:id="@+id/privacyDistanceSeekBarProgress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="30/50"
-            android:textAlignment="center"
-            android:textSize="15sp" />
-        </LinearLayout>
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="25dp" />
-
-        <TextView
-            android:id="@+id/RideSettingsTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ride_settings_title"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
-
-        <TextView
-            android:id="@+id/bikeTypeSpinnerTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/bikeTypeSpinnerTitle"
-            android:textAlignment="center"
-            android:textSize="15sp" />
-
-
-        <Spinner
-            android:id="@+id/bikeTypeSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:entries="@array/bikeTypeList"
-            android:prompt="@string/pleaseChoose" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
-
-        <TextView
-            android:id="@+id/locationTypeSpinnerTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/locationTypeSpinnerTitle"
-            android:textSize="15sp" />
-
-        <Spinner
-            android:id="@+id/locationTypeSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:entries="@array/phoneLocations"
-            android:prompt="@string/pleaseChoose" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
-        <CheckBox android:id="@+id/childCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/childString"
-            android:singleLine="false"
-            android:maxEms="15"
-            android:checked="false"/>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="10dp" />
-        <CheckBox android:id="@+id/trailerCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/trailerString"
-            android:singleLine="false"
-            android:maxEms="15"
-            android:checked="false"/>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="10dp" />
-        <!--
-                <RelativeLayout
+            <!--
+            <TextView
+                android:id="@+id/SettingsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title_activity_settings"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+                -->
+            <LinearLayout
+                android:id="@+id/privacySettingsLinearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <RelativeLayout
-                    android:id="@+id/childStringLayout"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
+                <Space
+                    android:id="@+id/settingsSpace1"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp" />
+
+                <TextView
+                    android:id="@+id/PrivacySettingsTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true">
+                    android:text="@string/privacy_settings_title"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true"
-                        android:layout_marginTop="0dp"
-                        android:text="@string/childString" />
+                <Space
+                    android:id="@+id/settingsSpace2"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp" />
 
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/childToggleLayout"
+                <TextView
+                    android:id="@+id/privacyDurationSeekBarTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_toEndOf="@+id/childStringLayout"
-                    android:gravity="center">
-                    <ToggleButton
-                        android:id="@+id/childToggle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textOn="@string/yes"
-                        android:textOff="@string/no"/>
-                </RelativeLayout>
-            </RelativeLayout>
+                    android:text="@string/privacyDurationDescription"
+                    android:textAlignment="center"
+                    android:textSize="15sp" />
+
+                <SeekBar
+                    android:id="@+id/privacyDurationSeekBar"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:max="50"
+                    android:progress="30" />
+
+                <TextView
+                    android:id="@+id/privacyDurationSeekBarProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="30/50"
+                    android:textAlignment="center"
+                    android:textSize="15sp" />
+
+                <Space
+                    android:id="@+id/settingsSpace3"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp" />
+
+                <TextView
+                    android:id="@+id/privacyDistanceSeekBarTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/privacyDistanceDescription"
+                    android:textAlignment="center"
+                    android:textSize="15sp" />
+
+                <SeekBar
+                    android:id="@+id/privacyDistanceSeekBar"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:max="50"
+                    android:progress="30" />
+
+                <TextView
+                    android:id="@+id/privacyDistanceSeekBarProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="30/50"
+                    android:textAlignment="center"
+                    android:textSize="15sp" />
+            </LinearLayout>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="25dp" />
+
+            <TextView
+                android:id="@+id/RideSettingsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ride_settings_title"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="20dp" />
 
-
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <RelativeLayout
-                            android:id="@+id/trailerStringLayout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentTop="true"
-                                android:layout_marginTop="0dp"
-                                android:text="@string/trailerString" />
-
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:id="@+id/trailerToggleLayout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_toEndOf="@+id/trailerStringLayout"
-                            android:gravity="center">
-                            <ToggleButton
-                                android:id="@+id/trailerToggle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textOn="@string/yes"
-                                android:textOff="@string/no"/>
-                        </RelativeLayout>
-
-            </RelativeLayout>
-            -->
-        <CheckBox android:id="@+id/showRideSettingsCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/showRideSettings"
-            android:singleLine="false"
-            android:maxEms="15"
-            android:checked="true"/>
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:baselineAligned="false"
-            android:orientation="horizontal"
-            android:weightSum="2">
-
-            <LinearLayout
-                android:id="@+id/abort_button"
-                android:layout_width="0dp"
-                android:layout_height="70dp"
-                android:layout_marginEnd="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/ripple_effect"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="horizontal"
-                android:weightSum="7">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="5"
-                    android:fontFamily="@font/assistant_extralight"
-                    android:gravity="center"
-                    android:text="@string/cancel"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="2"
-                    android:background="@drawable/cancel_icon_640" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/done_button"
-                android:layout_width="0dp"
-                android:layout_height="70dp"
-                android:layout_marginStart="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/ripple_effect"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="horizontal"
-                android:weightSum="7">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="5"
-                    android:fontFamily="@font/assistant_extralight"
-                    android:gravity="center"
-                    android:text="@string/doneEditingIncident"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="2"
-                    android:background="@drawable/ok_icon_640" />
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:layout_gravity="end">
-
             <TextView
-                android:id="@+id/textViewId"
+                android:id="@+id/bikeTypeSpinnerTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
-        </RelativeLayout>
-    </LinearLayout>
+                android:text="@string/bikeTypeSpinnerTitle"
+                android:textAlignment="center"
+                android:textSize="15sp" />
 
+
+            <Spinner
+                android:id="@+id/bikeTypeSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/bikeTypeList"
+                android:prompt="@string/pleaseChoose" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/locationTypeSpinnerTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/locationTypeSpinnerTitle"
+                android:textSize="15sp" />
+
+            <Spinner
+                android:id="@+id/locationTypeSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/phoneLocations"
+                android:prompt="@string/pleaseChoose" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+            <CheckBox android:id="@+id/childCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/childString"
+                android:singleLine="false"
+                android:maxEms="15"
+                android:checked="false"/>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+            <CheckBox android:id="@+id/trailerCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/trailerString"
+                android:singleLine="false"
+                android:maxEms="15"
+                android:checked="false"/>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+            <!--
+                    <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <RelativeLayout
+                        android:id="@+id/childStringLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true"
+                            android:layout_marginTop="0dp"
+                            android:text="@string/childString" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/childToggleLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_toEndOf="@+id/childStringLayout"
+                        android:gravity="center">
+                        <ToggleButton
+                            android:id="@+id/childToggle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textOn="@string/yes"
+                            android:textOff="@string/no"/>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp" />
+
+
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <RelativeLayout
+                                android:id="@+id/trailerStringLayout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentTop="true"
+                                    android:layout_marginTop="0dp"
+                                    android:text="@string/trailerString" />
+
+                            </RelativeLayout>
+
+                            <RelativeLayout
+                                android:id="@+id/trailerToggleLayout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_toEndOf="@+id/trailerStringLayout"
+                                android:gravity="center">
+                                <ToggleButton
+                                    android:id="@+id/trailerToggle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textOn="@string/yes"
+                                    android:textOff="@string/no"/>
+                            </RelativeLayout>
+
+                </RelativeLayout>
+                -->
+            <CheckBox android:id="@+id/showRideSettingsCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/showRideSettings"
+                android:singleLine="false"
+                android:maxEms="15"
+                android:checked="true"/>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:id="@+id/abort_button"
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple_effect"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="horizontal"
+                    android:weightSum="7">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="5"
+                        android:fontFamily="@font/assistant_extralight"
+                        android:gravity="center"
+                        android:text="@string/cancel"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="2"
+                        android:background="@drawable/cancel_icon_640" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/done_button"
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple_effect"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="horizontal"
+                    android:weightSum="7">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="5"
+                        android:fontFamily="@font/assistant_extralight"
+                        android:gravity="center"
+                        android:text="@string/doneEditingIncident"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="2"
+                        android:background="@drawable/ok_icon_640" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                android:layout_gravity="end">
+
+                <TextView
+                    android:id="@+id/textViewId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TextView" />
+            </RelativeLayout>
+        </LinearLayout>
 
 
 </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>

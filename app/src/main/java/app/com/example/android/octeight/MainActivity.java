@@ -528,7 +528,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             i.setType("message/rfc822");
             i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
-            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackMail) + "\n id: " + getUniqueUserID(this));
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackReceiver) + "\n id: " + getUniqueUserID(this));
             try {
                 startActivity(Intent.createChooser(i, "Send mail..."));
             } catch (android.content.ActivityNotFoundException ex) {
@@ -547,13 +547,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             intent.putExtra("caller", "MainActivity");
             startActivity(intent);
         } else if (id == R.id.nav_impressum) {
-            Intent intent = new Intent(MainActivity.this, ImpressumActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_credits) {
-            Intent intent = new Intent(MainActivity.this, CreditsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_data) {
-            Intent intent = new Intent(MainActivity.this, Impressum2Activity.class);
+            Intent intent = new Intent(MainActivity.this, ImprintActivity.class);
             startActivity(intent);
         }
 

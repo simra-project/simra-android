@@ -9,21 +9,17 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -37,10 +33,12 @@ import static app.com.example.android.octeight.Utils.fileExists;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
 
-public class HistoryActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class HistoryActivity extends BaseActivity {
 
     // Log tag
     private static final String TAG = "HistoryActivity_LOG";
+    ImageButton backBtn;
+    TextView toolbarTxt;
 
     boolean exitWhenDone = false;
     String accGpsString = "";
@@ -76,25 +74,20 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         //  Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        toolbarTxt = findViewById(R.id.toolbar_title);
+        toolbarTxt.setText(R.string.title_activity_history);
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        //  Helmet
-        ImageButton helmetButton = findViewById(R.id.helmet_icon);
-        helmetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent launchActivityIntent = new Intent(HistoryActivity.this,
-                        MainActivity.class);
-                startActivity(launchActivityIntent);
-                finish();
-            }
-        });
+        backBtn = findViewById(R.id.back_button);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           finish();
+                                       }
+                                   }
+        );
 
         listView = findViewById(R.id.listView);
 
@@ -172,7 +165,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
 
             Log.d(TAG, "metaData.csv doesn't exists");
 
-            Snackbar snackbar = Snackbar.make(findViewById(R.id.drawer_layout), (getString(R.string.noHistory)), Snackbar.LENGTH_LONG);
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), (getString(R.string.noHistory)), Snackbar.LENGTH_LONG);
             snackbar.show();
 
         }
@@ -310,7 +303,7 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
             }
         });
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Press immediately the button, if HistoryActivity was created automatically after the
         // recording of a route has finished
@@ -370,74 +363,6 @@ public class HistoryActivity extends BaseActivity implements NavigationView.OnNa
         // requires API 26 (Java 8) Date.from(Instant.ofEpochMilli( Long.getLong(item[0]) )).toString()
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Navigation Drawer
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-
-            finish();
-        }
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_main) {
-            finish();
-        } else if (id == R.id.nav_history) {
-            DrawerLayout drawer = findViewById(R.id.drawer_layout);
-            if (drawer.isDrawerOpen(GravityCompat.START)) {
-                drawer.closeDrawer(GravityCompat.START);
-            }
-        } else if (id == R.id.nav_democraphic_data) {
-            Intent intent = new Intent(HistoryActivity.this, ProfileActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_feedback) {
-            // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
-            Intent i = new Intent(Intent.ACTION_SEND);
-            i.setType("message/rfc822");
-            i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
-            i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
-            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackMail));
-            try {
-                startActivity(Intent.createChooser(i, "Send mail..."));
-            } catch (android.content.ActivityNotFoundException ex) {
-                Toast.makeText(HistoryActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-            }
-
-        } else if (id == R.id.nav_setting) {
-            Intent intent = new Intent(HistoryActivity.this, SettingsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_infoMCC) {
-            Intent intent = new Intent(HistoryActivity.this, WebActivity.class);
-            intent.putExtra("URL", getString(R.string.mccPage));
-            startActivity(intent);
-        } else if (id == R.id.nav_infoSimRa) {
-            Intent intent = new Intent(HistoryActivity.this, StartActivity.class);
-            intent.putExtra("caller", "MainActivity");
-            startActivity(intent);
-        }else if (id == R.id.nav_impressum) {
-            Intent intent = new Intent(HistoryActivity.this, ImpressumActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_credits) {
-            Intent intent = new Intent(HistoryActivity.this, CreditsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_data) {
-            Intent intent = new Intent(HistoryActivity.this, Impressum2Activity.class);
-            startActivity(intent);
-        }
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 
   /*  private Long getMillis (String dateStr){
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss");

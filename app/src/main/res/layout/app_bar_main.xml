@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -20,16 +21,6 @@
         app:popupTheme="@style/AppTheme.PopupOverlay"
         app:titleTextAppearance="@style/Toolbar.TitleText">
 
-        <!--TextView android:id="@+id/welcome_text"
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:fontFamily="@font/assistant_extralight"
-            android:text="@string/welcome_header"
-            android:textColor="#FEFEFE"
-            android:textSize="24dp"
-            android:textStyle="bold"
-            /-->
 
         <ImageButton
             android:id="@+id/helmet_icon"
@@ -69,9 +60,9 @@
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="30dp"
             android:layout_marginBottom="10dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="10dp"
             android:fontFamily="@font/assistant_extralight"
 
             android:gravity="center"
@@ -106,9 +97,9 @@
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="30dp"
             android:layout_marginBottom="10dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="10dp"
             android:fontFamily="@font/assistant_extralight"
             android:gravity="center"
             android:text="@string/endRecording"
@@ -121,8 +112,8 @@
         android:id="@+id/copyright_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:layout_marginRight="5dp"
         android:text="@string/osmCopyright"
         android:textSize="10dp" />
