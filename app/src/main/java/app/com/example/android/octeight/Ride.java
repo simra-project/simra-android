@@ -75,7 +75,7 @@ public class Ride {
         this.id = path.split("_")[0];
 
         String pathToAccEventsOfRide = "accEvents" + id + ".csv";
-        String content = "key,lat,lon,ts,bike,child,trailer,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
+        String content = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
         content += System.lineSeparator();
 
         if (!fileExists(pathToAccEventsOfRide, context)) {

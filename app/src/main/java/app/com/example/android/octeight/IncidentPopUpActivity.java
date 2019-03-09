@@ -63,9 +63,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 (rideID, incidentKey);
 
         Spinner incidentTypeSpinner = findViewById(R.id.incidentTypeSpinner);
-        LinearLayout involvedCheckBoxesLinearLayout = findViewById(R.id.involvedCheckboxes);
         EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
-        ToggleButton scarinessSwitch = findViewById(R.id.scarinessToggle);
+        CheckBox scarinessCheckBox = findViewById(R.id.scarinessCheckBox);
         CheckBox involvedType1CheckBox = findViewById(R.id.involvedType1);
         CheckBox involvedType2CheckBox = findViewById(R.id.involvedType2);
         CheckBox involvedType3CheckBox = findViewById(R.id.involvedType3);
@@ -130,7 +129,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             */
             if(previousAnnotation[18].length()>0){
                 if(previousAnnotation[18].equals("1")){
-                    scarinessSwitch.setChecked(true);
+                    scarinessCheckBox.setChecked(true);
                 }
             }
             incidentDescription.setText(previousAnnotation[19]);
@@ -160,7 +159,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 int incidentType = incidentTypeSpinner.getSelectedItemPosition();
                 String description = incidentDescription.getText().toString();
                 int scariness = 0;
-                if (scarinessSwitch.isChecked()){
+                if (scarinessCheckBox.isChecked()){
                     scariness = 1;
                 }
                 String[] checkBoxValues = {"0","0","0","0","0","0","0","0","0"};

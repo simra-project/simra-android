@@ -33,7 +33,7 @@
     <string name="noHistory"> Es wurden keine Fahrten gefunden.</string>
     <string name="nextPatch"> Diese Funktion wird leider erst mit dem nächsten Patch veröffentlicht.</string>
     <string name="locationSpinner">Ort des Handys während der Fahrt </string>
-    <string name="description">Zusätzlicher Kommentar (optional)</string>
+    <string name="description">Optionaler Kommentar</string>
     <string name="notReady">Wollen sie die Bearbeitung unfertig beenden?</string>
     <string name="noIntentExtras">Leider ist ein Fehler aufgetreten, bitte versuchen sie es erneut.</string>
     <string name="annotation_title">Was ist hier passiert?</string>
@@ -211,7 +211,17 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="regionSpinnerTitle">Region</string>
     <string name="experienceSpinnerTitle">Erfahrung als Fahrradfahrer</string>
     <string name="involved_type">Beteiligte Verkehrsteilnehmer</string>
-    <string name="scarinessString">Diese Erfahrung war beängstigend:</string>
+    <string name="scarinessString">Diese Erfahrung war beängstigend</string>
     <string name="title_activity_ride_settings">RideSettingsActivity</string>
+    <string name="rideSettingsTitle">Fahrteinstellungen</string>
+    <string name="settingsSaved">Einstellungen gespeichert</string>
+    <string name="settingsNotSaved">Einstellungen nicht gespeichert</string>
+    <string name="ride_settings_title">Fahrteinstellungen</string>
+    <string name="childString">Auf dem Fahrrad wird ein Kind transportiert.</string>
+    <string name="trailerString">Am Fahrrad ist ein Anhänger angebracht.</string>
+    <string name="ride_settings_description">Unten finden Sie die Einstellungen, die für diese Fahrt verwendet werden. Sie können diese sowohl in diesem Fenster, als auch unter \"Einstellungen\" im Hauptmenü finden.</string>
+    <string name="rememberMyChoice">Diese Einstellungen merken</string>
+    <string name="doNotShowAgain">Diesen Dialog nicht mehr zeigen</string>
+    <string name="showRideSettings">Fahrteinstellungen vor Bearbeitung der Fahrt nochmal anzeigen.</string>
 
 </resources>

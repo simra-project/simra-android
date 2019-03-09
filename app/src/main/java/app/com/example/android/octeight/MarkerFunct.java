@@ -235,14 +235,14 @@ public class MarkerFunct {
                     // Append new acc event to accEvents[rideID].csv
 
                     String pathToAccEventsOfRide = "accEvents" + rideID + ".csv";
-                    String header = "key,lat,lon,ts,bike,child,trailer,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
+                    String header = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
                     header += System.lineSeparator();
                     int bike = lookUpIntSharedPrefs("Settings-BikeType",0,"simraPrefs",mother);
                     int child = lookUpIntSharedPrefs("Settings-Child",0,"simraPrefs",mother);
                     int trailer = lookUpIntSharedPrefs("Settings-Trailer",0,"simraPrefs",mother);
                     int pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation",0,"simraPrefs",mother);
 
-                    // eventline = key,lat,lon,ts,bike,child,trailer,pLoc,,,,,,,,,,,,
+                    // eventline = key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,,,,,,,,,,,,
                     String eventLine = newAcc.key + ","
                             + newAcc.position.getLatitude() + "," + newAcc.position.getLongitude()
                             + "," + newAcc.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + "," + /*incident*/"," + /*i1*/"," + /*i2*/"," + /*i3*/"," + /*i4*/"," + /*i5*/"," + /*i6*/"," + /*i7*/"," + /*i8*/"," + /*i9*/"," + /*scary*/"," + /*desc*/"," +System.lineSeparator();
