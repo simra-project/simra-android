@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -137,6 +138,36 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         doneButton = findViewById(R.id.save_button);
         backButton = findViewById(R.id.back_button);
+
+        doneButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    doneButton.setElevation(0.0f);
+                    doneButton.setBackground(getDrawable(R.drawable.button_pressed));
+                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                    doneButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                    doneButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
+            }
+
+        });
+
+        backButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    backButton.setElevation(0.0f);
+                    backButton.setBackground(getDrawable(R.drawable.button_pressed));
+                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                    backButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                    backButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
+            }
+
+        });
 
         if (getIntent().getExtras() != null) {
 

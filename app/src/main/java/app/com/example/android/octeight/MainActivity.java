@@ -23,6 +23,7 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -290,6 +291,20 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (4): NEUE ROUTE / START BUTTON
         startBtn = findViewById(R.id.start_button);
+        startBtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    startBtn.setElevation(0.0f);
+                    startBtn.setBackground(getDrawable(R.drawable.button_pressed));
+                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                    startBtn.setElevation(2 * MainActivity.this.getResources().getDisplayMetrics().density);
+                    startBtn.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
+            }
+
+        });
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -313,6 +328,20 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (5): AUFZEICHNUNG STOPPEN / STOP-BUTTON
         stopBtn = findViewById(R.id.stop_button);
+        stopBtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    stopBtn.setElevation(0.0f);
+                    stopBtn.setBackground(getDrawable(R.drawable.button_pressed));
+                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                    stopBtn.setElevation(2 * MainActivity.this.getResources().getDisplayMetrics().density);
+                    stopBtn.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
+            }
+
+        });
         stopBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override

@@ -211,5 +211,6 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="doNotShowAgain">Diesen Dialog nicht mehr zeigen</string>
     <string name="showRideSettings">Fahrteinstellungen vor Bearbeitung der Fahrt nochmal anzeigen.</string>
     <string name="title_activity_ride_settings">Fahrteinstellungen bearbeiten</string>
+    <string name="quitAddIncident">Hinzufügen\nbeenden</string>
 
 </resources>

@@ -13,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -171,6 +172,20 @@ public class HistoryActivity extends BaseActivity {
         }
 
         RelativeLayout justUploadButton = findViewById(R.id.justUpload);
+        justUploadButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    justUploadButton.setElevation(0.0f);
+                    justUploadButton.setBackground(getDrawable(R.drawable.button_pressed));
+                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                    justUploadButton.setElevation(2 * HistoryActivity.this.getResources().getDisplayMetrics().density);
+                    justUploadButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
+            }
+
+        });
         justUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -294,6 +309,20 @@ public class HistoryActivity extends BaseActivity {
 
 
         RelativeLayout uploadAndExitButton = findViewById(R.id.uploadAndExit);
+        uploadAndExitButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    uploadAndExitButton.setElevation(0.0f);
+                    uploadAndExitButton.setBackground(getDrawable(R.drawable.button_pressed));
+                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                    uploadAndExitButton.setElevation(2 * HistoryActivity.this.getResources().getDisplayMetrics().density);
+                    uploadAndExitButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
+            }
+
+        });
         uploadAndExitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -14,7 +14,7 @@
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentTop="true"
         android:layout_margin="10dp"
-        android:background="@drawable/rounded_corners"
+        android:background="@drawable/button_unpressed"
         android:elevation="8dp"
         android:theme="@style/ToolbarTheme"
         android:titleTextColor="#FEFEFE"
@@ -43,7 +43,10 @@
         android:layout_above="@id/copyright_text"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"
-        android:background="@drawable/rounded_corners">
+        android:background="@drawable/button_unpressed"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="2dp">
 
 
         <ImageView
@@ -80,8 +83,9 @@
         android:layout_above="@id/copyright_text"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"
-        android:background="@drawable/rounded_corners"
-        android:visibility="invisible">
+        android:background="@drawable/button_unpressed"
+        android:visibility="invisible"
+        android:elevation="2dp">
 
         <ImageView
             android:id="@+id/stop_image"
