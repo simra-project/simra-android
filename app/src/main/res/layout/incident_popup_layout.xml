@@ -3,7 +3,7 @@
     android:id="@+id/incidentPopupLayout"
     android:layout_height="wrap_content"
     android:layout_width="wrap_content"
-    android:background="@drawable/rounded_white"
+    android:background="@color/white"
     android:layout_gravity="center"
     android:layout_marginTop="20dp"
     android:layout_marginBottom="20dp"
@@ -215,7 +215,9 @@
         android:id="@+id/buttonsRelativeLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:padding="10dp">
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -230,9 +232,10 @@
             android:layout_height="70dp"
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
-            android:background="@drawable/ripple_effect"
+            android:background="@drawable/button_unpressed"
             android:clickable="true"
             android:focusable="true"
+            android:elevation="2dp"
             android:orientation="horizontal"
             android:weightSum="7">
 
@@ -242,6 +245,7 @@
                 android:layout_weight="5"
                 android:fontFamily="@font/assistant_extralight"
                 android:gravity="center"
+                android:paddingStart="3dp"
                 android:text="@string/cancel"
                 android:textColor="@color/white"
                 android:textSize="20sp"
@@ -249,10 +253,10 @@
 
             <ImageView
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="2"
-                android:background="@drawable/cancel_icon_640" />
+                android:src="@drawable/cancel_icon_640" />
 
         </LinearLayout>
 
@@ -262,9 +266,10 @@
             android:layout_height="70dp"
             android:layout_marginStart="5dp"
             android:layout_weight="1"
-            android:background="@drawable/ripple_effect"
+            android:background="@drawable/button_unpressed"
             android:clickable="true"
             android:focusable="true"
+            android:elevation="2dp"
             android:orientation="horizontal"
             android:weightSum="7">
 
@@ -281,12 +286,13 @@
 
             <ImageView
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="2"
-                android:background="@drawable/ok_icon_640" />
+                android:src="@drawable/ok_icon_640" />
         </LinearLayout>
     </LinearLayout>
+
     </RelativeLayout>
 
 </RelativeLayout>

@@ -19,7 +19,10 @@
         android:layout_alignParentTop="true"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/rounded_corners">
+        android:background="@drawable/button_unpressed"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="2dp">
 
         <ImageView
             android:layout_width="40dp"
@@ -34,7 +37,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginTop="5dp"
             android:fontFamily="@font/assistant_extralight"
             android:text="@string/addIncident"
@@ -47,50 +50,55 @@
         android:id="@+id/exitAddIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/rounded_white">
+        android:background="@drawable/button_pressed"
+        android:clickable="true"
+        android:focusable="true">
 
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/tap_blck_64" />
+            android:layout_marginStart="10dp"
+            android:background="@drawable/tap_64" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginTop="5dp"
             android:fontFamily="@font/assistant_extralight"
-            android:text="Hinzufügen\n beenden"
-            android:textColor="#000000"
+            android:text="@string/quitAddIncident"
+            android:textColor="#FEFEFE"
             android:textStyle="bold" />
 
     </RelativeLayout>
 
     <ImageButton
         android:id="@+id/bounding_box_center_button"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_alignParentRight="true"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignEnd="@id/exitAddIncident"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="15dp"
+
         android:layout_marginTop="85dp"
-        android:background="@drawable/my_center" />
+        android:background="@drawable/my_center"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="2dp"/>
 
     <!--
     <RelativeLayout
         android:id="@+id/doneButton"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:background="@drawable/rounded_corners"
+        android:background="@drawable/button_unpressed"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp">
@@ -115,10 +123,14 @@
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
+        android:layout_alignEnd="@id/exitAddIncident"
+
         android:layout_marginBottom="20dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/rounded_corners">
+
+        android:elevation="2dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/button_unpressed">
 
         <ImageView
             android:layout_width="40dp"

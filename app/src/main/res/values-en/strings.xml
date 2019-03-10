@@ -236,4 +236,5 @@
     <string name="umsatzsteueridentifikationsnummer">Umsatzsteueridentifikationsnummer</string>
     <string name="title_activity_credits">Credits</string>
     <string name="title_activity_ride_settings">Edit Ride Settings</string>
+    <string name="quitAddIncident">Cancel\nadding</string>
 </resources>

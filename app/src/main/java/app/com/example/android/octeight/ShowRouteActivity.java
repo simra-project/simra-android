@@ -12,6 +12,7 @@ import android.support.design.button.MaterialButton;
 import android.support.v7.app.AlertDialog;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
@@ -264,6 +265,21 @@ public class ShowRouteActivity extends BaseActivity {
             addIncBttn.setVisibility(View.VISIBLE);
             exitAddIncBttn.setVisibility(View.INVISIBLE);
             ShowRouteActivity.this.addCustomMarkerMode = false;
+
+        });
+
+        saveButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    saveButton.setElevation(0.0f);
+                    saveButton.setBackground(getDrawable(R.drawable.button_pressed));
+                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                    saveButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
+                    saveButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
+            }
 
         });
 

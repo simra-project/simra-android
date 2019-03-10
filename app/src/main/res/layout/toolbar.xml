@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/toolbar_height"
     android:layout_margin="10dp"
-    android:background="@drawable/rounded_corners"
+    android:background="@drawable/button_unpressed"
     android:elevation="8dp"
     android:theme="@style/AppTheme.AppBarOverlay"
     app:popupTheme="@style/AppTheme.PopupOverlay">
