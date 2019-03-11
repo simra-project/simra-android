@@ -1,6 +1,7 @@
 package app.com.example.android.octeight;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,11 +14,13 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -266,6 +269,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
                 mMapController.setZoom(ZOOM_LEVEL);
+
                 /*
                 String[] bla = new String[4];
                 bla[5] = "bla";
@@ -309,19 +313,44 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             @Override
             public void onClick(View v) {
 
+                if(isAirplaneModeOn(MainActivity.this)){
+                    // notify user
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setMessage(R.string.airplaneModeIsOn)
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                                    MainActivity.this.startActivity(new Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS));
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
+                } else if(isLocationServiceOff(MainActivity.this)) {
+                    // notify user
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setMessage(R.string.locationServiceisOff)
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                                    MainActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
 
-                // show stop button, hide start button
-                showStop();
-                stopBtn.setVisibility(View.VISIBLE);
-                startBtn.setVisibility(View.INVISIBLE);
+                } else {
+                    // show stop button, hide start button
+                    showStop();
+                    stopBtn.setVisibility(View.VISIBLE);
+                    startBtn.setVisibility(View.INVISIBLE);
 
-                // start RecorderService for accelerometer data recording
-                Intent intent = new Intent(MainActivity.this, RecorderService.class);
-                startService(intent);
-                bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
-                //startService(recService);
-                recording = true;
-
+                    // start RecorderService for accelerometer data recording
+                    Intent intent = new Intent(MainActivity.this, RecorderService.class);
+                    startService(intent);
+                    bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
+                    //startService(recService);
+                    recording = true;
+                }
             }
         });
 
@@ -620,4 +649,28 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             mBoundRecorderService = myBinder.getService();
         }
     };
+
+    private static boolean isAirplaneModeOn(Context context) {
+
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+
+    }
+
+    private static boolean isLocationServiceOff(MainActivity mainActivity) {
+
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = mainActivity.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {}
+
+        try {
+            network_enabled = mainActivity.locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {}
+
+        return (!gps_enabled && !network_enabled);
+
+    }
 }

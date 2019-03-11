@@ -212,5 +212,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="showRideSettings">Fahrteinstellungen vor Bearbeitung der Fahrt nochmal anzeigen.</string>
     <string name="title_activity_ride_settings">Fahrteinstellungen bearbeiten</string>
     <string name="quitAddIncident">Hinzufügen\nbeenden</string>
+    <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalten Sie es aus, damit die Fahrt aufgezeichnet werden kann.</string>
+    <string name="locationServiceisOff">Der Ortungsdienst Ihres Geräts ist aus. Bitte schalten Sie den Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
 
 </resources>

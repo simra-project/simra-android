@@ -237,4 +237,6 @@
     <string name="title_activity_credits">Credits</string>
     <string name="title_activity_ride_settings">Edit Ride Settings</string>
     <string name="quitAddIncident">Cancel\nadding</string>
+    <string name="airplaneModeIsOn">The airplane mode is enabled! Please disable it, so the ride can be recorded.</string>
+    <string name="locationServiceisOff">The locaation service is disabled! Please enable it, so the ride can be recorded.</string>
 </resources>
