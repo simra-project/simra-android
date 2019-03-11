@@ -25,7 +25,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;

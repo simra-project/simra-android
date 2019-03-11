@@ -322,7 +322,7 @@ public class ShowRouteActivity extends BaseActivity {
 
                 String result = data.getStringExtra("result");
 
-                String[] incidentProps = result.split(",");
+                String[] incidentProps = result.split(",",-1);
 
                 boolean annotated = checkForAnnotation(incidentProps);
 
