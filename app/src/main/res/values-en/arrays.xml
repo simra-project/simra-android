@@ -119,6 +119,7 @@
     -->
     <string-array name="bikeTypeList">
         <item>@string/pleaseChoose</item>
+        <item>@string/cityBike</item>
         <item>@string/roadRacingBike</item>
         <item>@string/eBike</item>
         <item>@string/recumbentBicycle</item>

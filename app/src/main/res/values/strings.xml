@@ -104,6 +104,7 @@
     <string name="bikeTypeSpinnerTitle">Fahrradtyp</string>
     <string name="mensBike">Herrenrad</string>
     <string name="womensBike">Damenrad</string>
+    <string name="cityBike">City-/Trekkingrad</string>
     <string name="roadRacingBike">Rennrad</string>
     <string name="eBike">E-Bike</string>
     <string name="freightBicycle">Lastenrad</string>

@@ -103,6 +103,7 @@
     <string name="bikeTypeSpinnerTitle">Bicycle Type</string>
     <string name="mensBike">Men\'s Road Bike</string>
     <string name="womensBike">Women\'s Road Bike</string>
+    <string name="cityBike">City-/Trekking Bike</string>
     <string name="roadRacingBike">Road Racing Bike</string>
     <string name="tandemBike">Tandem Bicycle</string>
     <string name="eBike">E-Bike</string>
