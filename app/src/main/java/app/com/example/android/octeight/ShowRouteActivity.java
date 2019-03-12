@@ -2,7 +2,6 @@ package app.com.example.android.octeight;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,7 +21,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.BoundingBox;
@@ -42,8 +40,8 @@ import java.util.concurrent.TimeUnit;
 import static app.com.example.android.octeight.Utils.checkForAnnotation;
 import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
-import static app.com.example.android.octeight.Utils.writeBooleanToSharePrefs;
-import static app.com.example.android.octeight.Utils.writeIntToSharePrefs;
+import static app.com.example.android.octeight.Utils.writeBooleanToSharedPrefs;
+import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
 
 public class ShowRouteActivity extends BaseActivity {
 
@@ -484,13 +482,13 @@ public class ShowRouteActivity extends BaseActivity {
                     bike = bikeTypeSpinner.getSelectedItemPosition();
                     pLoc = phoneLocationSpinner.getSelectedItemPosition();
                     if (rememberMyChoiceCheckBox.isChecked()) {
-                        writeIntToSharePrefs("Settings-BikeType",bike, "simraPrefs", ShowRouteActivity.this);
-                        writeIntToSharePrefs("Settings-PhoneLocation",pLoc, "simraPrefs", ShowRouteActivity.this);
-                        writeIntToSharePrefs("Settings-Child", child, "simraPrefs", ShowRouteActivity.this);
-                        writeIntToSharePrefs("Settings-Trailer", trailer, "simraPrefs", ShowRouteActivity.this);
+                        writeIntToSharedPrefs("Settings-BikeType",bike, "simraPrefs", ShowRouteActivity.this);
+                        writeIntToSharedPrefs("Settings-PhoneLocation",pLoc, "simraPrefs", ShowRouteActivity.this);
+                        writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", ShowRouteActivity.this);
+                        writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", ShowRouteActivity.this);
                     }
                     if (doNotShowAgainCheckBox.isChecked()) {
-                        writeBooleanToSharePrefs("Settings-ShowRideSettingsDialog",false,"simraPrefs",ShowRouteActivity.this);
+                        writeBooleanToSharedPrefs("Settings-ShowRideSettingsDialog",false,"simraPrefs",ShowRouteActivity.this);
                     }
                     // Close Alert Dialog.
                     handler.sendMessage(handler.obtainMessage());

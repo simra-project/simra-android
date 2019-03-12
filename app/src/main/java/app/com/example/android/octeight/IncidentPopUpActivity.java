@@ -76,7 +76,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         CheckBox involvedType8CheckBox = findViewById(R.id.involvedType8);
         CheckBox involvedType9CheckBox = findViewById(R.id.involvedType9);
 
-        if (previousAnnotation != null) {
+        if (previousAnnotation != null && previousAnnotation.length > 7) {
 
             if(previousAnnotation[8].length()>0) {
                 incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[8]));
@@ -188,7 +188,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 // Instead of writing the String selected items in the spinner,
                 // we use an int to save disk space and bandwidth
                 int incidentType = incidentTypeSpinner.getSelectedItemPosition();
-                String description = incidentDescription.getText().toString();
+                String description = incidentDescription.getText().toString().replace(System.lineSeparator()," ");
                 int scariness = 0;
                 if (scarinessCheckBox.isChecked()){
                     scariness = 1;
@@ -259,7 +259,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                         + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[","").replace("]","") + "," + scariness + "," + description);
 
                 incidentSaved = true;
-                // writeIntToSharePrefs("Settings-PhoneLocation", locationType, "simraPrefs", this);
+                // writeIntToSharedPrefs("Settings-PhoneLocation", locationType, "simraPrefs", this);
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("result", incidentString);

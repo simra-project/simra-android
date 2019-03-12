@@ -64,7 +64,7 @@ public class Utils {
         return sharedPrefs.getBoolean(key, defValue);
     }
 
-    public static void writeToSharePrefs(String key, String value, String sharedPrefName, Context context) {
+    public static void writeToSharedPrefs(String key, String value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -72,7 +72,7 @@ public class Utils {
         editor.apply();
     }
 
-    public static void writeIntToSharePrefs(String key, int value, String sharedPrefName, Context context) {
+    public static void writeIntToSharedPrefs(String key, int value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -80,7 +80,7 @@ public class Utils {
         editor.apply();
     }
 
-    public static void writeLongToSharePrefs(String key, long value, String sharedPrefName, Context context) {
+    public static void writeLongToSharedPrefs(String key, long value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -88,7 +88,7 @@ public class Utils {
         editor.apply();
     }
 
-    public static void writeBooleanToSharePrefs(String key, boolean value, String sharedPrefName, Context context) {
+    public static void writeBooleanToSharedPrefs(String key, boolean value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -100,7 +100,7 @@ public class Utils {
         String id = lookUpSharedPrefs("USER-ID", "0", "simraPrefs", context);
         if (id.equals("0")) {
             id = String.valueOf(System.currentTimeMillis());
-            writeToSharePrefs("USER-ID", id, "simraPrefs", context);
+            writeToSharedPrefs("USER-ID", id, "simraPrefs", context);
         }
         return id;
     }

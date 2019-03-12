@@ -13,7 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import static app.com.example.android.octeight.Utils.lookUpSharedPrefs;
-import static app.com.example.android.octeight.Utils.writeToSharePrefs;
+import static app.com.example.android.octeight.Utils.writeToSharedPrefs;
 
 public class ImprintActivity extends AppCompatActivity {
 
@@ -85,7 +85,7 @@ public class ImprintActivity extends AppCompatActivity {
         String id = lookUpSharedPrefs("USER-ID", "0", "simraPrefs", context);
         if (id.equals("0")) {
             id = String.valueOf(System.currentTimeMillis());
-            writeToSharePrefs("USER-ID", id, "simraPrefs", context);
+            writeToSharedPrefs("USER-ID", id, "simraPrefs", context);
         }
         return id;
     }

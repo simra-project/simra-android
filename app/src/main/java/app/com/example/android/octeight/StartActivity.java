@@ -17,9 +17,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import java.io.File;
+
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
+import static app.com.example.android.octeight.Utils.overWriteFile;
 import static app.com.example.android.octeight.Utils.showMessageOK;
+import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
 
 /**
  * Shows general info about the app and starts the MainActivity once the okay-Button is pressed
@@ -82,6 +87,8 @@ public class StartActivity extends BaseActivity {
             editor.putBoolean("NEW-UNSENT-ERROR", false);
             editor.commit();
         }
+
+        newUpdate();
 
 
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
@@ -160,6 +167,71 @@ public class StartActivity extends BaseActivity {
                 }
             });
         }
+    }
+
+    private void newUpdate() {
+
+        int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
+
+        if (appVersion < 6) {
+            File[] dirFiles = getFilesDir().listFiles();
+            String path;
+            for (int i = 0; i < dirFiles.length; i++) {
+
+                path = dirFiles[i].getName();
+                Log.d(TAG, "path: " + path);
+                if (!path.equals("profile.csv")){
+                    dirFiles[i].delete();
+                }
+                /*
+                if(path.startsWith("accEvents")) {
+                    try (BufferedReader reader = new BufferedReader(new FileReader(getFileStreamPath(path)))) {
+                        String[] line = reader.readLine().split(",", -1);
+                        if (line.length < 20) {
+                            ridesToDelete.add(line[0]);
+                            dirFiles[i].delete();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                */
+            }
+            /*
+            dirFiles = getFilesDir().listFiles();
+            for (int i = 0; i < ridesToDelete.size(); i++) {
+                for (int j = 0; j < dirFiles.length ; j++) {
+                    path = dirFiles[j].getName();
+                    if(path.split("_")[0].equals(ridesToDelete.get(i))){
+                        dirFiles[j].delete();
+                    }
+                }
+            }
+
+            String newMetaData = "";
+            try (BufferedReader reader = new BufferedReader(new FileReader
+                    (getFileStreamPath("metaData.csv")))) {
+                reader.readLine();
+
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    String[] actualRide = line.split(",", -1);
+
+                }
+
+
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        */
+            overWriteFile("key, startTime, endTime, annotated" + System.lineSeparator(),"metaData.csv",this);
+            writeIntToSharedPrefs("RIDE-KEY",0,"simraPrefs",this);
+            writeIntToSharedPrefs("App-Version",6,"simraPrefs",this);
+        }
+
     }
 
 

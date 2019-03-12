@@ -59,13 +59,13 @@ public class SettingsActivity extends BaseActivity {
         backBtn.setOnClickListener(new View.OnClickListener() {
                                        @Override
                                        public void onClick(View v) {
-                                           writeLongToSharePrefs("Privacy-Duration", privacyDuration, "simraPrefs", SettingsActivity.this);
-                                           writeIntToSharePrefs("Privacy-Distance", privacyDistance, "simraPrefs", SettingsActivity.this);
-                                           writeIntToSharePrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
-                                           writeIntToSharePrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
-                                           writeIntToSharePrefs("Settings-Child", child, "simraPrefs", SettingsActivity.this);
-                                           writeIntToSharePrefs("Settings-Trailer", trailer, "simraPrefs", SettingsActivity.this);
-                                           writeBooleanToSharePrefs("Settings-ShowRideSettingsDialog",showRideSettingsCheckBox.isChecked(),"simraPrefs",SettingsActivity.this);
+                                           writeLongToSharedPrefs("Privacy-Duration", privacyDuration, "simraPrefs", SettingsActivity.this);
+                                           writeIntToSharedPrefs("Privacy-Distance", privacyDistance, "simraPrefs", SettingsActivity.this);
+                                           writeIntToSharedPrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
+                                           writeIntToSharedPrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
+                                           writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", SettingsActivity.this);
+                                           writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", SettingsActivity.this);
+                                           writeBooleanToSharedPrefs("Settings-ShowRideSettingsDialog",showRideSettingsCheckBox.isChecked(),"simraPrefs",SettingsActivity.this);
                                            finish();
                                        }
                                    }
@@ -215,10 +215,10 @@ public class SettingsActivity extends BaseActivity {
                 }
                 if (privacyOption.equals("Privacy-Duration")) {
                     privacyDuration = seekBar.getProgress();
-                    //writeLongToSharePrefs(privacyOption, (long) seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
+                    //writeLongToSharedPrefs(privacyOption, (long) seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
                 } else if (privacyOption.equals("Privacy-Distance")) {
                     privacyDistance = seekBar.getProgress();
-                    // writeIntToSharePrefs(privacyOption, seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
+                    // writeIntToSharedPrefs(privacyOption, seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
                 } else {
                     Log.e(TAG, "onStopTrackingTouch unknown privacyOption: " + privacyOption);
                 }

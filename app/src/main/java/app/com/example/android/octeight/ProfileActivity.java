@@ -6,16 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.Space;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
-import static app.com.example.android.octeight.Utils.writeIntToSharePrefs;
+import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
 
 public class ProfileActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,10 +59,10 @@ public class ProfileActivity extends AppCompatActivity {
                                            int gender = genderSpinner.getSelectedItemPosition();
                                            int region = regionSpinner.getSelectedItemPosition();
                                            int experience = experienceSpinner.getSelectedItemPosition();
-                                           writeIntToSharePrefs("Profile-Age", ageGroup, "simraPrefs", ProfileActivity.this);
-                                           writeIntToSharePrefs("Profile-Gender", gender, "simraPrefs", ProfileActivity.this);
-                                           writeIntToSharePrefs("Profile-Region", region, "simraPrefs", ProfileActivity.this);
-                                           writeIntToSharePrefs("Profile-Experience", experience, "simraPrefs", ProfileActivity.this);
+                                           writeIntToSharedPrefs("Profile-Age", ageGroup, "simraPrefs", ProfileActivity.this);
+                                           writeIntToSharedPrefs("Profile-Gender", gender, "simraPrefs", ProfileActivity.this);
+                                           writeIntToSharedPrefs("Profile-Region", region, "simraPrefs", ProfileActivity.this);
+                                           writeIntToSharedPrefs("Profile-Experience", experience, "simraPrefs", ProfileActivity.this);
                                            finish();
                                        }
                                    }
