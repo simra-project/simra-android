@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -171,6 +172,16 @@ public class StartActivity extends BaseActivity {
 
     private void newUpdate() {
 
+        PackageInfo pinfo = null;
+        try {
+            pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        int installedVersionNumber = -1;
+        if (pinfo != null) {
+            installedVersionNumber = pinfo.versionCode;
+        }
         int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
 
         if (appVersion < 6) {
@@ -229,9 +240,8 @@ public class StartActivity extends BaseActivity {
         */
             overWriteFile("key, startTime, endTime, annotated" + System.lineSeparator(),"metaData.csv",this);
             writeIntToSharedPrefs("RIDE-KEY",0,"simraPrefs",this);
-            writeIntToSharedPrefs("App-Version",6,"simraPrefs",this);
         }
-
+        writeIntToSharedPrefs("App-Version",installedVersionNumber,"simraPrefs",this);
     }
 
 

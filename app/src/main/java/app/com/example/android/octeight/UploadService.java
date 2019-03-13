@@ -185,36 +185,22 @@ public class UploadService extends Service {
                         Log.d(TAG, path + " deleted: " + deleted);
                     }
                 }
+                // set the boolean "NEW-UNSENT-ERROR" in simraPrefs.xml to false
+                // so that the StartActivity doesn't think there are still unsent
+                // crash logs.
+                editor.putBoolean("NEW-UNSENT-ERROR", false);
+                editor.commit();
+
                 // If there wasn't a crash or the user did not gave us the permission, upload
             } else {
-                ArrayList<String> ridesToUpload;
-                ridesToUpload = intent.getStringArrayListExtra("RidesToUpload");
-                UploadService.this.setNumberOfTasks((ridesToUpload.size() * 2));
-                // For each ride to upload...
-                for (int i = 0; i < ridesToUpload.size(); i++) {
-                    // ... find the corresponding ride csv file ...
-                    for (int j = 0; j < dirFiles.length; j++) {
-                        String nameOfFile = dirFiles[j].getName();
-                        if (ridesToUpload.get(i).equals(nameOfFile)) {
-                            // ... and upload.
-                            makePostTestPhase(nameOfFile, id);
-                            String key = ridesToUpload.get(i).split("_")[0];
-                            String accEventName = "accEvents" + key + ".csv";
-                            makePostTestPhase(accEventName, id);
-                        }
-                    }
+                ArrayList<String> filesToUpload;
+                filesToUpload = intent.getStringArrayListExtra("PathsToUpload");
+                UploadService.this.setNumberOfTasks((filesToUpload.size()));
+                for (int i = 0; i < filesToUpload.size(); i++) {
+                    makePostTestPhase(filesToUpload.get(i), id);
                 }
             }
-
-            // set the boolean "NEW-UNSENT-ERROR" in simraPrefs.xml to false
-            // so that the StartActivity doesn't think there are still unsent
-            // crash logs.
-            editor.putBoolean("NEW-UNSENT-ERROR", false);
-            editor.commit();
-
-
         }
-
 
         private void makePostTestPhase(String pathToFile, String id) throws IOException {
 

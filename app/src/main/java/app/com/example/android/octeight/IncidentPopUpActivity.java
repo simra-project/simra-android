@@ -133,7 +133,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     scarinessCheckBox.setChecked(true);
                 }
             }
-            incidentDescription.setText(previousAnnotation[19]);
+            incidentDescription.setText(previousAnnotation[19].replaceAll(";linebreak;",System.lineSeparator()).replaceAll(";komma;",","));
         }
 
         doneButton = findViewById(R.id.save_button);
@@ -188,7 +188,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 // Instead of writing the String selected items in the spinner,
                 // we use an int to save disk space and bandwidth
                 int incidentType = incidentTypeSpinner.getSelectedItemPosition();
-                String description = incidentDescription.getText().toString().replace(System.lineSeparator()," ");
+                String description = incidentDescription.getText().toString().replace(System.lineSeparator(),";linebreak;").replace(",",";komma;");
                 int scariness = 0;
                 if (scarinessCheckBox.isChecked()){
                     scariness = 1;

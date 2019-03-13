@@ -404,8 +404,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.helmet)
-                .setContentTitle("Aufzeichnung der Fahrt")
-                .setContentText("Ihre Fahrt wird aufgezeichnet.")
+                .setContentTitle(getResources().getString(R.string.recordingNotificationTitle))
+                .setContentText(getResources().getString(R.string.recordingNotificationBody))
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent);
