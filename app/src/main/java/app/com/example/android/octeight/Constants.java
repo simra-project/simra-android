@@ -36,7 +36,7 @@ public class Constants extends Service {
     public static final String APP_PATH = "/data/user/0/app.com.example.android.octeight/";
 
     // Every GPS fix has to be at least this accurate to be taken into account.
-    public static final double GPS_ACCURACY_THRESHOLD = 30.0;
+    public static final double GPS_ACCURACY_THRESHOLD = 90.0;
 
     public Constants() {
     }

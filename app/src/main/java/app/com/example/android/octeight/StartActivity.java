@@ -22,6 +22,7 @@ import java.io.File;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
 import static app.com.example.android.octeight.Utils.showMessageOK;
@@ -114,8 +115,19 @@ public class StartActivity extends BaseActivity {
                 //   (fileExists and appendToFile can be found in the Utils.java class)
                 Log.d(TAG, "firstTime. Creating metaData.csv");
                 if (!fileExists("metaData.csv", this)) {
-                    appendToFile("key, startTime, endTime, annotated"
-                            + System.lineSeparator(), "metaData.csv", this);
+                    String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
+
+                    appendToFile((fileInfoLine + "key, startTime, endTime, annotated"
+                            + System.lineSeparator()), "metaData.csv", this);
+
+                }
+
+                Log.d(TAG, "firstTime. Creating profile.csv");
+                if (!fileExists("profile.csv", this)) {
+                    String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
+
+                    appendToFile((fileInfoLine + "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents"
+                            + System.lineSeparator()), "profile.csv", this);
 
                 }
 
@@ -171,17 +183,6 @@ public class StartActivity extends BaseActivity {
     }
 
     private void newUpdate() {
-
-        PackageInfo pinfo = null;
-        try {
-            pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        int installedVersionNumber = -1;
-        if (pinfo != null) {
-            installedVersionNumber = pinfo.versionCode;
-        }
         int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
 
         if (appVersion < 6) {
@@ -238,10 +239,12 @@ public class StartActivity extends BaseActivity {
                 e.printStackTrace();
             }
         */
-            overWriteFile("key, startTime, endTime, annotated" + System.lineSeparator(),"metaData.csv",this);
+            String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
+
+            overWriteFile((fileInfoLine + "key, startTime, endTime, annotated" + System.lineSeparator()),"metaData.csv",this);
             writeIntToSharedPrefs("RIDE-KEY",0,"simraPrefs",this);
         }
-        writeIntToSharedPrefs("App-Version",installedVersionNumber,"simraPrefs",this);
+        writeIntToSharedPrefs("App-Version",getAppVersionNumber(this),"simraPrefs",this);
     }
 
 

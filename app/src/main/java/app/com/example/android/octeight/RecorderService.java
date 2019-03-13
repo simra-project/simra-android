@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
+import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 
 public class RecorderService extends Service implements SensorEventListener, LocationListener {
 
@@ -304,8 +305,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // data.
         if (recordingAllowed && lineAdded) {
 
+            String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
+
             // Create head of the csv-file
-            appendToFile("lat,lon,X,Y,Z,timeStamp" + System.lineSeparator(), pathToAccGpsFile, this);
+            appendToFile((fileInfoLine + "lat,lon,X,Y,Z,timeStamp" + System.lineSeparator()), pathToAccGpsFile, this);
 
             // Write String data to files
             appendToFile(accGpsString, pathToAccGpsFile, this);
