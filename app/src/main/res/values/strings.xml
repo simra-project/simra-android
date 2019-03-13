@@ -215,5 +215,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="quitAddIncident">Hinzufügen\nbeenden</string>
     <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalten Sie es aus, damit die Fahrt aufgezeichnet werden kann.</string>
     <string name="locationServiceisOff">Der Ortungsdienst Ihres Geräts ist aus. Bitte schalten Sie den Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
+    <string name="recordingNotificationTitle">Aufzeichnung der Fahrt</string>
+    <string name="recordingNotificationBody">Ihre Fahrt wird aufgezeichnet.</string>
 
 </resources>

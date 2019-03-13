@@ -25,11 +25,14 @@ import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static app.com.example.android.octeight.Utils.checkForAnnotation;
 import static app.com.example.android.octeight.Utils.fileExists;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
@@ -51,7 +54,7 @@ public class HistoryActivity extends BaseActivity {
 
     ListView listView;
     private File metaDataFile;
-    ArrayList<String[]> ridesList = new ArrayList<>();
+    ArrayList<String[]> metaDataLines = new ArrayList<>();
     String[] ridesArr;
 
     UploadService mBoundUploadService;
@@ -102,22 +105,22 @@ public class HistoryActivity extends BaseActivity {
 
                 while ((line = br.readLine()) != null) {
                     // Log.d(TAG, line);
-                    ridesList.add(line.split(","));
+                    metaDataLines.add(line.split(","));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            //ridesArr = ridesList.toArray(new String[ridesList.size()]);
-            ridesArr = new String[ridesList.size()];
-            Log.d(TAG, "ridesList: " + Arrays.deepToString(ridesList.toArray()));
+            //ridesArr = metaDataLines.toArray(new String[metaDataLines.size()]);
+            ridesArr = new String[metaDataLines.size()];
+            Log.d(TAG, "metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             /*
-            for (int i = 0; i < ridesList.size(); i++) {
-                ridesArr[Integer.valueOf(ridesList.get(i)[0])] = listToTextShape(ridesList.get(i));
+            for (int i = 0; i < metaDataLines.size(); i++) {
+                ridesArr[Integer.valueOf(metaDataLines.get(i)[0])] = listToTextShape(metaDataLines.get(i));
             }
             */
-            for (String[] i : ridesList) {
-                ridesArr[((ridesList.size()) - Integer.parseInt(i[0])) - 1] = listToTextShape(i);
+            for (String[] i : metaDataLines) {
+                ridesArr[((metaDataLines.size()) - Integer.parseInt(i[0])) - 1] = listToTextShape(i);
             }
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
@@ -148,13 +151,13 @@ public class HistoryActivity extends BaseActivity {
                                 Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
                                 intent.putExtra("PathToAccGpsFile", dirFiles[i].getPath().replace(prefix, ""));
                                 // Log.d(TAG, "onClick() date: " + date);
-                                intent.putExtra("Duration", String.valueOf(Long.valueOf(ridesList.get(position)[2]) - Long.valueOf(ridesList.get(position)[1])));
-                                intent.putExtra("StartTime", ridesList.get(position)[2]);
-                                intent.putExtra("State", ridesList.get(position)[3]);
-                                Log.d(TAG, "pathToAccGpsFile: " + intent.getStringExtra("PathToAccGpsFile"));
-                                Log.d(TAG, "Duration: " + intent.getStringExtra("Duration"));
-                                Log.d(TAG, "StartTime: " + intent.getStringExtra("StartTime"));
-                                Log.d(TAG, "State: " + intent.getStringExtra("State"));
+                                intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
+                                intent.putExtra("StartTime", metaDataLines.get(position)[2]);
+                                intent.putExtra("State", Integer.valueOf(metaDataLines.get(position)[3]));
+                                Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getPath().replace(prefix, ""));
+                                Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
+                                Log.d(TAG, "StartTime: " + metaDataLines.get(position)[2]);
+                                Log.d(TAG, "State: " + metaDataLines.get(position)[3]);
 
                                 startActivity(intent);
                             }
@@ -191,24 +194,53 @@ public class HistoryActivity extends BaseActivity {
             public void onClick(View view) {
 
                 File[] dirFiles = getFilesDir().listFiles();
-                ArrayList<String> ridesToUpload = new ArrayList<>();
+                ArrayList<String> pathsToUpload = new ArrayList<>();
+                ArrayList<String> rideKeysToUpload = new ArrayList<>();
                 int numberOfRides = 0;
                 long duration = 0;
                 int numberOfIncidents = 0;
 
+                String content = "";
                 try {
                     BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
-                    // br.readLine() to skip the first line which contains the headers
-                    String line = br.readLine();
-
+                    String line;
                     while ((line = br.readLine()) != null) {
                         // Log.d(TAG, line);
-                        String[] actualLine = line.split(",");
-                        duration = duration + (Long.valueOf(actualLine[2]) - Long.valueOf(actualLine[1]));
-                        numberOfRides = Integer.valueOf(actualLine[0]);
+                        String[] metaDataLine = line.split(",",-1);
+                        String metaDataRide = line;
+                        Log.d(TAG, "metaDataLine: " + Arrays.toString(metaDataLine));
+                        Log.d(TAG, "line: " + line);
+                        if (metaDataLine[3].equals("1")){
+                            rideKeysToUpload.add(metaDataLine[0]);
+                            metaDataLine[3] = "2";
+                            metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
+
+                        }
+                        content += metaDataRide += System.lineSeparator();
+                        if(!metaDataLine[0].equals("key")) {
+                            duration = duration + (Long.valueOf(metaDataLine[2]) - Long.valueOf(metaDataLine[1]));
+                            numberOfRides = Integer.valueOf(metaDataLine[0]);
+                        }
                     }
-                } catch (Exception e) {
+                overWriteFile(content,"metaData.csv",HistoryActivity.this);
+                } catch (FileNotFoundException e) {
                     e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "rideKeysToUpload: " + Arrays.toString(rideKeysToUpload.toArray()));
+                for (int i = 0; i < rideKeysToUpload.size(); i++) {
+                    String rideKeyToUpload = rideKeysToUpload.get(i);
+                    if (dirFiles.length > 0) {
+                        for (int j = 0; j < dirFiles.length; j++) {
+                            String path = dirFiles[j].getName();
+                            if (path.split("_")[0].startsWith(rideKeyToUpload)){
+                                pathsToUpload.add(path);
+                            } else if (path.startsWith("accEvents" + rideKeyToUpload)){
+                                pathsToUpload.add(path);
+                            }
+                        }
+                    }
                 }
 
                 if (dirFiles.length != 0) {
@@ -223,7 +255,7 @@ public class HistoryActivity extends BaseActivity {
                                 while ((line = br.readLine()) != null) {
                                     // Log.d(TAG, line);
                                     String[] actualLine = line.split(",", -1);
-                                    if ((!actualLine[4].equals("") && !actualLine[4].equals("0")) && !actualLine[6].equals("")) {
+                                    if (checkForAnnotation(actualLine)) {
                                         numberOfIncidents++;
                                     }
                                 }
@@ -231,22 +263,15 @@ public class HistoryActivity extends BaseActivity {
                                 e.printStackTrace();
                             }
                         }
-                        String newNameOfFile = nameOfFileToBeRenamed.replace("_1.csv", "_2.csv");
-                        String path = Constants.APP_PATH + "files/";
-                        Log.d(TAG, "nameOfFileToBeRenamed: " + nameOfFileToBeRenamed + " newNameOfFile: " + newNameOfFile);
-                        if (nameOfFileToBeRenamed.endsWith("_1.csv")) {
-                            Log.d(TAG, "Renaming");
-                            dirFiles[i].renameTo(new File(path + newNameOfFile));
-                            ridesToUpload.add(newNameOfFile);
-                        }
                     }
                 }
-                if (ridesToUpload.size() > 0) {
+                Log.d(TAG, "pathToUpload: " + Arrays.toString(pathsToUpload.toArray()));
+                if (pathsToUpload.size() > 0) {
                     String demographicHeader = "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents" + System.lineSeparator();
                     String demographics = getDemographics();
                     overWriteFile(demographicHeader + demographics + "," + numberOfRides + "," + duration + "," + numberOfIncidents, "profile.csv", HistoryActivity.this);
                     Intent intent = new Intent(HistoryActivity.this, UploadService.class);
-                    intent.putStringArrayListExtra("RidesToUpload", ridesToUpload);
+                    intent.putStringArrayListExtra("PathsToUpload", pathsToUpload);
                     startService(intent);
                     bindService(intent, mUploadServiceConnection, Context.BIND_AUTO_CREATE);
 
@@ -280,7 +305,7 @@ public class HistoryActivity extends BaseActivity {
 
                             if (mBoundUploadService != null) {
                                 int currentNumberOfTasks = mBoundUploadService.getNumberOfTasks();
-                                pd.setProgress(Math.round(100 - 100 * ((float) currentNumberOfTasks / (float) (ridesToUpload.size() * 2))));
+                                pd.setProgress(Math.round(100 - 100 * ((float) currentNumberOfTasks / (float) (pathsToUpload.size()))));
                                 Log.d(TAG, "currentNumberOfTasks: " + currentNumberOfTasks);
                                 if (currentNumberOfTasks == 0) {
                                     unbindService(mUploadServiceConnection);
@@ -359,22 +384,11 @@ public class HistoryActivity extends BaseActivity {
         Log.d(TAG, "listToTextShape item: " + Arrays.toString(item));
         String todo = getString(R.string.newRideInHistoryActivity);
 
-        File[] dirFiles = getFilesDir().listFiles();
-        if (dirFiles.length != 0) {
-            for (int i = 0; i < dirFiles.length; i++) {
-                if (dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_2.csv")) {
-                    Log.d(TAG, "dirFiles[i].getName().endsWith: " + dirFiles[i].getName());
-                    todo = getString(R.string.rideUploadedInHistoryActivity);
-                } else if (dirFiles[i].getName().startsWith(item[0] + "_") && dirFiles[i].getName().endsWith("_1.csv")) {
-                    todo = getString(R.string.rideAnnotatedInHistoryActivity);
-
-                }
-            }
+        if (item[3].equals("1")) {
+            todo = getString(R.string.rideAnnotatedInHistoryActivity);
+        } else if (item[3].equals("2")) {
+            todo = getString(R.string.rideUploadedInHistoryActivity);
         }
-        if (item[3].equals("2")) {
-            todo = "";
-        }
-
 
         long millis = Long.valueOf(item[2]) - Long.valueOf(item[1]);
         String prettyDuration = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
@@ -389,20 +403,7 @@ public class HistoryActivity extends BaseActivity {
 
 
         return result;
-        // requires API 26 (Java 8) Date.from(Instant.ofEpochMilli( Long.getLong(item[0]) )).toString()
     }
-
-
-  /*  private Long getMillis (String dateStr){
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss");
-        Date date = null;
-        try {
-            date = (Date)formatter.parse(dateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return date.getTime();
-    }*/
 
     public void startShowRouteWithSelectedRide() {
 

@@ -153,7 +153,7 @@ public class MarkerFunct {
 
         }
 
-        Log.i("WRAPPED_GP_LIST", String.valueOf(wrappedGPS.size()));
+        Log.d(TAG, "wrappedGPS.size(): " + wrappedGPS.size());
 
         Collections.sort(wrappedGPS, (GeoPointWrapper o1, GeoPointWrapper o2) -> {
 
@@ -169,40 +169,28 @@ public class MarkerFunct {
 
         closestOnRoute = wrappedGPS.get(0).wrappedGeoPoint;
 
-        Log.i("WRAPPED_GP_LIST", closestOnRoute.toString());
+        Log.d(TAG, "closestOnRoute: " + closestOnRoute.toString());
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Create a new AccEvent
-
         int eventCount = ++this.numEvents;
-
         AccEvent newAcc = new AccEvent(eventCount, closestOnRoute.getLatitude(),
                 closestOnRoute.getLongitude(), 1337, false);
-
-        Log.i("NEW_ACC", newAcc.toString());
+        Log.d(TAG,"newAcc: " + newAcc.toString());
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // set Marker for new AccEvent, refresh map
-
         setMarker(newAcc, eventCount);
-
         mother.getmMapView().invalidate();
-
         long sleepTime = 500L;
-
         try {
-
             Thread.sleep(sleepTime);
-
         } catch (InterruptedException ie) {
-
-            // ....
-
+            ie.printStackTrace();
         }
 
         // Now we display a dialog box to allow the user to decide if she/he is happy
         // with the location of the custom marker.
-
         approveCustMarker(newAcc);
 
     }
@@ -233,10 +221,10 @@ public class MarkerFunct {
 
                     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // Append new acc event to accEvents[rideID].csv
-
                     String pathToAccEventsOfRide = "accEvents" + rideID + ".csv";
                     String header = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
                     header += System.lineSeparator();
+
                     int bike = lookUpIntSharedPrefs("Settings-BikeType",0,"simraPrefs",mother);
                     int child = lookUpIntSharedPrefs("Settings-Child",0,"simraPrefs",mother);
                     int trailer = lookUpIntSharedPrefs("Settings-Trailer",0,"simraPrefs",mother);
@@ -248,20 +236,13 @@ public class MarkerFunct {
                             + "," + newAcc.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + "," + /*incident*/"," + /*i1*/"," + /*i2*/"," + /*i3*/"," + /*i4*/"," + /*i5*/"," + /*i6*/"," + /*i7*/"," + /*i8*/"," + /*i9*/"," + /*scary*/"," + /*desc*/"," +System.lineSeparator();
 
                     if (!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())) {
-
                         appendToFile((header + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
-
                     } else {
-
                         appendToFile(eventLine, pathToAccEventsOfRide, mother.getApplicationContext());
-
                     }
-
                     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // Add new AccEvent to ride's AccEvents list
-
                     mother.ride.getEvents().add(newAcc);
-
                 });
 
         Window window = alertDialog.getWindow();
@@ -275,55 +256,35 @@ public class MarkerFunct {
             alertDialog.show();
 
         }, 750);
-
-
     }
 
     public void setMarker(AccEvent event, int accEventKey) {
-
         Marker incidentMarker = new Marker(mother.getmMapView());
 
         // Add the marker + corresponding key to map so we can manage markers if
         // necessary (e.g., remove them)
-
         markerMap.put(accEventKey, incidentMarker);
-
         GeoPoint currentLocHelper = event.position;
-
         incidentMarker.setPosition(currentLocHelper);
-
         /** Different marker icons for ....
          * A) annotated y/n
          * B) default/custom
          */
 
         if (!event.annotated) {
-
             // custom events can be detected via their timeStamp
-
             if (!(event.timeStamp == 1337)) {
-
                 incidentMarker.setIcon(mother.editMarkerDefault);
-
             } else {
-
                 incidentMarker.setIcon(mother.editCustMarker);
             }
-
         } else {
-
             // custom events can be detected via their timeStamp
-
             if (!(event.timeStamp == 1337)) {
-
                 incidentMarker.setIcon(mother.editDoneDefault);
-
             } else {
-
                 incidentMarker.setIcon(mother.editDoneCust);
-
             }
-
         }
 
         String addressForLoc = "";
@@ -335,19 +296,13 @@ public class MarkerFunct {
             ex.printStackTrace();
         }
 
-        long millis = Long.valueOf(startTime);
-        String time = DateUtils.formatDateTime(mother, millis, DateUtils.FORMAT_SHOW_TIME);
-
         Log.d(TAG, "setting up InfoWindow with address: " + addressForLoc);
         InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble,
                 mother.getmMapView(),
                 event, addressForLoc, mother, event.key);
         incidentMarker.setInfoWindow(infoWindow);
 
-        //incidentMarker.setSnippet("Vorfall " + i);
-
         markers.add(incidentMarker);
-
         mother.getmMapView().getOverlays().add(incidentMarker);
         mother.getmMapView().invalidate();
     }
@@ -355,41 +310,21 @@ public class MarkerFunct {
     // Generate a new GeoPoint from address String via Geocoding
 
     public String getAddressFromLocation(GeoPoint incidentLoc) {
-
         List<Address> address = new ArrayList<>();
-
         String addressForLocation = "";
-
         try {
-
             // This is the actual geocoding
-
             address = geocoderNominatim.getFromLocation(incidentLoc.getLatitude(),
                     incidentLoc.getLongitude(), 1);
-
             if (address.size() == 0) {
-
-                Log.i("getFromLoc", "Couldn't find an address for input geoPoint");
-
+                Log.d(TAG, "getAddressFromLocation(): Couldn't find an address for input geoPoint");
             } else {
-
                 // Log.i("getFromLoc", address.get(0).toString());
-
                 // Get address result from geocoding result
-
                 Log.d(TAG, "address.get(0): " + address.get(0).toString());
-
                 Address location = address.get(0);
-
                 addressForLocation = location.getAddressLine(0);
-
-                // Generate GeoPoint address result
-
-                /**Log.i("StartStop", "Latitude: " +
-                 destCoords.getLatitude() + ", Longitude: " + destCoords.getLongitude());
-                 myLoc = location.toString();*/
-
-            }
+                            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -408,19 +343,12 @@ public class MarkerFunct {
     }
 
     // Thread factory implementation: to enable setting priority before new thread is returned
-
     class SimpleThreadFactory implements ThreadFactory {
-
         public Thread newThread(Runnable r) {
-
             Thread myThread = new Thread(r);
-
             myThread.setPriority(Thread.MIN_PRIORITY);
-
             return myThread;
-
         }
-
     }
 
 }

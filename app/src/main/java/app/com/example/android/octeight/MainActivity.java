@@ -386,16 +386,14 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                     if (mBoundRecorderService.getRecordingAllowed()) {
                         // Get the recorded files and send them to HistoryActivity for further processing
                         Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+
                         // The file under PathToAccGpsFile contains the accelerometer and location data
                         // as well as time data
                         intent.putExtra("PathToAccGpsFile", mBoundRecorderService.getPathToAccGpsFile());
-                        // intent.putExtra("PathToAccGpsFile", "7_accGps_1549365838012.csv");
-                        // intent.putExtra("PathToAccGpsFile", "59_accGps_23.01.2019 09_19_09_epoch.csv");
 
                         // timestamp in ms from 1970
                         intent.putExtra("Duration", String.valueOf(mBoundRecorderService.getDuration()));
                         intent.putExtra("StartTime", String.valueOf(mBoundRecorderService.getStartTime()));
-
 
                         // State can be 0 for not annotated, 1 for started but not sent
                         // and 2 for annotated and sent to the server

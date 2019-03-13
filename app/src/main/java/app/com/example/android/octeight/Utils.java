@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 
 import static android.content.Context.MODE_APPEND;
@@ -14,6 +16,22 @@ import static android.content.Context.MODE_APPEND;
 public class Utils {
 
     private static final String TAG = "Utils_LOG";
+
+    public static String readContentFromFile(String fileName, Context context) {
+        String content = "";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(fileName)))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                content += line += System.lineSeparator();
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return content;
+    }
+
 
     public static void appendToFile(String content, String fileName, Context context) {
         try {

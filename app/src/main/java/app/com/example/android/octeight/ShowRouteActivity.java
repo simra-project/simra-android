@@ -31,8 +31,12 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 import static app.com.example.android.octeight.Utils.checkForAnnotation;
 import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
+import static app.com.example.android.octeight.Utils.overWriteFile;
 import static app.com.example.android.octeight.Utils.writeBooleanToSharedPrefs;
 import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
 
@@ -119,7 +124,7 @@ public class ShowRouteActivity extends BaseActivity {
         String pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
         // Log.d(TAG, "onCreate() date: " + date);
-        int state = 0; //getIntent().getIntExtra("State", 0);
+        int state = getIntent().getIntExtra("State", 0);
         // Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
         String duration = getIntent().getStringExtra("Duration");
 
@@ -215,7 +220,6 @@ public class ShowRouteActivity extends BaseActivity {
                     exitAddIncBttn.performClick();
                     return true;
                 } else {
-                    // myMarkerFunct.closeAllInfoWindows();
                     InfoWindow.closeAllInfoWindowsOn(mMapView);
                     return false;
                 }
@@ -226,7 +230,6 @@ public class ShowRouteActivity extends BaseActivity {
             public boolean longPressHelper(GeoPoint p) {
 
                 if (addCustomMarkerMode) {
-
                     // Call custom marker adding functionality which enables the user to put
                     // markers on the map
                     myMarkerFunct.addCustMarker(p);
@@ -243,11 +246,10 @@ public class ShowRouteActivity extends BaseActivity {
         mMapView.invalidate();
 
         Log.d(TAG, "setting up clickListeners");
+
         // Functionality for 'edit mode', i.e. the mode in which users can put their own incidents
         // onto the map
-
         addIncBttn.setOnClickListener((View v) -> {
-
             addIncBttn.setVisibility(View.INVISIBLE);
             exitAddIncBttn.setVisibility(View.VISIBLE);
             ShowRouteActivity.this.addCustomMarkerMode = true;
@@ -255,15 +257,12 @@ public class ShowRouteActivity extends BaseActivity {
             // overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
             // mMapView.getOverlays().add(overlayEvents);
             // mMapView.invalidate();
-
         });
 
         exitAddIncBttn.setOnClickListener((View v) -> {
-
             addIncBttn.setVisibility(View.VISIBLE);
             exitAddIncBttn.setVisibility(View.INVISIBLE);
             ShowRouteActivity.this.addCustomMarkerMode = false;
-
         });
 
         saveButton.setOnTouchListener(new View.OnTouchListener() {
@@ -283,23 +282,27 @@ public class ShowRouteActivity extends BaseActivity {
 
         saveButton.setOnClickListener((View v) -> {
 
-            File[] dirFiles = getFilesDir().listFiles();
-            if (dirFiles.length != 0) {
-                for (int i = 0; i < dirFiles.length; i++) {
-                    String nameOfFileToBeRenamed = dirFiles[i].getName();
-                    String newNameOfFile = nameOfFileToBeRenamed.replace(".csv", "_1.csv");
-                    String path = Constants.APP_PATH + "files/";
-                    Log.d(TAG, "nameOfFileToBeRenamed: " + nameOfFileToBeRenamed + " newNameOfFile: " + newNameOfFile);
-                    if (nameOfFileToBeRenamed.startsWith(ride.getId() + "_") && !nameOfFileToBeRenamed.endsWith("_1.csv")) {
-                        Log.d(TAG, "Renaming");
-                        dirFiles[i].renameTo(new File(path + newNameOfFile));
+            String content = "";
+
+            try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] metaDataLine = line.split(",",-1);
+                    String metaDataRide = line;
+                    if (metaDataLine[0].equals(ride.getId())) {
+                        metaDataLine[3] = "1";
+                        metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
                     }
+                    content += metaDataRide += System.lineSeparator();
                 }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
             }
+
+            overWriteFile(content,"metaData.csv",this);
 
             Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
             finish();
-
         });
 
 
