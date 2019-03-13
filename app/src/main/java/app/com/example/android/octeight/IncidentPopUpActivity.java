@@ -16,6 +16,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.j256.ormlite.stmt.query.In;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.overWriteFile;
 
 public class IncidentPopUpActivity extends AppCompatActivity {
@@ -314,6 +317,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             try {
 
                 reader.readLine(); // this will read the first line
+                reader.readLine();
 
                 String line = null;
 
@@ -350,10 +354,17 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         String path = "accEvents" + rideID + ".csv";
 
         String contentOfNewFile = "";
+        int appVersion = getAppVersionNumber(IncidentPopUpActivity.this);
+        String fileVersion = "";
         try (BufferedReader reader = new BufferedReader(new FileReader(getFileStreamPath(path)))) {
-
             contentOfNewFile += reader.readLine();
             contentOfNewFile += System.lineSeparator();
+
+            if (contentOfNewFile.contains("#")) {
+                String[] fileInfoArray = contentOfNewFile.split("#");
+                fileVersion = fileInfoArray[1];
+            }
+
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] oldIncident = line.split(",", -1);
@@ -371,8 +382,9 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        overWriteFile(contentOfNewFile, path, this);
+        String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+        Log.d(TAG, "fileInfoLine: " + fileInfoLine + " contentOfNewFile: " + contentOfNewFile);
+        overWriteFile((contentOfNewFile), path, this);
 
     }
 

@@ -24,6 +24,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
+import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.getUniqueUserID;
 
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
@@ -61,6 +62,8 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
                     stackTrace += ex.getCause().getStackTrace()[i] + "\n";
                 }
             }
+            String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
+
             String errorReport = "Exception in: " + context.getClass().getName()
                     + " " + ex.getClass().getName() + "\n" +
                     ex.getMessage() + "\n" +
@@ -72,7 +75,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
                     Build.MODEL + "\n" +
                     Build.PRODUCT;
 
-            appendToFile(errorReport, "CRASH_REPORT" + new Date().toString() + ".txt", this);
+            appendToFile((fileInfoLine + errorReport), "CRASH_REPORT" + new Date().toString() + ".txt", this);
 
             SharedPreferences sharedPrefs = getApplicationContext()
                     .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);

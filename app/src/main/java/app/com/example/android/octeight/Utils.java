@@ -3,6 +3,8 @@ package app.com.example.android.octeight;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
@@ -154,6 +156,20 @@ public class Utils {
                 .setPositiveButton("OK", okListener)
                 .create()
                 .show();
+    }
+
+    public static int getAppVersionNumber(Context context) {
+        PackageInfo pinfo = null;
+        try {
+            pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        int installedVersionNumber = -1;
+        if (pinfo != null) {
+            installedVersionNumber = pinfo.versionCode;
+        }
+        return installedVersionNumber;
     }
 
 }

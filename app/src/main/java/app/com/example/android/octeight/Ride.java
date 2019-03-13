@@ -15,6 +15,7 @@ import java.util.List;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 
 public class Ride {
@@ -77,6 +78,7 @@ public class Ride {
         String pathToAccEventsOfRide = "accEvents" + id + ".csv";
         String content = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
         content += System.lineSeparator();
+        String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
 
         if (!fileExists(pathToAccEventsOfRide, context)) {
 
@@ -92,7 +94,7 @@ public class Ride {
                 content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + ",,,,,,,,,,,," + System.lineSeparator();
             }
 
-            appendToFile(content, pathToAccEventsOfRide, context);
+            appendToFile((fileInfoLine + content), pathToAccEventsOfRide, context);
         }
 
     }
@@ -111,6 +113,7 @@ public class Ride {
             BufferedReader br = new BufferedReader(new FileReader(gpsFile));
             // br.readLine() to skip the first line which contains the headers
             String line = br.readLine();
+            line = br.readLine();
 
             while ((line = br.readLine()) != null) {
 
@@ -280,6 +283,7 @@ public class Ride {
         String nextLine = null;
         try {
             br = new BufferedReader(new FileReader(accGpsFile));
+            br.readLine();
             br.readLine();
             thisLine = br.readLine();
             nextLine = br.readLine();

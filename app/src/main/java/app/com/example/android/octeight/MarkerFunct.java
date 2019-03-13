@@ -31,6 +31,7 @@ import java.util.concurrent.ThreadFactory;
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.checkForAnnotation;
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 
 public class MarkerFunct {
@@ -97,9 +98,12 @@ public class MarkerFunct {
                 (mother.getApplicationContext()
                         .getFileStreamPath("accEvents" + rideID + ".csv")))) {
 
-            reader.readLine();
+
 
             String line;
+            line = reader.readLine();
+            line = reader.readLine();
+
 
             while ((line = reader.readLine()) != null) {
 
@@ -224,6 +228,7 @@ public class MarkerFunct {
                     String pathToAccEventsOfRide = "accEvents" + rideID + ".csv";
                     String header = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
                     header += System.lineSeparator();
+                    String fileInfoLine = getAppVersionNumber(mother) + "#1" + System.lineSeparator();
 
                     int bike = lookUpIntSharedPrefs("Settings-BikeType",0,"simraPrefs",mother);
                     int child = lookUpIntSharedPrefs("Settings-Child",0,"simraPrefs",mother);
@@ -236,7 +241,7 @@ public class MarkerFunct {
                             + "," + newAcc.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + "," + /*incident*/"," + /*i1*/"," + /*i2*/"," + /*i3*/"," + /*i4*/"," + /*i5*/"," + /*i6*/"," + /*i7*/"," + /*i8*/"," + /*i9*/"," + /*scary*/"," + /*desc*/"," +System.lineSeparator();
 
                     if (!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())) {
-                        appendToFile((header + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
+                        appendToFile((fileInfoLine + header + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
                     } else {
                         appendToFile(eventLine, pathToAccEventsOfRide, mother.getApplicationContext());
                     }

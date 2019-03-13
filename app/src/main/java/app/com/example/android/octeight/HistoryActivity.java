@@ -34,8 +34,10 @@ import java.util.concurrent.TimeUnit;
 
 import static app.com.example.android.octeight.Utils.checkForAnnotation;
 import static app.com.example.android.octeight.Utils.fileExists;
+import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
+import static app.com.example.android.octeight.Utils.readContentFromFile;
 
 public class HistoryActivity extends BaseActivity {
 
@@ -102,6 +104,7 @@ public class HistoryActivity extends BaseActivity {
                 BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
                 // br.readLine() to skip the first line which contains the headers
                 String line = br.readLine();
+                line = br.readLine();
 
                 while ((line = br.readLine()) != null) {
                     // Log.d(TAG, line);
@@ -200,29 +203,37 @@ public class HistoryActivity extends BaseActivity {
                 long duration = 0;
                 int numberOfIncidents = 0;
 
+                int appVersion = getAppVersionNumber(HistoryActivity.this);
+                String fileVersion = "";
                 String content = "";
                 try {
                     BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
                     String line;
                     while ((line = br.readLine()) != null) {
                         // Log.d(TAG, line);
+                        if (line.contains("#")) {
+                            String[] fileInfoArray = line.split("#");
+                            fileVersion = fileInfoArray[1];
+                            continue;
+                        }
                         String[] metaDataLine = line.split(",",-1);
                         String metaDataRide = line;
                         Log.d(TAG, "metaDataLine: " + Arrays.toString(metaDataLine));
                         Log.d(TAG, "line: " + line);
-                        if (metaDataLine[3].equals("1")){
+                        if (metaDataLine.length >1 && metaDataLine[3].equals("1")){
                             rideKeysToUpload.add(metaDataLine[0]);
                             metaDataLine[3] = "2";
                             metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
 
                         }
                         content += metaDataRide += System.lineSeparator();
-                        if(!metaDataLine[0].equals("key")) {
+                        if(!metaDataLine[0].equals("key") && !metaDataLine[0].contains("#")) {
                             duration = duration + (Long.valueOf(metaDataLine[2]) - Long.valueOf(metaDataLine[1]));
                             numberOfRides = Integer.valueOf(metaDataLine[0]);
                         }
                     }
-                overWriteFile(content,"metaData.csv",HistoryActivity.this);
+                    String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+                    overWriteFile((fileInfoLine + content),"metaData.csv",HistoryActivity.this);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -251,6 +262,7 @@ public class HistoryActivity extends BaseActivity {
                                 BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(nameOfFileToBeRenamed)));
                                 // br.readLine() to skip the first line which contains the headers
                                 String line = br.readLine();
+                                line = br.readLine();
 
                                 while ((line = br.readLine()) != null) {
                                     // Log.d(TAG, line);
@@ -267,9 +279,13 @@ public class HistoryActivity extends BaseActivity {
                 }
                 Log.d(TAG, "pathToUpload: " + Arrays.toString(pathsToUpload.toArray()));
                 if (pathsToUpload.size() > 0) {
+
+                    String profileContent = readContentFromFile("profile.csv",HistoryActivity.this);
+                    fileVersion = profileContent.split(System.lineSeparator())[0].split("#")[1];
                     String demographicHeader = "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents" + System.lineSeparator();
                     String demographics = getDemographics();
-                    overWriteFile(demographicHeader + demographics + "," + numberOfRides + "," + duration + "," + numberOfIncidents, "profile.csv", HistoryActivity.this);
+                    String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+                    overWriteFile(fileInfoLine + demographicHeader + demographics + "," + numberOfRides + "," + duration + "," + numberOfIncidents, "profile.csv", HistoryActivity.this);
                     Intent intent = new Intent(HistoryActivity.this, UploadService.class);
                     intent.putStringArrayListExtra("PathsToUpload", pathsToUpload);
                     startService(intent);

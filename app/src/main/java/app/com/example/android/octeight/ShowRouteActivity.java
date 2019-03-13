@@ -42,6 +42,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static app.com.example.android.octeight.Utils.checkForAnnotation;
+import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
@@ -283,10 +284,16 @@ public class ShowRouteActivity extends BaseActivity {
         saveButton.setOnClickListener((View v) -> {
 
             String content = "";
-
+            int appVersion = getAppVersionNumber(ShowRouteActivity.this);
+            String fileVersion = "";
             try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
                 String line;
                 while ((line = br.readLine()) != null) {
+                    if (line.contains("#")) {
+                        String[] fileInfoArray = line.split("#");
+                        fileVersion = fileInfoArray[1];
+                        continue;
+                    }
                     String[] metaDataLine = line.split(",",-1);
                     String metaDataRide = line;
                     if (metaDataLine[0].equals(ride.getId())) {
@@ -298,8 +305,8 @@ public class ShowRouteActivity extends BaseActivity {
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
-
-            overWriteFile(content,"metaData.csv",this);
+            String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+            overWriteFile((fileInfoLine + content),"metaData.csv",this);
 
             Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
             finish();
