@@ -56,7 +56,6 @@ public class HistoryActivity extends BaseActivity {
 
     ListView listView;
     private File metaDataFile;
-    ArrayList<String[]> metaDataLines = new ArrayList<>();
     String[] ridesArr;
 
     UploadService mBoundUploadService;
@@ -96,86 +95,6 @@ public class HistoryActivity extends BaseActivity {
         );
 
         listView = findViewById(R.id.listView);
-
-        if (fileExists("metaData.csv", this)) {
-
-            metaDataFile = getFileStreamPath("metaData.csv");
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
-                // br.readLine() to skip the first line which contains the headers
-                String line = br.readLine();
-                line = br.readLine();
-
-                while ((line = br.readLine()) != null) {
-                    // Log.d(TAG, line);
-                    metaDataLines.add(line.split(","));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            //ridesArr = metaDataLines.toArray(new String[metaDataLines.size()]);
-            ridesArr = new String[metaDataLines.size()];
-            Log.d(TAG, "metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
-            /*
-            for (int i = 0; i < metaDataLines.size(); i++) {
-                ridesArr[Integer.valueOf(metaDataLines.get(i)[0])] = listToTextShape(metaDataLines.get(i));
-            }
-            */
-            for (String[] i : metaDataLines) {
-                ridesArr[((metaDataLines.size()) - Integer.parseInt(i[0])) - 1] = listToTextShape(i);
-            }
-            Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
-            listView.setAdapter(adapter);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    // gets the files in the directory
-                    // lists all the files into an array
-                    File[] dirFiles = getFilesDir().listFiles();
-                    Log.d(TAG, "dirFiles: " + Arrays.deepToString(dirFiles));
-                    String clicked = (String) listView.getItemAtPosition(position);
-                    Log.d(TAG, "clicked: " + clicked);
-                    String prefix = Constants.APP_PATH + "files/";
-                    String key = clicked.replace("#", "").split(" ")[0];
-                    clicked = prefix + key;
-                    if (dirFiles.length != 0) {
-                        // loops through the array of files, outputting the name to console
-                        for (int i = 0; i < dirFiles.length; i++) {
-
-                            String fileOutput = dirFiles[i].toString();
-                            Log.d(TAG, "fileOutput: " + fileOutput);
-
-
-                            if (fileOutput.startsWith(clicked + "_")) {
-                                // Start ShowRouteActivity with the selected Ride.
-                                Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
-                                intent.putExtra("PathToAccGpsFile", dirFiles[i].getPath().replace(prefix, ""));
-                                // Log.d(TAG, "onClick() date: " + date);
-                                intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
-                                intent.putExtra("StartTime", metaDataLines.get(position)[2]);
-                                intent.putExtra("State", Integer.valueOf(metaDataLines.get(position)[3]));
-                                Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getPath().replace(prefix, ""));
-                                Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
-                                Log.d(TAG, "StartTime: " + metaDataLines.get(position)[2]);
-                                Log.d(TAG, "State: " + metaDataLines.get(position)[3]);
-
-                                startActivity(intent);
-                            }
-                        }
-                    }
-                }
-            });
-        } else {
-
-            Log.d(TAG, "metaData.csv doesn't exists");
-
-            Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), (getString(R.string.noHistory)), Snackbar.LENGTH_LONG);
-            snackbar.show();
-
-        }
 
         RelativeLayout justUploadButton = findViewById(R.id.justUpload);
         justUploadButton.setOnTouchListener(new View.OnTouchListener() {
@@ -271,7 +190,9 @@ public class HistoryActivity extends BaseActivity {
                                         numberOfIncidents++;
                                     }
                                 }
-                            } catch (Exception e) {
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
@@ -327,6 +248,7 @@ public class HistoryActivity extends BaseActivity {
                                     unbindService(mUploadServiceConnection);
                                     pd.dismiss();
                                     Toast.makeText(HistoryActivity.this, getString(R.string.uploadRidesSuccessful), Toast.LENGTH_SHORT).show();
+                                    refreshMyRides();
                                     handler.removeCallbacks(this);
                                     if (exitWhenDone) {
                                         finishAndRemoveTask();
@@ -381,6 +303,101 @@ public class HistoryActivity extends BaseActivity {
             startShowRouteWithSelectedRide();
         }
 
+    }
+
+    private void refreshMyRides() {
+        ArrayList<String[]> metaDataLines = new ArrayList<>();
+
+        if (fileExists("metaData.csv", this)) {
+
+            metaDataFile = getFileStreamPath("metaData.csv");
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
+                // br.readLine() to skip the first line which contains the headers
+                String line = br.readLine();
+
+                while ((line = br.readLine()) != null) {
+                    // Log.d(TAG, line);
+                    metaDataLines.add(line.split(","));
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //ridesArr = metaDataLines.toArray(new String[metaDataLines.size()]);
+            ridesArr = new String[metaDataLines.size()];
+            Log.d(TAG, "refreshMyRides(): metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
+            /*
+            for (int i = 0; i < metaDataLines.size(); i++) {
+                ridesArr[Integer.valueOf(metaDataLines.get(i)[0])] = listToTextShape(metaDataLines.get(i));
+            }
+            */
+
+                for (int i = 0; i < metaDataLines.size(); i++) {
+                    String[] metaDataLine = metaDataLines.get(i);
+                    ridesArr[((metaDataLines.size()) - Integer.parseInt(metaDataLine[0])) - 1] = listToTextShape(metaDataLine);
+                }
+
+            Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
+            listView.setAdapter(adapter);
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    // gets the files in the directory
+                    // lists all the files into an array
+                    File[] dirFiles = getFilesDir().listFiles();
+                    Log.d(TAG, "dirFiles: " + Arrays.deepToString(dirFiles));
+                    String clicked = (String) listView.getItemAtPosition(position);
+                    Log.d(TAG, "clicked: " + clicked);
+                    String prefix = Constants.APP_PATH + "files/";
+                    String key = clicked.replace("#", "").split(" ")[0];
+                    clicked = prefix + key;
+                    if (dirFiles.length != 0) {
+                        // loops through the array of files, outputting the name to console
+                        for (int i = 0; i < dirFiles.length; i++) {
+
+                            String fileOutput = dirFiles[i].toString();
+                            Log.d(TAG, "fileOutput: " + fileOutput);
+
+
+                            if (fileOutput.startsWith(clicked + "_")) {
+                                // Start ShowRouteActivity with the selected Ride.
+                                Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
+                                intent.putExtra("PathToAccGpsFile", dirFiles[i].getPath().replace(prefix, ""));
+                                // Log.d(TAG, "onClick() date: " + date);
+                                intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
+                                intent.putExtra("StartTime", metaDataLines.get(position)[2]);
+                                intent.putExtra("State", Integer.valueOf(metaDataLines.get(position)[3]));
+                                Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getPath().replace(prefix, ""));
+                                Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
+                                Log.d(TAG, "StartTime: " + metaDataLines.get(position)[2]);
+                                Log.d(TAG, "State: " + metaDataLines.get(position)[3]);
+
+                                startActivity(intent);
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+
+            Log.d(TAG, "metaData.csv doesn't exists");
+
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), (getString(R.string.noHistory)), Snackbar.LENGTH_LONG);
+            snackbar.show();
+
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshMyRides();
     }
 
     private String getDemographics() {
