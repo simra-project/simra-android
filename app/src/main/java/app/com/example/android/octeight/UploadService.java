@@ -32,7 +32,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.getUniqueUserID;
+import static app.com.example.android.octeight.Utils.overWriteFile;
 
 public class UploadService extends Service {
 
@@ -220,12 +222,28 @@ public class UploadService extends Service {
             //
             final StringBuilder fileContent = new StringBuilder();
 
+            String content = "";
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
 
-                String line;
+                String line = reader.readLine();
+                Log.d(TAG, "line: " + line);
+                String[] lineArray = line.split("#");
+                String fileVersion = "-1";
+                if (lineArray.length == 2) {
+                    fileVersion = "" + (Integer.valueOf(line.split("#")[1]) + 1);
+                }
+                int appVersion = getAppVersionNumber(context);
+                String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+                line = fileInfoLine;
+                fileContent.append(line);
+                fileContent.append(System.lineSeparator());
                 while ((line = reader.readLine()) != null) {
                     fileContent.append(line);
                     fileContent.append(System.lineSeparator());
+                    content += line += System.lineSeparator();
+                }
+                if (lineArray.length == 2) {
+                    overWriteFile((fileInfoLine + content), pathToFile, context);
                 }
 
             } catch (IOException e) {
