@@ -132,7 +132,7 @@ public class HistoryActivity extends BaseActivity {
                         // Log.d(TAG, line);
                         if (line.contains("#")) {
                             String[] fileInfoArray = line.split("#");
-                            fileVersion = fileInfoArray[1];
+                            fileVersion = fileInfoArray[1]; //"" + (Integer.valueOf(fileInfoArray[1]) + 1);
                             continue;
                         }
                         String[] metaDataLine = line.split(",",-1);
@@ -175,10 +175,10 @@ public class HistoryActivity extends BaseActivity {
 
                 if (dirFiles.length != 0) {
                     for (int i = 0; i < dirFiles.length; i++) {
-                        String nameOfFileToBeRenamed = dirFiles[i].getName();
-                        if (nameOfFileToBeRenamed.startsWith("accEvents")) {
+                        String pathOfFile = dirFiles[i].getName();
+                        if (pathOfFile.startsWith("accEvents")) {
                             try {
-                                BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(nameOfFileToBeRenamed)));
+                                BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(pathOfFile)));
                                 // br.readLine() to skip the first line which contains the headers
                                 String line = br.readLine();
                                 line = br.readLine();
@@ -315,6 +315,7 @@ public class HistoryActivity extends BaseActivity {
                 BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
                 // br.readLine() to skip the first line which contains the headers
                 String line = br.readLine();
+                line = br.readLine();
 
                 while ((line = br.readLine()) != null) {
                     // Log.d(TAG, line);
