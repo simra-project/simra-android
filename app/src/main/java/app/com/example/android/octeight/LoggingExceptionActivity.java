@@ -188,7 +188,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
             Log.d(TAG, "clientHash: " + clientHash);
 
             Request request = new Request.Builder()
-                    .url(Constants.SERVICE_URL + key.replace(Constants.APP_PATH + "shared_prefs/", "") + "?clientHash=" + clientHash)
+                    .url(Constants.MCC_VM1 + key.replace(Constants.APP_PATH + "shared_prefs/", "") + "?clientHash=" + clientHash)
                     .post(requestBody)
                     .build();
 
@@ -228,7 +228,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
             Log.d(TAG, "clientHash: " + clientHash);
 
             Request request = new Request.Builder()
-                    .url(Constants.SERVICE_URL + key + "?clientHash=" + clientHash)
+                    .url(Constants.MCC_VM1 + key + "?clientHash=" + clientHash)
                     .post(requestBody)
                     .build();
 

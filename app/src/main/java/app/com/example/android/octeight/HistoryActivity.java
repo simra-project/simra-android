@@ -166,8 +166,6 @@ public class HistoryActivity extends BaseActivity {
                             String path = dirFiles[j].getName();
                             if (path.split("_")[0].startsWith(rideKeyToUpload)){
                                 pathsToUpload.add(path);
-                            } else if (path.startsWith("accEvents" + rideKeyToUpload)){
-                                pathsToUpload.add(path);
                             }
                         }
                     }
@@ -202,7 +200,7 @@ public class HistoryActivity extends BaseActivity {
                 if (pathsToUpload.size() > 0) {
 
                     String profileContent = readContentFromFile("profile.csv",HistoryActivity.this);
-                    fileVersion = profileContent.split(System.lineSeparator())[0].split("#")[1];
+                    fileVersion = "" + Integer.valueOf(profileContent.split(System.lineSeparator())[0].split("#")[1] + 1);
                     String demographicHeader = "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents" + System.lineSeparator();
                     String demographics = getDemographics();
                     String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
@@ -242,8 +240,7 @@ public class HistoryActivity extends BaseActivity {
 
                             if (mBoundUploadService != null) {
                                 int currentNumberOfTasks = mBoundUploadService.getNumberOfTasks();
-                                pd.setProgress(Math.round(100 - 100 * ((float) currentNumberOfTasks / (float) (pathsToUpload.size()))));
-                                Log.d(TAG, "currentNumberOfTasks: " + currentNumberOfTasks);
+                                pd.setProgress(Math.round(100 - 100 * ((float) currentNumberOfTasks / (float) (pathsToUpload.size() * 2))));                                Log.d(TAG, "currentNumberOfTasks: " + currentNumberOfTasks);
                                 if (currentNumberOfTasks == 0) {
                                     unbindService(mUploadServiceConnection);
                                     pd.dismiss();

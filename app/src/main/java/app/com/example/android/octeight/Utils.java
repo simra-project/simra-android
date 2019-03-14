@@ -9,9 +9,12 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import static android.content.Context.MODE_APPEND;
 
@@ -20,9 +23,21 @@ public class Utils {
     private static final String TAG = "Utils_LOG";
 
     public static String readContentFromFile(String fileName, Context context) {
+        File file;
+        // Log.d(TAG, "File.pathSeparator: " + File.pathSeparator);
+        if (fileName.contains(File.separator)) {
+            //Log.d(TAG, "pathToFile contains pathSeparator!");
+            file = new File(fileName);
+        } else {
+            file = context.getFileStreamPath(fileName);
+
+        }
+        if (file.isDirectory()) {
+            return "FILE IS DIRECTORY";
+        }
         String content = "";
 
-        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(fileName)))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -32,6 +47,26 @@ public class Utils {
             ioe.printStackTrace();
         }
         return content;
+    }
+
+    public static String readContentFromFileAndIncreaseFileVersion(String fileName, Context context) {
+        String content = "";
+        int appVersion = getAppVersionNumber(context);
+        String fileInfoLine = appVersion + "#-1";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(fileName)))) {
+            String line;
+            line = br.readLine();
+            String fileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
+            fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+            while ((line = br.readLine()) != null) {
+                content += line += System.lineSeparator();
+            }
+            overWriteFile((fileInfoLine + content), fileName, context);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return (fileInfoLine + content);
     }
 
 
@@ -44,6 +79,50 @@ public class Utils {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+
+    // appends content from file <fileNameBottom> to the content of file <fileNameTop>
+    // and increases both their file version number
+    public static String appendFromFileToFile(String fileNameTop, String fileNameBottom, Context context){
+
+        String content = "";
+        String contentTop = "";
+        int appVersion = getAppVersionNumber(context);
+        String topFileInfoLine = appVersion + "#-1";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(fileNameTop)))) {
+            String line;
+            line = br.readLine();
+            String topFileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
+            topFileInfoLine = appVersion + "#" + topFileVersion + System.lineSeparator();
+            while ((line = br.readLine()) != null) {
+                contentTop += line += System.lineSeparator();
+            }
+            overWriteFile((topFileInfoLine + contentTop), fileNameTop, context);
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        String contentBottom = "";
+        String bottomFileInfoLine = appVersion + "#-1";
+        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(fileNameBottom)))) {
+            String line;
+            line = br.readLine();
+            String bottomFileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
+            bottomFileInfoLine = appVersion + "#" + bottomFileVersion + System.lineSeparator();
+            while ((line = br.readLine()) != null) {
+                contentBottom += line += System.lineSeparator();
+            }
+            overWriteFile((bottomFileInfoLine + contentBottom), fileNameBottom, context);
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        content += (topFileInfoLine + contentTop);
+        content += (System.lineSeparator() + "=========================" + System.lineSeparator());
+        content += (bottomFileInfoLine + contentBottom);
+        return content;
     }
 
     public static void overWriteFile(String content, String fileName, Context context) {
