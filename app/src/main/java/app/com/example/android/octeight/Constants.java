@@ -29,7 +29,8 @@ public class Constants extends Service {
 
     public static final SimpleDateFormat DATE_PATTERN_SHORT = new SimpleDateFormat("dd.MM.yyyy");
 
-    public static final String SERVICE_URL = "http://vm1.mcc.tu-berlin.de:8080/resource/";
+    public static final String MCC_VM1 = "http://vm1.mcc.tu-berlin.de:8080/resource/";
+    public static final String MCC_VM3 = "https://vm3.mcc.tu-berlin.de:8082/";
 
     public static final String UPLOAD_HASH_SUFFIX = "mcc_simra";
 
@@ -37,6 +38,9 @@ public class Constants extends Service {
 
     // Every GPS fix has to be at least this accurate to be taken into account.
     public static final double GPS_ACCURACY_THRESHOLD = 90.0;
+
+    // Locales
+    public static final String[] LOCALE_ABVS = {"UNKNOWN", "DE", "EN", "OTHER", "TEST"};
 
     public Constants() {
     }
