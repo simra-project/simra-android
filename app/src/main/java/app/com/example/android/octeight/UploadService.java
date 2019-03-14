@@ -18,15 +18,12 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -46,18 +43,12 @@ import javax.net.ssl.TrustManagerFactory;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 import static app.com.example.android.octeight.Constants.LOCALE_ABVS;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.getUniqueUserID;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpSharedPrefs;
-import static app.com.example.android.octeight.Utils.overWriteFile;
 import static app.com.example.android.octeight.Utils.readContentFromFile;
 import static app.com.example.android.octeight.Utils.readContentFromFileAndIncreaseFileVersion;
 import static app.com.example.android.octeight.Utils.writeToSharedPrefs;
@@ -86,7 +77,6 @@ public class UploadService extends Service {
 
     public static final String TAG = "UploadService_LOG:";
     private IBinder mBinder = new UploadService.MyBinder();
-    private OkHttpClient client = new OkHttpClient();
 
 
     @Override
@@ -216,7 +206,8 @@ public class UploadService extends Service {
                     path = dirFiles[i].getName();
                     if (!(new File(path)).isDirectory()) {
                         String contentToSend = readContentFromFileAndIncreaseFileVersion(path,context);
-                        String key = path.split("_",-1)[0];
+                        String ts = String.valueOf(System.currentTimeMillis());
+                        String key = "CRASH_" + ts + "_" + path;
                         String hashPassword = postUpload(key,contentToSend);
                         if (!path.startsWith("CRASH")) {
                             writeToSharedPrefs(key,hashPassword,"keyPrefs",context);
@@ -264,7 +255,7 @@ public class UploadService extends Service {
             }
         }
 
-        private String postUpload (String key, String contentToSend) throws IOException {
+        private String postUpload (String fileName, String contentToSend) throws IOException {
 
             // Calculating hash for server access.
             Date dateToday = new Date();
@@ -284,10 +275,10 @@ public class UploadService extends Service {
                 // (could be from a resource or ByteArrayInputStream or ...)
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
                 // From https://www.washington.edu/itconnect/security/ca/load-der.crt
-                File certificateFile = getFileStreamPath("server.cer");
-                Log.d(TAG,"file: " + certificateFile.getAbsolutePath());
+                // File certificateFile = new File (getResources().getAssets().open("server.cer"));// getFileStreamPath("server.cer");
+                // Log.d(TAG,"file: " + certificateFile.getAbsolutePath());
 
-                InputStream caInput = new BufferedInputStream(new FileInputStream(certificateFile));
+                InputStream caInput = new BufferedInputStream(getResources().getAssets().open("server.cer"));//new FileInputStream(certificateFile));
                 Certificate ca;
 
                 try {
@@ -334,8 +325,11 @@ public class UploadService extends Service {
                     return true; //hv.verify("vm3.mcc.tu-berlin.de", session);
                 }
             };
+            int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
-            URL url = new URL(Constants.MCC_VM3 + "upload/" + key + "?loc=" + locale + "&clientHash=" + clientHash);
+            // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileName + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
+            URL url = new URL(Constants.MCC_VM3 + appVersion + "/" + "upload?fileName=" + fileName + "&loc=" + locale + "&clientHash=" + clientHash);
+
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
             urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
@@ -352,86 +346,11 @@ public class UploadService extends Service {
             os.close();
             int status = urlConnection.getResponseCode();
             Log.d(TAG, "Server status: " + status);
-            InputStream in = urlConnection.getInputStream();
-            String response = readStream(in,10000);
+            String response = urlConnection.getResponseMessage();
             Log.d(TAG, "Server Response: " + response);
             UploadService.this.decreaseNumberOfTasks();
+
             return response;
-        }
-
-        private void makePostTestPhase(String pathToFile, String id) throws IOException {
-
-            Log.d(TAG, "pathToFile: " + pathToFile + " id: " + id);
-            File file;
-            // Log.d(TAG, "File.pathSeparator: " + File.pathSeparator);
-            if (pathToFile.contains(File.separator)) {
-                //Log.d(TAG, "pathToFile contains pathSeparator!");
-                file = new File(pathToFile);
-            } else {
-                file = getFileStreamPath(pathToFile);
-
-            }
-            if (file.isDirectory()) {
-                return;
-            }
-            //
-            final StringBuilder fileContent = new StringBuilder();
-
-            String content = "";
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
-
-                String line = reader.readLine();
-                Log.d(TAG, "line: " + line);
-                String[] lineArray = line.split("#");
-                String fileVersion = "-1";
-                if (lineArray.length == 2) {
-                    fileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
-                }
-                int appVersion = getAppVersionNumber(context);
-                String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-                line = fileInfoLine;
-                fileContent.append(line);
-                fileContent.append(System.lineSeparator());
-                while ((line = reader.readLine()) != null) {
-                    fileContent.append(line);
-                    fileContent.append(System.lineSeparator());
-                    content += line += System.lineSeparator();
-                }
-                if (lineArray.length == 2) {
-                    overWriteFile((fileInfoLine + content), pathToFile, context);
-                }
-
-            } catch (IOException e) {
-                throw e;
-            }
-
-
-            String key = id + "_" + pathToFile;
-
-            RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), fileContent.toString());
-
-            Log.d(TAG, "sending file with following key to server: " + key);
-            Date dateToday = new Date();
-            String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
-
-            Log.d(TAG, "clientHash: " + clientHash);
-            Log.d(TAG, "dateToday: " + dateToday.toString());
-            Log.d(TAG, "beforeHash: " + (Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX));
-
-
-            Request request = new Request.Builder()
-                    .url(Constants.MCC_VM1 + key.replace(Constants.APP_PATH + "shared_prefs/", "") + "?clientHash=" + clientHash)
-                    .post(requestBody)
-                    .build();
-
-            try (Response response = client.newCall(request).execute()) {
-
-                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
-                Log.d(TAG, "Response Message: " + response.message());
-                UploadService.this.decreaseNumberOfTasks();
-
-            }
         }
 
     }
@@ -457,8 +376,8 @@ public class UploadService extends Service {
         }
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.helmet)
-                .setContentTitle("Fahrten werden hochgeladen")
-                .setContentText("Ihre Fahrten werden hochgeladen.")
+                .setContentTitle(getResources().getString(R.string.recordingNotificationTitle))
+                .setContentText(getResources().getString(R.string.recordingNotificationBody))
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent);

@@ -40,7 +40,7 @@ public class Constants extends Service {
     public static final double GPS_ACCURACY_THRESHOLD = 90.0;
 
     // Locales
-    public static final String[] LOCALE_ABVS = {"UNKNOWN", "DE", "EN", "OTHER", "TEST"};
+    public static final String[] LOCALE_ABVS = {"UNKNOWN", "Berlin", "London", "other", "TEST"};
 
     public Constants() {
     }
