@@ -47,10 +47,12 @@ import java.security.cert.X509Certificate;
 import static app.com.example.android.octeight.Constants.LOCALE_ABVS;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.getUniqueUserID;
+import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpSharedPrefs;
 import static app.com.example.android.octeight.Utils.readContentFromFile;
 import static app.com.example.android.octeight.Utils.readContentFromFileAndIncreaseFileVersion;
+import static app.com.example.android.octeight.Utils.writeBooleanToSharedPrefs;
 import static app.com.example.android.octeight.Utils.writeToSharedPrefs;
 
 public class UploadService extends Service {
@@ -147,7 +149,7 @@ public class UploadService extends Service {
             Log.d(TAG, "doInBackground()");
 
             try {
-                uploadAllFilesTestPhase(context);
+                uploadFile(context);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -164,31 +166,26 @@ public class UploadService extends Service {
             stopSelf();
         }
 
-        private void uploadAllFilesTestPhase(Context context) throws IOException {
+        private void uploadFile(Context context) throws IOException {
 
-            String id = getUniqueUserID(context);
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // SharedPrefs (same as in MainActivity) for unique user id (only in test phase).
-            // ID is used as prefix for each file. Server creates a directory for each id.
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            SharedPreferences sharedPrefs = getApplicationContext()
-                    .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
-            SharedPreferences.Editor editor = sharedPrefs.edit();
-
-            boolean sendCrashReportPermitted = intent.getBooleanExtra("CRASH_REPORT", false);
+            boolean sendCrashReportPermitted = lookUpBooleanSharedPrefs("CRASH_REPORT",false,"simraPrefs",context);
 
             // Sending / Updating profile with each upload
             String profileContentToSend = readContentFromFile("profile.csv",context);
             String profilePassword = lookUpSharedPrefs("profile.csv","-1","keyPrefs",context);
             Log.d(TAG, "Saved password: " + profilePassword);
             if(profilePassword.equals("-1")){
-                Log.d(TAG, "sending profile");
+                Log.d(TAG, "sending profile with POST");
                 String hashPassword = postUpload("profile.csv",profileContentToSend);
                 writeToSharedPrefs("profile.csv",hashPassword,"keyPrefs",context);
                 Log.d(TAG, "hashPassword: " + hashPassword + " written to keyPrefs");
+            } else {
+                Log.d(TAG, "sending profile with PUT");
+                String fileHash = profilePassword.split(",")[0];
+                String filePassword = profilePassword.split(",")[1];
+                String response = putUpload("profile.csv"+fileHash, filePassword, profileContentToSend);
+                Log.d(TAG, "PUT response: " + response);
             }
 
             File[] dirFiles = getFilesDir().listFiles();
@@ -220,13 +217,13 @@ public class UploadService extends Service {
                 // set the boolean "NEW-UNSENT-ERROR" in simraPrefs.xml to false
                 // so that the StartActivity doesn't think there are still unsent
                 // crash logs.
-                editor.putBoolean("NEW-UNSENT-ERROR", false);
-                editor.commit();
+                writeBooleanToSharedPrefs("NEW-UNSENT-ERROR",false,"simraPrefs", context);
 
                 // If there wasn't a crash or the user did not gave us the permission, upload
             } else {
                 ArrayList<String> filesToUpload;
                 filesToUpload = intent.getStringArrayListExtra("PathsToUpload");
+                Log.d(TAG, "DataString: " + intent.getDataString());
                 UploadService.this.setNumberOfTasks((filesToUpload.size()));
 
                 // For each ride to upload...
@@ -244,10 +241,16 @@ public class UploadService extends Service {
                             String password = lookUpSharedPrefs(key, "-1", "keyPrefs", context);
                             Log.d(TAG, "Saved password: " + password);
                             if (password.equals("-1")) {
-                                Log.d(TAG, "sending ride " + key);
+                                Log.d(TAG, "sending ride with POST" + key);
                                 String hashPassword = postUpload(key, contentToSend);
                                 writeToSharedPrefs(key, hashPassword, "keyPrefs", context);
                                 Log.d(TAG, "hashPassword: " + hashPassword + " written to keyPrefs");
+                            } else {
+                                Log.d(TAG, "sending ride with PUT" + key);
+                                String fileHash = password.split(",")[0];
+                                String filePassword = password.split(",")[1];
+                                String response = putUpload(fileHash, filePassword, contentToSend);
+                                Log.d(TAG, "PUT response: " + response);
                             }
                         }
                     }
@@ -340,6 +343,105 @@ public class UploadService extends Service {
             urlConnection.setConnectTimeout(15000);
             urlConnection.setHostnameVerifier(hostnameVerifier);
             urlConnection.setRequestProperty("Content-Type","text/plain");
+            byte[] outputInBytes = contentToSend.getBytes("UTF-8");
+            OutputStream os = urlConnection.getOutputStream();
+            os.write( outputInBytes );
+            os.close();
+            int status = urlConnection.getResponseCode();
+            Log.d(TAG, "Server status: " + status);
+            String response = urlConnection.getResponseMessage();
+            Log.d(TAG, "Server Response: " + response);
+            UploadService.this.decreaseNumberOfTasks();
+
+            return response;
+        }
+
+        private String putUpload (String fileHash, String filePassword, String contentToSend) throws IOException {
+
+            // Calculating hash for server access.
+            Date dateToday = new Date();
+            String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
+
+            Log.d(TAG, "clientHash: " + clientHash);
+            Log.d(TAG, "dateToday: " + dateToday.toString());
+            Log.d(TAG, "beforeHash: " + (Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX));
+
+            int localeInt = lookUpIntSharedPrefs("Profile-Region",0,"simraPrefs",context);
+            String locale = LOCALE_ABVS[localeInt];
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            SSLContext sslContext = null;
+            try{
+                // Load CAs from an InputStream
+                // (could be from a resource or ByteArrayInputStream or ...)
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                // From https://www.washington.edu/itconnect/security/ca/load-der.crt
+                // File certificateFile = new File (getResources().getAssets().open("server.cer"));// getFileStreamPath("server.cer");
+                // Log.d(TAG,"file: " + certificateFile.getAbsolutePath());
+
+                InputStream caInput = new BufferedInputStream(getResources().getAssets().open("server.cer"));//new FileInputStream(certificateFile));
+                Certificate ca;
+
+                try {
+                    ca = cf.generateCertificate(caInput);
+                    Log.d(TAG,"ca=" + ((X509Certificate) ca).getSubjectDN());
+                } finally {
+                    caInput.close();
+                }
+
+                // Create a KeyStore containing our trusted CAs
+                String keyStoreType = KeyStore.getDefaultType();
+                KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+                keyStore.load(null, null);
+                keyStore.setCertificateEntry("ca", ca);
+                Log.d(TAG,"subjectDN: " + ((X509Certificate) ca).getSubjectDN());
+
+                // Create a TrustManager that trusts the CAs in our KeyStore
+                String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+                tmf.init(keyStore);
+
+                // Create an SSLContext that uses our TrustManager
+                sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, tmf.getTrustManagers(), null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (CertificateException e) {
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (KeyStoreException e) {
+                e.printStackTrace();
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
+            }
+
+            HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    HostnameVerifier hv =
+                            HttpsURLConnection.getDefaultHostnameVerifier();
+                    Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de", session));
+                    Log.d(TAG, "hostname: " + hostname);
+                    return true; //hv.verify("vm3.mcc.tu-berlin.de", session);
+                }
+            };
+            int appVersion = getAppVersionNumber(context);
+            // Tell the URLConnection to use a SocketFactory from our SSLContext
+            // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
+            URL url = new URL(Constants.MCC_VM3 + appVersion + "/" + "update?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + clientHash);
+
+            HttpsURLConnection urlConnection =
+                    (HttpsURLConnection)url.openConnection();
+            urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+            urlConnection.setRequestMethod("PUT");
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(true);
+            urlConnection.setReadTimeout(10000);
+            urlConnection.setConnectTimeout(15000);
+            urlConnection.setHostnameVerifier(hostnameVerifier);
+            urlConnection.setRequestProperty("Content-Type","text/plain");
+            Log.d(TAG, "contentToSend.length(): " + contentToSend.length());
             byte[] outputInBytes = contentToSend.getBytes("UTF-8");
             OutputStream os = urlConnection.getOutputStream();
             os.write( outputInBytes );
