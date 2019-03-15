@@ -169,7 +169,7 @@ public class UploadService extends Service {
         private void uploadFile(Context context) throws IOException {
 
 
-            boolean sendCrashReportPermitted = lookUpBooleanSharedPrefs("CRASH_REPORT",false,"simraPrefs",context);
+            boolean sendCrashReportPermitted = lookUpBooleanSharedPrefs("NEW-UNSENT-ERROR",false,"simraPrefs",context);
 
             // Sending / Updating profile with each upload
             String profileContentToSend = readContentFromFile("profile.csv",context);
@@ -197,18 +197,17 @@ public class UploadService extends Service {
             // in order to enable reconstructing the error.
             if (sendCrashReportPermitted) {
                 String path = Constants.APP_PATH + "shared_prefs/simraPrefs.xml";
-                postUpload(path, readContentFromFile(path,context));
+                String ts = String.valueOf(System.currentTimeMillis());
+                String key = "CRASH_" + ts + "_" + path;
+                postUpload(key, readContentFromFile(path,context));
 
                 for (int i = 0; i < dirFiles.length; i++) {
                     path = dirFiles[i].getName();
                     if (!(new File(path)).isDirectory()) {
                         String contentToSend = readContentFromFileAndIncreaseFileVersion(path,context);
-                        String ts = String.valueOf(System.currentTimeMillis());
-                        String key = "CRASH_" + ts + "_" + path;
-                        String hashPassword = postUpload(key,contentToSend);
-                        if (!path.startsWith("CRASH")) {
-                            writeToSharedPrefs(key,hashPassword,"keyPrefs",context);
-                        } else {
+                        key = "CRASH_" + ts + "_" + path;
+                        postUpload(key,contentToSend);
+                        if (path.startsWith("CRASH")) {
                             boolean deleted = context.deleteFile(path);
                             Log.d(TAG, path + " deleted: " + deleted);
                         }
