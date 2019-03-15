@@ -200,7 +200,16 @@ public class HistoryActivity extends BaseActivity {
                 if (pathsToUpload.size() > 0) {
 
                     String profileContent = readContentFromFile("profile.csv",HistoryActivity.this);
-                    fileVersion = "" + Integer.valueOf(profileContent.split(System.lineSeparator())[0].split("#")[1] + 1);
+
+                    try {
+                        fileVersion = "" + (Integer.valueOf((profileContent.split(System.lineSeparator())[0].split("#")[1])) + 1);
+                    } catch (ArrayIndexOutOfBoundsException a) {
+                        fileVersion = "1";
+                        a.printStackTrace();
+                    } catch (NumberFormatException n) {
+                        fileVersion = "1";
+                        n.printStackTrace();
+                    }
                     String demographicHeader = "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents" + System.lineSeparator();
                     String demographics = getDemographics();
                     String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
