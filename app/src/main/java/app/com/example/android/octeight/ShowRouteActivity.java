@@ -22,6 +22,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jaygoo.widget.OnRangeChangedListener;
+import com.jaygoo.widget.RangeSeekBar;
+
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
@@ -33,10 +36,13 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -95,6 +101,16 @@ public class ShowRouteActivity extends BaseActivity {
     int trailer;
     int pLoc;
 
+    int state;
+    String duration;
+    File gpsFile;
+    Polyline route;
+
+    Ride tempRide;
+    File tempGpsFile;
+    String tempAccGpsPath;
+    String tempAccEventsPath;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,11 +141,11 @@ public class ShowRouteActivity extends BaseActivity {
         String pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
         // Log.d(TAG, "onCreate() date: " + date);
-        int state = getIntent().getIntExtra("State", 0);
+        state = getIntent().getIntExtra("State", 0);
         // Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
-        String duration = getIntent().getStringExtra("Duration");
+        duration = getIntent().getStringExtra("Duration");
 
-        File gpsFile = getFileStreamPath(pathToAccGpsFile);
+        gpsFile = getFileStreamPath(pathToAccGpsFile);
 
         Log.d(TAG, "creating ride objects");
         bike = lookUpIntSharedPrefs("Settings-BikeType",0,"simraPrefs",this);
@@ -143,6 +159,114 @@ public class ShowRouteActivity extends BaseActivity {
 
         Log.d(TAG, "onCreate() continues.");
 
+        refreshRoute();
+
+        Log.d(TAG, "setting up clickListeners");
+
+        // Functionality for 'edit mode', i.e. the mode in which users can put their own incidents
+        // onto the map
+        addIncBttn.setOnClickListener((View v) -> {
+            addIncBttn.setVisibility(View.INVISIBLE);
+            exitAddIncBttn.setVisibility(View.VISIBLE);
+            ShowRouteActivity.this.addCustomMarkerMode = true;
+
+            // overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
+            // mMapView.getOverlays().add(overlayEvents);
+            // mMapView.invalidate();
+        });
+
+        exitAddIncBttn.setOnClickListener((View v) -> {
+            addIncBttn.setVisibility(View.VISIBLE);
+            exitAddIncBttn.setVisibility(View.INVISIBLE);
+            ShowRouteActivity.this.addCustomMarkerMode = false;
+        });
+
+        RangeSeekBar privacySlider = findViewById(R.id.privacySlider);
+        privacySlider.setRange(0, route.getPoints().size());
+        privacySlider.setValue(0, route.getPoints().size());
+        Log.d(TAG, "route.size(): " + route.getPoints().size());
+        // String originalAccGpsContent = readContentFromFile(ride.accGpsFile.getName(),this);
+        // String tempAccGpsPath = originalAccGpsContent;
+
+        final int[] left = {0};
+        final int[] right = {0};
+        privacySlider.setOnRangeChangedListener(new OnRangeChangedListener() {
+
+            @Override
+            public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
+                left[0] = (int) leftValue;
+                right[0] = (int) rightValue;
+            }
+
+            @Override
+            public void onStartTrackingTouch(RangeSeekBar view,  boolean isLeft) {
+                //start tracking touch
+            }
+
+            @Override
+            public void onStopTrackingTouch(RangeSeekBar view,  boolean isLeft) {
+
+                //stop tracking touch
+                Log.d(TAG, "left: " + left[0] + " right: " + right[0]);
+                tempAccEventsPath = "TempaccEvents" + ride.getId() + ".csv";
+                tempAccGpsPath = "Temp" + gpsFile.getName();
+                gpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
+                refreshRoute();
+            }
+        });
+
+        saveButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    saveButton.setElevation(0.0f);
+                    saveButton.setBackground(getDrawable(R.drawable.button_pressed));
+                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                    saveButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
+                    saveButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
+            }
+
+        });
+
+        saveButton.setOnClickListener((View v) -> {
+
+            String content = "";
+            int appVersion = getAppVersionNumber(ShowRouteActivity.this);
+            String fileVersion = "";
+            try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("#")) {
+                        String[] fileInfoArray = line.split("#");
+                        fileVersion = fileInfoArray[1];
+                        continue;
+                    }
+                    String[] metaDataLine = line.split(",",-1);
+                    String metaDataRide = line;
+                    if (metaDataLine[0].equals(ride.getId())) {
+                        metaDataLine[3] = "1";
+                        metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
+                    }
+                    content += metaDataRide += System.lineSeparator();
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+            String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+            overWriteFile((fileInfoLine + content),"metaData.csv",this);
+
+            Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
+            finish();
+        });
+
+
+        Log.d(TAG, "onCreate() finished");
+
+    }
+
+    private void refreshRoute() {
         // Create a ride object with the accelerometer, gps and time data
         try {
             ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, this);
@@ -151,7 +275,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
 
         // Get the Route as a Polyline to be displayed on the map
-        Polyline route = ride.getRoute();
+        route = ride.getRoute();
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
         // set accordingly
         BoundingBox bBox = getBoundingBox(route);
@@ -246,75 +370,44 @@ public class ShowRouteActivity extends BaseActivity {
         mMapView.getOverlays().add(overlayEvents);
         mMapView.invalidate();
 
-        Log.d(TAG, "setting up clickListeners");
+    }
 
-        // Functionality for 'edit mode', i.e. the mode in which users can put their own incidents
-        // onto the map
-        addIncBttn.setOnClickListener((View v) -> {
-            addIncBttn.setVisibility(View.INVISIBLE);
-            exitAddIncBttn.setVisibility(View.VISIBLE);
-            ShowRouteActivity.this.addCustomMarkerMode = true;
+    private File updateRoute(int left, int right, String pathToAccGpsFile) {
+        String content = "";
+        FileOutputStream writer = null;
+        try {
+            writer = openFileOutput(pathToAccGpsFile, MODE_APPEND);
 
-            // overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
-            // mMapView.getOverlays().add(overlayEvents);
-            // mMapView.invalidate();
-        });
-
-        exitAddIncBttn.setOnClickListener((View v) -> {
-            addIncBttn.setVisibility(View.VISIBLE);
-            exitAddIncBttn.setVisibility(View.INVISIBLE);
-            ShowRouteActivity.this.addCustomMarkerMode = false;
-        });
-
-        saveButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                    saveButton.setElevation(0.0f);
-                    saveButton.setBackground(getDrawable(R.drawable.button_pressed));
-                } if (event.getAction() == MotionEvent.ACTION_UP) {
-                    saveButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
-                    saveButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                }
-                return false;
-            }
-
-        });
-
-        saveButton.setOnClickListener((View v) -> {
-
-            String content = "";
-            int appVersion = getAppVersionNumber(ShowRouteActivity.this);
-            String fileVersion = "";
-            try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(ride.accGpsFile)))) {
                 String line;
+                content += (br.readLine() + System.lineSeparator()); // fileInfo
+                content += (br.readLine() + System.lineSeparator()); // csv header
+                int partOfRideNumber = 0;
                 while ((line = br.readLine()) != null) {
-                    if (line.contains("#")) {
-                        String[] fileInfoArray = line.split("#");
-                        fileVersion = fileInfoArray[1];
-                        continue;
+                    if (!line.startsWith(",,")) {
+                        partOfRideNumber++;
                     }
-                    String[] metaDataLine = line.split(",",-1);
-                    String metaDataRide = line;
-                    if (metaDataLine[0].equals(ride.getId())) {
-                        metaDataLine[3] = "1";
-                        metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
+                    if((partOfRideNumber >= left)&&(partOfRideNumber <= right)) {
+                        content += (br.readLine() + System.lineSeparator());
+                        writer.write(content.getBytes());
+                        writer.flush();
                     }
-                    content += metaDataRide += System.lineSeparator();
                 }
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
-            String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-            overWriteFile((fileInfoLine + content),"metaData.csv",this);
-
-            Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
-            finish();
-        });
-
-
-        Log.d(TAG, "onCreate() finished");
-
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return getFileStreamPath(pathToAccGpsFile);
     }
 
     // If the user clicks on an InfoWindow and IncidentPopUpActivity for that
