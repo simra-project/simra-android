@@ -33,6 +33,7 @@ import static app.com.example.android.octeight.Utils.checkForAnnotation;
 import static app.com.example.android.octeight.Utils.fileExists;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
+import static app.com.example.android.octeight.Utils.overWriteFile;
 
 public class MarkerFunct {
 
@@ -57,20 +58,26 @@ public class MarkerFunct {
     String startTime;
     String timeStamp;
 
+    boolean temp;
+
     private int numEvents;
 
     private Map<Integer, Marker> markerMap = new HashMap<>();
 
-    public MarkerFunct(ShowRouteActivity mother) {
+    public MarkerFunct(ShowRouteActivity mother, boolean temp) {
 
         this.mother = mother;
+
+        this.temp = temp;
 
         this.pool = mother.pool;
 
         //this.incidentDat = mother.ride.getEvents();
-
-        this.rideID = mother.ride.getId();
-
+        if (temp) {
+            this.rideID = mother.tempRide.getId();
+        } else {
+            this.rideID = mother.ride.getId();
+        }
         pool.execute(new SimpleThreadFactory().newThread(() ->
                 geocoderNominatim = new GeocoderNominatim(userAgent)
         ));
@@ -79,7 +86,11 @@ public class MarkerFunct {
 
         this.timeStamp = mother.timeStamp;
 
-        this.numEvents = (mother.ride.events.size() - 1);
+        if (temp) {
+            this.numEvents = (mother.tempRide.events.size() - 1);
+        } else {
+            this.numEvents = (mother.ride.events.size() - 1);
+        }
 
     }
 
@@ -93,10 +104,14 @@ public class MarkerFunct {
 
          setMarker(accEvent);
          }*/
+        String path = "accEvents" + rideID + ".csv";
+        if (temp) {
+            path = "TempaccEvents" + rideID + ".csv";
+        }
 
         try (BufferedReader reader = new BufferedReader(new FileReader
                 (mother.getApplicationContext()
-                        .getFileStreamPath("accEvents" + rideID + ".csv")))) {
+                        .getFileStreamPath(path)))) {
 
 
 
@@ -151,11 +166,16 @@ public class MarkerFunct {
 
         List<GeoPointWrapper> wrappedGPS = new ArrayList<>();
 
-        for (GeoPoint thisGP : mother.ride.getRoute().getPoints()) {
-
-            wrappedGPS.add(new GeoPointWrapper(thisGP, p));
-
+        if (temp) {
+            for (GeoPoint thisGP : mother.tempRide.getRoute().getPoints()) {
+                wrappedGPS.add(new GeoPointWrapper(thisGP, p));
+            }
+        } else {
+            for (GeoPoint thisGP : mother.ride.getRoute().getPoints()) {
+                wrappedGPS.add(new GeoPointWrapper(thisGP, p));
+            }
         }
+
 
         Log.d(TAG, "wrappedGPS.size(): " + wrappedGPS.size());
 
@@ -226,6 +246,9 @@ public class MarkerFunct {
                     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // Append new acc event to accEvents[rideID].csv
                     String pathToAccEventsOfRide = "accEvents" + rideID + ".csv";
+                    if (temp) {
+                        pathToAccEventsOfRide = "TempaccEvents" + rideID + ".csv";
+                    }
                     String header = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
                     header += System.lineSeparator();
                     String fileInfoLine = getAppVersionNumber(mother) + "#1" + System.lineSeparator();
@@ -241,13 +264,17 @@ public class MarkerFunct {
                             + "," + newAcc.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + "," + /*incident*/"," + /*i1*/"," + /*i2*/"," + /*i3*/"," + /*i4*/"," + /*i5*/"," + /*i6*/"," + /*i7*/"," + /*i8*/"," + /*i9*/"," + /*scary*/"," + /*desc*/"," +System.lineSeparator();
 
                     if (!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())) {
-                        appendToFile((fileInfoLine + header + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
+                        overWriteFile((fileInfoLine + header + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
                     } else {
                         appendToFile(eventLine, pathToAccEventsOfRide, mother.getApplicationContext());
                     }
                     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // Add new AccEvent to ride's AccEvents list
-                    mother.ride.getEvents().add(newAcc);
+                    if (temp) {
+                        mother.tempRide.getEvents().add(newAcc);
+                    } else {
+                        mother.ride.getEvents().add(newAcc);
+                    }
                 });
 
         Window window = alertDialog.getWindow();
@@ -304,7 +331,7 @@ public class MarkerFunct {
         Log.d(TAG, "setting up InfoWindow with address: " + addressForLoc);
         InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble,
                 mother.getmMapView(),
-                event, addressForLoc, mother, event.key);
+                event, addressForLoc, mother, event.key, temp);
         incidentMarker.setInfoWindow(infoWindow);
 
         markers.add(incidentMarker);
@@ -345,6 +372,14 @@ public class MarkerFunct {
         for (int i = 0; i < markers.size(); i++) {
             markers.get(i).closeInfoWindow();
         }
+    }
+
+    public void deleteAllMarkers() {
+        for (int i = 0; i < markers.size(); i++) {
+            mother.getmMapView().getOverlays().remove(markers.get(i));
+
+        }
+        mother.getmMapView().invalidate();
     }
 
     // Thread factory implementation: to enable setting priority before new thread is returned
