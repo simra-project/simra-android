@@ -1,8 +1,11 @@
 package app.com.example.android.octeight;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -112,6 +115,13 @@ public class ShowRouteActivity extends BaseActivity {
     String tempAccGpsPath;
     String tempAccEventsPath;
     Polyline tempRoute;
+    boolean showWarning = true;
+    boolean continueWithRefresh = true;
+
+    int lastLeft;
+    int lastRight;
+
+    RangeSeekBar privacySlider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +148,8 @@ public class ShowRouteActivity extends BaseActivity {
 
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
+
+        showWarning = lookUpBooleanSharedPrefs("ShowRoute-Warning",true,"simraPrefs",this);
 
         String pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
@@ -183,13 +195,16 @@ public class ShowRouteActivity extends BaseActivity {
             ShowRouteActivity.this.addCustomMarkerMode = false;
         });
 
-        RangeSeekBar privacySlider = findViewById(R.id.privacySlider);
-        privacySlider.setRange(0, route.getPoints().size());
-        privacySlider.setValue(0, route.getPoints().size());
-        Log.d(TAG, "route.size(): " + route.getPoints().size());
+        privacySlider = findViewById(R.id.privacySlider);
+        int routeSize = route.getPoints().size();
+        privacySlider.setRange(0, routeSize);
+        privacySlider.setValue(0, routeSize);
+        Log.d(TAG, "route.size(): " + routeSize);
         // String originalAccGpsContent = readContentFromFile(ride.accGpsFile.getName(),this);
         // String tempAccGpsPath = originalAccGpsContent;
 
+        lastLeft = 0;
+        lastRight = routeSize;
         final int[] left = {0};
         final int[] right = {0};
         privacySlider.setOnRangeChangedListener(new OnRangeChangedListener() {
@@ -208,12 +223,19 @@ public class ShowRouteActivity extends BaseActivity {
             @Override
             public void onStopTrackingTouch(RangeSeekBar view,  boolean isLeft) {
 
-                //stop tracking touch
-                Log.d(TAG, "left: " + left[0] + " right: " + right[0]);
-                tempAccEventsPath = "TempaccEvents" + ride.getId() + ".csv";
-                tempAccGpsPath = "Temp" + gpsFile.getName();
-                tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
-                refreshRoute(true);
+                if (showWarning) {
+                    getDialogValueBack(left[0], right[0]);
+                } else {
+                    //stop tracking touch
+                    Log.d(TAG, "left: " + left[0] + " right: " + right[0]);
+                    tempAccEventsPath = "TempaccEvents" + ride.getId() + ".csv";
+                    tempAccGpsPath = "Temp" + gpsFile.getName();
+                    tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
+                    refreshRoute(true);
+                    Toast.makeText(ShowRouteActivity.this, getString(R.string.newIncidents), Toast.LENGTH_LONG).show();
+                    lastLeft = left[0];
+                    lastRight = right[0];
+                }
 
             }
         });
@@ -679,6 +701,50 @@ public class ShowRouteActivity extends BaseActivity {
         } catch (RuntimeException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean getDialogValueBack(int left, int right) {
+
+        View checkBoxView = View.inflate(this, R.layout.checkbox, null);
+        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                writeBooleanToSharedPrefs("ShowRoute-Warning",checkBox.isChecked(),"simraPrefs",ShowRouteActivity.this);
+            }
+        });
+        checkBox.setText(getString(R.string.doNotShowAgain));
+        AlertDialog.Builder alert = new AlertDialog.Builder(ShowRouteActivity.this);
+        alert.setTitle(getString(R.string.warningRefreshTitle));
+        alert.setMessage(getString(R.string.warningRefresMessage));
+        alert.setView(checkBoxView);
+        alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                continueWithRefresh = true;
+                //stop tracking touch
+                Log.d(TAG, "left: " + left + " right: " + right);
+                tempAccEventsPath = "TempaccEvents" + ride.getId() + ".csv";
+                tempAccGpsPath = "Temp" + gpsFile.getName();
+                tempGpsFile = updateRoute(left, right, tempAccGpsPath);
+                refreshRoute(true);
+                // Toast.makeText(ShowRouteActivity.this, getString(R.string.newIncidents), Toast.LENGTH_LONG).show();
+                lastLeft = left;
+                lastRight = right;
+            }
+        });
+        alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                continueWithRefresh = false;
+                privacySlider.setValue(lastLeft, lastRight);
+            }
+        });
+        alert.show();
+
+
+        return continueWithRefresh;
+
 
     }
+
 }

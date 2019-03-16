@@ -219,5 +219,8 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="recordingNotificationBody">Ihre Fahrt wird aufgezeichnet.</string>
     <string name="calculatingIncidentsDialogTitle">Ereignisse werden ermittelt</string>
     <string name="calculatingIncidentsDialogMessage">Bitte Warten</string>
+    <string name="newIncidents">Annotationen zurückgesetzt</string>
+    <string name="warningRefreshTitle">Achtung</string>
+    <string name="warningRefresMessage">Nach Veränderung der Fahrt werden die Ereignisse neu berechnet und bisherige Ereignisse diese Fahrt, inklusive der Annotationen, werden verworfen.</string>
 
 </resources>
