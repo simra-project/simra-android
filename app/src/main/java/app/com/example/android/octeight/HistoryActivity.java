@@ -223,8 +223,8 @@ public class HistoryActivity extends BaseActivity {
                     ProgressDialog pd;
 
                     pd = new ProgressDialog(HistoryActivity.this);
-                    pd.setTitle(getString(R.string.progressDialogTitle));
-                    pd.setMessage(getString(R.string.progressDialogText));
+                    pd.setTitle(getString(R.string.uploadProgressDialogTitle));
+                    pd.setMessage(getString(R.string.uploadProgressDialogText));
                     pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                     pd.setCancelable(false);
                     pd.setIndeterminate(false);

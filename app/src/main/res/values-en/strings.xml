@@ -73,8 +73,8 @@
     <string name="uploadRidesSuccessful">Upload successful!</string>
     <string name="noFilesToBeUploaded">All annotated rides were\nalready uploaded.</string>
     <string name="justUpload">Upload</string>
-    <string name="progressDialogTitle">Upload</string>
-    <string name="progressDialogText">Uploading rides. Please wait.</string>
+    <string name="uploadProgressDialogTitle">Upload</string>
+    <string name="uploadProgressDialogText">Uploading rides. Please wait.</string>
     <string name="newRideInHistoryActivity">New ride! Please annotate.\n</string>
     <string name="startRecording">Start\nRecording</string>
     <string name="endRecording">End\nRecording</string>
@@ -242,4 +242,6 @@
     <string name="locationServiceisOff">The locaation service is disabled! Please enable it, so the ride can be recorded.</string>
     <string name="recordingNotificationTitle">Recording Ride</string>
     <string name="recordingNotificationBody">Your Ride is being recorded.</string>
+    <string name="calculatingIncidentsDialogTitle">Calculating Incidents</string>
+    <string name="calculatingIncidentsDialogMessage">Please Wait</string>
 </resources>
