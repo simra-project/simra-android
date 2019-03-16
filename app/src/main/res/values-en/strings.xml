@@ -244,4 +244,7 @@
     <string name="recordingNotificationBody">Your Ride is being recorded.</string>
     <string name="calculatingIncidentsDialogTitle">Calculating Incidents</string>
     <string name="calculatingIncidentsDialogMessage">Please Wait</string>
+    <string name="newIncidents">Renewed reset to default</string>
+    <string name="warningRefreshTitle">Warning</string>
+    <string name="warningRefresMessage">After the ride gets changed, new incidents will be calculated and previous incidents of this ride and their annotations will be deleted.</string>
 </resources>
