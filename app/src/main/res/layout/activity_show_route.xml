@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ShowRouteActivity">
 
     <org.osmdroid.views.MapView
@@ -122,11 +122,8 @@
         android:id="@+id/saveIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignEnd="@id/exitAddIncident"
-
-        android:layout_marginBottom="20dp"
-
+        android:layout_above="@id/privacySlider"
         android:elevation="2dp"
         android:clickable="true"
         android:focusable="true"
@@ -153,6 +150,20 @@
             android:textStyle="bold" />
 
     </RelativeLayout>
+
+    <com.jaygoo.widget.RangeSeekBar
+        android:id="@+id/privacySlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="20dp"
+        app:rsb_progress_default_color="@color/colorPrimary"
+        app:rsb_progress_color="@color/colorAccent"
+        android:background="@color/transparent"
+        app:rsb_mode="range"
+        app:rsb_range_interval="1"
+        app:rsb_tick_mark_number="1"
+        />
 
     <TextView
         android:id="@+id/copyright_text"

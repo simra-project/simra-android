@@ -43,6 +43,7 @@ public class Ride {
     int child;
     int trailer;
     int pLoc;
+    boolean temp;
 
     public String getDuration() {
         return duration;
@@ -96,6 +97,45 @@ public class Ride {
 
             appendToFile((fileInfoLine + content), pathToAccEventsOfRide, context);
         }
+
+    }
+
+    public Ride(File tempAccGpsFile, String duration, String startTime, /*String date,*/ int state, int bike, int child, int trailer, int pLoc, boolean temp, Context context) {
+        this.accGpsFile = tempAccGpsFile;
+        this.duration = duration;
+        this.startTime = startTime;
+        this.route = getRouteLine(tempAccGpsFile);
+        this.state = state;
+        this.bike = bike;
+        this.child = child;
+        this.trailer = trailer;
+        this.pLoc = pLoc;
+        this.events = findAccEvents();
+        this.context = context;
+        String prefix = "/data/user/0/app.com.example.android.octeight/files/";
+        String path = tempAccGpsFile.getPath().replace(prefix, "");
+        this.id = path.split("_")[0];
+        this.temp = temp;
+
+        String pathToAccEventsOfRide = "TempaccEvents" + id + ".csv";
+        String content = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
+        content += System.lineSeparator();
+        String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
+
+        for (int i = 0; i < events.size(); i++) {
+
+            AccEvent actualAccEvent = events.get(i);
+
+            // Forwarding the key to the accEvents; from the accEvents, we forward them to
+            // the Info-Windows and from there to IncidentPopUpActivity.
+            //actualAccEvent.setKey(i);
+            // @TODO do AccEvents have to have a key here???
+
+            content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + ",,,,,,,,,,,," + System.lineSeparator();
+        }
+
+        appendToFile((fileInfoLine + content), pathToAccEventsOfRide, context);
+
 
     }
 
