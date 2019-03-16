@@ -195,15 +195,6 @@ public class Utils {
         editor.apply();
     }
 
-    public static String getUniqueUserID(Context context) {
-        String id = lookUpSharedPrefs("USER-ID", "0", "simraPrefs", context);
-        if (id.equals("0")) {
-            id = String.valueOf(System.currentTimeMillis());
-            writeToSharedPrefs("USER-ID", id, "simraPrefs", context);
-        }
-        return id;
-    }
-
 
     // Check if an accEvent has already been annotated based on one line of the accEvents csv file.
     // Returns true, if accEvent was already annotated.

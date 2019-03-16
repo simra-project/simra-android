@@ -47,7 +47,6 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static app.com.example.android.octeight.Utils.getUniqueUserID;
 import static app.com.example.android.octeight.Utils.showMessageOK;
 
 
@@ -567,12 +566,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_main) {
-            DrawerLayout drawer = findViewById(R.id.drawer_layout);
-            if (drawer.isDrawerOpen(GravityCompat.START)) {
-                drawer.closeDrawer(GravityCompat.START);
-            }
-        } else if (id == R.id.nav_history) {
+        if (id == R.id.nav_history) {
             Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_democraphic_data) {
@@ -584,7 +578,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             i.setType("message/rfc822");
             i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
-            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackReceiver) + "\n id: " + getUniqueUserID(this));
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackReceiver));
             try {
                 startActivity(Intent.createChooser(i, "Send mail..."));
             } catch (android.content.ActivityNotFoundException ex) {

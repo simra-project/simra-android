@@ -25,7 +25,6 @@ import okhttp3.Response;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
-import static app.com.example.android.octeight.Utils.getUniqueUserID;
 
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
 
@@ -132,14 +131,14 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
 
             String path = Constants.APP_PATH + "shared_prefs/simraPrefs.xml";
 
-            makePostTestPhase(path, getUniqueUserID(context));
+            // makePostTestPhase(path, getUniqueUserID(context));
 
             File[] dirFiles = getFilesDir().listFiles();
 
             for (int i = 0; i < dirFiles.length; i++) {
                 path = dirFiles[i].getName()/*.getPath().replace(prefix, "")*/;
                 Log.d(TAG, "path: " + path);
-                makePostTestPhase(path, getUniqueUserID(context));
+                // makePostTestPhase(path, getUniqueUserID(context));
             }
 
 

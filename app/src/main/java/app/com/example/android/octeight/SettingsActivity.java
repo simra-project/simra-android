@@ -70,9 +70,7 @@ public class SettingsActivity extends BaseActivity {
                                        }
                                    }
         );
-        // Unique user id (bottom right of the screen)
-        TextView tv1 = findViewById(R.id.textViewId);
-        tv1.setText("id: " + getUniqueUserID(this));
+
 
 
         // Set the distance measure unit according to locale (foot when english, meter when german)

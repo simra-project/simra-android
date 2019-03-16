@@ -46,7 +46,6 @@ import java.security.cert.X509Certificate;
 
 import static app.com.example.android.octeight.Constants.LOCALE_ABVS;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
-import static app.com.example.android.octeight.Utils.getUniqueUserID;
 import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpSharedPrefs;
