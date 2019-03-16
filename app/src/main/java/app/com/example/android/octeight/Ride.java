@@ -17,6 +17,7 @@ import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
+import static app.com.example.android.octeight.Utils.overWriteFile;
 
 public class Ride {
 
@@ -114,7 +115,7 @@ public class Ride {
         this.context = context;
         String prefix = "/data/user/0/app.com.example.android.octeight/files/";
         String path = tempAccGpsFile.getPath().replace(prefix, "");
-        this.id = path.split("_")[0];
+        this.id = path.split("_")[0].replace("Temp", "");
         this.temp = temp;
 
         String pathToAccEventsOfRide = "TempaccEvents" + id + ".csv";
@@ -134,7 +135,7 @@ public class Ride {
             content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + ",,,,,,,,,,,," + System.lineSeparator();
         }
 
-        appendToFile((fileInfoLine + content), pathToAccEventsOfRide, context);
+        overWriteFile((fileInfoLine + content), pathToAccEventsOfRide, context);
 
 
     }

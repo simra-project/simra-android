@@ -38,6 +38,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     String rideID;
     String incidentKey;
     String[] previousAnnotation;
+    boolean temp;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
@@ -62,6 +63,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         rideID = getIntent().getStringExtra("Ride_ID");
 
         incidentKey = getIntent().getStringExtra("Incident_Key");
+
+        temp = getIntent().getBooleanExtra("Incident_temp",false);
 
         previousAnnotation = loadPreviousAnnotation
                 (rideID, incidentKey);
@@ -352,6 +355,9 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     public void overwriteIncidentFile(String rideID, String incidentKey, String newAnnotation) {
 
         String path = "accEvents" + rideID + ".csv";
+        if (temp) {
+            path = "Temp" + path;
+        }
 
         String contentOfNewFile = "";
         int appVersion = getAppVersionNumber(IncidentPopUpActivity.this);

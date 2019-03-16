@@ -48,6 +48,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static app.com.example.android.octeight.Utils.checkForAnnotation;
+import static app.com.example.android.octeight.Utils.fileExists;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
@@ -110,6 +111,7 @@ public class ShowRouteActivity extends BaseActivity {
     File tempGpsFile;
     String tempAccGpsPath;
     String tempAccEventsPath;
+    Polyline tempRoute;
 
 
     @Override
@@ -159,7 +161,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         Log.d(TAG, "onCreate() continues.");
 
-        refreshRoute();
+        refreshRoute(false);
 
         Log.d(TAG, "setting up clickListeners");
 
@@ -210,8 +212,8 @@ public class ShowRouteActivity extends BaseActivity {
                 Log.d(TAG, "left: " + left[0] + " right: " + right[0]);
                 tempAccEventsPath = "TempaccEvents" + ride.getId() + ".csv";
                 tempAccGpsPath = "Temp" + gpsFile.getName();
-                gpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
-                refreshRoute();
+                tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
+                refreshRoute(true);
             }
         });
 
@@ -257,6 +259,26 @@ public class ShowRouteActivity extends BaseActivity {
             String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
             overWriteFile((fileInfoLine + content),"metaData.csv",this);
 
+
+            // tempAccEventsPath
+            // tempAccGpsPath
+            if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {
+                Log.d(TAG, "path of tempGpsFile: " + tempGpsFile.getPath());
+                deleteFile(pathToAccGpsFile);
+                String path = Constants.APP_PATH + "files/";
+                boolean success = tempGpsFile.renameTo(new File(path + pathToAccGpsFile));
+                Log.d(TAG, "tempGpsFile successfully renamed: " + success);
+            }
+            String pathToAccEventsFile = "accEvents" + ride.getId() + ".csv";
+            if (tempAccEventsPath != null) {
+                deleteFile(pathToAccEventsFile);
+                String path = Constants.APP_PATH + "files/";
+                File tempAccEventsFile = new File(path + tempAccEventsPath);
+                Log.d(TAG, "path of tempAccEventsFile: " + tempAccEventsFile.getPath());
+                boolean success = tempAccEventsFile.renameTo(new File(path + pathToAccEventsFile));
+                Log.d(TAG, "tempAccEventsFile successfully renamed: " + success);
+            }
+
             Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
             finish();
         });
@@ -266,21 +288,48 @@ public class ShowRouteActivity extends BaseActivity {
 
     }
 
-    private void refreshRoute() {
+    private void refreshRoute(boolean temp) {
         // Create a ride object with the accelerometer, gps and time data
-        try {
-            ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, this);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (temp) {
+            try {
+                tempRide = new Ride(tempGpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, true, this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         // Get the Route as a Polyline to be displayed on the map
-        route = ride.getRoute();
+        if (temp) {
+            mMapView.getOverlayManager().remove(route);
+            if (tempRoute != null) {
+                mMapView.getOverlayManager().remove(tempRoute);
+            }
+            tempRoute = tempRide.getRoute();
+            Log.d(TAG, "temp route size: " + tempRoute.getPoints().size());
+            mMapView.getOverlayManager().add(tempRoute);
+
+        } else {
+            route = ride.getRoute();
+            Log.d(TAG, "route size: " + route.getPoints().size());
+            mMapView.getOverlayManager().add(route);
+
+        }
+
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
         // set accordingly
-        BoundingBox bBox = getBoundingBox(route);
+        BoundingBox bBox;
+        if (temp) {
+            bBox = getBoundingBox(tempRoute);
+        } else {
+            bBox = getBoundingBox(route);
+        }
 
-        mMapView.getOverlayManager().add(route);
 
         mMapView.invalidate();
         zoomToBBox(bBox);
@@ -289,11 +338,12 @@ public class ShowRouteActivity extends BaseActivity {
         // (3): CenterMap
         ImageButton centerMap = findViewById(R.id.bounding_box_center_button);
 
+        BoundingBox finalBBox = bBox;
         centerMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "boundingBoxCenterMap clicked ");
-                zoomToBBox(bBox);
+                zoomToBBox(finalBBox);
             }
         });
 
@@ -323,7 +373,14 @@ public class ShowRouteActivity extends BaseActivity {
         // Create an instance of MarkerFunct-class which provides all functionality related to
         // incident markers
         Log.d(TAG, "creating MarkerFunct object");
-        myMarkerFunct = new MarkerFunct(this);
+        if (temp) {
+            if (myMarkerFunct != null) {
+                myMarkerFunct.deleteAllMarkers();
+            }
+            myMarkerFunct = new MarkerFunct(this, true);
+        } else {
+            myMarkerFunct = new MarkerFunct(this, false);
+        }
 
         // Show all the incidents present in our ride object
         Log.d(TAG, "showing all incidents");
@@ -376,12 +433,14 @@ public class ShowRouteActivity extends BaseActivity {
         String content = "";
         FileOutputStream writer = null;
         try {
-            writer = openFileOutput(pathToAccGpsFile, MODE_APPEND);
+            writer = openFileOutput(pathToAccGpsFile, MODE_PRIVATE);
 
             try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(ride.accGpsFile)))) {
                 String line;
                 content += (br.readLine() + System.lineSeparator()); // fileInfo
                 content += (br.readLine() + System.lineSeparator()); // csv header
+                writer.write(content.getBytes());
+                writer.flush();
                 int partOfRideNumber = 0;
                 while ((line = br.readLine()) != null) {
                     if (!line.startsWith(",,")) {
@@ -389,7 +448,7 @@ public class ShowRouteActivity extends BaseActivity {
                     }
                     if((partOfRideNumber >= left)&&(partOfRideNumber <= right)) {
                         content += (br.readLine() + System.lineSeparator());
-                        writer.write(content.getBytes());
+                        writer.write((line + System.lineSeparator()).getBytes());
                         writer.flush();
                     }
                 }
@@ -440,6 +499,15 @@ public class ShowRouteActivity extends BaseActivity {
     protected void onDestroy() {
         Log.d(TAG, "onDestroy()");
         super.onDestroy();
+        Log.d(TAG, "tempAccEventsPath: " + tempAccEventsPath);
+
+        if (tempAccEventsPath != null && fileExists(tempAccEventsPath, this)) {
+            deleteFile(tempAccEventsPath);
+        }
+        if (tempAccGpsPath != null && fileExists(tempAccGpsPath, this)) {
+            deleteFile(tempAccGpsPath);
+        }
+
         //*****************************************************************
         // Shutdown pool and await termination to make sure the program
         // doesn't continue without the relevant work being completed
