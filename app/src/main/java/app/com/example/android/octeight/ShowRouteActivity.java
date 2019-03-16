@@ -113,7 +113,6 @@ public class ShowRouteActivity extends BaseActivity {
     String tempAccEventsPath;
     Polyline tempRoute;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,6 +161,7 @@ public class ShowRouteActivity extends BaseActivity {
         Log.d(TAG, "onCreate() continues.");
 
         refreshRoute(false);
+
 
         Log.d(TAG, "setting up clickListeners");
 
@@ -214,6 +214,7 @@ public class ShowRouteActivity extends BaseActivity {
                 tempAccGpsPath = "Temp" + gpsFile.getName();
                 tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
                 refreshRoute(true);
+
             }
         });
 
@@ -283,12 +284,12 @@ public class ShowRouteActivity extends BaseActivity {
             finish();
         });
 
-
         Log.d(TAG, "onCreate() finished");
 
     }
 
     private void refreshRoute(boolean temp) {
+
         // Create a ride object with the accelerometer, gps and time data
         if (temp) {
             try {
@@ -426,7 +427,6 @@ public class ShowRouteActivity extends BaseActivity {
         overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
         mMapView.getOverlays().add(overlayEvents);
         mMapView.invalidate();
-
     }
 
     private File updateRoute(int left, int right, String pathToAccGpsFile) {
@@ -681,6 +681,4 @@ public class ShowRouteActivity extends BaseActivity {
         }
 
     }
-
-
 }

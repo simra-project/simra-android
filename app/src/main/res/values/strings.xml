@@ -73,8 +73,8 @@
     <string name="uploadRidesSuccessful">Hochladen erfolgreich!</string>
     <string name="noFilesToBeUploaded">Alle bearbeiteten Fahrten wurden\nbereits hochgeladen.</string>
     <string name="justUpload">Hochladen</string>
-    <string name="progressDialogTitle">Hochladen</string>
-    <string name="progressDialogText">Bitte warten. Fahrten werden hochgeladen.</string>
+    <string name="uploadProgressDialogTitle">Hochladen</string>
+    <string name="uploadProgressDialogText">Bitte warten. Fahrten werden hochgeladen.</string>
     <string name="newRideInHistoryActivity">Neue Fahrt! Bitte bearbeiten.\n</string>
     <string name="startRecording">Aufzeichnung\nstarten</string>
     <string name="endRecording">Aufzeichnung\nbeenden</string>
@@ -217,5 +217,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="locationServiceisOff">Der Ortungsdienst Ihres Geräts ist aus. Bitte schalten Sie den Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
     <string name="recordingNotificationTitle">Aufzeichnung der Fahrt</string>
     <string name="recordingNotificationBody">Ihre Fahrt wird aufgezeichnet.</string>
+    <string name="calculatingIncidentsDialogTitle">Ereignisse werden ermittelt</string>
+    <string name="calculatingIncidentsDialogMessage">Bitte Warten</string>
 
 </resources>
