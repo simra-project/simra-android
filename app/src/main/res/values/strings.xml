@@ -223,5 +223,8 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="warningRefreshTitle">Achtung</string>
     <string name="warningRefresMessage">Nach Veränderung der Fahrt werden die Ereignisse neu berechnet und bisherige Ereignisse diese Fahrt, inklusive der Annotationen, werden verworfen.</string>
     <string name="title_activity_showRoute">Fahrt Annotieren</string>
+    <string name="dataPrivayAgreementDialogTitle">Datenschutz</string>
+    <string name="dataPrivayAgreementDialogText">Um ihre Fahrten hochzuladen, bitten wir sie unserer Datenschutzerklärung zuzustimmen.</string>
+    <string name="yesClose"><![CDATA[Ja & schließen]]></string>
 
 </resources>

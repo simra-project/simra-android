@@ -26,6 +26,7 @@ import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
 import static app.com.example.android.octeight.Utils.showMessageOK;
+import static app.com.example.android.octeight.Utils.writeBooleanToSharedPrefs;
 import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
 
 /**
@@ -36,7 +37,7 @@ import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
 
 public class StartActivity extends BaseActivity {
 
-    private static int TIME_OUT = 10000; //Time to launch the another activity
+    private static int TIME_OUT = 100000; //Time to launch the another activity
     Button next;
     Runnable startActivityRunnable;
     Handler startActivityHandler;
@@ -52,6 +53,8 @@ public class StartActivity extends BaseActivity {
     private String caller = null;
 
     public boolean sendErrorPermitted = false;
+
+    boolean privacyAgreement = false;
 
 
     @Override
@@ -144,6 +147,11 @@ public class StartActivity extends BaseActivity {
                     editor.commit();
                 }
 
+                // starts the PrivacyActivity to Request the Data Privacy Agreement
+                Intent intent = new Intent(StartActivity.this, PrivacyActivity.class);
+                startActivity(intent);
+
+
                 // Runnable that starts MainActivity after defined time (TIME_OUT)
                 startActivityRunnable = new Runnable() {
                     @Override
@@ -192,7 +200,7 @@ public class StartActivity extends BaseActivity {
 
                 path = dirFiles[i].getName();
                 Log.d(TAG, "path: " + path);
-                if (!path.equals("profile.csv")){
+                if (!path.equals("profile.csv")) {
                     dirFiles[i].delete();
                 }
                 /*
@@ -241,10 +249,10 @@ public class StartActivity extends BaseActivity {
         */
             String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
 
-            overWriteFile((fileInfoLine + "key, startTime, endTime, annotated" + System.lineSeparator()),"metaData.csv",this);
-            writeIntToSharedPrefs("RIDE-KEY",0,"simraPrefs",this);
+            overWriteFile((fileInfoLine + "key, startTime, endTime, annotated" + System.lineSeparator()), "metaData.csv", this);
+            writeIntToSharedPrefs("RIDE-KEY", 0, "simraPrefs", this);
         }
-        writeIntToSharedPrefs("App-Version",getAppVersionNumber(this),"simraPrefs",this);
+        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
     }
 
 
@@ -357,11 +365,7 @@ public class StartActivity extends BaseActivity {
         }
 
         return sendErrorPermitted;
-
-
     }
+
 }
-
-
-
 

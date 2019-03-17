@@ -183,12 +183,12 @@ public class ShowRouteActivity extends BaseActivity {
         gpsFile = getFileStreamPath(pathToAccGpsFile);
 
         Log.d(TAG, "creating ride objects");
-        bike = lookUpIntSharedPrefs("Settings-BikeType",0,"simraPrefs",this);
-        child = lookUpIntSharedPrefs("Settings-Child",0,"simraPrefs",this);
-        trailer = lookUpIntSharedPrefs("Settings-Trailer",0,"simraPrefs",this);
-        pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation",0,"simraPrefs",this);
+        bike = lookUpIntSharedPrefs("Settings-BikeType", 0, "simraPrefs", this);
+        child = lookUpIntSharedPrefs("Settings-Child", 0, "simraPrefs", this);
+        trailer = lookUpIntSharedPrefs("Settings-Trailer", 0, "simraPrefs", this);
+        pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this);
 
-        if (lookUpBooleanSharedPrefs("Settings-ShowRideSettingsDialog",true,"simraPrefs",ShowRouteActivity.this)) {
+        if (lookUpBooleanSharedPrefs("Settings-ShowRideSettingsDialog", true, "simraPrefs", ShowRouteActivity.this)) {
             showCustomViewAlertDialog();
         }
 
@@ -238,13 +238,13 @@ public class ShowRouteActivity extends BaseActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(RangeSeekBar view,  boolean isLeft) {
+            public void onStartTrackingTouch(RangeSeekBar view, boolean isLeft) {
                 //start tracking touch
             }
 
             @Override
-            public void onStopTrackingTouch(RangeSeekBar view,  boolean isLeft) {
-                showWarning = lookUpBooleanSharedPrefs("ShowRoute-Warning",true,"simraPrefs",ShowRouteActivity.this);
+            public void onStopTrackingTouch(RangeSeekBar view, boolean isLeft) {
+                showWarning = lookUpBooleanSharedPrefs("ShowRoute-Warning", true, "simraPrefs", ShowRouteActivity.this);
                 if (showWarning) {
                     getDialogValueBack(left[0], right[0]);
                 } else {
@@ -265,10 +265,11 @@ public class ShowRouteActivity extends BaseActivity {
         saveButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     saveButton.setElevation(0.0f);
                     saveButton.setBackground(getDrawable(R.drawable.button_pressed));
-                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     saveButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
                     saveButton.setBackground(getDrawable(R.drawable.button_unpressed));
                 }
@@ -290,7 +291,7 @@ public class ShowRouteActivity extends BaseActivity {
                         fileVersion = fileInfoArray[1];
                         continue;
                     }
-                    String[] metaDataLine = line.split(",",-1);
+                    String[] metaDataLine = line.split(",", -1);
                     String metaDataRide = line;
                     if (metaDataLine[0].equals(ride.getId())) {
                         metaDataLine[3] = "1";
@@ -302,7 +303,7 @@ public class ShowRouteActivity extends BaseActivity {
                 ioe.printStackTrace();
             }
             String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-            overWriteFile((fileInfoLine + content),"metaData.csv",this);
+            overWriteFile((fileInfoLine + content), "metaData.csv", this);
 
 
             // tempAccEventsPath
@@ -490,7 +491,7 @@ public class ShowRouteActivity extends BaseActivity {
                     if (!line.startsWith(",,")) {
                         partOfRideNumber++;
                     }
-                    if((partOfRideNumber >= left)&&(partOfRideNumber <= right)) {
+                    if ((partOfRideNumber >= left) && (partOfRideNumber <= right)) {
                         content += (br.readLine() + System.lineSeparator());
                         writer.write((line + System.lineSeparator()).getBytes());
                         writer.flush();
@@ -526,7 +527,7 @@ public class ShowRouteActivity extends BaseActivity {
 
                 String result = data.getStringExtra("result");
 
-                String[] incidentProps = result.split(",",-1);
+                String[] incidentProps = result.split(",", -1);
 
                 boolean annotated = checkForAnnotation(incidentProps);
 
@@ -659,14 +660,14 @@ public class ShowRouteActivity extends BaseActivity {
 
         // Load previous child and trailer settings
 
-        if (child == 1){
+        if (child == 1) {
             childCheckBoxButton.setChecked(true);
         }
 
         childCheckBoxButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
+                if (isChecked) {
                     child = 1;
                 } else {
                     child = 0;
@@ -674,13 +675,13 @@ public class ShowRouteActivity extends BaseActivity {
             }
         });
 
-        if (trailer == 1){
+        if (trailer == 1) {
             trailerCheckBoxButton.setChecked(true);
         }
         trailerCheckBoxButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
+                if (isChecked) {
                     trailer = 1;
                 } else {
                     trailer = 0;
@@ -697,18 +698,18 @@ public class ShowRouteActivity extends BaseActivity {
                     bike = bikeTypeSpinner.getSelectedItemPosition();
                     pLoc = phoneLocationSpinner.getSelectedItemPosition();
                     if (rememberMyChoiceCheckBox.isChecked()) {
-                        writeIntToSharedPrefs("Settings-BikeType",bike, "simraPrefs", ShowRouteActivity.this);
-                        writeIntToSharedPrefs("Settings-PhoneLocation",pLoc, "simraPrefs", ShowRouteActivity.this);
+                        writeIntToSharedPrefs("Settings-BikeType", bike, "simraPrefs", ShowRouteActivity.this);
+                        writeIntToSharedPrefs("Settings-PhoneLocation", pLoc, "simraPrefs", ShowRouteActivity.this);
                         writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", ShowRouteActivity.this);
                         writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", ShowRouteActivity.this);
                     }
                     if (doNotShowAgainCheckBox.isChecked()) {
-                        writeBooleanToSharedPrefs("Settings-ShowRideSettingsDialog",false,"simraPrefs",ShowRouteActivity.this);
+                        writeBooleanToSharedPrefs("Settings-ShowRideSettingsDialog", false, "simraPrefs", ShowRouteActivity.this);
                     }
                     // Close Alert Dialog.
                     handler.sendMessage(handler.obtainMessage());
                     alertDialog.cancel();
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
@@ -733,7 +734,7 @@ public class ShowRouteActivity extends BaseActivity {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                writeBooleanToSharedPrefs("ShowRoute-Warning",!checkBox.isChecked(),"simraPrefs",ShowRouteActivity.this);
+                writeBooleanToSharedPrefs("ShowRoute-Warning", !checkBox.isChecked(), "simraPrefs", ShowRouteActivity.this);
             }
         });
         checkBox.setText(getString(R.string.doNotShowAgain));

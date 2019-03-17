@@ -297,10 +297,11 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         startBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     startBtn.setElevation(0.0f);
                     startBtn.setBackground(getDrawable(R.drawable.button_pressed));
-                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     startBtn.setElevation(2 * MainActivity.this.getResources().getDisplayMetrics().density);
                     startBtn.setBackground(getDrawable(R.drawable.button_unpressed));
                 }
@@ -312,7 +313,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             @Override
             public void onClick(View v) {
 
-                if(isAirplaneModeOn(MainActivity.this)){
+                if (isAirplaneModeOn(MainActivity.this)) {
                     // notify user
                     new AlertDialog.Builder(MainActivity.this)
                             .setMessage(R.string.airplaneModeIsOn)
@@ -324,7 +325,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                             })
                             .setNegativeButton(R.string.cancel, null)
                             .show();
-                } else if(isLocationServiceOff(MainActivity.this)) {
+                } else if (isLocationServiceOff(MainActivity.this)) {
                     // notify user
                     new AlertDialog.Builder(MainActivity.this)
                             .setMessage(R.string.locationServiceisOff)
@@ -359,10 +360,11 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         stopBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     stopBtn.setElevation(0.0f);
                     stopBtn.setBackground(getDrawable(R.drawable.button_pressed));
-                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     stopBtn.setElevation(2 * MainActivity.this.getResources().getDisplayMetrics().density);
                     stopBtn.setBackground(getDrawable(R.drawable.button_unpressed));
                 }
@@ -596,6 +598,10 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             Intent intent = new Intent(MainActivity.this, StartActivity.class);
             intent.putExtra("caller", "MainActivity");
             startActivity(intent);
+        } else if (id == R.id.nav_dataPrivacy) {
+            Intent intent = new Intent(MainActivity.this, PrivacyActivity.class);
+            startActivity(intent);
+
         } else if (id == R.id.nav_impressum) {
             Intent intent = new Intent(MainActivity.this, ImprintActivity.class);
             startActivity(intent);
@@ -656,11 +662,13 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
         try {
             gps_enabled = mainActivity.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {}
+        } catch (Exception ex) {
+        }
 
         try {
             network_enabled = mainActivity.locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {}
+        } catch (Exception ex) {
+        }
 
         return (!gps_enabled && !network_enabled);
 
