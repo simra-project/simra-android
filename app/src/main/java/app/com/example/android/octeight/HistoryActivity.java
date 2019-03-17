@@ -44,6 +44,7 @@ public class HistoryActivity extends BaseActivity {
     // Log tag
     private static final String TAG = "HistoryActivity_LOG";
     ImageButton backBtn;
+    ImageButton helpBtn;
     TextView toolbarTxt;
 
     boolean exitWhenDone = false;
@@ -94,16 +95,29 @@ public class HistoryActivity extends BaseActivity {
                                    }
         );
 
+        // activating the help Button
+        helpBtn = findViewById(R.id.help_icon);
+        helpBtn.setVisibility(View.VISIBLE);
+        helpBtn.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           Intent intent = new Intent (getApplicationContext(), HelpActivity.class);
+                                           startActivity(intent);
+                                       }
+                                   }
+        );
+
         listView = findViewById(R.id.listView);
 
         RelativeLayout justUploadButton = findViewById(R.id.justUpload);
         justUploadButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     justUploadButton.setElevation(0.0f);
                     justUploadButton.setBackground(getDrawable(R.drawable.button_pressed));
-                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     justUploadButton.setElevation(2 * HistoryActivity.this.getResources().getDisplayMetrics().density);
                     justUploadButton.setBackground(getDrawable(R.drawable.button_unpressed));
                 }
@@ -135,24 +149,24 @@ public class HistoryActivity extends BaseActivity {
                             fileVersion = fileInfoArray[1]; //"" + (Integer.valueOf(fileInfoArray[1]) + 1);
                             continue;
                         }
-                        String[] metaDataLine = line.split(",",-1);
+                        String[] metaDataLine = line.split(",", -1);
                         String metaDataRide = line;
                         Log.d(TAG, "metaDataLine: " + Arrays.toString(metaDataLine));
                         Log.d(TAG, "line: " + line);
-                        if (metaDataLine.length >1 && metaDataLine[3].equals("1")){
+                        if (metaDataLine.length > 1 && metaDataLine[3].equals("1")) {
                             rideKeysToUpload.add(metaDataLine[0]);
                             metaDataLine[3] = "2";
                             metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
 
                         }
                         content += metaDataRide += System.lineSeparator();
-                        if(!metaDataLine[0].equals("key") && !metaDataLine[0].contains("#")) {
+                        if (!metaDataLine[0].equals("key") && !metaDataLine[0].contains("#")) {
                             duration = duration + (Long.valueOf(metaDataLine[2]) - Long.valueOf(metaDataLine[1]));
                             numberOfRides = Integer.valueOf(metaDataLine[0]);
                         }
                     }
                     String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-                    overWriteFile((fileInfoLine + content),"metaData.csv",HistoryActivity.this);
+                    overWriteFile((fileInfoLine + content), "metaData.csv", HistoryActivity.this);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -164,7 +178,7 @@ public class HistoryActivity extends BaseActivity {
                     if (dirFiles.length > 0) {
                         for (int j = 0; j < dirFiles.length; j++) {
                             String path = dirFiles[j].getName();
-                            if (path.split("_")[0].startsWith(rideKeyToUpload)){
+                            if (path.split("_")[0].startsWith(rideKeyToUpload)) {
                                 pathsToUpload.add(path);
                             }
                         }
@@ -199,7 +213,7 @@ public class HistoryActivity extends BaseActivity {
                 Log.d(TAG, "pathToUpload: " + Arrays.toString(pathsToUpload.toArray()));
                 if (pathsToUpload.size() > 0) {
 
-                    String profileContent = readContentFromFile("profile.csv",HistoryActivity.this);
+                    String profileContent = readContentFromFile("profile.csv", HistoryActivity.this);
 
                     try {
                         fileVersion = "" + (Integer.valueOf((profileContent.split(System.lineSeparator())[0].split("#")[1])) + 1);
@@ -249,7 +263,8 @@ public class HistoryActivity extends BaseActivity {
 
                             if (mBoundUploadService != null) {
                                 int currentNumberOfTasks = mBoundUploadService.getNumberOfTasks();
-                                pd.setProgress(Math.round(100 - 100 * ((float) currentNumberOfTasks / (float) (pathsToUpload.size() * 2))));                                Log.d(TAG, "currentNumberOfTasks: " + currentNumberOfTasks);
+                                pd.setProgress(Math.round(100 - 100 * ((float) currentNumberOfTasks / (float) (pathsToUpload.size() * 2))));
+                                Log.d(TAG, "currentNumberOfTasks: " + currentNumberOfTasks);
                                 if (currentNumberOfTasks == 0) {
                                     unbindService(mUploadServiceConnection);
                                     pd.dismiss();
@@ -281,10 +296,11 @@ public class HistoryActivity extends BaseActivity {
         uploadAndExitButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     uploadAndExitButton.setElevation(0.0f);
                     uploadAndExitButton.setBackground(getDrawable(R.drawable.button_pressed));
-                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     uploadAndExitButton.setElevation(2 * HistoryActivity.this.getResources().getDisplayMetrics().density);
                     uploadAndExitButton.setBackground(getDrawable(R.drawable.button_unpressed));
                 }
@@ -300,6 +316,7 @@ public class HistoryActivity extends BaseActivity {
                 HistoryActivity.this.moveTaskToBack(true);
             }
         });
+
 
         // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -342,10 +359,10 @@ public class HistoryActivity extends BaseActivity {
             }
             */
 
-                for (int i = 0; i < metaDataLines.size(); i++) {
-                    String[] metaDataLine = metaDataLines.get(i);
-                    ridesArr[((metaDataLines.size()) - Integer.parseInt(metaDataLine[0])) - 1] = listToTextShape(metaDataLine);
-                }
+            for (int i = 0; i < metaDataLines.size(); i++) {
+                String[] metaDataLine = metaDataLines.get(i);
+                ridesArr[((metaDataLines.size()) - Integer.parseInt(metaDataLine[0])) - 1] = listToTextShape(metaDataLine);
+            }
 
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
