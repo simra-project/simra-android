@@ -13,21 +13,17 @@
             android:icon="@drawable/ic_face_black_24dp"
             android:title="@string/title_activity_profile" />
         <item
-            android:id="@+id/nav_feedback"
-            android:icon="@drawable/ic_content_paste_black_24dp"
-            android:title="@string/feedback" />
-        <item
             android:id="@+id/nav_infoSimRa"
-            android:icon="@drawable/ic_nav_helmet"
-            android:title="@string/simra_news" />
-        <item
-            android:id="@+id/nav_infoMCC"
-            android:icon="@drawable/ic_nav_mcc"
-            android:title="@string/mcc_news" />
+            android:icon="@drawable/helmet"
+            android:title="@string/about_simra" />
         <item
             android:id="@+id/nav_setting"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/title_activity_settings" />
+        <item
+            android:id="@+id/nav_feedback"
+            android:icon="@drawable/ic_content_paste_black_24dp"
+            android:title="@string/feedback" />
         <item
             android:id="@+id/nav_impressum"
             android:icon="@drawable/ic_info_black_24dp"

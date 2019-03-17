@@ -81,7 +81,7 @@
     <string name="nav_main">Start</string>
     <string name="uploadInBackground">Im Hintergrund ausführen</string>
     <string name="app_name">SimRa (Beta)</string>
-    <string name="simra_news">SimRa Aktuelles</string>
+    <string name="about_simra">Über Simra</string>
     <string name="mcc_news">MCC Aktuelles</string>
     <string name="imprint">Impressum</string>
     <string name="feedback">Feedback</string>
