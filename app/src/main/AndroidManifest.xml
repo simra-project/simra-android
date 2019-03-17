@@ -25,7 +25,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name=".LicenseActivity"></activity>
+        <activity android:name=".AboutActivity"></activity>
+        <activity android:name=".LicenseActivity" />
         <activity
             android:name=".RideSettingsActivity"
             android:configChanges="orientation|screenSize"
