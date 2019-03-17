@@ -42,7 +42,7 @@
                 android:layout_toEndOf="@+id/helmetCredit_icon"
                 android:autoLink="web"
                 android:scrollHorizontally="false"
-                android:text="@string/freepikCredit" />
+                android:text="@string/logoMakrCredit" />
 
 
         </RelativeLayout>

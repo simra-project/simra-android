@@ -139,4 +139,10 @@
         <item>@string/involvedType8</item>
         <item>@string/involvedType9</item>
     </string-array>
+    <string-array name="aboutSimraItems">
+        <item>SimRa-Projektseite</item>
+        <item>Datenschutzerklärung</item>
+        <item>Drittanbieter-Lizenzen</item>
+        <item>Grafikreferenzen</item>
+    </string-array>
 </resources>

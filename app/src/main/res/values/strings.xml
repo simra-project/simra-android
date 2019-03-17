@@ -13,6 +13,7 @@
     <string name="demoDataMail">Name: \nAlter: \nBeruf: \nFahrradtyp: Bsp. Rennrad\nDurchschnittlich wöchentlich zurückgelegte Kilometeranzahl mit dem Rad: </string>
     <string name="permissionFineLocation">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten.</string>
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
+    <string name="simRaPage">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/?isMobile=1</string>
     <string name="dsbContact">https://www.tu-berlin.de/allgemeine_seiten/e_mail_anfrage/parameter/mobil/id/141314/?no_cache=1&amp;ask_mail=XHzLwAANlp3Iq7tw1i0B%2F1ZZPCqSMY443IwjBNB1a4lD6OfrRJfJHXOx5r3yL9Ga&amp;ask_name=DATENSCHUTZBEAUFTRAGTE</string>
     <string name="startButtonText">Aufzeichnung \n starten</string>
     <string name="stopButtonText">Aufzeichnung \n stoppen</string>
@@ -189,6 +190,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="osmCopyrightText">Wir verwenden in unserer Applikation die Karten von OpenStreetMap, einen Dienst der OpenStreetMap Foundation, St John’s Innovation Centre, Cowley Road, Cambridge, CB 4 0 WS, United Kingdom, nachfolgend \"OpenStreetMap\" genannt, ein. In unsere Applikation ist der Dienst OpenStreetMap eingebunden , deswegen wird durch OpenStreetMap ein Cookie auf Ihrem Endgerät gespeichert. Hierdurch werden Ihre Nutzereinstellungen und Nutzerdaten zum Zwecke der Anzeige der Seite bzw. zur Gewährleistung der Funktionalität von OpenStreetMap verarbeitet. Durch diese Verarbeitung kann OpenStreetMap erkennen, von welcher Anwendung Ihre Anfrage gesendet worden ist und an welche IP- Adresse die Daten übermittelt werden sollen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f) DSGVO. Unser berechtigtes Interesse liegt Betrieb unserer Applikation. Sofern Sie mit dieser Verarbeitung nicht einverstanden sind, wenden Sie sich bitte an die oben genannten Ansprechpartner. OpenStreetMap bietet unter https://wiki.osmfoundation.org/wiki/Privacy_Policy weitere Informationen zur Erhebung und Nutzung der Daten sowie zu Ihren Rechten und Möglichkeiten zum Schutz Ihrer Privatsphäre an.</string>
     <string name="title_activity_credits">Credits</string>
     <string name="freepikCredit">Icon gestaltet von Freepik, bereitgestellt auf www.flaticon.com .</string>
+    <string name="logoMakrCredit">Kostenloses logo erstellt auf www.LogoMakr.com .</string>
     <string name="smashiconCredit">Icon gestaltet von Smashicon, bereitgestellt auf www.flaticon.com .</string>
     <string name="pixelCredit">Icon gestaltet von Pixel, bereitgestellt auf www.flaticon.com .</string>
     <string name="icons8Credit">Icon gestaltet von Icons8, bereitgestellt auf https://icons8.com .</string>
@@ -224,9 +226,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="warningRefresMessage">Nach Veränderung der Fahrt werden die Ereignisse neu berechnet und bisherige Ereignisse diese Fahrt, inklusive der Annotationen, werden verworfen.</string>
     <string name="title_activity_showRoute">Fahrt Annotieren</string>
     <string name="title_activity_library_license">Drittanbieter-Lizenzen</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="close">Schließen</string>
+    <string name="title_activity_about_simra">Über SimRa</string>
 
 </resources>

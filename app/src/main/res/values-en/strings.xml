@@ -14,6 +14,7 @@
     <string name="demoDataMail">Name: \nAge: \nJob: \nBike type: e.g. mountain bike\nAverage ride distance: </string>
     <string name="permissionFineLocation">In order to continue, please allow SimRa to access your location.</string>
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
+    <string name="simRaPage">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1</string>
     <string name="startButtonText">Start \n Recording</string>
     <string name="stopButtonText">End \n Recording</string>
     <string name="permissionRequestRationale">This app needs permission to access your location data in order to show you your location on the map and to record your rides.</string>
@@ -139,6 +140,7 @@
     <string name="mailRequestTU"><a href="https://www.tu-berlin.de/allgemeine_seiten/contact/parameter/en/id/16/?no_cache=1&amp;ask_name=Pressestelle&amp;ask_mail=XH4N4AAD0Pm6SW%2BAqRiyNWi2wtI5xLDRrsckIn8nzonCUl%2B95CeT8w%3D%3D">Mail Request</a></string>
     <string name="bycicleCreditTxt">Icon made by Nikita Golubev from www.flaticon.com .</string>
     <string name="freepikCredit">Icon made by Freepik from www.flaticon.com .</string>
+    <string name="logoMakrCredit">Created my free logo at www.LogoMakr.com .</string>
     <string name="smashiconCredit">Icon made by Smashicon from www.flaticon.com .</string>
     <string name="pixelCredit">Icon made by Pixel perfect from www.flaticon.com .</string>
     <string name="icons8Credit">Icon made by Icons8 from https://icons8.com .</string>
@@ -248,6 +250,7 @@
     <string name="warningRefreshTitle">Warning</string>
     <string name="warningRefresMessage">After the ride gets changed, new incidents will be calculated and previous incidents of this ride and their annotations will be deleted.</string>
     <string name="title_activity_showRoute">Annotate Ride</string>
-    <string name="title_activity_library_license">Third Party Library Licenses</string>
+    <string name="title_activity_library_license">Third Party Licenses</string>
     <string name="close">Close</string>
+    <string name="title_activity_about_simra">About SimRa</string>
 </resources>
