@@ -1,7 +1,6 @@
 package app.com.example.android.octeight;
 
 import android.annotation.SuppressLint;
-import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -268,9 +267,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
                 mMapController.setZoom(ZOOM_LEVEL);
-
-                Intent intent = new Intent(MainActivity.this, LicenseActivity.class);
-                startActivity(intent);
 
                 /*
                 String[] bla = new String[4];
@@ -575,6 +571,12 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         } else if (id == R.id.nav_democraphic_data) {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
+        } else if (id == R.id.nav_aboutSimRa) {
+            Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_setting) {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_feedback) {
             // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
             Intent i = new Intent(Intent.ACTION_SEND);
@@ -588,17 +590,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
             }
 
-        } else if (id == R.id.nav_setting) {
-            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_infoMCC) {
-            Intent intent = new Intent(MainActivity.this, WebActivity.class);
-            intent.putExtra("URL", getString(R.string.mccPage));
-            startActivity(intent);
-        } else if (id == R.id.nav_infoSimRa) {
-            Intent intent = new Intent(MainActivity.this, StartActivity.class);
-            intent.putExtra("caller", "MainActivity");
-            startActivity(intent);
         } else if (id == R.id.nav_impressum) {
             Intent intent = new Intent(MainActivity.this, ImprintActivity.class);
             startActivity(intent);

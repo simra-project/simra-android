@@ -25,7 +25,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name=".AboutActivity"></activity>
+        <activity android:name=".AboutActivity"
+            android:label="@string/title_activity_about_simra"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize"/>
+
         <activity
             android:name=".RideSettingsActivity"
             android:configChanges="orientation|screenSize"
