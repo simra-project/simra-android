@@ -125,6 +125,8 @@ public class StartActivity extends BaseActivity {
                     editor.putInt("Privacy-Distance", 30);
                     editor.commit();
                 }
+                firePrivacyDialog();
+
             }
 
             // start MainActivity when Button is clicked
@@ -283,6 +285,44 @@ public class StartActivity extends BaseActivity {
         });
         alert.show();
 
+    }
+
+    public void firePrivacyDialog() {
+        View checkBoxView = View.inflate(this, R.layout.checkbox, null);
+        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+
+        checkBox.setText(getString(R.string.iAccept));
+        AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
+
+        builder.setTitle(getString(R.string.privacyAgreementTitle));
+        builder.setMessage(getString(R.string.privacyAgreementMessage));
+        builder.setView(checkBoxView);
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Intent intent = new Intent(StartActivity.this, UploadService.class);
+                intent.putExtra("CRASH_REPORT", sendErrorPermitted);
+                startService(intent);
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Initially disable the button
+        ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                writeBooleanToSharedPrefs("Data-Privacy-Agreement",checkBox.isChecked(),"simraPrefs",StartActivity.this);
+                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked);
+
+            }
+        });
     }
 }
 
