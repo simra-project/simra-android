@@ -253,4 +253,7 @@
     <string name="title_activity_library_license">Third Party Licenses</string>
     <string name="close">Close</string>
     <string name="title_activity_about_simra">About SimRa</string>
+    <string name="iAccept">I accept the privacy policy statement</string>
+    <string name="privacyAgreementTitle">Privacy Policy Statement</string>
+    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our privacy policy statement.</string>
 </resources>

@@ -228,5 +228,8 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="title_activity_library_license">Drittanbieter-Lizenzen</string>
     <string name="close">Schließen</string>
     <string name="title_activity_about_simra">Über SimRa</string>
+    <string name="iAccept">Ich akzeptiere die Datenschutzerklärung</string>
+    <string name="privacyAgreementTitle">Datenschutzerklärung</string>
+    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrt Standort- und Sensordaten auf, sowie von Ihnen eingegebene demografische Daten. Weitere Informationen finden Sie in unserer Datenschutzerklärung.</string>
 
 </resources>
