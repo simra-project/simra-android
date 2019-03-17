@@ -14,9 +14,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.ToggleButton;
-
-import com.j256.ormlite.stmt.query.In;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
