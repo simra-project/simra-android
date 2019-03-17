@@ -37,9 +37,10 @@
                 android:value="app.com.example.android.octeight.ShowRouteActivity" />
         </activity>
         <activity
-            android:name=".LicensesActivity"
+            android:name=".LicenseActivity"
             android:label="@string/title_activity_library_license"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".PrivacyActivity"
             android:label="@string/title_activity_privacy"
