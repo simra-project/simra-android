@@ -247,4 +247,5 @@
     <string name="newIncidents">Renewed reset to default</string>
     <string name="warningRefreshTitle">Warning</string>
     <string name="warningRefresMessage">After the ride gets changed, new incidents will be calculated and previous incidents of this ride and their annotations will be deleted.</string>
+    <string name="title_activity_showRoute">Annotate Ride</string>
 </resources>

@@ -6,6 +6,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ShowRouteActivity">
 
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
     <org.osmdroid.views.MapView
         android:id="@+id/showRouteMap"
         android:layout_width="fill_parent"
@@ -15,10 +19,8 @@
         android:id="@+id/addIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_below="@id/toolbar"
+        android:layout_alignEnd="@id/toolbar"
         android:background="@drawable/button_unpressed"
         android:clickable="true"
         android:focusable="true"
@@ -50,10 +52,8 @@
         android:id="@+id/exitAddIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_alignEnd="@id/toolbar"
+        android:layout_below="@id/toolbar"
         android:background="@drawable/button_pressed"
         android:clickable="true"
         android:focusable="true">
@@ -84,10 +84,9 @@
         android:id="@+id/bounding_box_center_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_alignEnd="@id/exitAddIncident"
-        android:layout_alignParentTop="true"
-
-        android:layout_marginTop="85dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignEnd="@id/toolbar"
+        android:layout_below="@id/addIncident"
         android:background="@drawable/my_center"
         android:clickable="true"
         android:focusable="true"
@@ -156,7 +155,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="20dp"
+        android:layout_alignEnd="@id/toolbar"
+        android:layout_alignStart="@id/toolbar"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
         app:rsb_progress_default_color="@color/colorPrimary"
         app:rsb_progress_color="@color/colorAccent"
         android:background="@color/transparent"

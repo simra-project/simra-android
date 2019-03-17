@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.design.button.MaterialButton;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -60,6 +61,9 @@ import static app.com.example.android.octeight.Utils.writeBooleanToSharedPrefs;
 import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
 
 public class ShowRouteActivity extends BaseActivity {
+
+    ImageButton backBtn;
+    TextView toolbarTxt;
 
     String startTime = "";
     String timeStamp = "";
@@ -129,6 +133,26 @@ public class ShowRouteActivity extends BaseActivity {
         Log.d(TAG, "onCreate() started");
         setContentView(R.layout.activity_show_route);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Toolbar
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        toolbarTxt = findViewById(R.id.toolbar_title);
+        toolbarTxt.setText(R.string.title_activity_showRoute);
+
+        backBtn = findViewById(R.id.back_button);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Map configuration
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -148,8 +172,6 @@ public class ShowRouteActivity extends BaseActivity {
 
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
-
-        showWarning = lookUpBooleanSharedPrefs("ShowRoute-Warning",true,"simraPrefs",this);
 
         String pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
@@ -222,7 +244,7 @@ public class ShowRouteActivity extends BaseActivity {
 
             @Override
             public void onStopTrackingTouch(RangeSeekBar view,  boolean isLeft) {
-
+                showWarning = lookUpBooleanSharedPrefs("ShowRoute-Warning",true,"simraPrefs",ShowRouteActivity.this);
                 if (showWarning) {
                     getDialogValueBack(left[0], right[0]);
                 } else {
@@ -711,7 +733,7 @@ public class ShowRouteActivity extends BaseActivity {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                writeBooleanToSharedPrefs("ShowRoute-Warning",checkBox.isChecked(),"simraPrefs",ShowRouteActivity.this);
+                writeBooleanToSharedPrefs("ShowRoute-Warning",!checkBox.isChecked(),"simraPrefs",ShowRouteActivity.this);
             }
         });
         checkBox.setText(getString(R.string.doNotShowAgain));
