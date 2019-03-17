@@ -5,23 +5,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Date;
-
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
@@ -31,7 +19,6 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
     private final static String TAG = LoggingExceptionActivity.class.getSimpleName() + "_LOG";
     private final Context context;
     private final Thread.UncaughtExceptionHandler rootHandler;
-    private OkHttpClient client = new OkHttpClient();
 
 
     public LoggingExceptionActivity(Context context) {
@@ -100,145 +87,4 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
         System.exit(0);
     }
-
-
-    private class UpdateTask extends AsyncTask<String, String, String> {
-
-        private String path;
-        private Context context;
-
-        private UpdateTask(/*String path, */Context context) {
-            // this.path = path;
-            this.context = context;
-        }
-
-        protected String doInBackground(String... urls) {
-
-            Log.d(TAG, "doInBackground()");
-
-            try {
-                // makePost(path);
-                uploadAllFilesTestPhase(context);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        // Upload all files to the backend
-        private void uploadAllFilesTestPhase(Context context) throws IOException {
-
-            String path = Constants.APP_PATH + "shared_prefs/simraPrefs.xml";
-
-            // makePostTestPhase(path, getUniqueUserID(context));
-
-            File[] dirFiles = getFilesDir().listFiles();
-
-            for (int i = 0; i < dirFiles.length; i++) {
-                path = dirFiles[i].getName()/*.getPath().replace(prefix, "")*/;
-                Log.d(TAG, "path: " + path);
-                // makePostTestPhase(path, getUniqueUserID(context));
-            }
-
-
-        }
-
-
-        private void makePostTestPhase(String pathToFile, String id) throws IOException {
-
-            Log.d(TAG, "pathToFile: " + pathToFile + " id: " + id);
-            File file;
-            // Log.d(TAG, "File.pathSeparator: " + File.pathSeparator);
-            if (pathToFile.contains(File.separator)) {
-                //Log.d(TAG, "pathToFile contains pathSeparator!");
-                file = new File(pathToFile);
-            } else {
-                file = getFileStreamPath(pathToFile);
-
-            }
-            if (file.isDirectory()) {
-                return;
-            }
-            //
-            final StringBuilder fileContent = new StringBuilder();
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));) {
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    fileContent.append(line);
-                    fileContent.append(System.lineSeparator());
-                }
-
-            } catch (IOException e) {
-                throw e;
-            }
-
-
-            String key = id + "_" + pathToFile;
-
-            RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), fileContent.toString());
-
-            Log.d(TAG, "sending file to server: " + fileContent.toString());
-            Date dateToday = new Date();
-            String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
-
-            Log.d(TAG, "clientHash: " + clientHash);
-
-            Request request = new Request.Builder()
-                    .url(Constants.MCC_VM1 + key.replace(Constants.APP_PATH + "shared_prefs/", "") + "?clientHash=" + clientHash)
-                    .post(requestBody)
-                    .build();
-
-            try (Response response = client.newCall(request).execute()) {
-
-                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
-                Log.d(TAG, "Response Message: " + response.message());
-            }
-        }
-
-        private void makePost(String pathToFile) throws IOException {
-
-            File file = getFileStreamPath(pathToFile);
-            final StringBuilder fileContent = new StringBuilder();
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));) {
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    fileContent.append(line);
-                    fileContent.append(System.lineSeparator());
-                }
-
-            } catch (IOException e) {
-                throw e;
-            }
-
-
-            String key = pathToFile;
-
-            RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), fileContent.toString());
-
-            Date dateToday = new Date();
-            String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
-
-            Log.d(TAG, "clientHash: " + clientHash);
-
-            Request request = new Request.Builder()
-                    .url(Constants.MCC_VM1 + key + "?clientHash=" + clientHash)
-                    .post(requestBody)
-                    .build();
-
-            try (Response response = client.newCall(request).execute()) {
-
-                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
-                Log.d(TAG, "Response Message: " + response.message());
-            }
-        }
-
-    }
-
 }
