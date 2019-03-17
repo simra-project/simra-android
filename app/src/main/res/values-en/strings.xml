@@ -249,4 +249,5 @@
     <string name="warningRefresMessage">After the ride gets changed, new incidents will be calculated and previous incidents of this ride and their annotations will be deleted.</string>
     <string name="title_activity_showRoute">Annotate Ride</string>
     <string name="title_activity_library_license">Third Party Library Licenses</string>
+    <string name="close">Close</string>
 </resources>

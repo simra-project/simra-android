@@ -225,4 +225,8 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="title_activity_showRoute">Fahrt Annotieren</string>
     <string name="title_activity_library_license">Drittanbieter-Lizenzen</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="close">Schließen</string>
+
 </resources>
