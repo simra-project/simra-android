@@ -1,7 +1,7 @@
 package app.com.example.android.octeight;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -268,6 +268,21 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
                 mMapController.setZoom(ZOOM_LEVEL);
+                // Intent intent = new Intent(MainActivity.this, LicensesActivity.class);
+                // startActivity(intent);
+
+                /*
+                new LibsBuilder()
+                        .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                        .withAutoDetect(true)
+                        .withFields(R.string.class.getFields())
+                        .withLibraries("osmdroid", "commonsio")
+                        .withLicenseDialog(true)
+                        .withLicenseShown(true)
+                        .start(MainActivity.this);
+                */
+                Intent intent = new Intent(MainActivity.this, LicenseActivity.class);
+                startActivity(intent);
 
                 /*
                 String[] bla = new String[4];

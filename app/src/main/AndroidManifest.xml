@@ -25,19 +25,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+        <activity android:name=".LicenseActivity"></activity>
         <activity
             android:name=".RideSettingsActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_ride_settings"
             android:parentActivityName=".ShowRouteActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:configChanges="orientation|screenSize">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.com.example.android.octeight.ShowRouteActivity" />
         </activity>
         <activity
-          android:name=".PrivacyActivity"
-          android:label="@string/title_activity_privacy"
+            android:name=".LicensesActivity"
+            android:label="@string/title_activity_library_license"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PrivacyActivity"
+            android:label="@string/title_activity_privacy"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ImprintActivity"
