@@ -29,6 +29,11 @@
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/title_activity_settings" />
         <item
+            android:id="@+id/nav_dataPrivacy"
+            android:icon="@drawable/ic_security_black_24dp"
+            android:title="@string/title_activity_privacy" />
+
+        <item
             android:id="@+id/nav_impressum"
             android:icon="@drawable/ic_info_black_24dp"
             android:title="@string/imprint" />

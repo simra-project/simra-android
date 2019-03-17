@@ -248,4 +248,8 @@
     <string name="warningRefreshTitle">Warning</string>
     <string name="warningRefresMessage">After the ride gets changed, new incidents will be calculated and previous incidents of this ride and their annotations will be deleted.</string>
     <string name="title_activity_showRoute">Annotate Ride</string>
+
+    <string name="dataPrivayAgreementDialogTitle">Data Privacy</string>
+    <string name="dataPrivayAgreementDialogText">Please agree to our data privacy policy, otherwise you cannot upload your rides.</string>
+    <string name="yesClose"><![CDATA[Yes & close]]></string>
 </resources>
