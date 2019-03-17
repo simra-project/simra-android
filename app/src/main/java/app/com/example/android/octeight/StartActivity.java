@@ -5,18 +5,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
 import java.io.File;
 
@@ -26,6 +24,7 @@ import static app.com.example.android.octeight.Utils.getAppVersionNumber;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
 import static app.com.example.android.octeight.Utils.showMessageOK;
+import static app.com.example.android.octeight.Utils.writeBooleanToSharedPrefs;
 import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
 
 /**
@@ -38,20 +37,15 @@ public class StartActivity extends BaseActivity {
 
     private static int TIME_OUT = 10000; //Time to launch the another activity
     Button next;
-    Runnable startActivityRunnable;
-    Handler startActivityHandler;
 
     // For permission request
     private final int LOCATION_ACCESS_CODE = 1;
 
     // Log tag
     private static final String TAG = "StartActivity_LOG";
-
     private Boolean firstTime = null;
-
-    private String caller = null;
-
     public boolean sendErrorPermitted = false;
+    boolean privacyAgreement = false;
 
 
     @Override
@@ -60,11 +54,6 @@ public class StartActivity extends BaseActivity {
         setContentView(R.layout.activity_start);
 
         Log.d(TAG, "onCreate() started");
-
-        caller = getIntent().getStringExtra("caller");
-        if (caller == null) {
-            caller = "NoCaller";
-        }
 
         SharedPreferences sharedPrefs = getApplicationContext()
                 .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
@@ -76,15 +65,8 @@ public class StartActivity extends BaseActivity {
         if (sharedPrefs.contains("NEW-UNSENT-ERROR")) {
             boolean newErrorsExist = sharedPrefs.getBoolean("NEW-UNSENT-ERROR", true);
             if (newErrorsExist) {
-                sendErrorPermitted = getDialogValueBack(this);
-                if (sendErrorPermitted) {
-                    Intent intent = new Intent(this, UploadService.class);
-                    intent.putExtra("CRASH_REPORT", sendErrorPermitted);
-                    startService(intent);
-                }
-
+                fireSendErrorDialog();
             }
-
         } else {
             editor.putBoolean("NEW-UNSENT-ERROR", false);
             editor.commit();
@@ -96,14 +78,14 @@ public class StartActivity extends BaseActivity {
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
 
         if (!(isFirstTime()) && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) && (!caller.equals("MainActivity"))) {
+                == PackageManager.PERMISSION_GRANTED)) {
             Intent intent = new Intent(StartActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         } else {
 
             // First start, show your dialog | first-run code goes here
-            if (isFirstTime() && !caller.equals("MainActivity")) {
+            if (isFirstTime()) {
 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // META-FILE (one per user): contains ...
@@ -143,22 +125,7 @@ public class StartActivity extends BaseActivity {
                     editor.putInt("Privacy-Distance", 30);
                     editor.commit();
                 }
-
-                // Runnable that starts MainActivity after defined time (TIME_OUT)
-                startActivityRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent i = new Intent(StartActivity.this, MainActivity.class);
-                        startActivity(i);
-                        // finish() to prevent going back to StartActivity, when the Back Button is pressed
-                        // in MainActivity
-                        finish();
-                    }
-                };
             }
-            // create Handler and make it run the Runnable after TIME_OUT
-            startActivityHandler = new Handler();
-            startActivityHandler.postDelayed(startActivityRunnable, TIME_OUT);
 
             // start MainActivity when Button is clicked
             next = findViewById(R.id.nextBtn);
@@ -168,12 +135,7 @@ public class StartActivity extends BaseActivity {
                     Intent intent = new Intent(StartActivity.this, MainActivity.class);
                     // remove the Callback of the Runnable to the Handler to prevent second start of
                     // MainActivity
-                    startActivityHandler.removeCallbacks(startActivityRunnable);
-                    if (caller.equals("MainActivity")) {
-                        returnToMain();
-                    } else {
-                        startActivity(intent);
-                    }
+                    startActivity(intent);
                     // finish() to prevent going back to StartActivity, when the Back Button is pressed
                     // in MainActivity
                     finish();
@@ -248,11 +210,6 @@ public class StartActivity extends BaseActivity {
     }
 
 
-    public void returnToMain() {
-        super.onBackPressed();
-    }
-
-
     private void permissionRequest(final String requestedPermission, String rationaleMessage, final int accessCode) {
         // Check whether FINE_LOCATION permission is not granted
         if (ContextCompat.checkSelfPermission(StartActivity.this, requestedPermission)
@@ -277,35 +234,6 @@ public class StartActivity extends BaseActivity {
         }
     }
 
-
-    // Create an AlertDialog with an Ok and Cancel Button displaying a message
-    private void askUserToSendError() {
-        // setup the alert builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Ups!");
-        builder.setMessage("Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?");
-
-        // add the buttons
-        builder.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                sendErrorPermitted = true;
-            }
-        });
-        // builder.setNeutralButton("Immer", null);
-        builder.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                sendErrorPermitted = false;
-            }
-        });
-
-        // create and show the alert dialog
-        AlertDialog dialog = builder.create();
-        Log.d(TAG, "showing dialog");
-        dialog.show();
-    }
-
     /**
      * Checks if the user is opening the app for the first time.
      * Note that this method should be placed inside an activity and it can be called multiple times.
@@ -314,7 +242,7 @@ public class StartActivity extends BaseActivity {
      */
     private boolean isFirstTime() {
         if (firstTime == null) {
-            SharedPreferences mPreferences = this.getSharedPreferences("first_time", Context.MODE_PRIVATE);
+            SharedPreferences mPreferences = this.getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
             firstTime = mPreferences.getBoolean("firstTime", true);
             if (firstTime) {
                 SharedPreferences.Editor editor = mPreferences.edit();
@@ -325,39 +253,35 @@ public class StartActivity extends BaseActivity {
         return firstTime;
     }
 
-    public boolean getDialogValueBack(Context context) {
+    public void fireSendErrorDialog() {
 
-        final Handler handler = new Handler() {
+        View checkBoxView = View.inflate(this, R.layout.checkbox, null);
+        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
             @Override
-            public void handleMessage(Message mesg) {
-                throw new RuntimeException();
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                writeBooleanToSharedPrefs("NEW-UNSENT-ERROR",!checkBox.isChecked(),"simraPrefs",StartActivity.this);
             }
-        };
-
-        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        });
+        checkBox.setText(getString(R.string.doNotShowAgain));
+        AlertDialog.Builder alert = new AlertDialog.Builder(StartActivity.this);
         alert.setTitle(getString(R.string.sendErrorTitle));
         alert.setMessage(getString(R.string.sendErrorMessage));
+        alert.setView(checkBoxView);
         alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                sendErrorPermitted = true;
-                handler.sendMessage(handler.obtainMessage());
+                Intent intent = new Intent(StartActivity.this, UploadService.class);
+                intent.putExtra("CRASH_REPORT", sendErrorPermitted);
+                startService(intent);
             }
         });
         alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                sendErrorPermitted = false;
-                handler.sendMessage(handler.obtainMessage());
+
             }
         });
         alert.show();
-
-        try {
-            Looper.loop();
-        } catch (RuntimeException e) {
-        }
-
-        return sendErrorPermitted;
-
 
     }
 }
