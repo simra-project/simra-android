@@ -147,24 +147,23 @@
     <string name="privacyButton">Further information about data privacy</string>
     <string name="impressum">imprint</string>
     <string name="osmCopyrightText">n our application we use the maps of OpenStreetMap, an OpenStreetMap Foundation service, St John\'s Innovation Center, Cowley Road, Cambridge, CB 4 0 WS, United Kingdom, hereinafter referred to as \"OpenStreetMap\". In our application, the service OpenStreetMap is involved, so is stored by OpenStreetMap a cookie on your device. This will process your user settings and user data for the purpose of displaying the page or ensuring the functionality of OpenStreetMap.
-        Through this processing, OpenStreetMap can recognize from which application your request has been sent and to which IP address the data should be transmitted. Legal basis is Art. 6 para. 1 lit. f) GDPR. Our legitimate interest lies in the operation of our application. If you do not agree with this processing, please contact the above mentioned contact persons. OpenStreetMap provides more information at https://wiki.osmfoundation.org/wiki/Privacy_Policy to collect and use the data, and to protect your rights and privacy.</string>
+        Through this processing, OpenStreetMap can recognize from which application your request has been sent and to which IP address the data should be transmitted. Legal basis is Art. 6 para. 1 lit. f) GDPR. Our legitimate interest lies in the operation of our application. If you do not agree with this processing, please contact the above mentioned contact persons. OpenStreetMap provides more information at https://wiki.osmfoundation.org/wiki/Privacy_Policy to collect and use the data, and to protect your rights and privacy.
+        We reserve the right to set up our own mirror for OpenStreetMap. In this case, we will delete any generated data as soon as possible and don’t link it to our regularly collected data, if possible.
+        </string>
     <string name="descriptionUpload">Upload</string>
     <string name="descriptionExit">Exit</string>
     <string name="dsbContact">https://www.tu-berlin.de/allgemeine_seiten/contact/parameter/en/id/141314/?no_cache=1&amp;ask_mail=XH42VwAGY4UY%2FsBThz469wu5C%2FkG22St45NcTUgQYpTRCgWF30y04Y642h8HsYQv&amp;ask_name=DATENSCHUTZBEAUFTRAGTE</string>
     <string name="title_activity_imprint">Imprint</string>
     <string name="title_activity_privacy">Data Privacy</string>
     <string name="headerSubjectOfDataPrivacy">Subject of Data Privacy</string>
-    <string name="textRightOfAcces">You can retrieve information about your stored personal data without giving reasons at any time free of charge. Please contact the address provided in the legal details of the website. We will be pleased to assist you if you have any further questions about our data privacy information.
-        Right of Complaint
-        Should you have reason to believe that we are not adhering to this data privacy statement, you can contact the data protection officer at Technische Universität Berlin at any time:
-
-        Annette Hiller
-        Data Protection Officer of Technischen Universität Berlin
-        Straße des 17. Juni 135, 10623 Berlin,
-        Room H 1038
-        Tel.:  +49 30 314 21784
-        Fax:  +49 30 314 28033
-        Email: datenschutzbeauftragte@tu-berlin.de
+    <string name="textRightOfAcces">The SimRa project is coordinated with the official data protection at Technische Universität Berlin. For questions about data protection in the SimRa project, please contact:\n
+        Annette Hiller, Data Protection Official at Technischen Universität Berlin \n
+        Straße des 17. Juni 135, 10623 Berlin\n
+        Raum H 1038\n
+         \n
+        Tel.: +49 30 314 21784 \n
+        Fax: +49 30 314 28033 \n
+E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
 
         You also have the right to contact the local controlling authority:
 
@@ -211,6 +210,7 @@
         Haftungsansprüche gegen den Herausgeber, welche sich auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung oder Nichtnutzung der dargebotenen Informationen bzw. durch die Nutzung fehlerhafter und unvollständiger Informationen verursacht wurden, sind grundsätzlich ausgeschlossen, sofern seitens des Herausgebers kein nachweislich vorsätzliches oder grob fahrlässiges Verschulden vorliegt. Alle Angebote sind freibleibend und unverbindlich.
         Der Herausgeber behält es sich ausdrücklich vor, Teile der Applikation oder das gesamte Angebot ohne gesonderte Ankündigung zu verändern, zu ergänzen, zu löschen oder die Veröffentlichung zeitweise oder endgültig einzustellen.</string>
     <string name="headerDisclaimer">Haftungsausschluss</string>
+    <string name="headerContact">Contact:</string>
     <string name="headerHerausgeber"><p>Prof. Dr.&#8211;Ing. David Bermbach\n
         Einsteinufer 17 Sekr.EN17 \n
         10587 Berlin \n
@@ -256,4 +256,42 @@
     <string name="iAccept">I accept the privacy policy statement</string>
     <string name="privacyAgreementTitle">Privacy Policy Statement</string>
     <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our privacy policy statement.</string>
+
+    <string name="dataPrivayAgreementDialogTitle">Data Privacy</string>
+    <string name="dataPrivayAgreementDialogText">Please agree to our data privacy policy, otherwise you cannot upload your rides.</string>
+    <string name="yesClose"><![CDATA[Yes & close]]></string>
+    <string name="headerShort">Summary</string>
+    <string name="textDPshort">In the research project SimRa, we collect data to get an overview of cycling near accidents in Berlin. We collect data about driving routes, acceleration data, your ride annotations and some demographic data. The goal is, to get information’s about the distribution of time, place and type of dangerous situations while cycling. One of our main goals is to protect your privacy, therefor we individually pseudonymizing your rides and storing them separately from the likewise pseudonymised demographic data.
+</string>
+    <string name="headerGeneralDataPrivacyNew">Data collection and reasons:</string>
+    <string name="textGeneralDataPrivacyNew">All in the research project SimRa collected data, is aiming for getting an overview of cycling near accidents in Berlin. Together with cooperation partners in other cities, we collect data in other cities in the same way. Specifically, we collect the following data:</string>
+    <string name="textGeneralDataPrivacyListNew"> \t1Routes: We use the GPS module and the location services of your smartphone to record the journey. We store your current position every 10 seconds. \n
+
+        \t2
+        Acceleration values: We use the acceleration sensors of your smartphone. These continuously values describe the respective acceleration in the X, Y and Z directions. We record these in the form of three time series.\n
+
+        \t3 Annotated rides:
+        Based on the acceleration values, we determine probable danger points, you can supplement other danger points and annotate them. In annotation, we request, e.g. the type of event or how endangered you felt. Please do not enter any personal data, such as names or contact details in free text fields, otherwise we won’t be able to ensure your anonymity. Additionally, we request information’s like your bike type. \n
+
+        \t4 Demographic data:
+        In order to classify the collected information’s on routes and near accidents compared to representative data sets from cycler (e.g. age distribution surveys), we collect some demographic data. These are queried in the corresponding submenu. In addition to your user input, we also store aggregated information about your rides, e.g. the total distance covered, the date of your first and last uploaded ride, the number of your rides, the number of annotated dangerous situations. All information’s in this regard is showed in the corresponding menu.
+        \n
+
+        \t5 Meta data:
+         To develop the app, we
+        Capture some meta information’s. These are transmitted to us during regular data transmissions - e.g. while uploading rides or while uploading your demographic data. As meta data we record the app version that is used and the version of your dataset (if you update it). We reserve the right to store connection data such as your IP address momentarily (less than a week) to prevent server attacks.  We store data from real or perceived attackers permanent. After app crashes, you have the option to submit an error log to us. Usually this logfile don’t contain any personal data. Apart from mentioned information, we do not collect any device ID or similar information’s, that could determine your device. \n
+
+        \t6
+        E-mails:
+         If you contact us by e-mail or via feedback, we will save these e-mails as usual. For this we refer to the general data protection information of the Technische Universität Berlin (https://www.tu-berlin.de/allgemeine_seiten/datenschutz/).
+    </string>
+    <string name="textGeneralDataPrivacyEndNew">All collected data will be used for research purposes. We plan to publish the data on routes and dangerous situations as freely accessible public dataset, which we do, after the best possible anonymization (see also the information to personal data in point 3). On base of this data, e.g. traffic flows for cycling can be optimized and dangerous places defused. Further uses, like routing around danger centres or audible warnings while driving, are possible. Because the data collected in this research project will be freely available, any uses are possible.</string>
+    <string name="headerPersonalPrivacy">We securing your privacy:</string>
+    <string name="presonalPrivacyText">In addition to the usual mechanisms of IT security, we ensure your privacy through anonymization. This is particularly done whereby following mechanisms:
+        \t1 Individual pseudonymisation of the rides: Each ride is individually pseudonymised, thereby a combination of several rides, is not possible for us. Technically, this means that each ride data set (consisting of GPS route, acceleration data and annotation data) is first transmitted to us in a file. Our servers then create an identifier (similar to a file name) and a random access key and send it to your app. This identifier and access key are stored in your smartphone thereby you can view your trips at any time.
+        This means for us, that we cannot create cross-driving links, because we don’t have any data about which smartphone or user the ride belongs to. We only can say, that there is a ride from place A to place B every day at the same time, but we cannot say, if this is the same person. This is particularly true in high populated regions. If you start your rides alone in a house with a clear distance to other houses, an assignment with additional knowledge may be possible. Here we refer to the possibilities from point 3 below.\n
+        \t2 Pseudonymisation of demographic data: The demographic data uploaded by you gets individually pseudonymized as the individual rides, technically this is implemented comparably. This means that linking your demographic data with your rides is not possible. Before being published as a public dataset, we will explicitly verify that the demographic information does not uniquely identify anyone and, if necessary, further aggregate the data.\n
+        \t3 Trimming rides: After recording a ride you can cut off your ride at both ends - you can freely define the part that will be removed; this will not be sent to us per upload and gets permanently deleted instead. In high populated cities, your trip should usually be sufficiently anonymized without trimming, especially because information’s if a ride got trimmed or not, isn’t saved at all. In more rural areas, you should use this feature specifically. But we would ask you to don’t overuse the function, as excessive use can reduce the validity of the collected data. </string>
+    <string name="headerThirdParties">Usage of external applications:</string>
+    <string name="textPrivacyImprint">Further information to data privacy, data collection and data utilisation on the Button below. Third parties aren’t allowed to use in the app published data, like address, phone number, fax number or mail address, to send unrequested information. We reserve to take legal steps against sender from spam mails.</string>
 </resources>

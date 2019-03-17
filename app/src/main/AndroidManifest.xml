@@ -30,6 +30,9 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation|screenSize"/>
 
+        <activity android:name=".HelpActivity"
+            android:configChanges="orientation|screenSize/">
+
         <activity
             android:name=".RideSettingsActivity"
             android:configChanges="orientation|screenSize"

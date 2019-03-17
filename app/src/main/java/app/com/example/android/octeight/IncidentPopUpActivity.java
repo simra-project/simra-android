@@ -61,7 +61,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         incidentKey = getIntent().getStringExtra("Incident_Key");
 
-        temp = getIntent().getBooleanExtra("Incident_temp",false);
+        temp = getIntent().getBooleanExtra("Incident_temp", false);
 
         previousAnnotation = loadPreviousAnnotation
                 (rideID, incidentKey);
@@ -81,34 +81,34 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         if (previousAnnotation != null && previousAnnotation.length > 7) {
 
-            if(previousAnnotation[8].length()>0) {
+            if (previousAnnotation[8].length() > 0) {
                 incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[8]));
             }
-            if(previousAnnotation[9].equals("1")){
+            if (previousAnnotation[9].equals("1")) {
                 involvedType1CheckBox.setChecked(true);
             }
-            if(previousAnnotation[10].equals("1")){
+            if (previousAnnotation[10].equals("1")) {
                 involvedType2CheckBox.setChecked(true);
             }
-            if(previousAnnotation[11].equals("1")){
+            if (previousAnnotation[11].equals("1")) {
                 involvedType3CheckBox.setChecked(true);
             }
-            if(previousAnnotation[12].equals("1")){
+            if (previousAnnotation[12].equals("1")) {
                 involvedType4CheckBox.setChecked(true);
             }
-            if(previousAnnotation[13].equals("1")){
+            if (previousAnnotation[13].equals("1")) {
                 involvedType5CheckBox.setChecked(true);
             }
-            if(previousAnnotation[14].equals("1")){
+            if (previousAnnotation[14].equals("1")) {
                 involvedType6CheckBox.setChecked(true);
             }
-            if(previousAnnotation[15].equals("1")){
+            if (previousAnnotation[15].equals("1")) {
                 involvedType7CheckBox.setChecked(true);
             }
-            if(previousAnnotation[16].equals("1")){
+            if (previousAnnotation[16].equals("1")) {
                 involvedType8CheckBox.setChecked(true);
             }
-            if(previousAnnotation[17].equals("1")){
+            if (previousAnnotation[17].equals("1")) {
                 involvedType9CheckBox.setChecked(true);
             }
 
@@ -131,12 +131,12 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 }
             }
             */
-            if(previousAnnotation[18].length()>0){
-                if(previousAnnotation[18].equals("1")){
+            if (previousAnnotation[18].length() > 0) {
+                if (previousAnnotation[18].equals("1")) {
                     scarinessCheckBox.setChecked(true);
                 }
             }
-            incidentDescription.setText(previousAnnotation[19].replaceAll(";linebreak;",System.lineSeparator()).replaceAll(";komma;",","));
+            incidentDescription.setText(previousAnnotation[19].replaceAll(";linebreak;", System.lineSeparator()).replaceAll(";komma;", ","));
         }
 
         doneButton = findViewById(R.id.save_button);
@@ -145,10 +145,11 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         doneButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     doneButton.setElevation(0.0f);
                     doneButton.setBackground(getDrawable(R.drawable.button_pressed));
-                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     doneButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
                     doneButton.setBackground(getDrawable(R.drawable.button_unpressed));
                 }
@@ -160,10 +161,11 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         backButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     backButton.setElevation(0.0f);
                     backButton.setBackground(getDrawable(R.drawable.button_pressed));
-                } if (event.getAction() == MotionEvent.ACTION_UP) {
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     backButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
                     backButton.setBackground(getDrawable(R.drawable.button_unpressed));
                 }
@@ -191,38 +193,38 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 // Instead of writing the String selected items in the spinner,
                 // we use an int to save disk space and bandwidth
                 int incidentType = incidentTypeSpinner.getSelectedItemPosition();
-                String description = incidentDescription.getText().toString().replace(System.lineSeparator(),";linebreak;").replace(",",";komma;");
+                String description = incidentDescription.getText().toString().replace(System.lineSeparator(), ";linebreak;").replace(",", ";komma;");
                 int scariness = 0;
-                if (scarinessCheckBox.isChecked()){
+                if (scarinessCheckBox.isChecked()) {
                     scariness = 1;
                 }
-                String[] checkBoxValues = {"0","0","0","0","0","0","0","0","0"};
+                String[] checkBoxValues = {"0", "0", "0", "0", "0", "0", "0", "0", "0"};
 
-                if (involvedType1CheckBox.isChecked()){
+                if (involvedType1CheckBox.isChecked()) {
                     checkBoxValues[0] = "1";
                 }
-                if (involvedType2CheckBox.isChecked()){
+                if (involvedType2CheckBox.isChecked()) {
                     checkBoxValues[1] = "1";
                 }
-                if (involvedType3CheckBox.isChecked()){
+                if (involvedType3CheckBox.isChecked()) {
                     checkBoxValues[2] = "1";
                 }
-                if (involvedType4CheckBox.isChecked()){
+                if (involvedType4CheckBox.isChecked()) {
                     checkBoxValues[3] = "1";
                 }
-                if (involvedType5CheckBox.isChecked()){
+                if (involvedType5CheckBox.isChecked()) {
                     checkBoxValues[4] = "1";
                 }
-                if (involvedType6CheckBox.isChecked()){
+                if (involvedType6CheckBox.isChecked()) {
                     checkBoxValues[5] = "1";
                 }
-                if (involvedType7CheckBox.isChecked()){
+                if (involvedType7CheckBox.isChecked()) {
                     checkBoxValues[6] = "1";
                 }
-                if (involvedType8CheckBox.isChecked()){
+                if (involvedType8CheckBox.isChecked()) {
                     checkBoxValues[7] = "1";
                 }
-                if (involvedType9CheckBox.isChecked()){
+                if (involvedType9CheckBox.isChecked()) {
                     checkBoxValues[8] = "1";
                 }
 
@@ -256,10 +258,10 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
 
                 String incidentString = incidentKey + "," + lat + "," + lon + "," + ts + ","
-                        + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[","").replace("]","") + "," + scariness + "," + description;
+                        + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description;
 
                 overwriteIncidentFile(rideID, incidentKey, incidentKey + "," + lat + "," + lon + "," + ts + ","
-                        + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[","").replace("]","") + "," + scariness + "," + description);
+                        + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description);
 
                 incidentSaved = true;
                 // writeIntToSharedPrefs("Settings-PhoneLocation", locationType, "simraPrefs", this);

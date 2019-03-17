@@ -35,7 +35,7 @@ import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
 
 public class StartActivity extends BaseActivity {
 
-    private static int TIME_OUT = 10000; //Time to launch the another activity
+    private static int TIME_OUT = 100000; //Time to launch the another activity
     Button next;
 
     // For permission request
@@ -45,6 +45,8 @@ public class StartActivity extends BaseActivity {
     private static final String TAG = "StartActivity_LOG";
     private Boolean firstTime = null;
     public boolean sendErrorPermitted = false;
+    boolean privacyAgreement = false;
+
     boolean privacyAgreement = false;
 
 
@@ -156,7 +158,7 @@ public class StartActivity extends BaseActivity {
 
                 path = dirFiles[i].getName();
                 Log.d(TAG, "path: " + path);
-                if (!path.equals("profile.csv")){
+                if (!path.equals("profile.csv")) {
                     dirFiles[i].delete();
                 }
                 /*
@@ -205,10 +207,10 @@ public class StartActivity extends BaseActivity {
         */
             String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
 
-            overWriteFile((fileInfoLine + "key, startTime, endTime, annotated" + System.lineSeparator()),"metaData.csv",this);
-            writeIntToSharedPrefs("RIDE-KEY",0,"simraPrefs",this);
+            overWriteFile((fileInfoLine + "key, startTime, endTime, annotated" + System.lineSeparator()), "metaData.csv", this);
+            writeIntToSharedPrefs("RIDE-KEY", 0, "simraPrefs", this);
         }
-        writeIntToSharedPrefs("App-Version",getAppVersionNumber(this),"simraPrefs",this);
+        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
     }
 
 
@@ -324,8 +326,5 @@ public class StartActivity extends BaseActivity {
             }
         });
     }
+
 }
-
-
-
-
