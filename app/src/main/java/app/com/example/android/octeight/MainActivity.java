@@ -312,19 +312,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             @Override
             public void onClick(View v) {
 
-                if (isAirplaneModeOn(MainActivity.this)) {
-                    // notify user
-                    new AlertDialog.Builder(MainActivity.this)
-                            .setMessage(R.string.airplaneModeIsOn)
-                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                                    MainActivity.this.startActivity(new Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS));
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel, null)
-                            .show();
-                } else if (isLocationServiceOff(MainActivity.this)) {
+                if (isLocationServiceOff(MainActivity.this)) {
                     // notify user
                     new AlertDialog.Builder(MainActivity.this)
                             .setMessage(R.string.locationServiceisOff)
@@ -637,13 +625,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             mBoundRecorderService = myBinder.getService();
         }
     };
-
-    private static boolean isAirplaneModeOn(Context context) {
-
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
-
-    }
 
     private static boolean isLocationServiceOff(MainActivity mainActivity) {
 

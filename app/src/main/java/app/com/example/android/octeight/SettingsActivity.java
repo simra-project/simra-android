@@ -28,7 +28,6 @@ public class SettingsActivity extends BaseActivity {
     int privacyDistance;
     int child;
     int trailer;
-    boolean showRideSettings;
 
     // Bike Type and Phone Location Items
     Spinner bikeTypeSpinner;
@@ -37,9 +36,6 @@ public class SettingsActivity extends BaseActivity {
     // Child and Trailer
     CheckBox childCheckBox;
     CheckBox trailerCheckBox;
-
-    // Ride settings are shown before annotating a ride if checked
-    CheckBox showRideSettingsCheckBox;
 
 
 
@@ -65,7 +61,6 @@ public class SettingsActivity extends BaseActivity {
                                            writeIntToSharedPrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
                                            writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", SettingsActivity.this);
                                            writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", SettingsActivity.this);
-                                           writeBooleanToSharedPrefs("Settings-ShowRideSettingsDialog",showRideSettingsCheckBox.isChecked(),"simraPrefs",SettingsActivity.this);
                                            finish();
                                        }
                                    }
@@ -120,9 +115,6 @@ public class SettingsActivity extends BaseActivity {
         childCheckBox = findViewById(R.id.childCheckBox);
         trailerCheckBox = findViewById(R.id.trailerCheckBox);
 
-        // CheckBox for showing ride settings before annotating a ride.
-        showRideSettingsCheckBox = findViewById(R.id.showRideSettingsCheckBox);
-
         // Load previous bikeType and phoneLocation settings
         int bikeType = lookUpIntSharedPrefs("Settings-BikeType", 0, "simraPrefs", this);
         int phoneLocation = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this);
@@ -161,12 +153,6 @@ public class SettingsActivity extends BaseActivity {
                 }
             }
         });
-
-        showRideSettings = lookUpBooleanSharedPrefs("Settings-ShowRideSettingsDialog",true,"simraPrefs", SettingsActivity.this);
-
-        if (!showRideSettings) {
-            showRideSettingsCheckBox.setChecked(false);
-        }
 
     }
 

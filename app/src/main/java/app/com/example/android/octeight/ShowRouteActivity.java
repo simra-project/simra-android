@@ -188,9 +188,8 @@ public class ShowRouteActivity extends BaseActivity {
         trailer = lookUpIntSharedPrefs("Settings-Trailer", 0, "simraPrefs", this);
         pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this);
 
-        if (lookUpBooleanSharedPrefs("Settings-ShowRideSettingsDialog", true, "simraPrefs", ShowRouteActivity.this)) {
-            showCustomViewAlertDialog();
-        }
+        showCustomViewAlertDialog();
+
 
         Log.d(TAG, "onCreate() continues.");
 
@@ -656,7 +655,6 @@ public class ShowRouteActivity extends BaseActivity {
         CheckBox trailerCheckBoxButton = settingsView.findViewById(R.id.trailerCheckBoxRideSettings);
 
         CheckBox rememberMyChoiceCheckBox = settingsView.findViewById(R.id.rememberMyChoice);
-        CheckBox doNotShowAgainCheckBox = settingsView.findViewById(R.id.doNotShowAgain);
 
         bikeTypeSpinner.setSelection(bike);
         phoneLocationSpinner.setSelection(pLoc);
@@ -705,9 +703,6 @@ public class ShowRouteActivity extends BaseActivity {
                         writeIntToSharedPrefs("Settings-PhoneLocation", pLoc, "simraPrefs", ShowRouteActivity.this);
                         writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", ShowRouteActivity.this);
                         writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", ShowRouteActivity.this);
-                    }
-                    if (doNotShowAgainCheckBox.isChecked()) {
-                        writeBooleanToSharedPrefs("Settings-ShowRideSettingsDialog", false, "simraPrefs", ShowRouteActivity.this);
                     }
                     // Close Alert Dialog.
                     handler.sendMessage(handler.obtainMessage());

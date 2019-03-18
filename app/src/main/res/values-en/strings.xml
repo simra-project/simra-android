@@ -136,7 +136,6 @@
     <string name="ride_settings_description">Below, you can find the settings chosen for this ride. You can change them here, or in the settings menu.</string>
     <string name="rememberMyChoice">Remember My Choice</string>
     <string name="doNotShowAgain">Don\'t show this again</string>
-    <string name="showRideSettings">Show me the ride settings before annotating a ride.</string>
     <string name="mailRequestTU"><a href="https://www.tu-berlin.de/allgemeine_seiten/contact/parameter/en/id/16/?no_cache=1&amp;ask_name=Pressestelle&amp;ask_mail=XH4N4AAD0Pm6SW%2BAqRiyNWi2wtI5xLDRrsckIn8nzonCUl%2B95CeT8w%3D%3D">Mail Request</a></string>
     <string name="bycicleCreditTxt">Icon made by Nikita Golubev from www.flaticon.com .</string>
     <string name="freepikCredit">Icon made by Freepik from www.flaticon.com .</string>
@@ -255,8 +254,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
     <string name="title_activity_about_simra">About SimRa</string>
     <string name="iAccept">I accept the privacy policy statement</string>
     <string name="privacyAgreementTitle">Privacy Policy Statement</string>
-    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).</string>
-
+    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/research/projects/simra/privacy_policy_statement/parameter/en?isMobile=1">privacy policy statement</a>).</string>
     <string name="dataPrivayAgreementDialogTitle">Data Privacy</string>
     <string name="dataPrivayAgreementDialogText">Please agree to our data privacy policy, otherwise you cannot upload your rides.</string>
     <string name="yesClose"><![CDATA[Yes & close]]></string>
@@ -297,4 +295,5 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
     <string name="simra_closed">SimRa closed</string>
     <string name="next">Continue</string>
     <string name="close_simra">Close SimRa</string>
+    <string name="privacySlider">Cut off the beginning or the end of the ride</string>
 </resources>
