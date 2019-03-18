@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:locale="de">
     <string name="welcome_header">Willkommen bei SimRa!</string>
     <string name="welcome_text">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
-    <string name="welcome_text2">Die App ist noch in der Betaphase. Wir freuen uns auf Euer Feedback.</string>
+    <string name="welcome_text2">Viel Spaß und Gute Fahrt!.</string>
     <string name="welcome_text3">Mit freundlichen Grüßen,\ndas SimRa-Team.</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

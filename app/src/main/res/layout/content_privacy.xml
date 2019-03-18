@@ -12,7 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="16dp"
         android:orientation="vertical">
 
         <TextView
@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:text="@string/headerDataPrivacy"
-            android:textSize="15sp" />
+            android:textSize="21sp" />
 
         <TextView
             android:id="@+id/headerShort"
@@ -30,7 +30,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:text="@string/headerShort"
-            android:textSize="12sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/shortText"
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:text="@string/textDPshort"
-            android:textSize="10sp" />
+            android:textSize="16sp" />
 
 
         <TextView
@@ -48,28 +48,28 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:text="@string/headerGeneralDataPrivacyNew"
-            android:textSize="12sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/generalDataPrivacyText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/textGeneralDataPrivacyNew"
-            android:textSize="10sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/generalDataPrivacyList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/textGeneralDataPrivacyListNew"
-            android:textSize="10sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/generalDataPrivacyEnd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/textGeneralDataPrivacyEndNew"
-            android:textSize="10sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/headerPersonalPrivacy"
@@ -78,14 +78,14 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:text="@string/headerPersonalPrivacy"
-            android:textSize="12sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/personalPrivacyText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/presonalPrivacyText"
-            android:textSize="10sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/headerThirdParties"
@@ -94,14 +94,14 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:text="@string/headerThirdParties"
-            android:textSize="12sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/osmCopyrightText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/osmCopyrightText"
-            android:textSize="10sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/headerContact"
@@ -111,7 +111,7 @@
             android:layout_marginTop="5dp"
             android:autoLink="email"
             android:text="@string/headerContact"
-            android:textSize="12sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/contactText"
@@ -119,7 +119,7 @@
             android:layout_height="wrap_content"
             android:autoLink="phone|email"
             android:text="@string/headerHerausgeber"
-            android:textSize="10sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/headerRightOfAccesText"
@@ -129,7 +129,7 @@
             android:layout_marginTop="5dp"
             android:autoLink="email"
             android:text="@string/headerRightOfAcces"
-            android:textSize="12sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/rightOfAccesText"
@@ -137,7 +137,7 @@
             android:layout_height="wrap_content"
             android:autoLink="phone|email"
             android:text="@string/textRightOfAcces"
-            android:textSize="10sp" />
+            android:textSize="16sp" />
 
 
         <TextView
@@ -146,6 +146,6 @@
             android:layout_height="30dp"
             android:layout_marginStart="10dp"
             android:text=" "
-            android:textSize="12sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 </ScrollView>
