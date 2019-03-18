@@ -189,10 +189,6 @@
                 android:singleLine="false"
                 android:maxEms="15"
                 android:checked="false"/>
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="10dp" />
             <!--
                     <RelativeLayout
                     android:layout_width="match_parent"
@@ -269,13 +265,6 @@
 
                 </RelativeLayout>
                 -->
-            <CheckBox android:id="@+id/showRideSettingsCheckBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/showRideSettings"
-                android:singleLine="false"
-                android:maxEms="15"
-                android:checked="true"/>
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="20dp" />

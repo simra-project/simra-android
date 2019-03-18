@@ -122,7 +122,8 @@
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:layout_alignEnd="@id/exitAddIncident"
-        android:layout_above="@id/privacySlider"
+        android:layout_above="@id/privacySliderDescription"
+        android:layout_marginBottom="20dp"
         android:elevation="2dp"
         android:clickable="true"
         android:focusable="true"
@@ -150,23 +151,60 @@
 
     </RelativeLayout>
 
-    <com.jaygoo.widget.RangeSeekBar
-        android:id="@+id/privacySlider"
+    <TextView
+        android:id="@+id/privacySliderDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/privacySlider"
+        android:layout_centerHorizontal="true"
+        android:layout_alignStart="@id/privacySliderLinearLayout"
+        android:layout_alignEnd="@id/privacySliderLinearLayout"
+        android:background="@color/transparent"
+        android:textColor="@color/white"
+        android:layout_above="@id/privacySliderLinearLayout"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"/>
+
+    <LinearLayout
+        android:id="@+id/privacySliderLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignEnd="@id/toolbar"
         android:layout_alignStart="@id/toolbar"
         android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
-        app:rsb_progress_default_color="@color/colorPrimary"
-        app:rsb_progress_color="@color/colorAccent"
-        android:background="@color/transparent"
-        app:rsb_mode="range"
-        app:rsb_range_interval="1"
-        app:rsb_tick_mark_number="1"
-        />
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:background="@color/transparent">
 
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:src="@drawable/startwhite"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            />
+        <com.jaygoo.widget.RangeSeekBar
+            android:id="@+id/privacySlider"
+            android:layout_width="0dp"
+            android:layout_weight="8"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_height="wrap_content"
+            app:rsb_progress_default_color="@color/colorPrimary"
+            app:rsb_progress_color="@color/colorAccent"
+            app:rsb_mode="range"
+            app:rsb_range_interval="1"
+            app:rsb_tick_mark_number="1"
+            />
+        <ImageView
+            android:src="@drawable/racingflagwhite"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            />
+    </LinearLayout>
     <TextView
         android:id="@+id/copyright_text"
         android:layout_width="wrap_content"

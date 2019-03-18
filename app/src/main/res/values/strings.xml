@@ -216,7 +216,6 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="ride_settings_description">Unten finden Sie die Einstellungen, die für diese Fahrt verwendet werden. Sie können diese sowohl in diesem Fenster, als auch unter \"Einstellungen\" im Hauptmenü finden.</string>
     <string name="rememberMyChoice">Diese Einstellungen merken</string>
     <string name="doNotShowAgain">Diesen Dialog nicht mehr zeigen</string>
-    <string name="showRideSettings">Fahrteinstellungen vor Bearbeitung der Fahrt nochmal anzeigen.</string>
     <string name="title_activity_ride_settings">Fahrteinstellungen bearbeiten</string>
     <string name="quitAddIncident">Hinzufügen\nbeenden</string>
     <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalten Sie es aus, damit die Fahrt aufgezeichnet werden kann.</string>
@@ -234,8 +233,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="title_activity_about_simra">Über SimRa</string>
     <string name="iAccept">Ich akzeptiere die Datenschutzerklärung</string>
     <string name="privacyAgreementTitle">Datenschutzerklärung</string>
-    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrt Standort- und Sensordaten auf, sowie von Ihnen eingegebene demografische Daten. Weitere Informationen finden Sie in unserer <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/?isMobile=1">Datenschutzerklärung</a>.</string>
-
+    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrt Standort- und Sensordaten auf, sowie von Ihnen eingegebene demografische Daten. Weitere Informationen finden Sie in unserer <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1">Datenschutzerklärung</a>.</string>
     <string name="dataPrivayAgreementDialogTitle">Datenschutz</string>
     <string name="dataPrivayAgreementDialogText">Um ihre Fahrten hochzuladen, bitten wir sie unserer Datenschutzerklärung zuzustimmen.</string>
     <string name="yesClose"><![CDATA[Ja & schließen]]></string>
@@ -261,5 +259,6 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="simra_closed">SimRa beendet</string>
     <string name="next">Weiter</string>
     <string name="close_simra">SimRa beenden</string>
+    <string name="privacySlider">Fahrtbeginn und -ende abschneiden</string>
 
 </resources>
