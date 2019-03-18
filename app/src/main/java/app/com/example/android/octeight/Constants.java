@@ -30,6 +30,8 @@ public class Constants extends Service {
     public static final SimpleDateFormat DATE_PATTERN_SHORT = new SimpleDateFormat("dd.MM.yyyy");
 
     public static final String MCC_VM1 = "http://vm1.mcc.tu-berlin.de:8080/resource/";
+    public static final String MCC_VM2 = "https://vm2.mcc.tu-berlin.de:8082/";
+
     public static final String MCC_VM3 = "https://vm3.mcc.tu-berlin.de:8082/";
 
     public static final String UPLOAD_HASH_SUFFIX = "mcc_simra";
