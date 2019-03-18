@@ -31,7 +31,7 @@
             android:configChanges="orientation|screenSize"/>
 
         <activity android:name=".HelpActivity"
-            android:configChanges="orientation|screenSize/">
+            android:configChanges="orientation|screenSize"/>
 
         <activity
             android:name=".RideSettingsActivity"

@@ -10,22 +10,30 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
 import static app.com.example.android.octeight.Utils.appendToFile;
 import static app.com.example.android.octeight.Utils.fileExists;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
+import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
 import static app.com.example.android.octeight.Utils.showMessageOK;
 import static app.com.example.android.octeight.Utils.writeBooleanToSharedPrefs;
 import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
+import static app.com.example.android.octeight.Utils.writeLongToSharedPrefs;
 
 /**
  * Shows general info about the app and starts the MainActivity once the okay-Button is pressed
@@ -43,12 +51,7 @@ public class StartActivity extends BaseActivity {
 
     // Log tag
     private static final String TAG = "StartActivity_LOG";
-    private Boolean firstTime = null;
     public boolean sendErrorPermitted = false;
-    boolean privacyAgreement = false;
-
-    boolean privacyAgreement = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,79 +60,16 @@ public class StartActivity extends BaseActivity {
 
         Log.d(TAG, "onCreate() started");
 
-        SharedPreferences sharedPrefs = getApplicationContext()
-                .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-
-        // Look up whether there are unsent crash logs and ask the user for a permission to
-        // send them to the server. If the user gives permission, upload the crash report(s).
-        if (sharedPrefs.contains("NEW-UNSENT-ERROR")) {
-            boolean newErrorsExist = sharedPrefs.getBoolean("NEW-UNSENT-ERROR", true);
-            if (newErrorsExist) {
-                fireSendErrorDialog();
-            }
-        } else {
-            editor.putBoolean("NEW-UNSENT-ERROR", false);
-            editor.commit();
-        }
-
         newUpdate();
-
 
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
 
-        if (!(isFirstTime()) && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if ((!isFirstTime()) & (privacyPolicyAccepted()) & (!unsentErrors()) && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED)) {
             Intent intent = new Intent(StartActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         } else {
-
-            // First start, show your dialog | first-run code goes here
-            if (isFirstTime()) {
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // META-FILE (one per user): contains ...
-                // * the information required to display rides in the ride history (See RecorderService)
-                //   (DATE,START TIME, END TIME, ANNOTATED TRUE/FALSE)
-                // * the RIDE KEY which allows to identify the file containing the complete data for
-                //   a ride. => Use case: user wants to view a ride from history - retrieve data
-                // * one meta file per user, so we only want to create it if it doesn't exist yet.
-                //   (fileExists and appendToFile can be found in the Utils.java class)
-                Log.d(TAG, "firstTime. Creating metaData.csv");
-                if (!fileExists("metaData.csv", this)) {
-                    String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
-
-                    appendToFile((fileInfoLine + "key, startTime, endTime, annotated"
-                            + System.lineSeparator()), "metaData.csv", this);
-
-                }
-
-                Log.d(TAG, "firstTime. Creating profile.csv");
-                if (!fileExists("profile.csv", this)) {
-                    String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
-
-                    appendToFile((fileInfoLine + "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents"
-                            + System.lineSeparator()), "profile.csv", this);
-
-                }
-
-                // Write the default values for privacy duration and distance. These values are
-                // used to determine whether a ride should be saved or not.
-                if (!sharedPrefs.contains("Privacy-Duration")) {
-                    // don't start to record the ride, until user is 30 meters away
-                    // from his starting position.
-                    editor.putLong("Privacy-Duration", 30);
-                    editor.commit();
-                    // don't start to record the ride, until user 30 seconds passed
-                    // from recording start time.
-                    editor.putInt("Privacy-Distance", 30);
-                    editor.commit();
-                }
-                firePrivacyDialog();
-
-            }
 
             // start MainActivity when Button is clicked
             next = findViewById(R.id.nextBtn);
@@ -245,16 +185,64 @@ public class StartActivity extends BaseActivity {
      * @return boolean
      */
     private boolean isFirstTime() {
-        if (firstTime == null) {
-            SharedPreferences mPreferences = this.getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-            firstTime = mPreferences.getBoolean("firstTime", true);
-            if (firstTime) {
-                SharedPreferences.Editor editor = mPreferences.edit();
-                editor.putBoolean("firstTime", false);
-                editor.commit();
+        boolean firstTime = lookUpBooleanSharedPrefs("firstTime",true,"simraPrefs",this);
+        if(firstTime) {
+            writeBooleanToSharedPrefs("firstTime",false,"simraPrefs", this);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // META-FILE (one per user): contains ...
+            // * the information required to display rides in the ride history (See RecorderService)
+            //   (DATE,START TIME, END TIME, ANNOTATED TRUE/FALSE)
+            // * the RIDE KEY which allows to identify the file containing the complete data for
+            //   a ride. => Use case: user wants to view a ride from history - retrieve data
+            // * one meta file per user, so we only want to create it if it doesn't exist yet.
+            //   (fileExists and appendToFile can be found in the Utils.java class)
+            Log.d(TAG, "firstTime. Creating metaData.csv");
+            if (!fileExists("metaData.csv", this)) {
+                String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
+
+                overWriteFile((fileInfoLine + "key, startTime, endTime, annotated"
+                        + System.lineSeparator()), "metaData.csv", this);
+
             }
+
+            Log.d(TAG, "firstTime. Creating profile.csv");
+            if (!fileExists("profile.csv", this)) {
+                String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
+
+                overWriteFile((fileInfoLine + "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents"
+                        + System.lineSeparator()), "profile.csv", this);
+
+            }
+
+            // Write the default values for privacy duration and distance. These values are
+            // used to determine whether a ride should be saved or not.
+
+            // don't start to record the ride, until user is 30 meters away
+            // from his starting position.
+            writeLongToSharedPrefs("Privacy-Duration",30,"simraPrefs",this);
+            // don't start to record the ride, until user 30 seconds passed
+            // from recording start time.
+            writeIntToSharedPrefs("Privacy-Distance",30,"simraPrefs",this);
         }
         return firstTime;
+    }
+
+    private boolean privacyPolicyAccepted() {
+        boolean accepted = lookUpBooleanSharedPrefs("Privacy-Policy-Accepted",false,"simraPrefs", this);
+        if (!accepted) {
+            firePrivacyDialog();
+        }
+        return accepted;
+    }
+
+    // Look up whether there are unsent crash logs and ask the user for a permission to
+    // send them to the server. If the user gives permission, upload the crash report(s).
+    private boolean unsentErrors() {
+        boolean positive = lookUpBooleanSharedPrefs("NEW-UNSENT-ERROR",false,"simraPrefs",this);
+        if (positive) {
+            fireSendErrorDialog();
+        }
+        return positive;
     }
 
     public void fireSendErrorDialog() {
@@ -296,23 +284,25 @@ public class StartActivity extends BaseActivity {
         checkBox.setText(getString(R.string.iAccept));
         AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
 
+        // Linkify the message
         builder.setTitle(getString(R.string.privacyAgreementTitle));
-        builder.setMessage(getString(R.string.privacyAgreementMessage));
+        builder.setMessage(getResources().getText(R.string.privacyAgreementMessage));
         builder.setView(checkBoxView);
-        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                Intent intent = new Intent(StartActivity.this, UploadService.class);
-                intent.putExtra("CRASH_REPORT", sendErrorPermitted);
-                startService(intent);
+                writeBooleanToSharedPrefs("Privacy-Policy-Accepted",checkBox.isChecked(),"simraPrefs",StartActivity.this);
             }
         });
-        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.close_simra, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-
+                writeBooleanToSharedPrefs("firstTime",true,"simraPrefs",StartActivity.this);
+                finish();
+                Toast.makeText(StartActivity.this,getString(R.string.simra_closed),Toast.LENGTH_LONG).show();
             }
         });
         final AlertDialog dialog = builder.create();
         dialog.show();
+        ((TextView)dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 
         // Initially disable the button
         ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
@@ -320,7 +310,6 @@ public class StartActivity extends BaseActivity {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                writeBooleanToSharedPrefs("Data-Privacy-Agreement",checkBox.isChecked(),"simraPrefs",StartActivity.this);
                 ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked);
 
             }

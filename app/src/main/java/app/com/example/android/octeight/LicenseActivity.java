@@ -53,28 +53,28 @@ public class LicenseActivity extends AppCompatActivity {
         );
 
         Button androidSupportLibraryButton = findViewById(R.id.android_support_library);
-        createDialogWhenButtonIsPressed(androidSupportLibraryButton,"licenseandroidsupportlibrary.txt");
+        createDialogWhenButtonIsPressed(androidSupportLibraryButton,"licenseandroidsupportlibrary.txt","Android Support Library");
 
         Button gsonButton = findViewById(R.id.gson_library);
-        createDialogWhenButtonIsPressed(gsonButton,"licensegson.txt");
+        createDialogWhenButtonIsPressed(gsonButton,"licensegson.txt","Gson");
 
         Button osmdroidButton = findViewById(R.id.osmdroid_library);
-        createDialogWhenButtonIsPressed(osmdroidButton,"licenseosmdroid.txt");
+        createDialogWhenButtonIsPressed(osmdroidButton,"licenseosmdroid.txt","Osmdroid");
 
         Button osmbonuspackButton = findViewById(R.id.osmbonuspack_library);
-        createDialogWhenButtonIsPressed(osmbonuspackButton,"licenseosmbonuspack.txt");
+        createDialogWhenButtonIsPressed(osmbonuspackButton,"licenseosmbonuspack.txt","Osmbonuspack");
 
         Button okhttpButton = findViewById(R.id.okhttp_library);
-        createDialogWhenButtonIsPressed(okhttpButton,"licenseokhttp.txt");
+        createDialogWhenButtonIsPressed(okhttpButton,"licenseokhttp.txt","OkHttp");
 
         Button rangeSeekBarButton = findViewById(R.id.rangeseekbar_library);
-        createDialogWhenButtonIsPressed(rangeSeekBarButton,"licenserangeseekbar.txt");
+        createDialogWhenButtonIsPressed(rangeSeekBarButton,"licenserangeseekbar.txt","RangeSeekBar");
 
 
 
     }
 
-    private void createDialogWhenButtonIsPressed(Button button, String licenceFileName) {
+    private void createDialogWhenButtonIsPressed(Button button, String licenceFileName, String title) {
         Dialog showLicenseDialog = new Dialog(this);
         showLicenseDialog.setContentView(R.layout.show_license_dialog);
 
@@ -106,6 +106,8 @@ public class LicenseActivity extends AppCompatActivity {
                 } catch (IOException e) {e.printStackTrace();}
                 TextView textView = showLicenseDialog.findViewById(R.id.tv);
                 textView.setText(message);
+                TextView titleView = showLicenseDialog.findViewById(R.id.licenseTitle);
+                titleView.setText(title);
                 Button closeButton = showLicenseDialog.findViewById(R.id.closeButton);
                 closeButton.setOnClickListener(new View.OnClickListener() {
                     @Override

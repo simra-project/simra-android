@@ -18,13 +18,29 @@
             android:fadingEdgeLength="80dp"
             android:requiresFadingEdge="vertical"
             android:scrollbars="vertical">
-            <TextView
-                android:id="@+id/tv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="10dp"
-                android:text="TextView" />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/licenseTitle"
+                    android:layout_alignParentTop="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:text="TextView" />
+                <TextView
+                    android:layout_below="@id/licenseTitle"
+                    android:id="@+id/tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="TextView" />
+            </RelativeLayout>
+
         </ScrollView>
         </RelativeLayout>
     <RelativeLayout
