@@ -91,7 +91,7 @@ public class StartActivity extends BaseActivity {
     private void newUpdate() {
         int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
 
-        if (appVersion < 6) {
+        if (appVersion < 7) {
             File[] dirFiles = getFilesDir().listFiles();
             String path;
             for (int i = 0; i < dirFiles.length; i++) {
