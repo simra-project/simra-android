@@ -146,7 +146,7 @@
     <string name="icons8Credit">Icon made by Icons8 from https://icons8.com .</string>
     <string name="privacyButton">Further information about data privacy</string>
     <string name="impressum">imprint</string>
-    <string name="osmCopyrightText">n our application we use the maps of OpenStreetMap, an OpenStreetMap Foundation service, St John\'s Innovation Center, Cowley Road, Cambridge, CB 4 0 WS, United Kingdom, hereinafter referred to as \"OpenStreetMap\". In our application, the service OpenStreetMap is involved, so is stored by OpenStreetMap a cookie on your device. This will process your user settings and user data for the purpose of displaying the page or ensuring the functionality of OpenStreetMap.
+    <string name="osmCopyrightText">In our application we use the maps of OpenStreetMap, an OpenStreetMap Foundation service, St John\'s Innovation Center, Cowley Road, Cambridge, CB 4 0 WS, United Kingdom, hereinafter referred to as \"OpenStreetMap\". In our application, the service OpenStreetMap is involved, so is stored by OpenStreetMap a cookie on your device. This will process your user settings and user data for the purpose of displaying the page or ensuring the functionality of OpenStreetMap.
         Through this processing, OpenStreetMap can recognize from which application your request has been sent and to which IP address the data should be transmitted. Legal basis is Art. 6 para. 1 lit. f) GDPR. Our legitimate interest lies in the operation of our application. If you do not agree with this processing, please contact the above mentioned contact persons. OpenStreetMap provides more information at https://wiki.osmfoundation.org/wiki/Privacy_Policy to collect and use the data, and to protect your rights and privacy.
         We reserve the right to set up our own mirror for OpenStreetMap. In this case, we will delete any generated data as soon as possible and don’t link it to our regularly collected data, if possible.
         </string>
@@ -173,7 +173,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
         Tel.: +49 30 13889-0
         Fax: +49 30 2155050
         Email: mailbox@datenschutz-berlin.de</string>
-    <string name="headerRightOfAcces">Right of Access to Personal Data</string>
+    <string name="headerRightOfAcces">Right to Information</string>
     <string name="headerDataPrivacy">Data Privacy Statement</string>
     <string name="textSubjectOfDataPrivacy">Data privacy covers personal data. According to art. 4 par. 1 of DSGVO this are data referring to an identified or identifiable individual, hence all data which could be used to identify you. This applies for data such as name, private address, e-mail address, telephone number but also to usage data such as your IP address.
         Of course Technische Universität Berlin observes the legal requirements of data privacy and other applicable regulations.
@@ -265,7 +265,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
 </string>
     <string name="headerGeneralDataPrivacyNew">Data collection and reasons:</string>
     <string name="textGeneralDataPrivacyNew">All in the research project SimRa collected data, is aiming for getting an overview of cycling near accidents in Berlin. Together with cooperation partners in other cities, we collect data in other cities in the same way. Specifically, we collect the following data:</string>
-    <string name="textGeneralDataPrivacyListNew"> \t1Routes: We use the GPS module and the location services of your smartphone to record the journey. We store your current position every 10 seconds. \n
+    <string name="textGeneralDataPrivacyListNew"> \t1 Routes: We use the GPS module and the location services of your smartphone to record the journey. We store your current position every 10 seconds. \n
 
         \t2
         Acceleration values: We use the acceleration sensors of your smartphone. These continuously values describe the respective acceleration in the X, Y and Z directions. We record these in the form of three time series.\n
@@ -286,7 +286,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
          If you contact us by e-mail or via feedback, we will save these e-mails as usual. For this we refer to the general data protection information of the Technische Universität Berlin (https://www.tu-berlin.de/allgemeine_seiten/datenschutz/).
     </string>
     <string name="textGeneralDataPrivacyEndNew">All collected data will be used for research purposes. We plan to publish the data on routes and dangerous situations as freely accessible public dataset, which we do, after the best possible anonymization (see also the information to personal data in point 3). On base of this data, e.g. traffic flows for cycling can be optimized and dangerous places defused. Further uses, like routing around danger centres or audible warnings while driving, are possible. Because the data collected in this research project will be freely available, any uses are possible.</string>
-    <string name="headerPersonalPrivacy">We securing your privacy:</string>
+    <string name="headerPersonalPrivacy">How we secure your privacy:</string>
     <string name="presonalPrivacyText">In addition to the usual mechanisms of IT security, we ensure your privacy through anonymization. This is particularly done whereby following mechanisms:
         \t1 Individual pseudonymisation of the rides: Each ride is individually pseudonymised, thereby a combination of several rides, is not possible for us. Technically, this means that each ride data set (consisting of GPS route, acceleration data and annotation data) is first transmitted to us in a file. Our servers then create an identifier (similar to a file name) and a random access key and send it to your app. This identifier and access key are stored in your smartphone thereby you can view your trips at any time.
         This means for us, that we cannot create cross-driving links, because we don’t have any data about which smartphone or user the ride belongs to. We only can say, that there is a ride from place A to place B every day at the same time, but we cannot say, if this is the same person. This is particularly true in high populated regions. If you start your rides alone in a house with a clear distance to other houses, an assignment with additional knowledge may be possible. Here we refer to the possibilities from point 3 below.\n
