@@ -237,7 +237,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
         Telefon: +49 (0)30 314&#8211;0</string>
     <string name="headerAddresseTUBerlin">Zentrale Adresse der TU Berlin</string>
     <string name="umsatzsteueridentifikationsnummer">Umsatzsteueridentifikationsnummer</string>
-    <string name="title_activity_credits">Credits</string>
+    <string name="title_activity_credits">Graphics References</string>
     <string name="title_activity_ride_settings">Edit Ride Settings</string>
     <string name="quitAddIncident">Cancel\nadding</string>
     <string name="airplaneModeIsOn">The airplane mode is enabled! Please disable it, so the ride can be recorded.</string>
@@ -255,7 +255,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
     <string name="title_activity_about_simra">About SimRa</string>
     <string name="iAccept">I accept the privacy policy statement</string>
     <string name="privacyAgreementTitle">Privacy Policy Statement</string>
-    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our privacy policy statement.</string>
+    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).</string>
 
     <string name="dataPrivayAgreementDialogTitle">Data Privacy</string>
     <string name="dataPrivayAgreementDialogText">Please agree to our data privacy policy, otherwise you cannot upload your rides.</string>
@@ -294,4 +294,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
         \t3 Trimming rides: After recording a ride you can cut off your ride at both ends - you can freely define the part that will be removed; this will not be sent to us per upload and gets permanently deleted instead. In high populated cities, your trip should usually be sufficiently anonymized without trimming, especially because information’s if a ride got trimmed or not, isn’t saved at all. In more rural areas, you should use this feature specifically. But we would ask you to don’t overuse the function, as excessive use can reduce the validity of the collected data. </string>
     <string name="headerThirdParties">Usage of external applications:</string>
     <string name="textPrivacyImprint">Further information to data privacy, data collection and data utilisation on the Button below. Third parties aren’t allowed to use in the app published data, like address, phone number, fax number or mail address, to send unrequested information. We reserve to take legal steps against sender from spam mails.</string>
+    <string name="simra_closed">SimRa closed</string>
+    <string name="next">Continue</string>
+    <string name="close_simra">Close SimRa</string>
 </resources>

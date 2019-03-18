@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import static app.com.example.android.octeight.Utils.checkForAnnotation;
 import static app.com.example.android.octeight.Utils.fileExists;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
+import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.lookUpIntSharedPrefs;
 import static app.com.example.android.octeight.Utils.overWriteFile;
 import static app.com.example.android.octeight.Utils.readContentFromFile;
@@ -62,7 +63,7 @@ public class HistoryActivity extends BaseActivity {
 
     UploadService mBoundUploadService;
 
-    Boolean privacyAgreement = false;
+    boolean privacyAgreement = false;
 
 
     /**
@@ -80,15 +81,7 @@ public class HistoryActivity extends BaseActivity {
         Log.d(TAG, "onCreate()");
         setContentView(R.layout.activity_history);
 
-        SharedPreferences sharedPrefs = getApplicationContext()
-                .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        if (!sharedPrefs.contains("Data-Privacy-Agreement")) {
-            editor.putBoolean("Data-Privacy-Agreement", false);
-            editor.commit();
-        }
-        privacyAgreement = sharedPrefs.getBoolean("Data-Privacy-Agreement", false);
+        privacyAgreement = lookUpBooleanSharedPrefs("Privacy-Policy-Accepted", false, "simraPrefs", this);
 
         //  Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -305,7 +298,7 @@ public class HistoryActivity extends BaseActivity {
                 }else{
                     Intent intent = new Intent(getApplicationContext(), PrivacyActivity.class);
                     startActivity(intent);
-                    privacyAgreement = sharedPrefs.getBoolean("Data-Privacy-Agreement", false);
+                    privacyAgreement = lookUpBooleanSharedPrefs("Privacy-Policy-Accepted", false, "simraPrefs",HistoryActivity.this);
                 }
             }
         });

@@ -192,7 +192,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="openstreetmap" translatable="false">OpenStreetMap</string>
     <string name="osmCopyrightText">Wir verwenden in unserer Applikation die Karten von OpenStreetMap, einen Dienst der OpenStreetMap Foundation, St John’s Innovation Centre, Cowley Road, Cambridge, CB 4 0 WS, United Kingdom, nachfolgend \"OpenStreetMap\" genannt, ein. In unsere Applikation ist der Dienst OpenStreetMap eingebunden , deswegen wird durch OpenStreetMap ein Cookie auf Ihrem Endgerät gespeichert. Hierdurch werden Ihre Nutzereinstellungen und Nutzerdaten zum Zwecke der Anzeige der Seite bzw. zur Gewährleistung der Funktionalität von OpenStreetMap verarbeitet.
         Durch diese Verarbeitung kann OpenStreetMap erkennen, von welcher Anwendung Ihre Anfrage gesendet worden ist und an welche IP- Adresse die Daten übermittelt werden sollen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f) DSGVO. Unser berechtigtes Interesse liegt Betrieb unserer Applikation. Sofern Sie mit dieser Verarbeitung nicht einverstanden sind, wenden Sie sich bitte an die oben genannten Ansprechpartner. OpenStreetMap bietet unter https://wiki.osmfoundation.org/wiki/Privacy_Policy weitere Informationen zur Erhebung und Nutzung der Daten sowie zu Ihren Rechten und Möglichkeiten zum Schutz Ihrer Privatsphäre an. Wir behalten uns vor, einen eigenen Mirror für OpenStreetMap aufzusetzen. In diesem Fall werden wir Daten, die aus diesem Grund anfallen, schnellstmöglich löschen und in keinem Fall mit unseren regulär gesammelten Daten verknüpfen, sofern dies möglich sein sollte.</string>
-    <string name="title_activity_credits">Credits</string>
+    <string name="title_activity_credits">Grafikreferenzen</string>
     <string name="freepikCredit">Icon gestaltet von Freepik, bereitgestellt auf www.flaticon.com .</string>
     <string name="logoMakrCredit">Kostenloses logo erstellt auf www.LogoMakr.com .</string>
     <string name="smashiconCredit">Icon gestaltet von Smashicon, bereitgestellt auf www.flaticon.com .</string>
@@ -234,7 +234,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="title_activity_about_simra">Über SimRa</string>
     <string name="iAccept">Ich akzeptiere die Datenschutzerklärung</string>
     <string name="privacyAgreementTitle">Datenschutzerklärung</string>
-    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrt Standort- und Sensordaten auf, sowie von Ihnen eingegebene demografische Daten. Weitere Informationen finden Sie in unserer Datenschutzerklärung.</string>
+    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrt Standort- und Sensordaten auf, sowie von Ihnen eingegebene demografische Daten. Weitere Informationen finden Sie in unserer <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/?isMobile=1">Datenschutzerklärung</a>.</string>
 
     <string name="dataPrivayAgreementDialogTitle">Datenschutz</string>
     <string name="dataPrivayAgreementDialogText">Um ihre Fahrten hochzuladen, bitten wir sie unserer Datenschutzerklärung zuzustimmen.</string>
@@ -258,5 +258,8 @@ E-Mail: simra.mcc@gmail.com</p></string>
         \t3 Beschneiden von Fahrten: Im Anschluss an eine aufgezeichnete Fahrt haben Sie die Möglichkeit, Ihre Fahrt an beiden Enden abzuschneiden – den Teil, der dabei entfernt wird, können Sie dabei frei festlegen; dieser wird beim Hochladen nicht an uns übermittelt und dauerhaft gelöscht. In dicht besiedelten Städten sollte Ihre Fahrt im Regelfall auch ohne Beschneiden hinreichend anonymisiert sein, insbesondere da die Information, ob die Fahrt beschnitten wurde, nicht gespeichert wird. In eher ländlichen Gegenden sollten Sie diese Funktion gezielt nutzen. Unabhängig davon würden wir Sie aber bitten, die Funktion nicht mehr als nötig zu nutzen, da ein exzessiver Gebrauch die Aussagekraft der gesammelten Daten schmälert.</string>
     <string name="headerThirdParties">Welche externen Dienste verwenden wir:</string>
     <string name="textPrivacyImprint">Zum Thema Datenschutz und Umgang mit von Nutzern erhobenen Daten beachten Sie bitte die gesonderten Hinweise auf der Datenschutzseite (zur Datenschutzseite kommen sie durch den Button unten). \\nDie Nutzung der im Rahmen des Impressums oder vergleichbarer Angaben veröffentlichten Kontaktdaten wie Postanschriften, Telefon- und Faxnummern sowie E-M0ailadressen durch Dritte zur Übersendung von nicht ausdrücklich angeforderten Informationen ist nicht gestattet. Rechtliche Schritte gegen die Versender von so genannten Spam-Mails bei Verstößen gegen dieses Verbot sind ausdrücklich vorbehalten.</string>
+    <string name="simra_closed">SimRa beendet</string>
+    <string name="next">Weiter</string>
+    <string name="close_simra">SimRa beenden</string>
 
 </resources>

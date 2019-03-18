@@ -69,7 +69,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
             SharedPreferences.Editor editor = sharedPrefs.edit();
 
             editor.putBoolean("NEW-UNSENT-ERROR", true);
-            editor.commit();
+            editor.apply();
 
             restartApp();
 

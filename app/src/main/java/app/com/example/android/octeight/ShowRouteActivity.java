@@ -219,6 +219,9 @@ public class ShowRouteActivity extends BaseActivity {
 
         privacySlider = findViewById(R.id.privacySlider);
         int routeSize = route.getPoints().size();
+        if (routeSize < 2) {
+            routeSize = 2;
+        }
         privacySlider.setRange(0, routeSize);
         privacySlider.setValue(0, routeSize);
         Log.d(TAG, "route.size(): " + routeSize);

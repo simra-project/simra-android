@@ -12,18 +12,22 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import static app.com.example.android.octeight.Utils.lookUpBooleanSharedPrefs;
 import static app.com.example.android.octeight.Utils.writeBooleanToSharedPrefs;
 
 public class PrivacyActivity extends AppCompatActivity {
 
+    private static final String TAG = "PrivacyActivity_LOG";
+
 
     ImageButton backBtn;
     TextView toolbarTxt;
-    Boolean privacyAgreement;
+    boolean privacyAgreement;
     // Context ctx = null;
 
     @Override
@@ -32,16 +36,8 @@ public class PrivacyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_privacy);
         //ctx = getBaseContext();
 
-        SharedPreferences sharedPrefs = getApplicationContext()
-                .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        if (!sharedPrefs.contains("Data-Privacy-Agreement")) {
-            editor.putBoolean("Data-Privacy-Agreement", false);
-            editor.commit();
-        }
-        privacyAgreement = sharedPrefs.getBoolean("Data-Privacy-Agreement", false);
-
+        privacyAgreement = lookUpBooleanSharedPrefs("Privacy-Policy-Accepted", false,"simraPrefs",this);
+        Log.d(TAG, "onCreate() privacyAgreement: " + privacyAgreement);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -54,10 +50,11 @@ public class PrivacyActivity extends AppCompatActivity {
         backBtn.setOnClickListener(new View.OnClickListener() {
                                        @Override
                                        public void onClick(View v) {
+                                           Log.d(TAG,"backBtn.onClick() privacyAgreement: " + privacyAgreement);
                                            if (!privacyAgreement) {
                                                privacyAgreement = getAgreementValueBack();
                                                if (privacyAgreement) {
-                                                   writeBooleanToSharedPrefs("Data-Privacy-Agreement", true, "simraPrefs", PrivacyActivity.this);
+                                                   writeBooleanToSharedPrefs("Privacy-Policy-Accepted", true, "simraPrefs", PrivacyActivity.this);
                                                }
                                            }
                                            finish();
