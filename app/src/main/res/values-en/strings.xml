@@ -142,7 +142,7 @@
     <string name="logoMakrCredit">Created my free logo at www.LogoMakr.com .</string>
     <string name="smashiconCredit">Icon made by Smashicon from www.flaticon.com .</string>
     <string name="pixelCredit">Icon made by Pixel perfect from www.flaticon.com .</string>
-    <string name="icons8Credit">Icon made by Icons8 from https://icons8.com .</string>
+    <string name="icons8Credit">Icon made by Icons8 from\nhttps://icons8.com .</string>
     <string name="privacyButton">Further information about data privacy</string>
     <string name="impressum">imprint</string>
     <string name="osmCopyrightText">In our application we use the maps of OpenStreetMap, an OpenStreetMap Foundation service, St John\'s Innovation Center, Cowley Road, Cambridge, CB 4 0 WS, United Kingdom, hereinafter referred to as \"OpenStreetMap\". In our application, the service OpenStreetMap is involved, so is stored by OpenStreetMap a cookie on your device. This will process your user settings and user data for the purpose of displaying the page or ensuring the functionality of OpenStreetMap.

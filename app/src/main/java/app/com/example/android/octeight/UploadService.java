@@ -329,7 +329,7 @@ public class UploadService extends Service {
             int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileName + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM3 + appVersion + "/" + "upload?fileName=" + fileName + "&loc=" + locale + "&clientHash=" + clientHash);
+            URL url = new URL(Constants.MCC_VM2 + appVersion + "/" + "upload?fileName=" + fileName + "&loc=" + locale + "&clientHash=" + clientHash);
 
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
@@ -427,7 +427,7 @@ public class UploadService extends Service {
             int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM3 + appVersion + "/" + "update?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + clientHash);
+            URL url = new URL(Constants.MCC_VM2 + appVersion + "/" + "update?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + clientHash);
 
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
