@@ -296,4 +296,6 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
     <string name="next">Continue</string>
     <string name="close_simra">Close SimRa</string>
     <string name="privacySlider">Cut off the beginning or the end of the ride</string>
+    <string name="title_tutorial">Tutorial</string>
+    <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Instructions.pdf</string>
 </resources>
