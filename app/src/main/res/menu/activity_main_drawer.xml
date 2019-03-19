@@ -21,6 +21,10 @@
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/title_activity_settings" />
         <item
+            android:id="@+id/nav_tutorial"
+            android:icon="@drawable/ic_help_outline_black_24dp"
+            android:title="@string/title_tutorial" />
+        <item
             android:id="@+id/nav_feedback"
             android:icon="@drawable/ic_content_paste_black_24dp"
             android:title="@string/feedback" />

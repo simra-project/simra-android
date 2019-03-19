@@ -260,5 +260,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="next">Weiter</string>
     <string name="close_simra">SimRa beenden</string>
     <string name="privacySlider">Fahrtbeginn und -ende abschneiden</string>
+    <string name="title_tutorial">Anleitung</string>
+    <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Anleitung.pdf</string>
 
 </resources>
