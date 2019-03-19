@@ -13,17 +13,10 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-
-import static app.com.example.android.octeight.Utils.writeBooleanToSharedPrefs;
-import static app.com.example.android.octeight.Utils.writeIntToSharedPrefs;
-import static app.com.example.android.octeight.Utils.writeLongToSharedPrefs;
 
 public class LicenseActivity extends AppCompatActivity {
 
@@ -55,8 +48,26 @@ public class LicenseActivity extends AppCompatActivity {
         Button androidSupportLibraryButton = findViewById(R.id.android_support_library);
         createDialogWhenButtonIsPressed(androidSupportLibraryButton,"licenseandroidsupportlibrary.txt","Android Support Library");
 
+        Button apacheCommonsLibraryButton = findViewById(R.id.apache_commons_library);
+        createDialogWhenButtonIsPressed(apacheCommonsLibraryButton,"licenseapachecommons.txt","Apache Commons");
+
+        Button fbaseButton = findViewById(R.id.fbase_library);
+        createDialogWhenButtonIsPressed(fbaseButton,"licensefbase.txt","FBase");
+
         Button gsonButton = findViewById(R.id.gson_library);
         createDialogWhenButtonIsPressed(gsonButton,"licensegson.txt","Gson");
+
+        Button javaxActivationButton = findViewById(R.id.javax_activation_library);
+        createDialogWhenButtonIsPressed(javaxActivationButton,"licensejavaxactivation.txt","Javax Activation");
+
+        Button jerseyButton = findViewById(R.id.jersey_library);
+        createDialogWhenButtonIsPressed(jerseyButton,"licensejersey.txt","Jersey");
+
+        Button jettyButton = findViewById(R.id.jetty_library);
+        createDialogWhenButtonIsPressed(jettyButton,"licensejetty.txt","Jetty");
+
+        Button logbackButton = findViewById(R.id.logback_library);
+        createDialogWhenButtonIsPressed(logbackButton,"licenselogback.txt","Logback");
 
         Button osmdroidButton = findViewById(R.id.osmdroid_library);
         createDialogWhenButtonIsPressed(osmdroidButton,"licenseosmdroid.txt","Osmdroid");
@@ -70,7 +81,11 @@ public class LicenseActivity extends AppCompatActivity {
         Button rangeSeekBarButton = findViewById(R.id.rangeseekbar_library);
         createDialogWhenButtonIsPressed(rangeSeekBarButton,"licenserangeseekbar.txt","RangeSeekBar");
 
+        Button slf4jSimpleButton = findViewById(R.id.slf4j_simple_library);
+        createDialogWhenButtonIsPressed(slf4jSimpleButton, "licenseslf4jsimple.txt","SLF4J Simple");
 
+        Button slf4jApiButton = findViewById(R.id.slf4j_api_library);
+        createDialogWhenButtonIsPressed(slf4jApiButton, "licenseslf4japi.txt","SLF4J API");
 
     }
 
