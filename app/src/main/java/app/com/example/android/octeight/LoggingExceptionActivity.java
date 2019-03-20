@@ -67,9 +67,8 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
                     .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
 
             SharedPreferences.Editor editor = sharedPrefs.edit();
-
             editor.putBoolean("NEW-UNSENT-ERROR", true);
-            editor.apply();
+            editor.commit();
 
             restartApp();
 

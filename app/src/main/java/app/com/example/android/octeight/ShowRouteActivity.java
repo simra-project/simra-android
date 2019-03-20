@@ -1,15 +1,11 @@
 package app.com.example.android.octeight;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.design.button.MaterialButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -33,6 +29,7 @@ import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
+import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Polyline;
@@ -51,6 +48,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static app.com.example.android.octeight.Constants.ZOOM_LEVEL;
 import static app.com.example.android.octeight.Utils.checkForAnnotation;
 import static app.com.example.android.octeight.Utils.fileExists;
 import static app.com.example.android.octeight.Utils.getAppVersionNumber;
@@ -111,6 +109,7 @@ public class ShowRouteActivity extends BaseActivity {
 
     int state;
     String duration;
+    String pathToAccGpsFile;
     File gpsFile;
     Polyline route;
 
@@ -126,6 +125,13 @@ public class ShowRouteActivity extends BaseActivity {
     int lastRight;
 
     RangeSeekBar privacySlider;
+
+    final int[] left = {0};
+    final int[] right = {0};
+
+    int routeSize = 3;
+    private View progressBarRelativeLayout;
+    BoundingBox bBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +166,8 @@ public class ShowRouteActivity extends BaseActivity {
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mMapView.setMultiTouchControls(true); // gesture zooming
         mMapView.setFlingEnabled(true);
+        MapController mMapController = (MapController) mMapView.getController();
+        mMapController.setZoom(ZOOM_LEVEL);
         TextView copyrightTxt = (TextView) findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -167,13 +175,14 @@ public class ShowRouteActivity extends BaseActivity {
         addIncBttn.setVisibility(View.VISIBLE);
         exitAddIncBttn = findViewById(R.id.exitAddIncident);
         exitAddIncBttn.setVisibility(View.INVISIBLE);
-        RelativeLayout saveButton = findViewById(R.id.saveIncident);
-        saveButton.setVisibility(View.VISIBLE);
+        progressBarRelativeLayout = findViewById(R.id.progressBarRelativeLayout);
+
+
 
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
 
-        String pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
+        pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
         // Log.d(TAG, "onCreate() date: " + date);
         state = getIntent().getIntExtra("State", 0);
@@ -188,13 +197,7 @@ public class ShowRouteActivity extends BaseActivity {
         trailer = lookUpIntSharedPrefs("Settings-Trailer", 0, "simraPrefs", this);
         pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this);
 
-        showCustomViewAlertDialog();
-
-
-        Log.d(TAG, "onCreate() continues.");
-
-        refreshRoute(false);
-
+        privacySlider = findViewById(R.id.privacySlider);
 
         Log.d(TAG, "setting up clickListeners");
 
@@ -216,129 +219,59 @@ public class ShowRouteActivity extends BaseActivity {
             ShowRouteActivity.this.addCustomMarkerMode = false;
         });
 
-        privacySlider = findViewById(R.id.privacySlider);
-        int routeSize = route.getPoints().size();
-        if (routeSize < 2) {
-            routeSize = 2;
-        }
-        privacySlider.setRange(0, routeSize);
-        privacySlider.setValue(0, routeSize);
-        Log.d(TAG, "route.size(): " + routeSize);
-        // String originalAccGpsContent = readContentFromFile(ride.accGpsFile.getName(),this);
-        // String tempAccGpsPath = originalAccGpsContent;
-
-        lastLeft = 0;
-        lastRight = routeSize;
-        final int[] left = {0};
-        final int[] right = {0};
-        privacySlider.setOnRangeChangedListener(new OnRangeChangedListener() {
-
-            @Override
-            public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
-                left[0] = (int) leftValue;
-                right[0] = (int) rightValue;
-            }
-
-            @Override
-            public void onStartTrackingTouch(RangeSeekBar view, boolean isLeft) {
-                //start tracking touch
-            }
-
-            @Override
-            public void onStopTrackingTouch(RangeSeekBar view, boolean isLeft) {
-                showWarning = lookUpBooleanSharedPrefs("ShowRoute-Warning", true, "simraPrefs", ShowRouteActivity.this);
-                if (showWarning) {
-                    getDialogValueBack(left[0], right[0]);
-                } else {
-                    //stop tracking touch
-                    Log.d(TAG, "left: " + left[0] + " right: " + right[0]);
-                    tempAccEventsPath = "TempaccEvents" + ride.getId() + ".csv";
-                    tempAccGpsPath = "Temp" + gpsFile.getName();
-                    tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
-                    refreshRoute(true);
-                    Toast.makeText(ShowRouteActivity.this, getString(R.string.newIncidents), Toast.LENGTH_LONG).show();
-                    lastLeft = left[0];
-                    lastRight = right[0];
-                }
-
-            }
-        });
-
-        saveButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    saveButton.setElevation(0.0f);
-                    saveButton.setBackground(getDrawable(R.drawable.button_pressed));
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    saveButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
-                    saveButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                }
-                return false;
-            }
-
-        });
-
-        saveButton.setOnClickListener((View v) -> {
-
-            String content = "";
-            int appVersion = getAppVersionNumber(ShowRouteActivity.this);
-            String fileVersion = "";
-            try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    if (line.contains("#")) {
-                        String[] fileInfoArray = line.split("#");
-                        fileVersion = fileInfoArray[1];
-                        continue;
-                    }
-                    String[] metaDataLine = line.split(",", -1);
-                    String metaDataRide = line;
-                    if (metaDataLine[0].equals(ride.getId())) {
-                        metaDataLine[3] = "1";
-                        metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
-                    }
-                    content += metaDataRide += System.lineSeparator();
-                }
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-            String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-            overWriteFile((fileInfoLine + content), "metaData.csv", this);
-
-
-            // tempAccEventsPath
-            // tempAccGpsPath
-            if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {
-                Log.d(TAG, "path of tempGpsFile: " + tempGpsFile.getPath());
-                deleteFile(pathToAccGpsFile);
-                String path = Constants.APP_PATH + "files/";
-                boolean success = tempGpsFile.renameTo(new File(path + pathToAccGpsFile));
-                Log.d(TAG, "tempGpsFile successfully renamed: " + success);
-            }
-            String pathToAccEventsFile = "accEvents" + ride.getId() + ".csv";
-            if (tempAccEventsPath != null) {
-                deleteFile(pathToAccEventsFile);
-                String path = Constants.APP_PATH + "files/";
-                File tempAccEventsFile = new File(path + tempAccEventsPath);
-                Log.d(TAG, "path of tempAccEventsFile: " + tempAccEventsFile.getPath());
-                boolean success = tempAccEventsFile.renameTo(new File(path + pathToAccEventsFile));
-                Log.d(TAG, "tempAccEventsFile successfully renamed: " + success);
-            }
-
-            Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
-            finish();
-        });
+        fireRideSettingsDialog();
 
         Log.d(TAG, "onCreate() finished");
 
+    }
+
+    private class RideUpdateTask extends AsyncTask<String, String, String> {
+
+        private boolean temp;
+
+
+        private RideUpdateTask(Boolean temp) {
+            this.temp = temp;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        protected String doInBackground(String... urls) {
+            Log.d(TAG, "doInBackground()");
+            refreshRoute(temp);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            Log.d(TAG, "onPostExecute()");
+            super.onPostExecute(s);
+            progressBarRelativeLayout.setVisibility(View.GONE);
+            if (temp) {
+                Toast.makeText(ShowRouteActivity.this, getString(R.string.newIncidents), Toast.LENGTH_LONG).show();
+                InfoWindow.closeAllInfoWindowsOn(mMapView);
+            }
+
+        }
     }
 
     private void refreshRoute(boolean temp) {
 
         // Create a ride object with the accelerometer, gps and time data
         if (temp) {
+            tempAccEventsPath = "TempaccEvents" + ride.getId() + ".csv";
+            tempAccGpsPath = "Temp" + gpsFile.getName();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progressBarRelativeLayout.setVisibility(View.VISIBLE);
+                }
+            });
+            tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
             try {
                 tempRide = new Ride(tempGpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, true, this);
             } catch (Exception e) {
@@ -351,6 +284,7 @@ public class ShowRouteActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
+
 
         // Get the Route as a Polyline to be displayed on the map
         if (temp) {
@@ -371,27 +305,30 @@ public class ShowRouteActivity extends BaseActivity {
 
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
         // set accordingly
-        BoundingBox bBox;
-        if (temp) {
-            bBox = getBoundingBox(tempRoute);
-        } else {
-            bBox = getBoundingBox(route);
+
+        if(!temp) {
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    bBox = getBoundingBox(route);
+                    zoomToBBox(bBox);
+                    mMapView.invalidate();
+
+                }
+            });
         }
-
-
-        mMapView.invalidate();
-        zoomToBBox(bBox);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (3): CenterMap
         ImageButton centerMap = findViewById(R.id.bounding_box_center_button);
 
-        BoundingBox finalBBox = bBox;
+
         centerMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "boundingBoxCenterMap clicked ");
-                zoomToBBox(finalBBox);
+                zoomToBBox(bBox);
             }
         });
 
@@ -470,6 +407,125 @@ public class ShowRouteActivity extends BaseActivity {
                 return false;
             }
         };
+
+
+
+
+        routeSize = route.getPoints().size();
+        if (routeSize < 2) {
+            routeSize = 2;
+        }
+        privacySlider.setRange(0, routeSize);
+        // privacySlider.setValue(0, routeSize);
+        if (!temp) {
+            privacySlider.setValue(0, routeSize);
+        }
+        Log.d(TAG, "route.size(): " + routeSize);
+        // String originalAccGpsContent = readContentFromFile(ride.accGpsFile.getName(),this);
+        // String tempAccGpsPath = originalAccGpsContent;
+
+        lastLeft = 0;
+        lastRight = routeSize;
+
+        privacySlider.setOnRangeChangedListener(new OnRangeChangedListener() {
+
+            @Override
+            public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
+                left[0] = (int) leftValue;
+                right[0] = (int) rightValue;
+            }
+
+            @Override
+            public void onStartTrackingTouch(RangeSeekBar view, boolean isLeft) {
+                //start tracking touch
+            }
+
+            @Override
+            public void onStopTrackingTouch(RangeSeekBar view, boolean isLeft) {
+                showWarning = lookUpBooleanSharedPrefs("ShowRoute-Warning", true, "simraPrefs", ShowRouteActivity.this);
+                if (showWarning) {
+                    firePrivacySliderWarningDialog(left[0], right[0]);
+                } else {
+                    //stop tracking touch
+                    Log.d(TAG, "left: " + left[0] + " right: " + right[0]);
+
+                    new RideUpdateTask(true).execute();
+
+                    lastLeft = left[0];
+                    lastRight = right[0];
+                }
+
+            }
+        });
+
+        RelativeLayout saveButton = findViewById(R.id.saveIncident);
+        saveButton.setVisibility(View.VISIBLE);
+        saveButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    saveButton.setElevation(0.0f);
+                    saveButton.setBackground(getDrawable(R.drawable.button_pressed));
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    saveButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
+                    saveButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
+            }
+
+        });
+
+        saveButton.setOnClickListener((View v) -> {
+
+            String content = "";
+            int appVersion = getAppVersionNumber(ShowRouteActivity.this);
+            String fileVersion = "";
+            try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("#")) {
+                        String[] fileInfoArray = line.split("#");
+                        fileVersion = fileInfoArray[1];
+                        continue;
+                    }
+                    String[] metaDataLine = line.split(",", -1);
+                    String metaDataRide = line;
+                    if (metaDataLine[0].equals(ride.getId())) {
+                        metaDataLine[3] = "1";
+                        metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
+                    }
+                    content += metaDataRide += System.lineSeparator();
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+            String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+            overWriteFile((fileInfoLine + content), "metaData.csv", this);
+
+
+            // tempAccEventsPath
+            // tempAccGpsPath
+            if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {
+                Log.d(TAG, "path of tempGpsFile: " + tempGpsFile.getPath());
+                deleteFile(pathToAccGpsFile);
+                String path = Constants.APP_PATH + "files/";
+                boolean success = tempGpsFile.renameTo(new File(path + pathToAccGpsFile));
+                Log.d(TAG, "tempGpsFile successfully renamed: " + success);
+            }
+            String pathToAccEventsFile = "accEvents" + ride.getId() + ".csv";
+            if (tempAccEventsPath != null) {
+                deleteFile(pathToAccEventsFile);
+                String path = Constants.APP_PATH + "files/";
+                File tempAccEventsFile = new File(path + tempAccEventsPath);
+                Log.d(TAG, "path of tempAccEventsFile: " + tempAccEventsFile.getPath());
+                boolean success = tempAccEventsFile.renameTo(new File(path + pathToAccEventsFile));
+                Log.d(TAG, "tempAccEventsFile successfully renamed: " + success);
+            }
+
+            Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
+            finish();
+        });
 
         overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
         mMapView.getOverlays().add(overlayEvents);
@@ -623,20 +679,11 @@ public class ShowRouteActivity extends BaseActivity {
         }
     }
 
-    // Show how to add custom view in android alert dialog.
-    private void showCustomViewAlertDialog() {
-
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message mesg) {
-                throw new RuntimeException();
-            }
-        };
-
+    public void fireRideSettingsDialog() {
+        Log.d(TAG, "fireRideSettingsDialog()");
         // Store the created AlertDialog instance.
         // Because only AlertDialog has cancel method.
         alertDialog = null;
-
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(ShowRouteActivity.this);
 
@@ -689,6 +736,7 @@ public class ShowRouteActivity extends BaseActivity {
                 }
             }
         });
+
         // doneButton click listener.
         MaterialButton doneButton = (MaterialButton) settingsView.findViewById(R.id.done_button);
 
@@ -705,8 +753,10 @@ public class ShowRouteActivity extends BaseActivity {
                         writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", ShowRouteActivity.this);
                     }
                     // Close Alert Dialog.
-                    handler.sendMessage(handler.obtainMessage());
                     alertDialog.cancel();
+                    progressBarRelativeLayout.setVisibility(View.VISIBLE);
+                    new RideUpdateTask(false).execute();
+
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -716,15 +766,10 @@ public class ShowRouteActivity extends BaseActivity {
         builder.setCancelable(false);
         alertDialog = builder.create();
         alertDialog.show();
-
-        try {
-            Looper.loop();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        }
     }
 
-    public boolean getDialogValueBack(int left, int right) {
+
+    public boolean firePrivacySliderWarningDialog(int left, int right) {
 
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
         CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
@@ -743,12 +788,7 @@ public class ShowRouteActivity extends BaseActivity {
         alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 continueWithRefresh = true;
-                //stop tracking touch
-                Log.d(TAG, "left: " + left + " right: " + right);
-                tempAccEventsPath = "TempaccEvents" + ride.getId() + ".csv";
-                tempAccGpsPath = "Temp" + gpsFile.getName();
-                tempGpsFile = updateRoute(left, right, tempAccGpsPath);
-                refreshRoute(true);
+                new RideUpdateTask(true).execute();
                 // Toast.makeText(ShowRouteActivity.this, getString(R.string.newIncidents), Toast.LENGTH_LONG).show();
                 lastLeft = left;
                 lastRight = right;
