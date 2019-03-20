@@ -1,12 +1,8 @@
 package app.com.example.android.octeight;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
-
 import java.text.SimpleDateFormat;
 
-public class Constants extends Service {
+public class Constants {
 
     public static final int ZOOM_LEVEL = 19;
 
@@ -41,17 +37,9 @@ public class Constants extends Service {
     public static final String APP_PATH = "/data/user/0/app.com.example.android.octeight/";
 
     // Every GPS fix has to be at least this accurate to be taken into account.
-    public static final double GPS_ACCURACY_THRESHOLD = 90.0;
+    public static final double GPS_ACCURACY_THRESHOLD = 120.0;
 
     // Locales
     public static final String[] LOCALE_ABVS = {"UNKNOWN", "Berlin", "London", "other", "TEST"};
 
-    public Constants() {
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 }

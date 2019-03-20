@@ -1,12 +1,12 @@
 package app.com.example.android.octeight;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -14,9 +14,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -343,6 +344,7 @@ public class HistoryActivity extends BaseActivity {
     private void refreshMyRides() {
         ArrayList<String[]> metaDataLines = new ArrayList<>();
 
+
         if (fileExists("metaData.csv", this)) {
 
             metaDataFile = getFileStreamPath("metaData.csv");
@@ -377,48 +379,10 @@ public class HistoryActivity extends BaseActivity {
             }
 
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ridesArr);
-            listView.setAdapter(adapter);
+            ArrayList<String> stringArrayList = new ArrayList<>(Arrays.asList(ridesArr));
+            MyArrayAdapter myAdapter = new MyArrayAdapter(this, R.layout.row, stringArrayList, metaDataLines);
+            listView.setAdapter(myAdapter);
 
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    // gets the files in the directory
-                    // lists all the files into an array
-                    File[] dirFiles = getFilesDir().listFiles();
-                    Log.d(TAG, "dirFiles: " + Arrays.deepToString(dirFiles));
-                    String clicked = (String) listView.getItemAtPosition(position);
-                    Log.d(TAG, "clicked: " + clicked);
-                    String prefix = Constants.APP_PATH + "files/";
-                    String key = clicked.replace("#", "").split(" ")[0];
-                    clicked = prefix + key;
-                    if (dirFiles.length != 0) {
-                        // loops through the array of files, outputting the name to console
-                        for (int i = 0; i < dirFiles.length; i++) {
-
-                            String fileOutput = dirFiles[i].toString();
-                            Log.d(TAG, "fileOutput: " + fileOutput);
-
-
-                            if (fileOutput.startsWith(clicked + "_")) {
-                                // Start ShowRouteActivity with the selected Ride.
-                                Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
-                                intent.putExtra("PathToAccGpsFile", dirFiles[i].getPath().replace(prefix, ""));
-                                // Log.d(TAG, "onClick() date: " + date);
-                                intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
-                                intent.putExtra("StartTime", metaDataLines.get(position)[2]);
-                                intent.putExtra("State", Integer.valueOf(metaDataLines.get(position)[3]));
-                                Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getPath().replace(prefix, ""));
-                                Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
-                                Log.d(TAG, "StartTime: " + metaDataLines.get(position)[2]);
-                                Log.d(TAG, "State: " + metaDataLines.get(position)[3]);
-
-                                startActivity(intent);
-                            }
-                        }
-                    }
-                }
-            });
         } else {
 
             Log.d(TAG, "metaData.csv doesn't exists");
@@ -460,18 +424,23 @@ public class HistoryActivity extends BaseActivity {
         }
 
         long millis = Long.valueOf(item[2]) - Long.valueOf(item[1]);
+        int minutes = Math.round((millis/1000/60));
         String prettyDuration = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
                 TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
                 TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
 
         String startDateOfRide = DateUtils.formatDateTime(this, Long.valueOf(item[1]), DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE |
                 DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NUMERIC_DATE);
+        String[] startDateOfrideAsArray = startDateOfRide.split("\\.");
+        String day = startDateOfrideAsArray[0];
+        String month = startDateOfrideAsArray[1];
+        String year = startDateOfrideAsArray[2].substring(2,4);
+        if (month.length() < 2) {
+           month = "0" + month;
+        }
+        startDateOfRide = day + "." + month + "." + year;
 
-        String result = "#" + item[0] + " " + todo + " " + startDateOfRide
-                + " " + getString(R.string.ride_length) + " : " + prettyDuration;
-
-
-        return result;
+        return "#" + item[0] + ";" + startDateOfRide + "h;" + todo + ";" + minutes + ";" + item[3];
     }
 
     public void startShowRouteWithSelectedRide() {
@@ -529,4 +498,111 @@ public class HistoryActivity extends BaseActivity {
             mBoundUploadService = myBinder.getService();
         }
     };
+
+    public class MyArrayAdapter extends ArrayAdapter<String> {
+        String TAG = "MyArrayAdapter_LOG";
+
+        Context context;
+        int layoutResourceId;
+        ArrayList<String> stringArrayList = new ArrayList<String>();
+        ArrayList<String[]> metaDataLines = new ArrayList<String[]>();
+
+        public MyArrayAdapter(Context context, int layoutResourceId,
+                              ArrayList<String> stringArrayList, ArrayList<String[]> metaDataLines ) {
+
+            super(context, layoutResourceId, stringArrayList);
+            this.layoutResourceId = layoutResourceId;
+            this.context = context;
+            this.stringArrayList = stringArrayList;
+            this.metaDataLines = metaDataLines;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View row = convertView;
+            Holder holder = null;
+
+            if (row == null) {
+                LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+                row = inflater.inflate(layoutResourceId, parent, false);
+                holder = new Holder();
+                holder.rideDate = (TextView) row.findViewById(R.id.row_ride_date);
+                holder.duration = (TextView) row.findViewById(R.id.row_duration);
+                holder.message = (TextView) row.findViewById(R.id.row_message);
+
+                holder.btnDelete = (ImageButton) row.findViewById(R.id.button1);
+                row.setTag(holder);
+            } else {
+                holder = (Holder) row.getTag();
+            }
+            Log.d(TAG, stringArrayList.get(position));
+            String[] itemComponents = stringArrayList.get(position).split(";");
+            holder.rideDate.setText(itemComponents[1]);
+            holder.message.setText(itemComponents[2]);
+            holder.duration.setText(itemComponents[3]);
+
+            if (!itemComponents[4].equals("2")) {
+                holder.btnDelete.setVisibility(View.VISIBLE);
+            }
+
+
+            row.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // gets the files in the directory
+                    // lists all the files into an array
+                    File[] dirFiles = getFilesDir().listFiles();
+                    Log.d(TAG, "dirFiles: " + Arrays.deepToString(dirFiles));
+                    String clicked = (String) listView.getItemAtPosition(position);
+                    Log.d(TAG, "clicked: " + clicked);
+                    String prefix = Constants.APP_PATH + "files/";
+                    String key = clicked.replace("#", "").split(" ")[0];
+                    clicked = prefix + key;
+                    if (dirFiles.length != 0) {
+                        // loops through the array of files, outputting the name to console
+                        for (int i = 0; i < dirFiles.length; i++) {
+
+                            String fileOutput = dirFiles[i].toString();
+                            Log.d(TAG, "fileOutput: " + fileOutput);
+
+                            if (fileOutput.startsWith(clicked + "_")) {
+                                // Start ShowRouteActivity with the selected Ride.
+                                Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
+                                intent.putExtra("PathToAccGpsFile", dirFiles[i].getPath().replace(prefix, ""));
+                                // Log.d(TAG, "onClick() date: " + date);
+                                intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
+                                intent.putExtra("StartTime", metaDataLines.get(position)[2]);
+                                intent.putExtra("State", Integer.valueOf(metaDataLines.get(position)[3]));
+                                Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getPath().replace(prefix, ""));
+                                Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
+                                Log.d(TAG, "StartTime: " + metaDataLines.get(position)[2]);
+                                Log.d(TAG, "State: " + metaDataLines.get(position)[3]);
+
+                                startActivity(intent);
+                            }
+                        }
+                    }
+                }
+            });
+
+            holder.btnDelete.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    // TODO Auto-generated method stub
+                    Log.d(TAG,"Delete Button Clicked");
+                    Toast.makeText(context, "Delete button Clicked",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+            return row;
+        }
+
+        class Holder {
+            TextView rideDate;
+            TextView duration;
+            TextView message;
+            ImageButton btnDelete;
+        }
+    }
 }
