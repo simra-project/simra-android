@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:locale="en">
-    <string name="app_name">SimRa (Beta)</string>
+    <string name="app_name">SimRa</string>
     <string name="welcome_header">Welcome to SimRa!</string>
     <string name="welcome_text">Thank you for supporting the SimRa project.</string>
     <string name="welcome_text2">Have fun, and bon voyage</string>
@@ -76,7 +76,9 @@
     <string name="justUpload">Upload</string>
     <string name="uploadProgressDialogTitle">Upload</string>
     <string name="uploadProgressDialogText">Uploading rides. Please wait.</string>
-    <string name="newRideInHistoryActivity">New ride! Please annotate.\n</string>
+    <string name="newRideInHistoryActivity">Please annotate.</string>
+    <string name="rideAnnotatedInHistoryActivity">Ready for upload.</string>
+    <string name="rideUploadedInHistoryActivity">Uploaded.</string>
     <string name="startRecording">Start\nRecording</string>
     <string name="endRecording">End\nRecording</string>
     <string name="nav_main">Start</string>
@@ -85,7 +87,7 @@
     <string name="mcc_news">MCC News</string>
     <string name="imprint">Imprint</string>
     <string name="feedback">Feedback</string>
-    <string name="ride_length">ride duration</string>
+    <string name="ride_length">duration:</string>
     <string name="sendErrorTitle">Whoops!</string>
     <string name="sendErrorMessage">Seems like an error occurred during your last session. Would you like to send a report to help us improve the app?</string>
     <string name="yes">Yes</string>
@@ -119,8 +121,6 @@
     <string name="experienceLessThen2">Less then 2 years</string>
     <string name="editingProfileAborted">Profile data not saved</string>
     <string name="editingProfileCompleted">Profile data saved</string>
-    <string name="rideAnnotatedInHistoryActivity">Annotated ride. Please upload.</string>
-    <string name="rideUploadedInHistoryActivity">Annotated and uploaded ride.</string>
     <string name="customIncidentAddedTitle">New incident added!</string>
     <string name="customIncidentAddedMessage">Did an incident happen here?</string>
     <string name="regionSpinnerTitle">Region</string>
