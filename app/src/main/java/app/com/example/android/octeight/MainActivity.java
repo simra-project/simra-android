@@ -47,6 +47,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static app.com.example.android.octeight.Constants.ZOOM_LEVEL;
 import static app.com.example.android.octeight.Utils.showMessageOK;
 
 
@@ -59,7 +60,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
     private MapView mMapView;
     private MapController mMapController;
-    private final int ZOOM_LEVEL = 19;
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
     private RotationGestureOverlay mRotationGestureOverlay;
@@ -269,10 +269,10 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 mLocationOverlay.enableFollowLocation();
                 mMapController.setZoom(ZOOM_LEVEL);
 
-                /*
+
                 String[] bla = new String[4];
                 bla[5] = "bla";
-
+                /*
                 try {
                     String[] bla = new String[4];
                     bla[5] = "bla";

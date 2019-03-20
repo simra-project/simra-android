@@ -116,6 +116,37 @@
 
     </RelativeLayout>
     -->
+    <RelativeLayout
+        android:id="@+id/progressBarRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:elevation="5dp">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_centerInParent="true"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:paddingBottom="10dp">
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="@android:style/Widget.Material.ProgressBar"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:layout_margin="10dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/calculating_incidents"
+                android:layout_below="@id/progressBar"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/saveIncident"
@@ -163,7 +194,8 @@
         android:textColor="@color/white"
         android:layout_above="@id/privacySliderLinearLayout"
         android:paddingStart="5dp"
-        android:paddingEnd="5dp"/>
+        android:paddingEnd="5dp"
+        android:elevation="4dp"/>
 
     <LinearLayout
         android:id="@+id/privacySliderLinearLayout"
@@ -175,7 +207,8 @@
         android:layout_marginBottom="20dp"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:background="@color/transparent">
+        android:background="@color/transparent"
+        android:elevation="4dp">
 
         <ImageView
             android:layout_width="0dp"
