@@ -372,10 +372,14 @@ public class HistoryActivity extends BaseActivity {
                 ridesArr[Integer.valueOf(metaDataLines.get(i)[0])] = listToTextShape(metaDataLines.get(i));
             }
             */
-
+            Log.d(TAG, "ArrayList<String[]> metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             for (int i = 0; i < metaDataLines.size(); i++) {
                 String[] metaDataLine = metaDataLines.get(i);
-                ridesArr[((metaDataLines.size()) - Integer.parseInt(metaDataLine[0])) - 1] = listToTextShape(metaDataLine);
+                Log.d(TAG, "String[] metaDataLine: " + Arrays.toString(metaDataLine));
+                Log.d(TAG, "metaDataLines.size(): " + metaDataLines.size() + " metaDataLine[0]: " + metaDataLine[0]);
+                Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
+                ridesArr[((metaDataLines.size()) - i) - 1] = listToTextShape(metaDataLine);
+                Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             }
 
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
@@ -552,28 +556,24 @@ public class HistoryActivity extends BaseActivity {
                     // gets the files in the directory
                     // lists all the files into an array
                     File[] dirFiles = getFilesDir().listFiles();
-                    Log.d(TAG, "dirFiles: " + Arrays.deepToString(dirFiles));
                     String clicked = (String) listView.getItemAtPosition(position);
-                    Log.d(TAG, "clicked: " + clicked);
-                    String prefix = Constants.APP_PATH + "files/";
-                    String key = clicked.replace("#", "").split(" ")[0];
-                    clicked = prefix + key;
+                    clicked = clicked.replace("#", "").split(";")[0];
                     if (dirFiles.length != 0) {
                         // loops through the array of files, outputting the name to console
                         for (int i = 0; i < dirFiles.length; i++) {
 
-                            String fileOutput = dirFiles[i].toString();
-                            Log.d(TAG, "fileOutput: " + fileOutput);
+                            String fileOutput = dirFiles[i].getName();
+
 
                             if (fileOutput.startsWith(clicked + "_")) {
                                 // Start ShowRouteActivity with the selected Ride.
                                 Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
-                                intent.putExtra("PathToAccGpsFile", dirFiles[i].getPath().replace(prefix, ""));
+                                intent.putExtra("PathToAccGpsFile", dirFiles[i].getName());
                                 // Log.d(TAG, "onClick() date: " + date);
                                 intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
                                 intent.putExtra("StartTime", metaDataLines.get(position)[2]);
                                 intent.putExtra("State", Integer.valueOf(metaDataLines.get(position)[3]));
-                                Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getPath().replace(prefix, ""));
+                                Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getName());
                                 Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
                                 Log.d(TAG, "StartTime: " + metaDataLines.get(position)[2]);
                                 Log.d(TAG, "State: " + metaDataLines.get(position)[3]);
@@ -591,8 +591,7 @@ public class HistoryActivity extends BaseActivity {
                 public void onClick(View v) {
                     // TODO Auto-generated method stub
                     Log.d(TAG,"Delete Button Clicked");
-                    Toast.makeText(context, "Delete button Clicked",
-                            Toast.LENGTH_LONG).show();
+                    fireDeletePrompt(position, MyArrayAdapter.this);
                 }
             });
             return row;
@@ -604,5 +603,57 @@ public class HistoryActivity extends BaseActivity {
             TextView message;
             ImageButton btnDelete;
         }
+    }
+
+    public void fireDeletePrompt(int position, MyArrayAdapter arrayAdapter) {
+        android.support.v7.app.AlertDialog.Builder alert = new android.support.v7.app.AlertDialog.Builder(HistoryActivity.this);
+        alert.setTitle(getString(R.string.warning));
+        alert.setMessage(getString(R.string.delete_file_warning));
+        alert.setPositiveButton(R.string.delete_ride_approve, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                File[] dirFiles = getFilesDir().listFiles();
+                Log.d(TAG, "btnDelete.onClick() dirFiles: " + Arrays.deepToString(dirFiles));
+                String clicked = (String) listView.getItemAtPosition(position);
+                Log.d(TAG, "btnDelete.onClick() clicked: " + clicked);
+                clicked = clicked.replace("#", "").split(";")[0];
+                if (dirFiles.length != 0) {
+                    for (int i = 0; i < dirFiles.length; i++) {
+                        File actualFile = dirFiles[i];
+                        if (actualFile.getName().startsWith(clicked + "_") || actualFile.getName().startsWith("accEvents"+clicked)) {
+
+                            /** don't delete the following line! */
+                            Log.d(TAG, actualFile.getName() + " deleted: " + actualFile.delete());
+
+                        }
+                    }
+                }
+                // @TODO: delete line of ride to delete from metaData.csv
+                String content = "";
+
+                try (BufferedReader br = new BufferedReader(new FileReader(HistoryActivity.this.getFileStreamPath("metaData.csv")))) {
+                    String line;
+
+                    while ((line = br.readLine()) != null) {
+                        if (!line.split(",")[0].equals(clicked)) {
+                            content += line += System.lineSeparator();
+                        }
+                    }
+                    overWriteFile(content,"metaData.csv", HistoryActivity.this);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+                arrayAdapter.remove(arrayAdapter.getItem(position));
+                listView.invalidateViews();
+                Toast.makeText(HistoryActivity.this,R.string.ride_deleted,Toast.LENGTH_SHORT).show();
+                // refreshMyRides();
+            }
+        });
+        alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        alert.show();
+
     }
 }
