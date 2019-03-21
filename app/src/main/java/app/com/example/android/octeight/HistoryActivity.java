@@ -623,13 +623,10 @@ public class HistoryActivity extends BaseActivity {
 
                             /** don't delete the following line! */
                             Log.d(TAG, actualFile.getName() + " deleted: " + actualFile.delete());
-
                         }
                     }
                 }
-                // @TODO: delete line of ride to delete from metaData.csv
                 String content = "";
-
                 try (BufferedReader br = new BufferedReader(new FileReader(HistoryActivity.this.getFileStreamPath("metaData.csv")))) {
                     String line;
 
@@ -642,10 +639,8 @@ public class HistoryActivity extends BaseActivity {
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
-                arrayAdapter.remove(arrayAdapter.getItem(position));
-                listView.invalidateViews();
                 Toast.makeText(HistoryActivity.this,R.string.ride_deleted,Toast.LENGTH_SHORT).show();
-                // refreshMyRides();
+                refreshMyRides();
             }
         });
         alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
