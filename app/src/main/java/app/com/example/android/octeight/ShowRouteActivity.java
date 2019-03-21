@@ -242,7 +242,12 @@ public class ShowRouteActivity extends BaseActivity {
 
         protected String doInBackground(String... urls) {
             Log.d(TAG, "doInBackground()");
-            refreshRoute(temp);
+            try {
+                refreshRoute(temp);
+            } catch (IOException e) {
+                e.printStackTrace();
+                cancel(true);
+            }
             return null;
         }
 
@@ -259,7 +264,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
     }
 
-    private void refreshRoute(boolean temp) {
+    private void refreshRoute(boolean temp) throws IOException {
 
         // Create a ride object with the accelerometer, gps and time data
         if (temp) {
@@ -272,17 +277,13 @@ public class ShowRouteActivity extends BaseActivity {
                 }
             });
             tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
-            try {
-                tempRide = new Ride(tempGpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, true, this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+
+            tempRide = new Ride(tempGpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, true, this);
+
         } else {
-            try {
-                ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+
+            ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, this);
+
         }
 
 
@@ -782,7 +783,7 @@ public class ShowRouteActivity extends BaseActivity {
         });
         checkBox.setText(getString(R.string.doNotShowAgain));
         AlertDialog.Builder alert = new AlertDialog.Builder(ShowRouteActivity.this);
-        alert.setTitle(getString(R.string.warningRefreshTitle));
+        alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.warningRefresMessage));
         alert.setView(checkBoxView);
         alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {

@@ -225,7 +225,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="calculatingIncidentsDialogTitle">Ereignisse werden ermittelt</string>
     <string name="calculatingIncidentsDialogMessage">Bitte Warten</string>
     <string name="newIncidents">Annotationen zurückgesetzt</string>
-    <string name="warningRefreshTitle">Achtung</string>
+    <string name="warning">Achtung</string>
     <string name="warningRefresMessage">Nach Veränderung der Fahrt werden die Ereignisse neu berechnet und bisherige Ereignisse diese Fahrt, inklusive der Annotationen, werden verworfen.</string>
     <string name="title_activity_showRoute">Fahrt Annotieren</string>
     <string name="title_activity_library_license">Drittanbieter-Lizenzen</string>
@@ -263,5 +263,8 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="title_tutorial">Anleitung</string>
     <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Anleitung.pdf</string>
     <string name="calculating_incidents">Berechne Ereignesse</string>
+    <string name="delete_file_warning">Diese Fahrt wurde noch nicht hochgeladen. Soll sie wirklich gelöscht werden?</string>
+    <string name="delete_ride_approve">Fahrt löschen</string>
+    <string name="ride_deleted">Fahrt gelöscht</string>
 
 </resources>

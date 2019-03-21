@@ -246,7 +246,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
     <string name="calculatingIncidentsDialogTitle">Calculating Incidents</string>
     <string name="calculatingIncidentsDialogMessage">Please Wait</string>
     <string name="newIncidents">Renewed reset to default</string>
-    <string name="warningRefreshTitle">Warning</string>
+    <string name="warning">Warning</string>
     <string name="warningRefresMessage">After the ride gets changed, new incidents will be calculated and previous incidents of this ride and their annotations will be deleted.</string>
     <string name="title_activity_showRoute">Annotate Ride</string>
     <string name="title_activity_library_license">Third Party Licenses</string>
@@ -299,4 +299,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
     <string name="title_tutorial">Tutorial</string>
     <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Instructions.pdf</string>
     <string name="calculating_incidents">Calculating Incidents</string>
+    <string name="delete_file_warning">This ride hasn\t been uploaded yet. Do you want to delete the ride anyway?</string>
+    <string name="delete_ride_approve">Delete ride</string>
+    <string name="ride_deleted">Ride deleted</string>
 </resources>

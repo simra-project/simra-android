@@ -8,6 +8,7 @@ import org.osmdroid.views.overlay.Polyline;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class Ride {
 
 
     // This is the constructor that is used for now.
-    public Ride(File accGpsFile, String duration, String startTime, /*String date,*/ int state, int bike, int child, int trailer, int pLoc, Context context) {
+    public Ride(File accGpsFile, String duration, String startTime, /*String date,*/ int state, int bike, int child, int trailer, int pLoc, Context context) throws IOException {
         this.accGpsFile = accGpsFile;
         this.duration = duration;
         this.startTime = startTime;
@@ -101,7 +102,7 @@ public class Ride {
 
     }
 
-    public Ride(File tempAccGpsFile, String duration, String startTime, /*String date,*/ int state, int bike, int child, int trailer, int pLoc, boolean temp, Context context) {
+    public Ride(File tempAccGpsFile, String duration, String startTime, /*String date,*/ int state, int bike, int child, int trailer, int pLoc, boolean temp, Context context) throws IOException {
         this.accGpsFile = tempAccGpsFile;
         this.duration = duration;
         this.startTime = startTime;
@@ -146,33 +147,29 @@ public class Ride {
     // Maybe this should happen in RecorderService since we
     // already loop through all the lines there.
     // It is not good to do loop here through the data again.
-    public static Polyline getRouteLine(File gpsFile) {
+    public static Polyline getRouteLine(File gpsFile) throws IOException {
         List<GeoPoint> geoPoints = new ArrayList<>();
         Polyline polyLine = new Polyline();
 
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(gpsFile));
-            // br.readLine() to skip the first line which contains the headers
-            String line = br.readLine();
-            line = br.readLine();
 
-            while ((line = br.readLine()) != null) {
+        BufferedReader br = new BufferedReader(new FileReader(gpsFile));
+        // br.readLine() to skip the first line which contains the headers
+        String line = br.readLine();
+        line = br.readLine();
 
-                try {
-                    if ((line.startsWith(",,"))) {
-                        continue;
-                    }
-                    String[] separatedLine = line.split(",");
-                    GeoPoint actualGeoPoint = new GeoPoint(Double.valueOf(separatedLine[0]), Double.valueOf(separatedLine[1]));
-                    polyLine.addPoint(actualGeoPoint);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        while ((line = br.readLine()) != null) {
+
+
+            if ((line.startsWith(",,"))) {
+                continue;
             }
-            br.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+            String[] separatedLine = line.split(",");
+            GeoPoint actualGeoPoint = new GeoPoint(Double.valueOf(separatedLine[0]), Double.valueOf(separatedLine[1]));
+            polyLine.addPoint(actualGeoPoint);
         }
+
+        br.close();
+
         return polyLine;
     }
 
