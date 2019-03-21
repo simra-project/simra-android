@@ -14,6 +14,7 @@
     <string name="permissionFineLocation">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten.</string>
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
     <string name="simRaPage">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/?isMobile=1</string>
+    <string name="privacyLink">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1</string>
     <string name="dsbContact">https://www.tu-berlin.de/allgemeine_seiten/e_mail_anfrage/parameter/mobil/id/141314/?no_cache=1&amp;ask_mail=XHzLwAANlp3Iq7tw1i0B%2F1ZZPCqSMY443IwjBNB1a4lD6OfrRJfJHXOx5r3yL9Ga&amp;ask_name=DATENSCHUTZBEAUFTRAGTE</string>
     <string name="startButtonText">Aufzeichnung \n starten</string>
     <string name="stopButtonText">Aufzeichnung \n stoppen</string>

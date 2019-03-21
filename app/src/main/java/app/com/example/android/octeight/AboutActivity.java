@@ -57,7 +57,9 @@ public class AboutActivity extends BaseActivity {
                         intent.putExtra("URL", getString(R.string.simRaPage));
                         break;
                     case 1 :
-                        intent = new Intent(AboutActivity.this, PrivacyActivity.class);
+                        intent = new Intent(AboutActivity.this, WebActivity.class);
+                        intent.putExtra("URL", getString(R.string.privacyLink));
+
                         break;
                     case 2 :
                         intent = new Intent(AboutActivity.this, LicenseActivity.class);
