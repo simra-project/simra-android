@@ -262,7 +262,7 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="privacySlider">Fahrtbeginn und -ende abschneiden</string>
     <string name="title_tutorial">Anleitung</string>
     <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Anleitung.pdf</string>
-    <string name="calculating_incidents">Berechne Ereignesse</string>
+    <string name="calculating_incidents">Berechne Ereignisse</string>
     <string name="delete_file_warning">Diese Fahrt wurde noch nicht hochgeladen. Soll sie wirklich gelöscht werden?</string>
     <string name="delete_ride_approve">Fahrt löschen</string>
     <string name="ride_deleted">Fahrt gelöscht</string>

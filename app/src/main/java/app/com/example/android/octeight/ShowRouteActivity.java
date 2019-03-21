@@ -3,6 +3,7 @@ package app.com.example.android.octeight;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,11 +37,13 @@ import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -112,6 +115,7 @@ public class ShowRouteActivity extends BaseActivity {
     String pathToAccGpsFile;
     File gpsFile;
     Polyline route;
+    Polyline editableRoute;
 
     Ride tempRide;
     File tempGpsFile;
@@ -286,7 +290,6 @@ public class ShowRouteActivity extends BaseActivity {
 
         }
 
-
         // Get the Route as a Polyline to be displayed on the map
         if (temp) {
             mMapView.getOverlayManager().remove(route);
@@ -294,15 +297,34 @@ public class ShowRouteActivity extends BaseActivity {
                 mMapView.getOverlayManager().remove(tempRoute);
             }
             tempRoute = tempRide.getRoute();
+            tempRoute.setWidth(8.0f);
+            // tempRoute.getPaint().setStrokeJoin(Paint.Join.ROUND);
+            tempRoute.getPaint().setStrokeCap(Paint.Cap.ROUND);
             Log.d(TAG, "temp route size: " + tempRoute.getPoints().size());
+            mMapView.getOverlayManager().add(editableRoute);
             mMapView.getOverlayManager().add(tempRoute);
+
 
         } else {
             route = ride.getRoute();
             Log.d(TAG, "route size: " + route.getPoints().size());
+            if (editableRoute == null) {
+                Log.d(TAG, "adding editableRoute");
+                editableRoute = new Polyline();
+                editableRoute.setPoints(route.getPoints());
+                editableRoute.setWidth(40.0f);
+
+                // editableRoute.setColor(R.color.colorAccent);
+                editableRoute.getPaint().setColor(getColor(R.color.colorAccent));
+                // editableRoute.getPaint().setStrokeJoin(Paint.Join.ROUND);
+                editableRoute.getPaint().setStrokeCap(Paint.Cap.ROUND);
+
+                mMapView.getOverlayManager().add(editableRoute);
+            }
             mMapView.getOverlayManager().add(route);
 
         }
+
 
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
         // set accordingly
@@ -434,6 +456,8 @@ public class ShowRouteActivity extends BaseActivity {
             public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
                 left[0] = (int) leftValue;
                 right[0] = (int) rightValue;
+                editableRoute.setPoints(route.getPoints().subList((int)leftValue,(int)rightValue));
+                mMapView.invalidate();
             }
 
             @Override
@@ -534,41 +558,33 @@ public class ShowRouteActivity extends BaseActivity {
     }
 
     private File updateRoute(int left, int right, String pathToAccGpsFile) {
-        String content = "";
-        FileOutputStream writer = null;
-        try {
-            writer = openFileOutput(pathToAccGpsFile, MODE_PRIVATE);
+
+        File inputFile = getFileStreamPath(pathToAccGpsFile);
+        StringBuilder content = new StringBuilder();
+        //String content = "";
+        try(BufferedWriter writer = new BufferedWriter((new FileWriter(inputFile,false)))) {
 
             try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(ride.accGpsFile)))) {
                 String line;
-                content += (br.readLine() + System.lineSeparator()); // fileInfo
-                content += (br.readLine() + System.lineSeparator()); // csv header
-                writer.write(content.getBytes());
-                writer.flush();
+                content.append(br.readLine() + System.lineSeparator()); // fileInfo
+                content.append(br.readLine() + System.lineSeparator()); // csv header
                 int partOfRideNumber = 0;
                 while ((line = br.readLine()) != null) {
                     if (!line.startsWith(",,")) {
                         partOfRideNumber++;
                     }
                     if ((partOfRideNumber >= left) && (partOfRideNumber <= right)) {
-                        content += (br.readLine() + System.lineSeparator());
-                        writer.write((line + System.lineSeparator()).getBytes());
-                        writer.flush();
+                        content.append(line + System.lineSeparator());
                     }
                 }
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
+            writer.append(content);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return getFileStreamPath(pathToAccGpsFile);
     }
