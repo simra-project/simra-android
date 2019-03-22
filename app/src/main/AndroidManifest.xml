@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="app.com.example.android.octeight">
+    package="de.tuberlin.mcc.simra.app">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!--
@@ -41,7 +41,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="app.com.example.android.octeight.ShowRouteActivity" />
+                android:value="de.tuberlin.mcc.simra.app.ShowRouteActivity" />
         </activity>
         <activity
             android:name=".LicenseActivity"
@@ -103,7 +103,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="app.com.example.android.octeight.MainActivity" />
+                android:value="de.tuberlin.mcc.simra.app.MainActivity" />
         </activity>
         <activity
             android:name=".SettingsActivity"
@@ -111,10 +111,6 @@
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity" />
 
-        <service
-            android:name=".Constants"
-            android:enabled="true"
-            android:exported="true" />
         <service
             android:name=".RecorderService"
             android:parentActivityName=".MainActivity" />
@@ -131,7 +127,7 @@
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="app.com.example.android.octeight.MainActivity" />
+                android:value="de.tuberlin.mcc.simra.app.MainActivity" />
         </activity>
         <activity
             android:name=".ShowRouteActivity"
