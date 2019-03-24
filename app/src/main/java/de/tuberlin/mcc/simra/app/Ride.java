@@ -114,7 +114,7 @@ public class Ride {
         this.pLoc = pLoc;
         this.events = findAccEvents();
         this.context = context;
-        String prefix = "/data/user/0/ade.tuberlin.mcc.simra.app/files/";
+        String prefix = "/data/user/0/de.tuberlin.mcc.simra.app/files/";
         String path = tempAccGpsFile.getPath().replace(prefix, "");
         this.id = path.split("_")[0].replace("Temp", "");
         this.temp = temp;

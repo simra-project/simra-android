@@ -39,7 +39,11 @@ public class Constants {
     // Every GPS fix has to be at least this accurate to be taken into account.
     public static final double GPS_ACCURACY_THRESHOLD = 30.0;
 
+    // Backend Interface Version
+    public static final int BACKEND_VERSION = 9;
+
     // Locales
     public static final String[] LOCALE_ABVS = {"UNKNOWN", "Berlin", "London", "other", "TEST"};
+
 
 }

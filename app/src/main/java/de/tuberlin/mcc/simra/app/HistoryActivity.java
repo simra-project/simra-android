@@ -136,10 +136,16 @@ public class HistoryActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
 
-                if (  privacyAgreement) {
+                if (privacyAgreement) {
                     File[] dirFiles = getFilesDir().listFiles();
                     ArrayList<String> pathsToUpload = new ArrayList<>();
                     ArrayList<String> rideKeysToUpload = new ArrayList<>();
+
+                    // contains each line of metaData.csv. Is given to UploadService, so that after
+                    // each successful upload, the state of the corresponding ride can be
+                    // overwritten from 1 to 2
+                    // ArrayList<String> metaDataLines = new ArrayList<>();
+
                     int numberOfRides = 0;
                     long duration = 0;
                     int numberOfIncidents = 0;
@@ -155,8 +161,10 @@ public class HistoryActivity extends BaseActivity {
                             if (line.contains("#")) {
                                 String[] fileInfoArray = line.split("#");
                                 fileVersion = fileInfoArray[1]; //"" + (Integer.valueOf(fileInfoArray[1]) + 1);
+                                // metaDataLines.add(line);
                                 continue;
                             }
+                            // metaDataLines.add(line);
                             String[] metaDataLine = line.split(",", -1);
                             String metaDataRide = line;
                             Log.d(TAG, "metaDataLine: " + Arrays.toString(metaDataLine));
@@ -218,7 +226,7 @@ public class HistoryActivity extends BaseActivity {
                             }
                         }
                     }
-                    Log.d(TAG, "pathToUpload: " + Arrays.toString(pathsToUpload.toArray()));
+                    Log.d(TAG, "pathsToUpload: " + Arrays.toString(pathsToUpload.toArray()));
                     if (pathsToUpload.size() > 0) {
 
                         String profileContent = readContentFromFile("profile.csv", HistoryActivity.this);
