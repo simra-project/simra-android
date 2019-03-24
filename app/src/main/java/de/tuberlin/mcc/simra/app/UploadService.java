@@ -44,6 +44,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 
+import static de.tuberlin.mcc.simra.app.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.Constants.LOCALE_ABVS;
 import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpBooleanSharedPrefs;
@@ -114,7 +115,6 @@ public class UploadService extends Service {
         Log.d(TAG, "onStartCommand() called");
 
         Notification notification = createNotification().build();
-
         notificationManager = NotificationManagerCompat.from(this);
         // Send the notification.
         notificationManager.notify(notificationId, notification);
@@ -181,8 +181,13 @@ public class UploadService extends Service {
                 Log.d(TAG, "hashPassword: " + hashPassword + " written to keyPrefs");
             } else {
                 Log.d(TAG, "sending profile with PUT");
-                String fileHash = profilePassword.split(",")[0];
-                String filePassword = profilePassword.split(",")[1];
+                String[] fileHashPassword = profilePassword.split(",");
+                String fileHash = "-1";
+                String filePassword = "-1";
+                if (fileHashPassword.length >= 2) {
+                    fileHash = profilePassword.split(",")[0];
+                    filePassword = profilePassword.split(",")[1];
+                }
                 String response = putUpload("profile.csv"+fileHash, filePassword, profileContentToSend);
                 Log.d(TAG, "PUT response: " + response);
             }
@@ -202,14 +207,11 @@ public class UploadService extends Service {
 
                 for (int i = 0; i < dirFiles.length; i++) {
                     path = dirFiles[i].getName();
-                    if (!(new File(path)).isDirectory()) {
+                    if (!((new File(path)).isDirectory()) && path.startsWith("CRASH")) {
                         String contentToSend = readContentFromFileAndIncreaseFileVersion(path,context);
                         key = "CRASH_" + ts + "_" + path;
                         postUpload(key,contentToSend);
-                        if (path.startsWith("CRASH")) {
-                            boolean deleted = context.deleteFile(path);
-                            Log.d(TAG, path + " deleted: " + deleted);
-                        }
+                        context.deleteFile(path);
                     }
                 }
                 // set the boolean "NEW-UNSENT-ERROR" in simraPrefs.xml to false
@@ -241,7 +243,9 @@ public class UploadService extends Service {
                             if (password.equals("-1")) {
                                 Log.d(TAG, "sending ride with POST" + key);
                                 String hashPassword = postUpload(key, contentToSend);
-                                writeToSharedPrefs(key, hashPassword, "keyPrefs", context);
+                                if (!hashPassword.contains(" ")) {
+                                    writeToSharedPrefs(key, hashPassword, "keyPrefs", context);
+                                }
                                 Log.d(TAG, "hashPassword: " + hashPassword + " written to keyPrefs");
                             } else {
                                 Log.d(TAG, "sending ride with PUT" + key);
@@ -275,7 +279,6 @@ public class UploadService extends Service {
                 // Load CAs from an InputStream
                 // (could be from a resource or ByteArrayInputStream or ...)
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                // From https://www.washington.edu/itconnect/security/ca/load-der.crt
                 // File certificateFile = new File (getResources().getAssets().open("server.cer"));// getFileStreamPath("server.cer");
                 // Log.d(TAG,"file: " + certificateFile.getAbsolutePath());
 
@@ -326,11 +329,11 @@ public class UploadService extends Service {
                     return true; //hv.verify("vm3.mcc.tu-berlin.de", session);
                 }
             };
-            int appVersion = getAppVersionNumber(context);
+            // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileName + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM2 + appVersion + "/" + "upload?fileName=" + fileName + "&loc=" + locale + "&clientHash=" + clientHash);
-
+            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "upload?fileName=" + fileName + "&loc=" + locale + "&clientHash=" + clientHash);
+            Log.d(TAG, "URL: " + Constants.MCC_VM2 + BACKEND_VERSION + "/" + "upload?fileName=" + fileName + "&loc=" + locale + "&clientHash=" + clientHash);
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
             urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
@@ -424,11 +427,11 @@ public class UploadService extends Service {
                     return true; //hv.verify("vm3.mcc.tu-berlin.de", session);
                 }
             };
-            int appVersion = getAppVersionNumber(context);
+            // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM2 + appVersion + "/" + "update?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + clientHash);
-
+            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "update?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + clientHash);
+            Log.d(TAG, "URL: " + Constants.MCC_VM2 + BACKEND_VERSION + "/" + "update?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + clientHash);
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
             urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());

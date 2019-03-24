@@ -71,6 +71,7 @@ public class Utils {
 
 
     public static void appendToFile(String content, String fileName, Context context) {
+
         try {
             FileOutputStream writer = context.openFileOutput(fileName, MODE_APPEND);
             writer.write(content.getBytes());
@@ -126,6 +127,14 @@ public class Utils {
     }
 
     public static void overWriteFile(String content, String fileName, Context context) {
+        /*
+        File file;
+        // Log.d(TAG, "File.pathSeparator: " + File.pathSeparator);
+        if (fileName.contains(File.separator)) {
+            //Log.d(TAG, "pathToFile contains pathSeparator!");
+            file = new File(fileName);
+            fileName = file.getName();
+        }*/
         try {
             FileOutputStream writer = context.openFileOutput(fileName, Context.MODE_PRIVATE);
             writer.write(content.getBytes());
