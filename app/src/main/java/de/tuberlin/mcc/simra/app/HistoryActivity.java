@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,8 +32,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import static de.tuberlin.mcc.simra.app.Utils.checkForAnnotation;
@@ -101,6 +108,7 @@ public class HistoryActivity extends BaseActivity {
                                        }
                                    }
         );
+
 
         // activating the help Button
         /*helpBtn = findViewById(R.id.help_icon);
@@ -437,22 +445,28 @@ public class HistoryActivity extends BaseActivity {
 
         long millis = Long.valueOf(item[2]) - Long.valueOf(item[1]);
         int minutes = Math.round((millis/1000/60));
-        String prettyDuration = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
-                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
-                TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
 
-        String startDateOfRide = DateUtils.formatDateTime(this, Long.valueOf(item[1]), DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE |
-                DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NUMERIC_DATE);
-        String[] startDateOfrideAsArray = startDateOfRide.split("\\.");
-        String day = startDateOfrideAsArray[0];
-        String month = startDateOfrideAsArray[1];
-        String year = startDateOfrideAsArray[2].substring(2,4);
+        Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
+        int day = localCalendar.get(Calendar.DATE);
+        String month = String.valueOf(localCalendar.get(Calendar.MONTH) + 1);
+        String year = String.valueOf(localCalendar.get(Calendar.YEAR)).substring(2,4);
+        Date dt = new Date(Long.valueOf(item[1]));
+        Locale locale = Resources.getSystem().getConfiguration().locale;
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm", locale);
+        if (locale.equals(Locale.US)) {
+            sdf = new SimpleDateFormat("hh:mm aa", locale);
+        }
+        String time = sdf.format(dt);
         if (month.length() < 2) {
            month = "0" + month;
         }
-        startDateOfRide = day + "." + month + "." + year;
 
-        return "#" + item[0] + ";" + startDateOfRide + "h;" + todo + ";" + minutes + ";" + item[3];
+        String startDateOfRide = day + "." + month + "." + year + ", " + time + "h";
+        if (locale.equals(Locale.US)) {
+            startDateOfRide = month + "/" + day + "/" + year + ", " + time;
+        }
+
+        return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3];
     }
 
     public void startShowRouteWithSelectedRide() {
@@ -533,15 +547,20 @@ public class HistoryActivity extends BaseActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             View row = convertView;
             Holder holder = null;
+            Locale locale = Resources.getSystem().getConfiguration().locale;
+
 
             if (row == null) {
                 LayoutInflater inflater = ((Activity) context).getLayoutInflater();
                 row = inflater.inflate(layoutResourceId, parent, false);
                 holder = new Holder();
                 holder.rideDate = (TextView) row.findViewById(R.id.row_ride_date);
+                if (locale.equals(Locale.US)) {
+                    holder.rideDate.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 13));
+                    row.findViewById(R.id.duration_relativeLayout).setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 10));
+                }
                 holder.duration = (TextView) row.findViewById(R.id.row_duration);
                 holder.message = (TextView) row.findViewById(R.id.row_message);
-
                 holder.btnDelete = (ImageButton) row.findViewById(R.id.button1);
                 row.setTag(holder);
             } else {

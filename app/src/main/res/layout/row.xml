@@ -20,15 +20,19 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/row_ride_date"
-            android:layout_width="0dp"
-            android:layout_weight="15"
-            android:layout_height="wrap_content"
-            android:paddingStart="5dp"
-            android:textAppearance="?android:attr/textAppearanceListItemSmall"
-            android:text="18.3.2019 10:10"/>
+
+            <TextView
+                android:id="@+id/row_ride_date"
+                android:layout_width="0dp"
+                android:layout_weight="15"
+                android:layout_height="wrap_content"
+                android:paddingStart="5dp"
+                android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                android:textAlignment="viewStart"
+                android:text="18/03/2019 10:10 AM"/>
+
             <RelativeLayout
+                android:id="@+id/duration_relativeLayout"
                 android:layout_width="0dp"
                 android:layout_weight="8"
                 android:layout_height="wrap_content">
