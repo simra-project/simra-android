@@ -13,6 +13,8 @@ import java.util.Date;
 
 import static de.tuberlin.mcc.simra.app.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.Utils.lookUpBooleanSharedPrefs;
+import static de.tuberlin.mcc.simra.app.Utils.writeBooleanToSharedPrefs;
 
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
 
@@ -67,8 +69,11 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
                     .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
 
             SharedPreferences.Editor editor = sharedPrefs.edit();
+
             editor.putBoolean("NEW-UNSENT-ERROR", true);
             editor.commit();
+
+
 
             restartApp();
 

@@ -303,4 +303,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
     <string name="delete_file_warning">This ride hasn\t been uploaded yet. Do you want to delete the ride anyway?</string>
     <string name="delete_ride_approve">Delete ride</string>
     <string name="ride_deleted">Ride deleted</string>
+    <string name="uploadingNotificationTitle">SimRa</string>
+    <string name="uploadingNotificationBody">SimRa is uploading rides</string>
+    <string name="upload_started">SimRa ride upload started</string>
 </resources>

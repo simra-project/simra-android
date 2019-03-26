@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
@@ -15,10 +14,14 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,8 +32,10 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -40,16 +45,15 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-
 
 import static de.tuberlin.mcc.simra.app.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.Constants.LOCALE_ABVS;
+import static de.tuberlin.mcc.simra.app.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpSharedPrefs;
+import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.Utils.readContentFromFile;
 import static de.tuberlin.mcc.simra.app.Utils.readContentFromFileAndIncreaseFileVersion;
 import static de.tuberlin.mcc.simra.app.Utils.writeBooleanToSharedPrefs;
@@ -97,6 +101,8 @@ public class UploadService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy()");
+        notificationManager.cancel(notificationId);
+        wakeLock.release();
     }
 
     @Override
@@ -119,12 +125,12 @@ public class UploadService extends Service {
         // Send the notification.
         notificationManager.notify(notificationId, notification);
         startForeground(notificationId, notification);
-        wakeLock.acquire();
+        wakeLock.acquire(1000 * 60 * 15);
 
         // new UpdateTask(intent.getStringExtra("PathToAccGpsFile")).execute();
         new UpdateTask(this, intent).execute();
         // stopSelf();
-        return Service.START_STICKY;
+        return Service.START_NOT_STICKY;
     }
 
     public class MyBinder extends Binder {
@@ -151,6 +157,7 @@ public class UploadService extends Service {
                 uploadFile(context);
             } catch (IOException e) {
                 e.printStackTrace();
+                UploadService.this.decreaseNumberOfTasks();
             }
 
             return null;
@@ -159,47 +166,22 @@ public class UploadService extends Service {
         @Override
         protected void onPostExecute(String s) {
             Log.d(TAG, "onPostExecute()");
+            Intent intent = new Intent();
+            intent.setAction("de.tuberlin.mcc.simra.app.MY_NOTIFICATION");
+            intent.putExtra("data","Notice me senpai!");
+            sendBroadcast(intent);
             super.onPostExecute(s);
-            notificationManager.cancel(notificationId);
-            wakeLock.release();
             stopSelf();
+            // stopForeground(true);
+            // stopService(intent);
         }
 
         private void uploadFile(Context context) throws IOException {
-
-
-            boolean sendCrashReportPermitted = lookUpBooleanSharedPrefs("NEW-UNSENT-ERROR",false,"simraPrefs",context);
-
-            // Sending / Updating profile with each upload
-            String profileContentToSend = readContentFromFile("profile.csv",context);
-            String profilePassword = lookUpSharedPrefs("profile.csv","-1","keyPrefs",context);
-            Log.d(TAG, "Saved password: " + profilePassword);
-            if(profilePassword.equals("-1")){
-                Log.d(TAG, "sending profile with POST");
-                String hashPassword = postUpload("profile.csv",profileContentToSend);
-                writeToSharedPrefs("profile.csv",hashPassword,"keyPrefs",context);
-                Log.d(TAG, "hashPassword: " + hashPassword + " written to keyPrefs");
-            } else {
-                Log.d(TAG, "sending profile with PUT");
-                String[] fileHashPassword = profilePassword.split(",");
-                String fileHash = "-1";
-                String filePassword = "-1";
-                if (fileHashPassword.length >= 2) {
-                    fileHash = profilePassword.split(",")[0];
-                    filePassword = profilePassword.split(",")[1];
-                }
-                String response = putUpload("profile.csv"+fileHash, filePassword, profileContentToSend);
-                Log.d(TAG, "PUT response: " + response);
-            }
-
             File[] dirFiles = getFilesDir().listFiles();
 
-            Log.d(TAG, "dirFiles: " + Arrays.deepToString(dirFiles));
-
-            Log.d(TAG, "sendCrashReportPermitted: " + sendCrashReportPermitted);
-            // If there was a crash and the user permitted to send the crash logs, upload all data
-            // in order to enable reconstructing the error.
-            if (sendCrashReportPermitted) {
+            boolean crash = intent.getBooleanExtra("CRASH_REPORT",false);
+            // If there was a crash and the user permitted to send the crash logs, upload simraPrefs and crash log
+            if (crash) {
                 String path = Constants.APP_PATH + "shared_prefs/simraPrefs.xml";
                 String ts = String.valueOf(System.currentTimeMillis());
                 String key = "CRASH_" + ts + "_" + path;
@@ -221,41 +203,128 @@ public class UploadService extends Service {
 
                 // If there wasn't a crash or the user did not gave us the permission, upload
             } else {
-                ArrayList<String> filesToUpload;
-                filesToUpload = intent.getStringArrayListExtra("PathsToUpload");
-                Log.d(TAG, "DataString: " + intent.getDataString());
-                UploadService.this.setNumberOfTasks((filesToUpload.size()));
+                UploadService.this.setNumberOfTasks(((dirFiles.length-3)/2)+1);
 
-                // For each ride to upload...
-                for (int i = 0; i < filesToUpload.size(); i++) {
-                    // ... find the corresponding ride csv file ...
-                    for (int j = 0; j < dirFiles.length; j++) {
-                        String nameOfFile = dirFiles[j].getName();
-                        if (filesToUpload.get(i).equals(nameOfFile)) {
-                            // ... and upload.
-                            // makePostTestPhaseFiles(nameOfFile, id);
-                            String key = filesToUpload.get(i).split("_")[0];
-                            String accEventName = "accEvents" + key + ".csv";
-                            // makePostTestPhaseFiles(accEventName, id);
-                            String contentToSend = Utils.appendFromFileToFile(accEventName, nameOfFile, context);
-                            String password = lookUpSharedPrefs(key, "-1", "keyPrefs", context);
-                            Log.d(TAG, "Saved password: " + password);
-                            if (password.equals("-1")) {
-                                Log.d(TAG, "sending ride with POST" + key);
-                                String hashPassword = postUpload(key, contentToSend);
-                                if (!hashPassword.contains(" ")) {
-                                    writeToSharedPrefs(key, hashPassword, "keyPrefs", context);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                int numberOfRides = 0;
+                long duration = 0;
+                int numberOfIncidents = 0;
+
+                int appVersion = getAppVersionNumber(context);
+                String fileVersion = "";
+                String content = "";
+
+                try {
+                    BufferedReader metaDataReader = new BufferedReader(new FileReader(context.getFileStreamPath("metaData.csv")));
+                    String line;
+                    while ((line = metaDataReader.readLine()) != null) {
+                        // Log.d(TAG, line);
+                        if (line.contains("#")) {
+                            String[] fileInfoArray = line.split("#");
+                            fileVersion = fileInfoArray[1]; //"" + (Integer.valueOf(fileInfoArray[1]) + 1);
+                            continue;
+                        }
+                        String[] metaDataLine = line.split(",", -1);
+                        Log.d(TAG, "metaDataLine: " + Arrays.toString(metaDataLine));
+                        Log.d(TAG, "line: " + line);
+                        if (metaDataLine.length > 1 && metaDataLine[3].equals("1")) {
+                            String rideKey = metaDataLine[0];
+                            String accGpsName = "";
+                            String accEventName = "";
+                            Log.d(TAG, "dirFiles: " + Arrays.toString(dirFiles));
+                            for (int i = 0; i < dirFiles.length; i++) {
+                                if (dirFiles[i].getName().startsWith(rideKey + "_accGps")) {
+                                    Log.d(TAG, "dirFiles[i]: " + dirFiles[i].getName());
+                                    accGpsName = dirFiles[i].getName();
+                                    accEventName = "accEvents" + rideKey + ".csv";
+                                    break;
                                 }
-                                Log.d(TAG, "hashPassword: " + hashPassword + " written to keyPrefs");
+                            }
+                            Log.d(TAG, "accEventName: " + accEventName + " accGpsName: " + accGpsName);
+                            String contentToSend = Utils.appendFromFileToFile(accEventName, accGpsName, context);
+                            String password = lookUpSharedPrefs(rideKey, "-1", "keyPrefs", context);
+
+                            Log.d(TAG, "Saved password: " + password);
+                            String response = "";
+                            if (password.equals("-1")) {
+                                Log.d(TAG, "sending ride with POST: " + rideKey);
+                                response = postUpload(rideKey, contentToSend);
+                                if (response.split(",").length >= 2) {
+                                    writeToSharedPrefs(rideKey, response, "keyPrefs", context);
+                                    metaDataLine[3] = "2";
+                                }
+                                Log.d(TAG, "hashPassword: " + response + " written to keyPrefs");
                             } else {
-                                Log.d(TAG, "sending ride with PUT" + key);
+                                Log.d(TAG, "sending ride with PUT: " + rideKey);
                                 String fileHash = password.split(",")[0];
                                 String filePassword = password.split(",")[1];
-                                String response = putUpload(fileHash, filePassword, contentToSend);
+                                response = putUpdate(fileHash, filePassword, contentToSend);
+                                if (response.equals("OK")) {
+                                    metaDataLine[3] = "2";
+                                }
                                 Log.d(TAG, "PUT response: " + response);
                             }
+
+                        }
+                        content += ((Arrays.toString(metaDataLine).replace("[","")
+                                .replace(", ",",").replace("]","")) + System.lineSeparator());
+                        if (!metaDataLine[0].equals("key")) {
+                            duration = duration + (Long.valueOf(metaDataLine[2]) - Long.valueOf(metaDataLine[1]));
+                            numberOfRides = Integer.valueOf(metaDataLine[0]);
                         }
                     }
+                    String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+                    overWriteFile((fileInfoLine + content), "metaData.csv", context);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                for (int i = 0; i < dirFiles.length; i++) {
+                    if (dirFiles[i].getName().startsWith("accEvents")) {
+                        BufferedReader accEventsReader = new BufferedReader(new FileReader(context.getFileStreamPath(dirFiles[i].getName())));
+                        String accEventsLine;
+                        accEventsReader.readLine(); // Skip fileInfo line (11#2)
+                        accEventsReader.readLine(); // Skip csv header (key,lat,lon,...)
+                        while ((accEventsLine = accEventsReader.readLine()) != null) {
+                            String[] actualLine = accEventsLine.split(",", -1);
+                            if (checkForAnnotation(actualLine)) {
+                                numberOfIncidents++;
+                            }
+                        }
+
+                    }
+                }
+                String demographicHeader = "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents" + System.lineSeparator();
+                String demographics = getDemographics();
+                String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+                overWriteFile(fileInfoLine + demographicHeader + demographics + "," + numberOfRides + "," + duration + "," + numberOfIncidents, "profile.csv", context);
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                // Sending / Updating profile with each upload
+                String profileContentToSend = readContentFromFile("profile.csv",context);
+                String profilePassword = lookUpSharedPrefs("profile.csv","-1","keyPrefs",context);
+                Log.d(TAG, "Saved password: " + profilePassword);
+                if(profilePassword.equals("-1")){
+                    Log.d(TAG, "sending profile with POST");
+                    String hashPassword = postUpload("profile.csv",profileContentToSend);
+                    if (hashPassword.split(",").length >= 2) {
+                        writeToSharedPrefs("profile.csv",hashPassword,"keyPrefs",context);
+                    }
+                    Log.d(TAG, "hashPassword: " + hashPassword + " written to keyPrefs");
+                } else {
+                    Log.d(TAG, "sending profile with PUT");
+                    String[] fileHashPassword = profilePassword.split(",");
+                    String fileHash = "-1";
+                    String filePassword = "-1";
+                    if (fileHashPassword.length >= 2) {
+                        fileHash = profilePassword.split(",")[0];
+                        filePassword = profilePassword.split(",")[1];
+                    }
+                    String response = putUpdate("profile.csv"+fileHash, filePassword, profileContentToSend);
+                    Log.d(TAG, "PUT response: " + response);
                 }
             }
         }
@@ -357,7 +426,7 @@ public class UploadService extends Service {
             return response;
         }
 
-        private String putUpload (String fileHash, String filePassword, String contentToSend) throws IOException {
+        private String putUpdate(String fileHash, String filePassword, String contentToSend) throws IOException {
 
             // Calculating hash for server access.
             Date dateToday = new Date();
@@ -456,19 +525,27 @@ public class UploadService extends Service {
             return response;
         }
 
+        private String getDemographics() {
+
+            int birth = lookUpIntSharedPrefs("Profile-Age", 0, "simraPrefs", context);
+            int gender = lookUpIntSharedPrefs("Profile-Gender", 0, "simraPrefs", context);
+            int region = lookUpIntSharedPrefs("Profile-Region", 0, "simraPrefs", context);
+            int experience = lookUpIntSharedPrefs("Profile-Experience", 0, "simraPrefs", context);
+            return birth + "," + gender + "," + region + "," + experience;
+        }
+
     }
 
     private NotificationCompat.Builder createNotification() {
         String CHANNEL_ID = "UploadServiceNotification";
-
         Intent contentIntent = new Intent(this, HistoryActivity.class);
         contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, contentIntent, 0);
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.recorder_channel_name);
-            String description = getString(R.string.recorder_channel_description);
+            CharSequence name = getString(R.string.upload_channel_name);
+            String description = getString(R.string.upload_channel_description);
             int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
@@ -479,31 +556,13 @@ public class UploadService extends Service {
         }
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.helmet)
-                .setContentTitle(getResources().getString(R.string.recordingNotificationTitle))
-                .setContentText(getResources().getString(R.string.recordingNotificationBody))
+                .setContentTitle(getResources().getString(R.string.uploadingNotificationTitle))
+                .setContentText(getResources().getString(R.string.uploadingNotificationBody))
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent);
 
         return mBuilder;
 
-    }
-
-    //Converts the contents of an InputStream to a String.
-    public String readStream(InputStream stream, int maxReadSize)
-            throws IOException {
-        Reader reader = null;
-        reader = new InputStreamReader(stream, "UTF-8");
-        char[] rawBuffer = new char[maxReadSize];
-        int readSize;
-        StringBuffer buffer = new StringBuffer();
-        while (((readSize = reader.read(rawBuffer)) != -1) && maxReadSize > 0) {
-            if (readSize > maxReadSize) {
-                readSize = maxReadSize;
-            }
-            buffer.append(rawBuffer, 0, readSize);
-            maxReadSize -= readSize;
-        }
-        return buffer.toString();
     }
 }

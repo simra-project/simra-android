@@ -267,5 +267,8 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="delete_file_warning">Diese Fahrt wurde noch nicht hochgeladen. Soll sie wirklich gelöscht werden?</string>
     <string name="delete_ride_approve">Fahrt löschen</string>
     <string name="ride_deleted">Fahrt gelöscht</string>
+    <string name="uploadingNotificationTitle">SimRa</string>
+    <string name="uploadingNotificationBody">SimRa lädt Fahrten hoch</string>
+    <string name="upload_started">SimRa Hochladen gestartet</string>
 
 </resources>

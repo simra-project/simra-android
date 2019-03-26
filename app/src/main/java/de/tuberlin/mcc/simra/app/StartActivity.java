@@ -1,19 +1,14 @@
 package de.tuberlin.mcc.simra.app;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.text.Html;
-import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
-import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,16 +19,17 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import static de.tuberlin.mcc.simra.app.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.Utils.showMessageOK;
 import static de.tuberlin.mcc.simra.app.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.writeLongToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.Utils.writeToSharedPrefs;
 
 /**
  * Shows general info about the app and starts the MainActivity once the okay-Button is pressed
@@ -64,7 +60,7 @@ public class StartActivity extends BaseActivity {
 
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
 
-        if ((!isFirstTime()) & (privacyPolicyAccepted()) & (!unsentErrors()) && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if ((!isFirstTime()) & (privacyPolicyAccepted()) & (!showUnsentErrorDialogPermitted()) && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED)) {
             Intent intent = new Intent(StartActivity.this, MainActivity.class);
             startActivity(intent);
@@ -235,47 +231,62 @@ public class StartActivity extends BaseActivity {
         return accepted;
     }
 
-    // Look up whether there are unsent crash logs and ask the user for a permission to
-    // send them to the server. If the user gives permission, upload the crash report(s).
-    private boolean unsentErrors() {
-        boolean positive = lookUpBooleanSharedPrefs("NEW-UNSENT-ERROR",false,"simraPrefs",this);
-        if (positive) {
+    // Look up whether to ask the user for a permission to
+    // send the crash logs to the server. If the user gives permission, upload the crash report(s).
+    private boolean showUnsentErrorDialogPermitted() {
+        String crashSendState = lookUpSharedPrefs("SEND-CRASH","UNKNOWN","simraPrefs",this);
+        boolean newCrash = lookUpBooleanSharedPrefs("NEW-UNSENT-ERROR",false,"simraPrefs", this);
+        if (crashSendState.equals("UNKNOWN") && newCrash) {
             fireSendErrorDialog();
+            return true;
+        } else if (crashSendState.equals("ALWAYS-SEND") && newCrash) {
+            Intent intent = new Intent(StartActivity.this, UploadService.class);
+            intent.putExtra("CRASH_REPORT", true);
+            startService(intent);
+            return false;
+        } else {
+            return false;
         }
-        return positive;
     }
 
     public void fireSendErrorDialog() {
 
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
         CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+        final boolean[] rememberChoice = {false};
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                writeBooleanToSharedPrefs("NEW-UNSENT-ERROR",!checkBox.isChecked(),"simraPrefs",StartActivity.this);
+                rememberChoice[0] = isChecked;
             }
         });
-        checkBox.setText(getString(R.string.doNotShowAgain));
+        checkBox.setText(getString(R.string.rememberMyChoice));
         AlertDialog.Builder alert = new AlertDialog.Builder(StartActivity.this);
         alert.setTitle(getString(R.string.sendErrorTitle));
         alert.setMessage(getString(R.string.sendErrorMessage));
         alert.setView(checkBoxView);
         alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                if (rememberChoice[0]) {
+                    writeToSharedPrefs("SEND-CRASH","ALWAYS-SEND","simraPrefs",StartActivity.this);
+                }
                 Intent intent = new Intent(StartActivity.this, UploadService.class);
-                intent.putExtra("CRASH_REPORT", sendErrorPermitted);
+                intent.putExtra("CRASH_REPORT", true);
                 startService(intent);
             }
         });
         alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-
+                if (rememberChoice[0]) {
+                    writeToSharedPrefs("SEND-CRASH", "NEVER-SEND", "simraPrefs",StartActivity.this);
+                }
             }
         });
         alert.show();
-
     }
+
+
 
     public void firePrivacyDialog() {
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
