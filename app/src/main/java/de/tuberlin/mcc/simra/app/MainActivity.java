@@ -62,7 +62,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     private MapController mMapController;
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
-    private RotationGestureOverlay mRotationGestureOverlay;
+    // private RotationGestureOverlay mRotationGestureOverlay;
     private LocationManager locationManager;
    /* private static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
             0, 19, 256, ".png", new String[] {
@@ -83,7 +83,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     // Service encapsulating accelerometer accGpsFile recording functionality
     Intent recService;
     RecorderService mBoundRecorderService;
-    UploadService mBoundUploadService;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private Boolean recording = false;
@@ -208,8 +207,8 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         mLocationOverlay.enableFollowLocation();
 
         // enables map rotation with gestures
-        mRotationGestureOverlay = new RotationGestureOverlay(mMapView);
-        mRotationGestureOverlay.setEnabled(true);
+        // mRotationGestureOverlay = new RotationGestureOverlay(mMapView);
+        // mRotationGestureOverlay.setEnabled(true);
 
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
@@ -217,7 +216,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         // Add overlays
         mMapView.getOverlays().add(this.mLocationOverlay);
         mMapView.getOverlays().add(this.mCompassOverlay);
-        mMapView.getOverlays().add(this.mRotationGestureOverlay);
+        // mMapView.getOverlays().add(this.mRotationGestureOverlay);
 
         mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
@@ -272,6 +271,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 /*
                 String[] bla = new String[4];
                 bla[5] = "bla";
+
                 try {
                     String[] bla = new String[4];
                     bla[5] = "bla";

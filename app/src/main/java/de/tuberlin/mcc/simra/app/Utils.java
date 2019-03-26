@@ -50,7 +50,7 @@ public class Utils {
     }
 
     public static String readContentFromFileAndIncreaseFileVersion(String fileName, Context context) {
-        String content = "";
+        StringBuilder content = new StringBuilder();
         int appVersion = getAppVersionNumber(context);
         String fileInfoLine = appVersion + "#-1";
 
@@ -60,13 +60,13 @@ public class Utils {
             String fileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
             fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
             while ((line = br.readLine()) != null) {
-                content += line += System.lineSeparator();
+                content.append(line + System.lineSeparator());
             }
-            overWriteFile((fileInfoLine + content), fileName, context);
+            overWriteFile((fileInfoLine + content.toString()), fileName, context);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        return (fileInfoLine + content);
+        return (fileInfoLine + content.toString());
     }
 
 
