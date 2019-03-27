@@ -392,7 +392,13 @@ public class ShowRouteActivity extends BaseActivity {
 
         // Show all the incidents present in our ride object
         Log.d(TAG, "showing all incidents");
-        myMarkerFunct.showIncidents();
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                myMarkerFunct.showIncidents();
+            }
+        });
 
         addCustomMarkerMode = false;
 
@@ -553,6 +559,7 @@ public class ShowRouteActivity extends BaseActivity {
         });
 
         overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
+
         mMapView.getOverlays().add(overlayEvents);
         mMapView.invalidate();
     }
