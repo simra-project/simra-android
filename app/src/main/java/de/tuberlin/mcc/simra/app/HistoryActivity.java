@@ -441,9 +441,11 @@ public class HistoryActivity extends BaseActivity {
             holder.rideDate.setText(itemComponents[1]);
             holder.message.setText(itemComponents[2]);
             holder.duration.setText(itemComponents[3]);
-
+            Log.d(TAG, "itemComponents: " + Arrays.toString(itemComponents));
             if (!itemComponents[4].equals("2")) {
                 holder.btnDelete.setVisibility(View.VISIBLE);
+            } else {
+                holder.btnDelete.setVisibility(View.INVISIBLE);
             }
 
 
