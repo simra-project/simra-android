@@ -469,6 +469,10 @@ public class ShowRouteActivity extends BaseActivity {
             public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
                 left[0] = (int) leftValue;
                 right[0] = (int) rightValue;
+                int routeSize = route.getPoints().size();
+                if(rightValue > routeSize) {
+                    rightValue = routeSize;
+                }
                 editableRoute.setPoints(route.getPoints().subList((int)leftValue,(int)rightValue));
                 mMapView.invalidate();
             }
@@ -663,12 +667,14 @@ public class ShowRouteActivity extends BaseActivity {
         // Shutdown pool and await termination to make sure the program
         // doesn't continue without the relevant work being completed
 
-        pool.shutdown();
 
         try {
+            pool.shutdown();
             pool.awaitTermination(2, TimeUnit.SECONDS);
         } catch (InterruptedException ie) {
             ie.printStackTrace();
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
         }
     }
 
