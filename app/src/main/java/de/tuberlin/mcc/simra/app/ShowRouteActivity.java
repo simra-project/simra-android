@@ -444,11 +444,18 @@ public class ShowRouteActivity extends BaseActivity {
         if (routeSize < 2) {
             routeSize = 2;
         }
-        privacySlider.setRange(0, routeSize);
-        // privacySlider.setValue(0, routeSize);
-        if (!temp) {
-            privacySlider.setValue(0, routeSize);
-        }
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                privacySlider.setRange(0, routeSize);
+                // privacySlider.setValue(0, routeSize);
+                if (!temp) {
+                    privacySlider.setValue(0, routeSize);
+                }
+            }
+        });
+
         Log.d(TAG, "route.size(): " + routeSize);
         // String originalAccGpsContent = readContentFromFile(ride.accGpsFile.getName(),this);
         // String tempAccGpsPath = originalAccGpsContent;
@@ -488,9 +495,20 @@ public class ShowRouteActivity extends BaseActivity {
 
             }
         });
-
         RelativeLayout saveButton = findViewById(R.id.saveIncident);
-        saveButton.setVisibility(View.VISIBLE);
+
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                privacySlider.setRange(0, routeSize);
+                // privacySlider.setValue(0, routeSize);
+                if (!temp) {
+                    saveButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
         saveButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -559,9 +577,15 @@ public class ShowRouteActivity extends BaseActivity {
         });
 
         overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
+        runOnUiThread(new Runnable() {
 
-        mMapView.getOverlays().add(overlayEvents);
-        mMapView.invalidate();
+            @Override
+            public void run() {
+                mMapView.getOverlays().add(overlayEvents);
+                mMapView.invalidate();
+            }
+        });
+
     }
 
     private File updateRoute(int left, int right, String pathToAccGpsFile) {

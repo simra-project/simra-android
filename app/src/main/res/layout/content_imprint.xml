@@ -189,45 +189,6 @@
             android:text="@string/textTUCopyRight"
             android:textSize="10sp" />
 
-
-        <TextView
-            android:id="@+id/headerPrivacyText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:text="@string/title_activity_privacy"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/privacyText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/textPrivacyImprint"
-            android:textSize="10sp" />
-
-
-        <Button
-            android:id="@+id/privacyButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_marginStart="10dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:text="@string/privacyButton"
-            android:textSize="12sp" />
-
-        <Button
-            android:id="@+id/creditsButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:text="@string/title_activity_credits"
-            android:textSize="12sp" />
-
         <TextView
             android:id="@+id/border"
             android:layout_width="match_parent"
