@@ -320,7 +320,7 @@ public class HistoryActivity extends BaseActivity {
         String year = String.valueOf(localCalendar.get(Calendar.YEAR)).substring(2,4);
         Date dt = new Date(Long.valueOf(item[1]));
         Locale locale = Resources.getSystem().getConfiguration().locale;
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm", locale);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", locale);
         if (locale.equals(Locale.US)) {
             sdf = new SimpleDateFormat("hh:mm aa", locale);
         }
