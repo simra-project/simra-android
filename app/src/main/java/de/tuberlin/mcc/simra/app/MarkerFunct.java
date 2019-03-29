@@ -206,12 +206,14 @@ public class MarkerFunct {
         // set Marker for new AccEvent, refresh map
         setMarker(newAcc, eventCount);
         mother.getmMapView().invalidate();
+        /*
         long sleepTime = 500L;
         try {
             Thread.sleep(sleepTime);
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
+        */
 
         // Now we display a dialog box to allow the user to decide if she/he is happy
         // with the location of the custom marker.
@@ -224,7 +226,8 @@ public class MarkerFunct {
         AlertDialog alertDialog = new AlertDialog.Builder(mother).create();
         alertDialog.setTitle(mother.getResources().getString(R.string.customIncidentAddedTitle));
         alertDialog.setMessage(mother.getResources().getString(R.string.customIncidentAddedMessage));
-
+        alertDialog.setCancelable(false);
+        alertDialog.setCanceledOnTouchOutside(false);
         // NEGATIVE BUTTON: marker wasn't placed in the right location, remove from
         // map & markerMap.
         // Removal from ride.events and file not necessary as the new event hasn't been
@@ -283,11 +286,13 @@ public class MarkerFunct {
         wlp.gravity = Gravity.BOTTOM;
         wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
         window.setAttributes(wlp);
-
+        alertDialog.show();
+        /*
         new Handler().postDelayed(() -> {
             alertDialog.show();
 
         }, 750);
+        */
     }
 
     public void setMarker(AccEvent event, int accEventKey) {
