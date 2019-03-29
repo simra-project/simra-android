@@ -766,30 +766,9 @@ public class ShowRouteActivity extends BaseActivity {
             childCheckBoxButton.setChecked(true);
         }
 
-        childCheckBoxButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    child = 1;
-                } else {
-                    child = 0;
-                }
-            }
-        });
-
         if (trailer == 1) {
             trailerCheckBoxButton.setChecked(true);
         }
-        trailerCheckBoxButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    trailer = 1;
-                } else {
-                    trailer = 0;
-                }
-            }
-        });
 
         // doneButton click listener.
         MaterialButton doneButton = (MaterialButton) settingsView.findViewById(R.id.done_button);
@@ -800,6 +779,16 @@ public class ShowRouteActivity extends BaseActivity {
                 try {
                     bike = bikeTypeSpinner.getSelectedItemPosition();
                     pLoc = phoneLocationSpinner.getSelectedItemPosition();
+                    if (childCheckBoxButton.isChecked()) {
+                        child = 1;
+                    } else {
+                        child = 0;
+                    }
+                    if (trailerCheckBoxButton.isChecked()) {
+                        trailer = 1;
+                    } else {
+                        trailer = 0;
+                    }
                     if (rememberMyChoiceCheckBox.isChecked()) {
                         writeIntToSharedPrefs("Settings-BikeType", bike, "simraPrefs", ShowRouteActivity.this);
                         writeIntToSharedPrefs("Settings-PhoneLocation", pLoc, "simraPrefs", ShowRouteActivity.this);
