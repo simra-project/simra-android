@@ -55,13 +55,14 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
             String errorReport = "Exception in: " + context.getClass().getName()
                     + " " + ex.getClass().getName() + "\n" +
                     ex.getMessage() + "\n" +
-                    stackTrace + "\n" +
-                    causeTrace + "\n" +
-                    System.currentTimeMillis() + "\n" +
-                    Build.VERSION.RELEASE + "\n" +
-                    Build.DEVICE + "\n" +
-                    Build.MODEL + "\n" +
-                    Build.PRODUCT;
+                    "stackTrace: " + stackTrace + "\n" +
+                    "causeTrace: " + causeTrace + "\n" +
+                    "System Timestamp: " + System.currentTimeMillis() + "\n" +
+                    "Build.VERSION.RELEASE: " + Build.VERSION.RELEASE + "\n" +
+                    "Build.DEVICE: " + Build.DEVICE + "\n" +
+                    "Build.MODEL: " + Build.MODEL + "\n" +
+                    "Build.PRODUCT: " + Build.PRODUCT + "\n" +
+                    "App Version: " + getAppVersionNumber(this);
 
             appendToFile((fileInfoLine + errorReport), "CRASH_REPORT" + new Date().toString() + ".txt", this);
 
