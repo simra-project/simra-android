@@ -56,7 +56,7 @@ public class StartActivity extends BaseActivity {
 
         Log.d(TAG, "onCreate() started");
 
-        resetAppIfVersionIsBelow(7);
+        // resetAppIfVersionIsBelow(7);
         deleteCrashesIfVersionIsBelow(17);
 
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
@@ -98,6 +98,8 @@ public class StartActivity extends BaseActivity {
                 }
             }
         }
+        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
+
     }
 
     private void resetAppIfVersionIsBelow(int version) {
