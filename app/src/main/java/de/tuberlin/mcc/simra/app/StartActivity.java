@@ -47,7 +47,6 @@ public class StartActivity extends BaseActivity {
 
     // Log tag
     private static final String TAG = "StartActivity_LOG";
-    public boolean sendErrorPermitted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +56,7 @@ public class StartActivity extends BaseActivity {
         Log.d(TAG, "onCreate() started");
 
         // resetAppIfVersionIsBelow(7);
-        deleteCrashesIfVersionIsBelow(17);
+        deleteCrashesIfVersionIsBelow(18);
 
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
 

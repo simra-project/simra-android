@@ -168,7 +168,7 @@ public class UploadService extends Service {
             Log.d(TAG, "onPostExecute()");
             Intent intent = new Intent();
             intent.setAction("de.tuberlin.mcc.simra.app.MY_NOTIFICATION");
-            intent.putExtra("data","Notice me senpai!");
+            // intent.putExtra("data","Notice me senpai!");
             sendBroadcast(intent);
             super.onPostExecute(s);
             stopSelf();
