@@ -182,16 +182,13 @@ public class UploadService extends Service {
             boolean crash = intent.getBooleanExtra("CRASH_REPORT",false);
             // If there was a crash and the user permitted to send the crash logs, upload simraPrefs and crash log
             if (crash) {
-                String path = Constants.APP_PATH + "shared_prefs/simraPrefs.xml";
                 String ts = String.valueOf(System.currentTimeMillis());
-                String key = "CRASH_" + ts + "_" + path;
-                postUpload(key, readContentFromFile(path,context));
 
                 for (int i = 0; i < dirFiles.length; i++) {
-                    path = dirFiles[i].getName();
+                    String path = dirFiles[i].getName();
                     if (!((new File(path)).isDirectory()) && path.startsWith("CRASH")) {
                         String contentToSend = readContentFromFileAndIncreaseFileVersion(path,context);
-                        key = "CRASH_" + ts + "_" + path;
+                        String key = "CRASH_" + ts + "_" + path;
                         postUpload(key,contentToSend);
                         context.deleteFile(path);
                     }
