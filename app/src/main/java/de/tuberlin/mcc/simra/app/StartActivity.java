@@ -56,7 +56,8 @@ public class StartActivity extends BaseActivity {
 
         Log.d(TAG, "onCreate() started");
 
-        newUpdate();
+        resetAppIfVersionIsBelow(7);
+        deleteCrashesIfVersionIsBelow(17);
 
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
 
@@ -84,10 +85,25 @@ public class StartActivity extends BaseActivity {
         }
     }
 
-    private void newUpdate() {
+    private void deleteCrashesIfVersionIsBelow(int version) {
+        int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
+        if (appVersion < version) {
+            writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", this);
+            File[] dirFiles = getFilesDir().listFiles();
+            String path;
+            for (int i = 0; i < dirFiles.length; i++) {
+                path = dirFiles[i].getName();
+                if (path.startsWith("CRASH")) {
+                    dirFiles[i].delete();
+                }
+            }
+        }
+    }
+
+    private void resetAppIfVersionIsBelow(int version) {
         int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
 
-        if (appVersion < 7) {
+        if (appVersion < version) {
             File[] dirFiles = getFilesDir().listFiles();
             String path;
             for (int i = 0; i < dirFiles.length; i++) {
