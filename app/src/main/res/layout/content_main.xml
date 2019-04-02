@@ -26,4 +26,37 @@
         android:focusable="true"
         android:elevation="2dp"/>
 
+    <RelativeLayout
+        android:id="@+id/checkingAppVersionProgressBarRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:elevation="9dp"
+        android:visibility="gone">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_centerInParent="true"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:paddingBottom="10dp">
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="@android:style/Widget.Material.ProgressBar"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:layout_margin="10dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/checking_for_updates"
+                android:layout_below="@id/progressBar"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
 </RelativeLayout>

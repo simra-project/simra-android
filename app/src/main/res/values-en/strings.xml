@@ -306,4 +306,12 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
     <string name="uploadingNotificationTitle">SimRa</string>
     <string name="uploadingNotificationBody">SimRa is uploading rides</string>
     <string name="upload_started">SimRa ride upload started</string>
+    <string name="checking_for_updates">Checking for updates</string>
+    <string name="new_app_version_text">To continue, please download the new version via Google Play or manually via the .APK file.</string>
+    <string name="open_google_play_store">Open Google Play Store</string>
+    <string name="download_the_apk_file">Download the .APK file</string>
+    <string name="installed_version">installed version:</string>
+    <string name="newest_version">newest version:</string>
+    <string name="new_app_version_title">New update available</string>
+    <string name="later">Later</string>
 </resources>
