@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -28,6 +29,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,14 +42,36 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManagerFactory;
+
+import static de.tuberlin.mcc.simra.app.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.Constants.ZOOM_LEVEL;
+import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.Utils.showMessageOK;
 
 
@@ -405,7 +429,8 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 // as we want to keep recording when screen is turned off!)
             }
         });
-
+        // fireNewAppVersionPrompt(18,19,"http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/simra-release-v18.apk", false);
+        new CheckVersionTask().execute();
         Log.i(TAG, "OnCreate finished");
 
     }
@@ -646,6 +671,213 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         }
 
         return (!gps_enabled && !network_enabled);
+    }
+
+    private class CheckVersionTask extends AsyncTask<String, String, String> {
+        int installedAppVersion = -1;
+        int newestAppVersion = 0;
+        String urlToNewestAPK = null;
+        Boolean critical = null;
+        private CheckVersionTask() {};
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            installedAppVersion = getAppVersionNumber(MainActivity.this);
+
+            // Calculating hash for server access.
+            Date dateToday = new Date();
+            String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
+
+            Log.d(TAG, "clientHash: " + clientHash);
+            Log.d(TAG, "dateToday: " + dateToday.toString());
+            Log.d(TAG, "beforeHash: " + (Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX));
+
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            SSLContext sslContext = null;
+            try{
+                // Load CAs from an InputStream
+                // (could be from a resource or ByteArrayInputStream or ...)
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                // File certificateFile = new File (getResources().getAssets().open("server.cer"));// getFileStreamPath("server.cer");
+                // Log.d(TAG,"file: " + certificateFile.getAbsolutePath());
+
+                InputStream caInput = new BufferedInputStream(getResources().getAssets().open("server.cer"));//new FileInputStream(certificateFile));
+                Certificate ca;
+
+                try {
+                    ca = cf.generateCertificate(caInput);
+                    Log.d(TAG,"ca=" + ((X509Certificate) ca).getSubjectDN());
+                } finally {
+                    caInput.close();
+                }
+
+                // Create a KeyStore containing our trusted CAs
+                String keyStoreType = KeyStore.getDefaultType();
+                KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+                keyStore.load(null, null);
+                keyStore.setCertificateEntry("ca", ca);
+                Log.d(TAG,"subjectDN: " + ((X509Certificate) ca).getSubjectDN());
+
+                // Create a TrustManager that trusts the CAs in our KeyStore
+                String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+                tmf.init(keyStore);
+
+                // Create an SSLContext that uses our TrustManager
+                sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, tmf.getTrustManagers(), null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (CertificateException e) {
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (KeyStoreException e) {
+                e.printStackTrace();
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
+            }
+
+            HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    HostnameVerifier hv =
+                            HttpsURLConnection.getDefaultHostnameVerifier();
+                    Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de", session));
+                    Log.d(TAG, "hostname: " + hostname);
+                    Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de:8082", session));
+                    return true; //hv.verify("vm3.mcc.tu-berlin.de", session);
+                }
+            };
+            String response = "-1";
+            try {
+                URL url = new URL(Constants.MCC_VM1 + BACKEND_VERSION + "/" + "checkVersion?clientHash=" + clientHash);
+                Log.d(TAG, "URL: " + Constants.MCC_VM1 + BACKEND_VERSION + "/" + "checkVersion?clientHash=" + clientHash);
+                HttpsURLConnection urlConnection =
+                        (HttpsURLConnection)url.openConnection();
+                urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setDoOutput(true);
+                urlConnection.setReadTimeout(10000);
+                urlConnection.setConnectTimeout(15000);
+                urlConnection.setHostnameVerifier(hostnameVerifier);
+                urlConnection.setRequestProperty("Content-Type","text/plain");
+                int status = urlConnection.getResponseCode();
+                Log.d(TAG, "Server status: " + status);
+                response = urlConnection.getResponseMessage();
+                Log.d(TAG, "Server Response: " + response);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String[] responseArray = response.split("splitter");
+            if (responseArray.length > 2) {
+                critical = Boolean.valueOf(responseArray[0]);
+                newestAppVersion = Integer.valueOf(responseArray[1]);
+                urlToNewestAPK = responseArray[2];
+                return response;
+            } else {
+                return null;
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.GONE);
+                }
+            });
+            if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
+                MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
+            }
+        }
+    }
+
+    private void fireNewAppVersionPrompt(int installedAppVersion, int newestAppVersion, String urlToNewestAPK, Boolean critical) {
+        Log.d(TAG, "fireRideSettingsDialog()");
+        // Store the created AlertDialog instance.
+        // Because only AlertDialog has cancel method.
+        AlertDialog alertDialog = null;
+        // Create a alert dialog builder.
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        // Get custom login form view.
+        View settingsView = getLayoutInflater().inflate(R.layout.new_update_prompt, null);
+
+        // Set above view in alert dialog.
+        builder.setView(settingsView);
+
+        builder.setTitle(getString(R.string.new_app_version_title));
+
+        ((TextView) settingsView.findViewById(R.id.installed_version_textView)).setText(getString(R.string.installed_version) + " " + installedAppVersion);
+        ((TextView) settingsView.findViewById(R.id.newest_version_textView)).setText(getString(R.string.newest_version) + " " + newestAppVersion);
+
+        Button googlePlayStoreButton = settingsView.findViewById(R.id.google_play_store_button);
+
+        googlePlayStoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
+            }
+        });
+
+        Button apkButton = settingsView.findViewById(R.id.apk_button);
+
+        apkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(urlToNewestAPK)));
+            }
+        });
+
+        alertDialog = builder.create();
+
+        if (critical) {
+            Button closeSimRaButton = settingsView.findViewById(R.id.close_simra_button);
+            closeSimRaButton.setVisibility(View.VISIBLE);
+            closeSimRaButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        } else {
+            Button laterButton = settingsView.findViewById(R.id.later_button);
+            laterButton.setVisibility(View.VISIBLE);
+            AlertDialog finalAlertDialog = alertDialog;
+            laterButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finalAlertDialog.cancel();
+                }
+            });
+        }
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setCancelable(false);
+        alertDialog.show();
 
     }
 }

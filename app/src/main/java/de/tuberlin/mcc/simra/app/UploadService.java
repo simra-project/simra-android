@@ -66,7 +66,6 @@ public class UploadService extends Service {
     // For Managing the notification shown while the service is running
     int notificationId = 1453;
 
-
     int numberOfTasks = 0;
 
     public void decreaseNumberOfTasks() {

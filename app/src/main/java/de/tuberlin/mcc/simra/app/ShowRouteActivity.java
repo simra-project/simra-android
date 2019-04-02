@@ -381,21 +381,22 @@ public class ShowRouteActivity extends BaseActivity {
         // Create an instance of MarkerFunct-class which provides all functionality related to
         // incident markers
         Log.d(TAG, "creating MarkerFunct object");
-        if (temp) {
-            if (myMarkerFunct != null) {
-                myMarkerFunct.deleteAllMarkers();
-            }
-            myMarkerFunct = new MarkerFunct(this, true);
-        } else {
-            myMarkerFunct = new MarkerFunct(this, false);
-        }
-
-        // Show all the incidents present in our ride object
-        Log.d(TAG, "showing all incidents");
         runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
+        if (temp) {
+            if (myMarkerFunct != null) {
+                myMarkerFunct.deleteAllMarkers();
+            }
+            myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, true);
+        } else {
+            myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, false);
+        }
+
+        // Show all the incidents present in our ride object
+        Log.d(TAG, "showing all incidents");
+
                 myMarkerFunct.showIncidents();
             }
         });
