@@ -149,7 +149,7 @@ public class HistoryActivity extends BaseActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(HistoryActivity.this, UploadService.class);
                 startService(intent);
-                Toast.makeText(HistoryActivity.this,getString(R.string.upload_started),Toast.LENGTH_SHORT);
+                Toast.makeText(HistoryActivity.this,getString(R.string.upload_started),Toast.LENGTH_SHORT).show();
 
             }
         });
