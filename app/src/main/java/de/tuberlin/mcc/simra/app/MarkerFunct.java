@@ -45,8 +45,6 @@ public class MarkerFunct {
 
     private ExecutorService pool;
 
-    //private List<AccEvent> incidentDat;
-
     private String rideID;
 
     private ArrayList<Marker> markers = new ArrayList<>();
@@ -72,7 +70,6 @@ public class MarkerFunct {
 
         this.pool = mother.pool;
 
-        //this.incidentDat = mother.ride.getEvents();
         if (temp) {
             this.rideID = mother.tempRide.getId();
         } else {
@@ -99,11 +96,6 @@ public class MarkerFunct {
 
     public void showIncidents() {
 
-        /**for(AccEvent accEvent : incidentDat) {
-         Log.d(TAG, "setting Marker at: " + accEvent.position.toString());
-
-         setMarker(accEvent);
-         }*/
         String path = "accEvents" + rideID + ".csv";
         if (temp) {
             path = "TempaccEvents" + rideID + ".csv";
@@ -123,17 +115,6 @@ public class MarkerFunct {
             while ((line = reader.readLine()) != null) {
 
                 String[] actualIncident = line.split(",", -1);
-
-                /**String[] eventLine = new String[6];
-                 //Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident)
-                 //        + " id: " + mother.ride.getId());
-                 //if(actualIncident[0].equals(mother.ride.getId())){
-                 //    Log.d(TAG, "custom incident found! actualIncident: " + Arrays.toString(actualIncident));
-                 eventLine[0] = actualIncident[1];
-                 eventLine[1] = actualIncident[2];
-                 eventLine[5] = actualIncident[3];
-                 AccEvent accEvent = new AccEvent(eventLine);
-                 */
 
                 Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident));
 
@@ -189,8 +170,6 @@ public class MarkerFunct {
 
         });
 
-        // Collections.sort(wrappedGPS);
-
         closestOnRoute = wrappedGPS.get(0).wrappedGeoPoint;
 
         Log.d(TAG, "closestOnRoute: " + closestOnRoute.toString());
@@ -206,14 +185,6 @@ public class MarkerFunct {
         // set Marker for new AccEvent, refresh map
         setMarker(newAcc, eventCount);
         mother.getmMapView().invalidate();
-        /*
-        long sleepTime = 500L;
-        try {
-            Thread.sleep(sleepTime);
-        } catch (InterruptedException ie) {
-            ie.printStackTrace();
-        }
-        */
 
         // Now we display a dialog box to allow the user to decide if she/he is happy
         // with the location of the custom marker.
@@ -287,12 +258,6 @@ public class MarkerFunct {
         wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
         window.setAttributes(wlp);
         alertDialog.show();
-        /*
-        new Handler().postDelayed(() -> {
-            alertDialog.show();
-
-        }, 750);
-        */
     }
 
     public void setMarker(AccEvent event, int accEventKey) {
@@ -356,7 +321,6 @@ public class MarkerFunct {
             if (address.size() == 0) {
                 Log.d(TAG, "getAddressFromLocation(): Couldn't find an address for input geoPoint");
             } else {
-                // Log.i("getFromLoc", address.get(0).toString());
                 // Get address result from geocoding result
                 Log.d(TAG, "address.get(0): " + address.get(0).toString());
                 Address location = address.get(0);

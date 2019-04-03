@@ -188,9 +188,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
-        // Log.d(TAG, "onCreate() date: " + date);
         state = getIntent().getIntExtra("State", 0);
-        // Log.d(TAG, "onCreate() PathToAccGpsFile:" + pathToAccGpsFile);
         duration = getIntent().getStringExtra("Duration");
 
         gpsFile = getFileStreamPath(pathToAccGpsFile);
@@ -211,10 +209,6 @@ public class ShowRouteActivity extends BaseActivity {
             addIncBttn.setVisibility(View.INVISIBLE);
             exitAddIncBttn.setVisibility(View.VISIBLE);
             ShowRouteActivity.this.addCustomMarkerMode = true;
-
-            // overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
-            // mMapView.getOverlays().add(overlayEvents);
-            // mMapView.invalidate();
         });
 
         exitAddIncBttn.setOnClickListener((View v) -> {
@@ -314,9 +308,7 @@ public class ShowRouteActivity extends BaseActivity {
                 editableRoute.setPoints(route.getPoints());
                 editableRoute.setWidth(40.0f);
 
-                // editableRoute.setColor(R.color.colorAccent);
                 editableRoute.getPaint().setColor(getColor(R.color.colorAccent));
-                // editableRoute.getPaint().setStrokeJoin(Paint.Join.ROUND);
                 editableRoute.getPaint().setStrokeCap(Paint.Cap.ROUND);
 
                 mMapView.getOverlayManager().add(editableRoute);
@@ -450,7 +442,6 @@ public class ShowRouteActivity extends BaseActivity {
             @Override
             public void run() {
                 privacySlider.setRange(0, routeSize);
-                // privacySlider.setValue(0, routeSize);
                 if (!temp) {
                     privacySlider.setValue(0, routeSize);
                 }
@@ -458,8 +449,6 @@ public class ShowRouteActivity extends BaseActivity {
         });
 
         Log.d(TAG, "route.size(): " + routeSize);
-        // String originalAccGpsContent = readContentFromFile(ride.accGpsFile.getName(),this);
-        // String tempAccGpsPath = originalAccGpsContent;
 
         lastLeft = 0;
         lastRight = routeSize;
@@ -507,7 +496,6 @@ public class ShowRouteActivity extends BaseActivity {
             @Override
             public void run() {
                 privacySlider.setRange(0, routeSize);
-                // privacySlider.setValue(0, routeSize);
                 if (!temp) {
                     saveButton.setVisibility(View.VISIBLE);
                 }
@@ -563,15 +551,15 @@ public class ShowRouteActivity extends BaseActivity {
             if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {
                 Log.d(TAG, "path of tempGpsFile: " + tempGpsFile.getPath());
                 deleteFile(pathToAccGpsFile);
-                String path = Constants.APP_PATH + "files/";
-                boolean success = tempGpsFile.renameTo(new File(path + pathToAccGpsFile));
+                String path = ShowRouteActivity.this.getFilesDir().getPath();
+                boolean success = tempGpsFile.renameTo(new File(path + File.separator + pathToAccGpsFile));
                 Log.d(TAG, "tempGpsFile successfully renamed: " + success);
             }
             String pathToAccEventsFile = "accEvents" + ride.getId() + ".csv";
             if (tempAccEventsPath != null) {
                 deleteFile(pathToAccEventsFile);
-                String path = Constants.APP_PATH + "files/";
-                File tempAccEventsFile = new File(path + tempAccEventsPath);
+                String path = ShowRouteActivity.this.getFilesDir().getPath();
+                File tempAccEventsFile = new File(path + File.separator + tempAccEventsPath);
                 Log.d(TAG, "path of tempAccEventsFile: " + tempAccEventsFile.getPath());
                 boolean success = tempAccEventsFile.renameTo(new File(path + pathToAccEventsFile));
                 Log.d(TAG, "tempAccEventsFile successfully renamed: " + success);
@@ -833,7 +821,6 @@ public class ShowRouteActivity extends BaseActivity {
             public void onClick(DialogInterface dialog, int id) {
                 continueWithRefresh = true;
                 new RideUpdateTask(true).execute();
-                // Toast.makeText(ShowRouteActivity.this, getString(R.string.newIncidents), Toast.LENGTH_LONG).show();
                 lastLeft = left;
                 lastRight = right;
             }

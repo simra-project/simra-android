@@ -62,7 +62,6 @@ public class HistoryActivity extends BaseActivity {
     boolean exitWhenDone = false;
     String accGpsString = "";
     String pathToAccGpsFile = "";
-    String date = "";
     int state = 0;
     String duration = "";
     String startTime = "";
@@ -75,9 +74,6 @@ public class HistoryActivity extends BaseActivity {
 
     boolean privacyAgreement = false;
 
-    private BroadcastReceiver statusReceiver;
-    private IntentFilter mIntent;
-
     BroadcastReceiver br;
 
     public class MyBroadcastReceiver extends BroadcastReceiver {
@@ -85,11 +81,9 @@ public class HistoryActivity extends BaseActivity {
         public void onReceive(Context context, Intent intent) {
             StringBuilder sb = new StringBuilder();
             sb.append("Action: " + intent.getAction() + "\n");
-            // sb.append("Extra: " + intent.getStringExtra("data") + "\n");
             sb.append("URI: " + intent.toUri(Intent.URI_INTENT_SCHEME).toString() + "\n");
             String log = sb.toString();
             Log.d(TAG, "onReceive: " + log);
-            // Toast.makeText(context, log, Toast.LENGTH_LONG).show();
             refreshMyRides();
         }
     }
@@ -97,7 +91,7 @@ public class HistoryActivity extends BaseActivity {
 
 
     /**
-     * @TODO: When this Activity gets started automatically after the route recording is finished,
+     * When this Activity gets started automatically after the route recording is finished,
      * the route gets shown immediately by calling ShowRouteActivity.
      * Otherwise, this activity has to scan for saved rides (maybe as files in the internal storage
      * or as entries in sharedPreference) and display them in a list.
@@ -131,36 +125,6 @@ public class HistoryActivity extends BaseActivity {
                                    }
         );
 
-        /*
-        statusReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                switch(intent.getIntExtra("status", -1)) {
-                    case 1:
-                        Log.d(TAG, "BroadcastReceiver.onReceive() case 1");
-                        break;
-                    case 2:
-                        Log.d(TAG, "BroadcastReceiver.onReceive() case 2");
-                        break;
-                    default:
-                        Log.d(TAG, "BroadcastReceiver.onReceive() case default");
-                }
-            }
-        };
-
-        registerReceiver(statusReceiver, new IntentFilter("de.tuberlin.mcc.simra.app.GET_STATUS_INTENT"));
-        */
-        // activating the help Button
-        /*helpBtn = findViewById(R.id.help_icon);
-        helpBtn.setVisibility(View.VISIBLE);
-        helpBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           Intent intent = new Intent (getApplicationContext(), HelpActivity.class);
-                                           startActivity(intent);
-                                       }
-                                   }
-        );*/
 
         listView = findViewById(R.id.listView);
 
@@ -186,7 +150,6 @@ public class HistoryActivity extends BaseActivity {
                 Intent intent = new Intent(HistoryActivity.this, UploadService.class);
                 startService(intent);
                 Toast.makeText(HistoryActivity.this,getString(R.string.upload_started),Toast.LENGTH_SHORT);
-                // bindService(intent, mUploadServiceConnection, Context.BIND_AUTO_CREATE);
 
             }
         });
@@ -218,8 +181,6 @@ public class HistoryActivity extends BaseActivity {
         });
 
 
-        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         // Press immediately the button, if HistoryActivity was created automatically after the
         // recording of a route has finished
         if (getIntent().hasExtra("PathToAccGpsFile")) {
@@ -242,7 +203,6 @@ public class HistoryActivity extends BaseActivity {
                 line = br.readLine();
 
                 while ((line = br.readLine()) != null) {
-                    // Log.d(TAG, line);
                     metaDataLines.add(line.split(","));
                 }
             } catch (FileNotFoundException e) {
@@ -251,14 +211,8 @@ public class HistoryActivity extends BaseActivity {
                 e.printStackTrace();
             }
 
-            //ridesArr = metaDataLines.toArray(new String[metaDataLines.size()]);
             ridesArr = new String[metaDataLines.size()];
             Log.d(TAG, "refreshMyRides(): metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
-            /*
-            for (int i = 0; i < metaDataLines.size(); i++) {
-                ridesArr[Integer.valueOf(metaDataLines.get(i)[0])] = listToTextShape(metaDataLines.get(i));
-            }
-            */
             Log.d(TAG, "ArrayList<String[]> metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             for (int i = 0; i < metaDataLines.size(); i++) {
                 String[] metaDataLine = metaDataLines.get(i);
@@ -354,13 +308,10 @@ public class HistoryActivity extends BaseActivity {
             // and 2 for processed by server so the incidents can be annotated by the user
             state = getIntent().getIntExtra("State", 0);
         }
-        // Log.d(TAG, "onCreate(): pathToAccGpsFile: " + pathToAccGpsFile + " date: " + date + " state: " + state);
 
         // Checks whether a ride was selected or not. Maybe it will be possible to select
         // multiple rides and push a button to send them all to the server to be analyzed
         if (accGpsString != null && startTime != "") {
-            // Snackbar.make(view, getString(R.string.selectedRideInfo) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
-            //     .setAction("Action", null).show();
             // Start ShowRouteActivity with the selected Ride.
             Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
             intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
@@ -368,9 +319,6 @@ public class HistoryActivity extends BaseActivity {
             intent.putExtra("StartTime", startTime);
             intent.putExtra("State", state);
             startActivity(intent);
-        } else {
-            //Snackbar.make(view, getString(R.string.errorNoRideSelected) + new Date(Long.valueOf(startTime)), Snackbar.LENGTH_LONG)
-            //      .setAction("Action", null).show();
         }
 
 
@@ -468,7 +416,6 @@ public class HistoryActivity extends BaseActivity {
                                 // Start ShowRouteActivity with the selected Ride.
                                 Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
                                 intent.putExtra("PathToAccGpsFile", dirFiles[i].getName());
-                                // Log.d(TAG, "onClick() date: " + date);
                                 intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
                                 intent.putExtra("StartTime", metaDataLines.get(position)[2]);
                                 intent.putExtra("State", Integer.valueOf(metaDataLines.get(position)[3]));
@@ -488,7 +435,6 @@ public class HistoryActivity extends BaseActivity {
 
                 @Override
                 public void onClick(View v) {
-                    // TODO Auto-generated method stub
                     Log.d(TAG,"Delete Button Clicked");
                     fireDeletePrompt(position, MyArrayAdapter.this);
                 }

@@ -9,7 +9,6 @@ public class AccEvent {
 
     long timeStamp;
     GeoPoint position;
-    Date date;
     String TAG = "AccEvent_LOG";
     int key = 999;              // when an event doesn't have a key yet, the key is 999
     // (can't use 0 because that's an actual valid key)

@@ -56,9 +56,6 @@ public class Ride {
     }
 
     int state;
-    final int ANNOTATION_NOT_STARTED = 0;
-    final int ANNOTATION_NOT_FINISHED = 1;
-    final int ANNOTATION_FINISHED = 2;
 
 
     // This is the constructor that is used for now.
@@ -89,10 +86,6 @@ public class Ride {
 
                 AccEvent actualAccEvent = events.get(i);
 
-                // Forwarding the key to the accEvents; from the accEvents, we forward them to
-                // the Info-Windows and from there to IncidentPopUpActivity.
-                //actualAccEvent.setKey(i);
-                // @TODO do AccEvents have to have a key here???
 
                 content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + ",,,,,,,,,,,," + System.lineSeparator();
             }
@@ -128,11 +121,6 @@ public class Ride {
 
             AccEvent actualAccEvent = events.get(i);
 
-            // Forwarding the key to the accEvents; from the accEvents, we forward them to
-            // the Info-Windows and from there to IncidentPopUpActivity.
-            //actualAccEvent.setKey(i);
-            // @TODO do AccEvents have to have a key here???
-
             content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + ",,,,,,,,,,,," + System.lineSeparator();
         }
 
@@ -144,9 +132,6 @@ public class Ride {
 
     // Takes a File which contains all the data and creates a
     // PolyLine to be displayed on the map as a route.
-    // Maybe this should happen in RecorderService since we
-    // already loop through all the lines there.
-    // It is not good to do loop here through the data again.
     public static Polyline getRouteLine(File gpsFile) throws IOException {
         List<GeoPoint> geoPoints = new ArrayList<>();
         Polyline polyLine = new Polyline();
@@ -175,146 +160,6 @@ public class Ride {
 
     public ArrayList<AccEvent> findAccEvents() {
 
-/*
-        BufferedReader br = null;
-        String thisLine = null;
-        String nextLine = null;
-        try {
-            br = new BufferedReader(new FileReader(accGpsFile));
-            br.readLine();
-            thisLine = br.readLine();
-            nextLine = br.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        String[] partOfRide;
-        ArrayList<String[]> ride = new ArrayList<>();
-        boolean newSubPart = false;
-        while ( (thisLine != null )&&(!newSubPart)) {
-            System.out.println("outer thisLine: " + thisLine);
-            System.out.println("outer nextLine: " + nextLine);
-
-            String[] currentLine = thisLine.split(",");
-            partOfRide = new String[6];
-            String lat = currentLine[0];
-            String lon = currentLine[1];
-            String date = currentLine[7];
-            partOfRide[0] = lat; // lat
-            partOfRide[1] = lon; // lon
-            partOfRide[2] = "0"; // maxXDelta
-            partOfRide[3] = "0"; // maxYDelta
-            partOfRide[4] = "0"; // maxZDelta
-            partOfRide[5] = date; // date
-
-            double maxX = Double.valueOf(currentLine[2]);
-            double minX = Double.valueOf(currentLine[2]);
-            double maxY = Double.valueOf(currentLine[3]);
-            double minY = Double.valueOf(currentLine[3]);
-            double maxZ = Double.valueOf(currentLine[4]);
-            double minZ = Double.valueOf(currentLine[4]);
-            thisLine = nextLine;
-            try {
-                nextLine = br.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if(thisLine.startsWith(",,")){
-                newSubPart = true;
-            }
-
-            while ((thisLine!= null) && newSubPart) {
-                System.out.println("inner thisLine: " + thisLine);
-                System.out.println("inner nextLine: " + nextLine);
-
-                currentLine = thisLine.split(",");
-                if (Double.valueOf(currentLine[2]) >= maxX){
-                    maxX = Double.valueOf(currentLine[2]);
-                } else if (Double.valueOf(currentLine[2]) < minX){
-                    minX =  Double.valueOf(currentLine[2]);
-                }
-                if (Double.valueOf(currentLine[3]) >= maxY){
-                    maxY = Double.valueOf(currentLine[3]);
-                } else if (Double.valueOf(currentLine[3]) < minY){
-                    minY =  Double.valueOf(currentLine[3]);
-                }
-                if (Double.valueOf(currentLine[4]) >= maxZ){
-                    maxZ = Double.valueOf(currentLine[4]);
-                } else if (Double.valueOf(currentLine[4]) < minZ){
-                    minZ =  Double.valueOf(currentLine[4]);
-                }
-                thisLine = nextLine;
-                try {
-                    nextLine = br.readLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                System.out.println(thisLine == nextLine);
-                if(thisLine != null && !thisLine.startsWith(",,")){
-                    newSubPart = false;
-                }
-            }
-
-
-            double maxXDelta = Math.abs(maxX - minX);
-            double maxYDelta = Math.abs(maxY - minY);
-            double maxZDelta = Math.abs(maxZ - minZ);
-
-            partOfRide[2] = String.valueOf(maxXDelta);
-            partOfRide[3] = String.valueOf(maxYDelta);
-            partOfRide[4] = String.valueOf(maxZDelta);
-
-
-            ride.add(partOfRide);
-            if(nextLine == null){
-                break;
-            }
-        }
-
-        ArrayList<String[]> output = new ArrayList<>();
-
-        double oldXAverage = Double.valueOf((ride.get(0))[2]) / Double.valueOf((ride.get(1))[2]);
-        double oldYAverage = Double.valueOf((ride.get(0))[3]) / Double.valueOf((ride.get(1))[3]);
-        double oldZAverage = Double.valueOf((ride.get(0))[4]) / Double.valueOf((ride.get(1))[4]);
-        int newSize = 2;
-
-
-        for (int i = 2; i < ride.size() ; i++) {
-            newSize++;
-            double actualDeltaX = Double.valueOf(ride.get(i)[2]);
-            double actualDeltaY = Double.valueOf(ride.get(i)[3]);
-            double actualDeltaZ = Double.valueOf(ride.get(i)[4]);
-            double newAverageDeltaX = (oldXAverage * (newSize - 1) + actualDeltaX)/newSize;
-            double newAverageDeltaY = (oldYAverage * (newSize - 1) + actualDeltaY)/newSize;
-            double newAverageDeltaZ = (oldZAverage * (newSize - 1) + actualDeltaZ)/newSize;
-            if(actualDeltaX > 3 * newAverageDeltaX || actualDeltaY > 3 * newAverageDeltaY || actualDeltaZ > 3 * newAverageDeltaZ){
-                output.add(ride.get(i));
-            }
-            oldXAverage = newAverageDeltaX;
-            oldYAverage = newAverageDeltaY;
-            oldZAverage = newAverageDeltaZ;
-        }
-
-        ArrayList<AccEvent> accEvents = new ArrayList<>();
-        Collections.sort(ride, new Comparator<String[]>() {
-            @Override
-            public int compare(String[] o1, String[] o2) {
-                return Double.valueOf(o1[2]).compareTo(Double.valueOf(o2[2]));
-            }
-        });
-        try{
-        for (int i = ride.size()-1; i > ride.size()-6; i--){
-            accEvents.add(new AccEvent(ride.get(i)));
-            Log.d(TAG, "sorted: " + ride.get(i)[3]);
-        }} catch(Exception e) {
-            e.printStackTrace();
-        }
-
-
-        Log.d(TAG, "findAccEvents(): " + Arrays.deepToString(ride.toArray()));
-        return accEvents;
-        */
 
         BufferedReader br = null;
         String thisLine = null;

@@ -98,15 +98,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         return startTime;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // The ride object which will be created and retrieved by the MainActivity at the end of the
-    // service
-    /*
-    public Ride getRide() {
-        File accGpsFile = getFileStreamPath(pathToAccGpsFile);
-        return new Ride(accGpsFile, String.valueOf(startTime), String.valueOf((curTime - startTime)), 0, this);
-    }
-    */
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // SensorEventListener Methods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -140,20 +131,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             }
 
         }
-
-
-        /*
-        if ((curTime - lastGPSUpdate) >= GPS_POLL_FREQUENCY){
-            lastGPSUpdate = curTime;
-            //write data to file in background thread
-            try{
-                Log.d(TAG, "RecorderService executing gpsExecutor");
-                Runnable insertGPSHandler = new InsertGPSHandler();
-                gpsExecutor.execute(insertGPSHandler);
-            } catch (Exception e) {
-                Log.e(TAG, "insertData: " + e.getMessage(), e);
-            }
-        }*/
 
     }
 
@@ -222,15 +199,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 .LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager
                 .GPS_PROVIDER, 3000, 1.0f, this);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 1.0f, this);
 
         // Queues for storing acc data
         accXQueue = new LinkedList<>();
         accYQueue = new LinkedList<>();
         accZQueue = new LinkedList<>();
-        // accQQueue = new LinkedList<>();
-
-        // date = DateFormat.getDateTimeInstance().format(new Date());
 
         // When the user records a route for the first time, the ride key is 0.
         // For all subsequent rides, the key value increases by one at a time.
@@ -339,21 +312,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Remove the Notification
         notificationManager.cancel(notificationId);
 
-        // Log.d(TAG, "onDestroy() writing accGpsString");
-        // Log.d(TAG, accString);
-        // Log.d(TAG, gpsString);
-
-        /*
-        executor.execute( () -> {
-            try {
-                appendToFile(gpsString, gpsFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        */
-
-
         // Create new thread to wait for gpsExecutor to clear queue and wait for termination
         new Thread(() -> {
             try {
@@ -430,50 +388,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         @SuppressLint("MissingPermission")
         public void run() {
 
-            // Record location data
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            /*
-            if((curTime - lastGPSUpdate) >= GPS_POLL_FREQUENCY) {
-                lastGPSUpdate = curTime;
-
-                if (lastLocation == null){
-                    lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                }
-                if (lastLocation == null){
-                    lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                }
-                if (lastLocation == null){
-                    lastLocation = new Location(LocationManager.GPS_PROVIDER);
-                }
-
-                String str = String.valueOf(lastLocation.getLongitude()) + ", " +
-                        String.valueOf(lastLocation.getLatitude()) + ", " +
-                        (curTime - startTime) + ", " +
-                        (curTime - lastGPSUpdate) + ", " +
-                        DateFormat.getDateTimeInstance().format(new Date());
-
-                // Log.d(TAG, "GPSService InsertAccHandler run(): " + str);
-
-                gpsString += str += '\n';
-            }
-            */
-
-            // Record accelerometer and location data
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            // Log.d(TAG, String.valueOf(curTime));
-            double x = accelerometerMatrix[0];
-            double y = accelerometerMatrix[1];
-            double z = accelerometerMatrix[2];
-                /*
-                float mAccelCurrent = (float) Math.sqrt(x*x+y*y+z*z);
-
-                mAcceleration += String.valueOf(x) + "," + String.valueOf(y) + ","
-                        + String.valueOf(z) + ","+ String.valueOf(mAccelCurrent);
-                mAcceleration += '\n';
-                */
-
-
             /** Every average is computed over 30 data points, so we want the queues for the
              three accelerometer values to be of size 30 in order to compute the averages.
 
@@ -485,7 +399,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 accXQueue.add(accelerometerMatrix[0]);
                 accYQueue.add(accelerometerMatrix[1]);
                 accZQueue.add(accelerometerMatrix[2]);
-                // accQQueue.add(mAccelCurrent);
 
             } else {
 
@@ -503,10 +416,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                                 .GPS_PROVIDER);
                     }
                     if (lastLocation == null) {
-                        lastLocation = locationManager.getLastKnownLocation(LocationManager
-                                .NETWORK_PROVIDER);
-                    }
-                    if (lastLocation == null) {
                         lastLocation = new Location(LocationManager
                                 .GPS_PROVIDER);
                     }
@@ -520,7 +429,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 float xAvg = computeAverage(accXQueue);
                 float yAvg = computeAverage(accYQueue);
                 float zAvg = computeAverage(accZQueue);
-                //float qAvg = computeAverage(accQQueue);
 
                 // Put the averages + time data into a string and append to file.
                 String str = gps + String.valueOf(xAvg) + "," +
@@ -528,7 +436,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         String.valueOf(zAvg) + "," +
                         curTime;
 
-                accGpsString += str /*+= String.valueOf(qAvg)*/;
+                accGpsString += str;
                 accGpsString += System.getProperty("line.separator");
                 lineAdded = true;
 
@@ -541,8 +449,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     accXQueue.remove();
                     accYQueue.remove();
                     accZQueue.remove();
-                    //accQQueue.remove();
-
                 }
 
             }

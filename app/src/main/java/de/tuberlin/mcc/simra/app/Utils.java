@@ -24,9 +24,7 @@ public class Utils {
 
     public static String readContentFromFile(String fileName, Context context) {
         File file;
-        // Log.d(TAG, "File.pathSeparator: " + File.pathSeparator);
         if (fileName.contains(File.separator)) {
-            //Log.d(TAG, "pathToFile contains pathSeparator!");
             file = new File(fileName);
         } else {
             file = context.getFileStreamPath(fileName);
@@ -127,14 +125,6 @@ public class Utils {
     }
 
     public static void overWriteFile(String content, String fileName, Context context) {
-        /*
-        File file;
-        // Log.d(TAG, "File.pathSeparator: " + File.pathSeparator);
-        if (fileName.contains(File.separator)) {
-            //Log.d(TAG, "pathToFile contains pathSeparator!");
-            file = new File(fileName);
-            fileName = file.getName();
-        }*/
         try {
             FileOutputStream writer = context.openFileOutput(fileName, Context.MODE_PRIVATE);
             writer.write(content.getBytes());

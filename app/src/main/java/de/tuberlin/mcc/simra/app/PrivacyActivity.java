@@ -26,13 +26,11 @@ public class PrivacyActivity extends AppCompatActivity {
     ImageButton backBtn;
     TextView toolbarTxt;
     boolean privacyAgreement;
-    // Context ctx = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_privacy);
-        //ctx = getBaseContext();
 
         privacyAgreement = lookUpBooleanSharedPrefs("Privacy-Policy-Accepted", false,"simraPrefs",this);
         Log.d(TAG, "onCreate() privacyAgreement: " + privacyAgreement);
@@ -87,7 +85,6 @@ public class PrivacyActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 privacyAgreement = true;
                 handler.sendMessage(handler.obtainMessage());
-                // finish();
             }
         });
         alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

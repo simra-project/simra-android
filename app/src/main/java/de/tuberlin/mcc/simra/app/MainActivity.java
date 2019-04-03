@@ -86,21 +86,12 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     private MapController mMapController;
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
-    // private RotationGestureOverlay mRotationGestureOverlay;
     private LocationManager locationManager;
-   /* private static final OnlineTileSourceBase HTTP_MAPNIK = new XYTileSource("HttpMapnik",
-            0, 19, 256, ".png", new String[] {
-            "http://a.tile.openstreetmap.org/",
-            "http://b.tile.openstreetmap.org/",
-            "http://c.tile.openstreetmap.org/" },
-            "© OpenStreetMap contributors"); */
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // SharedPreferences for storing last location, editor for editing sharedPrefs
-
     SharedPreferences sharedPrefs;
-
     SharedPreferences.Editor editor;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,7 +153,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mMapView.setMultiTouchControls(true); // gesture zooming
         mMapView.setFlingEnabled(true);
-        // mMapView.setTileSource(HTTP_MAPNIK);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
         TextView copyrightTxt = (TextView) findViewById(R.id.copyright_text);
@@ -173,20 +163,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
         sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
         editor = sharedPrefs.edit();
-
-        //**************************************************************************************
-        // ALTERNATIVE MAP TILE PROVIDERS
-
-        // (1) MapBox
-        /**final MapBoxTileSource tileSource = new MapBoxTileSource();
-         tileSource.retrieveAccessToken(ctx);
-         tileSource.retrieveMapBoxMapId(ctx);
-         mMapView.setTileSource(tileSource);*/
-
-        // (2) HERE we go
-        /**final ITileSource tileSource = new HEREWeGoTileSource(ctx);
-         mMapView.setTileSource(tileSource);*/
-        //**************************************************************************************
 
         // Set compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
         //                       java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
@@ -230,10 +206,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         // the map will follow the user until the user scrolls in the UI
         mLocationOverlay.enableFollowLocation();
 
-        // enables map rotation with gestures
-        // mRotationGestureOverlay = new RotationGestureOverlay(mMapView);
-        // mRotationGestureOverlay.setEnabled(true);
-
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
 
@@ -268,16 +240,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             @Override
             public void onClick(View v) {
 
-                /*
-                Intent intent = new Intent(MainActivity.this, UploadService.class);
-                intent.putExtra("PathToAccGpsFile", "metaData.csv");
-                startService(intent);
-                bindService(intent, mUploadServiceConnection, Context.BIND_AUTO_CREATE);
-
-                Intent launchActivityIntent = new Intent(MainActivity.this,
-                        HelmetActivity.class);
-                startActivity(launchActivityIntent);
-                */
             }
         });
 
@@ -291,26 +253,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 Log.i(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
                 mMapController.setZoom(ZOOM_LEVEL);
-
-                /*
-                String[] bla = new String[4];
-                bla[5] = "bla";
-
-                try {
-                    String[] bla = new String[4];
-                    bla[5] = "bla";
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.d(TAG, "e.toString(): " + e.toString());
-                    String stackTrace = "\n";
-                    for (int i = 0; i < e.getStackTrace().length; i++) {
-                        stackTrace += e.getStackTrace()[i].toString() + "\n";
-                    }
-                    Log.d(TAG, "stackTrace: " + stackTrace);
-                    Log.d(TAG, "e.getCause(): " + e.getCause());
-                    // throw e;
-                }*/
             }
         });
 
@@ -359,7 +301,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                     Intent intent = new Intent(MainActivity.this, RecorderService.class);
                     startService(intent);
                     bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
-                    //startService(recService);
                     recording = true;
                 }
             }
@@ -422,14 +363,8 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 } catch (Exception e) {
                     Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
                 }
-
-                // unregister accelerometer accGpsFile listener
-                // @TODO (is this necessary? where else to unregister? - unregistering the
-                // listener in onPause as demonstrated in most examples is not an option
-                // as we want to keep recording when screen is turned off!)
             }
         });
-        // fireNewAppVersionPrompt(18,19,"http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/simra-release-v18.apk", false);
         new CheckVersionTask().execute();
         Log.i(TAG, "OnCreate finished");
 
@@ -468,7 +403,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         super.onResume();
 
         // Ensure the button that matches current state is presented.
-        // @TODO für MARK: doesn't seem to work yet, when display is rotated "Neue Route" is always presented
         if (recording) {
             showStop();
         } else {
@@ -483,13 +417,12 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
                     0, this);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
         } catch (SecurityException se) {
             Log.d(TAG, "onStart() permission not granted yet");
         }
 
         // Refresh the osmdroid configuration on resuming.
-        mMapView.onResume(); //needed for compass and icons
+        mMapView.onResume(); // needed for compass and icons
 
     }
 
@@ -501,21 +434,12 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
         super.onPause();
 
-        // Ensure the button that matches current state is presented.
-        // @TODO für MARK: doesn't seem to work yet, when display is rotated "Neue Route" is always presented
-        /**if(recording) {
-         showStop();
-         } else {
-         showStart();
-         }*/
-
-
         // Load Configuration with changes from onCreate
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().save(this, prefs);
 
         // Refresh the osmdroid configuration on pausing.
-        mMapView.onPause(); //needed for compass and icons
+        mMapView.onPause(); // needed for compass and icons
 
         Log.i(TAG, "OnPause finished");
     }
@@ -658,19 +582,14 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     private static boolean isLocationServiceOff(MainActivity mainActivity) {
 
         boolean gps_enabled = false;
-        boolean network_enabled = false;
 
         try {
             gps_enabled = mainActivity.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         } catch (Exception ex) {
+            Log.d(TAG, ex.getMessage());
         }
 
-        try {
-            network_enabled = mainActivity.locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception ex) {
-        }
-
-        return (!gps_enabled && !network_enabled);
+        return (!gps_enabled);
     }
 
     private class CheckVersionTask extends AsyncTask<String, String, String> {
@@ -709,8 +628,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 // Load CAs from an InputStream
                 // (could be from a resource or ByteArrayInputStream or ...)
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                // File certificateFile = new File (getResources().getAssets().open("server.cer"));// getFileStreamPath("server.cer");
-                // Log.d(TAG,"file: " + certificateFile.getAbsolutePath());
 
                 InputStream caInput = new BufferedInputStream(getResources().getAssets().open("server.cer"));//new FileInputStream(certificateFile));
                 Certificate ca;
@@ -762,17 +679,15 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             };
             String response = "-1";
             try {
-                URL url = new URL(Constants.MCC_VM1 + BACKEND_VERSION + "/" + "checkVersion?clientHash=" + clientHash);
-                Log.d(TAG, "URL: " + Constants.MCC_VM1 + BACKEND_VERSION + "/" + "checkVersion?clientHash=" + clientHash);
+                URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "version?clientHash=" + clientHash);
+                Log.d(TAG, "URL: " + Constants.MCC_VM2 + BACKEND_VERSION + "/" + "version?clientHash=" + clientHash);
                 HttpsURLConnection urlConnection =
                         (HttpsURLConnection)url.openConnection();
                 urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setDoOutput(true);
                 urlConnection.setReadTimeout(10000);
                 urlConnection.setConnectTimeout(15000);
                 urlConnection.setHostnameVerifier(hostnameVerifier);
-                urlConnection.setRequestProperty("Content-Type","text/plain");
                 int status = urlConnection.getResponseCode();
                 Log.d(TAG, "Server status: " + status);
                 response = urlConnection.getResponseMessage();
