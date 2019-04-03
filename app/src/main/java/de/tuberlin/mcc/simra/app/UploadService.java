@@ -14,7 +14,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -24,9 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -36,9 +33,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -49,8 +44,9 @@ import javax.net.ssl.TrustManagerFactory;
 import static de.tuberlin.mcc.simra.app.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.Constants.LOCALE_ABVS;
 import static de.tuberlin.mcc.simra.app.Utils.checkForAnnotation;
+import static de.tuberlin.mcc.simra.app.Utils.configureHostNameVerifier;
+import static de.tuberlin.mcc.simra.app.Utils.configureSSLContext;
 import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
@@ -292,7 +288,6 @@ public class UploadService extends Service {
                 overWriteFile(fileInfoLine + demographicHeader + demographics + "," + numberOfRides + "," + duration + "," + numberOfIncidents, "profile.csv", context);
 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
                 // Sending / Updating profile with each upload
                 String profileContentToSend = readContentFromFile("profile.csv",context);
                 String profilePassword = lookUpSharedPrefs("profile.csv","-1","keyPrefs",context);
@@ -321,84 +316,24 @@ public class UploadService extends Service {
 
         private String postUpload (String fileName, String contentToSend) throws IOException {
 
-            // Calculating hash for server access.
-            Date dateToday = new Date();
-            String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
-
-            Log.d(TAG, "clientHash: " + clientHash);
-            Log.d(TAG, "dateToday: " + dateToday.toString());
-            Log.d(TAG, "beforeHash: " + (Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX));
-
             int localeInt = lookUpIntSharedPrefs("Profile-Region",0,"simraPrefs",context);
             String locale = LOCALE_ABVS[localeInt];
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            SSLContext sslContext = null;
-            try{
-                // Load CAs from an InputStream
-                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-
-                InputStream caInput = new BufferedInputStream(getResources().getAssets().open("server.cer"));//new FileInputStream(certificateFile));
-                Certificate ca;
-
-                try {
-                    ca = cf.generateCertificate(caInput);
-                    Log.d(TAG,"ca=" + ((X509Certificate) ca).getSubjectDN());
-                } finally {
-                    caInput.close();
-                }
-
-                // Create a KeyStore containing our trusted CAs
-                String keyStoreType = KeyStore.getDefaultType();
-                KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-                keyStore.load(null, null);
-                keyStore.setCertificateEntry("ca", ca);
-                Log.d(TAG,"subjectDN: " + ((X509Certificate) ca).getSubjectDN());
-
-                // Create a TrustManager that trusts the CAs in our KeyStore
-                String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-                tmf.init(keyStore);
-
-                // Create an SSLContext that uses our TrustManager
-                sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, tmf.getTrustManagers(), null);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (CertificateException e) {
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (KeyStoreException e) {
-                e.printStackTrace();
-            } catch (KeyManagementException e) {
-                e.printStackTrace();
-            }
-
-            HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    HostnameVerifier hv =
-                            HttpsURLConnection.getDefaultHostnameVerifier();
-                    Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de", session));
-                    Log.d(TAG, "hostname: " + hostname);
-                    return true; //hv.verify("vm3.mcc.tu-berlin.de", session);
-                }
-            };
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileName + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "upload?fileName=" + fileName + "&loc=" + locale + "&clientHash=" + clientHash);
-            Log.d(TAG, "URL: " + Constants.MCC_VM2 + BACKEND_VERSION + "/" + "upload?fileName=" + fileName + "&loc=" + locale + "&clientHash=" + clientHash);
+            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "upload?fileName=" + fileName + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
+            Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
-            urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+            urlConnection.setSSLSocketFactory(configureSSLContext(context).getSocketFactory());
             urlConnection.setRequestMethod("POST");
             urlConnection.setDoInput(true);
             urlConnection.setDoOutput(true);
             urlConnection.setReadTimeout(10000);
             urlConnection.setConnectTimeout(15000);
-            urlConnection.setHostnameVerifier(hostnameVerifier);
+            urlConnection.setHostnameVerifier(configureHostNameVerifier());
             urlConnection.setRequestProperty("Content-Type","text/plain");
             byte[] outputInBytes = contentToSend.getBytes("UTF-8");
             OutputStream os = urlConnection.getOutputStream();
@@ -415,83 +350,24 @@ public class UploadService extends Service {
 
         private String putUpdate(String fileHash, String filePassword, String contentToSend) throws IOException {
 
-            // Calculating hash for server access.
-            Date dateToday = new Date();
-            String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
-
-            Log.d(TAG, "clientHash: " + clientHash);
-            Log.d(TAG, "dateToday: " + dateToday.toString());
-            Log.d(TAG, "beforeHash: " + (Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX));
-
             int localeInt = lookUpIntSharedPrefs("Profile-Region",0,"simraPrefs",context);
             String locale = LOCALE_ABVS[localeInt];
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            SSLContext sslContext = null;
-            try{
-                // Load CAs from an InputStream
-                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                InputStream caInput = new BufferedInputStream(getResources().getAssets().open("server.cer"));//new FileInputStream(certificateFile));
-                Certificate ca;
-
-                try {
-                    ca = cf.generateCertificate(caInput);
-                    Log.d(TAG,"ca=" + ((X509Certificate) ca).getSubjectDN());
-                } finally {
-                    caInput.close();
-                }
-
-                // Create a KeyStore containing our trusted CAs
-                String keyStoreType = KeyStore.getDefaultType();
-                KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-                keyStore.load(null, null);
-                keyStore.setCertificateEntry("ca", ca);
-                Log.d(TAG,"subjectDN: " + ((X509Certificate) ca).getSubjectDN());
-
-                // Create a TrustManager that trusts the CAs in our KeyStore
-                String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-                tmf.init(keyStore);
-
-                // Create an SSLContext that uses our TrustManager
-                sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, tmf.getTrustManagers(), null);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (CertificateException e) {
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (KeyStoreException e) {
-                e.printStackTrace();
-            } catch (KeyManagementException e) {
-                e.printStackTrace();
-            }
-
-            HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    HostnameVerifier hv =
-                            HttpsURLConnection.getDefaultHostnameVerifier();
-                    Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de", session));
-                    Log.d(TAG, "hostname: " + hostname);
-                    return true; //hv.verify("vm3.mcc.tu-berlin.de", session);
-                }
-            };
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "update?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + clientHash);
-            Log.d(TAG, "URL: " + Constants.MCC_VM2 + BACKEND_VERSION + "/" + "update?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + clientHash);
+            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "update?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
+            Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
-            urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+            urlConnection.setSSLSocketFactory(configureSSLContext(context).getSocketFactory());
             urlConnection.setRequestMethod("PUT");
             urlConnection.setDoInput(true);
             urlConnection.setDoOutput(true);
             urlConnection.setReadTimeout(10000);
             urlConnection.setConnectTimeout(15000);
-            urlConnection.setHostnameVerifier(hostnameVerifier);
+            urlConnection.setHostnameVerifier(configureHostNameVerifier());
             urlConnection.setRequestProperty("Content-Type","text/plain");
             Log.d(TAG, "contentToSend.length(): " + contentToSend.length());
             byte[] outputInBytes = contentToSend.getBytes("UTF-8");

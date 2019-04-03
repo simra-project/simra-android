@@ -561,7 +561,7 @@ public class ShowRouteActivity extends BaseActivity {
                 String path = ShowRouteActivity.this.getFilesDir().getPath();
                 File tempAccEventsFile = new File(path + File.separator + tempAccEventsPath);
                 Log.d(TAG, "path of tempAccEventsFile: " + tempAccEventsFile.getPath());
-                boolean success = tempAccEventsFile.renameTo(new File(path + pathToAccEventsFile));
+                boolean success = tempAccEventsFile.renameTo(new File(path + File.separator + pathToAccEventsFile));
                 Log.d(TAG, "tempAccEventsFile successfully renamed: " + success);
             }
 
