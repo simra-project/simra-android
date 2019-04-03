@@ -5,16 +5,33 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.nfc.cardemulation.HostNfcFService;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManagerFactory;
 
 import static android.content.Context.MODE_APPEND;
 
@@ -239,6 +256,67 @@ public class Utils {
             installedVersionNumber = pinfo.versionCode;
         }
         return installedVersionNumber;
+    }
+
+    public static SSLContext configureSSLContext(Context context) {
+        SSLContext sslContext = null;
+        try{
+            // Load CAs from an InputStream
+            // (could be from a resource or ByteArrayInputStream or ...)
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+            InputStream caInput = new BufferedInputStream(context.getResources().getAssets().open("server.cer"));//new FileInputStream(certificateFile));
+            Certificate ca;
+
+            try {
+                ca = cf.generateCertificate(caInput);
+                Log.d(TAG,"ca=" + ((X509Certificate) ca).getSubjectDN());
+            } finally {
+                caInput.close();
+            }
+
+            // Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+            Log.d(TAG,"subjectDN: " + ((X509Certificate) ca).getSubjectDN());
+
+            // Create a TrustManager that trusts the CAs in our KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+            // Create an SSLContext that uses our TrustManager
+            sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, tmf.getTrustManagers(), null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+
+        return sslContext;
+    }
+
+    public static HostnameVerifier configureHostNameVerifier() {
+        return new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                HostnameVerifier hv =
+                        HttpsURLConnection.getDefaultHostnameVerifier();
+                Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de", session));
+                Log.d(TAG, "hostname: " + hostname);
+                Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de:8082", session));
+                return true;
+            }
+        };
     }
 
 }
