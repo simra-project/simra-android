@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".ImprintActivity"
+    tools:showIn="@layout/activity_imprint">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="50dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/headerImpText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="10dp"
+            android:text="@string/impressum"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/headerTUText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/headerAddresseTUBerlin"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/anschriftTUText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textAddresseTUBerlin"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/mailTUText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:text="@string/mailRequestTU"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/websiteTUText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:text="@string/www_tu_berlin_de"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/hinweisTUText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textSupplementAddresseTUBerlin"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/headerSenatText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/rechtsaufsicht"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/senatText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textRechtsaufsicht"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/websiteSenatText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:text="@string/https_www_berlin_de_rbmskzl"
+            android:textSize="10sp" />
+
+
+        <TextView
+            android:id="@+id/headerUmsatzText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/umsatzsteueridentifikationsnummer"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/UmsatzText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ust"
+            android:textSize="10sp" />
+
+
+        <TextView
+            android:id="@+id/headerAnsprechPartnerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/ansprechpartner"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/ansprechPartnerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:text="@string/textCallCenterTUBerlin"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/headerHerausgeberText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/herausgeber"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/herausgeberText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoLink="email"
+            android:text="@string/headerHerausgeber"
+            android:textSize="10sp" />
+
+
+        <TextView
+            android:id="@+id/headerDisclaimerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/headerDisclaimer"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/disclaimerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textDisclaimer"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/headerLinksText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/verweise_und_links"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/linksText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textLinks"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/headerTUCopyRightText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/urheber_und_kennzeichenrecht"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tUCopyRightText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textTUCopyRight"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/border"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text=" "
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

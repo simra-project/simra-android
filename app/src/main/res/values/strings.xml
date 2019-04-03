@@ -1,66 +1,282 @@
-<resources>
-
-    <string name="app_name">SimRa (Beta)</string>
-    <string name="welcome_headerDE">Willkommen bei SimRa!</string>
-    <string name="welcome_textDE">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
-    <string name="welcome_text2DE">Die App ist noch in der Betaphase. Wir freuen uns auf Euer Feedback.</string>
-    <string name="welcome_text3DE">Mit freundlichen Grüßen,\ndas SimRa-Team.</string>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="de">
+    <string name="welcome_header">Willkommen bei SimRa!</string>
+    <string name="welcome_text">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
+    <string name="welcome_text2">Viel Spaß und Gute Fahrt!.</string>
+    <string name="welcome_text3">Mit freundlichen Grüßen,\ndas SimRa-Team.</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">MCC TU Berlin</string>
-    <string name="nav_header_subtitle">ask@mcc.tu-berlin.de</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="feedbackReceiver">ask@mcc.tu-berlin.de</string>
-    <string name="demoDataHeader">SimRa Teilnehmerdaten</string>
+    <string name="demoDataHeader">SimRa User Data</string>
     <string name="feedbackHeader">SimRa Feedback</string>
     <string name="demoDataMail">Name: \nAlter: \nBeruf: \nFahrradtyp: Bsp. Rennrad\nDurchschnittlich wöchentlich zurückgelegte Kilometeranzahl mit dem Rad: </string>
-    <string name="feedbackMail"> </string>
     <string name="permissionFineLocation">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten.</string>
-    <string name="mccPageDE">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
-    <string name="mccPageEN">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
+    <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
+    <string name="simRaPage">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/?isMobile=1</string>
+    <string name="privacyLink">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1</string>
+    <string name="dsbContact">https://www.tu-berlin.de/allgemeine_seiten/e_mail_anfrage/parameter/mobil/id/141314/?no_cache=1&amp;ask_mail=XHzLwAANlp3Iq7tw1i0B%2F1ZZPCqSMY443IwjBNB1a4lD6OfrRJfJHXOx5r3yL9Ga&amp;ask_name=DATENSCHUTZBEAUFTRAGTE</string>
     <string name="startButtonText">Aufzeichnung \n starten</string>
     <string name="stopButtonText">Aufzeichnung \n stoppen</string>
-    <string name="permissionRequestRationaleDE">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
-    <string name="channel_nameDE">Aufzeichnung</string>
-    <string name="channel_descriptionDE">Fahrt wird aufgezeichnet</string>
-    <string name="osmCopyrightEN">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
-    <string name="osmCopyrightDE">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
-    <string name="title_activity_historyDE">Meine Fahrten</string>
-    <string name="selectedRideInfoDE">Die folgende Fahrt wurde ausgewählt: </string>
-    <string name="errorNoRideSelectedDE">Es wurde keine Fahrt ausgewählt!</string>
-    <string name="errorRideTooShortDE">Die Fahrt muss mindestens\n30 Sekunden dauern!</string>
-    <string name="incidentDetectedDE"> Ereignis annotieren.</string>
-    <string name="noHistoryDE"> Es wurden keine Fahrten gefunden.</string>
-    <string name="nextPatchDE"> Diese Funktion wird leider erst mit dem nächsten Patch veröffentlicht.</string>
-    <string name="locationSpinnerDE">Ort des Handys während der Fahrt: </string>
-    <string name="descriptionDE">Was genau ist vorgefallen?</string>
-    <string name="notReadyDE">Wollen sie die Bearbeitung unfertig beenden?</string>
-    <string name="noIntentExtrasDE">Leider ist ein Fehler aufgetreten, bitte versuchen sie es erneut.</string>
-    <string name="annotation_titleDE">Was ist hier passiert?</string>
-    <string name="incident_typeDE">Art des Ereignisses</string>
-    <string name="descriptionBodyDE">Hier beschreiben was passiert ist</string>
-    <string name="incidentType1_DE">Nichts</string>
-    <string name="incidentType2_DE">Dooring</string>
-    <string name="incidentType3_DE">Hindernis im Weg (z.B. Passant)</string>
-    <string name="incidentType4_DE">Von einem Fahrzeug geschnitten</string>
-    <string name="incidentType5_DE">Sonstiges (Bitte unten angeben)</string>
-    <string name="locationType1_DE">Hosentasche</string>
-    <string name="locationType2_DE">Lenker</string>
-    <string name="locationType3_DE">Jackentasche</string>
-    <string name="locationType4_DE">Hand</string>
-    <string name="locationType5_DE">Rucksack</string>
-    <string name="locationType6_DE">Sonstiges (Bitte unten angeben)</string>
-    <string name="doneEditingIncidentDE">Fertig</string>
-    <string name="editingIncidentAbortedDE">Ereignis wurde nicht gespeichert</string>
-    <string name="editingIncidentCompletedDE">Ereignis wurde gespeichert</string>
-    <string name="cancelDE">Abbrechen</string>
-    <string name="addIncidentDE">Ereignis\nhinzufügen</string>
-    <string name="uploadIncidentDE">Fahrt\nhochladen</string>
-    <string name="uploadLoadingFilesDE">Die Fahrt wird hochgeladen</string>
-    <string name="newRideInHistoryActivityDE">Neue Fahrt! Bitte bearbeiten.\n</string>
-    <string name="startRecordingDE">Aufzeichnung\nstarten</string>
-    <string name="endRecordingDE">Aufzeichnung\nbeenden</string>
+    <string name="permissionRequestRationale">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
+    <string name="recorder_channel_name">Aufzeichnung</string>
+    <string name="upload_channel_name">Hochladen</string>
+    <string name="recorder_channel_description">Fahrt wird aufgezeichnet</string>
+    <string name="upload_channel_description">Fahrten werden hochgeladen</string>
+    <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
+    <string name="title_activity_history">Meine Fahrten</string>
+    <string name="selectedRideInfo">Die folgende Fahrt wurde ausgewählt: </string>
+    <string name="errorNoRideSelected">Es wurde keine Fahrt ausgewählt!</string>
+    <string name="errorRideTooShort">Die Fahrt muss mindestens\n30 Sekunden dauern!</string>
+    <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um ihre Privatsphäre zu schützen.\nSie können ihre Privatsphäreeinstellungen und Einstellungen anpassen.</string>
+    <string name="incidentDetected"> Ereignis annotieren.</string>
+    <string name="noHistory"> Es wurden keine Fahrten gefunden.</string>
+    <string name="nextPatch"> Diese Funktion wird leider erst mit dem nächsten Patch veröffentlicht.</string>
+    <string name="locationSpinner">Ort des Handys während der Fahrt </string>
+    <string name="description">Optionaler Kommentar</string>
+    <string name="notReady">Wollen sie die Bearbeitung unfertig beenden?</string>
+    <string name="noIntentExtras">Leider ist ein Fehler aufgetreten, bitte versuchen sie es erneut.</string>
+    <string name="annotation_title">Was ist hier passiert?</string>
+    <string name="incident_type">Art des Ereignisses</string>
+    <string name="descriptionBody">Optionaler Kommentar</string>
+    <string name="incidentType1">Nichts</string>
+    <string name="incidentType2">Zu dichtes Überholen</string>
+    <string name="incidentType3">Ein- oder ausparkendes Fahrzeug</string>
+    <string name="incidentType4">Beinahe-Abbiegeunfall</string>
+    <string name="incidentType5">Entgegenkommender Verkehrsteilnehmer</string>
+    <string name="incidentType6">Zu dichtes Auffahren</string>
+    <string name="incidentType7">Beinahe-Dooring</string>
+    <string name="incidentType8">Hindernis ausweichen (z.B. Hund)</string>
+    <string name="incidentType9">Sonstiges (Bitte unten angeben)</string>
+    <string name="involvedType1">Bus</string>
+    <string name="involvedType2">Fahrrad</string>
+    <string name="involvedType3">Fußgänger</string>
+    <string name="involvedType4">Lieferwagen</string>
+    <string name="involvedType5">LKW</string>
+    <string name="involvedType6">Motorrad</string>
+    <string name="involvedType7">PKW</string>
+    <string name="involvedType8">Taxi</string>
+    <string name="involvedType9">Sonstiges\n(Bitte unten angeben)</string>
+    <string name="locationType1">Hosentasche</string>
+    <string name="locationType2">Lenker</string>
+    <string name="locationType3">Jackentasche</string>
+    <string name="locationType4">Hand</string>
+    <string name="locationType5">Fahrradkorb/Satteltasche</string>
+    <string name="locationType6">Rucksack o.ä.</string>
+    <string name="locationType7">Sonstiges (Bitte unten angeben)</string>
+    <string name="doneEditingIncident">Fertig</string>
+    <string name="editingIncidentAborted">Ereignis wurde nicht gespeichert</string>
+    <string name="editingIncidentCompleted">Ereignis wurde gespeichert</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="addIncident">Ereignis\nhinzufügen</string>
+    <string name="uploadAndExit">Hochladen &amp; App beenden</string>
+    <string name="saveIncident">Speichern &amp;\nZurück</string>
+    <string name="savedRide">Die Fahrt wurde gespeichert</string>
+    <string name="uploadRidesSuccessful">Hochladen erfolgreich!</string>
+    <string name="noFilesToBeUploaded">Alle bearbeiteten Fahrten wurden\nbereits hochgeladen.</string>
+    <string name="justUpload">Hochladen</string>
+    <string name="uploadProgressDialogTitle">Hochladen</string>
+    <string name="uploadProgressDialogText">Bitte warten. Fahrten werden hochgeladen.</string>
+    <string name="newRideInHistoryActivity">Unbearbeitet.</string>
+    <string name="rideAnnotatedInHistoryActivity">Bereit zum Hochladen.</string>
+    <string name="rideUploadedInHistoryActivity">Hochgeladen.</string>
+    <string name="startRecording">Aufzeichnung\nstarten</string>
+    <string name="endRecording">Aufzeichnung\nbeenden</string>
     <string name="nav_main">Start</string>
-
+    <string name="uploadInBackground">Im Hintergrund ausführen</string>
+    <string name="app_name">SimRa</string>
+    <string name="about_simra">Über Simra</string>
+    <string name="mcc_news">MCC Aktuelles</string>
+    <string name="imprint">Impressum</string>
+    <string name="feedback">Feedback</string>
+    <string name="ride_length">Dauer:</string>
+    <string name="sendErrorTitle">Ups!</string>
+    <string name="sendErrorMessage">Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="privacyDurationDescription">Verzögerung des Aufnahmestarts\n(in Sekunden)</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="privacy_settings_title">Privatsphäre</string>
+    <string name="privacyDistanceDescription">Verzögerung des Aufnahmestarts\n(in Metern)</string>
+    <string name="title_activity_profile">Profil</string>
+    <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
+    <string name="genderSpinnerTitle">Geschlecht</string>
+    <string name="pleaseChoose">Bitte auswählen</string>
+    <string name="male">Männlich</string>
+    <string name="female">Weiblich</string>
+    <string name="otherGender">Divers</string>
+    <string name="bikeTypeSpinnerTitle">Fahrradtyp</string>
+    <string name="mensBike">Herrenrad</string>
+    <string name="womensBike">Damenrad</string>
+    <string name="cityBike">City-/Trekkingrad</string>
+    <string name="roadRacingBike">Rennrad</string>
+    <string name="eBike">E-Bike</string>
+    <string name="freightBicycle">Lastenrad</string>
+    <string name="recumbentBicycle">Liegerad</string>
+    <string name="tandemBike">Tandemrad</string>
+    <string name="mountainBike">Mountainbike</string>
+    <string name="otherBike">Sonstiges</string>
+    <string name="locationTypeSpinnerTitle">Üblicher Ort des Geräts während der Fahrt:</string>
+    <string name="experienceMoreThen10">Mehr als 10 Jahre</string>
+    <string name="experience5to10">5 bis 10 Jahre</string>
+    <string name="experience2to4">2 bis 4 Jahre</string>
+    <string name="experienceLessThen2">Weniger als 2 Jahre</string>
+    <string name="editingProfileAborted">Profildaten wurden nicht gespeichert</string>
+    <string name="editingProfileCompleted">Profildaten wurden gespeichert</string>
+    <string name="customIncidentAddedTitle">Neuer Vorfall hinzugefügt!</string>
+    <string name="customIncidentAddedMessage">Ist an diesem Ort ein Ereignis vorgefallen?</string>
+    <string name="title_activity_imprint">Impressum</string>
+    <string name="title_activity_privacy">Datenschutz</string>
+    <string name="headerSubjectOfDataPrivacy">Gegenstand des Datenschutzes</string>
+    <string name="textRightOfAcces">Das Projekt SimRa ist mit der behördlichen Datenschutzbeauftragten der Technischen Universität Berlin abgestimmt. Bei Fragen zum Datenschutz im Projekt wenden Sie sich bitte an:  \n
+        Annette Hiller, Behördliche Datenschutzbeauftragte der Technischen Universität Berlin \n
+        Straße des 17. Juni 135, 10623 Berlin\n
+        Raum H 1038\n
+         \n
+        Tel.: +49 30 314 21784 \n
+        Fax: +49 30 314 28033 \n
+        E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
+        Natürlich steht Ihnen auch das Recht zu, sich an die übergeordnete Aufsichtsbehörde zu wenden: \n
+        Berliner Beauftragte für Datenschutz und Informationsfreiheit \n
+        Friedrichstr. 219 / Besuchereingang über Puttkamerstr. 16&#8211;18, 10969 Berlin \n
+        Tel.: +49 30 13889&#8211;0 \n
+        Fax: +49 30 2155050 \n
+        E&#8211;Mail: mailbox@datenschutz&#8211;berlin.de</string>
+    <string name="headerRightOfAcces">Auskunftsrecht</string>
+    <string name="headerDataPrivacy">Datenschutzerklärung</string>
+    <string name="textSubjectOfDataPrivacy">Der Datenschutz befasst sich mit personenbezogenen Daten. Diese sind nach Artikel 4 Nr. 1 der Europäischen Datenschutzgrundverordnung (DSGVO) alle Informationen, die sich auf eine identifizierte oder identifizierbare natürliche Person beziehen, also alle Informationen, die dazu genutzt werden können, Sie zu identifizieren. Hierunter fallen z.B. Angaben wie Name, Privat-Adresse, E-Mail-Adresse oder Telefonnummer, aber auch Nutzungsdaten wie Ihre IP-Adresse. Selbstverständlich beachtet die Technische Universität Berlin die gesetzlichen Bestimmungen zum Datenschutz und andere rechtliche Bestimmungen und Vorgaben. Wir tun alles dafür, dass Sie uns bezüglich Ihrer persönlichen Daten vertrauen können. So erfolgt die Übertragung personenbezogener und sensibler Daten verschlüsselt. Zusätzlich sind unsere Webseiten durch technische Maßnahmen gegen Beschädigungen oder unberechtigten Zugriff geschützt.</string>
+    <string name="headerGeneralDataPrivacy">Allgemeiner Datenschutzhinweis</string>
+    <string name="textGeneralDataPrivacy">(1) Wenn Sie TUB-Webseiten aufrufen oder Daten dieser Seiten herunterladen, werden Informationen hierüber in einer Logdatei mit folgendem Inhalt gespeichert: Ihre IP-Adresse, das Datum und die Uhrzeit des Seitenaufrufs, die aufgerufene Seite bzw. der Name der abgerufenen Datei, die übertragene Datenmenge, der \"User Agent-String\" Ihres Webbrowsers, die Webseite, von der aus Sie die aktuelle Seite oder Datei aufgerufen haben, und die Statusmeldung, ob der Zugriff bzw. Abruf erfolgreich war. Die nicht anonymisierten Logdaten werden nach zwei Wochen automatisch gelöscht und nicht archiviert. \n
+        (2) Diese Daten werden ausschließlich zu nichtkommerziellen Zwecken genutzt: sie werden nur im Bedarfsfall manuell eingesehen und zur Fehleranalyse, Optimierung oder Untersuchung von Missbrauchsfällen oder Performance-Engpässen verwendet. \n
+        (3) Zur Datenerhebung und -speicherung setzen wir zusätzlich Cookies ein. Cookies sind kleine Datenpakete, die aus Text bestehen und von Ihrem Webbrowser beim Aufruf einer Webseite gespeichert werden. Sie richten auf Ihrem Endgerät keinen Schaden an – Cookies enthalten weder Viren noch geben sie uns die Möglichkeit, Sie auszuspähen. Wir verwenden zwei Arten von Cookies: temporäre und permanente Cookies. Temporäre Cookies werden mit dem Schließen Ihres Webbrowsers automatisch gelöscht (Session-Cookies). Dauerhafte Cookies haben dagegen eine maximale Lebensdauer - bei uns bis zu einem Tag. Cookies werden von uns eingesetzt, um den Besuchern und Redakteuren eine optimale Nutzung der Webseiten zu ermöglichen.
+        Die eingesetzten Cookies werden in keinem Fall zur Nachverfolgung von personenbezogenen Nutzeraktionen oder zur Verhaltensanalyse verwendet. Sie werden ausschließlich dort eingesetzt, wo sie technisch notwendig bzw. sinnvoller als andere Techniken sind, so z.B. bei der Erfassung des Login-Status‘ von BenutzerInnen und RedakteurInnen oder dem Speichern von Informationen wie \"Mobile Variante der Webseite anzeigen\". Die Nutzung der Webseiten ist überwiegend auch ohne die Verwendung von Cookies möglich. Für Funktionen bzw. Seiten, die eine Anmeldung benötigen, ist der Einsatz von Cookies jedoch erforderlich. Sie können Ihren Webbrowser so einstellen, dass bereits abgelegte Cookies gelöscht werden. \n
+        (4) Innerhalb des TUB-Webauftrittes werden vereinzelt externe Seiten oder Dienste eingebunden. So führt die integrierte Suchfunktion beispielsweise auf eine Seite der Firma Google. Hierbei werden lediglich die zuvor in das Suchfeld eingegebenen Suchbegriffe übermittelt. Über Techniken wie \"iframes\" werden an bestimmten Stellen externe Webseiteninhalte eingebunden. Die Anbieter dieser Webseiten können unter Umständen Informationen von Ihnen erfassen, speichern und ggf. auch verarbeiten und weitergeben. Es handelt sich dabei aber höchstens um sogenannte Verkehrsdaten, nämlich solche Informationen von den externen Dienstleistern erfasst werden, wie sie bei einem normalen Seitenbesuch erhoben werden können, z.B. die IP-Adresse, der ungefähre Aufenthaltsort, den verwendeten Browser, die Seite von der Sie kommen usw. Keinesfalls werden persönlichen Informationen oder Daten erfasst, es sei denn Sie haben sie freiwillig via Webformular übermittelt.</string>
+    <string name="headerExtentOfDataCollectionAndStorage">Umfang der Datenerhebung und -speicherung</string>
+    <string name="textExtentOfDataCollectionAndStorage">Unseren Umgang mit personenbezogenen Verkehrsdaten entnehmen Sie bitte dem „Allgemeinen Hinweis“ (oben, bezüglich Logdaten und Cookies) und dem Kapitel zu „Nutzungsdaten“ (unten, weiter zu Cookies und der Nutzung von Mamoto). Für die Nutzung unserer Webseiten ist die aktive Mitteilung Ihrer personenbezogenen Daten überwiegend nicht erforderlich. Damit die TU Berlin ihren Dienstleistungsauftrag erfüllen können, benötigen wir im Einzelfall spezielle personenbezogenen Daten. Dies gilt insbesondere für die Beantwortung individueller E-Mail-Anfragen, die Bestellung spezieller Dienste oder Bewerbungen. Wenn Sie uns mit der Erbringung einer Dienstleistung beauftragen, erheben und speichern wir Ihre persönlichen Daten grundsätzlich nur, soweit es für die Erbringung des Dienstes notwendig ist. In Ausnahmefällen z.B. im Rahmen von Veranstaltungsanmeldungen, werden Sie gefragt, ob Ihre Daten zwecks Information über ähnliche Veranstaltungen über die für die reine Veranstaltungsabwicklung hinaus gespeichert werden dürfen. Hier entstehen Ihnen durch die Ablehnung keinerlei Nachteile. Sie können jederzeit und ohne Angaben von Gründen Ihr einmal erteiltes Einverständnis widerrufen und die Löschung Ihrer Daten verlangen.</string>
+    <string name="textPrivacy">Sofern innerhalb des Internetangebotes die Möglichkeit zur Eingabe persönlicher oder geschäftlicher Daten (Emailadressen, Namen, Anschriften) besteht, so erfolgt die Preisgabe dieser Daten seitens des Nutzers auf ausdrücklich freiwilliger Basis. Die Inanspruchnahme und Bezahlung aller angebotenen Dienste ist - soweit technisch möglich und zumutbar - auch ohne Angabe solcher Daten bzw. unter Angabe anonymisierter Daten oder eines Pseudonyms gestattet. Die Nutzung der im Rahmen des Impressums oder vergleichbarer Angaben veröffentlichten Kontaktdaten wie Postanschriften, Telefon- und Faxnummern sowie Emailadressen durch Dritte zur Übersendung von nicht ausdrücklich angeforderten Informationen ist nicht gestattet. Rechtliche Schritte gegen die Versender von so genannten Spam-Mails bei Verstößen gegen dieses Verbot sind ausdrücklich vorbehalten.</string>
+    <string name="textTUCopyRight">Der Herausgeber ist bestrebt, in allen Publikationen die Urheberrechte der verwendeten Bilder, Grafiken, Ton- und Videodokumente sowie Texte zu beachten, von ihm selbst erstellte Bilder, Grafiken, Ton- und Videodokumente sowie Texte zu nutzen oder auf lizenzfreie Grafiken, Ton- und Videodokumente sowie Texte zurückzugreifen. Alle innerhalb des Internetangebotes genannten und ggf. durch Dritte geschützten Marken- und Warenzeichen unterliegen uneingeschränkt den Bestimmungen des jeweils gültigen Kennzeichenrechts und den Besitzrechten der jeweiligen eingetragenen Eigentümer.
+        Allein aufgrund der bloßen Nennung ist nicht der Schluss zu ziehen, dass Markenzeichen nicht durch Rechte Dritter geschützt sind! Das Copyright für veröffentlichte, vom Herausgeber selbst erstellte Inhalte und Objekte bleibt allein beim Herausgeber der Seiten. Eine Vervielfältigung, Verarbeitung, Einspeicherung oder Verwendung solcher Grafiken, Ton- und Videodokumente sowie Texte in anderen elektronischen oder gedruckten Publikationen ist ohne ausdrückliche Zustimmung des Autors nicht gestattet. Unberührt davon bleibt das Kopieren und Herunterladen für den privaten, wissenschaftlichen und nicht kommerziellen Gebrauch. Wir erlauben ausdrücklich und begrüßen das Zitieren unserer Dokumente und Webseiten sowie das Setzen von Links auf unsere Website.</string>
+    <string name="urheber_und_kennzeichenrecht">Urheber- und Kennzeichenrecht</string>
+    <string name="textLinks">Bei direkten oder indirekten Verweisen auf fremde Webseiten (\"Hyperlinks\"), die außerhalb des Verantwortungsbereiches des Herausgebers liegen, würde eine Haftungsverpflichtung ausschließlich in dem Fall in Kraft treten, in dem der Herausgeber von den Inhalten Kenntnis hat und es ihm technisch möglich und zumutbar wäre, die Nutzung im Falle rechtswidriger Inhalte zu verhindern. Der Herausgeber erklärt hiermit ausdrücklich, dass zum Zeitpunkt der Linksetzung keine illegalen Inhalte auf den zu verlinkenden Seiten erkennbar waren. Auf die aktuelle und zukünftige Gestaltung, die Inhalte oder die Urheberschaft der verlinkten/verknüpften Seiten hat der Herausgeber keinerlei Einfluss.
+        Deshalb distanziert er sich hiermit ausdrücklich von allen Inhalten aller verlinkten /verknüpften Seiten, die nach der Linksetzung verändert wurden. Diese Feststellung gilt für alle innerhalb des eigenen Internetangebotes gesetzten Links und Verweise sowie für Fremdeinträge in vom Autor eingerichteten Gästebüchern, Diskussionsforen, Linkverzeichnissen, Mailinglisten und in allen anderen Formen von Datenbanken, auf deren Inhalt externe Schreibzugriffe möglich sind. Für illegale, fehlerhafte oder unvollständige Inhalte und insbesondere für Schäden, die aus der Nutzung oder Nichtnutzung solcherart dargebotener Informationen entstehen, haftet allein der Anbieter der Seite, auf welche verwiesen wurde, nicht derjenige, der über Links auf die jeweilige Veröffentlichung lediglich verweist.</string>
+    <string name="verweise_und_links">Verweise und Links</string>
+    <string name="textDisclaimer">Die Inhalte dieser Applikation werden mit größtmöglicher Sorgfalt recherchiert und implementiert. Fehler im Bearbeitungsvorgang sind dennoch nicht auszuschließen. Bei Hinweisen und Korrekturen wenden Sie sich bitte an die genannten Ansprechpartner. Der Herausgeber übernimmt keinerlei Gewähr für die Aktualität, Korrektheit, Vollständigkeit oder Qualität der bereitgestellten Informationen. Haftungsansprüche gegen den Herausgeber, welche sich auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung oder Nichtnutzung der dargebotenen Informationen bzw. durch die Nutzung fehlerhafter und unvollständiger Informationen verursacht wurden, sind grundsätzlich ausgeschlossen, sofern seitens des Herausgebers kein nachweislich vorsätzliches oder grob fahrlässiges Verschulden vorliegt. Alle Angebote sind freibleibend und unverbindlich. Der Herausgeber behält es sich ausdrücklich vor, Teile der Applikation oder das gesamte Angebot ohne gesonderte Ankündigung zu verändern, zu ergänzen, zu löschen oder die Veröffentlichung zeitweise oder endgültig einzustellen.</string>
+    <string name="headerDisclaimer">Haftungsausschluss</string>
+    <string name="headerContact">Kontakt:</string>
+    <string name="headerHerausgeber"><p>Prof. Dr.&#8211;Ing. David Bermbach\n
+Einsteinufer 17 Sekr.EN17 \n
+10587 Berlin \n
+Telefon: +49 (0)30 314&#8211;0 \n
+E-Mail: simra.mcc@gmail.com</p></string>
+    <string name="herausgeber">Herausgeber</string>
+    <string name="textCallCenterTUBerlin">
+        Das Call Center der TU Berlin \n
+        <p>Telefonvermittlung und Auskunftsdienst Telefon: +49 (0)30 314&#8211;0 (extern) oder &#8211;8 (intern) \n
+        Sprechzeiten: Mo-Do 8&#8211;16 Uhr, Fr 8&#8211;15 Uhr \n
+        Weitere Kontaktmöglichkeiten finden Sie unter https://www.tu-berlin.de/servicemenue/kontakt/.</p></string>
+    <string name="ansprechpartner">Ansprechpartner</string>
+    <string name="ust">USt-Id-Nr.: DE 811 231 089</string>
+    <string name="https_www_berlin_de_rbmskzl" translatable="false">https://www.berlin.de/rbmskzl/</string>
+    <string name="textRechtsaufsicht">Der Regierende Bürgermeister von Berlin - Senatskanzlei</string>
+    <string name="rechtsaufsicht">Rechtsaufsicht</string>
+    <string name="textSupplementAddresseTUBerlin">Die Technische Universität Berlin ist eine Körperschaft öffentlichen Rechts gemäß §§ 1 und 2 des Berliner Hochschulgesetzes (BerlHG) und zugleich eine staatliche Einrichtung. Sie wird durch den Präsidenten gesetzlich vertreten. Der Name \"Technische Universität Berlin\" wird nicht ins Englische übersetzt.</string>
+    <string name="www_tu_berlin_de">www.tu-berlin.de</string>
+    <string name="textAddresseTUBerlin">Technische Universität Berlin \n
+        Der Präsident \n
+        Prof. Dr. Christian Thomsen\n
+        Straße des 17. Juni 135 \n
+        10623 Berlin \n
+        Telefon: +49 (0)30 314&#8211;0</string>
+    <string name="headerAddresseTUBerlin">Zentrale Adresse der TU Berlin</string>
+    <string name="impressum">Impressum</string>
+    <string name="umsatzsteueridentifikationsnummer">Umsatzsteueridentifikationsnummer</string>
+    <string name="openstreetmap" translatable="false">OpenStreetMap</string>
+    <string name="osmCopyrightText">Wir verwenden in unserer Applikation die Karten von OpenStreetMap, einen Dienst der OpenStreetMap Foundation, St John’s Innovation Centre, Cowley Road, Cambridge, CB 4 0 WS, United Kingdom, nachfolgend \"OpenStreetMap\" genannt, ein. In unsere Applikation ist der Dienst OpenStreetMap eingebunden , deswegen wird durch OpenStreetMap ein Cookie auf Ihrem Endgerät gespeichert. Hierdurch werden Ihre Nutzereinstellungen und Nutzerdaten zum Zwecke der Anzeige der Seite bzw. zur Gewährleistung der Funktionalität von OpenStreetMap verarbeitet.
+        Durch diese Verarbeitung kann OpenStreetMap erkennen, von welcher Anwendung Ihre Anfrage gesendet worden ist und an welche IP- Adresse die Daten übermittelt werden sollen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f) DSGVO. Unser berechtigtes Interesse liegt Betrieb unserer Applikation. Sofern Sie mit dieser Verarbeitung nicht einverstanden sind, wenden Sie sich bitte an die oben genannten Ansprechpartner. OpenStreetMap bietet unter https://wiki.osmfoundation.org/wiki/Privacy_Policy weitere Informationen zur Erhebung und Nutzung der Daten sowie zu Ihren Rechten und Möglichkeiten zum Schutz Ihrer Privatsphäre an. Wir behalten uns vor, einen eigenen Mirror für OpenStreetMap aufzusetzen. In diesem Fall werden wir Daten, die aus diesem Grund anfallen, schnellstmöglich löschen und in keinem Fall mit unseren regulär gesammelten Daten verknüpfen, sofern dies möglich sein sollte.</string>
+    <string name="title_activity_credits">Grafikreferenzen</string>
+    <string name="freepikCredit">Icon gestaltet von Freepik, bereitgestellt auf www.flaticon.com .</string>
+    <string name="logoMakrCredit">Kostenloses logo erstellt auf www.LogoMakr.com .</string>
+    <string name="smashiconCredit">Icon gestaltet von Smashicon, bereitgestellt auf www.flaticon.com .</string>
+    <string name="pixelCredit">Icon gestaltet von Pixel, bereitgestellt auf www.flaticon.com .</string>
+    <string name="icons8Credit">Icon gestaltet von Icons8, bereitgestellt auf https://icons8.com .</string>
+    <string name="privacyButton">Weitere Informationen zum Datenschutz</string>
+    <string name="mailRequestTU"><a href="https://www.tu-berlin.de/allgemeine_seiten/e_mail_anfrage/parameter/de/id/15/?no_cache=1&amp;ask_mail=XHZJPwAMSDyndkyaq9VQvIECv9JeS5KNoXecmLrjpflqqQN2WHH85Q%3D%3D&amp;ask_name=PRESSESTELLE">E-Mail Anfrage</a></string>
+    <string name="bycicleCreditTxt">Icon gestaltet von Nikita Golubev, bereitgestellt auf\nwww.flaticon.com .</string>
+    <string name="descriptionUpload">Upload</string>
+    <string name="descriptionExit">Exit</string>
+    <string name="regionSpinnerTitle">Region</string>
+    <string name="experienceSpinnerTitle">Erfahrung als Fahrradfahrer</string>
+    <string name="involved_type">Beteiligte Verkehrsteilnehmer</string>
+    <string name="scarinessString">Diese Erfahrung war beängstigend</string>
+    <string name="rideSettingsTitle">Fahrteinstellungen</string>
+    <string name="settingsSaved">Einstellungen gespeichert</string>
+    <string name="settingsNotSaved">Einstellungen nicht gespeichert</string>
+    <string name="ride_settings_title">Fahrteinstellungen</string>
+    <string name="childString">Auf dem Fahrrad wird ein Kind transportiert.</string>
+    <string name="trailerString">Am Fahrrad ist ein Anhänger angebracht.</string>
+    <string name="ride_settings_description">Unten finden Sie die Einstellungen, die für diese Fahrt verwendet werden. Sie können diese sowohl in diesem Fenster, als auch unter \"Einstellungen\" im Hauptmenü finden.</string>
+    <string name="rememberMyChoice">Diese Einstellungen merken</string>
+    <string name="doNotShowAgain">Diesen Dialog nicht mehr zeigen</string>
+    <string name="title_activity_ride_settings">Fahrteinstellungen bearbeiten</string>
+    <string name="quitAddIncident">Hinzufügen\nbeenden</string>
+    <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalten Sie es aus, damit die Fahrt aufgezeichnet werden kann.</string>
+    <string name="locationServiceisOff">Der GPS-Ortungsdienst Ihres Geräts ist aus. Bitte schalten Sie den GPS-Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
+    <string name="recordingNotificationTitle">Aufzeichnung der Fahrt</string>
+    <string name="recordingNotificationBody">Ihre Fahrt wird aufgezeichnet.</string>
+    <string name="calculatingIncidentsDialogTitle">Ereignisse werden ermittelt</string>
+    <string name="calculatingIncidentsDialogMessage">Bitte Warten</string>
+    <string name="newIncidents">Annotationen zurückgesetzt</string>
+    <string name="warning">Achtung</string>
+    <string name="warningRefresMessage">Nach Veränderung der Fahrt werden die Ereignisse neu berechnet und bisherige Ereignisse diese Fahrt, inklusive der Annotationen, werden verworfen.</string>
+    <string name="title_activity_showRoute">Fahrt Annotieren</string>
+    <string name="title_activity_library_license">Drittanbieter-Lizenzen</string>
+    <string name="close">Schließen</string>
+    <string name="title_activity_about_simra">Über SimRa</string>
+    <string name="iAccept">Ich akzeptiere die Datenschutzerklärung</string>
+    <string name="privacyAgreementTitle">Datenschutzerklärung</string>
+    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrt Standort- und Sensordaten auf, sowie von Ihnen eingegebene demografische Daten. Weitere Informationen finden Sie in unserer <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1">Datenschutzerklärung</a>.</string>
+    <string name="dataPrivayAgreementDialogTitle">Datenschutz</string>
+    <string name="dataPrivayAgreementDialogText">Um ihre Fahrten hochzuladen, bitten wir sie unserer Datenschutzerklärung zuzustimmen.</string>
+    <string name="yesClose"><![CDATA[Ja & schließen]]></string>
+    <string name="headerShort">Kurzfassung</string>
+    <string name="textDPshort">Im Forschungsprojekt SimRa sammeln wir Daten mit dem Ziel, einen Überblick über Beinaheunfälle im Radverkehr in Berlin zu gewinnen. Dabei sammeln wir Informationen über Fahrtrouten, Beschleunigungsdaten, Ihre Fahrtannotationen und einige demographische Daten. Hiermit versuchen wir, Informationen über die Verteilung von Zeit, Ort und Art gefährlicher Situationen im Radverkehr zu sammeln. Hierbei tun wir alles, um Ihre Privatsphäre zu wahren, indem wir bspw. Fahrten einzeln pseudonymisieren und diese getrennt von den ebenfalls pseudonymisierten demographischen Daten speichern.</string>
+    <string name="headerGeneralDataPrivacyNew">Welche Daten erfassen wir für welchen Zweck:</string>
+    <string name="textGeneralDataPrivacyNew">Alle im Forschungsprojekt SimRa gesammelte Daten, dienen dem Ziel, einen Überblick über Beinaheunfälle im Radverkehr in Berlin zu gewinnen. Gemeinsam mit Kooperationspartnern in anderen Städten sammeln wir in gleicher Form auch Daten in anderen Städten. Konkret erfassen wir folgende Daten:</string>
+    <string name="textGeneralDataPrivacyListNew">\t1. Zurückgelegte Fahrtrouten: Hierfür verwenden wir das GPS-Modul und die Ortungsdienste Ihres Smartphones und zeichnen den Fahrtverlauf auf. Der Fahrtverlauf speichert in Abständen von etwa 10 Sekunden Ihre Position und die aktuelle Zeit.\n
+        \t2. Beschleunigungswerte: Hierfür greifen wir auf die Beschleunigungssensoren Ihres Smartphones zu. Diese liefern kontinuierlich Werte aus, die die jeweilige Beschleunigung in X-, Y- und Z-Richtung beschreiben. Diese erfassen wir in Form dreier Zeitreihen.\n
+        \t3. Fahrtannotationen: Auf Basis der Beschleunigungswerte ermitteln wir wahrscheinliche Gefahrenpunkte, Sie als Nutzer können im Anschluss weitere Gefahrenpunkte ergänzen und diese annotieren. Beim Annotieren erfassen wir die dort abgefragten Informationen wie beispielsweise der Art des Ereignisses oder für wie gefährdet Sie sich gefühlt haben. Bitte geben Sie in Freitextfeldern keine personenbezogenen Daten wie beispielsweise Namen oder Kontaktdaten an, da wir ansonsten ihre Anonymität nicht sicherstellen können. Zusätzlich fragen wir noch Zusatzinformationen wie bspw. den verwendeten Fahrradtyp pro Fahrt ab.\n
+        \t4. Demographische Daten: Um die erfassten Informationen über Fahrtrouten und Gefahrensituationen im Vergleich zu repräsentativen Datensätzen über Radverkehr (bspw. Umfragen zur Altersverteilung) einordnen zu können, erfassen wir einige demographische Daten. Diese werden im entsprechenden Untermenü abgefragt. Zusätzlich zu den dort von Ihnen explizit eingegebenen Daten speichern wir auch aggregierte Informationen über Ihre Fahrten wie bspw. die insgesamt zurückgelegte Strecke, das Datum Ihrer ersten und der zuletzt hochgeladenen Fahrt, die Anzahl Ihrer Fahrten, die Anzahl Ihrer annotierten Gefahrensituationen u.ä. Alle diesbezüglich gespeicherten Informationen werden im entsprechenden Menü angezeigt.\n
+        \t5. Metainformationen: Zur Weiterentwicklung der App erfassen wir in geringem Umfang Metainformationen. Diese werden beim regulären Übermitteln von Daten an uns mitübertragen – bspw. beim Hochladen von Fahrten oder beim Speichern der demographischen Daten. Als Metainformationen erfassen wir die genutzte Version der App und die Version eines Datensatzes (sofern diese von Ihnen aktualisiert werden können). Wir behalten uns vor, kurzzeitig (weniger als eine Woche) Verbindungsdaten wie bspw. Ihre IP-Adresse zu speichern, um  Angriffe auf unsere Server abwehren zu können. Daten von echten oder vermeintlichen Angreifern speichern wir dauerhaft, um einen Zugriff auf unsere Server zu unterbinden. Nach App-Abstürzen haben Sie die Möglichkeit, ein Fehlerlog an uns zu übermitteln. Im Regelfall sollte dieses Logfile keinerlei personenbezogene Daten enthalten. Abgesehen von den genannten Informationen erfassen wir explizit keine Geräte-ID oder ähnliche Informationen, die Ihr Device über längere Zeit identifizieren könnten.\n
+        \t6. E-Mails: Sollten Sie uns per E-Mail oder über die Feedbackfunktion kontaktieren, werden wir diese E-Mails im üblichen Rahmen speichern. Hierfür verweisen wir auch auf die allgemeinen Datenschutzhinweise der Technischen Universität Berlin</string>\n
+    <string name="textGeneralDataPrivacyEndNew">Sämtliche erfassten Daten werden wir zu Forschungszwecken nutzen. Es ist geplant, die Daten zu Fahrtrouten und Gefahrensituationen als frei zugänglichen Public Dataset zu veröffentlichen, dies werden wir nach bestmöglicher Anonymisierung tun (siehe auch der Hinweis zu personenbezogenen Daten unten unter Punkt 3). Auf Basis dieser Daten können bspw. Verkehrsflüsse für den Radverkehr optimiert und gefährliche Orte entschärft werden. Weitergehende Verwendungen wie bspw. ein Routing um Gefahrenschwerpunkte herum oder akustische Warnungen beim Fahren sind möglich. Da die diesbezüglich gesammelten Daten frei verfügbar sein werden, sind beliebige Verwendungen möglich.</string>
+    <string name="headerPersonalPrivacy">Wie stellen wir den Schutz Ihrer Privatsphäre sicher:</string>
+    <string name="presonalPrivacyText">Neben den üblichen Mechanismen der IT-Sicherheit stellen wir durch Anonymisierung Ihre Privatsphäre sicher. Dies erfolgt insbesondere mittels folgender Mechanismen:
+        \n\t1 Einzelpseudonymisierung der Fahrten: Jede Fahrt wird einzeln pseudonymisiert, so dass eine Verknüpfung mehrerer Fahrten für uns nicht möglich ist. Technisch bedeutet dies, dass jeder Fahrtdatensatz (bestehend auf GPS-Route, Beschleunigungsdaten und Annotationsdaten) in einer Datei zunächst an uns übermittelt wird. Unsere Server erstellen daraufhin einen Identifier (vergleichbar zu einem Dateinamen) und einen zufälligen Zugriffsschlüssel und übermitteln diese an die App. Auf Ihrem Smartphone werden dieser Identifier und Zugriffsschlüssel gespeichert, damit Sie jederzeit Ihre Fahrten einsehen können.
+        Für uns bedeutet das, dass wir keine fahrtübergreifenden Verknüpfungen herstellen können, da wir keinerlei Informationen darüber besitzen, zu welchem Smartphone oder User die Fahrt jeweils gehört. Wir können lediglich feststellen, dass jeden Tag zur gleichen Zeit eine Fahrt von Ort A nach Ort B erfolgt, können jedoch nicht sagen, ob dies die gleiche Person ist. Dies gilt insbesondere innerhalb dicht besiedelter Regionen. Sollten Sie bspw. Ihre Fahrten allein in einem Haus mit deutlicher Entfernung zu anderen Häusern starten, ist eine Zuordnung mit Zusatzwissen ggf. möglich. Hier verweisen wir insbesondere auf die Möglichkeiten aus Punkt 3 weiter unten.\n
+        \t2 Pseudonymisierung der demographischen Daten: Die von Ihnen gespeicherten demographischen Daten werden wie die einzelnen Fahrten auf einzeln pseudonymisiert, technisch ist dies vergleichbar umgesetzt. Dies bedeutet insbesondere auch, dass eine Verknüpfung Ihrer demographischen Daten mit den Fahrten nicht möglich ist. Vor einer Veröffentlichung als Public Dataset werden wir explizit überprüfen, dass die demographischen Informationen niemanden eindeutig identifizieren und sofern nötig ggf. die Daten weiter aggregieren.\n
+        \t3 Beschneiden von Fahrten: Im Anschluss an eine aufgezeichnete Fahrt haben Sie die Möglichkeit, Ihre Fahrt an beiden Enden abzuschneiden – den Teil, der dabei entfernt wird, können Sie dabei frei festlegen; dieser wird beim Hochladen nicht an uns übermittelt und dauerhaft gelöscht. In dicht besiedelten Städten sollte Ihre Fahrt im Regelfall auch ohne Beschneiden hinreichend anonymisiert sein, insbesondere da die Information, ob die Fahrt beschnitten wurde, nicht gespeichert wird. In eher ländlichen Gegenden sollten Sie diese Funktion gezielt nutzen. Unabhängig davon würden wir Sie aber bitten, die Funktion nicht mehr als nötig zu nutzen, da ein exzessiver Gebrauch die Aussagekraft der gesammelten Daten schmälert.</string>
+    <string name="headerThirdParties">Welche externen Dienste verwenden wir:</string>
+    <string name="textPrivacyImprint">Zum Thema Datenschutz und Umgang mit von Nutzern erhobenen Daten beachten Sie bitte die gesonderten Hinweise auf der Datenschutzseite (zur Datenschutzseite kommen sie durch den Button unten). \\nDie Nutzung der im Rahmen des Impressums oder vergleichbarer Angaben veröffentlichten Kontaktdaten wie Postanschriften, Telefon- und Faxnummern sowie E-M0ailadressen durch Dritte zur Übersendung von nicht ausdrücklich angeforderten Informationen ist nicht gestattet. Rechtliche Schritte gegen die Versender von so genannten Spam-Mails bei Verstößen gegen dieses Verbot sind ausdrücklich vorbehalten.</string>
+    <string name="simra_closed">SimRa beendet</string>
+    <string name="next">Weiter</string>
+    <string name="close_simra">SimRa beenden</string>
+    <string name="privacySlider">Fahrtbeginn und -ende abschneiden</string>
+    <string name="title_tutorial">Anleitung</string>
+    <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Anleitung.pdf</string>
+    <string name="calculating_incidents">Berechne Ereignisse</string>
+    <string name="delete_file_warning">Diese Fahrt wurde noch nicht hochgeladen. Soll sie wirklich gelöscht werden?</string>
+    <string name="delete_ride_approve">Fahrt löschen</string>
+    <string name="ride_deleted">Fahrt gelöscht</string>
+    <string name="uploadingNotificationTitle">SimRa</string>
+    <string name="uploadingNotificationBody">SimRa lädt Fahrten hoch</string>
+    <string name="upload_started">SimRa Hochladen gestartet</string>
+    <string name="checking_for_updates">Überprüfe auf neue Versionen</string>
+    <string name="new_app_version_text">Um fortzufahren, aktualisieren Sie bitte SimRa via Google Play Store oder laden Sie die .APK-Datei herunter.</string>
+    <string name="open_google_play_store">Google Play Store öffnen</string>
+    <string name="download_the_apk_file">APK-Datei runterladen</string>
+    <string name="installed_version">installierte Version:</string>
+    <string name="newest_version">neueste Version:</string>
+    <string name="new_app_version_title">Neue Version verfügbar</string>
+    <string name="later">Später</string>
 
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="app.com.example.android.octeight">
+    package="de.tuberlin.mcc.simra.app">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!--
@@ -17,6 +17,8 @@
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.location.network" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/helmet"
@@ -25,6 +27,38 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+        <activity android:name=".AboutActivity"
+            android:label="@string/title_activity_about_simra"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity android:name=".HelpActivity"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name=".RideSettingsActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_ride_settings"
+            android:parentActivityName=".ShowRouteActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.tuberlin.mcc.simra.app.ShowRouteActivity" />
+        </activity>
+        <activity
+            android:name=".LicenseActivity"
+            android:label="@string/title_activity_library_license"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".PrivacyActivity"
+            android:label="@string/title_activity_privacy"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ImprintActivity"
+            android:label="@string/title_activity_imprint"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <meta-data
             android:name="MAPBOX_MAPID"
             android:value="mapbox.mapbox-light-v9" />
@@ -57,47 +91,57 @@
 
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".MenuActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".HelmetActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".SaveActivity"
-            android:parentActivityName=".MainActivity" />
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTop" />
         <activity
             android:name=".WebActivity"
+            android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity" />
         <activity
+            android:name=".ProfileActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_profile"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.tuberlin.mcc.simra.app.MainActivity" />
+        </activity>
+        <activity
             android:name=".SettingsActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity" />
 
-        <service
-            android:name=".Constants"
-            android:enabled="true"
-            android:exported="true" />
         <service
             android:name=".RecorderService"
             android:parentActivityName=".MainActivity" />
         <service
             android:name=".UploadService"
-            android:parentActivityName=".MainActivity" />
+            android:enabled="true"
+            android:parentActivityName=".HistoryActivity" />
 
         <activity
             android:name=".HistoryActivity"
-            android:label="@string/title_activity_historyDE"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_history"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="app.com.example.android.octeight.MainActivity" />
+                android:value="de.tuberlin.mcc.simra.app.MainActivity" />
         </activity>
-        <activity android:name=".ShowRouteActivity" />
-        <activity android:name=".IncidentPopUpActivity"
-            android:theme="@style/AppTheme.PopUpWindow"></activity>
+        <activity
+            android:name=".ShowRouteActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".IncidentPopUpActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.PopUpWindow" />
+        <activity
+            android:name=".CreditsActivity"
+            android:label="@string/title_activity_credits"
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

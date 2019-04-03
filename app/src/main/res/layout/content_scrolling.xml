@@ -34,9 +34,8 @@
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
             android:layout_marginEnd="50dp"
-            />
+            android:layout_marginStart="10dp" />
 
         <TextView
             android:id="@+id/seekBarText"
@@ -47,7 +46,7 @@
             android:textStyle="bold" />
 
         <Spinner
-            android:id="@+id/locationSpinner"
+            android:id="@+id/oldPhoneLocationSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp" />
@@ -69,7 +68,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginTop="20dp"
             android:fontFamily="@font/assistant_extralight"
-            android:text="@string/descriptionDE"
+            android:text="@string/description"
             android:textColor="#FEFEFE"
             android:textSize="20sp"
             android:textStyle="bold" />

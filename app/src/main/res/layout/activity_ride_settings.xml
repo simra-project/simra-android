@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_ride_settings"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:fadingEdgeLength="80dp"
+    android:requiresFadingEdge="vertical"
+    android:scrollbars="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="5dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/RideSettingsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ride_settings_title"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/RideSettingsDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="false"
+            android:maxEms="15"
+            android:text="@string/ride_settings_description" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/bikeTypeSpinnerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bikeTypeSpinnerTitle"
+            android:textAlignment="center"
+            android:textSize="15sp" />
+
+
+        <Spinner
+            android:id="@+id/bikeTypeSpinnerRideSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/bikeTypeList"
+            android:prompt="@string/pleaseChoose" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/locationTypeSpinnerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/locationTypeSpinnerTitle"
+            android:textSize="15sp" />
+
+        <Spinner
+            android:id="@+id/locationTypeSpinnerRideSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/phoneLocations"
+            android:prompt="@string/pleaseChoose" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <CheckBox android:id="@+id/childCheckBoxRideSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/childString"
+            android:singleLine="false"
+            android:maxEms="15" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <CheckBox android:id="@+id/trailerCheckBoxRideSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/trailerString"
+            android:singleLine="false"
+            android:maxEms="15" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+        <CheckBox android:id="@+id/rememberMyChoice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rememberMyChoice" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+        <android.support.design.button.MaterialButton
+            android:id="@+id/done_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/doneEditingIncident"
+            />
+
+    </LinearLayout>
+
+
+
+</android.support.v4.widget.NestedScrollView>
