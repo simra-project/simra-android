@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".CreditsActivity"
+    tools:showIn="@layout/activity_credits">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="50dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/helmetCredit_icon"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/helmet" />
+
+            <TextView
+                android:id="@+id/helmetCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/helmetCredit_icon"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/helmetCredit_icon"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/logoMakrCredit" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/route_icon"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="15dp"
+                android:background="@drawable/route" />
+
+            <TextView
+                android:id="@+id/routeCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/route_icon"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/route_icon"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/freepikCredit" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/directionArrow_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/direction_arrow" />
+
+            <TextView
+                android:id="@+id/directionArrowText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/directionArrow_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/directionArrow_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/freepikCredit" />
+
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/bycicle_icon"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/person" />
+
+            <TextView
+                android:id="@+id/bycicleCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/bycicle_icon"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/bycicle_icon"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/bycicleCreditTxt" />
+
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/stop_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/stop" />
+
+            <TextView
+                android:id="@+id/stopCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/stop_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/stop_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/smashiconCredit" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/locationMarker_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/edit_event_black" />
+
+            <TextView
+                android:id="@+id/locationMarkerCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/locationMarker_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/locationMarker_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/smashiconCredit" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/tab_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/tap" />
+
+            <TextView
+                android:id="@+id/tabCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/tab_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/tab_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/pixelCredit" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+
+
+        <ImageView
+            android:id="@+id/center_image"
+            android:layout_width="65dp"
+            android:layout_height="60dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="15dp"
+            android:background="@drawable/center" />
+
+        <TextView
+            android:id="@+id/centerCreditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignRight="@id/center_image"
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            android:layout_toEndOf="@+id/center_image"
+            android:autoLink="web"
+            android:scrollHorizontally="false"
+            android:text="@string/icons8Credit" />
+
+
+    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/start_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/start" />
+
+            <TextView
+                android:id="@+id/startCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/start_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/start_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/freepikCredit" />
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/racingflag_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/racingflag" />
+
+            <TextView
+                android:id="@+id/racingflagCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/racingflag_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/racingflag_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/freepikCredit" />
+
+        </RelativeLayout>
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

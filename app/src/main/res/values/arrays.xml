@@ -1,19 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="incidenttypelist">
-        <item>@string/incidentType1_DE</item>
-        <item>@string/incidentType2_DE</item>
-        <item>@string/incidentType3_DE</item>
-        <item>@string/incidentType4_DE</item>
-        <item>@string/incidentType5_DE</item>
-
+        <item>@string/incidentType1</item>
+        <item>@string/incidentType2</item>
+        <item>@string/incidentType3</item>
+        <item>@string/incidentType4</item>
+        <item>@string/incidentType5</item>
+        <item>@string/incidentType6</item>
+        <item>@string/incidentType7</item>
+        <item>@string/incidentType8</item>
+        <item>@string/incidentType9</item>
     </string-array>
-    <string-array name="locations">
-        <item>@string/locationType1_DE</item>
-        <item>@string/locationType2_DE</item>
-        <item>@string/locationType3_DE</item>
-        <item>@string/locationType4_DE</item>
-        <item>@string/locationType5_DE</item>
-        <item>@string/locationType6_DE</item>
+    <string-array name="phoneLocations">
+        <item>@string/locationType1</item>
+        <item>@string/locationType2</item>
+        <item>@string/locationType3</item>
+        <item>@string/locationType4</item>
+        <item>@string/locationType5</item>
+        <item>@string/locationType6</item>
+        <item>@string/otherBike</item>
+    </string-array>
+    <string-array name="settingsPhoneLocations">
+        <item>@string/locationType1</item>
+        <item>@string/locationType2</item>
+        <item>@string/locationType3</item>
+        <item>@string/locationType4</item>
+        <item>@string/locationType5</item>
+        <item>@string/locationType6</item>
+        <item>@string/locationType7</item>
+    </string-array>
+    <string-array name="ageGroupList">
+        <item>@string/pleaseChoose</item>
+        <item>nach 2004</item>
+        <item>2000–2004</item>
+        <item>1995–1999</item>
+        <item>1990–1994</item>
+        <item>1985–1989</item>
+        <item>1980–1984</item>
+        <item>1975–1979</item>
+        <item>1970–1974</item>
+        <item>1965–1969</item>
+        <item>1960–1964</item>
+        <item>1955–1959</item>
+        <item>1950–1954</item>
+        <item>vor 1950</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>@string/pleaseChoose</item>
+        <item>@string/male</item>
+        <item>@string/female</item>
+        <item>@string/otherGender</item>
+    </string-array>
+    <string-array name="regionList">
+        <item>@string/pleaseChoose</item>
+        <item>Berlin</item>
+        <item>London</item>
+        <item>@string/otherBike</item>
+    </string-array>
+    <string-array name="experienceList">
+        <item>@string/pleaseChoose</item>
+        <item>@string/experienceMoreThen10</item>
+        <item>@string/experience5to10</item>
+        <item>@string/experience2to4</item>
+        <item>@string/experienceLessThen2</item>
+    </string-array>
+    <!--
+    <string-array name="districtBERList">
+        <item>@string/pleaseChoose</item>
+        <item>@string/district1_BER</item>
+        <item>@string/district2_BER</item>
+        <item>@string/district3_BER</item>
+        <item>@string/district4_BER</item>
+        <item>@string/district5_BER</item>
+        <item>@string/district6_BER</item>
+        <item>@string/district7_BER</item>
+        <item>@string/district8_BER</item>
+        <item>@string/district9_BER</item>
+        <item>@string/district10_BER</item>
+        <item>@string/district11_BER</item>
+        <item>@string/district12_BER</item>
+    </string-array>
+
+    <string-array name="districtLONList">
+        <item>@string/pleaseChoose</item>
+        <item>@string/district1_LON</item>
+        <item>@string/district2_LON</item>
+        <item>@string/district3_LON</item>
+        <item>@string/district4_LON</item>
+        <item>@string/district5_LON</item>
+        <item>@string/district6_LON</item>
+        <item>@string/district7_LON</item>
+        <item>@string/district8_LON</item>
+        <item>@string/district9_LON</item>
+        <item>@string/district10_LON</item>
+        <item>@string/district11_LON</item>
+        <item>@string/district12_LON</item>
+        <item>@string/district13_LON</item>
+        <item>@string/district14_LON</item>
+        <item>@string/district15_LON</item>
+        <item>@string/district16_LON</item>
+        <item>@string/district17_LON</item>
+        <item>@string/district18_LON</item>
+        <item>@string/district19_LON</item>
+        <item>@string/district20_LON</item>
+        <item>@string/district21_LON</item>
+        <item>@string/district22_LON</item>
+        <item>@string/district23_LON</item>
+        <item>@string/district24_LON</item>
+        <item>@string/district25_LON</item>
+        <item>@string/district26_LON</item>
+        <item>@string/district27_LON</item>
+        <item>@string/district28_LON</item>
+        <item>@string/district29_LON</item>
+        <item>@string/district30_LON</item>
+        <item>@string/district31_LON</item>
+        <item>@string/district32_LON</item>
+        <item>@string/district33_LON</item>
+    </string-array>
+    -->
+    <string-array name="bikeTypeList">
+        <item>@string/pleaseChoose</item>
+        <item>@string/cityBike</item>
+        <item>@string/roadRacingBike</item>
+        <item>@string/eBike</item>
+        <item>@string/recumbentBicycle</item>
+        <item>@string/freightBicycle</item>
+        <item>@string/tandemBike</item>
+        <item>@string/otherBike</item>
+    </string-array>
+    <string-array name="involvedTypeList">
+        <item>@string/involvedType1</item>
+        <item>@string/involvedType2</item>
+        <item>@string/involvedType3</item>
+        <item>@string/involvedType4</item>
+        <item>@string/involvedType5</item>
+        <item>@string/involvedType6</item>
+        <item>@string/involvedType7</item>
+        <item>@string/involvedType8</item>
+        <item>@string/involvedType9</item>
+    </string-array>
+    <string-array name="aboutSimraItems">
+        <item>SimRa-Projektseite</item>
+        <item>Datenschutzerklärung</item>
+        <item>Drittanbieter-Lizenzen</item>
+        <item>Grafikreferenzen</item>
     </string-array>
 </resources>

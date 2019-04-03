@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ShowRouteActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
 
     <org.osmdroid.views.MapView
         android:id="@+id/showRouteMap"
@@ -16,33 +19,32 @@
         android:id="@+id/addIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
-        android:background="@drawable/rounded_corners"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_below="@id/toolbar"
+        android:layout_alignEnd="@id/toolbar"
+        android:background="@drawable/button_unpressed"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="2dp">
 
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
-            android:background="@drawable/tap_64"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            />
+            android:layout_marginStart="10dp"
+            android:background="@drawable/tap_64" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/addIncidentDE"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:fontFamily="@font/assistant_extralight"
-            android:textColor="#FEFEFE"
-            android:textStyle="bold"
+            android:layout_marginEnd="10dp"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
-            />
+            android:fontFamily="@font/assistant_extralight"
+            android:text="@string/addIncident"
+            android:textColor="#FEFEFE"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 
@@ -50,52 +52,52 @@
         android:id="@+id/exitAddIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
-        android:background="@drawable/rounded_white"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_alignEnd="@id/toolbar"
+        android:layout_below="@id/toolbar"
+        android:background="@drawable/button_pressed"
+        android:clickable="true"
+        android:focusable="true">
 
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
-            android:background="@drawable/tap_blck_64"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            />
+            android:layout_marginStart="10dp"
+            android:background="@drawable/tap_64" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Hinzufügen\n beenden"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:fontFamily="@font/assistant_extralight"
-            android:textColor="#000000"
-            android:textStyle="bold"
+            android:layout_marginEnd="10dp"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
-            />
+            android:fontFamily="@font/assistant_extralight"
+            android:text="@string/quitAddIncident"
+            android:textColor="#FEFEFE"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 
     <ImageButton
         android:id="@+id/bounding_box_center_button"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="85dp"
-        android:layout_marginRight="15dp"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/my_center" />
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignEnd="@id/toolbar"
+        android:layout_below="@id/addIncident"
+        android:background="@drawable/my_center"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="2dp"/>
 
     <!--
     <RelativeLayout
         android:id="@+id/doneButton"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:background="@drawable/rounded_corners"
+        android:background="@drawable/button_unpressed"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp">
@@ -114,48 +116,136 @@
 
     </RelativeLayout>
     -->
+    <RelativeLayout
+        android:id="@+id/progressBarRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:elevation="9dp">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_centerInParent="true"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:paddingBottom="10dp">
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="@android:style/Widget.Material.ProgressBar"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:layout_margin="10dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/calculating_incidents"
+                android:layout_below="@id/progressBar"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/uploadIncident"
+        android:id="@+id/saveIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
-        android:background="@drawable/rounded_corners"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
+        android:layout_alignEnd="@id/exitAddIncident"
+        android:layout_above="@id/privacySliderDescription"
         android:layout_marginBottom="20dp"
-        android:layout_marginRight="20dp">
+        android:elevation="2dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/button_unpressed">
 
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:background="@android:drawable/stat_sys_upload" />
+            android:layout_marginStart="10dp"
+            android:background="@android:drawable/ic_menu_save" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/uploadIncidentDE"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:fontFamily="@font/assistant_extralight"
-            android:textColor="#FEFEFE"
-            android:textStyle="bold"
+            android:layout_marginEnd="10dp"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
-            />
+            android:fontFamily="@font/assistant_extralight"
+            android:text="@string/saveIncident"
+            android:textColor="#FEFEFE"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 
-    <TextView android:id="@+id/copyright_text"
-        android:text="@string/osmCopyrightDE"
+    <TextView
+        android:id="@+id/privacySliderDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="10dp"
-        android:layout_alignParentLeft="true"
+        android:text="@string/privacySlider"
+        android:layout_centerHorizontal="true"
+        android:layout_alignStart="@id/privacySliderLinearLayout"
+        android:layout_alignEnd="@id/privacySliderLinearLayout"
+        android:background="@color/transparent"
+        android:textColor="@color/white"
+        android:layout_above="@id/privacySliderLinearLayout"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:elevation="4dp"/>
+
+    <LinearLayout
+        android:id="@+id/privacySliderLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="5dp"
-        />
+        android:layout_alignEnd="@id/toolbar"
+        android:layout_alignStart="@id/toolbar"
+        android:layout_marginBottom="20dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:background="@color/transparent"
+        android:elevation="4dp">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:src="@drawable/startwhite"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            />
+        <com.jaygoo.widget.RangeSeekBar
+            android:id="@+id/privacySlider"
+            android:layout_width="0dp"
+            android:layout_weight="8"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_height="wrap_content"
+            app:rsb_progress_default_color="@color/colorPrimary"
+            app:rsb_progress_color="@color/colorAccent"
+            app:rsb_mode="range"
+            app:rsb_range_interval="1"
+            app:rsb_tick_mark_number="1"
+            />
+        <ImageView
+            android:src="@drawable/racingflagwhite"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/copyright_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="5dp"
+        android:text="@string/osmCopyright"
+        android:textSize="10sp" />
 
 </RelativeLayout>
