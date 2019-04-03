@@ -59,7 +59,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -71,6 +70,8 @@ import javax.net.ssl.TrustManagerFactory;
 
 import static de.tuberlin.mcc.simra.app.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.Constants.ZOOM_LEVEL;
+import static de.tuberlin.mcc.simra.app.Utils.configureHostNameVerifier;
+import static de.tuberlin.mcc.simra.app.Utils.configureSSLContext;
 import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.Utils.showMessageOK;
 
@@ -613,81 +614,18 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         protected String doInBackground(String... strings) {
             installedAppVersion = getAppVersionNumber(MainActivity.this);
 
-            // Calculating hash for server access.
-            Date dateToday = new Date();
-            String clientHash = Integer.toHexString((Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX).hashCode());
-
-            Log.d(TAG, "clientHash: " + clientHash);
-            Log.d(TAG, "dateToday: " + dateToday.toString());
-            Log.d(TAG, "beforeHash: " + (Constants.DATE_PATTERN_SHORT.format(dateToday) + Constants.UPLOAD_HASH_SUFFIX));
-
-
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            SSLContext sslContext = null;
-            try{
-                // Load CAs from an InputStream
-                // (could be from a resource or ByteArrayInputStream or ...)
-                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-
-                InputStream caInput = new BufferedInputStream(getResources().getAssets().open("server.cer"));//new FileInputStream(certificateFile));
-                Certificate ca;
-
-                try {
-                    ca = cf.generateCertificate(caInput);
-                    Log.d(TAG,"ca=" + ((X509Certificate) ca).getSubjectDN());
-                } finally {
-                    caInput.close();
-                }
-
-                // Create a KeyStore containing our trusted CAs
-                String keyStoreType = KeyStore.getDefaultType();
-                KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-                keyStore.load(null, null);
-                keyStore.setCertificateEntry("ca", ca);
-                Log.d(TAG,"subjectDN: " + ((X509Certificate) ca).getSubjectDN());
-
-                // Create a TrustManager that trusts the CAs in our KeyStore
-                String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-                tmf.init(keyStore);
-
-                // Create an SSLContext that uses our TrustManager
-                sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, tmf.getTrustManagers(), null);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (CertificateException e) {
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (KeyStoreException e) {
-                e.printStackTrace();
-            } catch (KeyManagementException e) {
-                e.printStackTrace();
-            }
-
-            HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    HostnameVerifier hv =
-                            HttpsURLConnection.getDefaultHostnameVerifier();
-                    Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de", session));
-                    Log.d(TAG, "hostname: " + hostname);
-                    Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de:8082", session));
-                    return true; //hv.verify("vm3.mcc.tu-berlin.de", session);
-                }
-            };
             String response = "-1";
             try {
-                URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "version?clientHash=" + clientHash);
-                Log.d(TAG, "URL: " + Constants.MCC_VM2 + BACKEND_VERSION + "/" + "version?clientHash=" + clientHash);
+                URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "version?clientHash=" + SimRAuthenticator.getClientHash());
+                Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection =
                         (HttpsURLConnection)url.openConnection();
-                urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+                urlConnection.setSSLSocketFactory(configureSSLContext(MainActivity.this).getSocketFactory());
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setReadTimeout(10000);
                 urlConnection.setConnectTimeout(15000);
-                urlConnection.setHostnameVerifier(hostnameVerifier);
+                urlConnection.setHostnameVerifier(configureHostNameVerifier());
                 int status = urlConnection.getResponseCode();
                 Log.d(TAG, "Server status: " + status);
                 response = urlConnection.getResponseMessage();
