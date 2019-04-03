@@ -126,9 +126,7 @@ public class UploadService extends Service {
         startForeground(notificationId, notification);
         wakeLock.acquire(1000 * 60 * 15);
 
-        // new UpdateTask(intent.getStringExtra("PathToAccGpsFile")).execute();
         new UpdateTask(this, intent).execute();
-        // stopSelf();
         return Service.START_NOT_STICKY;
     }
 
@@ -167,12 +165,9 @@ public class UploadService extends Service {
             Log.d(TAG, "onPostExecute()");
             Intent intent = new Intent();
             intent.setAction("de.tuberlin.mcc.simra.app.MY_NOTIFICATION");
-            // intent.putExtra("data","Notice me senpai!");
             sendBroadcast(intent);
             super.onPostExecute(s);
             stopSelf();
-            // stopForeground(true);
-            // stopService(intent);
         }
 
         private void uploadFile(Context context) throws IOException {
@@ -214,7 +209,6 @@ public class UploadService extends Service {
                     BufferedReader metaDataReader = new BufferedReader(new FileReader(context.getFileStreamPath("metaData.csv")));
                     String line;
                     while ((line = metaDataReader.readLine()) != null) {
-                        // Log.d(TAG, line);
                         if (line.contains("#")) {
                             String[] fileInfoArray = line.split("#");
                             fileVersion = fileInfoArray[1]; //"" + (Integer.valueOf(fileInfoArray[1]) + 1);
@@ -342,10 +336,7 @@ public class UploadService extends Service {
             SSLContext sslContext = null;
             try{
                 // Load CAs from an InputStream
-                // (could be from a resource or ByteArrayInputStream or ...)
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                // File certificateFile = new File (getResources().getAssets().open("server.cer"));// getFileStreamPath("server.cer");
-                // Log.d(TAG,"file: " + certificateFile.getAbsolutePath());
 
                 InputStream caInput = new BufferedInputStream(getResources().getAssets().open("server.cer"));//new FileInputStream(certificateFile));
                 Certificate ca;
@@ -439,12 +430,7 @@ public class UploadService extends Service {
             SSLContext sslContext = null;
             try{
                 // Load CAs from an InputStream
-                // (could be from a resource or ByteArrayInputStream or ...)
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                // From https://www.washington.edu/itconnect/security/ca/load-der.crt
-                // File certificateFile = new File (getResources().getAssets().open("server.cer"));// getFileStreamPath("server.cer");
-                // Log.d(TAG,"file: " + certificateFile.getAbsolutePath());
-
                 InputStream caInput = new BufferedInputStream(getResources().getAssets().open("server.cer"));//new FileInputStream(certificateFile));
                 Certificate ca;
 

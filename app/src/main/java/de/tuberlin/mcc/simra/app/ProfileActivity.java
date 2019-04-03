@@ -18,15 +18,7 @@ public class ProfileActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
     private static final String TAG = "ProfileActivity_LOG";
-    // SharedPreferences
-    /*public static final String PREFERENCES = "simraPrefs" ;
-    public static final String agePrefs = "Profile-Age";
-    public static final String genderPrefs = "Profile-Gender";
-    public static final String regionPrefs = "Profile-Region";
-    public static final String berDistPrefs = "Profile-berDistrict";
-    public static final String lonDistPrefs = "Profile-lonDistrict";
-    public static final String bikePrefs = "Profile-bikeType";
-    public static final String phoneLocPref = "Profile-phoneLocation";*/
+
 
 
     ImageButton backBtn;
@@ -75,16 +67,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Get the previous saved settings
         int[] previousProfile = loadPreviousProfile();
-        // working with android template
-        /*SharedPreferences sharedpreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
 
-        ageGroupSpinner.setSelection(sharedpreferences.getInt(agePrefs, 0));
-        genderSpinner.setSelection(sharedpreferences.getInt(genderPrefs, 0));
-        regionSpinner.setSelection(sharedpreferences.getInt(regionPrefs,0));
-        berDistrictSpinner.setSelection(sharedpreferences.getInt(berDistPrefs, 0));
-        lonDistrictSpinner.setSelection(sharedpreferences.getInt(lonDistPrefs, 0));
-        bikeSpinner.setSelection(sharedpreferences.getInt(bikePrefs,0));
-        locationTypeSpinner.setSelection(sharedpreferences.getInt(phoneLocPref,0));*/
         ageGroupSpinner.setSelection(previousProfile[0]);
         genderSpinner.setSelection(previousProfile[1]);
         regionSpinner.setSelection(previousProfile[2]);

@@ -112,25 +112,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 involvedType9CheckBox.setChecked(true);
             }
 
-
-
-            /*
-            // Load checkboxValues
-            int count = involvedCheckBoxesLinearLayout.getChildCount();
-            // Iterate through all children of involvedCheckBoxesLinearLayout
-            for (int i = 0; i < count; i++) {
-                View v = involvedCheckBoxesLinearLayout.getChildAt(i);
-                Log.d(TAG, "v.getClass(): " + v.getClass().getName());
-                if (v instanceof CheckBox) {
-                    if (previousAnnotation[9+i].length()>0) {
-                        if (previousAnnotation[9 + i].equals("1")) {
-                            Log.d(TAG, ((CheckBox) v).getText().toString()+" was checked before.");
-                            ((CheckBox)v).setChecked(true);
-                        }
-                    }
-                }
-            }
-            */
             if (previousAnnotation[18].length() > 0) {
                 if (previousAnnotation[18].equals("1")) {
                     scarinessCheckBox.setChecked(true);
@@ -183,7 +164,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             String child = getIntent().getStringExtra("Incident_child");
             String trailer = getIntent().getStringExtra("Incident_trailer");
             String pLoc = getIntent().getStringExtra("Incident_pLoc");
-            String pathToAccDat = getIntent().getStringExtra("Incident_accDat");
 
             // onClick-behavior for 'Done inserting description'-button: save incident
             // data to file.
@@ -228,34 +208,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     checkBoxValues[8] = "1";
                 }
 
-                /*
-                // Load checkboxValues
-                int count = involvedCheckBoxesLinearLayout.getChildCount();
-                // Iterate through all children of involvedCheckBoxesLinearLayout
-                for (int i = 0; i < count; i++) {
-                    View w = involvedCheckBoxesLinearLayout.getChildAt(i);
-                    Log.d(TAG, "w.getClass(): " + w.getClass().getName());
-                    if (w instanceof CheckBox && ((CheckBox) w).isChecked()) {
-                        Log.d(TAG, ((CheckBox) v).getText().toString()+" is checked now.");
-                        checkBoxValues[i] = "1";
-                    }
-                }
-                */
-                /*
-                int incidentIndex = 0;
-                for (int i = 0; i < incidentTypes.length; i++) {
-                    if (incidentType.equals(incidentTypes[i])) {
-                        incidentIndex = i;
-                    }
-                }
-                int locationIndex = 0;
-                for (int i = 0; i < locations.length; i++) {
-                    if (locationType.equals(locations[i])) {
-                        locationIndex = i;
-                    }
-                }
-                */
-
 
                 String incidentString = incidentKey + "," + lat + "," + lon + "," + ts + ","
                         + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description;
@@ -264,13 +216,10 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                         + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description);
 
                 incidentSaved = true;
-                // writeIntToSharedPrefs("Settings-PhoneLocation", locationType, "simraPrefs", this);
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("result", incidentString);
                 setResult(Activity.RESULT_OK, returnIntent);
-                //setResult(Activity.RESULT_CANCELED, returnIntent);
-
                 finish();
             });
 

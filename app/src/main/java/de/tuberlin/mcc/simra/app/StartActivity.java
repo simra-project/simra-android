@@ -32,14 +32,12 @@ import static de.tuberlin.mcc.simra.app.Utils.writeLongToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.writeToSharedPrefs;
 
 /**
- * Shows general info about the app and starts the MainActivity once the okay-Button is pressed
- * or TIME_OUT/1000 seconds are passed.
- * TODO: migrate permission request and map loading from MainActivity to StartActivity
+ * Shows general info about the app, if the app is run the first time.
+ * If not, MainActivity is started, except if a crash happened before.
  */
 
 public class StartActivity extends BaseActivity {
 
-    private static int TIME_OUT = 100000; //Time to launch the another activity
     Button next;
 
     // For permission request
@@ -114,50 +112,8 @@ public class StartActivity extends BaseActivity {
                 if (!path.equals("profile.csv")) {
                     dirFiles[i].delete();
                 }
-                /*
-                if(path.startsWith("accEvents")) {
-                    try (BufferedReader reader = new BufferedReader(new FileReader(getFileStreamPath(path)))) {
-                        String[] line = reader.readLine().split(",", -1);
-                        if (line.length < 20) {
-                            ridesToDelete.add(line[0]);
-                            dirFiles[i].delete();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                */
-            }
-            /*
-            dirFiles = getFilesDir().listFiles();
-            for (int i = 0; i < ridesToDelete.size(); i++) {
-                for (int j = 0; j < dirFiles.length ; j++) {
-                    path = dirFiles[j].getName();
-                    if(path.split("_")[0].equals(ridesToDelete.get(i))){
-                        dirFiles[j].delete();
-                    }
-                }
             }
 
-            String newMetaData = "";
-            try (BufferedReader reader = new BufferedReader(new FileReader
-                    (getFileStreamPath("metaData.csv")))) {
-                reader.readLine();
-
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    String[] actualRide = line.split(",", -1);
-
-                }
-
-
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        */
             String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
 
             overWriteFile((fileInfoLine + "key, startTime, endTime, annotated" + System.lineSeparator()), "metaData.csv", this);
@@ -174,10 +130,6 @@ public class StartActivity extends BaseActivity {
 
             // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
             // in an AlertDialog and request access to FINE_LOCATION
-
-            // The message to be shown in the AlertDialog
-            //String rationaleMessage = "Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen" +
-            //      "können und deine Fahrt zu speichern.";
 
             // The OK-Button fires a requestPermissions
             DialogInterface.OnClickListener rationaleOnClickListener = new DialogInterface.OnClickListener() {

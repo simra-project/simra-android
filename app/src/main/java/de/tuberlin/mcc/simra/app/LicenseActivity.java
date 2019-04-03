@@ -101,7 +101,6 @@ public class LicenseActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //perfom actions here
                 String message = "";
                 try{
                     AssetManager am = getApplicationContext().getAssets();

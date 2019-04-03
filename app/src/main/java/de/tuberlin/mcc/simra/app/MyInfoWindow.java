@@ -93,9 +93,6 @@ class MyInfoWindow extends InfoWindow {
             popUpIntent.putExtra("Incident_pLoc",
                     String.valueOf(motherActivity.ride.pLoc));
 
-            //popUpIntent.putExtra("Incident_accDat",
-            //        String.valueOf(this.mAccEvent.sensorData.getAbsolutePath()));
-
             popUpIntent.putExtra("Incident_accDat",
                     "mockSensorDatForIncident.csv");
 
