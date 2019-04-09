@@ -18,14 +18,14 @@ public class Constants {
 
 
     public static final String MCC_VM1 = "https://vm1.mcc.tu-berlin.de:8082/";
-    public static final String MCC_VM2 = "https://vm2.mcc.tu-berlin.de:8082/";
+    public static final String MCC_VM2 = "https://vm1.mcc.tu-berlin.de:8082/";
     public static final String MCC_VM3 = "https://vm3.mcc.tu-berlin.de:8082/";
 
     // Every GPS fix has to be at least this accurate to be taken into account.
     public static final double GPS_ACCURACY_THRESHOLD = 30.0;
 
     // Backend Interface Version
-    public static final int BACKEND_VERSION = 9;
+    public static final int BACKEND_VERSION = 10;
 
     // Locales
     public static final String[] LOCALE_ABVS = {"UNKNOWN", "Berlin", "London", "other", "TEST"};

@@ -1,7 +1,6 @@
 package de.tuberlin.mcc.simra.app;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,11 +10,9 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -41,22 +38,16 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
-import static de.tuberlin.mcc.simra.app.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
-import static de.tuberlin.mcc.simra.app.Utils.readContentFromFile;
 
 public class HistoryActivity extends BaseActivity {
 
     // Log tag
     private static final String TAG = "HistoryActivity_LOG";
     ImageButton backBtn;
-    ImageButton helpBtn;
     TextView toolbarTxt;
 
     boolean exitWhenDone = false;
@@ -67,7 +58,6 @@ public class HistoryActivity extends BaseActivity {
     String startTime = "";
 
     ListView listView;
-    private File metaDataFile;
     String[] ridesArr;
 
     UploadService mBoundUploadService;
@@ -79,16 +69,18 @@ public class HistoryActivity extends BaseActivity {
     public class MyBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Action: " + intent.getAction() + "\n");
-            sb.append("URI: " + intent.toUri(Intent.URI_INTENT_SCHEME).toString() + "\n");
-            String log = sb.toString();
+            String log = ("Action: " + intent.getAction() + System.lineSeparator()) +
+                    "URI: " + intent.toUri(Intent.URI_INTENT_SCHEME) + System.lineSeparator();
             Log.d(TAG, "onReceive: " + log);
+            boolean uploadSuccessful = intent.getBooleanExtra("uploadSuccessful",false);
+            if (uploadSuccessful) {
+                Toast.makeText(getApplicationContext(), R.string.upload_completed, Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.upload_failed, Toast.LENGTH_LONG).show();
+            }
             refreshMyRides();
         }
     }
-
-
 
     /**
      * When this Activity gets started automatically after the route recording is finished,
@@ -195,7 +187,7 @@ public class HistoryActivity extends BaseActivity {
 
         if (fileExists("metaData.csv", this)) {
 
-            metaDataFile = getFileStreamPath("metaData.csv");
+            File metaDataFile = getFileStreamPath("metaData.csv");
             try {
                 BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
                 // br.readLine() to skip the first line which contains the headers
@@ -244,7 +236,7 @@ public class HistoryActivity extends BaseActivity {
         super.onResume();
         br = new MyBroadcastReceiver();
         IntentFilter filter = new IntentFilter();
-        filter.addAction("de.tuberlin.mcc.simra.app.MY_NOTIFICATION");
+        filter.addAction("de.tuberlin.mcc.simra.app.UPLOAD_COMPLETE");
         this.registerReceiver(br, filter);
         refreshMyRides();
     }

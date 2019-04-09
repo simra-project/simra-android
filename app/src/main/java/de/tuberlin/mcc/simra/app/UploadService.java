@@ -16,30 +16,17 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManagerFactory;
 
 import static de.tuberlin.mcc.simra.app.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.Constants.LOCALE_ABVS;
@@ -63,6 +50,8 @@ public class UploadService extends Service {
     int notificationId = 1453;
 
     int numberOfTasks = 0;
+
+    private boolean uploadSuccessful = true;
 
     public void decreaseNumberOfTasks() {
         numberOfTasks--;
@@ -160,7 +149,8 @@ public class UploadService extends Service {
         protected void onPostExecute(String s) {
             Log.d(TAG, "onPostExecute()");
             Intent intent = new Intent();
-            intent.setAction("de.tuberlin.mcc.simra.app.MY_NOTIFICATION");
+            intent.setAction("de.tuberlin.mcc.simra.app.UPLOAD_COMPLETE");
+            intent.putExtra("uploadSuccessful", uploadSuccessful);
             sendBroadcast(intent);
             super.onPostExecute(s);
             stopSelf();
@@ -179,7 +169,7 @@ public class UploadService extends Service {
                     if (!((new File(path)).isDirectory()) && path.startsWith("CRASH")) {
                         String contentToSend = readContentFromFileAndIncreaseFileVersion(path,context);
                         String key = "CRASH_" + ts + "_" + path;
-                        postUpload(key,contentToSend);
+                        postFile("crash",contentToSend);
                         context.deleteFile(path);
                     }
                 }
@@ -234,7 +224,7 @@ public class UploadService extends Service {
                             String response = "";
                             if (password.equals("-1")) {
                                 Log.d(TAG, "sending ride with POST: " + rideKey);
-                                response = postUpload(rideKey, contentToSend);
+                                response = postFile("ride", contentToSend);
                                 if (response.split(",").length >= 2) {
                                     writeToSharedPrefs(rideKey, response, "keyPrefs", context);
                                     metaDataLine[3] = "2";
@@ -244,7 +234,7 @@ public class UploadService extends Service {
                                 Log.d(TAG, "sending ride with PUT: " + rideKey);
                                 String fileHash = password.split(",")[0];
                                 String filePassword = password.split(",")[1];
-                                response = putUpdate(fileHash, filePassword, contentToSend);
+                                response = putFile("ride", fileHash, filePassword, contentToSend);
                                 if (response.equals("OK")) {
                                     metaDataLine[3] = "2";
                                 }
@@ -279,7 +269,6 @@ public class UploadService extends Service {
                                 numberOfIncidents++;
                             }
                         }
-
                     }
                 }
                 String demographicHeader = "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents" + System.lineSeparator();
@@ -294,7 +283,7 @@ public class UploadService extends Service {
                 Log.d(TAG, "Saved password: " + profilePassword);
                 if(profilePassword.equals("-1")){
                     Log.d(TAG, "sending profile with POST");
-                    String hashPassword = postUpload("profile.csv",profileContentToSend);
+                    String hashPassword = postFile("profile",profileContentToSend);
                     if (hashPassword.split(",").length >= 2) {
                         writeToSharedPrefs("profile.csv",hashPassword,"keyPrefs",context);
                     }
@@ -308,13 +297,13 @@ public class UploadService extends Service {
                         fileHash = profilePassword.split(",")[0];
                         filePassword = profilePassword.split(",")[1];
                     }
-                    String response = putUpdate("profile.csv"+fileHash, filePassword, profileContentToSend);
+                    String response = putFile("profile", fileHash, filePassword, profileContentToSend);
                     Log.d(TAG, "PUT response: " + response);
                 }
             }
         }
-
-        private String postUpload (String fileName, String contentToSend) throws IOException {
+        // String fileType = profile | ride | crash
+        private String postFile (String fileType, String contentToSend) throws IOException {
 
             int localeInt = lookUpIntSharedPrefs("Profile-Region",0,"simraPrefs",context);
             String locale = LOCALE_ABVS[localeInt];
@@ -323,7 +312,7 @@ public class UploadService extends Service {
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileName + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "upload?fileName=" + fileName + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
+            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + fileType + "?loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
@@ -339,16 +328,26 @@ public class UploadService extends Service {
             OutputStream os = urlConnection.getOutputStream();
             os.write( outputInBytes );
             os.close();
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(urlConnection.getInputStream()));
+            String inputLine;
+            String response = "";
+            while ((inputLine = in.readLine()) != null) {
+                response += inputLine;
+            }
+            in.close();
             int status = urlConnection.getResponseCode();
+            if (status != 200) {
+                uploadSuccessful = false;
+            }
             Log.d(TAG, "Server status: " + status);
-            String response = urlConnection.getResponseMessage();
             Log.d(TAG, "Server Response: " + response);
             UploadService.this.decreaseNumberOfTasks();
 
             return response;
         }
-
-        private String putUpdate(String fileHash, String filePassword, String contentToSend) throws IOException {
+        // fileType = profile | ride
+        private String putFile(String fileType, String fileHash, String filePassword, String contentToSend) throws IOException {
 
             int localeInt = lookUpIntSharedPrefs("Profile-Region",0,"simraPrefs",context);
             String locale = LOCALE_ABVS[localeInt];
@@ -357,7 +356,7 @@ public class UploadService extends Service {
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "update?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
+            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
@@ -375,6 +374,9 @@ public class UploadService extends Service {
             os.write( outputInBytes );
             os.close();
             int status = urlConnection.getResponseCode();
+            if (status != 200) {
+                uploadSuccessful = false;
+            }
             Log.d(TAG, "Server status: " + status);
             String response = urlConnection.getResponseMessage();
             Log.d(TAG, "Server Response: " + response);

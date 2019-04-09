@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class SimRAuthenticator {
     public static final SimpleDateFormat DATE_PATTERN_SHORT = new SimpleDateFormat("dd.MM.yyyy");
-    public static final String UPLOAD_HASH_SUFFIX = "mcc_simra";
+    public static final String UPLOAD_HASH_SUFFIX = "Ytjn5yv5xax6Dbhj";
 
     public static String getClientHash() {
         Date dateToday = new Date();

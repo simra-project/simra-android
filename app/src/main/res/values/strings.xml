@@ -278,5 +278,8 @@ E-Mail: simra.mcc@gmail.com</p></string>
     <string name="newest_version">neueste Version:</string>
     <string name="new_app_version_title">Neue Version verfügbar</string>
     <string name="later">Später</string>
+    <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/mobil/</string>
+    <string name="upload_completed">SimRa Hochladen abgeschlossen.</string>
+    <string name="upload_failed">SimRa Hochladen fehlgeschlagen. Versuchen Sie es später erneut.</string>
 
 </resources>
