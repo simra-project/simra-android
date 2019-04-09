@@ -46,8 +46,10 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -59,6 +61,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -535,7 +538,9 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             }
 
         } else if (id == R.id.nav_impressum) {
-            Intent intent = new Intent(MainActivity.this, ImprintActivity.class);
+            Intent intent = new Intent(MainActivity.this, WebActivity.class);
+            intent.putExtra("URL", getString(R.string.tuberlin_impressum));
+
             startActivity(intent);
         }
 
@@ -615,7 +620,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             installedAppVersion = getAppVersionNumber(MainActivity.this);
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            String response = "-1";
+            StringBuilder response = new StringBuilder();
             try {
                 URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "version?clientHash=" + SimRAuthenticator.getClientHash());
                 Log.d(TAG, "URL: " + url.toString());
@@ -623,13 +628,22 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                         (HttpsURLConnection)url.openConnection();
                 urlConnection.setSSLSocketFactory(configureSSLContext(MainActivity.this).getSocketFactory());
                 urlConnection.setRequestMethod("GET");
+                // urlConnection.setRequestProperty("Content-Type","text/plain");
+                // urlConnection.setDoOutput(true);
                 urlConnection.setReadTimeout(10000);
                 urlConnection.setConnectTimeout(15000);
                 urlConnection.setHostnameVerifier(configureHostNameVerifier());
+
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
                 int status = urlConnection.getResponseCode();
                 Log.d(TAG, "Server status: " + status);
-                response = urlConnection.getResponseMessage();
-                Log.d(TAG, "Server Response: " + response);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (ProtocolException e) {
@@ -637,12 +651,13 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String[] responseArray = response.split("splitter");
+            Log.d(TAG, "GET version response: " + response.toString());
+            String[] responseArray = response.toString().split("splitter");
             if (responseArray.length > 2) {
                 critical = Boolean.valueOf(responseArray[0]);
                 newestAppVersion = Integer.valueOf(responseArray[1]);
                 urlToNewestAPK = responseArray[2];
-                return response;
+                return response.toString();
             } else {
                 return null;
             }

@@ -270,7 +270,6 @@ public class Utils {
 
             try {
                 ca = cf.generateCertificate(caInput);
-                Log.d(TAG,"ca=" + ((X509Certificate) ca).getSubjectDN());
             } finally {
                 caInput.close();
             }
@@ -280,7 +279,6 @@ public class Utils {
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             keyStore.load(null, null);
             keyStore.setCertificateEntry("ca", ca);
-            Log.d(TAG,"subjectDN: " + ((X509Certificate) ca).getSubjectDN());
 
             // Create a TrustManager that trusts the CAs in our KeyStore
             String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
@@ -311,9 +309,6 @@ public class Utils {
             public boolean verify(String hostname, SSLSession session) {
                 HostnameVerifier hv =
                         HttpsURLConnection.getDefaultHostnameVerifier();
-                Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de", session));
-                Log.d(TAG, "hostname: " + hostname);
-                Log.d(TAG, "hv.verify: " + hv.verify("vm3.mcc.tu-berlin.de:8082", session));
                 return true;
             }
         };

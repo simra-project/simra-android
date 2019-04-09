@@ -137,7 +137,7 @@
     <string name="ride_settings_description">Below, you can find the settings chosen for this ride. You can change them here, or in the settings menu.</string>
     <string name="rememberMyChoice">Remember My Choice</string>
     <string name="doNotShowAgain">Don\'t show this again</string>
-    <string name="mailRequestTU"><a href="https://www.tu-berlin.de/allgemeine_seiten/contact/parameter/en/id/16/?no_cache=1&amp;ask_name=Pressestelle&amp;ask_mail=XH4N4AAD0Pm6SW%2BAqRiyNWi2wtI5xLDRrsckIn8nzonCUl%2B95CeT8w%3D%3D">Mail Request</a></string>
+    <string name="mailRequestTU"><a href="https://www.tu-berlin.de/allgemeine_seiten/contact/parameter/en/id/16/?no_cache=1&amp;ask_name=Pressestelle&amp;ask_mail=XH4N4AAD0Pm6SW%2BAqRiyNWi2wtI5xLDRrsckIn8nzonCUl%2B95CeT8w%3D%3D">CC</a></string>
     <string name="bycicleCreditTxt">Icon made by Nikita Golubev from www.flaticon.com .</string>
     <string name="freepikCredit">Icon made by Freepik from www.flaticon.com .</string>
     <string name="logoMakrCredit">Created my free logo at www.LogoMakr.com .</string>
@@ -314,4 +314,7 @@ E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
     <string name="newest_version">newest version:</string>
     <string name="new_app_version_title">New update available</string>
     <string name="later">Later</string>
+    <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/en/mobil/</string>
+    <string name="upload_completed">SimRa update completed</string>
+    <string name="upload_failed">SimRa upload failed</string>
 </resources>
