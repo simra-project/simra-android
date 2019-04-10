@@ -1,9 +1,33 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:locale="en">
+
+    <!--- ActivityTitles -->
     <string name="app_name">SimRa</string>
+    <string name="title_activity_history">My Rides</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_profile">Profile</string>
+    <string name="title_activity_imprint">Imprint</string>
+    <string name="title_activity_privacy">Data Privacy</string>
+    <string name="title_activity_credits">Graphics References</string>
+    <string name="title_activity_ride_settings">Edit Ride Settings</string>
+    <string name="title_activity_showRoute">Annotate Ride</string>
+    <string name="title_activity_library_license">Third Party Licenses</string>
+    <string name="title_activity_about_simra">About SimRa</string>
+
+    <!--- Start -->
     <string name="welcome_header">Welcome to SimRa!</string>
     <string name="welcome_text">Thank you for supporting the SimRa project.</string>
     <string name="welcome_text2">Have fun, and bon voyage</string>
     <string name="welcome_text3">Best, the SimRa team</string>
+    <string name="sendErrorTitle">Whoops!</string>
+    <string name="sendErrorMessage">Seems like an error occurred during your last session. Would you like to send a report to help us improve the app?</string>
+    <string name="simra_closed">SimRa closed</string>
+    <string name="next">Continue</string>
+    <string name="close_simra">Close SimRa</string>
+    <string name="iAccept">I accept the privacy policy statement</string>
+    <string name="privacyAgreementTitle">Privacy Policy Statement</string>
+    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).</string>
+
+    <!--- Menu -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">MCC TU Berlin</string>
@@ -11,31 +35,84 @@
     <string name="feedbackReceiver">ask@mcc.tu-berlin.de</string>
     <string name="demoDataHeader">SimRa user data</string>
     <string name="feedbackHeader">SimRa Feedback</string>
-    <string name="demoDataMail">Name: \nAge: \nJob: \nBike type: e.g. mountain bike\nAverage ride distance: </string>
+    <string name="about_simra">About</string>
+    <string name="imprint">Imprint</string>
+    <string name="feedback">Feedback</string>
+    <string name="title_tutorial">Tutorial</string>
+
+    <!--- Permission -->
     <string name="permissionFineLocation">In order to continue, please allow SimRa to access your location.</string>
+    <string name="permissionRequestRationale">This app needs permission to access your location data in order to show you your location on the map and to record your rides.</string>
+
+    <!--- WebActivity -->
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
     <string name="simRaPage">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1</string>
-    <string name="privacyLink">https://www.mcc.tu-berlin.de/menue/research/projects/simra/privacy_policy_statement/parameter/en?isMobile=1</string>
-    <string name="startButtonText">Start \n Recording</string>
-    <string name="stopButtonText">End \n Recording</string>
-    <string name="permissionRequestRationale">This app needs permission to access your location data in order to show you your location on the map and to record your rides.</string>
-    <string name="recorder_channel_name">Recording</string>
-    <string name="upload_channel_name">Uploading</string>
-    <string name="recorder_channel_description">Recording ride</string>
-    <string name="upload_channel_description">Uploading rides</string>
+    <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Instructions.pdf</string>
+    <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/en/mobil/</string>
+
+    <!--- MainActivity -->
     <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
-    <string name="title_activity_history">My Rides</string>
-    <string name="selectedRideInfo">The following ride has been chosen:</string>
-    <string name="errorNoRideSelected">No ride has been chosen!</string>
-    <string name="errorRideTooShort">The ride must be at\nleast 30 seconds long!</string>
     <string name="errorRideNotRecorded">The ride was not recorded due to privacy settings!\nYou can check your privacy settings under settings</string>
-    <string name="incidentDetected">"annotate incident."</string>
+    <string name="cancel">Cancel</string>
+    <string name="startButtonText">Start\nRecording</string>
+    <string name="stopButtonText">End\nRecording</string>
+    <string name="airplaneModeIsOn">The airplane mode is enabled! Please disable it, so the ride can be recorded.</string>
+    <string name="locationServiceisOff">The location service is disabled! Please enable it, so the ride can be recorded.</string>
+    <string name="checking_for_updates">Checking for updates</string>
+    <string name="new_app_version_text">To continue, please download the new version via Google Play or manually via the .APK file.</string>
+    <string name="open_google_play_store">Open Google Play Store</string>
+    <string name="download_the_apk_file">Download the .APK file</string>
+    <string name="installed_version">installed version:</string>
+    <string name="newest_version">newest version:</string>
+    <string name="new_app_version_title">New update available</string>
+    <string name="later">Later</string>
+
+    <!--- RecorderService -->
+    <string name="recorder_channel_name">Recording</string>
+    <string name="recorder_channel_description">Recording ride</string>
+    <string name="recordingNotificationTitle">Recording Ride</string>
+    <string name="recordingNotificationBody">Your Ride is being recorded.</string>
+
+    <!--- History -->
     <string name="noHistory">"No rides found."</string>
-    <string name="nextPatch">"This feature will be available in the future."</string>
-    <string name="locationSpinner">"Location of the phone during the ride "</string>
+    <string name="uploadAndExit">Upload &amp; exit app</string>
+    <string name="uploadRidesSuccessful">Upload successful!</string>
+    <string name="noFilesToBeUploaded">All annotated rides were\nalready uploaded.</string>
+    <string name="justUpload">Upload</string>
+    <string name="uploadProgressDialogTitle">Upload</string>
+    <string name="uploadProgressDialogText">Uploading rides. Please wait.</string>
+    <string name="newRideInHistoryActivity">Please annotate.</string>
+    <string name="rideAnnotatedInHistoryActivity">Ready for upload.</string>
+    <string name="rideUploadedInHistoryActivity">Uploaded.</string>
+    <string name="uploadInBackground">Run in background</string>
+    <string name="ride_length">ride duration</string>
+    <string name="descriptionUpload">Upload</string>
+    <string name="descriptionExit">Exit</string>
+    <string name="delete_file_warning">This ride hasn\t been uploaded yet. Do you want to delete the ride anyway?</string>
+    <string name="delete_ride_approve">Delete ride</string>
+    <string name="ride_deleted">Ride deleted</string>
+    <string name="uploadingNotificationTitle">SimRa</string>
+    <string name="uploadingNotificationBody">SimRa is uploading rides</string>
+    <string name="upload_started">SimRa ride upload started</string>
+    <string name="upload_channel_name">Uploading</string>
+    <string name="upload_channel_description">Uploading rides</string>
+    <string name="upload_completed">SimRa Hochladen abgeschlossen.</string>
+    <string name="upload_failed">SimRa Hochladen fehlgeschlagen. Versuchen Sie es später erneut.</string>
+
+    <!--- ShowRoute -->
+    <string name="quitAddIncident">Cancel\nadding</string>
+    <string name="warning">Warning</string>
+    <string name="newIncidents">Renewed reset to default</string>
+    <string name="warningRefresMessage">After the ride gets changed, new incidents will be calculated and previous incidents of this ride and their annotations will be deleted.</string>
+    <string name="privacySlider">Cut off the beginning or the end of the ride</string>
+    <string name="calculating_incidents">Calculating Incidents</string>
+    <string name="addIncident">Add\nIncident</string>
+    <string name="saveIncident">Save &amp;\nReturn</string>
+    <string name="savedRide">Ride saved</string>
+    <string name="doNotShowAgain">Don\'t show this again</string>
+
+    <!--- IncidentPopUp -->
     <string name="description">Optional Comment</string>
-    <string name="notReady">Do you want to leave the annotation unfinished?</string>
-    <string name="noIntentExtras">An error occurred. Please try again later.</string>
     <string name="annotation_title">What happened here?</string>
     <string name="incident_type">Incident Type</string>
     <string name="descriptionBody">Optional comment</string>
@@ -67,46 +144,45 @@
     <string name="doneEditingIncident">Done</string>
     <string name="editingIncidentAborted">Incident description not saved</string>
     <string name="editingIncidentCompleted">Incident description saved</string>
-    <string name="cancel">Cancel</string>
-    <string name="addIncident">Add\nIncident</string>
-    <string name="uploadAndExit">Upload &amp; exit app</string>
-    <string name="saveIncident">Save &amp;\nReturn</string>
-    <string name="savedRide">Ride saved</string>
-    <string name="uploadRidesSuccessful">Upload successful!</string>
-    <string name="noFilesToBeUploaded">All annotated rides were\nalready uploaded.</string>
-    <string name="justUpload">Upload</string>
-    <string name="uploadProgressDialogTitle">Upload</string>
-    <string name="uploadProgressDialogText">Uploading rides. Please wait.</string>
-    <string name="newRideInHistoryActivity">Please annotate.</string>
-    <string name="rideAnnotatedInHistoryActivity">Ready for upload.</string>
-    <string name="rideUploadedInHistoryActivity">Uploaded.</string>
-    <string name="startRecording">Start\nRecording</string>
-    <string name="endRecording">End\nRecording</string>
-    <string name="nav_main">Start</string>
-    <string name="uploadInBackground">Run in background</string>
-    <string name="about_simra">About</string>
-    <string name="mcc_news">MCC News</string>
-    <string name="imprint">Imprint</string>
-    <string name="feedback">Feedback</string>
-    <string name="ride_length">duration:</string>
-    <string name="sendErrorTitle">Whoops!</string>
-    <string name="sendErrorMessage">Seems like an error occurred during your last session. Would you like to send a report to help us improve the app?</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
+    <string name="involved_type">other road user involved</string>
+    <string name="scarinessString">This experience was scary</string>
+    <string name="customIncidentAddedTitle">New incident added!</string>
+    <string name="customIncidentAddedMessage">Did an incident happen here?</string>
+    <string name="incidentDetected">"annotate incident."</string>
+
+    <!--- About -->
+    <string name="notReady">Do you want to leave the annotation unfinished?</string>
+    <string name="privacyLink">https://www.mcc.tu-berlin.de/menue/research/projects/simra/privacy_policy_statement/parameter/en?isMobile=1</string>
+
+    <!--- Setting -->
     <string name="privacyDurationDescription">The delay after which the recording starts\n(in seconds)</string>
-    <string name="title_activity_settings">Settings</string>
     <string name="privacy_settings_title">Privacy</string>
     <string name="privacyDistanceDescription">The delay after which the recording starts\n(in Feet)</string>
-    <string name="title_activity_profile">Profile</string>
+    <string name="settingsSaved">Settings saved</string>
+
+    <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Year of Birth</string>
     <string name="genderSpinnerTitle">Gender</string>
-    <string name="pleaseChoose">Please Choose</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="otherGender">Other</string>
+    <string name="experienceMoreThen10">More then 10 years</string>
+    <string name="experience5to10">5 to 10 years</string>
+    <string name="experience2to4">2 to 4 years</string>
+    <string name="experienceLessThen2">Less then 2 years</string>
+    <string name="editingProfileCompleted">Profile data saved</string>
+    <string name="regionSpinnerTitle">Region</string>
+    <string name="experienceSpinnerTitle">Experience as a Cyclist</string>
+
+    <!---  -->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="pleaseChoose">Please Choose</string>
+    <string name="yesClose"><![CDATA[Yes & close]]></string>
+    <string name="close">Close</string>
+
+    <!--- RideSettings -->
     <string name="bikeTypeSpinnerTitle">Bicycle Type</string>
-    <string name="mensBike">Men\'s Road Bike</string>
-    <string name="womensBike">Women\'s Road Bike</string>
     <string name="cityBike">City-/Trekking Bike</string>
     <string name="roadRacingBike">Road Racing Bike</string>
     <string name="tandemBike">Tandem Bicycle</string>
@@ -115,206 +191,18 @@
     <string name="recumbentBicycle">Recumbent Bicycle</string>
     <string name="mountainBike">Mountain Bike</string>
     <string name="otherBike">Other</string>
-    <string name="locationTypeSpinnerTitle">The usual location of your phone during a ride:</string>
-    <string name="experienceMoreThen10">More then 10 years</string>
-    <string name="experience5to10">5 to 10 years</string>
-    <string name="experience2to4">2 to 4 years</string>
-    <string name="experienceLessThen2">Less then 2 years</string>
-    <string name="editingProfileAborted">Profile data not saved</string>
-    <string name="editingProfileCompleted">Profile data saved</string>
-    <string name="customIncidentAddedTitle">New incident added!</string>
-    <string name="customIncidentAddedMessage">Did an incident happen here?</string>
-    <string name="regionSpinnerTitle">Region</string>
-    <string name="experienceSpinnerTitle">Experience as a Cyclist</string>
-    <string name="involved_type">other road user involved</string>
-    <string name="scarinessString">This experience was scary</string>
-    <string name="rideSettingsTitle">Ride Settings</string>
-    <string name="settingsSaved">Settings saved</string>
-    <string name="settingsNotSaved">Settings not saved</string>
     <string name="ride_settings_title">Ride Settings</string>
     <string name="childString">There is a child on the bicycle</string>
     <string name="trailerString">A trailer is attached to the bicycle</string>
     <string name="ride_settings_description">Below, you can find the settings chosen for this ride. You can change them here, or in the settings menu.</string>
     <string name="rememberMyChoice">Remember My Choice</string>
-    <string name="doNotShowAgain">Don\'t show this again</string>
-    <string name="mailRequestTU"><a href="https://www.tu-berlin.de/allgemeine_seiten/contact/parameter/en/id/16/?no_cache=1&amp;ask_name=Pressestelle&amp;ask_mail=XH4N4AAD0Pm6SW%2BAqRiyNWi2wtI5xLDRrsckIn8nzonCUl%2B95CeT8w%3D%3D">CC</a></string>
+    <string name="locationTypeSpinnerTitle">The usual location of your phone during a ride:</string>
+
+    <!--- Credits -->
     <string name="bycicleCreditTxt">Icon made by Nikita Golubev from www.flaticon.com .</string>
     <string name="freepikCredit">Icon made by Freepik from www.flaticon.com .</string>
     <string name="logoMakrCredit">Created my free logo at www.LogoMakr.com .</string>
     <string name="smashiconCredit">Icon made by Smashicon from www.flaticon.com .</string>
     <string name="pixelCredit">Icon made by Pixel perfect from www.flaticon.com .</string>
-    <string name="icons8Credit">Icon made by Icons8 from\nhttps://icons8.com .</string>
-    <string name="privacyButton">Further information about data privacy</string>
-    <string name="impressum">imprint</string>
-    <string name="osmCopyrightText">In our application we use the maps of OpenStreetMap, an OpenStreetMap Foundation service, St John\'s Innovation Center, Cowley Road, Cambridge, CB 4 0 WS, United Kingdom, hereinafter referred to as \"OpenStreetMap\". In our application, the service OpenStreetMap is involved, so is stored by OpenStreetMap a cookie on your device. This will process your user settings and user data for the purpose of displaying the page or ensuring the functionality of OpenStreetMap.
-        Through this processing, OpenStreetMap can recognize from which application your request has been sent and to which IP address the data should be transmitted. Legal basis is Art. 6 para. 1 lit. f) GDPR. Our legitimate interest lies in the operation of our application. If you do not agree with this processing, please contact the above mentioned contact persons. OpenStreetMap provides more information at https://wiki.osmfoundation.org/wiki/Privacy_Policy to collect and use the data, and to protect your rights and privacy.
-        We reserve the right to set up our own mirror for OpenStreetMap. In this case, we will delete any generated data as soon as possible and don’t link it to our regularly collected data, if possible.
-        </string>
-    <string name="descriptionUpload">Upload</string>
-    <string name="descriptionExit">Exit</string>
-    <string name="dsbContact">https://www.tu-berlin.de/allgemeine_seiten/contact/parameter/en/id/141314/?no_cache=1&amp;ask_mail=XH42VwAGY4UY%2FsBThz469wu5C%2FkG22St45NcTUgQYpTRCgWF30y04Y642h8HsYQv&amp;ask_name=DATENSCHUTZBEAUFTRAGTE</string>
-    <string name="title_activity_imprint">Imprint</string>
-    <string name="title_activity_privacy">Data Privacy</string>
-    <string name="headerSubjectOfDataPrivacy">Subject of Data Privacy</string>
-    <string name="textRightOfAcces">The SimRa project is coordinated with the official data protection at Technische Universität Berlin. For questions about data protection in the SimRa project, please contact:\n
-        Annette Hiller, Data Protection Official at Technischen Universität Berlin \n
-        Straße des 17. Juni 135, 10623 Berlin\n
-        Raum H 1038\n
-         \n
-        Tel.: +49 30 314 21784 \n
-        Fax: +49 30 314 28033 \n
-E&#8211;Mail: info@datenschutzbeauftragte@tu&#8211;berlin.de \n
-
-        You also have the right to contact the local controlling authority:
-
-        Berliner Beauftragte für Datenschutz und Informationsfreiheit
-        Friedrichstr. 219 / visitor entrance via Puttkamerstr. 16 -18
-        10969 Berlin
-        Tel.: +49 30 13889-0
-        Fax: +49 30 2155050
-        Email: mailbox@datenschutz-berlin.de</string>
-    <string name="headerRightOfAcces">Right to Information</string>
-    <string name="headerDataPrivacy">Data Privacy Statement</string>
-    <string name="textSubjectOfDataPrivacy">Data privacy covers personal data. According to art. 4 par. 1 of DSGVO this are data referring to an identified or identifiable individual, hence all data which could be used to identify you. This applies for data such as name, private address, e-mail address, telephone number but also to usage data such as your IP address.
-        Of course Technische Universität Berlin observes the legal requirements of data privacy and other applicable regulations.
-        We are committed to ensure that you can trust us concerning your personal data. Therefore transfers of personal or sensitive data are encrypted.  In addition our websites are protected against damage and unauthorised access by technical measures.</string>
-    <string name="headerGeneralDataPrivacy">General Data Privacy</string>
-    <string name="textGeneralDataPrivacy">(1) If you visit a TUB website or download data of these sites, the following information will be stored in a log file: your IP address, date and time of the site access, visited website resp. name of the downloaded file, amount of transferred data, “user agent-string” of your web browser, the website from which you were referred to the current website or file and a status notification of successful or unsuccessful access. The non-anonymised data will be deleted after two weeks and will not be archived.
-        (2) This data will only be used for non-commercial purposes: it will only be reviewed manually if necessary for fault analysis, optimisation or investigation of abuse or performance issues.
-        (3) For data collection and storage we employ cookies. Cookies are small data packets consisting of text and are stored by your web browser upon website visit. They cause no harm on your device – neither do cookies contain viruses nor do they give us the option to spy on you. We employ two types of cookies: session cookies and permanent cookies. Session cookies are deleted when you close your web browser. Permanent cookies have a maximum life time – in our case up to one day.
-        Cookies are employed to ensure an optimal usage of the websites for visitors and editors. The employed cookies are not used for the tracing of personal user activities or analysis of behaviour. They are only employed where there is a technical requirement or they make more sense than other techniques such as the recognition of the login status of visitors and editors or the storage of information such as “display mobile version of the website”. The usage of the websites is possible without cookies most of the time.
-        For features resp. sites which require a login the employment of cookies is necessary.
-        You can configure your web browser to delete stored cookies.
-        (4) Within TUB websites external websites or services are embedded in some cases. The integrated search function refers to a website of the Google for example. In this case only the search terms are transferred.
-        With techniques like “iframes” external website contents are embedded at certain points. The providers of the websites may register, store and as the case may be process and relay your data.
-        At the very most, these data are so-called traffic data, that is information collected by external service providers as can be collected from visiting any regular website, e.g. the IP address, the approximate location, the browser used, the website you are coming from and so on. In no way are personal information or data collected unless you have voluntarily submitted these via a web form.</string>
-    <string name="headerExtentOfDataCollectionAndStorage">Extent of Data Collection and Storage</string>
-    <string name="textExtentOfDataCollectionAndStorage">Please refer to the section on our General Data Policy (see above, regarding login data and cookies) and the chapter on Usage Data (below, further information about cookies andusing Mamoto).
-        For the usage of our websites active registration of your personal data is not necessary in general. For TU Berlin to fulfil requested services, we require personal data in some cases. This applies especially for the individual replying to e-mails, provision of special services or applications.
-        If you entrust us with the supply of a service, we will only register and store your personal data as required for the supply of the service.
-        In some exceptions, e.g. for event registrations, you will be asked whether your data can be stored beyond the event date in order to inform you of similar events. No disadvantages result if you decline this request.
-        You can revoke your consent at any time and without giving reasons and demand the deletion of your data.
-        If you sign up for a newsletter with your e-mail address, we will use your e-mail address in order to inform you within the newsletter until you unsubscribe the newsletter.</string>
-    <string name="textPrivacy">Sofern innerhalb des Internetangebotes die Möglichkeit zur Eingabe persönlicher oder geschäftlicher Daten (Emailadressen, Namen, Anschriften) besteht, so erfolgt die Preisgabe dieser Daten seitens des Nutzers auf ausdrücklich freiwilliger Basis. Die Inanspruchnahme und Bezahlung aller angebotenen Dienste ist - soweit technisch möglich und zumutbar - auch ohne Angabe solcher Daten bzw. unter Angabe anonymisierter Daten oder eines Pseudonyms gestattet.
-        Die Nutzung der im Rahmen des Impressums oder vergleichbarer Angaben veröffentlichten Kontaktdaten wie Postanschriften, Telefon- und Faxnummern sowie Emailadressen durch Dritte zur Übersendung von nicht ausdrücklich angeforderten Informationen ist nicht gestattet. Rechtliche Schritte gegen die Versender von so genannten Spam-Mails bei Verstößen gegen dieses Verbot sind ausdrücklich vorbehalten.</string>
-    <string name="textTUCopyRight">Der Herausgeber ist bestrebt, in allen Publikationen die Urheberrechte der verwendeten Bilder, Grafiken, Ton- und Videodokumente sowie Texte zu beachten, von ihm selbst erstellte Bilder, Grafiken, Ton- und Videodokumente sowie Texte zu nutzen oder auf lizenzfreie Grafiken, Ton- und Videodokumente sowie Texte zurückzugreifen. Alle innerhalb des Internetangebotes genannten und ggf. durch Dritte geschützten Marken- und Warenzeichen unterliegen uneingeschränkt den Bestimmungen des jeweils gültigen Kennzeichenrechts und den Besitzrechten der jeweiligen eingetragenen Eigentümer.
-        Allein aufgrund der bloßen Nennung ist nicht der Schluss zu ziehen, dass Markenzeichen nicht durch Rechte Dritter geschützt sind! Das Copyright für veröffentlichte, vom Herausgeber selbst erstellte Inhalte und Objekte bleibt allein beim Herausgeber der Seiten.
-        Eine Vervielfältigung, Verarbeitung, Einspeicherung oder Verwendung solcher Grafiken, Ton- und Videodokumente sowie Texte in anderen elektronischen oder gedruckten Publikationen ist ohne ausdrückliche Zustimmung des Autors nicht gestattet. Unberührt davon bleibt das Kopieren und Herunterladen für den privaten, wissenschaftlichen und nicht kommerziellen Gebrauch. Wir erlauben ausdrücklich und begrüßen das Zitieren unserer Dokumente und Webseiten sowie das Setzen von Links auf unsere Website.</string>
-    <string name="urheber_und_kennzeichenrecht">Urheber- und Kennzeichenrecht</string>
-    <string name="textLinks">Bei direkten oder indirekten Verweisen auf fremde Webseiten (\"Hyperlinks\"), die außerhalb des Verantwortungsbereiches des Herausgebers liegen, würde eine Haftungsverpflichtung ausschließlich in dem Fall in Kraft treten, in dem der Herausgeber von den Inhalten Kenntnis hat und es ihm technisch möglich und zumutbar wäre, die Nutzung im Falle rechtswidriger Inhalte zu verhindern. Der Herausgeber erklärt hiermit ausdrücklich, dass zum Zeitpunkt der Linksetzung keine illegalen Inhalte auf den zu verlinkenden Seiten erkennbar waren.
-        Auf die aktuelle und zukünftige Gestaltung, die Inhalte oder die Urheberschaft der verlinkten/verknüpften Seiten hat der Herausgeber keinerlei Einfluss. Deshalb distanziert er sich hiermit ausdrücklich von allen Inhalten aller verlinkten /verknüpften Seiten,
-        die nach der Linksetzung verändert wurden. Diese Feststellung gilt für alle innerhalb des eigenen Internetangebotes gesetzten Links und Verweise sowie für Fremdeinträge in vom Autor eingerichteten Gästebüchern, Diskussionsforen, Linkverzeichnissen, Mailinglisten und in allen anderen Formen von Datenbanken, auf deren Inhalt externe Schreibzugriffe möglich sind. Für illegale, fehlerhafte oder unvollständige Inhalte und insbesondere für Schäden,
-        die aus der Nutzung oder Nichtnutzung solcherart dargebotener Informationen entstehen, haftet allein der Anbieter der Seite, auf welche verwiesen wurde, nicht derjenige, der über Links auf die jeweilige Veröffentlichung lediglich verweist.</string>
-    <string name="verweise_und_links">Verweise und Links</string>
-    <string name="textDisclaimer">Die Inhalte dieser Applikation werden mit größtmöglicher Sorgfalt recherchiert und implementiert. Fehler im Bearbeitungsvorgang sind dennoch nicht auszuschließen. Bei Hinweisen und Korrekturen wenden Sie sich bitte an die genannten Ansprechpartner. Der Herausgeber übernimmt keinerlei Gewähr für die Aktualität, Korrektheit, Vollständigkeit oder Qualität der bereitgestellten Informationen.
-        Haftungsansprüche gegen den Herausgeber, welche sich auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung oder Nichtnutzung der dargebotenen Informationen bzw. durch die Nutzung fehlerhafter und unvollständiger Informationen verursacht wurden, sind grundsätzlich ausgeschlossen, sofern seitens des Herausgebers kein nachweislich vorsätzliches oder grob fahrlässiges Verschulden vorliegt. Alle Angebote sind freibleibend und unverbindlich.
-        Der Herausgeber behält es sich ausdrücklich vor, Teile der Applikation oder das gesamte Angebot ohne gesonderte Ankündigung zu verändern, zu ergänzen, zu löschen oder die Veröffentlichung zeitweise oder endgültig einzustellen.</string>
-    <string name="headerDisclaimer">Haftungsausschluss</string>
-    <string name="headerContact">Contact:</string>
-    <string name="headerHerausgeber"><p>Prof. Dr.&#8211;Ing. David Bermbach\n
-        Einsteinufer 17 Sekr.EN17 \n
-        10587 Berlin \n
-        Telefon: +49 (0)30 314&#8211;0 \n
-        E-Mail: simra.mcc@gmail.com</p></string>
-    <string name="herausgeber">Herausgeber</string>
-    <string name="textCallCenterTUBerlin">
-        Das Call Center der TU Berlin \n
-        <p>Telefonvermittlung und Auskunftsdienst Telefon: +49 (0)30 314&#8211;0 (extern) oder &#8211;8 (intern) \n
-        Sprechzeiten: Mo-Do 8&#8211;16 Uhr, Fr 8&#8211;15 Uhr \n
-        Weitere Kontaktmöglichkeiten finden Sie unter https://www.tu-berlin.de/servicemenue/kontakt/.</p></string>
-    <string name="ansprechpartner">Ansprechpartner</string>
-    <string name="ust">USt-Id-Nr.: DE 811 231 089</string>
-    <string name="https_www_berlin_de_rbmskzl" translatable="false">https://www.berlin.de/rbmskzl/</string>
-    <string name="textRechtsaufsicht">Der Regierende Bürgermeister von Berlin - Senatskanzlei</string>
-    <string name="rechtsaufsicht">Rechtsaufsicht</string>
-    <string name="textSupplementAddresseTUBerlin">Die Technische Universität Berlin ist eine Körperschaft öffentlichen Rechts gemäß §§ 1 und 2 des Berliner Hochschulgesetzes (BerlHG) und zugleich eine staatliche Einrichtung. Sie wird durch den Präsidenten gesetzlich vertreten. Der Name \"Technische Universität Berlin\" wird nicht ins Englische übersetzt.</string>
-    <string name="www_tu_berlin_de">www.tu-berlin.de/menue/home/parameter/en/</string>
-    <string name="textAddresseTUBerlin">Technische Universität Berlin \n
-        Der Präsident \n
-        Prof. Dr. Christian Thomsen\n
-        Straße des 17. Juni 135 \n
-        10623 Berlin \n
-        Telefon: +49 (0)30 314&#8211;0</string>
-    <string name="headerAddresseTUBerlin">Zentrale Adresse der TU Berlin</string>
-    <string name="umsatzsteueridentifikationsnummer">Umsatzsteueridentifikationsnummer</string>
-    <string name="title_activity_credits">Graphics References</string>
-    <string name="title_activity_ride_settings">Edit Ride Settings</string>
-    <string name="quitAddIncident">Cancel\nadding</string>
-    <string name="airplaneModeIsOn">The airplane mode is enabled! Please disable it, so the ride can be recorded.</string>
-    <string name="locationServiceisOff">The gps location service is disabled! Please enable it, so the ride can be recorded.</string>
-    <string name="recordingNotificationTitle">Recording Ride</string>
-    <string name="recordingNotificationBody">Your Ride is being recorded.</string>
-    <string name="calculatingIncidentsDialogTitle">Calculating Incidents</string>
-    <string name="calculatingIncidentsDialogMessage">Please Wait</string>
-    <string name="newIncidents">Renewed reset to default</string>
-    <string name="warning">Warning</string>
-    <string name="warningRefresMessage">After the ride gets changed, new incidents will be calculated and previous incidents of this ride and their annotations will be deleted.</string>
-    <string name="title_activity_showRoute">Annotate Ride</string>
-    <string name="title_activity_library_license">Third Party Licenses</string>
-    <string name="close">Close</string>
-    <string name="title_activity_about_simra">About SimRa</string>
-    <string name="iAccept">I accept the privacy policy statement</string>
-    <string name="privacyAgreementTitle">Privacy Policy Statement</string>
-    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/research/projects/simra/privacy_policy_statement/parameter/en?isMobile=1">privacy policy statement</a>).</string>
-    <string name="dataPrivayAgreementDialogTitle">Data Privacy</string>
-    <string name="dataPrivayAgreementDialogText">Please agree to our data privacy policy, otherwise you cannot upload your rides.</string>
-    <string name="yesClose"><![CDATA[Yes & close]]></string>
-    <string name="headerShort">Summary</string>
-    <string name="textDPshort">In the research project SimRa, we collect data to get an overview of cycling near accidents in Berlin. We collect data about driving routes, acceleration data, your ride annotations and some demographic data. The goal is, to get information’s about the distribution of time, place and type of dangerous situations while cycling. One of our main goals is to protect your privacy, therefor we individually pseudonymizing your rides and storing them separately from the likewise pseudonymised demographic data.
-</string>
-    <string name="headerGeneralDataPrivacyNew">Data collection and reasons:</string>
-    <string name="textGeneralDataPrivacyNew">All in the research project SimRa collected data, is aiming for getting an overview of cycling near accidents in Berlin. Together with cooperation partners in other cities, we collect data in other cities in the same way. Specifically, we collect the following data:</string>
-    <string name="textGeneralDataPrivacyListNew"> \t1 Routes: We use the GPS module and the location services of your smartphone to record the journey. We store your current position every 10 seconds. \n
-
-        \t2
-        Acceleration values: We use the acceleration sensors of your smartphone. These continuously values describe the respective acceleration in the X, Y and Z directions. We record these in the form of three time series.\n
-
-        \t3 Annotated rides:
-        Based on the acceleration values, we determine probable danger points, you can supplement other danger points and annotate them. In annotation, we request, e.g. the type of event or how endangered you felt. Please do not enter any personal data, such as names or contact details in free text fields, otherwise we won’t be able to ensure your anonymity. Additionally, we request information’s like your bike type. \n
-
-        \t4 Demographic data:
-        In order to classify the collected information’s on routes and near accidents compared to representative data sets from cycler (e.g. age distribution surveys), we collect some demographic data. These are queried in the corresponding submenu. In addition to your user input, we also store aggregated information about your rides, e.g. the total distance covered, the date of your first and last uploaded ride, the number of your rides, the number of annotated dangerous situations. All information’s in this regard is showed in the corresponding menu.
-        \n
-
-        \t5 Meta data:
-         To develop the app, we
-        Capture some meta information’s. These are transmitted to us during regular data transmissions - e.g. while uploading rides or while uploading your demographic data. As meta data we record the app version that is used and the version of your dataset (if you update it). We reserve the right to store connection data such as your IP address momentarily (less than a week) to prevent server attacks.  We store data from real or perceived attackers permanent. After app crashes, you have the option to submit an error log to us. Usually this logfile don’t contain any personal data. Apart from mentioned information, we do not collect any device ID or similar information’s, that could determine your device. \n
-
-        \t6
-        E-mails:
-         If you contact us by e-mail or via feedback, we will save these e-mails as usual. For this we refer to the general data protection information of the Technische Universität Berlin (https://www.tu-berlin.de/allgemeine_seiten/datenschutz/).
-    </string>
-    <string name="textGeneralDataPrivacyEndNew">All collected data will be used for research purposes. We plan to publish the data on routes and dangerous situations as freely accessible public dataset, which we do, after the best possible anonymization (see also the information to personal data in point 3). On base of this data, e.g. traffic flows for cycling can be optimized and dangerous places defused. Further uses, like routing around danger centres or audible warnings while driving, are possible. Because the data collected in this research project will be freely available, any uses are possible.</string>
-    <string name="headerPersonalPrivacy">How we secure your privacy:</string>
-    <string name="presonalPrivacyText">In addition to the usual mechanisms of IT security, we ensure your privacy through anonymization. This is particularly done whereby following mechanisms:
-        \t1 Individual pseudonymisation of the rides: Each ride is individually pseudonymised, thereby a combination of several rides, is not possible for us. Technically, this means that each ride data set (consisting of GPS route, acceleration data and annotation data) is first transmitted to us in a file. Our servers then create an identifier (similar to a file name) and a random access key and send it to your app. This identifier and access key are stored in your smartphone thereby you can view your trips at any time.
-        This means for us, that we cannot create cross-driving links, because we don’t have any data about which smartphone or user the ride belongs to. We only can say, that there is a ride from place A to place B every day at the same time, but we cannot say, if this is the same person. This is particularly true in high populated regions. If you start your rides alone in a house with a clear distance to other houses, an assignment with additional knowledge may be possible. Here we refer to the possibilities from point 3 below.\n
-        \t2 Pseudonymisation of demographic data: The demographic data uploaded by you gets individually pseudonymized as the individual rides, technically this is implemented comparably. This means that linking your demographic data with your rides is not possible. Before being published as a public dataset, we will explicitly verify that the demographic information does not uniquely identify anyone and, if necessary, further aggregate the data.\n
-        \t3 Trimming rides: After recording a ride you can cut off your ride at both ends - you can freely define the part that will be removed; this will not be sent to us per upload and gets permanently deleted instead. In high populated cities, your trip should usually be sufficiently anonymized without trimming, especially because information’s if a ride got trimmed or not, isn’t saved at all. In more rural areas, you should use this feature specifically. But we would ask you to don’t overuse the function, as excessive use can reduce the validity of the collected data. </string>
-    <string name="headerThirdParties">Usage of external applications:</string>
-    <string name="textPrivacyImprint">Further information to data privacy, data collection and data utilisation on the Button below. Third parties aren’t allowed to use in the app published data, like address, phone number, fax number or mail address, to send unrequested information. We reserve to take legal steps against sender from spam mails.</string>
-    <string name="simra_closed">SimRa closed</string>
-    <string name="next">Continue</string>
-    <string name="close_simra">Close SimRa</string>
-    <string name="privacySlider">Cut off the beginning or the end of the ride</string>
-    <string name="title_tutorial">Tutorial</string>
-    <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Instructions.pdf</string>
-    <string name="calculating_incidents">Calculating Incidents</string>
-    <string name="delete_file_warning">This ride hasn\t been uploaded yet. Do you want to delete the ride anyway?</string>
-    <string name="delete_ride_approve">Delete ride</string>
-    <string name="ride_deleted">Ride deleted</string>
-    <string name="uploadingNotificationTitle">SimRa</string>
-    <string name="uploadingNotificationBody">SimRa is uploading rides</string>
-    <string name="upload_started">SimRa ride upload started</string>
-    <string name="checking_for_updates">Checking for updates</string>
-    <string name="new_app_version_text">To continue, please download the new version via Google Play or manually via the .APK file.</string>
-    <string name="open_google_play_store">Open Google Play Store</string>
-    <string name="download_the_apk_file">Download the .APK file</string>
-    <string name="installed_version">installed version:</string>
-    <string name="newest_version">newest version:</string>
-    <string name="new_app_version_title">New update available</string>
-    <string name="later">Later</string>
-    <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/en/mobil/</string>
-    <string name="upload_completed">SimRa update completed</string>
-    <string name="upload_failed">SimRa upload failed</string>
+    <string name="icons8Credit">Icon made by Icons8 from https://icons8.com .</string>
 </resources>

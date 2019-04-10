@@ -312,7 +312,7 @@ public class UploadService extends Service {
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileName + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + fileType + "?loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
+            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + fileType + "?loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash(context));
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
@@ -356,7 +356,7 @@ public class UploadService extends Service {
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
+            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash(context));
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();

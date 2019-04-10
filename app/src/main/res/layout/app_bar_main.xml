@@ -69,7 +69,7 @@
             android:fontFamily="@font/assistant_extralight"
 
             android:gravity="center"
-            android:text="@string/startRecording"
+            android:text="@string/startButtonText"
             android:textColor="#FEFEFE"
             android:textSize="24dp"
             android:textStyle="bold" />
@@ -106,7 +106,7 @@
             android:layout_marginTop="10dp"
             android:fontFamily="@font/assistant_extralight"
             android:gravity="center"
-            android:text="@string/endRecording"
+            android:text="@string/stopButtonText"
             android:textColor="#FEFEFE"
             android:textSize="24dp"
             android:textStyle="bold" />
