@@ -50,14 +50,6 @@
             android:label="@string/title_activity_library_license"
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation|screenSize"/>
-        <activity
-            android:name=".PrivacyActivity"
-            android:label="@string/title_activity_privacy"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ImprintActivity"
-            android:label="@string/title_activity_imprint"
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="MAPBOX_MAPID"

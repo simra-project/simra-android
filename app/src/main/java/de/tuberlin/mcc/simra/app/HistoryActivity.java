@@ -259,12 +259,12 @@ public class HistoryActivity extends BaseActivity {
 
         long millis = Long.valueOf(item[2]) - Long.valueOf(item[1]);
         int minutes = Math.round((millis/1000/60));
-
+        Date dt = new Date(Long.valueOf(item[1]));
         Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
-        int day = localCalendar.get(Calendar.DATE);
+        localCalendar.setTime(dt);
+        String day = String.valueOf(localCalendar.get(Calendar.DATE));
         String month = String.valueOf(localCalendar.get(Calendar.MONTH) + 1);
         String year = String.valueOf(localCalendar.get(Calendar.YEAR)).substring(2,4);
-        Date dt = new Date(Long.valueOf(item[1]));
         Locale locale = Resources.getSystem().getConfiguration().locale;
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", locale);
         if (locale.equals(Locale.US)) {
@@ -274,6 +274,10 @@ public class HistoryActivity extends BaseActivity {
         if (month.length() < 2) {
            month = "0" + month;
         }
+        if (day.length() < 2) {
+            day = "0" + day;
+        }
+
 
         String startDateOfRide = day + "." + month + "." + year + ", " + time + "h";
         if (locale.equals(Locale.US)) {
@@ -303,7 +307,7 @@ public class HistoryActivity extends BaseActivity {
 
         // Checks whether a ride was selected or not. Maybe it will be possible to select
         // multiple rides and push a button to send them all to the server to be analyzed
-        if (accGpsString != null && startTime != "") {
+        if (accGpsString != null && !startTime.equals("")) {
             // Start ShowRouteActivity with the selected Ride.
             Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
             intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);

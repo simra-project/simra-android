@@ -622,7 +622,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             StringBuilder response = new StringBuilder();
             try {
-                URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "version?clientHash=" + SimRAuthenticator.getClientHash());
+                URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "version?clientHash=" + SimRAuthenticator.getClientHash(MainActivity.this));
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection =
                         (HttpsURLConnection)url.openConnection();
