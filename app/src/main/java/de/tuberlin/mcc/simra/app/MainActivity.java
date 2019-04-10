@@ -243,7 +243,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         helmetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
             }
         });
 
