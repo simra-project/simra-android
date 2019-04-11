@@ -132,6 +132,7 @@ public class HistoryActivity extends BaseActivity {
                 return false;
             }
 
+
         });
         justUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
