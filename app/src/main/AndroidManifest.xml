@@ -134,7 +134,6 @@
             android:name=".CreditsActivity"
             android:label="@string/title_activity_credits"
             android:theme="@style/AppTheme" />
-        <activity android:name=".LoggingExceptionActivity" />
     </application>
 
 </manifest>

@@ -181,7 +181,7 @@
                 android:layout_height="60dp"
                 android:layout_alignParentStart="true"
                 android:layout_marginLeft="15dp"
-                android:background="@drawable/edit_event_black" />
+                android:background="@drawable/edit_event_blue" />
 
             <TextView
                 android:id="@+id/locationMarkerCreditText"
@@ -198,6 +198,38 @@
 
 
         </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/locationMarkerEdited_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/edited_event_blue" />
+
+            <TextView
+                android:id="@+id/locationMarkerEditedCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/locationMarkerEdited_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/locationMarkerEdited_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/smashiconCredit" />
+
+
+        </RelativeLayout>
+
+
 
         <RelativeLayout
             android:layout_width="match_parent"
