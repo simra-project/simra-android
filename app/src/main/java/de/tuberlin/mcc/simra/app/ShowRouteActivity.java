@@ -354,7 +354,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         // (2) Custom, not yet annotated
 
-        editCustMarker = getResources().getDrawable(R.drawable.edit_event_grun, null);
+        editCustMarker = getResources().getDrawable(R.drawable.edit_event_green, null);
 
         // (3) Automatically recognized, annotated
 
