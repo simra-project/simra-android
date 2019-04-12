@@ -71,9 +71,7 @@ public class Ride {
         this.pLoc = pLoc;
         this.events = findAccEvents();
         this.context = context;
-        String prefix = "/data/user/0/de.tuberlin.mcc.simra.app/files/";
-        String path = accGpsFile.getPath().replace(prefix, "");
-        this.id = path.split("_")[0];
+        this.id = accGpsFile.getName().split("_")[0];
 
         String pathToAccEventsOfRide = "accEvents" + id + ".csv";
         String content = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
@@ -107,9 +105,7 @@ public class Ride {
         this.pLoc = pLoc;
         this.events = findAccEvents();
         this.context = context;
-        String prefix = "/data/user/0/de.tuberlin.mcc.simra.app/files/";
-        String path = tempAccGpsFile.getPath().replace(prefix, "");
-        this.id = path.split("_")[0].replace("Temp", "");
+        this.id = tempAccGpsFile.getName().split("_")[0].replace("Temp", "");
         this.temp = temp;
 
         String pathToAccEventsOfRide = "TempaccEvents" + id + ".csv";

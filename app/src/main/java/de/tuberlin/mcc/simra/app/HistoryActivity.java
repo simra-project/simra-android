@@ -69,9 +69,6 @@ public class HistoryActivity extends BaseActivity {
     public class MyBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String log = ("Action: " + intent.getAction() + System.lineSeparator()) +
-                    "URI: " + intent.toUri(Intent.URI_INTENT_SCHEME) + System.lineSeparator();
-            Log.d(TAG, "onReceive: " + log);
             boolean uploadSuccessful = intent.getBooleanExtra("uploadSuccessful",false);
             if (uploadSuccessful) {
                 Toast.makeText(getApplicationContext(), R.string.upload_completed, Toast.LENGTH_LONG).show();
@@ -134,6 +131,7 @@ public class HistoryActivity extends BaseActivity {
                 }
                 return false;
             }
+
 
         });
         justUploadButton.setOnClickListener(new View.OnClickListener() {
@@ -205,14 +203,10 @@ public class HistoryActivity extends BaseActivity {
 
             ridesArr = new String[metaDataLines.size()];
             Log.d(TAG, "refreshMyRides(): metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
-            Log.d(TAG, "ArrayList<String[]> metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             for (int i = 0; i < metaDataLines.size(); i++) {
                 String[] metaDataLine = metaDataLines.get(i);
                 Log.d(TAG, "String[] metaDataLine: " + Arrays.toString(metaDataLine));
-                Log.d(TAG, "metaDataLines.size(): " + metaDataLines.size() + " metaDataLine[0]: " + metaDataLine[0]);
-                Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
                 ridesArr[((metaDataLines.size()) - i) - 1] = listToTextShape(metaDataLine);
-                Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             }
 
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
@@ -380,12 +374,10 @@ public class HistoryActivity extends BaseActivity {
             } else {
                 holder = (Holder) row.getTag();
             }
-            Log.d(TAG, stringArrayList.get(position));
             String[] itemComponents = stringArrayList.get(position).split(";");
             holder.rideDate.setText(itemComponents[1]);
             holder.message.setText(itemComponents[2]);
             holder.duration.setText(itemComponents[3]);
-            Log.d(TAG, "itemComponents: " + Arrays.toString(itemComponents));
             if (!itemComponents[4].equals("2")) {
                 holder.btnDelete.setVisibility(View.VISIBLE);
             } else {

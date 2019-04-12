@@ -219,12 +219,6 @@ public class Utils {
 
         // Only checking for empty strings, which means we are retaining
         // events that were labeled as 'nothing happened'
-        Log.d(TAG, "checkForAnnotation() incidentProps[10]: " + incidentProps[10] + " length: " + incidentProps[10].length());
-        Log.d(TAG, "checkForAnnotation() incidentProps[11]: " + incidentProps[11] + " length: " + incidentProps[11].length());
-        Log.d(TAG, "checkForAnnotation() incidentProps[12]: " + incidentProps[12] + " length: " + incidentProps[12].length());
-        Log.d(TAG, "checkForAnnotation() incidentProps[18]: " + incidentProps[18] + " length: " + incidentProps[18].length());
-        Log.d(TAG, "checkForAnnotation() incidentProps[19]: " + incidentProps[19] + " length: " + incidentProps[19].length());
-
         return !incidentProps[10].equals("") || !incidentProps[11].equals("") ||
                 !incidentProps[12].equals("") || !incidentProps[13].equals("") ||
                 !incidentProps[14].equals("") || !incidentProps[15].equals("") ||
