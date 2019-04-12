@@ -350,7 +350,7 @@ public class ShowRouteActivity extends BaseActivity {
         // Set the icons for event markers
         // (1) Automatically recognized, not yet annotated
 
-        editMarkerDefault = getResources().getDrawable(R.drawable.edit_event_bunt, null);
+        editMarkerDefault = getResources().getDrawable(R.drawable.edit_event_blue, null);
 
         // (2) Custom, not yet annotated
 
@@ -358,11 +358,11 @@ public class ShowRouteActivity extends BaseActivity {
 
         // (3) Automatically recognized, annotated
 
-        editDoneDefault = getResources().getDrawable(R.drawable.event_annotated_bunt, null);
+        editDoneDefault = getResources().getDrawable(R.drawable.edited_event_blue, null);
 
         // (4) Custom, not yet annotated
 
-        editDoneCust = getResources().getDrawable(R.drawable.event_annotated_grun, null);
+        editDoneCust = getResources().getDrawable(R.drawable.edited_event_green, null);
 
         // Call function for drawing markers for all AccEvents in ride, now encapsulated in
         // MarkerFunct class for better readability
