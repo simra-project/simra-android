@@ -49,10 +49,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     long endTime;
     ExecutorService executor;
     Sensor accelerometer;
+    Sensor gyroscope;
     float[] accelerometerMatrix = new float[3];
+    float[] gyroscopeMatrix = new float[3];
     String pathToAccGpsFile = "";
     LocationManager locationManager;
     Location lastLocation;
+    float lastAccuracy;
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,34 +107,38 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        curTime = System.currentTimeMillis();
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            curTime = System.currentTimeMillis();
 
-        // Privacy filter: Set recordingAllowed to true, when enough time (privacyDuration) passed
-        // since the user pressed Start Recording AND there is enough distance (privacyDistance)
-        // between the starting location and the current location.
-        if (!recordingAllowed && startLocation != null && lastLocation != null) {
-            if ((startLocation.distanceTo(lastLocation) >= (float) privacyDistance)
-                    && ((curTime - startTime) > privacyDuration)) {
-                recordingAllowed = true;
+            // Privacy filter: Set recordingAllowed to true, when enough time (privacyDuration) passed
+            // since the user pressed Start Recording AND there is enough distance (privacyDistance)
+            // between the starting location and the current location.
+            if (!recordingAllowed && startLocation != null && lastLocation != null) {
+                if ((startLocation.distanceTo(lastLocation) >= (float) privacyDistance)
+                        && ((curTime - startTime) > privacyDuration)) {
+                    recordingAllowed = true;
+                }
+            }
+                accelerometerMatrix = event.values;
+
+
+            if (((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) && recordingAllowed) {
+
+                lastAccUpdate = curTime;
+                // Write data to file in background thread
+                try {
+                    Runnable insertHandler = new InsertHandler(accelerometerMatrix, gyroscopeMatrix);
+                    executor.execute(insertHandler);
+                } catch (Exception e) {
+                    Log.e(TAG, "insertData: " + e.getMessage(), e);
+                }
+
             }
         }
-
-        accelerometerMatrix = event.values;
-
-
-        if (((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) && recordingAllowed) {
-
-            lastAccUpdate = curTime;
-            // Write data to file in background thread
-            try {
-                Runnable insertHandler = new InsertHandler(accelerometerMatrix);
-                executor.execute(insertHandler);
-            } catch (Exception e) {
-                Log.e(TAG, "insertData: " + e.getMessage(), e);
-            }
+        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+            gyroscopeMatrix = event.values;
 
         }
-
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,6 +162,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 startLocation = location;
             }
             lastLocation = location;
+            lastAccuracy = location.getAccuracy();
         }
     }
 
@@ -193,7 +201,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Prepare the accelerometer accGpsFile
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
+        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         // Request location updates
         locationManager = (LocationManager) getSystemService(Context
                 .LOCATION_SERVICE);
@@ -259,12 +267,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(notificationId, notification);
         startForeground(notificationId, notification);
-        wakeLock.acquire();
+        wakeLock.acquire(14400000);
 
-        // Register Accelerometer accGpsFile
+        // Register Accelerometer and Gyroscope
         sensorManager.registerListener(this, accelerometer,
                 SensorManager.SENSOR_DELAY_FASTEST);
-
+        sensorManager.registerListener(this, gyroscope,
+                2900);
         return START_STICKY;
     }
 
@@ -281,7 +290,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
 
             // Create head of the csv-file
-            appendToFile((fileInfoLine + "lat,lon,X,Y,Z,timeStamp" + System.lineSeparator()), pathToAccGpsFile, this);
+            appendToFile((fileInfoLine + "lat,lon,X,Y,Z,timeStamp,acc,a,b,c" + System.lineSeparator()), pathToAccGpsFile, this);
 
             // Write String data to files
             appendToFile(accGpsString, pathToAccGpsFile, this);
@@ -379,10 +388,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     class InsertHandler implements Runnable {
 
         final float[] accelerometerMatrix;
+        final float[] gyroscopeMatrix;
 
         // Store the current accGpsFile array values into THIS objects arrays, and db insert from this object
-        public InsertHandler(float[] accelerometerMatrix) {
+        public InsertHandler(float[] accelerometerMatrix, float[] gyroscopeMatrix) {
             this.accelerometerMatrix = accelerometerMatrix;
+            this.gyroscopeMatrix = gyroscopeMatrix;
         }
 
         @SuppressLint("MissingPermission")
@@ -402,11 +413,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
             } else {
 
-                // The gps (lat, lon) information are recorded (around) every 3 seconds.
-                // The accGpsFile data (x,y,z) information are recorded 50 times a second.
-                // So the gps changes (around) every 150 lines. We store the gps data
-                // only after the 3 seconds are over.
-                String gps = ",,";
+                // The gps (lat, lon, accuracy) information are recorded (around) every 3 seconds.
+                // The accelerometer data (x,y,z) information are recorded 50 times a second.
+                // The gyroscope data (a,b,c) information are recorded (around) every 3 seconds.
+                // So the gps and gyroscope data changes (around) every 150 lines. We store the gps
+                // data only after the 3 seconds are over.
+                String gps = ",";
+                String accuracy = "";
+                String gyro = ",,";
 
                 if ((lastAccUpdate - lastGPSUpdate) >= GPS_POLL_FREQUENCY) {
                     lastGPSUpdate = lastAccUpdate;
@@ -420,8 +434,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                                 .GPS_PROVIDER);
                     }
 
-                    gps = String.valueOf(lastLocation.getLatitude()) + "," +
-                            String.valueOf(lastLocation.getLongitude()) + ",";
+                    gps =   String.valueOf(lastLocation.getLatitude()) + "," +
+                            String.valueOf(lastLocation.getLongitude());
+                    accuracy =  String.valueOf(lastAccuracy);
+                    gyro =  String.valueOf(gyroscopeMatrix[0]) + "," +
+                            String.valueOf(gyroscopeMatrix[1]) + "," +
+                            String.valueOf(gyroscopeMatrix[2]);
                 }
 
                 // The queues are of sufficient size, let's compute the averages.
@@ -431,10 +449,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 float zAvg = computeAverage(accZQueue);
 
                 // Put the averages + time data into a string and append to file.
-                String str = gps + String.valueOf(xAvg) + "," +
+                String str =
+                        gps + "," +
+                        String.valueOf(xAvg) + "," +
                         String.valueOf(yAvg) + "," +
                         String.valueOf(zAvg) + "," +
-                        curTime;
+                        curTime + "," +
+                        accuracy + "," +
+                        gyro;
 
                 accGpsString += str;
                 accGpsString += System.getProperty("line.separator");
