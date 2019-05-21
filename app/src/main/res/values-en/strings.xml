@@ -108,6 +108,7 @@
     <string name="calculating_incidents">Calculating Incidents</string>
     <string name="addIncident">Add\nIncident</string>
     <string name="saveIncident">Save &amp;\nReturn</string>
+    <string name="exitShowRoute">Return</string>
     <string name="savedRide">Ride saved</string>
     <string name="doNotShowAgain">Don\'t show this again</string>
 

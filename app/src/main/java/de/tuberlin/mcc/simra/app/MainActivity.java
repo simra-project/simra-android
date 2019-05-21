@@ -73,8 +73,6 @@ import javax.net.ssl.TrustManagerFactory;
 
 import static de.tuberlin.mcc.simra.app.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.Constants.ZOOM_LEVEL;
-import static de.tuberlin.mcc.simra.app.Utils.configureHostNameVerifier;
-import static de.tuberlin.mcc.simra.app.Utils.configureSSLContext;
 import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.Utils.showMessageOK;
 
@@ -625,13 +623,11 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection =
                         (HttpsURLConnection)url.openConnection();
-                urlConnection.setSSLSocketFactory(configureSSLContext(MainActivity.this).getSocketFactory());
                 urlConnection.setRequestMethod("GET");
                 // urlConnection.setRequestProperty("Content-Type","text/plain");
                 // urlConnection.setDoOutput(true);
                 urlConnection.setReadTimeout(10000);
                 urlConnection.setConnectTimeout(15000);
-                urlConnection.setHostnameVerifier(configureHostNameVerifier());
 
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(urlConnection.getInputStream()));
