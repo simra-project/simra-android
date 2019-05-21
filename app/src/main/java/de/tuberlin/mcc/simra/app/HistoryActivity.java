@@ -404,13 +404,13 @@ public class HistoryActivity extends BaseActivity {
                                 // Start ShowRouteActivity with the selected Ride.
                                 Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
                                 intent.putExtra("PathToAccGpsFile", dirFiles[i].getName());
-                                intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
-                                intent.putExtra("StartTime", metaDataLines.get(position)[1]);
-                                intent.putExtra("State", Integer.valueOf(metaDataLines.get(position)[3]));
+                                intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
+                                intent.putExtra("StartTime", metaDataLines.get(metaDataLines.size() - position - 1)[1]);
+                                intent.putExtra("State", Integer.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[3]));
                                 Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getName());
-                                Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(position)[2]) - Long.valueOf(metaDataLines.get(position)[1])));
-                                Log.d(TAG, "StartTime: " + metaDataLines.get(position)[1]);
-                                Log.d(TAG, "State: " + metaDataLines.get(position)[3]);
+                                Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
+                                Log.d(TAG, "StartTime: " + metaDataLines.get(metaDataLines.size() - position - 1)[1]);
+                                Log.d(TAG, "State: " + metaDataLines.get(metaDataLines.size() - position - 1)[3]);
 
                                 startActivity(intent);
                             }

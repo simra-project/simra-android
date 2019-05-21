@@ -18,6 +18,7 @@ import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -74,6 +75,8 @@ public class ShowRouteActivity extends BaseActivity {
     private MapView mMapView;
     private RelativeLayout addIncBttn;
     private RelativeLayout exitAddIncBttn;
+    RelativeLayout saveButton;
+    RelativeLayout exitButton;
 
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Our ride
@@ -175,21 +178,22 @@ public class ShowRouteActivity extends BaseActivity {
         TextView copyrightTxt = (TextView) findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
-        addIncBttn = findViewById(R.id.addIncident);
-        addIncBttn.setVisibility(View.VISIBLE);
-        exitAddIncBttn = findViewById(R.id.exitAddIncident);
-        exitAddIncBttn.setVisibility(View.INVISIBLE);
-        progressBarRelativeLayout = findViewById(R.id.progressBarRelativeLayout);
 
-
-
-        // scales tiles to dpi of current display
-        mMapView.setTilesScaledToDpi(true);
 
         pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
         state = getIntent().getIntExtra("State", 0);
+        Log.d(TAG, "state: " + state);
         duration = getIntent().getStringExtra("Duration");
+
+        addIncBttn = findViewById(R.id.addIncident);
+
+        exitAddIncBttn = findViewById(R.id.exitAddIncident);
+        exitAddIncBttn.setVisibility(View.GONE);
+        progressBarRelativeLayout = findViewById(R.id.progressBarRelativeLayout);
+
+        // scales tiles to dpi of current display
+        mMapView.setTilesScaledToDpi(true);
 
         gpsFile = getFileStreamPath(pathToAccGpsFile);
 
@@ -200,6 +204,21 @@ public class ShowRouteActivity extends BaseActivity {
         pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this);
 
         privacySlider = findViewById(R.id.privacySlider);
+        TextView privacySliderDescription = findViewById(R.id.privacySliderDescription);
+        LinearLayout privacySliderLinearLayout = findViewById(R.id.privacySliderLinearLayout);
+        saveButton = findViewById(R.id.saveIncident);
+        exitButton = findViewById(R.id.exitShowRoute);
+
+        if (state < 2) {
+            addIncBttn.setVisibility(View.VISIBLE);
+            exitButton.setVisibility(View.INVISIBLE);
+        } else {
+            addIncBttn.setVisibility(View.GONE);
+            privacySliderLinearLayout.setVisibility(View.INVISIBLE);
+            privacySliderDescription.setVisibility(View.INVISIBLE);
+            saveButton.setVisibility(View.INVISIBLE);
+
+        }
 
         Log.d(TAG, "setting up clickListeners");
 
@@ -337,7 +356,6 @@ public class ShowRouteActivity extends BaseActivity {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (3): CenterMap
         ImageButton centerMap = findViewById(R.id.bounding_box_center_button);
-
 
         centerMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -489,16 +507,14 @@ public class ShowRouteActivity extends BaseActivity {
 
             }
         });
-        RelativeLayout saveButton = findViewById(R.id.saveIncident);
+
 
         runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
                 privacySlider.setRange(0, routeSize);
-                if (!temp) {
-                    saveButton.setVisibility(View.VISIBLE);
-                }
+
             }
         });
 

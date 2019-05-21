@@ -31,8 +31,6 @@ import javax.net.ssl.HttpsURLConnection;
 import static de.tuberlin.mcc.simra.app.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.Constants.LOCALE_ABVS;
 import static de.tuberlin.mcc.simra.app.Utils.checkForAnnotation;
-import static de.tuberlin.mcc.simra.app.Utils.configureHostNameVerifier;
-import static de.tuberlin.mcc.simra.app.Utils.configureSSLContext;
 import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.Utils.lookUpSharedPrefs;
@@ -316,13 +314,11 @@ public class UploadService extends Service {
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
-            urlConnection.setSSLSocketFactory(configureSSLContext(context).getSocketFactory());
             urlConnection.setRequestMethod("POST");
             urlConnection.setDoInput(true);
             urlConnection.setDoOutput(true);
             urlConnection.setReadTimeout(10000);
             urlConnection.setConnectTimeout(15000);
-            urlConnection.setHostnameVerifier(configureHostNameVerifier());
             urlConnection.setRequestProperty("Content-Type","text/plain");
             byte[] outputInBytes = contentToSend.getBytes("UTF-8");
             OutputStream os = urlConnection.getOutputStream();
@@ -360,13 +356,11 @@ public class UploadService extends Service {
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection)url.openConnection();
-            urlConnection.setSSLSocketFactory(configureSSLContext(context).getSocketFactory());
             urlConnection.setRequestMethod("PUT");
             urlConnection.setDoInput(true);
             urlConnection.setDoOutput(true);
             urlConnection.setReadTimeout(10000);
             urlConnection.setConnectTimeout(15000);
-            urlConnection.setHostnameVerifier(configureHostNameVerifier());
             urlConnection.setRequestProperty("Content-Type","text/plain");
             Log.d(TAG, "contentToSend.length(): " + contentToSend.length());
             byte[] outputInBytes = contentToSend.getBytes("UTF-8");

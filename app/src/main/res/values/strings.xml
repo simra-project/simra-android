@@ -109,6 +109,7 @@
     <string name="calculating_incidents">Berechne Ereignisse</string>
     <string name="addIncident">Ereignis\nhinzufügen</string>
     <string name="saveIncident">Speichern &amp;\nZurück</string>
+    <string name="exitShowRoute">Zurück</string>
     <string name="savedRide">Die Fahrt wurde gespeichert</string>
     <string name="doNotShowAgain">Diesen Dialog nicht mehr zeigen</string>
 
