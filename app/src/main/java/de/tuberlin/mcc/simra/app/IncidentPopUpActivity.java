@@ -262,7 +262,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             } catch (FileNotFoundException fnfe) {
 
                 fnfe.printStackTrace();
-                Log.i(TAG, "Incident file not found");
+                Log.d(TAG, "Incident file not found");
 
             }
             try {
@@ -287,7 +287,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
             } catch (IOException ioe) {
                 ioe.printStackTrace();
-                Log.i(TAG, "Problems reading AccEvents file");
+                Log.d(TAG, "Problems reading AccEvents file");
 
             }
 

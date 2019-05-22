@@ -83,7 +83,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private SensorManager sensorManager = null;
     private PowerManager.WakeLock wakeLock = null;
     private IBinder mBinder = new MyBinder();
-    private String accGpsString = "";
+    private StringBuilder accGpsString = new StringBuilder();
 
     public String getPathToAccGpsFile() {
         return pathToAccGpsFile;
@@ -293,7 +293,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             appendToFile((fileInfoLine + "lat,lon,X,Y,Z,timeStamp,acc,a,b,c" + System.lineSeparator()), pathToAccGpsFile, this);
 
             // Write String data to files
-            appendToFile(accGpsString, pathToAccGpsFile, this);
+            appendToFile(accGpsString.toString(), pathToAccGpsFile, this);
             appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0)) + ","
                     + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
                     + "0" + System.lineSeparator(), "metaData.csv", this);
@@ -326,9 +326,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             try {
                 // Wait for all tasks to finish before we proceed
                 while (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                    Log.i(TAG, "Waiting for current tasks to finish");
+                    Log.d(TAG, "Waiting for current tasks to finish");
                 }
-                Log.i(TAG, "No queue to clear");
+                Log.d(TAG, "No queue to clear");
             } catch (InterruptedException e) {
                 Log.e(TAG, "Exception caught while waiting for finishing gpsExecutor tasks");
                 executor.shutdownNow();
@@ -458,8 +458,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         accuracy + "," +
                         gyro;
 
-                accGpsString += str;
-                accGpsString += System.getProperty("line.separator");
+                accGpsString.append(str).append(System.getProperty("line.separator"));
                 lineAdded = true;
 
                 /** Now remove as many elements from the queues as our moving average step/shift

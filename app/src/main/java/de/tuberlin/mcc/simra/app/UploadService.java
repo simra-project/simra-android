@@ -187,7 +187,7 @@ public class UploadService extends Service {
 
                 int appVersion = getAppVersionNumber(context);
                 String fileVersion = "";
-                String content = "";
+                StringBuilder content = new StringBuilder();
 
                 try {
                     BufferedReader metaDataReader = new BufferedReader(new FileReader(context.getFileStreamPath("metaData.csv")));
@@ -240,7 +240,7 @@ public class UploadService extends Service {
                             }
 
                         }
-                        content += ((Arrays.toString(metaDataLine).replace("[","")
+                        content.append((Arrays.toString(metaDataLine).replace("[","")
                                 .replace(", ",",").replace("]","")) + System.lineSeparator());
                         if (!metaDataLine[0].equals("key")) {
                             duration = duration + (Long.valueOf(metaDataLine[2]) - Long.valueOf(metaDataLine[1]));

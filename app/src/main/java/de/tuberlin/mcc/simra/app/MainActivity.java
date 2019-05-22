@@ -125,7 +125,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Log.i(TAG, "OnCreate called");
+        Log.d(TAG, "OnCreate called");
         super.onCreate(savedInstanceState);
 
         myEx = Executors.newFixedThreadPool(4);
@@ -251,7 +251,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         centerMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(TAG, "centerMap clicked ");
+                Log.d(TAG, "centerMap clicked ");
                 mLocationOverlay.enableFollowLocation();
                 mMapController.setZoom(ZOOM_LEVEL);
             }
@@ -367,7 +367,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             }
         });
         new CheckVersionTask().execute();
-        Log.i(TAG, "OnCreate finished");
+        Log.d(TAG, "OnCreate finished");
 
     }
 
@@ -399,7 +399,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
     public void onResume() {
 
-        Log.i(TAG, "OnResume called");
+        Log.d(TAG, "OnResume called");
 
         super.onResume();
 
@@ -431,7 +431,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
     public void onPause() {
 
-        Log.i(TAG, "OnPause called");
+        Log.d(TAG, "OnPause called");
 
         super.onPause();
 
@@ -442,7 +442,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         // Refresh the osmdroid configuration on pausing.
         mMapView.onPause(); // needed for compass and icons
 
-        Log.i(TAG, "OnPause finished");
+        Log.d(TAG, "OnPause finished");
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -450,7 +450,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
     @SuppressLint("MissingPermission")
     public void onStop() {
 
-        Log.i(TAG, "OnStop called");
+        Log.d(TAG, "OnStop called");
 
         super.onStop();
 
@@ -466,7 +466,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             se.printStackTrace();
         }
 
-        Log.i(TAG, "OnStop finished");
+        Log.d(TAG, "OnStop finished");
     }
 
     @Override
