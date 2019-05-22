@@ -291,14 +291,12 @@ public class MarkerFunct {
 
         String addressForLoc = "";
 
-        Log.d(TAG, "Getting AddressFromLocation; currentLocHelper: " + currentLocHelper.toString());
         try {
             addressForLoc = pool.submit(() -> getAddressFromLocation(currentLocHelper)).get();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        Log.d(TAG, "setting up InfoWindow with address: " + addressForLoc);
         InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble,
                 mother.getmMapView(),
                 event, addressForLoc, mother, event.key, temp);
@@ -322,16 +320,14 @@ public class MarkerFunct {
                 Log.d(TAG, "getAddressFromLocation(): Couldn't find an address for input geoPoint");
             } else {
                 // Get address result from geocoding result
-                Log.d(TAG, "address.get(0): " + address.get(0).toString());
                 Address location = address.get(0);
                 addressForLocation = location.getAddressLine(0);
-                            }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Log.d(TAG, "returning addressForLocation: " + addressForLocation);
         return addressForLocation;
 
     }

@@ -360,7 +360,7 @@ public class ShowRouteActivity extends BaseActivity {
         centerMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(TAG, "boundingBoxCenterMap clicked ");
+                Log.d(TAG, "boundingBoxCenterMap clicked ");
                 zoomToBBox(bBox);
             }
         });
@@ -606,8 +606,8 @@ public class ShowRouteActivity extends BaseActivity {
 
             try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(ride.accGpsFile)))) {
                 String line;
-                content.append(br.readLine() + System.lineSeparator()); // fileInfo
-                content.append(br.readLine() + System.lineSeparator()); // csv header
+                content.append(br.readLine()).append(System.lineSeparator()); // fileInfo
+                content.append(br.readLine()).append(System.lineSeparator()); // csv header
                 int partOfRideNumber = 0;
                 while ((line = br.readLine()) != null) {
                     if (!line.startsWith(",,")) {
