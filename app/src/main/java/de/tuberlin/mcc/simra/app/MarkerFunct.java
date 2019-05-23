@@ -42,24 +42,14 @@ public class MarkerFunct {
     private static final String TAG = "MarkerFunct_LOG";
 
     private ShowRouteActivity mother;
-
     private ExecutorService pool;
-
     private String rideID;
-
     private ArrayList<Marker> markers = new ArrayList<>();
-
     private GeocoderNominatim geocoderNominatim;
-
     private final String userAgent = "SimRa/alpha";
-
-    String startTime;
-    String timeStamp;
-
-    boolean temp;
-
+    private boolean temp;
+    private int state;
     private int numEvents;
-
     private Map<Integer, Marker> markerMap = new HashMap<>();
 
     public MarkerFunct(ShowRouteActivity mother, boolean temp) {
@@ -79,9 +69,7 @@ public class MarkerFunct {
                 geocoderNominatim = new GeocoderNominatim(userAgent)
         ));
 
-        this.startTime = mother.startTime;
-
-        this.timeStamp = mother.timeStamp;
+        this.state = mother.state;
 
         if (temp) {
             this.numEvents = (mother.tempRide.events.size() - 1);
@@ -299,7 +287,7 @@ public class MarkerFunct {
 
         InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble,
                 mother.getmMapView(),
-                event, addressForLoc, mother, event.key, temp);
+                event, addressForLoc, mother, event.key, temp, state);
         incidentMarker.setInfoWindow(infoWindow);
 
         markers.add(incidentMarker);

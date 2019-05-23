@@ -154,32 +154,40 @@
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:layout_alignEnd="@id/exitAddIncident"
+        android:padding="2dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp"
-        android:elevation="2dp"
+        android:elevation="20dp"
         android:clickable="true"
         android:focusable="true"
         android:background="@drawable/button_unpressed">
-
-        <ImageView
-            android:id="@+id/revert_imageView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:background="@android:drawable/ic_menu_revert" />
-
-        <TextView
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:fontFamily="@font/assistant_extralight"
-            android:layout_alignParentEnd="true"
-            android:layout_toEndOf="@id/revert_imageView"
-            android:gravity="center"
-            android:text="@string/exitShowRoute"
-            android:textColor="#FEFEFE"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+            <ImageView
+                android:id="@+id/revert_imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:background="@android:drawable/ic_menu_revert"
+                android:scaleType="centerInside"
+                android:layout_marginEnd="3dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:fontFamily="@font/assistant_extralight"
+                android:layout_toEndOf="@id/revert_imageView"
+                android:gravity="center"
+                android:text="@string/returnAsText"
+                android:textColor="#FEFEFE"
+                android:textStyle="bold"
+                android:layout_marginStart="3dp"/>
+        </RelativeLayout>
+
+
 
     </RelativeLayout>
     <RelativeLayout

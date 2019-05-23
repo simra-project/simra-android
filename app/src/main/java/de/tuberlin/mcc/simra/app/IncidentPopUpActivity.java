@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -31,11 +32,13 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     String[] locations = new String[7];
     LinearLayout doneButton;
     LinearLayout backButton;
+    RelativeLayout exitButton;
     Boolean incidentSaved = false;
     String rideID;
     String incidentKey;
     String[] previousAnnotation;
     boolean temp;
+    int state = 0;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
@@ -44,7 +47,18 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.incident_popup_layout);
+        rideID = getIntent().getStringExtra("Ride_ID");
+
+        incidentKey = getIntent().getStringExtra("Incident_Key");
+
+        temp = getIntent().getBooleanExtra("Incident_temp", false);
+
+        state = getIntent().getIntExtra("State",0);
+        if (state < 2) {
+            setContentView(R.layout.incident_popup_layout);
+        } else {
+            setContentView(R.layout.incident_popup_layout_uneditable_incident);
+        }
 
         // Scale the activity so that it is smaller than the activity which called it
         // (ShowRouteActivity), floating on top of it (ShowRouteActivity is still visible
@@ -56,12 +70,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         incidentTypes = getResources().getStringArray(R.array.incidenttypelist);
         locations = getResources().getStringArray(R.array.phoneLocations);
-
-        rideID = getIntent().getStringExtra("Ride_ID");
-
-        incidentKey = getIntent().getStringExtra("Incident_Key");
-
-        temp = getIntent().getBooleanExtra("Incident_temp", false);
 
         previousAnnotation = loadPreviousAnnotation
                 (rideID, incidentKey);
@@ -79,6 +87,20 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         CheckBox involvedType8CheckBox = findViewById(R.id.involvedType8);
         CheckBox involvedType9CheckBox = findViewById(R.id.involvedType9);
 
+        if (state == 2) {
+            incidentTypeSpinner.setEnabled(false);
+            incidentDescription.setEnabled(false);
+            scarinessCheckBox.setEnabled(false);
+            involvedType1CheckBox.setEnabled(false);
+            involvedType2CheckBox.setEnabled(false);
+            involvedType3CheckBox.setEnabled(false);
+            involvedType4CheckBox.setEnabled(false);
+            involvedType5CheckBox.setEnabled(false);
+            involvedType6CheckBox.setEnabled(false);
+            involvedType7CheckBox.setEnabled(false);
+            involvedType8CheckBox.setEnabled(false);
+            involvedType9CheckBox.setEnabled(false);
+        }
         if (previousAnnotation != null && previousAnnotation.length > 7) {
 
             if (previousAnnotation[8].length() > 0) {
@@ -119,114 +141,140 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             }
             incidentDescription.setText(previousAnnotation[19].replaceAll(";linebreak;", System.lineSeparator()).replaceAll(";komma;", ","));
         }
+        if (state < 2) {
+            doneButton = findViewById(R.id.save_button);
+            backButton = findViewById(R.id.back_button);
 
-        doneButton = findViewById(R.id.save_button);
-        backButton = findViewById(R.id.back_button);
-
-        doneButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    doneButton.setElevation(0.0f);
-                    doneButton.setBackground(getDrawable(R.drawable.button_pressed));
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    doneButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
-                    doneButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                }
-                return false;
-            }
-
-        });
-
-        backButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    backButton.setElevation(0.0f);
-                    backButton.setBackground(getDrawable(R.drawable.button_pressed));
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    backButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
-                    backButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                }
-                return false;
-            }
-
-        });
-
-        if (getIntent().getExtras() != null) {
-
-            String lat = getIntent().getStringExtra("Incident_latitude");
-            String lon = getIntent().getStringExtra("Incident_longitude");
-            String ts = getIntent().getStringExtra("Incident_timeStamp");
-            String bike = getIntent().getStringExtra("Incident_bike");
-            String child = getIntent().getStringExtra("Incident_child");
-            String trailer = getIntent().getStringExtra("Incident_trailer");
-            String pLoc = getIntent().getStringExtra("Incident_pLoc");
-
-            // onClick-behavior for 'Done inserting description'-button: save incident
-            // data to file.
-
-            doneButton.setOnClickListener((View v) -> {
-
-                // Instead of writing the String selected items in the spinner,
-                // we use an int to save disk space and bandwidth
-                int incidentType = incidentTypeSpinner.getSelectedItemPosition();
-                String description = incidentDescription.getText().toString().replace(System.lineSeparator(), ";linebreak;").replace(",", ";komma;");
-                int scariness = 0;
-                if (scarinessCheckBox.isChecked()) {
-                    scariness = 1;
-                }
-                String[] checkBoxValues = {"0", "0", "0", "0", "0", "0", "0", "0", "0"};
-
-                if (involvedType1CheckBox.isChecked()) {
-                    checkBoxValues[0] = "1";
-                }
-                if (involvedType2CheckBox.isChecked()) {
-                    checkBoxValues[1] = "1";
-                }
-                if (involvedType3CheckBox.isChecked()) {
-                    checkBoxValues[2] = "1";
-                }
-                if (involvedType4CheckBox.isChecked()) {
-                    checkBoxValues[3] = "1";
-                }
-                if (involvedType5CheckBox.isChecked()) {
-                    checkBoxValues[4] = "1";
-                }
-                if (involvedType6CheckBox.isChecked()) {
-                    checkBoxValues[5] = "1";
-                }
-                if (involvedType7CheckBox.isChecked()) {
-                    checkBoxValues[6] = "1";
-                }
-                if (involvedType8CheckBox.isChecked()) {
-                    checkBoxValues[7] = "1";
-                }
-                if (involvedType9CheckBox.isChecked()) {
-                    checkBoxValues[8] = "1";
+            doneButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        doneButton.setElevation(0.0f);
+                        doneButton.setBackground(getDrawable(R.drawable.button_pressed));
+                    }
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        doneButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                        doneButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                    }
+                    return false;
                 }
 
-
-                String incidentString = incidentKey + "," + lat + "," + lon + "," + ts + ","
-                        + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description;
-
-                overwriteIncidentFile(rideID, incidentKey, incidentKey + "," + lat + "," + lon + "," + ts + ","
-                        + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description);
-
-                incidentSaved = true;
-
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("result", incidentString);
-                setResult(Activity.RESULT_OK, returnIntent);
-                finish();
             });
 
-            // Return to ShowRouteActivity without saving the annotated incidents
-            backButton.setOnClickListener((View v) -> {
-                incidentSaved = false;
-                finish();
+            backButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        backButton.setElevation(0.0f);
+                        backButton.setBackground(getDrawable(R.drawable.button_pressed));
+                    }
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        backButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                        backButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                    }
+                    return false;
+                }
+
+            });
+
+            if (getIntent().getExtras() != null) {
+
+                String lat = getIntent().getStringExtra("Incident_latitude");
+                String lon = getIntent().getStringExtra("Incident_longitude");
+                String ts = getIntent().getStringExtra("Incident_timeStamp");
+                String bike = getIntent().getStringExtra("Incident_bike");
+                String child = getIntent().getStringExtra("Incident_child");
+                String trailer = getIntent().getStringExtra("Incident_trailer");
+                String pLoc = getIntent().getStringExtra("Incident_pLoc");
+
+                // onClick-behavior for 'Done inserting description'-button: save incident
+                // data to file.
+
+                doneButton.setOnClickListener((View v) -> {
+
+                    // Instead of writing the String selected items in the spinner,
+                    // we use an int to save disk space and bandwidth
+                    int incidentType = incidentTypeSpinner.getSelectedItemPosition();
+                    String description = incidentDescription.getText().toString().replace(System.lineSeparator(), ";linebreak;").replace(",", ";komma;");
+                    int scariness = 0;
+                    if (scarinessCheckBox.isChecked()) {
+                        scariness = 1;
+                    }
+                    String[] checkBoxValues = {"0", "0", "0", "0", "0", "0", "0", "0", "0"};
+
+                    if (involvedType1CheckBox.isChecked()) {
+                        checkBoxValues[0] = "1";
+                    }
+                    if (involvedType2CheckBox.isChecked()) {
+                        checkBoxValues[1] = "1";
+                    }
+                    if (involvedType3CheckBox.isChecked()) {
+                        checkBoxValues[2] = "1";
+                    }
+                    if (involvedType4CheckBox.isChecked()) {
+                        checkBoxValues[3] = "1";
+                    }
+                    if (involvedType5CheckBox.isChecked()) {
+                        checkBoxValues[4] = "1";
+                    }
+                    if (involvedType6CheckBox.isChecked()) {
+                        checkBoxValues[5] = "1";
+                    }
+                    if (involvedType7CheckBox.isChecked()) {
+                        checkBoxValues[6] = "1";
+                    }
+                    if (involvedType8CheckBox.isChecked()) {
+                        checkBoxValues[7] = "1";
+                    }
+                    if (involvedType9CheckBox.isChecked()) {
+                        checkBoxValues[8] = "1";
+                    }
+
+
+                    String incidentString = incidentKey + "," + lat + "," + lon + "," + ts + ","
+                            + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description;
+
+                    overwriteIncidentFile(rideID, incidentKey, incidentKey + "," + lat + "," + lon + "," + ts + ","
+                            + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description);
+
+                    incidentSaved = true;
+
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra("result", incidentString);
+                    setResult(Activity.RESULT_OK, returnIntent);
+                    finish();
+                });
+
+                // Return to ShowRouteActivity without saving the annotated incidents
+                backButton.setOnClickListener((View v) -> {
+                    incidentSaved = false;
+                    finish();
+                });
+
+            }
+        } else {
+            exitButton = findViewById(R.id.exitButton);
+            exitButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        exitButton.setElevation(0.0f);
+                        exitButton.setBackground(getDrawable(R.drawable.button_pressed));
+                    }
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        exitButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                        exitButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                    }
+                    return false;
+                }
+
+            });
+            exitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    incidentSaved = false;
+                    finish();
+                }
             });
 
         }

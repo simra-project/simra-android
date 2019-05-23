@@ -18,22 +18,18 @@ class MyInfoWindow extends InfoWindow {
     private static final String TAG = "MyInfoWindow_LOG";
 
     private AccEvent mAccEvent;
-
     private ShowRouteActivity motherActivity;
-
     private String addressForLoc;
-
     private String rideID;
-
     private String incidentKey;
-
     private boolean temp;
+    private int state;
 
 
 
     public MyInfoWindow(int layoutResId, MapView mapView, AccEvent mAccEvent,
                         String addressForLoc, ShowRouteActivity motherActivity,
-                        int key, boolean temp) {
+                        int key, boolean temp, int state) {
         super(layoutResId, mapView);
         this.mAccEvent = mAccEvent;
         this.addressForLoc = addressForLoc;
@@ -45,6 +41,7 @@ class MyInfoWindow extends InfoWindow {
         }
         this.incidentKey = String.valueOf(key);
         this.temp = temp;
+        this.state = state;
     }
 
     public void onClose() {
@@ -102,6 +99,8 @@ class MyInfoWindow extends InfoWindow {
             popUpIntent.putExtra("Incident_Key", this.incidentKey);
 
             popUpIntent.putExtra("Incident_temp", this.temp);
+
+            popUpIntent.putExtra("State", state);
 
             motherActivity.startActivityForResult(popUpIntent, 1);
 
