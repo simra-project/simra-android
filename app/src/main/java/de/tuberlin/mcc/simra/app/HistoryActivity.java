@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -116,6 +117,29 @@ public class HistoryActivity extends BaseActivity {
 
 
         listView = findViewById(R.id.listView);
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+            LinearLayout historyButtons = findViewById(R.id.historyButtons);
+            boolean isUp = true;
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                // Log.d(TAG, view.getLastVisiblePosition() + " " + firstVisibleItem + " " + visibleItemCount + " " + totalItemCount);
+                if ( isUp && view.getLastVisiblePosition() + 1 == totalItemCount ) {
+                    Log.d(TAG, "hide buttons");
+                    historyButtons.animate().translationX(view.getWidth());
+                    isUp = false;
+                    // historyButtons.setVisibility(View.INVISIBLE);
+                } else if (!isUp && !(view.getLastVisiblePosition() + 1 == totalItemCount)) {
+                    historyButtons.animate().translationX(0);
+                    isUp = true;
+                    // historyButtons.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         RelativeLayout justUploadButton = findViewById(R.id.justUpload);
         justUploadButton.setOnTouchListener(new View.OnTouchListener() {

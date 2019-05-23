@@ -217,7 +217,27 @@ public class ShowRouteActivity extends BaseActivity {
             privacySliderLinearLayout.setVisibility(View.INVISIBLE);
             privacySliderDescription.setVisibility(View.INVISIBLE);
             saveButton.setVisibility(View.INVISIBLE);
+            exitButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        exitButton.setElevation(0.0f);
+                        exitButton.setBackground(getDrawable(R.drawable.button_pressed));
+                    }
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        exitButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
+                        exitButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                    }
+                    return false;
+                }
 
+            });
+            exitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
         }
 
         Log.d(TAG, "setting up clickListeners");
@@ -536,7 +556,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         saveButton.setOnClickListener((View v) -> {
 
-            String content = "";
+            StringBuffer content = new StringBuffer();
             int appVersion = getAppVersionNumber(ShowRouteActivity.this);
             String fileVersion = "";
             try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
@@ -553,7 +573,7 @@ public class ShowRouteActivity extends BaseActivity {
                         metaDataLine[3] = "1";
                         metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
                     }
-                    content += metaDataRide += System.lineSeparator();
+                    content.append(metaDataRide).append(System.lineSeparator());
                 }
             } catch (IOException ioe) {
                 ioe.printStackTrace();
