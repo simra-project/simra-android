@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.annotation;
 
 
 import org.osmdroid.util.GeoPoint;
@@ -7,13 +7,13 @@ import java.util.Date;
 
 public class AccEvent {
 
-    long timeStamp;
-    GeoPoint position;
+    public long timeStamp;
+    public GeoPoint position;
     String TAG = "AccEvent_LOG";
-    int key = 999;              // when an event doesn't have a key yet, the key is 999
+    public int key = 999;              // when an event doesn't have a key yet, the key is 999
     // (can't use 0 because that's an actual valid key)
 
-    boolean annotated = false;  // events are labeled as not annotated when first created.
+    public boolean annotated = false;  // events are labeled as not annotated when first created.
 
     /**
      * public void setKey(int key) {

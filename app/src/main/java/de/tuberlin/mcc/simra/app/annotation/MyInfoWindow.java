@@ -1,6 +1,5 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.annotation;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.text.format.DateUtils;
 import android.view.View;
@@ -11,7 +10,9 @@ import android.widget.TextView;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
-class MyInfoWindow extends InfoWindow {
+import de.tuberlin.mcc.simra.app.R;
+
+public class MyInfoWindow extends InfoWindow {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag

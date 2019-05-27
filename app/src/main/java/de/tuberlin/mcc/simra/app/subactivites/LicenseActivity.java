@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.subactivites;
 
 import android.app.Dialog;
 import android.content.res.AssetManager;
@@ -17,6 +17,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import de.tuberlin.mcc.simra.app.R;
 
 public class LicenseActivity extends AppCompatActivity {
 

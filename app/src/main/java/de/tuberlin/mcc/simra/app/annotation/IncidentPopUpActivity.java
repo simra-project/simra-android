@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.annotation;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,9 +22,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static de.tuberlin.mcc.simra.app.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
+import de.tuberlin.mcc.simra.app.R;
+
+import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class IncidentPopUpActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.main;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -32,8 +32,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static de.tuberlin.mcc.simra.app.Utils.appendToFile;
-import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
+import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.util.Constants;
+
+import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 
 public class RecorderService extends Service implements SensorEventListener, LocationListener {
 
