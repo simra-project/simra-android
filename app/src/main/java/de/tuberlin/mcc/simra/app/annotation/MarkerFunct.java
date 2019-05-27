@@ -1,11 +1,9 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.annotation;
 
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.location.Address;
-import android.os.Handler;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Window;
@@ -28,12 +26,14 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 
-import static de.tuberlin.mcc.simra.app.Utils.appendToFile;
-import static de.tuberlin.mcc.simra.app.Utils.checkForAnnotation;
-import static de.tuberlin.mcc.simra.app.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
+import de.tuberlin.mcc.simra.app.R;
+
+import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
+import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class MarkerFunct {
 

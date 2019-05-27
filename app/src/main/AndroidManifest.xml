@@ -27,26 +27,26 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name=".AboutActivity"
+        <activity android:name=".subactivites.AboutActivity"
             android:label="@string/title_activity_about_simra"
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation|screenSize"/>
 
-        <activity android:name=".HelpActivity"
+        <activity android:name=".util.HelpActivity"
             android:configChanges="orientation|screenSize"/>
 
         <activity
-            android:name=".RideSettingsActivity"
+            android:name=".annotation.RideSettingsActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_ride_settings"
-            android:parentActivityName=".ShowRouteActivity"
+            android:parentActivityName=".annotation.ShowRouteActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.tuberlin.mcc.simra.app.ShowRouteActivity" />
+                android:value="de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity" />
         </activity>
         <activity
-            android:name=".LicenseActivity"
+            android:name=".subactivites.LicenseActivity"
             android:label="@string/title_activity_library_license"
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation|screenSize"/>
@@ -68,7 +68,7 @@
             android:value="Dv1l6L3uczbBmhFasUc1Eg" />
 
         <activity
-            android:name=".StartActivity"
+            android:name=".main.StartActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -82,56 +82,56 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".main.MainActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTop" />
         <activity
-            android:name=".WebActivity"
+            android:name=".util.WebActivity"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".main.MainActivity" />
         <activity
-            android:name=".ProfileActivity"
+            android:name=".subactivites.ProfileActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_profile"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.tuberlin.mcc.simra.app.MainActivity" />
+                android:value="de.tuberlin.mcc.simra.app.main.MainActivity" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".subactivites.SettingsActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".main.MainActivity" />
 
         <service
-            android:name=".RecorderService"
+            android:name=".main.RecorderService"
             android:parentActivityName=".MainActivity" />
         <service
-            android:name=".UploadService"
+            android:name=".net.UploadService"
             android:enabled="true"
             android:parentActivityName=".HistoryActivity" />
 
         <activity
-            android:name=".HistoryActivity"
+            android:name=".main.HistoryActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_history"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".main.MainActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.tuberlin.mcc.simra.app.MainActivity" />
+                android:value="de.tuberlin.mcc.simra.app.main.MainActivity" />
         </activity>
         <activity
-            android:name=".ShowRouteActivity"
+            android:name=".annotation.ShowRouteActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".IncidentPopUpActivity"
+            android:name=".annotation.IncidentPopUpActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.PopUpWindow" />
         <activity
-            android:name=".CreditsActivity"
+            android:name=".subactivites.CreditsActivity"
             android:label="@string/title_activity_credits"
             android:theme="@style/AppTheme" />
     </application>

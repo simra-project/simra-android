@@ -1,7 +1,9 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.util;
 
 import android.os.Bundle;
 import android.webkit.WebView;
+
+import de.tuberlin.mcc.simra.app.R;
 
 public class WebActivity extends BaseActivity {
 

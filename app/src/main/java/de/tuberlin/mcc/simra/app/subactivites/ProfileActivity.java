@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.subactivites;
 
 
 import android.os.Bundle;
@@ -11,8 +11,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.writeIntToSharedPrefs;
+import de.tuberlin.mcc.simra.app.R;
+
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 
 public class ProfileActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
