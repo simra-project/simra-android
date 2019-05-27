@@ -130,7 +130,7 @@ public class HistoryActivity extends BaseActivity {
                 // Log.d(TAG, view.getLastVisiblePosition() + " " + firstVisibleItem + " " + visibleItemCount + " " + totalItemCount);
                 if ( isUp && view.getLastVisiblePosition() + 1 == totalItemCount ) {
                     Log.d(TAG, "hide buttons");
-                    historyButtons.animate().translationX(view.getWidth());
+                    historyButtons.animate().translationX(historyButtons.getWidth()/2f);
                     isUp = false;
                     // historyButtons.setVisibility(View.INVISIBLE);
                 } else if (!isUp && !(view.getLastVisiblePosition() + 1 == totalItemCount)) {
