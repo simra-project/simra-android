@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.net;
 
 import android.content.Context;
 

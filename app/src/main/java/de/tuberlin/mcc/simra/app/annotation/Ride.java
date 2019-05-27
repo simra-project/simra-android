@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.annotation;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,17 +8,17 @@ import org.osmdroid.views.overlay.Polyline;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.tuberlin.mcc.simra.app.Utils.appendToFile;
-import static de.tuberlin.mcc.simra.app.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
+import de.tuberlin.mcc.simra.app.annotation.AccEvent;
+
+import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class Ride {
 
@@ -28,8 +28,8 @@ public class Ride {
         return id;
     }
 
-    File accGpsFile;
-    ArrayList<AccEvent> events;
+    public File accGpsFile;
+    public ArrayList<AccEvent> events;
 
     public ArrayList<AccEvent> getEvents() {
         return events;
@@ -41,10 +41,10 @@ public class Ride {
     static String TAG = "Ride_LOG";
     Polyline route;
 
-    int bike;
-    int child;
-    int trailer;
-    int pLoc;
+    public int bike;
+    public int child;
+    public int trailer;
+    public int pLoc;
     boolean temp;
 
     public String getDuration() {

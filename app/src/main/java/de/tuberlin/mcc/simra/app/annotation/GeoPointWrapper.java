@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.annotation;
 
 import org.osmdroid.util.GeoPoint;
 

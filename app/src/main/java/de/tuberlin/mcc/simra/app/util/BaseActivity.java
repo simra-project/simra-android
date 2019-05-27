@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.util;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

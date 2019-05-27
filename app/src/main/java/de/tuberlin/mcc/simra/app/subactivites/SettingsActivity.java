@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.subactivites;
 
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -15,7 +15,10 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
-import static de.tuberlin.mcc.simra.app.Utils.*;
+import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.util.BaseActivity;
+
+import static de.tuberlin.mcc.simra.app.util.Utils.*;
 
 public class SettingsActivity extends BaseActivity {
 

@@ -6,7 +6,7 @@
     android:id="@+id/startScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".StartActivity">
+    tools:context=".main.StartActivity">
 
     <ImageView
         android:id="@+id/doublePic"

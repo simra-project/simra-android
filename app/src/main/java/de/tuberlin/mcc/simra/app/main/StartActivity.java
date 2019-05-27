@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.main;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -19,17 +19,21 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import static de.tuberlin.mcc.simra.app.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
-import static de.tuberlin.mcc.simra.app.Utils.showMessageOK;
-import static de.tuberlin.mcc.simra.app.Utils.writeBooleanToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.writeIntToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.writeLongToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.writeToSharedPrefs;
+import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.net.UploadService;
+import de.tuberlin.mcc.simra.app.util.BaseActivity;
+
+import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeLongToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeToSharedPrefs;
 
 /**
  * Shows general info about the app, if the app is run the first time.
@@ -39,9 +43,6 @@ import static de.tuberlin.mcc.simra.app.Utils.writeToSharedPrefs;
 public class StartActivity extends BaseActivity {
 
     Button next;
-
-    // For permission request
-    private final int LOCATION_ACCESS_CODE = 1;
 
     // Log tag
     private static final String TAG = "StartActivity_LOG";
@@ -56,6 +57,8 @@ public class StartActivity extends BaseActivity {
         // resetAppIfVersionIsBelow(7);
         deleteCrashesIfVersionIsBelow(18);
 
+        // For permission request
+        int LOCATION_ACCESS_CODE = 1;
         permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
 
         if ((!isFirstTime()) & (privacyPolicyAccepted()) & (!showUnsentErrorDialogPermitted()) && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)

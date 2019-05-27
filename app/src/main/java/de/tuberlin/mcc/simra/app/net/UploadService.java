@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.net;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -28,17 +28,22 @@ import java.util.Arrays;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import static de.tuberlin.mcc.simra.app.Constants.BACKEND_VERSION;
-import static de.tuberlin.mcc.simra.app.Constants.LOCALE_ABVS;
-import static de.tuberlin.mcc.simra.app.Utils.checkForAnnotation;
-import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
-import static de.tuberlin.mcc.simra.app.Utils.readContentFromFile;
-import static de.tuberlin.mcc.simra.app.Utils.readContentFromFileAndIncreaseFileVersion;
-import static de.tuberlin.mcc.simra.app.Utils.writeBooleanToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.writeToSharedPrefs;
+import de.tuberlin.mcc.simra.app.util.Constants;
+import de.tuberlin.mcc.simra.app.main.HistoryActivity;
+import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.util.Utils;
+
+import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
+import static de.tuberlin.mcc.simra.app.util.Constants.LOCALE_ABVS;
+import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFileAndIncreaseFileVersion;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeToSharedPrefs;
 
 public class UploadService extends Service {
 
@@ -114,7 +119,7 @@ public class UploadService extends Service {
     }
 
     public class MyBinder extends Binder {
-        UploadService getService() {
+        public UploadService getService() {
             return UploadService.this;
         }
     }

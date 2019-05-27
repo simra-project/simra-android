@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.main;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
@@ -45,36 +45,30 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManagerFactory;
 
-import static de.tuberlin.mcc.simra.app.Constants.BACKEND_VERSION;
-import static de.tuberlin.mcc.simra.app.Constants.ZOOM_LEVEL;
-import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.Utils.showMessageOK;
+import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.net.SimRAuthenticator;
+import de.tuberlin.mcc.simra.app.subactivites.AboutActivity;
+import de.tuberlin.mcc.simra.app.subactivites.ProfileActivity;
+import de.tuberlin.mcc.simra.app.subactivites.SettingsActivity;
+import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.Constants;
+import de.tuberlin.mcc.simra.app.util.WebActivity;
+
+import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
+import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
 
 
 public class MainActivity extends BaseActivity implements OnNavigationItemSelectedListener, LocationListener {
