@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LicenseActivity">
+    tools:context=".subactivites.LicenseActivity">
 
     <include
         android:id="@+id/toolbar"

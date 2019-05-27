@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.util;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -11,10 +11,10 @@ import android.util.Log;
 
 import java.util.Date;
 
-import static de.tuberlin.mcc.simra.app.Utils.appendToFile;
-import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.writeBooleanToSharedPrefs;
+import de.tuberlin.mcc.simra.app.main.StartActivity;
+
+import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
 

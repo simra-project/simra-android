@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.main;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -40,9 +40,14 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import static de.tuberlin.mcc.simra.app.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
+import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.net.UploadService;
+import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
+import de.tuberlin.mcc.simra.app.util.BaseActivity;
+
+import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class HistoryActivity extends BaseActivity {
 

@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app;
+package de.tuberlin.mcc.simra.app.annotation;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -42,7 +42,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -52,15 +51,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static de.tuberlin.mcc.simra.app.Constants.ZOOM_LEVEL;
-import static de.tuberlin.mcc.simra.app.Utils.checkForAnnotation;
-import static de.tuberlin.mcc.simra.app.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.overWriteFile;
-import static de.tuberlin.mcc.simra.app.Utils.writeBooleanToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.Utils.writeIntToSharedPrefs;
+import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.util.BaseActivity;
+
+import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
+import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
+import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 
 public class ShowRouteActivity extends BaseActivity {
 
@@ -80,7 +82,7 @@ public class ShowRouteActivity extends BaseActivity {
 
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Our ride
-    Ride ride;
+    public Ride ride;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
@@ -89,7 +91,7 @@ public class ShowRouteActivity extends BaseActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // GEOCODER --> obtain GeoPoint from address
 
-    ExecutorService pool;
+    public ExecutorService pool;
 
     public MapView getmMapView() {
         return mMapView;
@@ -100,10 +102,10 @@ public class ShowRouteActivity extends BaseActivity {
     // Marker-icons for different types/states of events:
     // Automatically detected/custom; to be annotated/already annotated
 
-    Drawable editMarkerDefault;
-    Drawable editCustMarker;
-    Drawable editDoneDefault;
-    Drawable editDoneCust;
+    public Drawable editMarkerDefault;
+    public Drawable editCustMarker;
+    public Drawable editDoneDefault;
+    public Drawable editDoneCust;
     boolean addCustomMarkerMode;
     MarkerFunct myMarkerFunct;
     AlertDialog alertDialog;
@@ -113,14 +115,14 @@ public class ShowRouteActivity extends BaseActivity {
     int trailer;
     int pLoc;
 
-    int state;
+    public int state;
     String duration;
     String pathToAccGpsFile;
     File gpsFile;
     Polyline route;
     Polyline editableRoute;
 
-    Ride tempRide;
+    public Ride tempRide;
     File tempGpsFile;
     String tempAccGpsPath;
     String tempAccEventsPath;
