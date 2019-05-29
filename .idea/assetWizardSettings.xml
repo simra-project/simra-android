@@ -74,8 +74,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="ebebeb" />
-                                      <entry key="foregroundImage" value="C:\Users\markb\Documents\GitHub\simra\app\src\main\res\drawable\helmet.png" />
+                                      <entry key="backgroundColor" value="86a0cd" />
+                                      <entry key="foregroundImage" value="C:\Users\markb\Documents\SimRa\LogoMakr_0qMBOF.png" />
                                       <entry key="outputName" value="simra_launcher" />
                                     </map>
                                   </option>
