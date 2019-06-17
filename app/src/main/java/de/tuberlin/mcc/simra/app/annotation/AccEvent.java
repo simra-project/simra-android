@@ -1,8 +1,11 @@
 package de.tuberlin.mcc.simra.app.annotation;
 
 
+import android.util.Log;
+
 import org.osmdroid.util.GeoPoint;
 
+import java.util.Arrays;
 import java.util.Date;
 
 public class AccEvent {
@@ -37,6 +40,7 @@ public class AccEvent {
     }
 
     public AccEvent(String[] eventLine) {
+        Log.d(TAG, "eventLine: " + Arrays.toString(eventLine));
         this.position = new GeoPoint(Double.valueOf(eventLine[0]), Double.valueOf(eventLine[1]));
         this.timeStamp = Long.valueOf(eventLine[5]);
     }

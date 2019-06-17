@@ -334,7 +334,6 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
                     if (mBoundRecorderService.getRecordingAllowed()) {
                         // Get the recorded files and send them to HistoryActivity for further processing
                         Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-
                         // The file under PathToAccGpsFile contains the accelerometer and location data
                         // as well as time data
                         intent.putExtra("PathToAccGpsFile", mBoundRecorderService.getPathToAccGpsFile());
@@ -667,6 +666,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             }
         }
     }
+
 
     private void fireNewAppVersionPrompt(int installedAppVersion, int newestAppVersion, String urlToNewestAPK, Boolean critical) {
         Log.d(TAG, "fireRideSettingsDialog()");

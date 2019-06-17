@@ -22,7 +22,10 @@ import java.io.File;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.Utils;
+import okhttp3.internal.Util;
 
+import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
@@ -30,6 +33,8 @@ import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
+import static de.tuberlin.mcc.simra.app.util.Utils.updateToV18;
+import static de.tuberlin.mcc.simra.app.util.Utils.updateToV24;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeLongToSharedPrefs;
@@ -53,9 +58,10 @@ public class StartActivity extends BaseActivity {
         setContentView(R.layout.activity_start);
 
         Log.d(TAG, "onCreate() started");
+        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
+        updateToV18(StartActivity.this);
+        updateToV24(StartActivity.this);
 
-        // resetAppIfVersionIsBelow(7);
-        deleteCrashesIfVersionIsBelow(18);
 
         // For permission request
         int LOCATION_ACCESS_CODE = 1;
@@ -85,45 +91,7 @@ public class StartActivity extends BaseActivity {
         }
     }
 
-    private void deleteCrashesIfVersionIsBelow(int version) {
-        int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
-        if (appVersion < version) {
-            writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", this);
-            File[] dirFiles = getFilesDir().listFiles();
-            String path;
-            for (int i = 0; i < dirFiles.length; i++) {
-                path = dirFiles[i].getName();
-                if (path.startsWith("CRASH")) {
-                    dirFiles[i].delete();
-                }
-            }
-        }
-        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
-    }
-
-    private void resetAppIfVersionIsBelow(int version) {
-        int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
-
-        if (appVersion < version) {
-            File[] dirFiles = getFilesDir().listFiles();
-            String path;
-            for (int i = 0; i < dirFiles.length; i++) {
-
-                path = dirFiles[i].getName();
-                Log.d(TAG, "path: " + path);
-                if (!path.equals("profile.csv")) {
-                    dirFiles[i].delete();
-                }
-            }
-
-            String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
-
-            overWriteFile((fileInfoLine + "key, startTime, endTime, annotated" + System.lineSeparator()), "metaData.csv", this);
-            writeIntToSharedPrefs("RIDE-KEY", 0, "simraPrefs", this);
-        }
-        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
-    }
 
 
     private void permissionRequest(final String requestedPermission, String rationaleMessage, final int accessCode) {
@@ -168,7 +136,7 @@ public class StartActivity extends BaseActivity {
             if (!fileExists("metaData.csv", this)) {
                 String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
 
-                overWriteFile((fileInfoLine + "key, startTime, endTime, annotated"
+                overWriteFile((fileInfoLine + "key, startTime, endTime, annotated, distance, waitTime"
                         + System.lineSeparator()), "metaData.csv", this);
 
             }

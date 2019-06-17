@@ -11,9 +11,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.tuberlin.mcc.simra.app.annotation.AccEvent;
+import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
@@ -37,6 +39,7 @@ public class Ride {
 
     String duration;
     String startTime;
+    String endTime;
     Context context;
     static String TAG = "Ride_LOG";
     Polyline route;
@@ -93,10 +96,12 @@ public class Ride {
 
     }
 
-    public Ride(File tempAccGpsFile, String duration, String startTime, /*String date,*/ int state, int bike, int child, int trailer, int pLoc, boolean temp, Context context) throws IOException {
+    // temp ride
+    public Ride(File tempAccGpsFile, String duration, String startTime, String endTime, /*String date,*/ int state, int bike, int child, int trailer, int pLoc, boolean temp, Context context) throws IOException {
         this.accGpsFile = tempAccGpsFile;
         this.duration = duration;
         this.startTime = startTime;
+        // this.endTime = endTime;
         this.route = getRouteLine(tempAccGpsFile);
         this.state = state;
         this.bike = bike;
@@ -122,19 +127,16 @@ public class Ride {
 
         overWriteFile((fileInfoLine + content), pathToAccEventsOfRide, context);
 
-
     }
 
 
     // Takes a File which contains all the data and creates a
     // PolyLine to be displayed on the map as a route.
     public static Polyline getRouteLine(File gpsFile) throws IOException {
-        List<GeoPoint> geoPoints = new ArrayList<>();
         Polyline polyLine = new Polyline();
 
-
         BufferedReader br = new BufferedReader(new FileReader(gpsFile));
-        // br.readLine() to skip the first line which contains the headers
+        // br.readLine() to skip the first two lines which contains the file version info and headers
         String line = br.readLine();
         line = br.readLine();
 
@@ -145,8 +147,12 @@ public class Ride {
                 continue;
             }
             String[] separatedLine = line.split(",");
-            GeoPoint actualGeoPoint = new GeoPoint(Double.valueOf(separatedLine[0]), Double.valueOf(separatedLine[1]));
-            polyLine.addPoint(actualGeoPoint);
+            try {
+                GeoPoint actualGeoPoint = new GeoPoint(Double.valueOf(separatedLine[0]), Double.valueOf(separatedLine[1]));
+                polyLine.addPoint(actualGeoPoint);
+            } catch (NumberFormatException nfe) {
+                nfe.printStackTrace();
+            }
         }
 
         br.close();
@@ -175,7 +181,7 @@ public class Ride {
         ArrayList<String[]> ride = new ArrayList<>();
         ArrayList<AccEvent> accEvents = new ArrayList<>(6);
         ArrayList<String[]> events = new ArrayList<>(6);
-
+        Log.d(TAG, thisLine + " nextLine: " + nextLine);
         accEvents.add(new AccEvent(thisLine.split(",")));
         accEvents.add(new AccEvent(thisLine.split(",")));
         accEvents.add(new AccEvent(thisLine.split(",")));

@@ -58,12 +58,6 @@ public class SettingsActivity extends BaseActivity {
         backBtn.setOnClickListener(new View.OnClickListener() {
                                        @Override
                                        public void onClick(View v) {
-                                           writeLongToSharedPrefs("Privacy-Duration", privacyDuration, "simraPrefs", SettingsActivity.this);
-                                           writeIntToSharedPrefs("Privacy-Distance", privacyDistance, "simraPrefs", SettingsActivity.this);
-                                           writeIntToSharedPrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
-                                           writeIntToSharedPrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
-                                           writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", SettingsActivity.this);
-                                           writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", SettingsActivity.this);
                                            finish();
                                        }
                                    }
@@ -221,6 +215,12 @@ public class SettingsActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy() called");
+        writeLongToSharedPrefs("Privacy-Duration", privacyDuration, "simraPrefs", SettingsActivity.this);
+        writeIntToSharedPrefs("Privacy-Distance", privacyDistance, "simraPrefs", SettingsActivity.this);
+        writeIntToSharedPrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
+        writeIntToSharedPrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
+        writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", SettingsActivity.this);
+        writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", SettingsActivity.this);
         Toast.makeText(this, getString(R.string.settingsSaved), Toast.LENGTH_SHORT).show();
 
     }
