@@ -48,7 +48,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     final int ACC_POLL_FREQUENCY = Constants.ACC_FREQUENCY;
     final int GPS_POLL_FREQUENCY = Constants.GPS_FREQUENCY;
     long curTime;
-    long startTime;
+    long startTime = 0;
     long endTime;
     ExecutorService executor;
     Sensor accelerometer;
@@ -192,7 +192,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onCreate() {
         super.onCreate();
-        startTime = System.currentTimeMillis();
 
         // Initialize sharedPrefs & editor
         sharedPrefs = getApplicationContext()
@@ -230,9 +229,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         privacyDuration = (sharedPrefs.getLong("Privacy-Duration", 30) * 1000);
         Log.d(TAG, "privacyDistance: " + privacyDistance + " privacyDuration: " + privacyDuration);
 
-        pathToAccGpsFile = sharedPrefs.getInt("RIDE-KEY", 0)
-                + "_accGps_"
-                + startTime +/*date +*/ ".csv";
+
 
         // Prevent the App to be killed while recording
         PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -265,6 +262,17 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
+        pathToAccGpsFile = sharedPrefs.getInt("RIDE-KEY", 0)
+                + "_accGps.csv";
+        // When the user records a route for the first time, the ride key is 0.
+        // For all subsequent rides, the key value increases by one at a time.
+
+        int key = sharedPrefs.getInt("RIDE-KEY", 0);
+
+        editor.putInt("RIDE-KEY", key + 1);
+
+        editor.apply();
+
         // Fire the notification while recording
         Notification notification = createNotification().build();
         notificationManager = NotificationManagerCompat.from(this);
@@ -291,24 +299,15 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         if (recordingAllowed && lineAdded) {
 
             String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
+            Log.d(TAG, "fileInfoLine: " + fileInfoLine);
 
             // Create head of the csv-file
             appendToFile((fileInfoLine + "lat,lon,X,Y,Z,timeStamp,acc,a,b,c" + System.lineSeparator()), pathToAccGpsFile, this);
-
             // Write String data to files
             appendToFile(accGpsString.toString(), pathToAccGpsFile, this);
             appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0)) + ","
                     + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
                     + "0" + System.lineSeparator(), "metaData.csv", this);
-
-            // When the user records a route for the first time, the ride key is 0.
-            // For all subsequent rides, the key value increases by one at a time.
-
-            int key = sharedPrefs.getInt("RIDE-KEY", 0);
-
-            editor.putInt("RIDE-KEY", key + 1);
-
-            editor.apply();
         }
 
 
@@ -463,6 +462,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 accGpsString.append(str).append(System.getProperty("line.separator"));
                 lineAdded = true;
+                if (startTime == 0) {
+                    startTime = System.currentTimeMillis();
+                }
 
                 /** Now remove as many elements from the queues as our moving average step/shift
                  specifies and therefore enable new data points to come in.

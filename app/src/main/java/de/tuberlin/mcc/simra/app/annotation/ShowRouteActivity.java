@@ -127,6 +127,8 @@ public class ShowRouteActivity extends BaseActivity {
     String tempAccGpsPath;
     String tempAccEventsPath;
     Polyline tempRoute;
+    Long tempStartTime;
+    Long tempEndTime;
     boolean showWarning = true;
     boolean continueWithRefresh = true;
 
@@ -317,7 +319,7 @@ public class ShowRouteActivity extends BaseActivity {
             });
             tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
 
-            tempRide = new Ride(tempGpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, true, this);
+            tempRide = new Ride(tempGpsFile, duration, String.valueOf(tempStartTime), String.valueOf(tempEndTime), state, bike, child, trailer, pLoc, true, this);
 
         } else {
 
@@ -572,6 +574,10 @@ public class ShowRouteActivity extends BaseActivity {
                     String[] metaDataLine = line.split(",", -1);
                     String metaDataRide = line;
                     if (metaDataLine[0].equals(ride.getId())) {
+                        if (temp) {
+                            metaDataLine[1] = String.valueOf(tempStartTime);
+                            metaDataLine[2] = String.valueOf(tempEndTime);
+                        }
                         metaDataLine[3] = "1";
                         metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
                     }
@@ -620,7 +626,8 @@ public class ShowRouteActivity extends BaseActivity {
     }
 
     private File updateRoute(int left, int right, String pathToAccGpsFile) {
-
+        tempStartTime = null;
+        tempEndTime = null;
         File inputFile = getFileStreamPath(pathToAccGpsFile);
         StringBuilder content = new StringBuilder();
         //String content = "";
@@ -636,6 +643,12 @@ public class ShowRouteActivity extends BaseActivity {
                         partOfRideNumber++;
                     }
                     if ((partOfRideNumber >= left) && (partOfRideNumber <= right)) {
+                        if(tempStartTime == null || Long.valueOf(line.split(",",-1)[5]) < tempStartTime) {
+                            tempStartTime = Long.valueOf(line.split(",",-1)[5]);
+                        }
+                        if(tempEndTime == null || Long.valueOf(line.split(",",-1)[5]) > tempEndTime) {
+                            tempEndTime = Long.valueOf(line.split(",",-1)[5]);
+                        }
                         content.append(line + System.lineSeparator());
                     }
                 }

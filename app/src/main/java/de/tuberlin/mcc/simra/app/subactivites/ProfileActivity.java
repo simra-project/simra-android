@@ -49,14 +49,6 @@ public class ProfileActivity extends AppCompatActivity {
         backBtn.setOnClickListener(new View.OnClickListener() {
                                        @Override
                                        public void onClick(View v) {
-                                           int ageGroup = ageGroupSpinner.getSelectedItemPosition();
-                                           int gender = genderSpinner.getSelectedItemPosition();
-                                           int region = regionSpinner.getSelectedItemPosition();
-                                           int experience = experienceSpinner.getSelectedItemPosition();
-                                           writeIntToSharedPrefs("Profile-Age", ageGroup, "simraPrefs", ProfileActivity.this);
-                                           writeIntToSharedPrefs("Profile-Gender", gender, "simraPrefs", ProfileActivity.this);
-                                           writeIntToSharedPrefs("Profile-Region", region, "simraPrefs", ProfileActivity.this);
-                                           writeIntToSharedPrefs("Profile-Experience", experience, "simraPrefs", ProfileActivity.this);
                                            finish();
                                        }
                                    }
@@ -80,6 +72,14 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy() called");
+        int ageGroup = ageGroupSpinner.getSelectedItemPosition();
+        int gender = genderSpinner.getSelectedItemPosition();
+        int region = regionSpinner.getSelectedItemPosition();
+        int experience = experienceSpinner.getSelectedItemPosition();
+        writeIntToSharedPrefs("Profile-Age", ageGroup, "simraPrefs", ProfileActivity.this);
+        writeIntToSharedPrefs("Profile-Gender", gender, "simraPrefs", ProfileActivity.this);
+        writeIntToSharedPrefs("Profile-Region", region, "simraPrefs", ProfileActivity.this);
+        writeIntToSharedPrefs("Profile-Experience", experience, "simraPrefs", ProfileActivity.this);
         Toast.makeText(this, getString(R.string.editingProfileCompleted), Toast.LENGTH_SHORT).show();
 
     }

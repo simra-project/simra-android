@@ -9,6 +9,8 @@ import android.nfc.cardemulation.HostNfcFService;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
+import org.osmdroid.views.overlay.Polyline;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,12 +28,15 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
+
+import de.tuberlin.mcc.simra.app.annotation.Ride;
 
 import static android.content.Context.MODE_APPEND;
 
@@ -249,6 +254,106 @@ public class Utils {
             installedVersionNumber = pinfo.versionCode;
         }
         return installedVersionNumber;
+    }
+
+    public void resetAppIfVersionIsBelow(Context context, int version) {
+        int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+
+        if (appVersion < version) {
+            File[] dirFiles = context.getFilesDir().listFiles();
+            String path;
+            for (int i = 0; i < dirFiles.length; i++) {
+
+                path = dirFiles[i].getName();
+                Log.d(TAG, "path: " + path);
+                if (!path.equals("profile.csv")) {
+                    dirFiles[i].delete();
+                }
+            }
+
+            String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
+
+            overWriteFile((fileInfoLine + "key, startTime, endTime, annotated, distance, waitTime" + System.lineSeparator()), "metaData.csv", context);
+            writeIntToSharedPrefs("RIDE-KEY", 0, "simraPrefs", context);
+        }
+        writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
+    }
+
+    public static void updateToV18(Context context) {
+        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        if (lastCriticalAppVersion < 18) {
+            writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", context);
+            File[] dirFiles = context.getFilesDir().listFiles();
+            String path;
+            for (int i = 0; i < dirFiles.length; i++) {
+                path = dirFiles[i].getName();
+                if (path.startsWith("CRASH")) {
+                    dirFiles[i].delete();
+                }
+            }
+            writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
+        }
+
+    }
+
+    /**
+     * Stuff that needs to be done in version24:
+     * updating metaData.csv with column "distance" and "waitTime" and calculating distance for
+     * already existing rides. waitTime will be calculated in a later Update.
+     * Also, renaming accGps files: removing timestamp from filename.
+     *
+     */
+    public static void updateToV24(Context context) {
+        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        if (lastCriticalAppVersion < 50) {
+            File directory = context.getFilesDir();
+            File[] fileList = directory.listFiles();
+            String name;
+            for (int i = 0; i < fileList.length; i++) {
+                name = fileList[i].getName();
+                if (!(name.equals("metaData.csv") || name.equals("profile.csv") || fileList[i].isDirectory() || name.startsWith("accEvents") || name.startsWith("CRASH"))) {
+                    fileList[i].renameTo(new File(directory.toString() + File.separator + name.split("_")[0] + "_accGps.csv"));
+                }
+            }
+            Log.d(TAG, "fileList: " + Arrays.toString(fileList));
+
+            File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+            StringBuilder contentOfNewMetaData = new StringBuilder();
+
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
+                // fileVersion
+                String line = br.readLine();
+                contentOfNewMetaData.append(line).append(System.lineSeparator());
+                // header
+                line = br.readLine();
+                contentOfNewMetaData.append("key, startTime, endTime, annotated, distance, waitTime").append(System.lineSeparator());
+
+                // rides
+                while ((line = br.readLine()) != null) {
+                    String[] lineArray = line.split(",");
+                    String key = lineArray[0];
+                    String startTime;
+                    File gpsFile = context.getFileStreamPath(key + "_accGps.csv");
+                    try (BufferedReader br2 = new BufferedReader(new InputStreamReader(new FileInputStream(gpsFile)))) {
+                        br2.readLine();
+                        br2.readLine();
+                        startTime = br2.readLine().split(",",-1)[5];
+                    }
+                    String endTime = lineArray[2];
+                    String annotated = lineArray[3];
+                    Polyline routeLine = Ride.getRouteLine(gpsFile);
+                    double distance = routeLine.getDistance();
+                    line = key + "," + startTime + "," + endTime + "," + annotated + "," + distance  + ",";
+                    contentOfNewMetaData.append(line).append(System.lineSeparator());
+                }
+                overWriteFile(contentOfNewMetaData.toString(),"metaData.csv",context);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+
+            writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
+        }
+
     }
 
 }
