@@ -27,14 +27,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name=".subactivites.AboutActivity"
+        <activity
+            android:name=".subactivites.StatisticsActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_statistics"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".subactivites.AboutActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_about_simra"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:configChanges="orientation|screenSize"/>
-
-        <activity android:name=".util.HelpActivity"
-            android:configChanges="orientation|screenSize"/>
-
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".util.HelpActivity"
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".annotation.RideSettingsActivity"
             android:configChanges="orientation|screenSize"
@@ -47,9 +52,9 @@
         </activity>
         <activity
             android:name=".subactivites.LicenseActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_library_license"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:configChanges="orientation|screenSize"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="MAPBOX_MAPID"

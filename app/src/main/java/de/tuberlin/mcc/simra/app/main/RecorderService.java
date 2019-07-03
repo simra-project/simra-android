@@ -25,6 +25,9 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.Polyline;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -56,9 +59,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     float[] accelerometerMatrix = new float[3];
     float[] gyroscopeMatrix = new float[3];
     String pathToAccGpsFile = "";
+    int key;
     LocationManager locationManager;
     Location lastLocation;
     float lastAccuracy;
+    Polyline route = new Polyline();
+    long waitedTime = 0;
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -262,16 +268,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        pathToAccGpsFile = sharedPrefs.getInt("RIDE-KEY", 0)
-                + "_accGps.csv";
+
         // When the user records a route for the first time, the ride key is 0.
         // For all subsequent rides, the key value increases by one at a time.
 
-        int key = sharedPrefs.getInt("RIDE-KEY", 0);
-
-        editor.putInt("RIDE-KEY", key + 1);
-
-        editor.apply();
+        key = sharedPrefs.getInt("RIDE-KEY", 0);
+        pathToAccGpsFile = key + "_accGps.csv";
 
         // Fire the notification while recording
         Notification notification = createNotification().build();
@@ -290,7 +292,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public void onDestroy() {
-        endTime = curTime;
+
 
         // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
         // with current ride and and sharedPrefs with current ride key. Do these things only,
@@ -305,9 +307,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             appendToFile((fileInfoLine + "lat,lon,X,Y,Z,timeStamp,acc,a,b,c" + System.lineSeparator()), pathToAccGpsFile, this);
             // Write String data to files
             appendToFile(accGpsString.toString(), pathToAccGpsFile, this);
-            appendToFile(String.valueOf(sharedPrefs.getInt("RIDE-KEY", 0)) + ","
+            appendToFile(key + ","
                     + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
-                    + "0" + System.lineSeparator(), "metaData.csv", this);
+                    + "0,0," + waitedTime + "," + Math.round(route.getDistance())  + System.lineSeparator(), "metaData.csv", this);
+            editor.putInt("RIDE-KEY", key + 1);
+
+            editor.apply();
         }
 
 
@@ -436,6 +441,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                                 .GPS_PROVIDER);
                     }
 
+                    route.addPoint(new GeoPoint(lastLocation.getLatitude(),lastLocation.getLongitude()));
+                    if (lastLocation.getSpeed() <= 3.0) {
+                        waitedTime += 3;
+                    }
                     gps =   String.valueOf(lastLocation.getLatitude()) + "," +
                             String.valueOf(lastLocation.getLongitude());
                     accuracy =  String.valueOf(lastAccuracy);
@@ -463,7 +472,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 accGpsString.append(str).append(System.getProperty("line.separator"));
                 lineAdded = true;
                 if (startTime == 0) {
-                    startTime = System.currentTimeMillis();
+                    startTime = curTime;
+                } else {
+                    endTime = curTime;
                 }
 
                 /** Now remove as many elements from the queues as our moving average step/shift

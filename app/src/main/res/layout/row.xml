@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceListItemSmall"
                     android:layout_alignParentEnd="true"
-                    android:text="Min."
+                    android:text="Min"
                     android:layout_marginStart="2dp"/>
                 <TextView
                     android:layout_toStartOf="@id/row_durationMin"
@@ -69,12 +69,41 @@
             <TextView
                 android:id="@+id/row_message"
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="15"
                 android:layout_height="wrap_content"
                 android:paddingStart="5dp"
                 android:textAppearance="?android:attr/textAppearanceListItemSmall"
                 android:text="Bereit zum Hochladen"/>
-
+            <RelativeLayout
+                android:id="@+id/distance_relativeLayout"
+                android:layout_width="0dp"
+                android:layout_weight="8"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/row_distanceText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/ride_distance"
+                    android:layout_marginEnd="2dp"/>
+                <TextView
+                    android:id="@+id/row_distanceKM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                    android:layout_alignParentEnd="true"
+                    android:text="km"
+                    android:layout_marginStart="2dp"/>
+                <TextView
+                    android:layout_toStartOf="@id/row_distanceKM"
+                    android:id="@+id/row_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                    android:textAlignment="viewEnd"
+                    android:text="18"/>
+            </RelativeLayout>
         </LinearLayout>
 
     </LinearLayout>

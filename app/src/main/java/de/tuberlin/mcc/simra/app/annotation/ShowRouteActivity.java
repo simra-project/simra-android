@@ -574,12 +574,38 @@ public class ShowRouteActivity extends BaseActivity {
                     String[] metaDataLine = line.split(",", -1);
                     String metaDataRide = line;
                     if (metaDataLine[0].equals(ride.getId())) {
+                        long distance = 0;
+                        long waitedTime = 0;
+                        int numberOfIncidents = 0;
                         if (temp) {
                             metaDataLine[1] = String.valueOf(tempStartTime);
                             metaDataLine[2] = String.valueOf(tempEndTime);
+                            distance = Math.round(tempRide.distance);
+                            waitedTime = tempRide.waitedTime;
+                            ArrayList<AccEvent> accEventArrayList = tempRide.events;
+                            for (int i = 0; i < accEventArrayList.size(); i++) {
+                                if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
+                                    numberOfIncidents++;
+                                }
+                            }
+                        } else {
+                            distance = Math.round(ride.distance);
+                            waitedTime = ride.waitedTime;
+                            ArrayList<AccEvent> accEventArrayList = ride.events;
+                            Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
+                            for (int i = 0; i < accEventArrayList.size(); i++) {
+                                AccEvent thisAccEvent = accEventArrayList.get(i);
+                                Log.d(TAG, "accEvent " + thisAccEvent.key + " incidentType: " +thisAccEvent.incidentType);
+                                Log.d(TAG, "accEvent" + thisAccEvent.key + " timeStamp: " + thisAccEvent.timeStamp);
+                                if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
+                                    numberOfIncidents++;
+                                }
+                            }
                         }
                         metaDataLine[3] = "1";
-                        metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3]);
+
+                        // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
+                        metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance);
                     }
                     content.append(metaDataRide).append(System.lineSeparator());
                 }
@@ -684,7 +710,7 @@ public class ShowRouteActivity extends BaseActivity {
                 myMarkerFunct.setMarker(new AccEvent(Integer.valueOf(incidentProps[0]),
                         Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
                         Long.parseLong(incidentProps[3]),
-                        annotated), Integer.valueOf(incidentProps[0]));
+                        annotated,incidentProps[8]), Integer.valueOf(incidentProps[0]));
 
             }
         }

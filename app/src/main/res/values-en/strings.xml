@@ -12,11 +12,13 @@
     <string name="title_activity_showRoute">Annotate Ride</string>
     <string name="title_activity_library_license">Third Party Licenses</string>
     <string name="title_activity_about_simra">About SimRa</string>
+    <string name="title_activity_statistics">Statistics</string>
+
 
     <!--- Start -->
     <string name="welcome_header">Welcome to SimRa!</string>
     <string name="welcome_text">Thank you for supporting the SimRa project.</string>
-    <string name="welcome_text2">Have fun, and bon voyage</string>
+    <string name="welcome_text2">Have fun, and bon voyage.</string>
     <string name="welcome_text3">Best, the SimRa team</string>
     <string name="sendErrorTitle">Whoops!</string>
     <string name="sendErrorMessage">Seems like an error occurred during your last session. Would you like to send a report to help us improve the app?</string>
@@ -86,6 +88,7 @@
     <string name="rideUploadedInHistoryActivity">Uploaded.</string>
     <string name="uploadInBackground">Run in background</string>
     <string name="ride_length">ride duration</string>
+    <string name="ride_distance">Distance</string>
     <string name="descriptionUpload">Upload</string>
     <string name="descriptionExit">Exit</string>
     <string name="delete_file_warning">This ride hasn\t been uploaded yet. Do you want to delete the ride anyway?</string>
@@ -96,8 +99,11 @@
     <string name="upload_started">SimRa ride upload started</string>
     <string name="upload_channel_name">Uploading</string>
     <string name="upload_channel_description">Uploading rides</string>
-    <string name="upload_completed">SimRa Hochladen abgeschlossen.</string>
-    <string name="upload_failed">SimRa Hochladen fehlgeschlagen. Versuchen Sie es später erneut.</string>
+    <string name="upload_completed">SimRa upload completed.</string>
+    <string name="upload_failed">SimRa failed to upload. Please try again later</string>
+    <string name="nothing_to_upload">SimRa could not find a ride to upload</string>
+    <string name="upload_file_warning">All annotated and not uploaded files will be uploaded. It is not possible to annotate them afterwards.</string>
+    <string name="upload">Upload</string>
 
     <!--- ShowRoute -->
     <string name="quitAddIncident">Cancel\nadding</string>
@@ -167,14 +173,18 @@
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="otherGender">Other</string>
-    <string name="experienceMoreThen10">More then 10 years</string>
+    <string name="experienceMoreThen10">More than 10 years</string>
     <string name="experience5to10">5 to 10 years</string>
     <string name="experience2to4">2 to 4 years</string>
-    <string name="experienceLessThen2">Less then 2 years</string>
+    <string name="experienceLessThen2">Less than 2 years</string>
     <string name="editingProfileCompleted">Profile data saved</string>
     <string name="regionSpinnerTitle">Region</string>
     <string name="experienceSpinnerTitle">Experience as a Cyclist</string>
-
+    <string name="rulesDescription">How often do you follow the traffic rules?</string>
+    <string name="never">Never</string>
+    <string name="always">Always</string>
+    <string name="on">ON</string>
+    <string name="off">OFF</string>
     <!---  -->
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -206,4 +216,24 @@
     <string name="smashiconCredit">Icon made by Smashicon from www.flaticon.com .</string>
     <string name="pixelCredit">Icon made by Pixel perfect from www.flaticon.com .</string>
     <string name="icons8Credit">Icon made by Icons8 from https://icons8.com .</string>
+
+    <!--- Statistics -->
+    <string name="uploaded_rides">Uploaded rides:</string>
+    <string name="distance">Distance:</string>
+    <string name="duration">Duration:</string>
+    <string name="incidents">Incidents:</string>
+    <string name="idle">Idle:</string>
+    <string name="co2Savings">CO2 savings:</string>
+    <string name="kcalConsumption">Calories consumption:</string>
+    <string name="rideDistribution">Ride distribution throughout the day</string>
+    <string name="hourOfDay">Hour</string>
+
+    <!--- News -->
+    <!--- 24 -->
+    <string name="statistics_news">New: You can see your profile statistics under the respective entry in the menu.</string>
+    <string name="profile_news">New: There is a new option you can set under \"Profile\".</string>
+    <string name="distance_news">New: Ride distances are displayed in \"My Rides\".</string>
+    <string name="annotate_hint_news">Hint: You can ignore the markers where nothing happened.</string>
+    <string name="dontkillmyapp_hint_news">Hint: The recording of a ride can automatically be stopped in some devices (like Huawei, OnePlus and Xiaomi). This can be prevented in the device settings. See www.DontKillMyApp.com for further information.</string>
+    <string name="what_is_new_title">What is new?</string>
 </resources>

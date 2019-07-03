@@ -71,14 +71,17 @@ public class LicenseActivity extends AppCompatActivity {
         Button logbackButton = findViewById(R.id.logback_library);
         createDialogWhenButtonIsPressed(logbackButton,"licenselogback.txt","Logback");
 
-        Button osmdroidButton = findViewById(R.id.osmdroid_library);
-        createDialogWhenButtonIsPressed(osmdroidButton,"licenseosmdroid.txt","Osmdroid");
+        Button mpandroidchartButton = findViewById(R.id.mpandroidchart_library);
+        createDialogWhenButtonIsPressed(mpandroidchartButton,"licensesmpandroidchart.txt","MPAndroidChart");
+
+        Button okhttpButton = findViewById(R.id.okhttp_library);
+        createDialogWhenButtonIsPressed(okhttpButton,"licenseokhttp.txt","OkHttp");
 
         Button osmbonuspackButton = findViewById(R.id.osmbonuspack_library);
         createDialogWhenButtonIsPressed(osmbonuspackButton,"licenseosmbonuspack.txt","Osmbonuspack");
 
-        Button okhttpButton = findViewById(R.id.okhttp_library);
-        createDialogWhenButtonIsPressed(okhttpButton,"licenseokhttp.txt","OkHttp");
+        Button osmdroidButton = findViewById(R.id.osmdroid_library);
+        createDialogWhenButtonIsPressed(osmdroidButton,"licenseosmdroid.txt","Osmdroid");
 
         Button rangeSeekBarButton = findViewById(R.id.rangeseekbar_library);
         createDialogWhenButtonIsPressed(rangeSeekBarButton,"licenserangeseekbar.txt","RangeSeekBar");

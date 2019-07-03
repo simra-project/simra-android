@@ -179,5 +179,54 @@
             android:entries="@array/experienceList"
             android:prompt="@string/pleaseChoose" />
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/rulesSeekBarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rulesDescription"
+            android:textAlignment="center"
+            android:textSize="15sp"
+            android:layout_gravity="center"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            >
+            <SeekBar
+                android:id="@+id/behaviourSeekBar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:max="5"
+                android:progress="3"
+                android:layout_alignParentTop="true"
+                android:paddingTop="5dp"
+                android:layout_toEndOf="@id/activateBehaviourSeekBar" />
+
+            <ToggleButton
+                android:id="@+id/activateBehaviourSeekBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="@string/on"
+                android:textOff="@string/off"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@id/behaviourSeekBar"
+                android:layout_below="@id/behaviourSeekBar"
+                android:text="@string/never" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/always"
+                android:layout_alignEnd="@+id/behaviourSeekBar"
+                android:layout_below="@id/behaviourSeekBar"/>
+        </RelativeLayout>
+
+
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>
