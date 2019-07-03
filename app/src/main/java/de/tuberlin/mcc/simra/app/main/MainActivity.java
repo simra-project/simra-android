@@ -61,6 +61,7 @@ import de.tuberlin.mcc.simra.app.net.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.subactivites.AboutActivity;
 import de.tuberlin.mcc.simra.app.subactivites.ProfileActivity;
 import de.tuberlin.mcc.simra.app.subactivites.SettingsActivity;
+import de.tuberlin.mcc.simra.app.subactivites.StatisticsActivity;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.WebActivity;
@@ -68,7 +69,9 @@ import de.tuberlin.mcc.simra.app.util.WebActivity;
 import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 
 
 public class MainActivity extends BaseActivity implements OnNavigationItemSelectedListener, LocationListener {
@@ -504,6 +507,9 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         } else if (id == R.id.nav_democraphic_data) {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
+        } else if (id == R.id.nav_statistics) {
+            Intent intent = new Intent(MainActivity.this, StatisticsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_aboutSimRa) {
             Intent intent = new Intent(MainActivity.this, AboutActivity.class);
             startActivity(intent);
@@ -663,6 +669,8 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             });
             if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
                 MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
+            } else if (!lookUpBooleanSharedPrefs("news24seen",false,"simraPrefs",MainActivity.this)) {
+                fireWhatIsNewPrompt();
             }
         }
     }
@@ -737,4 +745,41 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         alertDialog.show();
 
     }
+
+    private void fireWhatIsNewPrompt() {
+        Log.d(TAG, "fireWhatIsNewPrompt()");
+        // Store the created AlertDialog instance.
+        // Because only AlertDialog has cancel method.
+        AlertDialog alertDialog = null;
+        // Create a alert dialog builder.
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        // Get custom login form view.
+        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_24, null);
+
+        // Set above view in alert dialog.
+        builder.setView(settingsView);
+
+        builder.setTitle(getString(R.string.what_is_new_title));
+
+        alertDialog = builder.create();
+
+
+        Button okButton = settingsView.findViewById(R.id.ok_button);
+        AlertDialog finalAlertDialog = alertDialog;
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                writeBooleanToSharedPrefs("news24seen",true,"simraPrefs",MainActivity.this);
+                finalAlertDialog.cancel();
+            }
+        });
+
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+
+    }
+
 }
+

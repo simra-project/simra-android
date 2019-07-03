@@ -12,11 +12,13 @@
     <string name="title_activity_ride_settings">Fahrteinstellungen bearbeiten</string>
     <string name="title_activity_credits">Grafikreferenzen</string>
     <string name="title_activity_about_simra">Über SimRa</string>
+    <string name="title_activity_statistics">Statistiken</string>
+
 
     <!--- Start -->
     <string name="welcome_header">Willkommen bei SimRa!</string>
     <string name="welcome_text">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
-    <string name="welcome_text2">Viel Spaß und Gute Fahrt!.</string>
+    <string name="welcome_text2">Viel Spaß und Gute Fahrt!</string>
     <string name="welcome_text3">Mit freundlichen Grüßen,\ndas SimRa-Team.</string>
     <string name="sendErrorTitle">Ups!</string>
     <string name="sendErrorMessage">Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?</string>
@@ -87,6 +89,7 @@
     <string name="rideUploadedInHistoryActivity">Hochgeladen.</string>
     <string name="uploadInBackground">Im Hintergrund ausführen</string>
     <string name="ride_length">Dauer:</string>
+    <string name="ride_distance">Länge:</string>
     <string name="descriptionUpload">Upload</string>
     <string name="descriptionExit">Exit</string>
     <string name="delete_file_warning">Diese Fahrt wurde noch nicht hochgeladen. Soll sie wirklich gelöscht werden?</string>
@@ -99,6 +102,9 @@
     <string name="upload_channel_description">Fahrten werden hochgeladen</string>
     <string name="upload_completed">SimRa Hochladen abgeschlossen.</string>
     <string name="upload_failed">SimRa Hochladen fehlgeschlagen. Versuchen Sie es später erneut.</string>
+    <string name="nothing_to_upload">SimRa: Keine Fahrt bereit zum Hochladen</string>
+    <string name="upload_file_warning">Alle bearbeiteten und noch nicht hochgeladenen Fahrten werden hochgeladen. Die Fahrten können danach nicht weiter bearbeitet werden.</string>
+    <string name="upload">Hochladen</string>
 
     <!--- ShowRoute -->
     <string name="quitAddIncident">Hinzufügen\nbeenden</string>
@@ -175,7 +181,11 @@
     <string name="editingProfileCompleted">Profildaten wurden gespeichert</string>
     <string name="regionSpinnerTitle">Region</string>
     <string name="experienceSpinnerTitle">Erfahrung als Fahrradfahrer</string>
-
+    <string name="rulesDescription">Wie oft halten Sie sich an die Verkehrsregeln?</string>
+    <string name="never">Nie</string>
+    <string name="always">Immer</string>
+    <string name="on">EIN</string>
+    <string name="off">AUS</string>
     <!---  -->
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
@@ -207,4 +217,24 @@
     <string name="smashiconCredit">Icon gestaltet von Smashicon, bereitgestellt auf www.flaticon.com .</string>
     <string name="pixelCredit">Icon gestaltet von Pixel, bereitgestellt auf www.flaticon.com .</string>
     <string name="icons8Credit">Icon gestaltet von Icons8, bereitgestellt auf https://icons8.com .</string>
-    </resources>
+
+    <!--- Statistics -->
+    <string name="uploaded_rides">Hochgeladene Fahrten:</string>
+    <string name="distance">Streckenlänge:</string>
+    <string name="duration">Streckendauer:</string>
+    <string name="incidents">Ereignisse:</string>
+    <string name="idle">Stillstand:</string>
+    <string name="co2Savings">CO2-Ersparnisse:</string>
+    <string name="kcalConsumption">Kalorienverbrauch:</string>
+    <string name="rideDistribution">Fahrtverteilung über den Tag</string>
+    <string name="hourOfDay">Uhrzeit</string>
+
+    <!--- News -->
+    <!--- 24 -->
+    <string name="statistics_news">Neu: Die persönlichen Statistiken können im gleichnamigen Menüeintrag eingesehen werden.</string>
+    <string name="profile_news">Neu: Unter \"Profil\" ist nun eine neue Einstellungsmöglichkeit vorhanden.</string>
+    <string name="distance_news">Neu: Unter \"Meine Fahrten\" werden jetzt die Fahrtlängen angezeigt.</string>
+    <string name="annotate_hint_news">Hinweis: Markierungen, an denen es keine Beinaheunfälle gab können ignoriert werden.</string>
+    <string name="dontkillmyapp_hint_news">Hinweis: Auf manchen Geräten (z.B. Huawei, OnePlus, Xiaomi) kann es sein, dass die Aufzeichnung im Hintergrund automatisch gestoppt wird. Das kann in den Energieeinstellungen des Smartphones korrigiert werden. Weitere Informationen auf www.DontKillMyApp.com</string>
+    <string name="what_is_new_title">Was ist neu?</string>
+</resources>

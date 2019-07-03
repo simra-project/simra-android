@@ -1,7 +1,9 @@
 package de.tuberlin.mcc.simra.app.annotation;
 
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
+import android.util.Pair;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
@@ -11,12 +13,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import de.tuberlin.mcc.simra.app.annotation.AccEvent;
-import de.tuberlin.mcc.simra.app.util.Utils;
-
+import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
@@ -40,6 +38,8 @@ public class Ride {
     String duration;
     String startTime;
     String endTime;
+    public double distance;
+    int waitedTime;
     Context context;
     static String TAG = "Ride_LOG";
     Polyline route;
@@ -66,7 +66,11 @@ public class Ride {
         this.accGpsFile = accGpsFile;
         this.duration = duration;
         this.startTime = startTime;
-        this.route = getRouteLine(accGpsFile);
+        Pair<Integer, Polyline> routAndWaitedTime = getRouteAndWaitTime(accGpsFile);
+        this.route = routAndWaitedTime.second;
+        this.waitedTime = routAndWaitedTime.first;
+        this.distance = route.getDistance();
+        Log.d(TAG,"distance: " + distance + " waitedTime: " + waitedTime);
         this.state = state;
         this.bike = bike;
         this.child = child;
@@ -77,8 +81,7 @@ public class Ride {
         this.id = accGpsFile.getName().split("_")[0];
 
         String pathToAccEventsOfRide = "accEvents" + id + ".csv";
-        String content = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
-        content += System.lineSeparator();
+        String content = ACCEVENTS_HEADER;
         String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
 
         if (!fileExists(pathToAccEventsOfRide, context)) {
@@ -102,7 +105,11 @@ public class Ride {
         this.duration = duration;
         this.startTime = startTime;
         // this.endTime = endTime;
-        this.route = getRouteLine(tempAccGpsFile);
+        Pair<Integer, Polyline> routAndWaitedTime = getRouteAndWaitTime(tempAccGpsFile);
+        this.route = routAndWaitedTime.second;
+        this.waitedTime = routAndWaitedTime.first;
+        this.distance = route.getDistance();
+        Log.d(TAG,"distance: " + distance + " waitedTime: " + waitedTime);
         this.state = state;
         this.bike = bike;
         this.child = child;
@@ -114,8 +121,7 @@ public class Ride {
         this.temp = temp;
 
         String pathToAccEventsOfRide = "TempaccEvents" + id + ".csv";
-        String content = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
-        content += System.lineSeparator();
+        String content = ACCEVENTS_HEADER;
         String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
 
         for (int i = 0; i < events.size(); i++) {
@@ -132,32 +138,50 @@ public class Ride {
 
     // Takes a File which contains all the data and creates a
     // PolyLine to be displayed on the map as a route.
-    public static Polyline getRouteLine(File gpsFile) throws IOException {
+    public static Pair<Integer, Polyline> getRouteAndWaitTime(File gpsFile) throws IOException {
         Polyline polyLine = new Polyline();
 
         BufferedReader br = new BufferedReader(new FileReader(gpsFile));
-        // br.readLine() to skip the first two lines which contains the file version info and headers
+        // br.readLine() to skip the first two lines which contain the file version info and headers
         String line = br.readLine();
         line = br.readLine();
-
+        int waitedTime = 0;
+        Location lastLocation = null;
+        Location thisLocation = null;
         while ((line = br.readLine()) != null) {
+            String[] accGpsArray = line.split(",");
 
+            if (!line.startsWith(",,")) {
+                try {
+                    double distanceToLastPoint = 0;
 
-            if ((line.startsWith(",,"))) {
-                continue;
+                    if (thisLocation == null) {
+                        thisLocation = new Location("thisLocation");
+                        thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));
+                        thisLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                        lastLocation = new Location("lastLocation");
+                        lastLocation.setLatitude(Double.valueOf(accGpsArray[0]));
+                        lastLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                    } else {
+                        thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));
+                        thisLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                        if (thisLocation.distanceTo(lastLocation) < 2.5) {
+                            waitedTime += 3;
+                        }
+                        lastLocation.setLatitude(Double.valueOf(accGpsArray[0]));
+                        lastLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                    }
+                    polyLine.addPoint(new GeoPoint(thisLocation));
+                } catch (NumberFormatException nfe) {
+                    nfe.printStackTrace();
+                }
             }
-            String[] separatedLine = line.split(",");
-            try {
-                GeoPoint actualGeoPoint = new GeoPoint(Double.valueOf(separatedLine[0]), Double.valueOf(separatedLine[1]));
-                polyLine.addPoint(actualGeoPoint);
-            } catch (NumberFormatException nfe) {
-                nfe.printStackTrace();
-            }
+
         }
 
         br.close();
-
-        return polyLine;
+        Pair<Integer, Polyline> result = new Pair<>(waitedTime, polyLine);
+        return result;
     }
 
     public ArrayList<AccEvent> findAccEvents() {
@@ -182,12 +206,13 @@ public class Ride {
         ArrayList<AccEvent> accEvents = new ArrayList<>(6);
         ArrayList<String[]> events = new ArrayList<>(6);
         Log.d(TAG, thisLine + " nextLine: " + nextLine);
-        accEvents.add(new AccEvent(thisLine.split(",")));
-        accEvents.add(new AccEvent(thisLine.split(",")));
-        accEvents.add(new AccEvent(thisLine.split(",")));
-        accEvents.add(new AccEvent(thisLine.split(",")));
-        accEvents.add(new AccEvent(thisLine.split(",")));
-        accEvents.add(new AccEvent(thisLine.split(",")));
+        String[] thisLineArray = thisLine.split(",");
+        accEvents.add(new AccEvent(thisLineArray));
+        accEvents.add(new AccEvent(thisLineArray));
+        accEvents.add(new AccEvent(thisLineArray));
+        accEvents.add(new AccEvent(thisLineArray));
+        accEvents.add(new AccEvent(thisLineArray));
+        accEvents.add(new AccEvent(thisLineArray));
 
         String[] template = {"0.0", "0.0", "0.0", "0.0", "0.0", "0"};
         events.add(template);

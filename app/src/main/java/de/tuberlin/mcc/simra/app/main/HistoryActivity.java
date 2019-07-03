@@ -48,6 +48,7 @@ import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 
 public class HistoryActivity extends BaseActivity {
 
@@ -76,11 +77,15 @@ public class HistoryActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             boolean uploadSuccessful = intent.getBooleanExtra("uploadSuccessful",false);
-            if (uploadSuccessful) {
-                Toast.makeText(getApplicationContext(), R.string.upload_completed, Toast.LENGTH_LONG).show();
-            } else {
+            boolean foundARideToUpload = intent.getBooleanExtra("foundARideToUpload", true);
+            if (!foundARideToUpload) {
+                Toast.makeText(getApplicationContext(), R.string.nothing_to_upload, Toast.LENGTH_LONG).show();
+            } else if (!uploadSuccessful) {
                 Toast.makeText(getApplicationContext(), R.string.upload_failed, Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.upload_completed, Toast.LENGTH_LONG).show();
             }
+
             refreshMyRides();
         }
     }
@@ -166,10 +171,13 @@ public class HistoryActivity extends BaseActivity {
         justUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HistoryActivity.this, UploadService.class);
-                startService(intent);
-                Toast.makeText(HistoryActivity.this,getString(R.string.upload_started),Toast.LENGTH_SHORT).show();
-
+                if(!lookUpBooleanSharedPrefs("uploadWarningShown",false,"simraPrefs",HistoryActivity.this)){
+                    fireUploadPrompt();
+                } else {
+                    Intent intent = new Intent(HistoryActivity.this, UploadService.class);
+                    startService(intent);
+                    Toast.makeText(HistoryActivity.this,getString(R.string.upload_started),Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -307,7 +315,8 @@ public class HistoryActivity extends BaseActivity {
             startDateOfRide = month + "/" + day + "/" + year + ", " + time;
         }
 
-        return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3];
+        Log.d(TAG, "item: " + Arrays.toString(item));
+        return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3] + ";" + item[5];
     }
 
     public void startShowRouteWithSelectedRide() {
@@ -397,6 +406,8 @@ public class HistoryActivity extends BaseActivity {
                     row.findViewById(R.id.duration_relativeLayout).setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 10));
                 }
                 holder.duration = (TextView) row.findViewById(R.id.row_duration);
+                holder.distance = (TextView) row.findViewById(R.id.row_distance);
+                holder.distanceUnit = (TextView) row.findViewById(R.id.row_distanceKM);
                 holder.message = (TextView) row.findViewById(R.id.row_message);
                 holder.btnDelete = (ImageButton) row.findViewById(R.id.button1);
                 row.setTag(holder);
@@ -407,6 +418,13 @@ public class HistoryActivity extends BaseActivity {
             holder.rideDate.setText(itemComponents[1]);
             holder.message.setText(itemComponents[2]);
             holder.duration.setText(itemComponents[3]);
+            if (locale.equals(Locale.US)) {
+                holder.distance.setText(String.valueOf(Math.round(Double.valueOf(itemComponents[5])/1600)));
+                holder.distanceUnit.setText(" mi");
+            } else {
+                holder.distance.setText(String.valueOf(Math.round(Double.valueOf(itemComponents[5])/1000)));
+                holder.distanceUnit.setText("km ");
+            }
             if (!itemComponents[4].equals("2")) {
                 holder.btnDelete.setVisibility(View.VISIBLE);
             } else {
@@ -462,6 +480,8 @@ public class HistoryActivity extends BaseActivity {
         class Holder {
             TextView rideDate;
             TextView duration;
+            TextView distance;
+            TextView distanceUnit;
             TextView message;
             ImageButton btnDelete;
         }
@@ -503,6 +523,28 @@ public class HistoryActivity extends BaseActivity {
                 }
                 Toast.makeText(HistoryActivity.this,R.string.ride_deleted,Toast.LENGTH_SHORT).show();
                 refreshMyRides();
+            }
+        });
+        alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        alert.show();
+
+    }
+
+    public void fireUploadPrompt() {
+        android.support.v7.app.AlertDialog.Builder alert = new android.support.v7.app.AlertDialog.Builder(HistoryActivity.this);
+        alert.setTitle(getString(R.string.warning));
+        alert.setMessage(getString(R.string.upload_file_warning));
+        alert.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                writeBooleanToSharedPrefs("uploadWarningShown",true,"simraPrefs",HistoryActivity.this);
+                Intent intent = new Intent(HistoryActivity.this, UploadService.class);
+                startService(intent);
+                Toast.makeText(HistoryActivity.this,getString(R.string.upload_started),Toast.LENGTH_SHORT).show();
+
             }
         });
         alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

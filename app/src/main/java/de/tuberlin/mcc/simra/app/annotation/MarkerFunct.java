@@ -28,6 +28,7 @@ import java.util.concurrent.ThreadFactory;
 
 import de.tuberlin.mcc.simra.app.R;
 
+import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
@@ -107,13 +108,19 @@ public class MarkerFunct {
                 Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident));
 
                 boolean annotated = checkForAnnotation(actualIncident);
+                String incidentType = actualIncident[8];
 
                 Log.d(TAG, "annotated:" + annotated);
 
                 AccEvent accEvent = new AccEvent(Integer.parseInt(actualIncident[0]),
                         Double.parseDouble(actualIncident[1]),
                         Double.parseDouble(actualIncident[2]),
-                        Long.parseLong(actualIncident[3]), annotated);
+                        Long.parseLong(actualIncident[3]), annotated, incidentType);
+                if (temp) {
+                    mother.tempRide.events.set(Integer.valueOf(actualIncident[0]),accEvent);
+                } else {
+                    mother.ride.events.set(Integer.valueOf(actualIncident[0]),accEvent);
+                }
 
                 Log.d(TAG, "accEvent key: " + accEvent.key + " accEvent.position" + accEvent.position.toString());
                 setMarker(accEvent, accEvent.key);
@@ -166,7 +173,7 @@ public class MarkerFunct {
         // Create a new AccEvent
         int eventCount = ++this.numEvents;
         AccEvent newAcc = new AccEvent(eventCount, closestOnRoute.getLatitude(),
-                closestOnRoute.getLongitude(), 1337, false);
+                closestOnRoute.getLongitude(), 1337, false,"");
         Log.d(TAG,"newAcc: " + newAcc.toString());
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -211,8 +218,7 @@ public class MarkerFunct {
                     if (temp) {
                         pathToAccEventsOfRide = "TempaccEvents" + rideID + ".csv";
                     }
-                    String header = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc";
-                    header += System.lineSeparator();
+
                     String fileInfoLine = getAppVersionNumber(mother) + "#1" + System.lineSeparator();
 
                     int bike = lookUpIntSharedPrefs("Settings-BikeType",0,"simraPrefs",mother);
@@ -226,7 +232,7 @@ public class MarkerFunct {
                             + "," + newAcc.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + "," + /*incident*/"," + /*i1*/"," + /*i2*/"," + /*i3*/"," + /*i4*/"," + /*i5*/"," + /*i6*/"," + /*i7*/"," + /*i8*/"," + /*i9*/"," + /*scary*/"," + /*desc*/"," +System.lineSeparator();
 
                     if (!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())) {
-                        overWriteFile((fileInfoLine + header + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
+                        overWriteFile((fileInfoLine + ACCEVENTS_HEADER + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
                     } else {
                         appendToFile(eventLine, pathToAccEventsOfRide, mother.getApplicationContext());
                     }

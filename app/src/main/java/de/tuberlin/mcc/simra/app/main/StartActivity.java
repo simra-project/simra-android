@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.Arrays;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.UploadService;
@@ -25,6 +26,7 @@ import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.Utils;
 import okhttp3.internal.Util;
 
+import static de.tuberlin.mcc.simra.app.util.Constants.PROFILE_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
@@ -32,6 +34,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.showKeyPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateToV18;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateToV24;
@@ -59,9 +62,9 @@ public class StartActivity extends BaseActivity {
 
         Log.d(TAG, "onCreate() started");
         writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
+        showKeyPrefs(StartActivity.this);
         updateToV18(StartActivity.this);
         updateToV24(StartActivity.this);
-
 
         // For permission request
         int LOCATION_ACCESS_CODE = 1;
@@ -140,15 +143,15 @@ public class StartActivity extends BaseActivity {
                         + System.lineSeparator()), "metaData.csv", this);
 
             }
-
+            /*
             Log.d(TAG, "firstTime. Creating profile.csv");
             if (!fileExists("profile.csv", this)) {
                 String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
 
-                overWriteFile((fileInfoLine + "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents"
-                        + System.lineSeparator()), "profile.csv", this);
+                overWriteFile((fileInfoLine + PROFILE_HEADER), "profile.csv", this);
 
             }
+            */
 
             // Write the default values for privacy duration and distance. These values are
             // used to determine whether a ride should be saved or not.
