@@ -17,27 +17,19 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.util.Arrays;
-
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
-import de.tuberlin.mcc.simra.app.util.Utils;
-import okhttp3.internal.Util;
 
-import static de.tuberlin.mcc.simra.app.util.Constants.PROFILE_HEADER;
-import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.deleteErrorLogsForVersion;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.showKeyPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
-import static de.tuberlin.mcc.simra.app.util.Utils.updateToV18;
-import static de.tuberlin.mcc.simra.app.util.Utils.updateToV24;
+import static de.tuberlin.mcc.simra.app.util.Utils.updateToV26;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeLongToSharedPrefs;
@@ -61,10 +53,11 @@ public class StartActivity extends BaseActivity {
         setContentView(R.layout.activity_start);
 
         Log.d(TAG, "onCreate() started");
-        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
+        // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
         showKeyPrefs(StartActivity.this);
-        updateToV18(StartActivity.this);
-        updateToV24(StartActivity.this);
+        deleteErrorLogsForVersion(StartActivity.this, 26);
+        updateToV26(StartActivity.this);
+        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request
         int LOCATION_ACCESS_CODE = 1;

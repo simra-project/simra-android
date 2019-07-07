@@ -270,9 +270,9 @@ public class Utils {
         writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
     }
 
-    public static void updateToV18(Context context) {
-        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 18) {
+    public static void deleteErrorLogsForVersion(Context context, int version) {
+        int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        if (appVersion < version) {
             writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", context);
             File[] dirFiles = context.getFilesDir().listFiles();
             String path;
@@ -282,8 +282,10 @@ public class Utils {
                     dirFiles[i].delete();
                 }
             }
-            writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
         }
+
+            //writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
+
 
     }
 
@@ -294,9 +296,9 @@ public class Utils {
      * Also, renaming accGps files: removing timestamp from filename.
      *
      */
-    public static void updateToV24(Context context) {
+    public static void updateToV26(Context context) {
         int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 24) {
+        if (lastCriticalAppVersion < 26) {
 
             // rename accGps files
             File directory = context.getFilesDir();
@@ -419,6 +421,7 @@ public class Utils {
                     line = key + "," + startTime + "," + endTime + "," + lineArray[3] + "," + incidents  + "," + waitedTime + "," + distance;
                     contentOfNewMetaData.append(line).append(System.lineSeparator());
                 }
+                Log.d(TAG, "metaData.csv new content: " + contentOfNewMetaData.toString());
                 overWriteFile(contentOfNewMetaData.toString(),"metaData.csv",context);
             } catch (IOException ioe) {
                 Log.d(TAG, "++++++++++++++++++++++++++++++");
@@ -447,8 +450,6 @@ public class Utils {
             */
             updateProfile(context,birth,gender,region,experience,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,co2,timeBuckets,-1);
 
-
-            writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
         }
 
     }

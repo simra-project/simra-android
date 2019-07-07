@@ -77,7 +77,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
 
 
 
-            restartApp();
+            // restartApp();
 
         } catch (Exception e) {
             Log.e(TAG, "Exception Logger failed!", e);
