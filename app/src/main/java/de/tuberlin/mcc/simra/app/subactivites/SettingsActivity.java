@@ -151,6 +151,9 @@ public class SettingsActivity extends BaseActivity {
             }
         });
 
+
+        TextView appVersionTextView = findViewById(R.id.appVersionTextView);
+        appVersionTextView.setText("Version: " + getAppVersionNumber(this));
     }
 
     // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)

@@ -526,7 +526,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             i.setType("message/rfc822");
             i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
-            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.feedbackReceiver));
+            i.putExtra(Intent.EXTRA_TEXT, (getString(R.string.feedbackReceiver)) + System.lineSeparator() + "App Version: " + getAppVersionNumber(this) + System.lineSeparator() + "Android Version: ");
             try {
                 startActivity(Intent.createChooser(i, "Send mail..."));
             } catch (android.content.ActivityNotFoundException ex) {
