@@ -62,16 +62,15 @@ public class MarkerFunct {
         this.pool = mother.pool;
 
         if (temp) {
-            this.rideID = mother.tempRide.getId();
+            this.rideID = mother.tempRide.getKey();
         } else {
-            this.rideID = mother.ride.getId();
+            this.rideID = mother.ride.getKey();
         }
         pool.execute(new SimpleThreadFactory().newThread(() ->
                 geocoderNominatim = new GeocoderNominatim(userAgent)
         ));
 
         this.state = mother.state;
-
         if (temp) {
             this.numEvents = (mother.tempRide.events.size() - 1);
         } else {
@@ -121,7 +120,6 @@ public class MarkerFunct {
                 } else {
                     mother.ride.events.set(Integer.valueOf(actualIncident[0]),accEvent);
                 }
-
                 Log.d(TAG, "accEvent key: " + accEvent.key + " accEvent.position" + accEvent.position.toString());
                 setMarker(accEvent, accEvent.key);
             }

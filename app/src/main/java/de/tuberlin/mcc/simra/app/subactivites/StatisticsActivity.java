@@ -68,9 +68,10 @@ public class StatisticsActivity extends AppCompatActivity {
 
         TextView distanceOfRides = findViewById(R.id.distanceOfRides);
         if (locale.equals(new Locale("en").getLanguage())) {
-            distanceOfRides.setText(getText(R.string.distance) + " " + Math.round((float)profileValues[8]/1600) + " mi");
+            Log.d(TAG, "profileValues[8]: " + profileValues[8] + " class: " + profileValues[8].getClass());
+            distanceOfRides.setText(getText(R.string.distance) + " " + Math.round((Float.valueOf(String.valueOf(profileValues[8])))/1600) + " mi");
         } else {
-            distanceOfRides.setText(getText(R.string.distance) + " " + Math.round((long)profileValues[8]/1000) + " km");
+            distanceOfRides.setText(getText(R.string.distance) + " " + Math.round((Float.valueOf(String.valueOf(profileValues[8])))/1000) + " km");
         }
 
         TextView durationOfRides = findViewById(R.id.durationOfRides);

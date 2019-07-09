@@ -316,7 +316,11 @@ public class HistoryActivity extends BaseActivity {
         }
 
         Log.d(TAG, "item: " + Arrays.toString(item));
-        return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3] + ";" + item[5];
+        if(item.length>6) {
+            return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3] + ";" + item[6];
+        } else {
+            return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3] + ";" + 0;
+        }
     }
 
     public void startShowRouteWithSelectedRide() {

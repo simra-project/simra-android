@@ -296,9 +296,9 @@ public class Utils {
      * Also, renaming accGps files: removing timestamp from filename.
      *
      */
-    public static void updateToV26(Context context) {
+    public static void updateToV27(Context context) {
         int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 26) {
+        if (lastCriticalAppVersion < 27) {
 
             // rename accGps files
             File directory = context.getFilesDir();
@@ -340,64 +340,74 @@ public class Utils {
                     int incidents = 0;
                     int waitedTime = 0;
                     File gpsFile = context.getFileStreamPath(key + "_accGps.csv");
-                    try (BufferedReader accGpsReader = new BufferedReader(new InputStreamReader(new FileInputStream(gpsFile)))) {
+                    if (gpsFile.exists()) {
+                        try (BufferedReader accGpsReader = new BufferedReader(new InputStreamReader(new FileInputStream(gpsFile)))) {
 
-                        String accGpsLine = accGpsReader.readLine();
-                        accGpsReader.readLine();
-                        Location lastLocation = null;
-                        Location thisLocation = null;
-                        // loop through the accGps file and find startTime, endtime, distance and waitedTime
-                        while ((accGpsLine = accGpsReader.readLine()) != null) {
-                            String[] accGpsArray = accGpsLine.split(",",-1);
-                            if (startTime == null) {
-                                startTime = accGpsArray[5];
-                            } else {
-                                endTime = accGpsArray[5];
-                            }
-
-                            if (!accGpsLine.startsWith(",,")) {
-                                if (thisLocation == null) {
-                                    thisLocation = new Location("thisLocation");
-                                    thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                                    thisLocation.setLongitude(Double.valueOf(accGpsArray[1]));
-                                    lastLocation = new Location("lastLocation");
-                                    lastLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                                    lastLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                            String accGpsLine = accGpsReader.readLine();
+                            accGpsReader.readLine();
+                            Location lastLocation = null;
+                            Location thisLocation = null;
+                            // loop through the accGps file and find startTime, endtime, distance and waitedTime
+                            while ((accGpsLine = accGpsReader.readLine()) != null) {
+                                String[] accGpsArray = accGpsLine.split(",",-1);
+                                if (startTime == null) {
+                                    startTime = accGpsArray[5];
                                 } else {
-                                    thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                                    thisLocation.setLongitude(Double.valueOf(accGpsArray[1]));
-                                    if (thisLocation.distanceTo(lastLocation) < 2.5) {
-                                        waitedTime += 3;
-                                        if (isUploaded) {
-                                            totalWaitedTime += 3;
+                                    endTime = accGpsArray[5];
+                                }
+
+                                if (!accGpsLine.startsWith(",,")) {
+                                    if (thisLocation == null) {
+                                        thisLocation = new Location("thisLocation");
+                                        thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));
+                                        thisLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                                        lastLocation = new Location("lastLocation");
+                                        lastLocation.setLatitude(Double.valueOf(accGpsArray[0]));
+                                        lastLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                                    } else {
+                                        thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));
+                                        thisLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                                        if (thisLocation.distanceTo(lastLocation) < 2.5) {
+                                            waitedTime += 3;
+                                            if (isUploaded) {
+                                                totalWaitedTime += 3;
+                                            }
                                         }
+                                        lastLocation.setLatitude(Double.valueOf(accGpsArray[0]));
+                                        lastLocation.setLongitude(Double.valueOf(accGpsArray[1]));
                                     }
-                                    lastLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                                    lastLocation.setLongitude(Double.valueOf(accGpsArray[1]));
-                                }
 
-                            }
-                        }
-                    }
-
-                    // loop through accEvents lines
-                    try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/accEvents" + key + ".csv") )))) {
-                        // fileInfoLine (24#2)
-                        String accEventsLine = accEventsReader.readLine();
-                        // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc
-                        // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,
-                        // 20 entries per line (index 0-19)
-                        accEventsReader.readLine();
-                        while ((accEventsLine = accEventsReader.readLine()) != null) {
-                            String[] accEventsArray = accEventsLine.split(",",-1);
-                            if(!accEventsArray[8].equals("0") && !accEventsArray[8].equals("")) {
-                                incidents++;
-                                if (isUploaded) {
-                                    totalNumberOfIncidents++;
                                 }
                             }
                         }
+                    } else {
+                        continue;
                     }
+
+                    File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
+                    if (accEventsFile.exists()){
+                        // loop through accEvents lines
+                        try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/accEvents" + key + ".csv") )))) {
+                            // fileInfoLine (24#2)
+                            String accEventsLine = accEventsReader.readLine();
+                            // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc
+                            // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,
+                            // 20 entries per line (index 0-19)
+                            accEventsReader.readLine();
+                            while ((accEventsLine = accEventsReader.readLine()) != null) {
+                                String[] accEventsArray = accEventsLine.split(",",-1);
+                                if(!accEventsArray[8].equals("0") && !accEventsArray[8].equals("")) {
+                                    incidents++;
+                                    if (isUploaded) {
+                                        totalNumberOfIncidents++;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        continue;
+                    }
+
                     Polyline routeLine = Ride.getRouteAndWaitTime(gpsFile).second;
                     long distance = Math.round(routeLine.getDistance());
                     if (isUploaded) {

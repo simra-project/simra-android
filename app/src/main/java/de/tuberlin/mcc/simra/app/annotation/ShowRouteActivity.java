@@ -309,7 +309,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         // Create a ride object with the accelerometer, gps and time data
         if (temp) {
-            tempAccEventsPath = "TempaccEvents" + ride.getId() + ".csv";
+            tempAccEventsPath = "TempaccEvents" + ride.getKey() + ".csv";
             tempAccGpsPath = "Temp" + gpsFile.getName();
             runOnUiThread(new Runnable() {
                 @Override
@@ -573,7 +573,7 @@ public class ShowRouteActivity extends BaseActivity {
                     }
                     String[] metaDataLine = line.split(",", -1);
                     String metaDataRide = line;
-                    if (metaDataLine[0].equals(ride.getId())) {
+                    if (metaDataLine[0].equals(ride.getKey())) {
                         long distance = 0;
                         long waitedTime = 0;
                         int numberOfIncidents = 0;
@@ -625,7 +625,7 @@ public class ShowRouteActivity extends BaseActivity {
                 boolean success = tempGpsFile.renameTo(new File(path + File.separator + pathToAccGpsFile));
                 Log.d(TAG, "tempGpsFile successfully renamed: " + success);
             }
-            String pathToAccEventsFile = "accEvents" + ride.getId() + ".csv";
+            String pathToAccEventsFile = "accEvents" + ride.getKey() + ".csv";
             if (tempAccEventsPath != null) {
                 deleteFile(pathToAccEventsFile);
                 String path = ShowRouteActivity.this.getFilesDir().getPath();

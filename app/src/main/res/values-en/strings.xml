@@ -236,4 +236,5 @@
     <string name="annotate_hint_news">Hint: You can ignore the markers where nothing happened.</string>
     <string name="dontkillmyapp_hint_news">Hint: The recording of a ride can automatically be stopped in some devices (like Huawei, OnePlus and Xiaomi). This can be prevented in the device settings. See www.DontKillMyApp.com for further information.</string>
     <string name="what_is_new_title">What is new?</string>
+    <string name="apologies_news">Some users have encountered errors in the last few updates. I am working hard to get rid of them. Thanks for your support! If you still have problems feel free to contact me at ask@mcc.tu-berlin.de or press Feedback in the menu.</string>
 </resources>

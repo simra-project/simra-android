@@ -669,7 +669,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             });
             if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
                 MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
-            } else if (!lookUpBooleanSharedPrefs("news24seen",false,"simraPrefs",MainActivity.this)) {
+            } else if (!lookUpBooleanSharedPrefs("news27seen",false,"simraPrefs",MainActivity.this)) {
                 fireWhatIsNewPrompt();
             }
         }
@@ -754,7 +754,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         // Get custom login form view.
-        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_24, null);
+        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_27, null);
 
         // Set above view in alert dialog.
         builder.setView(settingsView);
@@ -769,7 +769,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                writeBooleanToSharedPrefs("news24seen",true,"simraPrefs",MainActivity.this);
+                writeBooleanToSharedPrefs("news27seen",true,"simraPrefs",MainActivity.this);
                 finalAlertDialog.cancel();
             }
         });
