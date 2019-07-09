@@ -119,10 +119,10 @@ public class Ride {
         this.child = child;
         this.trailer = trailer;
         this.pLoc = pLoc;
-        this.events = findAccEvents();
         this.context = context;
         this.key = tempAccGpsFile.getName().split("_")[0].replace("Temp", "");
         this.temp = temp;
+        this.events = findAccEvents();
 
         String pathToAccEventsOfRide = "TempaccEvents" + key + ".csv";
         String content = ACCEVENTS_HEADER;

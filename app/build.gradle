@@ -6,8 +6,8 @@ android {
         applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 27
-        versionName "27.0"
+        versionCode 28
+        versionName "28.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
