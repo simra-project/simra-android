@@ -52,7 +52,7 @@ public class Ride {
     public int child;
     public int trailer;
     public int pLoc;
-    boolean temp;
+    boolean temp = false;
 
     public String getDuration() {
         return duration;
@@ -192,7 +192,7 @@ public class Ride {
         ArrayList<AccEvent> accEvents = new ArrayList<>(6);
 
         File accEventsFile = new File(context.getFilesDir() + "/accEvents"+ key + ".csv");
-        if (accEventsFile.exists()) {
+        if (accEventsFile.exists() && !temp) {
             // loop through accEvents lines
             try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(accEventsFile)))) {
                 // fileInfoLine (24#2)
