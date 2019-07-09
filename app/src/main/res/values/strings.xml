@@ -237,4 +237,5 @@
     <string name="annotate_hint_news">Hinweis: Markierungen, an denen es keine Beinaheunfälle gab können ignoriert werden.</string>
     <string name="dontkillmyapp_hint_news">Hinweis: Auf manchen Geräten (z.B. Huawei, OnePlus, Xiaomi) kann es sein, dass die Aufzeichnung im Hintergrund automatisch gestoppt wird. Das kann in den Energieeinstellungen des Smartphones korrigiert werden. Weitere Informationen auf www.DontKillMyApp.com</string>
     <string name="what_is_new_title">Was ist neu?</string>
+    <string name="apologies_news">Einige Nutzer hatten in den letzten Updates mit Fehlern zu kämpfen, das tut mir Leid. Ich arbeite stets daran die App möglichst zu verbessern. Vielen Dank für die Unterstützung. Sollte immer noch etwas nicht stimmen, können Sie mich gerne über ask@mcc.tu-berin.de oder durch das Antippen auf Feedback im Menü kontaktieren.</string>
 </resources>

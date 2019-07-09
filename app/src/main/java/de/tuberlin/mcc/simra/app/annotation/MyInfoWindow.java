@@ -36,9 +36,9 @@ public class MyInfoWindow extends InfoWindow {
         this.addressForLoc = addressForLoc;
         this.motherActivity = motherActivity;
         if (temp) {
-            this.rideID = motherActivity.tempRide.getId();
+            this.rideID = motherActivity.tempRide.getKey();
         } else {
-            this.rideID = motherActivity.ride.getId();
+            this.rideID = motherActivity.ride.getKey();
         }
         this.incidentKey = String.valueOf(key);
         this.temp = temp;
