@@ -55,7 +55,7 @@
 
     <!--- MainActivity -->
     <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
-    <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um ihre Privatsphäre zu schützen.\nSie können ihre Privatsphäreeinstellungen und Einstellungen anpassen.</string>
+    <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um ihre Privatsphäre zu schützen.\nSie können dies im Menü "Einstellungen" anpassen.</string>
     <string name="startButtonText">Aufzeichnung\nstarten</string>
     <string name="stopButtonText">Aufzeichnung\nbeenden</string>
     <string name="cancel">Abbrechen</string>
