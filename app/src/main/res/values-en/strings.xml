@@ -54,7 +54,7 @@
 
     <!--- MainActivity -->
     <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
-    <string name="errorRideNotRecorded">The ride was not recorded due to privacy settings!\nYou can check your privacy settings under settings</string>
+    <string name="errorRideNotRecorded">The ride was not recorded due to privacy settings!\nYou can check your privacy settings in the settings menu</string>
     <string name="cancel">Cancel</string>
     <string name="startButtonText">Start\nRecording</string>
     <string name="stopButtonText">End\nRecording</string>
