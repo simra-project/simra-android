@@ -15,6 +15,7 @@ import org.osmdroid.views.overlay.Polyline;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -464,6 +465,39 @@ public class Utils {
 
     }
 
+    public static void updateToV30(Context context) {
+        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        if (lastCriticalAppVersion < 30) {
+            File directory = context.getFilesDir();
+            File[] fileList = directory.listFiles();
+            String name;
+            for (int i = 0; i < fileList.length; i++) {
+                name = fileList[i].getName();
+                if (name.startsWith("accEvents")) {
+                    StringBuilder contentOfNewAccEvents = new StringBuilder();
+                    try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(fileList[i])))) {
+                        // fileInfoLine (29#2)
+                        contentOfNewAccEvents.append(accEventsReader.readLine()).append(System.lineSeparator());
+                        // skip old header
+                        accEventsReader.readLine();
+                        // add new header
+                        contentOfNewAccEvents.append(ACCEVENTS_HEADER);
+                        // add rest of content
+                        String line;
+                        while ((line = accEventsReader.readLine()) != null) {
+                            contentOfNewAccEvents.append(line).append(System.lineSeparator());
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    overWriteFile(contentOfNewAccEvents.toString(),fileList[i].getName(),context);
+                }
+            }
+        }
+    }
+
     public static void showKeyPrefs(Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences("keyPrefs", Context.MODE_PRIVATE);
@@ -553,8 +587,9 @@ public class Utils {
         return result;
     }
 
+    // returns values of
+    // {(int)ageGroup,(int)gender,(int)region,(int)experience,(int)numberOfRides,(long)duration,(int)numberOfIncidents,(long)waitedTime,(long)distance,(long)co2,(int)0,1,2,...,23,(int)behaviour}
     public static Object[] getProfile(Context context) {
-        // {ageGroup, gender, region, experience, behaviour}
         Object[] result = new Object[35];
         int[] demographics = getProfileDemographics(context);
         Object[] rest = getProfileWithoutDemographics(context);
@@ -567,7 +602,7 @@ public class Utils {
         }
 
         result[34] = demographics[4];
-
+        Log.d(TAG, "profile: " + Arrays.toString(result));
         return result;
     }
 

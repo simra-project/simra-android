@@ -88,6 +88,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         CheckBox involvedType7CheckBox = findViewById(R.id.involvedType7);
         CheckBox involvedType8CheckBox = findViewById(R.id.involvedType8);
         CheckBox involvedType9CheckBox = findViewById(R.id.involvedType9);
+        CheckBox involvedType10CheckBox = findViewById(R.id.involvedType10);
 
         if (state == 2) {
             incidentTypeSpinner.setEnabled(false);
@@ -102,6 +103,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             involvedType7CheckBox.setEnabled(false);
             involvedType8CheckBox.setEnabled(false);
             involvedType9CheckBox.setEnabled(false);
+            involvedType10CheckBox.setEnabled(false);
         }
         if (previousAnnotation != null && previousAnnotation.length > 7) {
 
@@ -142,6 +144,9 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 }
             }
             incidentDescription.setText(previousAnnotation[19].replaceAll(";linebreak;", System.lineSeparator()).replaceAll(";komma;", ","));
+            if (previousAnnotation.length>20 && previousAnnotation[20].equals("1")) {
+                involvedType10CheckBox.setChecked(true);
+            }
         }
         if (state < 2) {
             doneButton = findViewById(R.id.save_button);
@@ -202,42 +207,46 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     if (scarinessCheckBox.isChecked()) {
                         scariness = 1;
                     }
-                    String[] checkBoxValues = {"0", "0", "0", "0", "0", "0", "0", "0", "0"};
+                    String[] checkBoxValuesWithouti10 = {"0", "0", "0", "0", "0", "0", "0", "0", "0"};
 
                     if (involvedType1CheckBox.isChecked()) {
-                        checkBoxValues[0] = "1";
+                        checkBoxValuesWithouti10[0] = "1";
                     }
                     if (involvedType2CheckBox.isChecked()) {
-                        checkBoxValues[1] = "1";
+                        checkBoxValuesWithouti10[1] = "1";
                     }
                     if (involvedType3CheckBox.isChecked()) {
-                        checkBoxValues[2] = "1";
+                        checkBoxValuesWithouti10[2] = "1";
                     }
                     if (involvedType4CheckBox.isChecked()) {
-                        checkBoxValues[3] = "1";
+                        checkBoxValuesWithouti10[3] = "1";
                     }
                     if (involvedType5CheckBox.isChecked()) {
-                        checkBoxValues[4] = "1";
+                        checkBoxValuesWithouti10[4] = "1";
                     }
                     if (involvedType6CheckBox.isChecked()) {
-                        checkBoxValues[5] = "1";
+                        checkBoxValuesWithouti10[5] = "1";
                     }
                     if (involvedType7CheckBox.isChecked()) {
-                        checkBoxValues[6] = "1";
+                        checkBoxValuesWithouti10[6] = "1";
                     }
                     if (involvedType8CheckBox.isChecked()) {
-                        checkBoxValues[7] = "1";
+                        checkBoxValuesWithouti10[7] = "1";
                     }
                     if (involvedType9CheckBox.isChecked()) {
-                        checkBoxValues[8] = "1";
+                        checkBoxValuesWithouti10[8] = "1";
+                    }
+                    String i10Value = "0";
+                    if (involvedType10CheckBox.isChecked()) {
+                        i10Value = "1";
                     }
 
 
                     String incidentString = incidentKey + "," + lat + "," + lon + "," + ts + ","
-                            + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description;
+                            + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValuesWithouti10).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description + "," + i10Value;
 
                     overwriteIncidentFile(rideID, incidentKey, incidentKey + "," + lat + "," + lon + "," + ts + ","
-                            + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValues).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description);
+                            + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValuesWithouti10).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description + "," + i10Value);
 
                     incidentSaved = true;
 
@@ -310,10 +319,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 reader = new BufferedReader(new FileReader(getFileStreamPath(pathToIncidents)));
 
             } catch (FileNotFoundException fnfe) {
-
                 fnfe.printStackTrace();
                 Log.d(TAG, "Incident file not found");
-
             }
             try {
 

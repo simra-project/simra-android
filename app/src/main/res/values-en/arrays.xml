@@ -27,7 +27,7 @@
         <item>@string/locationType4</item>
         <item>@string/locationType5</item>
         <item>@string/locationType6</item>
-        <item>@string/otherBike</item>
+        <item>@string/other</item>
     </string-array>
     <string-array name="ageGroupList">
         <item>@string/pleaseChoose</item>
@@ -54,8 +54,9 @@
     <string-array name="regionList">
         <item>@string/pleaseChoose</item>
         <item>Berlin</item>
+        <item>Bern</item>
         <item>London</item>
-        <item>@string/otherBike</item>
+        <item>@string/other</item>
     </string-array>
     <string-array name="experienceList">
         <item>@string/pleaseChoose</item>
@@ -125,7 +126,7 @@
         <item>@string/recumbentBicycle</item>
         <item>@string/freightBicycle</item>
         <item>@string/tandemBike</item>
-        <item>@string/otherBike</item>
+        <item>@string/other</item>
     </string-array>
     <string-array name="involvedTypeList">
         <item>@string/involvedType1</item>
