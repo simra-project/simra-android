@@ -669,8 +669,8 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             });
             if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
                 MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
-            } else if (!lookUpBooleanSharedPrefs("news27seen",false,"simraPrefs",MainActivity.this)) {
-                fireWhatIsNewPrompt();
+            } else if (!lookUpBooleanSharedPrefs("news30seen",false,"simraPrefs",MainActivity.this)) {
+                fireWhatIsNewPrompt(30);
             }
         }
     }
@@ -746,7 +746,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
 
     }
 
-    private void fireWhatIsNewPrompt() {
+    private void fireWhatIsNewPrompt(int version) {
         Log.d(TAG, "fireWhatIsNewPrompt()");
         // Store the created AlertDialog instance.
         // Because only AlertDialog has cancel method.
@@ -754,7 +754,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         // Get custom login form view.
-        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_27, null);
+        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_30, null);
 
         // Set above view in alert dialog.
         builder.setView(settingsView);
@@ -769,7 +769,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                writeBooleanToSharedPrefs("news27seen",true,"simraPrefs",MainActivity.this);
+                writeBooleanToSharedPrefs("news" + version + "seen",true,"simraPrefs",MainActivity.this);
                 finalAlertDialog.cancel();
             }
         });

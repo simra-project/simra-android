@@ -142,6 +142,7 @@
     <string name="involvedType7">PKW</string>
     <string name="involvedType8">Taxi</string>
     <string name="involvedType9">Sonstiges\n(Bitte unten angeben)</string>
+    <string name="involvedType10">E-Scooter</string>
     <string name="locationType1">Hosentasche</string>
     <string name="locationType2">Lenker</string>
     <string name="locationType3">Jackentasche</string>
@@ -202,7 +203,7 @@
     <string name="recumbentBicycle">Liegerad</string>
     <string name="tandemBike">Tandemrad</string>
     <string name="mountainBike">Mountainbike</string>
-    <string name="otherBike">Sonstiges</string>
+    <string name="other">Sonstiges</string>
     <string name="ride_settings_title">Fahrteinstellungen</string>
     <string name="childString">Auf dem Fahrrad wird ein Kind transportiert.</string>
     <string name="trailerString">Am Fahrrad ist ein Anhänger angebracht.</string>
@@ -230,12 +231,20 @@
     <string name="hourOfDay">Uhrzeit</string>
 
     <!--- News -->
+    <string name="what_is_new_title">Was ist neu?</string>
+
     <!--- 24 -->
     <string name="statistics_news">Neu: Die persönlichen Statistiken können im gleichnamigen Menüeintrag eingesehen werden.</string>
     <string name="profile_news">Neu: Unter \"Profil\" ist nun eine neue Einstellungsmöglichkeit vorhanden.</string>
     <string name="distance_news">Neu: Unter \"Meine Fahrten\" werden jetzt die Fahrtlängen angezeigt.</string>
     <string name="annotate_hint_news">Hinweis: Markierungen, an denen es keine Beinaheunfälle gab können ignoriert werden.</string>
     <string name="dontkillmyapp_hint_news">Hinweis: Auf manchen Geräten (z.B. Huawei, OnePlus, Xiaomi) kann es sein, dass die Aufzeichnung im Hintergrund automatisch gestoppt wird. Das kann in den Energieeinstellungen des Smartphones korrigiert werden. Weitere Informationen auf www.DontKillMyApp.com</string>
-    <string name="what_is_new_title">Was ist neu?</string>
+
+    <!-- 27 -->
     <string name="apologies_news">Einige Nutzer hatten in den letzten Updates mit Fehlern zu kämpfen, das tut mir Leid. Ich arbeite stets daran die App möglichst zu verbessern. Vielen Dank für die Unterstützung. Sollte immer noch etwas nicht stimmen, können Sie mich gerne über ask@mcc.tu-berin.de oder durch das Antippen auf Feedback im Menü kontaktieren.</string>
+
+    <!-- 30 -->
+    <string name="electric_news">Neu: Neuer Beteiligter \"E-Scooter\" im Annotationsmenü</string>
+    <string name="bern_news">Neu: Im Menüpunkt \"Profil\" kann nun die Region Bern ausgewählt werden.</string>
+    <string name="waitedTimeCorrected_news">Neu: Der Wert \"Stillstand\" in den Statistiken ist nun genauer.</string>
 </resources>

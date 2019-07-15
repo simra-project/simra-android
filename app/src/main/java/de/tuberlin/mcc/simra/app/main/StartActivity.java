@@ -30,6 +30,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.showKeyPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateToV27;
+import static de.tuberlin.mcc.simra.app.util.Utils.updateToV30;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeLongToSharedPrefs;
@@ -54,9 +55,10 @@ public class StartActivity extends BaseActivity {
 
         Log.d(TAG, "onCreate() started");
         // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
-        showKeyPrefs(StartActivity.this);
-        deleteErrorLogsForVersion(StartActivity.this, 26);
-        updateToV27(StartActivity.this);
+        showKeyPrefs(this);
+        deleteErrorLogsForVersion(this, 26);
+        updateToV27(this);
+        updateToV30(this);
         writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request

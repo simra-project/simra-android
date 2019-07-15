@@ -68,7 +68,6 @@ public class StatisticsActivity extends AppCompatActivity {
 
         TextView distanceOfRides = findViewById(R.id.distanceOfRides);
         if (locale.equals(new Locale("en").getLanguage())) {
-            Log.d(TAG, "profileValues[8]: " + profileValues[8] + " class: " + profileValues[8].getClass());
             distanceOfRides.setText(getText(R.string.distance) + " " + Math.round((Float.valueOf(String.valueOf(profileValues[8])))/1600) + " mi");
         } else {
             distanceOfRides.setText(getText(R.string.distance) + " " + Math.round((Float.valueOf(String.valueOf(profileValues[8])))/1000) + " km");
@@ -78,7 +77,7 @@ public class StatisticsActivity extends AppCompatActivity {
         durationOfRides.setText(getText(R.string.duration) + " " + ((new BigDecimal((long)profileValues[5])).divide(new BigDecimal(3600000),2,BigDecimal.ROUND_CEILING) + " h"));
 
         TextView durationOfWaitedTime = findViewById(R.id.durationOfWaitedTime);
-        durationOfWaitedTime.setText(getText(R.string.idle) + " " + ((new BigDecimal((long)profileValues[7]).divide(new BigDecimal(3600000),2,BigDecimal.ROUND_CEILING) + " h")));
+        durationOfWaitedTime.setText(getText(R.string.idle) + " " + ((new BigDecimal((long)profileValues[7]).divide(new BigDecimal(3600),2,BigDecimal.ROUND_CEILING) + " h")));
 
         TextView numberOfIncidents = findViewById(R.id.numberOfIncidents);
         numberOfIncidents.setText(getText(R.string.incidents) + " " + profileValues[6]);

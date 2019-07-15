@@ -227,7 +227,7 @@ public class MarkerFunct {
                     // eventline = key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,,,,,,,,,,,,
                     String eventLine = newAcc.key + ","
                             + newAcc.position.getLatitude() + "," + newAcc.position.getLongitude()
-                            + "," + newAcc.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + "," + /*incident*/"," + /*i1*/"," + /*i2*/"," + /*i3*/"," + /*i4*/"," + /*i5*/"," + /*i6*/"," + /*i7*/"," + /*i8*/"," + /*i9*/"," + /*scary*/"," + /*desc*/"," +System.lineSeparator();
+                            + "," + newAcc.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + "," + /*incident*/"," + /*i1*/"," + /*i2*/"," + /*i3*/"," + /*i4*/"," + /*i5*/"," + /*i6*/"," + /*i7*/"," + /*i8*/"," + /*i9*/"," + /*scary*/"," + /*desc*/"," + /*i10*/"," +System.lineSeparator();
 
                     if (!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())) {
                         overWriteFile((fileInfoLine + ACCEVENTS_HEADER + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());

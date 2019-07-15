@@ -197,7 +197,7 @@ public class Ride {
             try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(accEventsFile)))) {
                 // fileInfoLine (24#2)
                 String accEventsLine = accEventsReader.readLine();
-                // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc
+                // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10
                 // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,
                 // 20 entries per line (index 0-19)
                 accEventsReader.readLine();

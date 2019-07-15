@@ -74,6 +74,25 @@ public class ProfileActivity extends AppCompatActivity {
         ageGroupSpinner.setSelection(previousProfile[0]);
         genderSpinner.setSelection(previousProfile[1]);
         regionSpinner.setSelection(previousProfile[2]);
+        switch (previousProfile[2]) {
+            case 0:
+                regionSpinner.setSelection(0);
+                break;
+            case 1:
+                regionSpinner.setSelection(1);
+                break;
+            case 2:
+                regionSpinner.setSelection(3);
+                break;
+            case 3:
+                regionSpinner.setSelection(4);
+                break;
+            case 4:
+                regionSpinner.setSelection(2);
+                break;
+            default:
+                regionSpinner.setSelection(0);
+        }
         experienceSpinner.setSelection(previousProfile[3]);
         Log.d(TAG, "previousProfile[4]: " + previousProfile[4]);
         if (previousProfile[4] == -1) {
@@ -100,7 +119,28 @@ public class ProfileActivity extends AppCompatActivity {
         Log.d(TAG, "onDestroy() called");
         int ageGroup = ageGroupSpinner.getSelectedItemPosition();
         int gender = genderSpinner.getSelectedItemPosition();
-        int region = regionSpinner.getSelectedItemPosition();
+        int region = -1;
+        Log.d(TAG, "regionSpinner.getSelectedItem().toString(): " + regionSpinner.getSelectedItem().toString());
+        switch (regionSpinner.getSelectedItem().toString()) {
+            case "Berlin":
+                region = 1;
+                break;
+            case "London":
+                region = 2;
+                break;
+            case "Sonstiges":
+                region = 3;
+                break;
+            case "Other":
+                region = 3;
+                break;
+            case "Bern":
+                region = 4;
+                break;
+            default:
+                region = 0;
+        }
+        Log.d(TAG, "region " + region);
         int experience = experienceSpinner.getSelectedItemPosition();
         int behaviour = behaviourSeekBar.getProgress();
         // Log.d(TAG, "behaviour: " + behaviourSeekBar.getProgress() + " isEnabled: " + behaviourSeekBar.isEnabled());
