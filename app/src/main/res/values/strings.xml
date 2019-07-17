@@ -163,11 +163,18 @@
     <string name="notReady">Wollen sie die Bearbeitung unfertig beenden?</string>
     <string name="privacyLink">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1</string>
 
-    <!--- Setting -->
+    <!--- Settings -->
     <string name="privacyDurationDescription">Verzögerung des Aufnahmestarts\n(in Sekunden)</string>
     <string name="privacy_settings_title">Privatsphäre</string>
     <string name="privacyDistanceDescription">Verzögerung des Aufnahmestarts\n(in Metern)</string>
     <string name="settingsSaved">Einstellungen gespeichert</string>
+    <string name="general_settings_title">Allgemeine Einstellungen</string>
+    <string name="unitDescription">Einheitensystem</string>
+    <string name="imperial">Angloamerikanisch</string>
+    <string name="metric">Metrisch</string>
+    <string name="dateFormatDescription">Datumsformat</string>
+    <string name="germanDate">dd.mm.yy, hh:mm</string>
+    <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
@@ -193,6 +200,7 @@
     <string name="pleaseChoose">Bitte auswählen</string>
     <string name="yesClose"><![CDATA[Ja & schließen]]></string>
     <string name="close">Schließen</string>
+    <string name="crash_error">Fehler! SimRa wurde beendet.</string>
 
     <!--- RideSettings -->
     <string name="bikeTypeSpinnerTitle">Fahrradtyp</string>

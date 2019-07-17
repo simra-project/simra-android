@@ -47,6 +47,8 @@ import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 
@@ -70,6 +72,10 @@ public class HistoryActivity extends BaseActivity {
     UploadService mBoundUploadService;
 
     boolean privacyAgreement = false;
+
+    String unit;
+    int dateFormat;
+
 
     BroadcastReceiver br;
 
@@ -125,6 +131,8 @@ public class HistoryActivity extends BaseActivity {
                                    }
         );
 
+        unit = lookUpSharedPrefs("Settings-Unit","m","simraPrefs",HistoryActivity.this);
+        dateFormat = lookUpIntSharedPrefs("Settings-DateFormat", 0, "simraPrefs", HistoryActivity.this);
 
         listView = findViewById(R.id.listView);
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -298,7 +306,7 @@ public class HistoryActivity extends BaseActivity {
         String year = String.valueOf(localCalendar.get(Calendar.YEAR)).substring(2,4);
         Locale locale = Resources.getSystem().getConfiguration().locale;
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", locale);
-        if (locale.equals(Locale.US)) {
+        if (dateFormat == 1) {
             sdf = new SimpleDateFormat("hh:mm aa", locale);
         }
         String time = sdf.format(dt);
@@ -311,7 +319,7 @@ public class HistoryActivity extends BaseActivity {
 
 
         String startDateOfRide = day + "." + month + "." + year + ", " + time + "h";
-        if (locale.equals(Locale.US)) {
+        if (dateFormat == 1) {
             startDateOfRide = month + "/" + day + "/" + year + ", " + time;
         }
 
@@ -405,7 +413,7 @@ public class HistoryActivity extends BaseActivity {
                 row = inflater.inflate(layoutResourceId, parent, false);
                 holder = new Holder();
                 holder.rideDate = (TextView) row.findViewById(R.id.row_ride_date);
-                if (locale.equals(Locale.US)) {
+                if (dateFormat == 1) {
                     holder.rideDate.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 13));
                     row.findViewById(R.id.duration_relativeLayout).setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 10));
                 }
@@ -422,7 +430,7 @@ public class HistoryActivity extends BaseActivity {
             holder.rideDate.setText(itemComponents[1]);
             holder.message.setText(itemComponents[2]);
             holder.duration.setText(itemComponents[3]);
-            if (locale.equals(Locale.US)) {
+            if (unit.equals("ft")) {
                 holder.distance.setText(String.valueOf(Math.round(Double.valueOf(itemComponents[5])/1600)));
                 holder.distanceUnit.setText(" mi");
             } else {

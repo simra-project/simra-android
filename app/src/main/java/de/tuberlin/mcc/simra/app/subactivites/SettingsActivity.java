@@ -10,6 +10,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +32,8 @@ public class SettingsActivity extends BaseActivity {
     int privacyDistance;
     int child;
     int trailer;
+    String unit;
+    int dateFormat;
 
     // Bike Type and Phone Location Items
     Spinner bikeTypeSpinner;
@@ -39,6 +42,9 @@ public class SettingsActivity extends BaseActivity {
     // Child and Trailer
     CheckBox childCheckBox;
     CheckBox trailerCheckBox;
+
+    Switch unitSwitch;
+    Switch dateFormatSwitch;
 
 
 
@@ -63,15 +69,39 @@ public class SettingsActivity extends BaseActivity {
                                    }
         );
 
+        // load unit and date format
+        unit = lookUpSharedPrefs("Settings-Unit","m","simraPrefs",this);
+        dateFormat = lookUpIntSharedPrefs("Settings-DateFormat",0,"simraPrefs",this);
 
-
-        // Set the distance measure unit according to locale (foot when english, meter when german)
-        String unit = "m";
-        String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
-        if (locale.equals(new Locale("en").getLanguage())) {
-            unit = "ft";
+        // Set switches
+        unitSwitch = findViewById(R.id.unitSwitch);
+        if (unit.equals("ft")) {
+            unitSwitch.setChecked(true);
         }
-
+        dateFormatSwitch = findViewById(R.id.dateFormatSwitch);
+        if (dateFormat == 1) {
+            dateFormatSwitch.setChecked(true);
+        }
+        unitSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    unit = "ft";
+                } else {
+                    unit = "m";
+                }
+            }
+        });
+        dateFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    dateFormat = 1;
+                } else {
+                    dateFormat = 0;
+                }
+            }
+        });
         // Set seekBars
         SeekBar durationSeekBar = (SeekBar) findViewById(R.id.privacyDurationSeekBar);
         SeekBar distanceSeekBar = (SeekBar) findViewById(R.id.privacyDistanceSeekBar);
@@ -152,6 +182,7 @@ public class SettingsActivity extends BaseActivity {
         });
 
 
+
         TextView appVersionTextView = findViewById(R.id.appVersionTextView);
         appVersionTextView.setText("Version: " + getAppVersionNumber(this));
     }
@@ -218,12 +249,14 @@ public class SettingsActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy() called");
-        writeLongToSharedPrefs("Privacy-Duration", privacyDuration, "simraPrefs", SettingsActivity.this);
-        writeIntToSharedPrefs("Privacy-Distance", privacyDistance, "simraPrefs", SettingsActivity.this);
-        writeIntToSharedPrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
-        writeIntToSharedPrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", SettingsActivity.this);
-        writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", SettingsActivity.this);
-        writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", SettingsActivity.this);
+        writeLongToSharedPrefs("Privacy-Duration", privacyDuration, "simraPrefs", this);
+        writeIntToSharedPrefs("Privacy-Distance", privacyDistance, "simraPrefs", this);
+        writeIntToSharedPrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", this);
+        writeIntToSharedPrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", this);
+        writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", this);
+        writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", this);
+        writeToSharedPrefs("Settings-Unit",unit,"simraPrefs",this);
+        writeIntToSharedPrefs("Settings-DateFormat",dateFormat,"simraPrefs", this);
         Toast.makeText(this, getString(R.string.settingsSaved), Toast.LENGTH_SHORT).show();
 
     }
