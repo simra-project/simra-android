@@ -24,6 +24,7 @@ import java.util.Locale;
 import de.tuberlin.mcc.simra.app.R;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfile;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static org.apache.commons.lang3.time.DateUtils.round;
 
 public class StatisticsActivity extends AppCompatActivity {
@@ -60,6 +61,7 @@ public class StatisticsActivity extends AppCompatActivity {
                                        }
                                    }
         );
+        String unit = lookUpSharedPrefs("Settings-Unit","m","simraPrefs",this);
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
         // String[] profileValues = readContentFromFile("profile.csv", this).split(System.lineSeparator())[2].split(",");
         Object[] profileValues = getProfile(this);
@@ -67,7 +69,7 @@ public class StatisticsActivity extends AppCompatActivity {
         numberOfRides.setText(getText(R.string.uploaded_rides) + " " + profileValues[4]);
 
         TextView distanceOfRides = findViewById(R.id.distanceOfRides);
-        if (locale.equals(new Locale("en").getLanguage())) {
+        if (unit.equals("ft")) {
             distanceOfRides.setText(getText(R.string.distance) + " " + Math.round((Float.valueOf(String.valueOf(profileValues[8])))/1600) + " mi");
         } else {
             distanceOfRides.setText(getText(R.string.distance) + " " + Math.round((Float.valueOf(String.valueOf(profileValues[8])))/1000) + " km");
