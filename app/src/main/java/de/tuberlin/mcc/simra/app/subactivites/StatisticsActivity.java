@@ -84,6 +84,9 @@ public class StatisticsActivity extends AppCompatActivity {
         TextView numberOfIncidents = findViewById(R.id.numberOfIncidents);
         numberOfIncidents.setText(getText(R.string.incidents) + " " + profileValues[6]);
 
+        TextView numberOfScary = findViewById(R.id.numberOfScary);
+        numberOfScary.setText(getText(R.string.scary) + " " + profileValues[34]);
+
         TextView co2Savings = findViewById(R.id.co2Savings);
         co2Savings.setText(getText(R.string.co2Savings) + " " + profileValues[9] + " g");
 
@@ -94,9 +97,9 @@ public class StatisticsActivity extends AppCompatActivity {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setLabelsToSkip(0);
         ArrayList<BarEntry> entries = new ArrayList<>();
-        for (int i = 10; i < 33; i++) {
+        for (int i = 11; i < 34; i++) {
             entries.add(new BarEntry((float)profileValues[i],i-10));
-            if(entries.get(i-10).getVal() == 0.0) {
+            if(entries.get(i-11).getVal() == 0.0) {
                 xAxis.setPosition(XAxis.XAxisPosition.BOTTOM_INSIDE);
             }
         }

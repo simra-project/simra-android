@@ -231,6 +231,7 @@
     <string name="distance">Distance:</string>
     <string name="duration">Duration:</string>
     <string name="incidents">Incidents:</string>
+    <string name="scary">Scary Incidents:</string>
     <string name="idle">Idle:</string>
     <string name="co2Savings">CO2 savings:</string>
     <string name="kcalConsumption">Calories consumption:</string>

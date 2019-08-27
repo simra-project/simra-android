@@ -30,7 +30,6 @@ import de.tuberlin.mcc.simra.app.annotation.Ride;
 import static android.content.Context.MODE_APPEND;
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
-import static de.tuberlin.mcc.simra.app.util.Constants.PROFILE_HEADER;
 
 public class Utils {
 
@@ -459,7 +458,7 @@ public class Utils {
 
             overWriteFile((fileInfoLine + PROFILE_HEADER + profileContent), "profile.csv", context);
             */
-            updateProfile(context,birth,gender,region,experience,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,co2,timeBuckets,-1);
+            updateProfile(context,birth,gender,region,experience,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,co2,timeBuckets,-1,-1);
 
         }
 
@@ -497,6 +496,69 @@ public class Utils {
             }
         }
     }
+    public static void updateToV31(Context context) {
+        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        if (lastCriticalAppVersion < 31) {
+            File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+            StringBuilder contentOfNewMetaData = new StringBuilder();
+            int totalNumberOfScary = 0;
+            try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
+
+                // fileInfoLine (24#2)
+                String line = metaDataReader.readLine();
+                contentOfNewMetaData.append(line).append(System.lineSeparator());
+                // header (key,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary)
+                metaDataReader.readLine();
+                contentOfNewMetaData.append(METADATA_HEADER);
+
+                // loop through the metaData.csv lines
+                // rides (0,1553426842081,1553426843354,2,0,0,0)
+                while ((line = metaDataReader.readLine()) != null) {
+                    String[] lineArray = line.split(",");
+
+                    String key = lineArray[0];
+                    boolean isUploaded = lineArray[3].equals("2");
+
+                    int numberOfScary = 0;
+
+                    File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
+                    if (accEventsFile.exists()){
+                        // loop through accEvents lines
+                        try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/accEvents" + key + ".csv") )))) {
+                            // fileInfoLine (24#2)
+                            String accEventsLine = accEventsReader.readLine();
+                            // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc
+                            // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,
+                            // 20 entries per line (index 0-19)
+                            accEventsReader.readLine();
+                            while ((accEventsLine = accEventsReader.readLine()) != null) {
+                                String[] accEventsArray = accEventsLine.split(",",-1);
+                                if(accEventsArray[18].equals("1") && !accEventsArray[8].equals("")) {
+                                    numberOfScary++;
+                                    if (isUploaded) {
+                                        totalNumberOfScary++;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        continue;
+                    }
+                    // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary
+                    line = lineArray[0] + "," + lineArray[1] + "," + lineArray[2] + "," + lineArray[3] + "," + lineArray[4] + "," + lineArray[5] + "," + lineArray[6] + "," + numberOfScary;
+                    contentOfNewMetaData.append(line).append(System.lineSeparator());
+
+                }
+                updateProfile(context,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,null,-2,totalNumberOfScary);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            overWriteFile(contentOfNewMetaData.toString(),metaDataFile.getName(),context);
+        }
+    }
 
     public static void showKeyPrefs(Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
@@ -506,11 +568,11 @@ public class Utils {
 
     public static void updateProfile(Context context, int birth, int gender, int region, int experience, int behaviour) {
 
-        updateProfile(context, birth, gender, region, experience, -1,-1,-1,-1,-1,-1,null,behaviour);
+        updateProfile(context, birth, gender, region, experience, -1,-1,-1,-1,-1,-1,null,behaviour,-1);
 
     }
 
-    public static void updateProfile(Context context, int birth, int gender, int region, int experience, int numberOfRides, long duration, int numberOfIncidents, long waitedTime, long distance, long co2, float[] timeBuckets, int behaviour) {
+    public static void updateProfile(Context context, int birth, int gender, int region, int experience, int numberOfRides, long duration, int numberOfIncidents, long waitedTime, long distance, long co2, float[] timeBuckets, int behaviour, int numberOfScary) {
 
     SharedPreferences sharedPrefs = context.getApplicationContext()
             .getSharedPreferences("Profile", Context.MODE_PRIVATE);
@@ -553,6 +615,9 @@ public class Utils {
     if (behaviour > -2) {
         editor.putInt("Behaviour", behaviour);
     }
+    if (numberOfScary > -1) {
+        editor.putInt("NumberOfScary", numberOfScary);
+    }
     editor.apply();
 
 }
@@ -571,8 +636,8 @@ public class Utils {
     }
 
     public static Object[] getProfileWithoutDemographics(Context context) {
-        // {numberOfRides,duration,numberOfIncidents,waitedTime,distance,co2,0,1,2,...,23}
-        Object[] result = new Object[30];
+        // {numberOfRides,duration,numberOfIncidents,waitedTime,distance,co2,0,1,2,...,23,numberOfScary}
+        Object[] result = new Object[31];
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences("Profile", Context.MODE_PRIVATE);
         result[0] = sharedPrefs.getInt("NumberOfRides", 0);
@@ -584,13 +649,14 @@ public class Utils {
         for (int i = 0; i <= 23 ; i++) {
             result[i+6] = sharedPrefs.getFloat(i+"",0f);
         }
+        result[30] = sharedPrefs.getInt("NumberOfScary", 0);
         return result;
     }
 
     // returns values of
-    // {(int)ageGroup,(int)gender,(int)region,(int)experience,(int)numberOfRides,(long)duration,(int)numberOfIncidents,(long)waitedTime,(long)distance,(long)co2,(int)0,1,2,...,23,(int)behaviour}
+    // {(int)ageGroup,(int)gender,(int)region,(int)experience,(int)numberOfRides,(long)duration,(int)numberOfIncidents,(long)waitedTime,(long)distance,(long)co2,(int)0,1,2,...,23,(int)numberOfScary,(int)behaviour}
     public static Object[] getProfile(Context context) {
-        Object[] result = new Object[35];
+        Object[] result = new Object[36];
         int[] demographics = getProfileDemographics(context);
         Object[] rest = getProfileWithoutDemographics(context);
 
@@ -601,7 +667,7 @@ public class Utils {
             result[k+4] = rest[k];
         }
 
-        result[34] = demographics[4];
+        result[35] = demographics[4];
         Log.d(TAG, "profile: " + Arrays.toString(result));
         return result;
     }

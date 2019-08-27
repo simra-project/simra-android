@@ -137,6 +137,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/involvedType6" />
+                <CheckBox android:id="@+id/involvedType10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/involvedType10" />
                 <CheckBox android:id="@+id/involvedType9"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -62,13 +62,22 @@
                 android:layout_below="@id/durationOfRides"/>
 
             <TextView
-                android:id="@+id/numberOfIncidents"
+            android:id="@+id/numberOfIncidents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/incidents"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:layout_below="@id/durationOfWaitedTime"/>
+
+            <TextView
+                android:id="@+id/numberOfScary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/incidents"
+                android:text="@string/scary"
                 android:textAlignment="center"
                 android:textSize="18sp"
-                android:layout_below="@id/durationOfWaitedTime"/>
+                android:layout_below="@id/numberOfIncidents"/>
 
             <TextView
                 android:id="@+id/co2Savings"
@@ -77,7 +86,7 @@
                 android:text="@string/co2Savings"
                 android:textAlignment="center"
                 android:textSize="18sp"
-                android:layout_below="@id/numberOfIncidents"/>
+                android:layout_below="@id/numberOfScary"/>
         </RelativeLayout>
 
 

@@ -33,7 +33,9 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.IconOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
@@ -70,8 +72,6 @@ public class ShowRouteActivity extends BaseActivity {
     TextView toolbarTxt;
 
     String startTime = "";
-    String timeStamp = "";
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
     private MapView mMapView;
@@ -79,6 +79,8 @@ public class ShowRouteActivity extends BaseActivity {
     private RelativeLayout exitAddIncBttn;
     RelativeLayout saveButton;
     RelativeLayout exitButton;
+    IconOverlay startFlagOverlay;
+    IconOverlay finishFlagOverlay;
 
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Our ride
@@ -484,9 +486,24 @@ public class ShowRouteActivity extends BaseActivity {
             @Override
             public void run() {
                 privacySlider.setRange(0, routeSize);
-                if (!temp) {
+                ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+                Drawable startFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.startblack,null);
+                Drawable finishFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.racingflagblack,null);
+                GeoPoint startFlagPoint;
+                GeoPoint finishFlagPoint;
+                if (temp) {
+                    startFlagPoint = tempRoute.getPoints().get(0);
+                    finishFlagPoint = tempRoute.getPoints().get(tempRoute.getPoints().size()-1);
+                } else {
+                    startFlagPoint = route.getPoints().get(0);
+                    finishFlagPoint = route.getPoints().get(route.getPoints().size()-1);
                     privacySlider.setValue(0, routeSize);
                 }
+
+                startFlagOverlay = new IconOverlay(startFlagPoint,startFlag);
+                finishFlagOverlay = new IconOverlay(finishFlagPoint, finishFlag);
+                mMapView.getOverlays().add(startFlagOverlay);
+                mMapView.getOverlays().add(finishFlagOverlay);
             }
         });
 
@@ -522,6 +539,10 @@ public class ShowRouteActivity extends BaseActivity {
                 } else {
                     //stop tracking touch
                     Log.d(TAG, "left: " + left[0] + " right: " + right[0]);
+                    Log.d(TAG, "lastLeft: " + lastLeft + " lastRight: " + lastRight);
+                        mMapView.getOverlays().remove(startFlagOverlay);
+                        mMapView.getOverlays().remove(finishFlagOverlay);
+
 
                     new RideUpdateTask(true).execute();
 
@@ -577,6 +598,7 @@ public class ShowRouteActivity extends BaseActivity {
                         long distance = 0;
                         long waitedTime = 0;
                         int numberOfIncidents = 0;
+                        int numberOfScary = 0;
                         if (temp) {
                             metaDataLine[1] = String.valueOf(tempStartTime);
                             metaDataLine[2] = String.valueOf(tempEndTime);
@@ -586,6 +608,9 @@ public class ShowRouteActivity extends BaseActivity {
                             for (int i = 0; i < accEventArrayList.size(); i++) {
                                 if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
                                     numberOfIncidents++;
+                                }
+                                if (accEventArrayList.get(i).scary.equals("1")) {
+                                    numberOfScary++;
                                 }
                             }
                         } else {
@@ -600,12 +625,16 @@ public class ShowRouteActivity extends BaseActivity {
                                 if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
                                     numberOfIncidents++;
                                 }
+                                Log.d(TAG, "accEventArrayList.get(i).scary: " + accEventArrayList.get(i).scary);
+                                if (accEventArrayList.get(i).scary.equals("1")) {
+                                    numberOfScary++;
+                                }
                             }
                         }
                         metaDataLine[3] = "1";
 
                         // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
-                        metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance);
+                        metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance + "," + numberOfScary);
                     }
                     content.append(metaDataRide).append(System.lineSeparator());
                 }
@@ -710,7 +739,7 @@ public class ShowRouteActivity extends BaseActivity {
                 myMarkerFunct.setMarker(new AccEvent(Integer.valueOf(incidentProps[0]),
                         Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
                         Long.parseLong(incidentProps[3]),
-                        annotated,incidentProps[8]), Integer.valueOf(incidentProps[0]));
+                        annotated,incidentProps[8],incidentProps[18]), Integer.valueOf(incidentProps[0]));
 
             }
         }

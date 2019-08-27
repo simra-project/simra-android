@@ -296,10 +296,12 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy() called");
-        if (incidentSaved) {
-            Toast.makeText(this, getString(R.string.editingIncidentCompleted), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, getString(R.string.editingIncidentAborted), Toast.LENGTH_SHORT).show();
+        if (state < 2) {
+            if (incidentSaved) {
+                Toast.makeText(this, getString(R.string.editingIncidentCompleted), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.editingIncidentAborted), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

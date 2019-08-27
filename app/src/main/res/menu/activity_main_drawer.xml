@@ -17,13 +17,13 @@
             android:icon="@android:drawable/ic_menu_sort_by_size"
             android:title="@string/title_activity_statistics" />
         <item
-            android:id="@+id/nav_aboutSimRa"
-            android:icon="@drawable/helmet"
-            android:title="@string/about_simra" />
-        <item
             android:id="@+id/nav_setting"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/title_activity_settings" />
+        <item
+            android:id="@+id/nav_aboutSimRa"
+            android:icon="@drawable/helmet"
+            android:title="@string/about_simra" />
         <item
             android:id="@+id/nav_tutorial"
             android:icon="@drawable/ic_help_outline_black_24dp"
