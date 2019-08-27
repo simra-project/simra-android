@@ -256,4 +256,9 @@
     <string name="electric_news">Neu: Neuer Beteiligter \"E-Scooter\" im Annotationsmenü</string>
     <string name="bern_news">Neu: Im Menüpunkt \"Profil\" kann nun die Region Bern ausgewählt werden.</string>
     <string name="waitedTimeCorrected_news">Neu: Der Wert \"Stillstand\" in den Statistiken ist nun genauer.</string>
+
+    <!-- 32 -->
+    <string name="units_news_32">Im Menü \"Einstellungen\" kann das Einheitensystem und das Datumsformat eingestellt werden.</string>
+    <string name="scary_news_32">Neu: In den \"Statistiken\" wird die Anzahl an beängstigenden Ereignissen angezeigt.</string>
+
 </resources>
