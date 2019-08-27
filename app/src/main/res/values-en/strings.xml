@@ -254,5 +254,8 @@
     <string name="electric_news">New: New involved road user \"Electric Scooter\" in the annotation menu.</string>
     <string name="bern_news">New: Region Bern can be chosen in menu \"Profile\".</string>
     <string name="waitedTimeCorrected_news">New: Increased accuracy of idle time in \"Statistics\".</string>
+    <!-- 32 -->
+    <string name="units_news_32">New: Unit system and date format can be changed in settings.</string>
+    <string name="scary_news_32">New: The total number of scary incidents are show in \"Statistics\".</string>
 
 </resources>

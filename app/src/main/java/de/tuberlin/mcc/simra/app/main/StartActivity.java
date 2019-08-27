@@ -29,13 +29,14 @@ import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.showKeyPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
-import static de.tuberlin.mcc.simra.app.util.Utils.updateToV27;
-import static de.tuberlin.mcc.simra.app.util.Utils.updateToV30;
-import static de.tuberlin.mcc.simra.app.util.Utils.updateToV31;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeLongToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV27;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV30;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV31;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV32;
 
 /**
  * Shows general info about the app, if the app is run the first time.
@@ -61,6 +62,7 @@ public class StartActivity extends BaseActivity {
         updateToV27(this);
         updateToV30(this);
         updateToV31(this);
+        updateToV32(this);
         writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request
