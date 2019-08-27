@@ -203,7 +203,7 @@ public class Ride {
                 accEventsReader.readLine();
                 while ((accEventsLine = accEventsReader.readLine()) != null) {
                     String[] accEventsArray = accEventsLine.split(",", -1);
-                    accEvents.add(new AccEvent(Integer.valueOf(accEventsArray[0]),Double.valueOf(accEventsArray[1]),Double.valueOf(accEventsArray[2]),Long.valueOf(accEventsArray[3]),Boolean.valueOf(accEventsArray[4]),accEventsArray[5]));
+                    accEvents.add(new AccEvent(Integer.valueOf(accEventsArray[0]),Double.valueOf(accEventsArray[1]),Double.valueOf(accEventsArray[2]),Long.valueOf(accEventsArray[3]),Boolean.valueOf(accEventsArray[4]),accEventsArray[5],accEventsArray[18]));
                 }
             } catch (FileNotFoundException e) {
             e.printStackTrace();

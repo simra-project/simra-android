@@ -42,7 +42,6 @@ import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.util.Constants.LOCALE_ABVS;
-import static de.tuberlin.mcc.simra.app.util.Constants.PROFILE_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileWithoutDemographics;
@@ -198,10 +197,12 @@ public class UploadService extends Service {
                 UploadService.this.setNumberOfTasks(((dirFiles.length - 3) / 2) + 1);
                 // String[] profileContentWithoutDemographics = getProfileWithoutDemographics();
                 Object[] profileContentWithoutDemographics = getProfileWithoutDemographics(context);
+                Log.d(TAG, "profileContentWithoutDemographics:" + Arrays.toString(profileContentWithoutDemographics));
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 int totalNumberOfRides = (int) profileContentWithoutDemographics[0];
                 long totalDuration = (long) profileContentWithoutDemographics[1];
                 int totalNumberOfIncidents = (int) profileContentWithoutDemographics[2];
+                Log.d(TAG, "totalNumberOfIncidents: " + totalNumberOfIncidents);
                 long totalWaitedTime = (long) profileContentWithoutDemographics[3];
                 long totalDistance = (long) profileContentWithoutDemographics[4];
                 long totalCO2 = (long) profileContentWithoutDemographics[5];
@@ -210,6 +211,7 @@ public class UploadService extends Service {
                 for (int i = 0; i < timeBuckets.length; i++) {
                     timeBuckets[i] = (float)profileContentWithoutDemographics[i+6];
                 }
+                int totalNumberOfScary = (int) profileContentWithoutDemographics[30];
                 int appVersion = getAppVersionNumber(context);
                 String fileVersion = "";
                 StringBuilder content = new StringBuilder();
@@ -225,6 +227,7 @@ public class UploadService extends Service {
                         // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
                         // 17,1558605594337,1558606191224,1,4,180,725
                         String[] metaDataLine = line.split(",", -1);
+                        Log.d(TAG, "metaDataLine: " + Arrays.toString(metaDataLine));
                         // found a ride which is ready to upload in metaData.csv
                         if (metaDataLine.length > 1 && metaDataLine[3].equals("1")) {
                             foundARideToUpload = true;
@@ -251,6 +254,10 @@ public class UploadService extends Service {
                             if (password.equals("-1")) {
                                 Log.d(TAG, "sending ride with POST: " + rideKey);
                                 response = postFile("ride", contentToSend);
+
+                                if (response.second.split(",").length >= 2) {
+                                    writeToSharedPrefs(rideKey, response.second, "keyPrefs", context);
+                                }
                                 Log.d(TAG, "hashPassword: " + response + " written to keyPrefs");
                                 // send data with PUT, if it is being overwritten on the server
                             } else {
@@ -281,6 +288,7 @@ public class UploadService extends Service {
                                 for (int i = startHour; i <= endHour; i++) {
                                     timeBuckets[i] = timeBuckets[i] + (1 / duration);
                                 }
+                                totalNumberOfScary += Integer.valueOf(metaDataLine[7]);
                             }
 
                         }
@@ -339,13 +347,14 @@ public class UploadService extends Service {
                 }
                 */
                 // Now after the rides have been uploaded, we can update the profile with the new statistics
-                updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2,timeBuckets,-1);
+                updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2,timeBuckets,-1,totalNumberOfScary);
 
                 // StringBuilder profileContentToSend = new StringBuilder(profileInfoLine + System.lineSeparator() + PROFILE_HEADER);
                 SharedPreferences sharedPrefs = context.getApplicationContext()
                         .getSharedPreferences("Profile", Context.MODE_PRIVATE);
                 int profileVersion = sharedPrefs.getInt("Version", 1);
                 StringBuilder profileContentToSend = new StringBuilder().append(appVersion).append("#").append(profileVersion).append(System.lineSeparator());
+                profileContentToSend.append(Constants.PROFILE_HEADER);
                 int[] demographics = getProfileDemographics(context);
                 for (int i = 0; i < demographics.length-1; i++) {
                     profileContentToSend.append(demographics[i]).append(",");
@@ -361,8 +370,8 @@ public class UploadService extends Service {
                 for (int i = 0; i < timeBuckets.length; i++) {
                     profileContentToSend.append(timeBuckets[i]).append(",");
                 }
-
-                        profileContentToSend.append(demographics[4]);
+                profileContentToSend.append(demographics[4]).append(",");
+                profileContentToSend.append(totalNumberOfScary);
                 /*
                 for (int i = 0; i < profile.length; i++) {
                     profileContentToSend.append(profile[i]);

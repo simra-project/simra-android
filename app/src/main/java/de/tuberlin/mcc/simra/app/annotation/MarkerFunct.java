@@ -114,7 +114,7 @@ public class MarkerFunct {
                 AccEvent accEvent = new AccEvent(Integer.parseInt(actualIncident[0]),
                         Double.parseDouble(actualIncident[1]),
                         Double.parseDouble(actualIncident[2]),
-                        Long.parseLong(actualIncident[3]), annotated, incidentType);
+                        Long.parseLong(actualIncident[3]), annotated, incidentType,actualIncident[18]);
                 if (temp) {
                     mother.tempRide.events.set(Integer.valueOf(actualIncident[0]),accEvent);
                 } else {
@@ -171,7 +171,7 @@ public class MarkerFunct {
         // Create a new AccEvent
         int eventCount = ++this.numEvents;
         AccEvent newAcc = new AccEvent(eventCount, closestOnRoute.getLatitude(),
-                closestOnRoute.getLongitude(), 1337, false,"");
+                closestOnRoute.getLongitude(), 1337, false,"","0");
         Log.d(TAG,"newAcc: " + newAcc.toString());
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

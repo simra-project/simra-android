@@ -122,7 +122,7 @@ public class ProfileActivity extends AppCompatActivity {
         int region = -1;
         Log.d(TAG, "regionSpinner.getSelectedItem().toString(): " + regionSpinner.getSelectedItem().toString());
         switch (regionSpinner.getSelectedItem().toString()) {
-            case "Berlin":
+            case "Berlin/Potsdam":
                 region = 1;
                 break;
             case "London":

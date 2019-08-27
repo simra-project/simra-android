@@ -53,7 +53,7 @@
     </string-array>
     <string-array name="regionList">
         <item>@string/pleaseChoose</item>
-        <item>Berlin</item>
+        <item>Berlin/Potsdam</item>
         <item>Bern</item>
         <item>London</item>
         <item>@string/other</item>
@@ -139,6 +139,7 @@
         <item>@string/involvedType7</item>
         <item>@string/involvedType8</item>
         <item>@string/involvedType9</item>
+        <item>@string/involvedType10</item>
     </string-array>
     <string-array name="aboutSimraItems">
         <item>SimRa-Projektseite</item>
