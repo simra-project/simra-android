@@ -669,8 +669,8 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             });
             if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
                 MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
-            } else if (!lookUpBooleanSharedPrefs("news32seen",false,"simraPrefs",MainActivity.this)) {
-                fireWhatIsNewPrompt(32);
+            } else if (!lookUpBooleanSharedPrefs("news33seen",false,"simraPrefs",MainActivity.this)) {
+                fireWhatIsNewPrompt(33);
             }
         }
     }

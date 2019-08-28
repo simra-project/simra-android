@@ -585,15 +585,14 @@ public class ShowRouteActivity extends BaseActivity {
             int appVersion = getAppVersionNumber(ShowRouteActivity.this);
             String fileVersion = "";
             try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
-                String line;
+                // fileVersion line: 23#7
+                fileVersion = br.readLine().split("#")[1];
+                // skip header
+                String line = br.readLine();
                 while ((line = br.readLine()) != null) {
-                    if (line.contains("#")) {
-                        String[] fileInfoArray = line.split("#");
-                        fileVersion = fileInfoArray[1];
-                        continue;
-                    }
                     String[] metaDataLine = line.split(",", -1);
                     String metaDataRide = line;
+                    // loop through metaData.csv to find the right ride
                     if (metaDataLine[0].equals(ride.getKey())) {
                         long distance = 0;
                         long waitedTime = 0;
@@ -617,15 +616,10 @@ public class ShowRouteActivity extends BaseActivity {
                             distance = Math.round(ride.distance);
                             waitedTime = ride.waitedTime;
                             ArrayList<AccEvent> accEventArrayList = ride.events;
-                            Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
                             for (int i = 0; i < accEventArrayList.size(); i++) {
-                                AccEvent thisAccEvent = accEventArrayList.get(i);
-                                Log.d(TAG, "accEvent " + thisAccEvent.key + " incidentType: " +thisAccEvent.incidentType);
-                                Log.d(TAG, "accEvent" + thisAccEvent.key + " timeStamp: " + thisAccEvent.timeStamp);
                                 if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
                                     numberOfIncidents++;
                                 }
-                                Log.d(TAG, "accEventArrayList.get(i).scary: " + accEventArrayList.get(i).scary);
                                 if (accEventArrayList.get(i).scary.equals("1")) {
                                     numberOfScary++;
                                 }
@@ -735,7 +729,16 @@ public class ShowRouteActivity extends BaseActivity {
                 String[] incidentProps = result.split(",", -1);
 
                 boolean annotated = checkForAnnotation(incidentProps);
-
+                for (int i = 0; i < ride.events.size(); i++) {
+                    if ((ride.events.get(i).key)==Integer.valueOf(incidentProps[0])) {
+                        if (incidentProps[8] != null) {
+                            ride.events.get(i).incidentType = incidentProps[8];
+                        }
+                        if (incidentProps[18] != null) {
+                            ride.events.get(i).scary = incidentProps[18];
+                        }
+                    }
+                }
                 myMarkerFunct.setMarker(new AccEvent(Integer.valueOf(incidentProps[0]),
                         Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
                         Long.parseLong(incidentProps[3]),
