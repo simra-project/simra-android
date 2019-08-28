@@ -192,7 +192,7 @@ public class UploadService extends Service {
                 // crash logs.
                 writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", context);
 
-                // If there wasn't a crash or the user did not gave us the permission, upload
+                // If there wasn't a crash or the user did not gave us the permission, upload ride(s)
             } else {
                 UploadService.this.setNumberOfTasks(((dirFiles.length - 3) / 2) + 1);
                 // String[] profileContentWithoutDemographics = getProfileWithoutDemographics();
@@ -221,6 +221,8 @@ public class UploadService extends Service {
                     String line;
                     fileVersion = metaDataReader.readLine().split("#")[1];
 
+                    // skip header
+                    metaDataReader.readLine();
                     // loop through lines of metaData.csv to find rides ready for upload (state = 1)
                     while ((line = metaDataReader.readLine()) != null) {
 
