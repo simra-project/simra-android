@@ -17,6 +17,8 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
@@ -134,10 +136,9 @@ public class StartActivity extends BaseActivity {
             //   a ride. => Use case: user wants to view a ride from history - retrieve data
             // * one meta file per user, so we only want to create it if it doesn't exist yet.
             //   (fileExists and appendToFile can be found in the Utils.java class)
-            Log.d(TAG, "firstTime. Creating metaData.csv");
-            if (!fileExists("metaData.csv", this)) {
+            if ((!fileExists("metaData.csv", this))||(new File(getFilesDir() + "/metaData.csv").length() == 0)) {
                 String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
-
+                Log.d(TAG, "firstTime. Creating metaData.csv");
                 overWriteFile((fileInfoLine + "key, startTime, endTime, annotated, distance, waitTime"
                         + System.lineSeparator()), "metaData.csv", this);
 
