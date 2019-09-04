@@ -56,6 +56,7 @@ import java.util.concurrent.TimeUnit;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
+import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
@@ -636,7 +637,7 @@ public class ShowRouteActivity extends BaseActivity {
                 ioe.printStackTrace();
             }
             String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-            overWriteFile((fileInfoLine + content), "metaData.csv", this);
+            overWriteFile((fileInfoLine + METADATA_HEADER + content), "metaData.csv", this);
 
 
             // tempAccEventsPath
