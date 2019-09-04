@@ -22,6 +22,7 @@ import de.tuberlin.mcc.simra.app.annotation.Ride;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
@@ -353,6 +354,44 @@ public class VersionUpdater {
                 e.printStackTrace();
             }
             updateProfile(context,-1,-1,-1,-1,-1,-1,totalNumberOfIncidents,-1,-1,-1,null,-2,-1);
+
+        }
+    }
+    // There was a bug in which METADATA_HEADER was not written as metaData.csv was overwritten after
+    // each "save ride". This is to fix the metaData.csv files without METADATA_HEADER.
+    public static void updateToV35(Context context) {
+        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        if (lastCriticalAppVersion < 35) {
+            File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+            StringBuilder contentOfNewMetaData = new StringBuilder();
+            try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
+                // fileInfoLine (35#2)
+                String line = metaDataReader.readLine();
+                // first line should be file info
+                if (line.contains("#")) {
+                    contentOfNewMetaData.append(line).append(System.lineSeparator());
+                    line = metaDataReader.readLine();
+                } else {
+                    contentOfNewMetaData.append(getAppVersionNumber(context)).append("#1").append(System.lineSeparator());
+                }
+                // second line should be metaData header
+                if (line.startsWith("key")) {
+                    contentOfNewMetaData.append(line).append(System.lineSeparator());
+                    line = metaDataReader.readLine();
+                } else {
+                    contentOfNewMetaData.append(METADATA_HEADER);
+                }
+                // following lines should be rides
+                while (line != null) {
+                    contentOfNewMetaData.append(line).append(System.lineSeparator());
+                    line = metaDataReader.readLine();
+                }
+                overWriteFile(contentOfNewMetaData.toString(),metaDataFile.getName(),context);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         }
     }
