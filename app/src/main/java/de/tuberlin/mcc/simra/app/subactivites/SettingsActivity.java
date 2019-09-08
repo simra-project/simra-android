@@ -243,12 +243,10 @@ public class SettingsActivity extends BaseActivity {
         return onSeekBarChangeListener;
     }
 
-
-
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy() called");
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop called");
         writeLongToSharedPrefs("Privacy-Duration", privacyDuration, "simraPrefs", this);
         writeIntToSharedPrefs("Privacy-Distance", privacyDistance, "simraPrefs", this);
         writeIntToSharedPrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", this);
@@ -257,7 +255,6 @@ public class SettingsActivity extends BaseActivity {
         writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", this);
         writeToSharedPrefs("Settings-Unit",unit,"simraPrefs",this);
         writeIntToSharedPrefs("Settings-DateFormat",dateFormat,"simraPrefs", this);
-        Toast.makeText(this, getString(R.string.settingsSaved), Toast.LENGTH_SHORT).show();
-
     }
+
 }
