@@ -75,21 +75,27 @@ public class ProfileActivity extends AppCompatActivity {
         genderSpinner.setSelection(previousProfile[1]);
         regionSpinner.setSelection(previousProfile[2]);
         switch (previousProfile[2]) {
-            case 0:
-                regionSpinner.setSelection(0);
-                break;
+            // 1 = Berlin = setSelection(1)
             case 1:
                 regionSpinner.setSelection(1);
                 break;
+            // 2 = London = setSelection(3)
             case 2:
                 regionSpinner.setSelection(3);
                 break;
+            // 3 = Other = setSelection(5)
             case 3:
-                regionSpinner.setSelection(4);
+                regionSpinner.setSelection(5);
                 break;
+            // 4 = Bern = setSelection(2)
             case 4:
                 regionSpinner.setSelection(2);
                 break;
+            // 5 = Pforzheim/Enzkreis = setSelection(4)
+            case 5:
+                regionSpinner.setSelection(4);
+                break;
+            // 0 = UNKNOWN = setSelection(0)
             default:
                 regionSpinner.setSelection(0);
         }
@@ -114,9 +120,9 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy() called");
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop() called");
         int ageGroup = ageGroupSpinner.getSelectedItemPosition();
         int gender = genderSpinner.getSelectedItemPosition();
         int region = -1;
@@ -129,13 +135,14 @@ public class ProfileActivity extends AppCompatActivity {
                 region = 2;
                 break;
             case "Sonstiges":
-                region = 3;
-                break;
             case "Other":
                 region = 3;
                 break;
             case "Bern":
                 region = 4;
+                break;
+            case "Pforzheim/Enzkreis":
+                region = 5;
                 break;
             default:
                 region = 0;
@@ -152,7 +159,6 @@ public class ProfileActivity extends AppCompatActivity {
             editor.remove("Behaviour");
             editor.apply();
         }
-        Toast.makeText(this, getString(R.string.editingProfileCompleted),Toast.LENGTH_SHORT).show();
     }
 
     /*
