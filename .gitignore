@@ -9,3 +9,4 @@
 hash-suffix.h
 *.apk
 .idea/*
+*.properties
