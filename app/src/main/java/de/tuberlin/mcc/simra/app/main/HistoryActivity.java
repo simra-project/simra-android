@@ -237,7 +237,7 @@ public class HistoryActivity extends BaseActivity {
                 String line = br.readLine();
                 line = br.readLine();
 
-                while ((line = br.readLine()) != null) {
+                while (((line = br.readLine()) != null) && !line.startsWith("key") && !line.startsWith("null")) {
                     metaDataLines.add(line.split(","));
                 }
             } catch (FileNotFoundException e) {
@@ -251,7 +251,9 @@ public class HistoryActivity extends BaseActivity {
             for (int i = 0; i < metaDataLines.size(); i++) {
                 String[] metaDataLine = metaDataLines.get(i);
                 Log.d(TAG, "String[] metaDataLine: " + Arrays.toString(metaDataLine));
-                ridesArr[((metaDataLines.size()) - i) - 1] = listToTextShape(metaDataLine);
+                if(metaDataLine.length > 2 && !(metaDataLine[0].equals("key"))) {
+                    ridesArr[((metaDataLines.size()) - i) - 1] = listToTextShape(metaDataLine);
+                }
             }
 
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
