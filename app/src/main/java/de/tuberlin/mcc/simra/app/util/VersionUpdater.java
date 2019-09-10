@@ -359,12 +359,14 @@ public class VersionUpdater {
     }
     // There was a bug in which METADATA_HEADER was not written as metaData.csv was overwritten after
     // each "save ride". This is to fix the metaData.csv files without METADATA_HEADER.
-    public static void updateToV35(Context context) {
+    public static void updateToV38(Context context) {
         int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 35) {
+        if (lastCriticalAppVersion < 38) {
             File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
             StringBuilder contentOfNewMetaData = new StringBuilder();
             try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
+                String line = metaDataReader.readLine();
+                /*
                 // fileInfoLine (35#2)
                 String line = metaDataReader.readLine();
                 // first line should be file info
@@ -382,11 +384,15 @@ public class VersionUpdater {
                     contentOfNewMetaData.append(METADATA_HEADER);
                 }
                 // following lines should be rides
+                */
                 while (line != null) {
+                    if(!line.startsWith("key") && !line.startsWith("null") && line.split(",",-1).length > 2)
                     contentOfNewMetaData.append(line).append(System.lineSeparator());
                     line = metaDataReader.readLine();
                 }
-                overWriteFile(contentOfNewMetaData.toString(),metaDataFile.getName(),context);
+                String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
+
+                overWriteFile(fileInfoLine + METADATA_HEADER + contentOfNewMetaData.toString(),metaDataFile.getName(),context);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {

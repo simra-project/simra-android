@@ -237,9 +237,12 @@ public class HistoryActivity extends BaseActivity {
                 String line = br.readLine();
                 line = br.readLine();
 
-                while (((line = br.readLine()) != null) && !line.startsWith("key") && !line.startsWith("null")) {
-                    metaDataLines.add(line.split(","));
+                while (((line = br.readLine()) != null)) {
+                    if (!line.startsWith("key") && !line.startsWith("null")) {
+                        metaDataLines.add(line.split(","));
+                    }
                 }
+                Log.d(TAG, "metaDataLines: " + Arrays.toString(metaDataLines.toArray()));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
