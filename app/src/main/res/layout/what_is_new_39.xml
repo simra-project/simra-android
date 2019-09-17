@@ -29,6 +29,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/added_regions_news_39"
+            android:layout_margin="5dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textColor="@color/colorAccent"
             android:text="@string/annotate_hint_news"
             android:layout_margin="5dp"/>

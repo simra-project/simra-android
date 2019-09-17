@@ -264,4 +264,6 @@
     <string name="average_speed_news_39">New: Average speed of the past rides is shown in \"Statistics\".</string>
     <string name="reworked_my_rides_news_39">New: Improved design of \"My Rides\".</string>
     <string name="increased_precision_news_39">New: Higher precision of distance, speed and time values in \"My Rides\" and \"Statistics\".</string>
+    <string name="added_regions_news_39">New: Added regions: Augsburg, Bochum, Pforzheim/Enzkreis.</string>
+
 </resources>

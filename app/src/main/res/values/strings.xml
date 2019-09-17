@@ -268,6 +268,8 @@
     <string name="average_speed_news_39">Neu: In den \"Statistiken\" wird die durchnschnittliche Fahrtgeschwindigkeit der bisherigen Fahrten angezeigt.</string>
     <string name="reworked_my_rides_news_39">Neu: \"Meine Fahrten\" hat jetzt ein besseres Design.</string>
     <string name="increased_precision_news_39">Neu: Genauere Distanz-, Geschwindigkeits- und Zeitangaben in \"Meine Fahrten\" und \"Statistiken\".</string>
+    <string name="added_regions_news_39">Neu: Regionen hinzugefügt: Augsburg, Bochum, Pforzheim/Enzkreis.</string>
+
 
 
 </resources>
