@@ -14,8 +14,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.util.Pair;
 
@@ -35,6 +33,8 @@ import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.main.HistoryActivity;
 import de.tuberlin.mcc.simra.app.R;
@@ -42,6 +42,7 @@ import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.util.Constants.LOCALE_ABVS;
+import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileWithoutDemographics;
@@ -315,7 +316,7 @@ public class UploadService extends Service {
                         return;
                     }
                     String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-                    overWriteFile((fileInfoLine + content.toString()), "metaData.csv", context);
+                    overWriteFile((fileInfoLine + METADATA_HEADER + content.toString()), "metaData.csv", context);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -410,8 +411,9 @@ public class UploadService extends Service {
         // String fileType = profile | ride | crash
         private Pair<Integer, String> postFile(String fileType, String contentToSend) throws IOException {
 
-            int localeInt = lookUpIntSharedPrefs("Profile-Region", 0, "simraPrefs", context);
+            int localeInt = lookUpIntSharedPrefs("Region", 0, "Profile", context);
             String locale = LOCALE_ABVS[localeInt];
+            Log.d(TAG, "localeInt: " + localeInt + " locale: " + locale);
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // int appVersion = getAppVersionNumber(context);
@@ -453,7 +455,7 @@ public class UploadService extends Service {
         // fileType = profile | ride
         private Pair<Integer, String> putFile(String fileType, String fileHash, String filePassword, String contentToSend) throws IOException {
 
-            int localeInt = lookUpIntSharedPrefs("Profile-Region", 0, "simraPrefs", context);
+            int localeInt = lookUpIntSharedPrefs("Region", 0, "Profile", context);
             String locale = LOCALE_ABVS[localeInt];
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

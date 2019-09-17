@@ -4,8 +4,6 @@ package de.tuberlin.mcc.simra.app.subactivites;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -13,9 +11,10 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
@@ -75,24 +74,37 @@ public class ProfileActivity extends AppCompatActivity {
         genderSpinner.setSelection(previousProfile[1]);
         regionSpinner.setSelection(previousProfile[2]);
         switch (previousProfile[2]) {
-            // 1 = Berlin = setSelection(1)
+            // 1 = Berlin = setSelection(2)
             case 1:
-                regionSpinner.setSelection(1);
-                break;
-            // 2 = London = setSelection(3)
-            case 2:
-                regionSpinner.setSelection(3);
-                break;
-            // 3 = Other = setSelection(5)
-            case 3:
-                regionSpinner.setSelection(5);
-                break;
-            // 4 = Bern = setSelection(2)
-            case 4:
                 regionSpinner.setSelection(2);
                 break;
-            // 5 = Pforzheim/Enzkreis = setSelection(4)
+            /*// 2 = London = setSelection(6)
+            case 2:
+                regionSpinner.setSelection(6);
+                break;
+             */
+            // 3 = Other = setSelection(8)
+            case 3:
+                regionSpinner.setSelection(8);
+                break;
+            // 4 = Bern = setSelection(3)
+            case 4:
+                regionSpinner.setSelection(3);
+                break;
+            // 5 = Pforzheim/Enzkreis = setSelection(7)
             case 5:
+                regionSpinner.setSelection(7);
+                break;
+            // 6 = Leipzig = setSelection(5)
+            case 6:
+                regionSpinner.setSelection(5);
+                break;
+            // 7 = Augsburg = setSelection(1)
+            case 7:
+                regionSpinner.setSelection(1);
+                break;
+            // 8 = Bochum = setSelection(4)
+            case 8:
                 regionSpinner.setSelection(4);
                 break;
             // 0 = UNKNOWN = setSelection(0)
@@ -143,6 +155,12 @@ public class ProfileActivity extends AppCompatActivity {
                 break;
             case "Pforzheim/Enzkreis":
                 region = 5;
+                break;
+            case "Augsburg":
+                region = 6;
+                break;
+            case "Bochum":
+                region = 7;
                 break;
             default:
                 region = 0;

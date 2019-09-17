@@ -11,8 +11,6 @@ import android.content.ServiceConnection;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -27,6 +25,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,6 +40,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.UploadService;
 import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
@@ -210,8 +212,13 @@ public class HistoryActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 exitWhenDone = true;
-                justUploadButton.performClick();
-                HistoryActivity.this.moveTaskToBack(true);
+                if(!lookUpBooleanSharedPrefs("uploadWarningShown",false,"simraPrefs",HistoryActivity.this)){
+                    fireUploadPrompt();
+                } else {
+                    justUploadButton.performClick();
+                    HistoryActivity.this.moveTaskToBack(true);
+                }
+
             }
         });
 
@@ -242,7 +249,7 @@ public class HistoryActivity extends BaseActivity {
                         metaDataLines.add(line.split(","));
                     }
                 }
-                Log.d(TAG, "metaDataLines: " + Arrays.toString(metaDataLines.toArray()));
+                Log.d(TAG, "metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -253,7 +260,6 @@ public class HistoryActivity extends BaseActivity {
             Log.d(TAG, "refreshMyRides(): metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             for (int i = 0; i < metaDataLines.size(); i++) {
                 String[] metaDataLine = metaDataLines.get(i);
-                Log.d(TAG, "String[] metaDataLine: " + Arrays.toString(metaDataLine));
                 if(metaDataLine.length > 2 && !(metaDataLine[0].equals("key"))) {
                     ridesArr[((metaDataLines.size()) - i) - 1] = listToTextShape(metaDataLine);
                 }
@@ -261,7 +267,7 @@ public class HistoryActivity extends BaseActivity {
 
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             ArrayList<String> stringArrayList = new ArrayList<>(Arrays.asList(ridesArr));
-            MyArrayAdapter myAdapter = new MyArrayAdapter(this, R.layout.row, stringArrayList, metaDataLines);
+            MyArrayAdapter myAdapter = new MyArrayAdapter(this, R.layout.row_icons, stringArrayList, metaDataLines);
             listView.setAdapter(myAdapter);
 
         } else {
@@ -410,45 +416,56 @@ public class HistoryActivity extends BaseActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             View row = convertView;
             Holder holder = null;
-            Locale locale = Resources.getSystem().getConfiguration().locale;
-
 
             if (row == null) {
                 LayoutInflater inflater = ((Activity) context).getLayoutInflater();
                 row = inflater.inflate(layoutResourceId, parent, false);
                 holder = new Holder();
-                holder.rideDate = (TextView) row.findViewById(R.id.row_ride_date);
-                if (dateFormat == 1) {
+                holder.rideDate = (TextView) row.findViewById(R.id.row_icons_ride_date);
+                holder.rideTime = (TextView) row.findViewById(R.id.row_ride_time);
+                /*if (dateFormat == 1) {
                     holder.rideDate.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 13));
                     row.findViewById(R.id.duration_relativeLayout).setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 10));
-                }
+                }*/
                 holder.duration = (TextView) row.findViewById(R.id.row_duration);
                 holder.distance = (TextView) row.findViewById(R.id.row_distance);
                 holder.distanceUnit = (TextView) row.findViewById(R.id.row_distanceKM);
-                holder.message = (TextView) row.findViewById(R.id.row_message);
-                holder.btnDelete = (ImageButton) row.findViewById(R.id.button1);
+                holder.status = (ImageButton) row.findViewById(R.id.statusBtn);
+                holder.btnDelete = (ImageButton) row.findViewById(R.id.deleteBtn);
                 row.setTag(holder);
             } else {
                 holder = (Holder) row.getTag();
             }
             String[] itemComponents = stringArrayList.get(position).split(";");
-            holder.rideDate.setText(itemComponents[1]);
-            holder.message.setText(itemComponents[2]);
+            holder.rideDate.setText(itemComponents[1].split(",")[0]);
+            holder.rideTime.setText(itemComponents[1].split(",")[1]);
+            // holder.message.setText(itemComponents[2]);
+            Log.d(TAG, "itemComponents: " + Arrays.toString(itemComponents));
+            Log.d(TAG, "itemComponents[0]: " + itemComponents[0]);
+            Log.d(TAG, "itemComponents[1]: " + itemComponents[1]);
+            Log.d(TAG, "itemComponents[2]: " + itemComponents[2]);
+            Log.d(TAG, "itemComponents[3]: " + itemComponents[3]);
+
+            if(itemComponents[2].contains(getString(R.string.rideAnnotatedInHistoryActivity))){
+                holder.status.setBackground(getDrawable(R.drawable.ic_phone_android_black_24dp));
+            }else if(itemComponents[2].contains(getString(R.string.rideUploadedInHistoryActivity))){
+                holder.status.setBackground(getDrawable(R.drawable.ic_cloud_done_black_24dp));
+            } else {
+                holder.status.setBackground(null);
+            }
             holder.duration.setText(itemComponents[3]);
             if (unit.equals("ft")) {
-                holder.distance.setText(String.valueOf(Math.round(Double.valueOf(itemComponents[5])/1600)));
-                holder.distanceUnit.setText(" mi");
+                holder.distance.setText(String.valueOf(Math.round(((Double.valueOf(itemComponents[5])/1600)*100.0))/100.0));
+                holder.distanceUnit.setText("mi");
             } else {
-                holder.distance.setText(String.valueOf(Math.round(Double.valueOf(itemComponents[5])/1000)));
-                holder.distanceUnit.setText("km ");
+                holder.distance.setText(String.valueOf(Math.round(((Double.valueOf(itemComponents[5])/1000)*100.0))/100.0));
+                holder.distanceUnit.setText("km");
             }
             if (!itemComponents[4].equals("2")) {
                 holder.btnDelete.setVisibility(View.VISIBLE);
             } else {
                 holder.btnDelete.setVisibility(View.INVISIBLE);
             }
-
-
             row.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -456,14 +473,14 @@ public class HistoryActivity extends BaseActivity {
                     // lists all the files into an array
                     File[] dirFiles = getFilesDir().listFiles();
                     String clicked = (String) listView.getItemAtPosition(position);
+                    Log.d(TAG, "dirFiles.length: " + dirFiles.length + " clicked: " + clicked + " position: " + position);
                     clicked = clicked.replace("#", "").split(";")[0];
                     if (dirFiles.length != 0) {
                         // loops through the array of files, outputting the name to console
                         for (int i = 0; i < dirFiles.length; i++) {
 
                             String fileOutput = dirFiles[i].getName();
-
-
+                            Log.d(TAG, "fileOutput: " + fileOutput + " clicked: " + clicked + "_");
                             if (fileOutput.startsWith(clicked + "_")) {
                                 // Start ShowRouteActivity with the selected Ride.
                                 Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
@@ -496,16 +513,18 @@ public class HistoryActivity extends BaseActivity {
 
         class Holder {
             TextView rideDate;
+            TextView rideTime;
             TextView duration;
             TextView distance;
             TextView distanceUnit;
             TextView message;
+            ImageButton status;
             ImageButton btnDelete;
         }
     }
 
     public void fireDeletePrompt(int position, MyArrayAdapter arrayAdapter) {
-        android.support.v7.app.AlertDialog.Builder alert = new android.support.v7.app.AlertDialog.Builder(HistoryActivity.this);
+        AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.delete_file_warning));
         alert.setPositiveButton(R.string.delete_ride_approve, new DialogInterface.OnClickListener() {
@@ -552,7 +571,7 @@ public class HistoryActivity extends BaseActivity {
     }
 
     public void fireUploadPrompt() {
-        android.support.v7.app.AlertDialog.Builder alert = new android.support.v7.app.AlertDialog.Builder(HistoryActivity.this);
+        AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.upload_file_warning));
         alert.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {
@@ -561,7 +580,9 @@ public class HistoryActivity extends BaseActivity {
                 Intent intent = new Intent(HistoryActivity.this, UploadService.class);
                 startService(intent);
                 Toast.makeText(HistoryActivity.this,getString(R.string.upload_started),Toast.LENGTH_SHORT).show();
-
+                if (exitWhenDone) {
+                    HistoryActivity.this.moveTaskToBack(true);
+                }
             }
         });
         alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

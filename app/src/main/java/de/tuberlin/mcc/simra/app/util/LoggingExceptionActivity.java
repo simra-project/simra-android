@@ -6,14 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Date;
 
+import androidx.appcompat.app.AppCompatActivity;
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.main.HistoryActivity;
 import de.tuberlin.mcc.simra.app.main.StartActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
@@ -78,7 +78,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
             editor.putBoolean("NEW-UNSENT-ERROR", true);
             editor.commit();
 
-            Toast.makeText(this, R.string.crash_error,Toast.LENGTH_LONG).show();
+            // Toast.makeText(this, R.string.crash_error,Toast.LENGTH_LONG).show();
 
             System.exit(0);
             // restartApp();

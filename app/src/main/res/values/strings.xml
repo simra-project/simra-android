@@ -69,6 +69,8 @@
     <string name="newest_version">neueste Version:</string>
     <string name="new_app_version_title">Neue Version verfügbar</string>
     <string name="later">Später</string>
+    <string name="recording_not_started">Fahrtaufzeichnung wurde NICHT gestartet.</string>
+    <string name="recording_started">Fahrtaufzeichnung wurde gestartet.</string>
 
     <!--- RecorderService -->
     <string name="recorder_channel_name">Aufzeichnung</string>
@@ -234,6 +236,7 @@
     <string name="incidents">Ereignisse:</string>
     <string name="scary">davon beängstigend:</string>
     <string name="idle">Stillstand:</string>
+    <string name="average_Speed">Durchschn. Geschw.:</string>
     <string name="co2Savings">CO2-Ersparnisse:</string>
     <string name="kcalConsumption">Kalorienverbrauch:</string>
     <string name="rideDistribution">Fahrtverteilung über den Tag</string>
@@ -258,7 +261,13 @@
     <string name="waitedTimeCorrected_news">Neu: Der Wert \"Stillstand\" in den Statistiken ist nun genauer.</string>
 
     <!-- 32 -->
-    <string name="units_news_32">Im Menü \"Einstellungen\" kann das Einheitensystem und das Datumsformat eingestellt werden.</string>
+    <string name="units_news_32">Neu: Im Menü \"Einstellungen\" kann das Einheitensystem und das Datumsformat eingestellt werden.</string>
     <string name="scary_news_32">Neu: In den \"Statistiken\" wird die Anzahl an beängstigenden Ereignissen angezeigt.</string>
+
+    <!-- 39 -->
+    <string name="average_speed_news_39">Neu: In den \"Statistiken\" wird die durchnschnittliche Fahrtgeschwindigkeit der bisherigen Fahrten angezeigt.</string>
+    <string name="reworked_my_rides_news_39">Neu: \"Meine Fahrten\" hat jetzt ein besseres Design.</string>
+    <string name="increased_precision_news_39">Neu: Genauere Distanz-, Geschwindigkeits- und Zeitangaben in \"Meine Fahrten\" und \"Statistiken\".</string>
+
 
 </resources>

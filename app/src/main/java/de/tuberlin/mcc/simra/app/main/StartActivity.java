@@ -5,9 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -19,9 +16,13 @@ import android.widget.Toast;
 
 import java.io.File;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.deleteErrorLogsForVersion;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
@@ -62,12 +63,12 @@ public class StartActivity extends BaseActivity {
         updateToV30(this);
         updateToV31(this);
         updateToV32(this);
-        updateToV38(this);
+        updateToV39(this);
         writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request
         int LOCATION_ACCESS_CODE = 1;
-        permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
+        Utils.permissionRequest(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
 
         if ((!isFirstTime()) & (privacyPolicyAccepted()) & (!showUnsentErrorDialogPermitted()) && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED)) {
@@ -93,28 +94,6 @@ public class StartActivity extends BaseActivity {
         }
     }
 
-
-
-
-    private void permissionRequest(final String requestedPermission, String rationaleMessage, final int accessCode) {
-        // Check whether FINE_LOCATION permission is not granted
-        if (ContextCompat.checkSelfPermission(StartActivity.this, requestedPermission)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
-            // in an AlertDialog and request access to FINE_LOCATION
-
-            // The OK-Button fires a requestPermissions
-            DialogInterface.OnClickListener rationaleOnClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(StartActivity.this,
-                            new String[]{requestedPermission}, accessCode);
-                }
-            };
-            showMessageOK(rationaleMessage, rationaleOnClickListener, StartActivity.this);
-        }
-    }
 
     /**
      * Checks if the user is opening the app for the first time.

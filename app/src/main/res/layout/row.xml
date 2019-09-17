@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/button1"
+        android:layout_toStartOf="@+id/deleteBtn"
         android:gravity="center_vertical"
         android:layout_alignParentStart="true"
 
@@ -110,7 +110,7 @@
 
 
     <ImageButton
-        android:id="@+id/button1"
+        android:id="@+id/deleteBtn"
         android:layout_alignParentEnd="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

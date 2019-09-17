@@ -53,9 +53,10 @@
     </string-array>
     <string-array name="regionList">
         <item>@string/pleaseChoose</item>
+        <item>Augsburg</item>
         <item>Berlin/Potsdam</item>
         <item>Bern</item>
-        <item>London</item>
+        <item>Bochum</item>
         <item>Pforzheim/Enzkreis</item>
         <item>@string/other</item>
     </string-array>

@@ -7,9 +7,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.button.MaterialButton;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -24,6 +21,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.jaygoo.widget.OnRangeChangedListener;
 import com.jaygoo.widget.RangeSeekBar;
 
@@ -53,6 +51,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
@@ -693,6 +693,7 @@ public class ShowRouteActivity extends BaseActivity {
                         partOfRideNumber++;
                     }
                     if ((partOfRideNumber >= left) && (partOfRideNumber <= right)) {
+                        Log.d(TAG, "line: " + line);
                         if(tempStartTime == null || Long.valueOf(line.split(",",-1)[5]) < tempStartTime) {
                             tempStartTime = Long.valueOf(line.split(",",-1)[5]);
                         }
@@ -721,6 +722,7 @@ public class ShowRouteActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
 
             if (resultCode == Activity.RESULT_OK) {
@@ -731,7 +733,7 @@ public class ShowRouteActivity extends BaseActivity {
 
                 boolean annotated = checkForAnnotation(incidentProps);
                 for (int i = 0; i < ride.events.size(); i++) {
-                    if ((ride.events.get(i).key)==Integer.valueOf(incidentProps[0])) {
+                    if ((ride.events.get(i).key) == Integer.valueOf(incidentProps[0])) {
                         if (incidentProps[8] != null) {
                             ride.events.get(i).incidentType = incidentProps[8];
                         }
@@ -743,7 +745,7 @@ public class ShowRouteActivity extends BaseActivity {
                 myMarkerFunct.setMarker(new AccEvent(Integer.valueOf(incidentProps[0]),
                         Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
                         Long.parseLong(incidentProps[3]),
-                        annotated,incidentProps[8],incidentProps[18]), Integer.valueOf(incidentProps[0]));
+                        annotated, incidentProps[8], incidentProps[18]), Integer.valueOf(incidentProps[0]));
 
             }
         }
