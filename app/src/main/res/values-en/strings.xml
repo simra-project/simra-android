@@ -68,6 +68,8 @@
     <string name="newest_version">newest version:</string>
     <string name="new_app_version_title">New update available</string>
     <string name="later">Later</string>
+    <string name="recording_not_started">Recording did NOT start.</string>
+    <string name="recording_started">Recording started.</string>
 
     <!--- RecorderService -->
     <string name="recorder_channel_name">Recording</string>
