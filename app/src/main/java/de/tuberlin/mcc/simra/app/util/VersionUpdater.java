@@ -359,10 +359,9 @@ public class VersionUpdater {
     }
     // There was a bug in which METADATA_HEADER was not written as metaData.csv was overwritten after
     // each "save ride". This is to fix the metaData.csv files without METADATA_HEADER.
-    public static void updateToV38(Context context) {
+    public static void updateToV39(Context context) {
         int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 38) {
-            File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+        if (lastCriticalAppVersion < 39) {             File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
             StringBuilder contentOfNewMetaData = new StringBuilder();
             try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
                 String line = metaDataReader.readLine();

@@ -1,8 +1,6 @@
 package de.tuberlin.mcc.simra.app.subactivites;
 
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -12,10 +10,8 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.Locale;
-
+import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 

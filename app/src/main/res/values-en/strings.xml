@@ -233,6 +233,7 @@
     <string name="incidents">Incidents:</string>
     <string name="scary">Scary Incidents:</string>
     <string name="idle">Idle:</string>
+    <string name="average_Speed">Average speed:</string>
     <string name="co2Savings">CO2 savings:</string>
     <string name="kcalConsumption">Calories consumption:</string>
     <string name="rideDistribution">Ride distribution throughout the day</string>
@@ -257,5 +258,8 @@
     <!-- 32 -->
     <string name="units_news_32">New: Unit system and date format can be changed in settings.</string>
     <string name="scary_news_32">New: The total number of scary incidents are show in \"Statistics\".</string>
-
+    <!-- 39 -->
+    <string name="average_speed_news_39">New: Average speed of the past rides is shown in \"Statistics\".</string>
+    <string name="reworked_my_rides_news_39">New: Improved design of \"My Rides\".</string>
+    <string name="increased_precision_news_39">New: Higher precision of distance, speed and time values in \"My Rides\" and \"Statistics\".</string>
 </resources>

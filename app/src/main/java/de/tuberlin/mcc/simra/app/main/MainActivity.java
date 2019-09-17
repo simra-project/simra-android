@@ -1,5 +1,6 @@
 package de.tuberlin.mcc.simra.app.main;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,22 +8,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -34,6 +32,8 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.navigation.NavigationView;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
@@ -56,6 +56,13 @@ import java.util.concurrent.Executors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.subactivites.AboutActivity;
@@ -64,6 +71,7 @@ import de.tuberlin.mcc.simra.app.subactivites.SettingsActivity;
 import de.tuberlin.mcc.simra.app.subactivites.StatisticsActivity;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.Constants;
+import de.tuberlin.mcc.simra.app.util.Utils;
 import de.tuberlin.mcc.simra.app.util.WebActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
@@ -74,7 +82,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 
 
-public class MainActivity extends BaseActivity implements OnNavigationItemSelectedListener, LocationListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
 
     public static ExecutorService myEx;
 
@@ -238,7 +246,9 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         helmetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
             }
+
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -275,31 +285,42 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (isLocationServiceOff(MainActivity.this)) {
-                    // notify user
-                    new AlertDialog.Builder(MainActivity.this)
-                            .setMessage(R.string.locationServiceisOff)
-                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                                    MainActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel, null)
-                            .show();
-
+                // For permission request
+                int LOCATION_ACCESS_CODE = 1;
+                // Check whether FINE_LOCATION permission is not granted
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    Utils.permissionRequest(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION, MainActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
+                    Toast.makeText(MainActivity.this, R.string.recording_not_started,Toast.LENGTH_LONG).show();
                 } else {
-                    // show stop button, hide start button
-                    showStop();
-                    stopBtn.setVisibility(View.VISIBLE);
-                    startBtn.setVisibility(View.INVISIBLE);
+                    if (isLocationServiceOff(MainActivity.this)) {
+                        // notify user
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setMessage(R.string.locationServiceisOff)
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                                        MainActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                                    }
+                                })
+                                .setNegativeButton(R.string.cancel, null)
+                                .show();
+                        Toast.makeText(MainActivity.this, R.string.recording_not_started,Toast.LENGTH_LONG).show();
 
-                    // start RecorderService for accelerometer data recording
-                    Intent intent = new Intent(MainActivity.this, RecorderService.class);
-                    startService(intent);
-                    bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
-                    recording = true;
+                    } else {
+                        // show stop button, hide start button
+                        showStop();
+                        stopBtn.setVisibility(View.VISIBLE);
+                        startBtn.setVisibility(View.INVISIBLE);
+
+                        // start RecorderService for accelerometer data recording
+                        Intent intent = new Intent(MainActivity.this, RecorderService.class);
+                        startService(intent);
+                        bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
+                        recording = true;
+                        Toast.makeText(MainActivity.this, R.string.recording_started,Toast.LENGTH_LONG).show();
+
+                    }
                 }
             }
         });
@@ -669,8 +690,8 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
             });
             if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
                 MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
-            } else if (!lookUpBooleanSharedPrefs("news33seen",false,"simraPrefs",MainActivity.this)) {
-                fireWhatIsNewPrompt(33);
+            } else if (!lookUpBooleanSharedPrefs("news39seen",false,"simraPrefs",MainActivity.this)) {
+                fireWhatIsNewPrompt(39);
             }
         }
     }
@@ -754,7 +775,7 @@ public class MainActivity extends BaseActivity implements OnNavigationItemSelect
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         // Get custom login form view.
-        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_32, null);
+        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_39, null);
 
         // Set above view in alert dialog.
         builder.setView(settingsView);

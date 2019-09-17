@@ -3,8 +3,6 @@ package de.tuberlin.mcc.simra.app.subactivites;
 
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -21,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfile;
@@ -70,22 +70,37 @@ public class StatisticsActivity extends AppCompatActivity {
 
         TextView distanceOfRides = findViewById(R.id.distanceOfRides);
         if (unit.equals("ft")) {
-            distanceOfRides.setText(getText(R.string.distance) + " " + Math.round((Float.valueOf(String.valueOf(profileValues[8])))/1600) + " mi");
+            distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((Double.valueOf((long) profileValues[8])/1600)*100.0))/100.0) + " mi");
         } else {
-            distanceOfRides.setText(getText(R.string.distance) + " " + Math.round((Float.valueOf(String.valueOf(profileValues[8])))/1000) + " km");
+            distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((Double.valueOf((long) profileValues[8])/1000)*100.0))/100.0) + " km");
         }
 
         TextView durationOfRides = findViewById(R.id.durationOfRides);
-        durationOfRides.setText(getText(R.string.duration) + " " + ((new BigDecimal((long)profileValues[5])).divide(new BigDecimal(3600000),2,BigDecimal.ROUND_CEILING) + " h"));
+        long rideDurationHours = ((long) profileValues[5])/3600000;
+        long rideDurationMinutes = (((long) profileValues[5])%3600000)/60000;
+        // Log.d(TAG, "rideDurationHours: " + rideDurationHours + " rideDurationMinutes: " + rideDurationMinutes);
+                //(new BigDecimal((long)profileValues[5])).divide(new BigDecimal(3600000),2,BigDecimal.ROUND_CEILING) + " h")
+        durationOfRides.setText(getText(R.string.duration) + " " + rideDurationHours + " h " + rideDurationMinutes + " min");
 
+        long waitDurationHours = ((long) profileValues[7]/3600);
+        long waitDurationMinutes = ((long) profileValues[7]/60);
         TextView durationOfWaitedTime = findViewById(R.id.durationOfWaitedTime);
-        durationOfWaitedTime.setText(getText(R.string.idle) + " " + ((new BigDecimal((long)profileValues[7]).divide(new BigDecimal(3600),2,BigDecimal.ROUND_CEILING) + " h")));
+        durationOfWaitedTime.setText(getText(R.string.idle) + " " + waitDurationHours + " h " + waitDurationMinutes + " min");
+
+        TextView averageSpeed = findViewById(R.id.averageSpeed);
+
+        if (unit.equals("ft")) {
+            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8]))/1600.0)/(((((Double.valueOf((long) profileValues[5])/1000)) - (Double.valueOf((long) profileValues[7])))/3600))) + " mph");
+        } else {
+            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8]))/1000.0)/(((((Double.valueOf((long) profileValues[5])/1000)) - (Double.valueOf((long) profileValues[7])))/3600))) + " km/h");
+        }
 
         TextView numberOfIncidents = findViewById(R.id.numberOfIncidents);
         numberOfIncidents.setText(getText(R.string.incidents) + " " + profileValues[6]);
 
         TextView numberOfScary = findViewById(R.id.numberOfScary);
         numberOfScary.setText(getText(R.string.scary) + " " + profileValues[34]);
+
 
         TextView co2Savings = findViewById(R.id.co2Savings);
         co2Savings.setText(getText(R.string.co2Savings) + " " + profileValues[9] + " g");

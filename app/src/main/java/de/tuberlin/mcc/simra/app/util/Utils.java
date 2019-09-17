@@ -1,12 +1,18 @@
 package de.tuberlin.mcc.simra.app.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-import android.support.v7.app.AlertDialog;
+//import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import de.tuberlin.mcc.simra.app.main.StartActivity;
+
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -287,19 +293,19 @@ public class Utils {
         Log.d(TAG, "keyPrefs:" + Arrays.toString(sharedPrefs.getAll().entrySet().toArray()));
     }
 
-    public static void updateProfile(Context context, int birth, int gender, int region, int experience, int behaviour) {
+    public static void updateProfile(Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
 
-        updateProfile(context, birth, gender, region, experience, -1,-1,-1,-1,-1,-1,null,behaviour,-1);
+        updateProfile(context, ageGroup, gender, region, experience, -1,-1,-1,-1,-1,-1,null,behaviour,-1);
 
     }
 
-    public static void updateProfile(Context context, int birth, int gender, int region, int experience, int numberOfRides, long duration, int numberOfIncidents, long waitedTime, long distance, long co2, float[] timeBuckets, int behaviour, int numberOfScary) {
+    public static void updateProfile(Context context, int ageGroup, int gender, int region, int experience, int numberOfRides, long duration, int numberOfIncidents, long waitedTime, long distance, long co2, float[] timeBuckets, int behaviour, int numberOfScary) {
 
     SharedPreferences sharedPrefs = context.getApplicationContext()
             .getSharedPreferences("Profile", Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = sharedPrefs.edit();
-    if (birth > -1) {
-        editor.putInt("Birth", birth);
+    if (ageGroup > -1) {
+        editor.putInt("Birth", ageGroup);
     }
     if (gender > -1) {
         editor.putInt("Gender", gender);
@@ -391,6 +397,26 @@ public class Utils {
         result[35] = demographics[4];
         Log.d(TAG, "profile: " + Arrays.toString(result));
         return result;
+    }
+
+    public static void permissionRequest(Activity activity, final String requestedPermission, String rationaleMessage, final int accessCode) {
+        // Check whether FINE_LOCATION permission is not granted
+        if (ContextCompat.checkSelfPermission(activity, requestedPermission)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
+            // in an AlertDialog and request access to FINE_LOCATION
+
+            // The OK-Button fires a requestPermissions
+            DialogInterface.OnClickListener rationaleOnClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityCompat.requestPermissions(activity,
+                            new String[]{requestedPermission}, accessCode);
+                }
+            };
+            showMessageOK(rationaleMessage, rationaleOnClickListener, activity);
+        }
     }
 
 

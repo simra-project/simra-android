@@ -53,13 +53,22 @@
                 android:layout_below="@id/distanceOfRides"/>
 
             <TextView
-                android:id="@+id/durationOfWaitedTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/idle"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:layout_below="@id/durationOfRides"/>
+            android:id="@+id/durationOfWaitedTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/idle"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:layout_below="@id/durationOfRides"/>
+
+            <TextView
+            android:id="@+id/averageSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/average_Speed"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:layout_below="@id/durationOfWaitedTime"/>
 
             <TextView
             android:id="@+id/numberOfIncidents"
@@ -68,7 +77,7 @@
             android:text="@string/incidents"
             android:textAlignment="center"
             android:textSize="18sp"
-            android:layout_below="@id/durationOfWaitedTime"/>
+            android:layout_below="@id/averageSpeed"/>
 
             <TextView
                 android:id="@+id/numberOfScary"
