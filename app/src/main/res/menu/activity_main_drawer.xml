@@ -36,6 +36,10 @@
             android:id="@+id/nav_impressum"
             android:icon="@drawable/ic_info_black_24dp"
             android:title="@string/imprint" />
+        <item
+            android:id="@+id/nav_twitter"
+            android:icon="@drawable/ic_twitter_logo_blue"
+            android:title="@string/twitter" />
 
     </group>
 

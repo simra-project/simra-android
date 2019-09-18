@@ -80,12 +80,36 @@ public class StatisticsActivity extends AppCompatActivity {
         long rideDurationMinutes = (((long) profileValues[5])%3600000)/60000;
         // Log.d(TAG, "rideDurationHours: " + rideDurationHours + " rideDurationMinutes: " + rideDurationMinutes);
                 //(new BigDecimal((long)profileValues[5])).divide(new BigDecimal(3600000),2,BigDecimal.ROUND_CEILING) + " h")
-        durationOfRides.setText(getText(R.string.duration) + " " + rideDurationHours + " h " + rideDurationMinutes + " min");
+        String rideDurationH;
+        String rideDurationM;
+        if (rideDurationHours < 10) {
+            rideDurationH = "0" + rideDurationHours;
+        } else {
+            rideDurationH = String.valueOf(rideDurationHours);
+        }
+        if (rideDurationMinutes < 10) {
+            rideDurationM = "0" + rideDurationMinutes;
+        } else {
+            rideDurationM = String.valueOf(rideDurationMinutes);
+        }
+        durationOfRides.setText(getText(R.string.duration) + " " + rideDurationH + ":" + rideDurationM);
 
-        long waitDurationHours = ((long) profileValues[7]/3600);
-        long waitDurationMinutes = ((long) profileValues[7]/60);
         TextView durationOfWaitedTime = findViewById(R.id.durationOfWaitedTime);
-        durationOfWaitedTime.setText(getText(R.string.idle) + " " + waitDurationHours + " h " + waitDurationMinutes + " min");
+        long waitDurationHours = ((long) profileValues[7]/3600);
+        long waitDurationMinutes = (((long) profileValues[7]%3600)/60);
+        String waitDurationH;
+        String waitDurationM;
+        if (waitDurationHours < 10) {
+            waitDurationH = "0" + waitDurationHours;
+        } else {
+            waitDurationH = String.valueOf(waitDurationHours);
+        }
+        if (waitDurationMinutes < 10) {
+            waitDurationM = "0" + waitDurationMinutes;
+        } else {
+            waitDurationM = String.valueOf(waitDurationMinutes);
+        }
+        durationOfWaitedTime.setText(getText(R.string.idle) + " " + waitDurationH + ":" + waitDurationM);
 
         TextView averageSpeed = findViewById(R.id.averageSpeed);
 
@@ -103,8 +127,11 @@ public class StatisticsActivity extends AppCompatActivity {
 
 
         TextView co2Savings = findViewById(R.id.co2Savings);
-        co2Savings.setText(getText(R.string.co2Savings) + " " + profileValues[9] + " g");
-
+        if ((long)profileValues[9] > 10000) {
+            co2Savings.setText(getText(R.string.co2Savings) + " " + ((Double.valueOf((long)profileValues[9])/1000)*10.0) + " kg");
+        } else {
+            co2Savings.setText(getText(R.string.co2Savings) + " " + profileValues[9] + " g");
+        }
 
 
         chart = (BarChart) findViewById(R.id.timeBucketBarChart);
