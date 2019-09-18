@@ -555,6 +555,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             intent.putExtra("URL", getString(R.string.tuberlin_impressum));
 
             startActivity(intent);
+        } else if (id == R.id.nav_twitter) {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(getString(R.string.link_to_twitter)));
+            startActivity(i);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -672,7 +676,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             } else {
                 return null;
             }
-
         }
 
         @Override

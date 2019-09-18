@@ -41,6 +41,8 @@
     <string name="imprint">Imprint</string>
     <string name="feedback">Feedback</string>
     <string name="title_tutorial">Tutorial</string>
+    <string name="twitter">\@SimRa_Berlin</string>
+    <string name="link_to_twitter">https://twitter.com/SimRa_Berlin</string>
 
     <!--- Permission -->
     <string name="permissionFineLocation">In order to continue, please allow SimRa to access your location.</string>

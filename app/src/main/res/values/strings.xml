@@ -41,6 +41,8 @@
     <string name="imprint">Impressum</string>
     <string name="feedback">Feedback</string>
     <string name="title_tutorial">Anleitung</string>
+    <string name="twitter">\@SimRa_Berlin</string>
+    <string name="link_to_twitter">https://twitter.com/SimRa_Berlin</string>
 
     <!--- Permission -->
     <string name="permissionRequestRationale">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
@@ -269,7 +271,5 @@
     <string name="reworked_my_rides_news_40">Neu: \"Meine Fahrten\" hat jetzt ein besseres Design.</string>
     <string name="increased_precision_news_40">Neu: Genauere Distanz-, Geschwindigkeits- und Zeitangaben in \"Meine Fahrten\" und \"Statistiken\".</string>
     <string name="added_regions_news_40">Neu: Regionen hinzugefügt: Augsburg, Bochum, Pforzheim/Enzkreis.</string>
-
-
 
 </resources>
