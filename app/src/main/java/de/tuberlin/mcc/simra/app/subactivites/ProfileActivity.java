@@ -69,7 +69,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Get the previous saved settings
         int[] previousProfile = getProfileDemographics(this);
-
         ageGroupSpinner.setSelection(previousProfile[0]);
         genderSpinner.setSelection(previousProfile[1]);
         regionSpinner.setSelection(previousProfile[2]);
@@ -83,28 +82,24 @@ public class ProfileActivity extends AppCompatActivity {
                 regionSpinner.setSelection(6);
                 break;
              */
-            // 3 = Other = setSelection(8)
+            // 3 = Other = setSelection(6)
             case 3:
-                regionSpinner.setSelection(8);
+                regionSpinner.setSelection(6);
                 break;
             // 4 = Bern = setSelection(3)
             case 4:
                 regionSpinner.setSelection(3);
                 break;
-            // 5 = Pforzheim/Enzkreis = setSelection(7)
+            // 5 = Pforzheim/Enzkreis = setSelection(5)
             case 5:
-                regionSpinner.setSelection(7);
-                break;
-            // 6 = Leipzig = setSelection(5)
-            case 6:
                 regionSpinner.setSelection(5);
                 break;
-            // 7 = Augsburg = setSelection(1)
-            case 7:
+            // 6 = Augsburg = setSelection(1)
+            case 6:
                 regionSpinner.setSelection(1);
                 break;
-            // 8 = Bochum = setSelection(4)
-            case 8:
+            // 7 = Bochum = setSelection(4)
+            case 7:
                 regionSpinner.setSelection(4);
                 break;
             // 0 = UNKNOWN = setSelection(0)
@@ -112,7 +107,6 @@ public class ProfileActivity extends AppCompatActivity {
                 regionSpinner.setSelection(0);
         }
         experienceSpinner.setSelection(previousProfile[3]);
-        Log.d(TAG, "previousProfile[4]: " + previousProfile[4]);
         if (previousProfile[4] == -1) {
             behaviourSeekBar.setEnabled(false);
             activateBehaviourToggleButton.setChecked(false);
@@ -165,7 +159,6 @@ public class ProfileActivity extends AppCompatActivity {
             default:
                 region = 0;
         }
-        Log.d(TAG, "region " + region);
         int experience = experienceSpinner.getSelectedItemPosition();
         int behaviour = behaviourSeekBar.getProgress();
         // Log.d(TAG, "behaviour: " + behaviourSeekBar.getProgress() + " isEnabled: " + behaviourSeekBar.isEnabled());

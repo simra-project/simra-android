@@ -12,12 +12,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -62,7 +59,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.subactivites.AboutActivity;
@@ -690,8 +686,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             });
             if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
                 MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
-            } else if (!lookUpBooleanSharedPrefs("news39seen",false,"simraPrefs",MainActivity.this)) {
-                fireWhatIsNewPrompt(39);
+            } else if (!lookUpBooleanSharedPrefs("news40seen",false,"simraPrefs",MainActivity.this)) {
+                fireWhatIsNewPrompt(40);
             }
         }
     }
@@ -775,7 +771,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         // Get custom login form view.
-        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_39, null);
+        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_40, null);
 
         // Set above view in alert dialog.
         builder.setView(settingsView);

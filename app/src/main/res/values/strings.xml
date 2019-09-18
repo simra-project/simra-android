@@ -264,11 +264,11 @@
     <string name="units_news_32">Neu: Im Menü \"Einstellungen\" kann das Einheitensystem und das Datumsformat eingestellt werden.</string>
     <string name="scary_news_32">Neu: In den \"Statistiken\" wird die Anzahl an beängstigenden Ereignissen angezeigt.</string>
 
-    <!-- 39 -->
-    <string name="average_speed_news_39">Neu: In den \"Statistiken\" wird die durchnschnittliche Fahrtgeschwindigkeit der bisherigen Fahrten angezeigt.</string>
-    <string name="reworked_my_rides_news_39">Neu: \"Meine Fahrten\" hat jetzt ein besseres Design.</string>
-    <string name="increased_precision_news_39">Neu: Genauere Distanz-, Geschwindigkeits- und Zeitangaben in \"Meine Fahrten\" und \"Statistiken\".</string>
-    <string name="added_regions_news_39">Neu: Regionen hinzugefügt: Augsburg, Bochum, Pforzheim/Enzkreis.</string>
+    <!-- 40 -->
+    <string name="average_speed_news_40">Neu: In den \"Statistiken\" wird die durchnschnittliche Fahrtgeschwindigkeit der bisherigen Fahrten angezeigt.</string>
+    <string name="reworked_my_rides_news_40">Neu: \"Meine Fahrten\" hat jetzt ein besseres Design.</string>
+    <string name="increased_precision_news_40">Neu: Genauere Distanz-, Geschwindigkeits- und Zeitangaben in \"Meine Fahrten\" und \"Statistiken\".</string>
+    <string name="added_regions_news_40">Neu: Regionen hinzugefügt: Augsburg, Bochum, Pforzheim/Enzkreis.</string>
 
 
 
