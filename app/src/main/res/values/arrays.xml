@@ -58,6 +58,7 @@
         <item>Bern</item>
         <item>Bochum</item>
         <item>Pforzheim/Enzkreis</item>
+        <item>Stuttgart</item>
         <item>@string/other</item>
     </string-array>
     <string-array name="experienceList">

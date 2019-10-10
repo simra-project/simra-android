@@ -82,9 +82,9 @@ public class ProfileActivity extends AppCompatActivity {
                 regionSpinner.setSelection(6);
                 break;
              */
-            // 3 = Other = setSelection(6)
+            // 3 = Other = setSelection(7)
             case 3:
-                regionSpinner.setSelection(6);
+                regionSpinner.setSelection(7);
                 break;
             // 4 = Bern = setSelection(3)
             case 4:
@@ -101,6 +101,10 @@ public class ProfileActivity extends AppCompatActivity {
             // 7 = Bochum = setSelection(4)
             case 7:
                 regionSpinner.setSelection(4);
+                break;
+            // 8 = Stuttgart = setSelection(6)
+            case 8:
+                regionSpinner.setSelection(6);
                 break;
             // 0 = UNKNOWN = setSelection(0)
             default:

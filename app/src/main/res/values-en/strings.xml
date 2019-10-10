@@ -267,5 +267,6 @@
     <string name="reworked_my_rides_news_40">New: Improved design of \"My Rides\".</string>
     <string name="increased_precision_news_40">New: Higher precision of distance, speed and time values in \"My Rides\" and \"Statistics\".</string>
     <string name="added_regions_news_40">New: Added regions: Augsburg, Bochum, Pforzheim/Enzkreis.</string>
+    <string name="added_stuttgart_news_42">New region: Stuttgart</string>
 
 </resources>
