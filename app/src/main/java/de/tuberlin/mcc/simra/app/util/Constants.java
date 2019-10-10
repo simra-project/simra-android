@@ -27,7 +27,7 @@ public class Constants {
     public static final int BACKEND_VERSION = 10;
 
     // Locales
-    public static final String[] LOCALE_ABVS = {"UNKNOWN", "Berlin", "London", "other", "Bern", "Pforzheim", "Augsburg", "Bochum"};
+    public static final String[] LOCALE_ABVS = {"UNKNOWN", "Berlin", "London", "other", "Bern", "Pforzheim", "Augsburg", "Bochum", "Stuttgart"};
 
     public static final String PROFILE_HEADER = "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents,waitedTime,distance,co2,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,behaviour,numberOfScary" + System.lineSeparator();
 

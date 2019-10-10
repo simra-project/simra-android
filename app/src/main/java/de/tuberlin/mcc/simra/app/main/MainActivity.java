@@ -689,8 +689,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             });
             if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
                 MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
-            } else if (!lookUpBooleanSharedPrefs("news40seen",false,"simraPrefs",MainActivity.this)) {
-                fireWhatIsNewPrompt(40);
+            } else if (!lookUpBooleanSharedPrefs("news42seen",false,"simraPrefs",MainActivity.this)) {
+                fireWhatIsNewPrompt(42);
             }
         }
     }
@@ -774,7 +774,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         // Get custom login form view.
-        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_40, null);
+        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_42, null);
 
         // Set above view in alert dialog.
         builder.setView(settingsView);
@@ -793,7 +793,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 finalAlertDialog.cancel();
             }
         });
-
 
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setCancelable(false);

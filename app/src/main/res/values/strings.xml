@@ -271,5 +271,6 @@
     <string name="reworked_my_rides_news_40">Neu: \"Meine Fahrten\" hat jetzt ein besseres Design.</string>
     <string name="increased_precision_news_40">Neu: Genauere Distanz-, Geschwindigkeits- und Zeitangaben in \"Meine Fahrten\" und \"Statistiken\".</string>
     <string name="added_regions_news_40">Neu: Regionen hinzugefügt: Augsburg, Bochum, Pforzheim/Enzkreis.</string>
+    <string name="added_stuttgart_news_42">Neue Region: Stuttgart</string>
 
 </resources>
