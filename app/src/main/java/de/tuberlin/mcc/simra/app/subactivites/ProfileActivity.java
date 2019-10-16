@@ -160,6 +160,9 @@ public class ProfileActivity extends AppCompatActivity {
             case "Bochum":
                 region = 7;
                 break;
+            case "Stuttgart":
+                region = 8;
+                break;
             default:
                 region = 0;
         }
