@@ -286,7 +286,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 // Check whether FINE_LOCATION permission is not granted
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
-                    Utils.permissionRequest(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION, MainActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
+                    String[] locationPermissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+                    Utils.permissionRequest(MainActivity.this, locationPermissions, MainActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
                     Toast.makeText(MainActivity.this, R.string.recording_not_started,Toast.LENGTH_LONG).show();
                 } else {
                     if (isLocationServiceOff(MainActivity.this)) {
