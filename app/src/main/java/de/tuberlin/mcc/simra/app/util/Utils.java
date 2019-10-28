@@ -399,10 +399,11 @@ public class Utils {
         return result;
     }
 
-    public static void permissionRequest(Activity activity, final String requestedPermission, String rationaleMessage, final int accessCode) {
-        // Check whether FINE_LOCATION permission is not granted
-        if (ContextCompat.checkSelfPermission(activity, requestedPermission)
-                != PackageManager.PERMISSION_GRANTED) {
+    public static void permissionRequest(Activity activity, final String[] requestedPermission, String rationaleMessage, final int accessCode) {
+        // Check whether FINE_LOCATION or ACCESS_BACKGROUND_LOCATION permissions are not granted
+        if ((ContextCompat.checkSelfPermission(activity, requestedPermission[0])
+                != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(activity, requestedPermission[1])
+                != PackageManager.PERMISSION_GRANTED)) {
 
             // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
             // in an AlertDialog and request access to FINE_LOCATION
@@ -412,7 +413,7 @@ public class Utils {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     ActivityCompat.requestPermissions(activity,
-                            new String[]{requestedPermission}, accessCode);
+                            requestedPermission, accessCode);
                 }
             };
             showMessageOK(rationaleMessage, rationaleOnClickListener, activity);
