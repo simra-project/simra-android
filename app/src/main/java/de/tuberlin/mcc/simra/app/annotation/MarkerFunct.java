@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
 
@@ -284,7 +285,7 @@ public class MarkerFunct {
         String addressForLoc = "";
 
         try {
-            addressForLoc = pool.submit(() -> getAddressFromLocation(currentLocHelper)).get();
+            addressForLoc = pool.submit(() -> getAddressFromLocation(currentLocHelper)).get(2, TimeUnit.SECONDS);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
