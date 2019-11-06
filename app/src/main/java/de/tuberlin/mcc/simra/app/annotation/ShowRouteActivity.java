@@ -56,6 +56,7 @@ import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
+import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
@@ -413,7 +414,7 @@ public class ShowRouteActivity extends BaseActivity {
         // MarkerFunct class for better readability
 
         Log.d(TAG, "setting up Executors");
-        pool = Executors.newFixedThreadPool(4);
+        pool = Executors.newFixedThreadPool(6);
 
         // Create an instance of MarkerFunct-class which provides all functionality related to
         // incident markers
@@ -582,12 +583,12 @@ public class ShowRouteActivity extends BaseActivity {
 
         saveButton.setOnClickListener((View v) -> {
 
-            StringBuffer content = new StringBuffer();
+            StringBuilder metaDataContent = new StringBuilder();
             int appVersion = getAppVersionNumber(ShowRouteActivity.this);
-            String fileVersion = "";
+            String metaDataFileVersion = "";
             try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
-                // fileVersion line: 23#7
-                fileVersion = br.readLine().split("#")[1];
+                // metaDataFileVersion line: 23#7
+                metaDataFileVersion = br.readLine().split("#")[1];
                 // skip header
                 String line = br.readLine();
                 while ((line = br.readLine()) != null) {
@@ -631,14 +632,13 @@ public class ShowRouteActivity extends BaseActivity {
                         // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
                         metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance + "," + numberOfScary);
                     }
-                    content.append(metaDataRide).append(System.lineSeparator());
+                    metaDataContent.append(metaDataRide).append(System.lineSeparator());
                 }
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
-            String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-            overWriteFile((fileInfoLine + METADATA_HEADER + content), "metaData.csv", this);
-
+            String fileInfoLine = appVersion + "#" + metaDataFileVersion + System.lineSeparator();
+            overWriteFile((fileInfoLine + METADATA_HEADER + metaDataContent), "metaData.csv", this);
 
             // tempAccEventsPath
             // tempAccGpsPath
