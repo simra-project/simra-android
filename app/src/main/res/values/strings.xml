@@ -114,7 +114,8 @@
     <string name="quitAddIncident">Hinzufügen\nbeenden</string>
     <string name="newIncidents">Annotationen zurückgesetzt</string>
     <string name="warning">Achtung</string>
-    <string name="warningRefresMessage">Nach Veränderung der Fahrt werden die Ereignisse neu berechnet und bisherige Ereignisse diese Fahrt, inklusive der Annotationen, werden verworfen.</string>
+    <string name="warningRefreshMessage">Nach Veränderung der Fahrt werden die Ereignisse neu berechnet und bisherige Ereignisse diese Fahrt, inklusive der Annotationen, werden verworfen.</string>
+    <string name="warningDeleteEmptyMessage">Alle nicht bearbeiteten Markierungen für Beinaheunfälle werden gelöscht.</string>
     <string name="privacySlider">Fahrtbeginn und -ende abschneiden</string>
     <string name="calculating_incidents">Berechne Ereignisse</string>
     <string name="addIncident">Ereignis\nhinzufügen</string>
@@ -155,8 +156,8 @@
     <string name="locationType6">Rucksack o.ä.</string>
     <string name="locationType7">Sonstiges (Bitte unten angeben)</string>
     <string name="doneEditingIncident">Fertig</string>
-    <string name="editingIncidentAborted">Ereignis wurde nicht gespeichert</string>
-    <string name="editingIncidentCompleted">Ereignis wurde gespeichert</string>
+    <string name="editingIncidentAborted">Änderungen wurden nicht gespeichert</string>
+    <string name="editingIncidentCompleted">Änderungen wurden gespeichert</string>
     <string name="involved_type">Beteiligte Verkehrsteilnehmer</string>
     <string name="scarinessString">Diese Erfahrung war beängstigend</string>
     <string name="customIncidentAddedTitle">Neuer Vorfall hinzugefügt!</string>

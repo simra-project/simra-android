@@ -74,8 +74,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         incidentTypes = getResources().getStringArray(R.array.incidenttypelist);
         locations = getResources().getStringArray(R.array.phoneLocations);
 
-        previousAnnotation = loadPreviousAnnotation
-                (rideID, incidentKey);
+        previousAnnotation = loadPreviousAnnotation();
 
         Spinner incidentTypeSpinner = findViewById(R.id.incidentTypeSpinner);
         EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
@@ -306,12 +305,15 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         }
     }
 
-    public String[] loadPreviousAnnotation(String rideID, String incidentKey) {
+    public String[] loadPreviousAnnotation() {
 
         String[] result = null;
         Log.d(TAG, "loadPreviousAnnotation rideID: " + rideID + " incidentKey: " + incidentKey);
 
         String pathToIncidents = "accEvents" + rideID + ".csv";
+        if (temp) {
+            pathToIncidents = "Temp" + pathToIncidents;
+        }
 
         if (fileExists(pathToIncidents, this)) {
 
@@ -352,7 +354,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             }
 
         } else {
-            Log.d(TAG, "didn't enter if, " + pathToIncidents + " doesn't exist");
+            Log.d(TAG, pathToIncidents + " doesn't exist");
         }
 
         Log.d(TAG, "loadPreviousAnnotation() result: " + Arrays.toString(result));

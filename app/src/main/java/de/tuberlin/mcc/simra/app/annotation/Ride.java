@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
@@ -65,8 +66,8 @@ public class Ride {
     int state;
 
 
-    // This is the constructor that is used for now.
-    public Ride(File accGpsFile, String duration, String startTime, /*String date,*/ int state, int bike, int child, int trailer, int pLoc, Context context) throws IOException {
+    // Non-temp ride.
+    public Ride(File accGpsFile, String duration, String startTime, /*String date,*/ int state, int bike, int child, int trailer, int pLoc, Context context, boolean calculateEvents) throws IOException {
         this.accGpsFile = accGpsFile;
         this.duration = duration;
         this.startTime = startTime;
@@ -82,18 +83,45 @@ public class Ride {
         this.pLoc = pLoc;
         this.context = context;
         this.key = accGpsFile.getName().split("_")[0];
-        this.events = findAccEvents();
 
         String pathToAccEventsOfRide = "accEvents" + key + ".csv";
         String content = ACCEVENTS_HEADER;
         String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
+
+        if (calculateEvents) {
+            this.events = findAccEvents();
+        } else {
+            this.events = new ArrayList<>();
+            if (fileExists(pathToAccEventsOfRide, context)) {
+                Log.d(TAG, "reading " + pathToAccEventsOfRide + " to get accEvents");
+                try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(pathToAccEventsOfRide)))) {
+                    String line = br.readLine();
+                    while (line != null) {
+                        String[] accEventLine = line.split(",");
+                        Log.d(TAG, "accEventLine: " + line);
+                        if (!(accEventLine[0].equals("key") || (accEventLine.length < 20))) {
+                            int key = Integer.valueOf(accEventLine[0]);
+                            double lat = Double.valueOf(accEventLine[1]);
+                            double lon = Double.valueOf(accEventLine[2]);
+                            long timestamp = Long.valueOf(accEventLine[3]);
+                            boolean annotated = checkForAnnotation(accEventLine);
+                            String incidentType = accEventLine[8];
+                            String scary = accEventLine[18];
+                            events.add(new AccEvent(key,lat,lon,timestamp,annotated,incidentType,scary));
+                        }
+                        line = br.readLine();
+                    }
+                }
+
+            }
+        }
+
 
         if (!fileExists(pathToAccEventsOfRide, context)) {
 
             for (int i = 0; i < events.size(); i++) {
 
                 AccEvent actualAccEvent = events.get(i);
-
 
                 content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + ",,,,,,,,,,,," + System.lineSeparator();
             }

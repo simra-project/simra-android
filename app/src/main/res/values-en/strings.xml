@@ -113,7 +113,8 @@
     <string name="quitAddIncident">Cancel\nadding</string>
     <string name="warning">Warning</string>
     <string name="newIncidents">Renewed reset to default</string>
-    <string name="warningRefresMessage">After the ride gets changed, new incidents will be calculated and previous incidents of this ride and their annotations will be deleted.</string>
+    <string name="warningRefreshMessage">After the ride gets changed, new incidents will be calculated and previous incidents of this ride and their annotations will be deleted.</string>
+    <string name="warningDeleteEmptyMessage">All of the not annotated markers will be deleted.</string>
     <string name="privacySlider">Cut off the beginning or the end of the ride</string>
     <string name="calculating_incidents">Calculating Incidents</string>
     <string name="addIncident">Add\nIncident</string>
@@ -154,8 +155,8 @@
     <string name="locationType6">Backpack/Bag</string>
     <string name="locationType7">Other (Please specify below)</string>
     <string name="doneEditingIncident">Done</string>
-    <string name="editingIncidentAborted">Incident description not saved</string>
-    <string name="editingIncidentCompleted">Incident description saved</string>
+    <string name="editingIncidentAborted">Changes not saved</string>
+    <string name="editingIncidentCompleted">Changes saved</string>
     <string name="involved_type">other road user involved</string>
     <string name="scarinessString">This experience was scary</string>
     <string name="customIncidentAddedTitle">New incident added!</string>
