@@ -41,7 +41,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -264,8 +263,11 @@ public class ShowRouteActivity extends BaseActivity {
             ShowRouteActivity.this.addCustomMarkerMode = false;
         });
 
-        fireRideSettingsDialog();
-
+        if (state < 2) {
+            fireRideSettingsDialog();
+        } else {
+            new RideUpdateTask(false, false).execute();
+        }
         Log.d(TAG, "onCreate() finished");
 
     }
@@ -273,10 +275,11 @@ public class ShowRouteActivity extends BaseActivity {
     private class RideUpdateTask extends AsyncTask<String, String, String> {
 
         private boolean temp;
+        private boolean calculateEvents;
 
-
-        private RideUpdateTask(Boolean temp) {
+        private RideUpdateTask(boolean temp, boolean calculateEvents) {
             this.temp = temp;
+            this.calculateEvents = calculateEvents;
         }
 
         @Override
@@ -288,7 +291,7 @@ public class ShowRouteActivity extends BaseActivity {
         protected String doInBackground(String... urls) {
             Log.d(TAG, "doInBackground()");
             try {
-                refreshRoute(temp);
+                refreshRoute(temp, calculateEvents);
             } catch (IOException e) {
                 e.printStackTrace();
                 cancel(true);
@@ -309,7 +312,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
     }
 
-    private void refreshRoute(boolean temp) throws IOException {
+    private void refreshRoute(boolean temp, boolean calculate) throws IOException {
 
         // Create a ride object with the accelerometer, gps and time data
         if (temp) {
@@ -327,7 +330,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         } else {
 
-            ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, this);
+            ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, this, calculate);
 
         }
 
@@ -546,7 +549,7 @@ public class ShowRouteActivity extends BaseActivity {
                         mMapView.getOverlays().remove(finishFlagOverlay);
 
 
-                    new RideUpdateTask(true).execute();
+                    new RideUpdateTask(true, true).execute();
 
                     lastLeft = left[0];
                     lastRight = right[0];
@@ -582,85 +585,7 @@ public class ShowRouteActivity extends BaseActivity {
         });
 
         saveButton.setOnClickListener((View v) -> {
-
-            StringBuilder metaDataContent = new StringBuilder();
-            int appVersion = getAppVersionNumber(ShowRouteActivity.this);
-            String metaDataFileVersion = "";
-            try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
-                // metaDataFileVersion line: 23#7
-                metaDataFileVersion = br.readLine().split("#")[1];
-                // skip header
-                String line = br.readLine();
-                while ((line = br.readLine()) != null) {
-                    String[] metaDataLine = line.split(",", -1);
-                    String metaDataRide = line;
-                    // loop through metaData.csv to find the right ride
-                    if (metaDataLine[0].equals(ride.getKey())) {
-                        long distance = 0;
-                        long waitedTime = 0;
-                        int numberOfIncidents = 0;
-                        int numberOfScary = 0;
-                        if (temp) {
-                            metaDataLine[1] = String.valueOf(tempStartTime);
-                            metaDataLine[2] = String.valueOf(tempEndTime);
-                            distance = Math.round(tempRide.distance);
-                            waitedTime = tempRide.waitedTime;
-                            ArrayList<AccEvent> accEventArrayList = tempRide.events;
-                            for (int i = 0; i < accEventArrayList.size(); i++) {
-                                if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
-                                    numberOfIncidents++;
-                                }
-                                if (accEventArrayList.get(i).scary.equals("1")) {
-                                    numberOfScary++;
-                                }
-                            }
-                        } else {
-                            distance = Math.round(ride.distance);
-                            waitedTime = ride.waitedTime;
-                            ArrayList<AccEvent> accEventArrayList = ride.events;
-                            for (int i = 0; i < accEventArrayList.size(); i++) {
-                                if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
-                                    numberOfIncidents++;
-                                }
-                                if (accEventArrayList.get(i).scary.equals("1")) {
-                                    numberOfScary++;
-                                }
-                            }
-                        }
-                        metaDataLine[3] = "1";
-
-                        // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
-                        metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance + "," + numberOfScary);
-                    }
-                    metaDataContent.append(metaDataRide).append(System.lineSeparator());
-                }
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-            String fileInfoLine = appVersion + "#" + metaDataFileVersion + System.lineSeparator();
-            overWriteFile((fileInfoLine + METADATA_HEADER + metaDataContent), "metaData.csv", this);
-
-            // tempAccEventsPath
-            // tempAccGpsPath
-            if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {
-                Log.d(TAG, "path of tempGpsFile: " + tempGpsFile.getPath());
-                deleteFile(pathToAccGpsFile);
-                String path = ShowRouteActivity.this.getFilesDir().getPath();
-                boolean success = tempGpsFile.renameTo(new File(path + File.separator + pathToAccGpsFile));
-                Log.d(TAG, "tempGpsFile successfully renamed: " + success);
-            }
-            String pathToAccEventsFile = "accEvents" + ride.getKey() + ".csv";
-            if (tempAccEventsPath != null) {
-                deleteFile(pathToAccEventsFile);
-                String path = ShowRouteActivity.this.getFilesDir().getPath();
-                File tempAccEventsFile = new File(path + File.separator + tempAccEventsPath);
-                Log.d(TAG, "path of tempAccEventsFile: " + tempAccEventsFile.getPath());
-                boolean success = tempAccEventsFile.renameTo(new File(path + File.separator + pathToAccEventsFile));
-                Log.d(TAG, "tempAccEventsFile successfully renamed: " + success);
-            }
-
-            Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
-            finish();
+            firePrivacySliderWarningDialog(temp);
         });
 
         overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
@@ -672,6 +597,114 @@ public class ShowRouteActivity extends BaseActivity {
                 mMapView.invalidate();
             }
         });
+
+    }
+
+    private void saveChanges(boolean temp) {
+        StringBuilder metaDataContent = new StringBuilder();
+        int appVersion = getAppVersionNumber(ShowRouteActivity.this);
+        String metaDataFileVersion = "";
+        try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
+            // metaDataFileVersion line: 23#7
+            metaDataFileVersion = br.readLine().split("#")[1];
+            // skip header
+            String line = br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] metaDataLine = line.split(",", -1);
+                String metaDataRide = line;
+                // loop through metaData.csv to find the right ride
+                if (metaDataLine[0].equals(ride.getKey())) {
+                    long distance = 0;
+                    long waitedTime = 0;
+                    int numberOfIncidents = 0;
+                    int numberOfScary = 0;
+                    if (temp) {
+                        metaDataLine[1] = String.valueOf(tempStartTime);
+                        metaDataLine[2] = String.valueOf(tempEndTime);
+                        distance = Math.round(tempRide.distance);
+                        waitedTime = tempRide.waitedTime;
+                        ArrayList<AccEvent> accEventArrayList = tempRide.events;
+                        for (int i = 0; i < accEventArrayList.size(); i++) {
+                            if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
+                                numberOfIncidents++;
+                            }
+                            if (accEventArrayList.get(i).scary.equals("1")) {
+                                numberOfScary++;
+                            }
+                        }
+                    } else {
+                        distance = Math.round(ride.distance);
+                        waitedTime = ride.waitedTime;
+                        ArrayList<AccEvent> accEventArrayList = ride.events;
+                        for (int i = 0; i < accEventArrayList.size(); i++) {
+                            if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
+                                numberOfIncidents++;
+                            }
+                            if (accEventArrayList.get(i).scary.equals("1")) {
+                                numberOfScary++;
+                            }
+                        }
+                    }
+                    metaDataLine[3] = "1";
+
+                    // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
+                    metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance + "," + numberOfScary);
+                }
+                metaDataContent.append(metaDataRide).append(System.lineSeparator());
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        String fileInfoLine = appVersion + "#" + metaDataFileVersion + System.lineSeparator();
+        overWriteFile((fileInfoLine + METADATA_HEADER + metaDataContent), "metaData.csv", this);
+
+        StringBuilder accEventsDataContent = new StringBuilder();
+        String accEventsFileVersion = "";
+        String accEventName = "accEvents" + ride.getKey() + ".csv";
+        if(temp) {
+            accEventName = "Temp" + accEventName;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(accEventName)))) {
+            // metaDataFileVersion line: 23#7
+            accEventsFileVersion = br.readLine().split("#")[1];
+            // skip header
+            String line = br.readLine();
+
+            while ((line = br.readLine()) != null) {
+                String[] accEventsLine = line.split(",", -1);
+                if (checkForAnnotation(accEventsLine)) {
+                    accEventsDataContent.append(line).append(System.lineSeparator());
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        fileInfoLine = appVersion + "#" + accEventsFileVersion + System.lineSeparator();
+        overWriteFile((fileInfoLine + ACCEVENTS_HEADER + accEventsDataContent), accEventName, this);
+
+        // tempAccEventsPath
+        // tempAccGpsPath
+        if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {
+            Log.d(TAG, "path of tempGpsFile: " + tempGpsFile.getPath());
+            deleteFile(pathToAccGpsFile);
+            String path = ShowRouteActivity.this.getFilesDir().getPath();
+            boolean success = tempGpsFile.renameTo(new File(path + File.separator + pathToAccGpsFile));
+            Log.d(TAG, "tempGpsFile successfully renamed: " + success);
+        }
+        String pathToAccEventsFile = "accEvents" + ride.getKey() + ".csv";
+        if (tempAccEventsPath != null) {
+            deleteFile(pathToAccEventsFile);
+            String path = ShowRouteActivity.this.getFilesDir().getPath();
+            File tempAccEventsFile = new File(path + File.separator + tempAccEventsPath);
+            Log.d(TAG, "path of tempAccEventsFile: " + tempAccEventsFile.getPath());
+            boolean success = tempAccEventsFile.renameTo(new File(path + File.separator + pathToAccEventsFile));
+            Log.d(TAG, "tempAccEventsFile successfully renamed: " + success);
+        }
+
+        Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
+        finish();
 
     }
 
@@ -700,15 +733,13 @@ public class ShowRouteActivity extends BaseActivity {
                         if(tempEndTime == null || Long.valueOf(line.split(",",-1)[5]) > tempEndTime) {
                             tempEndTime = Long.valueOf(line.split(",",-1)[5]);
                         }
-                        content.append(line + System.lineSeparator());
+                        content.append(line).append(System.lineSeparator());
                     }
                 }
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
             writer.append(content);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -772,10 +803,8 @@ public class ShowRouteActivity extends BaseActivity {
         try {
             pool.shutdown();
             pool.awaitTermination(2, TimeUnit.SECONDS);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException | NullPointerException ie) {
             ie.printStackTrace();
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
         }
     }
 
@@ -899,7 +928,11 @@ public class ShowRouteActivity extends BaseActivity {
                     // Close Alert Dialog.
                     alertDialog.cancel();
                     progressBarRelativeLayout.setVisibility(View.VISIBLE);
-                    new RideUpdateTask(false).execute();
+                    if (state == 0) {
+                        new RideUpdateTask(false, true).execute();
+                    } else {
+                        new RideUpdateTask(false, false).execute();
+                    }
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -927,12 +960,12 @@ public class ShowRouteActivity extends BaseActivity {
         checkBox.setText(getString(R.string.doNotShowAgain));
         AlertDialog.Builder alert = new AlertDialog.Builder(ShowRouteActivity.this);
         alert.setTitle(getString(R.string.warning));
-        alert.setMessage(getString(R.string.warningRefresMessage));
+        alert.setMessage(getString(R.string.warningRefreshMessage));
         alert.setView(checkBoxView);
         alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 continueWithRefresh = true;
-                new RideUpdateTask(true).execute();
+                new RideUpdateTask(true, true).execute();
                 lastLeft = left;
                 lastRight = right;
             }
@@ -949,6 +982,37 @@ public class ShowRouteActivity extends BaseActivity {
         return continueWithRefresh;
 
 
+    }
+
+    public boolean firePrivacySliderWarningDialog(boolean temp) {
+        View checkBoxView = View.inflate(this, R.layout.checkbox, null);
+        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                writeBooleanToSharedPrefs("DeleteEmpty-Warning", !checkBox.isChecked(), "simraPrefs", ShowRouteActivity.this);
+            }
+        });
+        checkBox.setText(getString(R.string.doNotShowAgain));
+        AlertDialog.Builder alert = new AlertDialog.Builder(ShowRouteActivity.this);
+        alert.setTitle(getString(R.string.warning));
+        alert.setMessage(getString(R.string.warningDeleteEmptyMessage));
+        alert.setView(checkBoxView);
+
+        alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                saveChanges(temp);
+            }
+        });
+        alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        alert.show();
+
+
+        return continueWithRefresh;
     }
 
 }

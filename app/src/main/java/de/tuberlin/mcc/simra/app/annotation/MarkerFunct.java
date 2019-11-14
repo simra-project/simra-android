@@ -117,9 +117,10 @@ public class MarkerFunct {
                         Double.parseDouble(actualIncident[2]),
                         Long.parseLong(actualIncident[3]), annotated, incidentType,actualIncident[18]);
                 if (temp) {
-                    mother.tempRide.events.set(Integer.valueOf(actualIncident[0]),accEvent);
+                    mother.tempRide.events.add(accEvent);
                 } else {
-                    mother.ride.events.set(Integer.valueOf(actualIncident[0]),accEvent);
+                    // mother.ride.events.set(Integer.valueOf(actualIncident[0]),accEvent);
+                    mother.ride.events.add(accEvent);
                 }
                 Log.d(TAG, "accEvent key: " + accEvent.key + " accEvent.position" + accEvent.position.toString());
                 setMarker(accEvent, accEvent.key);
