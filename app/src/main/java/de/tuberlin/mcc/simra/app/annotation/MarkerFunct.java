@@ -85,6 +85,19 @@ public class MarkerFunct {
 
     public void showIncidents() {
 
+        if(temp) {
+            for (int i = 0; i < mother.tempRide.events.size(); i++) {
+                // Log.d(TAG,"showIncidents() mother.tempRide.events.get(i).key: " + mother.tempRide.events.get(i).key);
+                setMarker(mother.tempRide.events.get(i), mother.tempRide.events.get(i).key);
+            }
+        } else {
+            for (int i = 0; i < mother.ride.events.size(); i++) {
+                // Log.d(TAG,"showIncidents() mother.ride.events.get(i).key: " + mother.ride.events.get(i).key);
+                setMarker(mother.ride.events.get(i), mother.ride.events.get(i).key);
+            }
+        }
+
+        /*
         String path = "accEvents" + rideID + ".csv";
         if (temp) {
             path = "TempaccEvents" + rideID + ".csv";
@@ -116,12 +129,14 @@ public class MarkerFunct {
                         Double.parseDouble(actualIncident[1]),
                         Double.parseDouble(actualIncident[2]),
                         Long.parseLong(actualIncident[3]), annotated, incidentType,actualIncident[18]);
+
                 if (temp) {
                     mother.tempRide.events.add(accEvent);
                 } else {
                     // mother.ride.events.set(Integer.valueOf(actualIncident[0]),accEvent);
                     mother.ride.events.add(accEvent);
                 }
+
                 Log.d(TAG, "accEvent key: " + accEvent.key + " accEvent.position" + accEvent.position.toString());
                 setMarker(accEvent, accEvent.key);
             }
@@ -129,6 +144,7 @@ public class MarkerFunct {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        */
     }
 
     public void addCustMarker(GeoPoint p) {

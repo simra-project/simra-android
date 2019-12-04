@@ -22,7 +22,7 @@ public class MyInfoWindow extends InfoWindow {
     private ShowRouteActivity motherActivity;
     private String addressForLoc;
     private String rideID;
-    private String incidentKey;
+    private String accEventKey;
     private boolean temp;
     private int state;
 
@@ -30,7 +30,7 @@ public class MyInfoWindow extends InfoWindow {
 
     public MyInfoWindow(int layoutResId, MapView mapView, AccEvent mAccEvent,
                         String addressForLoc, ShowRouteActivity motherActivity,
-                        int key, boolean temp, int state) {
+                        int accEventKey, boolean temp, int state) {
         super(layoutResId, mapView);
         this.mAccEvent = mAccEvent;
         this.addressForLoc = addressForLoc;
@@ -40,7 +40,7 @@ public class MyInfoWindow extends InfoWindow {
         } else {
             this.rideID = motherActivity.ride.getKey();
         }
-        this.incidentKey = String.valueOf(key);
+        this.accEventKey = String.valueOf(accEventKey);
         this.temp = temp;
         this.state = state;
     }
@@ -97,7 +97,7 @@ public class MyInfoWindow extends InfoWindow {
             popUpIntent.putExtra("Ride_ID",
                     this.rideID);
 
-            popUpIntent.putExtra("Incident_Key", this.incidentKey);
+            popUpIntent.putExtra("Incident_Key", this.accEventKey);
 
             popUpIntent.putExtra("Incident_temp", this.temp);
 

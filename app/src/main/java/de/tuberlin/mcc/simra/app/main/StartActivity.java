@@ -64,6 +64,7 @@ public class StartActivity extends BaseActivity {
         updateToV31(this);
         updateToV32(this);
         updateToV39(this);
+        updateToV46(this);
         writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request

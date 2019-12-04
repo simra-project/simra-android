@@ -1,132 +1,335 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_statistics"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="10dp"
     android:animateLayoutChanges="true"
     android:fadingEdgeLength="80dp"
     android:requiresFadingEdge="vertical"
-    android:layout_margin="10dp"
     android:scrollbars="vertical">
-        <!--
-        <TextView
-            android:id="@+id/ProfileTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/profile_title"
-            android:textSize="25sp"
-            android:textStyle="bold" />
+    <!--
+    <TextView
+        android:id="@+id/ProfileTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/profile_title"
+        android:textSize="25sp"
+        android:textStyle="bold" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="25dp" />
-        -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="25dp" />
+    -->
+
+    <LinearLayout
+        android:id="@+id/numberStatisticsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_margin="5dp">
 
         <RelativeLayout
-            android:id="@+id/numberStatisticsRelativeLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/numberOfRides"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/uploaded_rides"
-                android:textAlignment="center"
-                android:textSize="18sp" />
+        android:id="@+id/leftColumn"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+            <RelativeLayout
+                android:id="@+id/firstRowLeft"
+                android:layout_width="match_parent"
+                android:layout_height="32sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true">
 
-            <TextView
-                android:id="@+id/distanceOfRides"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/distance"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:layout_below="@id/numberOfRides"/>
+                <ImageView
+                    android:id="@+id/uploadArrowSymbol"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/ic_file_upload_black_24dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/numberOfRidesText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/uploaded_rides"
+                    android:textSize="13sp"
+                    android:layout_toEndOf="@id/uploadArrowSymbol"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/secondRowLeft"
+                android:layout_width="match_parent"
+                android:layout_height="32sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_below="@id/firstRowLeft">
 
-            <TextView
-                android:id="@+id/durationOfRides"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/duration"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:layout_below="@id/distanceOfRides"/>
+                <ImageView
+                    android:id="@+id/incidentSymbol"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/edited_event_blue"
+                    android:backgroundTint="@color/black"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/numberOFIncidentsText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/incidents"
+                    android:textSize="13sp"
+                    android:layout_toEndOf="@id/incidentSymbol"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/thirdRowLeft"
+                android:layout_width="match_parent"
+                android:layout_height="32sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_below="@id/secondRowLeft">
 
-            <TextView
-            android:id="@+id/durationOfWaitedTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/idle"
-            android:textAlignment="center"
-            android:textSize="18sp"
-            android:layout_below="@id/durationOfRides"/>
+                <ImageView
+                    android:id="@+id/routeDistanceSymbol"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/route"
+                    android:backgroundTint="@color/black"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/distanceOfRidesText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/distance"
+                    android:textSize="13sp"
+                    android:layout_toEndOf="@id/routeDistanceSymbol"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/fourthRowLeft"
+                android:layout_width="match_parent"
+                android:layout_height="32sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_below="@id/thirdRowLeft">
 
-            <TextView
-            android:id="@+id/averageSpeed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/average_Speed"
-            android:textAlignment="center"
-            android:textSize="18sp"
-            android:layout_below="@id/durationOfWaitedTime"/>
+                <ImageView
+                    android:id="@+id/durationClockSymbol"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/ic_timer_black_24dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/durationOfRidesText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/duration"
+                    android:textSize="13sp"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@id/durationClockSymbol"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/fifthRowLeft"
+                android:layout_width="match_parent"
+                android:layout_height="32sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_below="@id/fourthRowLeft">
 
-            <TextView
-            android:id="@+id/numberOfIncidents"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/incidents"
-            android:textAlignment="center"
-            android:textSize="18sp"
-            android:layout_below="@id/averageSpeed"/>
-
-            <TextView
-                android:id="@+id/numberOfScary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/scary"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:layout_below="@id/numberOfIncidents"/>
-
-            <TextView
-                android:id="@+id/co2Savings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/co2Savings"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:layout_below="@id/numberOfScary"/>
+                <ImageView
+                    android:id="@+id/idleDurationSymbol"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/ic_traffic_light_red"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/durationOfIdleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/idle"
+                    android:textSize="13sp"
+                    android:layout_toEndOf="@id/idleDurationSymbol"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/rightColumn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <RelativeLayout
+                android:id="@+id/firstRowRight"
+                android:layout_width="match_parent"
+                android:layout_height="32sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true">
+
+                <ImageView
+                    android:id="@+id/nonScaryIncidentsSymbol"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/ic_co2"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/co2SavingsText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/co2Savings"
+                    android:textSize="13sp"
+                    android:layout_toEndOf="@id/nonScaryIncidentsSymbol"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/secondRowRight"
+                android:layout_width="match_parent"
+                android:layout_height="32sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_below="@id/firstRowRight">
+
+                <ImageView
+                    android:id="@+id/scaryIncidentsSymbol"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_alignParentStart="true"
+                    android:background="@android:drawable/stat_sys_warning"
+                    android:backgroundTint="@color/black"
+                    android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/numberOfScaryIncidentsText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/scary"
+                    android:textSize="13sp"
+                    android:layout_toEndOf="@id/scaryIncidentsSymbol"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/thirdRowRight"
+                android:layout_width="match_parent"
+                android:layout_height="32sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_below="@id/secondRowRight">
+
+                <ImageView
+                    android:id="@+id/routeDistanceSymbol2"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/route"
+                    android:backgroundTint="@color/black"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/averageDistanceOfRidesText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/avgDistance"
+                    android:textSize="13sp"
+                    android:layout_toEndOf="@id/routeDistanceSymbol2"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/fourthRowRight"
+                android:layout_width="match_parent"
+                android:layout_height="32sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_below="@id/thirdRowRight">
+
+                <ImageView
+                    android:id="@+id/tachometerSymbol"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/ic_tachometer"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/averageSpeedText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/average_Speed"
+                    android:textSize="13sp"
+                    android:layout_toEndOf="@id/tachometerSymbol"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/fifthRowRight"
+                android:layout_width="match_parent"
+                android:layout_height="32sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_below="@id/fourthRowRight">
+
+                <ImageView
+                    android:id="@+id/averageIdleDurationSymbol"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/ic_traffic_light_red"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/averageDurationOfIdleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/avgIdle"
+                    android:textSize="13sp"
+                    android:layout_toEndOf="@id/averageIdleDurationSymbol"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
+        </RelativeLayout>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/barChartHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/rideDistribution"
-        android:textAlignment="center"
+        android:layout_below="@id/numberStatisticsLayout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:textSize="20sp"
-        android:layout_below="@id/numberStatisticsRelativeLayout"/>
-
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/timeBucketBarChart"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/barChartHeader"
-        android:layout_above="@id/barChartXAxisName"
-        android:layout_marginBottom="0dp" />
+        android:text="@string/rideDistribution"
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/barChartXAxisName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hourOfDay"
-        android:textAlignment="center"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
-        android:textSize="15sp"
-        android:layout_alignParentBottom="true" />
+        android:text="@string/hourOfDay"
+        android:textSize="15sp" />
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/timeBucketBarChart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/barChartXAxisName"
+        android:layout_below="@id/barChartHeader"
+        android:layout_marginBottom="0dp" />
 </RelativeLayout>

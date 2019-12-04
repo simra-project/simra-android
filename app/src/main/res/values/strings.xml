@@ -50,7 +50,7 @@
 
     <!--- WebActivity -->
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
-    <string name="simRaPage">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/?isMobile=1</string>
+    <string name="simRaPage">https://www.digital-future.berlin/forschung/projekte/simra/</string>
     <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Anleitung.pdf</string>
     <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/mobil/</string>
 
@@ -227,18 +227,21 @@
     <!--- Credits -->
     <string name="bycicleCreditTxt">Icon gestaltet von Nikita Golubev, bereitgestellt auf\nwww.flaticon.com .</string>
     <string name="freepikCredit">Icon gestaltet von Freepik, bereitgestellt auf www.flaticon.com .</string>
+    <string name="googleCredit">Icon gestaltet von Google, bereitgestellt auf www.flaticon.com .</string>
     <string name="logoMakrCredit">Kostenloses logo erstellt auf www.LogoMakr.com .</string>
     <string name="smashiconCredit">Icon gestaltet von Smashicon, bereitgestellt auf www.flaticon.com .</string>
     <string name="pixelCredit">Icon gestaltet von Pixel, bereitgestellt auf www.flaticon.com .</string>
     <string name="icons8Credit">Icon gestaltet von Icons8, bereitgestellt auf https://icons8.com .</string>
 
     <!--- Statistics -->
-    <string name="uploaded_rides">Hochgeladene Fahrten:</string>
-    <string name="distance">Streckenlänge:</string>
+    <string name="uploaded_rides">Fahrten:</string>
+    <string name="distance">Distanz:</string>
+    <string name="avgDistance">Durschn. Distanz:</string>
     <string name="duration">Streckendauer:</string>
     <string name="incidents">Ereignisse:</string>
-    <string name="scary">davon beängstigend:</string>
+    <string name="scary">Beängstigend:</string>
     <string name="idle">Stillstand:</string>
+    <string name="avgIdle">Durchschn. Stillst.:</string>
     <string name="average_Speed">Durchschn. Geschw.:</string>
     <string name="co2Savings">CO2-Ersparnisse:</string>
     <string name="kcalConsumption">Kalorienverbrauch:</string>
@@ -272,6 +275,13 @@
     <string name="reworked_my_rides_news_40">Neu: \"Meine Fahrten\" hat jetzt ein besseres Design.</string>
     <string name="increased_precision_news_40">Neu: Genauere Distanz-, Geschwindigkeits- und Zeitangaben in \"Meine Fahrten\" und \"Statistiken\".</string>
     <string name="added_regions_news_40">Neu: Regionen hinzugefügt: Augsburg, Bochum, Pforzheim/Enzkreis.</string>
+
+    <!-- 42 -->
     <string name="added_stuttgart_news_42">Neue Region: Stuttgart</string>
+    <string name="thanks">Vielen Dank für Ihre Unterstützung!</string>
+
+    <!-- 46 -->
+    <string name="new_statistics_news_46">In den \"Statistiken\" befinden sich nun neue Kategorien.</string>
+    <string name="improved_calculation_speed_news_46">Schnelleres Berechnen der Beinaheunfälle.</string>
 
 </resources>

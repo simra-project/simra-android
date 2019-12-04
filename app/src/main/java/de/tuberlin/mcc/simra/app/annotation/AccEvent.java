@@ -20,10 +20,12 @@ public class AccEvent {
         return this.timeStamp;
     }
 
+    /*
     public AccEvent(String[] eventLine) {
         this.position = new GeoPoint(Double.valueOf(eventLine[0]), Double.valueOf(eventLine[1]));
         this.timeStamp = Long.valueOf(eventLine[5]);
     }
+     */
 
     public AccEvent(int key, double lat, double lon, long timeStamp, boolean annotated, String incidentType, String scary) {
         this.key = key;

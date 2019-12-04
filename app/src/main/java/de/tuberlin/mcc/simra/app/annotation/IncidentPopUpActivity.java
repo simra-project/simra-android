@@ -25,6 +25,7 @@ import java.util.Arrays;
 
 import de.tuberlin.mcc.simra.app.R;
 
+import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
@@ -249,9 +250,9 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                             + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValuesWithouti10).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description + "," + i10Value);
 
                     incidentSaved = true;
-
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra("result", incidentString);
+                    returnIntent.putExtra("temp",temp);
                     setResult(Activity.RESULT_OK, returnIntent);
                     finish();
                 });

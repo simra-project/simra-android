@@ -22,6 +22,7 @@ import de.tuberlin.mcc.simra.app.annotation.Ride;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
+import static de.tuberlin.mcc.simra.app.util.Utils.fixIncidentStatistics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
@@ -361,7 +362,8 @@ public class VersionUpdater {
     // each "save ride". This is to fix the metaData.csv files without METADATA_HEADER.
     public static void updateToV39(Context context) {
         int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 39) {             File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+        if (lastCriticalAppVersion < 39) {
+            File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
             StringBuilder contentOfNewMetaData = new StringBuilder();
             try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
                 String line = metaDataReader.readLine();
@@ -398,6 +400,15 @@ public class VersionUpdater {
                 e.printStackTrace();
             }
 
+        }
+    }
+
+    public static void updateToV46(Context context) {
+
+        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        if (lastCriticalAppVersion < 46) {
+            Log.d(TAG,"Updating to version 46");
+            fixIncidentStatistics(context);
         }
     }
 }

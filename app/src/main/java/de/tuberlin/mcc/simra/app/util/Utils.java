@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
 import de.tuberlin.mcc.simra.app.main.StartActivity;
 
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -26,6 +28,7 @@ import java.util.Arrays;
 
 
 import static android.content.Context.MODE_APPEND;
+import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 
 public class Utils {
@@ -418,6 +421,90 @@ public class Utils {
             };
             showMessageOK(rationaleMessage, rationaleOnClickListener, activity);
         }
+    }
+
+    // loops through all uploaded accEvents and updates profile statistics and metaData.csv accordingly
+    public static void fixIncidentStatistics(Context context) {
+        File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+        int totalNumberOfIncidents = 0;
+        int totalNumberOfScary = 0;
+        StringBuilder contentOfMetaData = new StringBuilder();
+        try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
+
+            // fileInfoLine (24#2)
+            String metaDataFileVersion = metaDataReader.readLine().split("#")[1];
+
+            contentOfMetaData.append(getAppVersionNumber(context)).append("#").append(metaDataFileVersion)
+                    .append(System.lineSeparator())
+                    .append(METADATA_HEADER);
+            // header (key,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary)
+            metaDataReader.readLine();
+            String metaDataLine;
+            // loop through the metaData.csv lines
+            // rides (0,1553426842081,1553426843354,2,0,0,0)
+            while ((metaDataLine = metaDataReader.readLine()) != null) {
+                Log.d(TAG, "metaDataLine: " + metaDataLine);
+                String[] metaDataArray = metaDataLine.split(",");
+
+                boolean isUploaded = metaDataArray[3].equals("2");
+                String key = metaDataArray[0];
+                int numberOfIncidentsCurrentAccEvent = 0;
+                int numberOfScaryCurrentAccEvent = 0;
+                StringBuilder contentOfAccEvents = new StringBuilder();
+                File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
+                if (accEventsFile.exists()) {
+                    // loop through accEvents lines
+                    try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/accEvents" + key + ".csv"))))) {
+                        // fileInfoLine (24#2)
+                        String accEventsLine = accEventsReader.readLine().split("#")[1];
+                        contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine)
+                                .append(System.lineSeparator())
+                                .append(ACCEVENTS_HEADER);
+                        // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc
+                        // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,
+                        // 20 entries per metaDataLine (index 0-19)
+                        accEventsLine = accEventsReader.readLine();
+                        while ((accEventsLine = accEventsReader.readLine()) != null) {
+                            String[] accEventsArray = accEventsLine.split(",",-1);
+                            if(!accEventsArray[8].equals("") && !accEventsArray[8].equals("0")) {
+                                numberOfIncidentsCurrentAccEvent++;
+                            }
+                            if(!accEventsArray[18].equals("") && !accEventsArray[18].equals("0")) {
+                                numberOfScaryCurrentAccEvent++;
+                            }
+                            if (isUploaded) {
+                                if (checkForAnnotation(accEventsArray)) {
+                                    contentOfAccEvents.append(accEventsLine).append(System.lineSeparator());
+                                }
+                            }
+                        }
+                        if (isUploaded) {
+                            totalNumberOfIncidents += numberOfIncidentsCurrentAccEvent;
+                            totalNumberOfScary += numberOfScaryCurrentAccEvent;
+                            overWriteFile(contentOfAccEvents.toString(),"accEvents" + key + ".csv",context);
+                        }
+                        contentOfMetaData
+                                .append(metaDataArray[0]).append(",")
+                                .append(metaDataArray[1]).append(",")
+                                .append(metaDataArray[2]).append(",")
+                                .append(metaDataArray[3]).append(",")
+                                .append(numberOfIncidentsCurrentAccEvent).append(",")
+                                .append(metaDataArray[5]).append(",")
+                                .append(metaDataArray[6]).append(",")
+                                .append(numberOfScaryCurrentAccEvent)
+                                .append(System.lineSeparator());
+                        overWriteFile(contentOfMetaData.toString(),"metaData.csv",context);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        updateProfile(context,-1,-1,-1,-1,-1,-1,totalNumberOfIncidents,-1,-1,-1,null,-2,totalNumberOfScary);
+
     }
 
 

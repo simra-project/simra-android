@@ -309,7 +309,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             appendToFile(accGpsString.toString(), pathToAccGpsFile, this);
             appendToFile(key + ","
                     + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
-                    + "0,0," + waitedTime + "," + Math.round(route.getDistance())  + System.lineSeparator(), "metaData.csv", this);
+                    + "0,0," + waitedTime + "," + Math.round(route.getDistance()) + ",0"  + System.lineSeparator(), "metaData.csv", this);
             editor.putInt("RIDE-KEY", key + 1);
 
             editor.apply();
