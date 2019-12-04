@@ -347,5 +347,117 @@
                 android:text="@string/freepikCredit" />
 
         </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/redLight_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/traffic_light_in_red_signal" />
+
+            <TextView
+                android:id="@+id/redLightCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/redLight_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/redLight_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/freepikCredit" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/co2_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/co2" />
+
+            <TextView
+                android:id="@+id/co2CreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/co2_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/co2_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/freepikCredit" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/tachometer_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/ic_tachometer" />
+
+            <TextView
+                android:id="@+id/tachometerCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/tachometer_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/tachometer_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/freepikCredit" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/upload_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/ic_file_upload_black_24dp" />
+
+            <TextView
+                android:id="@+id/uploadCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignRight="@id/upload_image"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/upload_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/googleCredit" />
+        </RelativeLayout>
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

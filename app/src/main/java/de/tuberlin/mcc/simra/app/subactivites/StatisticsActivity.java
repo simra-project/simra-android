@@ -14,7 +14,6 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
@@ -65,17 +64,56 @@ public class StatisticsActivity extends AppCompatActivity {
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
         // String[] profileValues = readContentFromFile("profile.csv", this).split(System.lineSeparator())[2].split(",");
         Object[] profileValues = getProfile(this);
-        TextView numberOfRides = findViewById(R.id.numberOfRides);
-        numberOfRides.setText(getText(R.string.uploaded_rides) + " " + profileValues[4]);
 
-        TextView distanceOfRides = findViewById(R.id.distanceOfRides);
-        if (unit.equals("ft")) {
-            distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((Double.valueOf((long) profileValues[8])/1600)*100.0))/100.0) + " mi");
+        // number of uploaded rides
+        TextView numberOfRides = findViewById(R.id.numberOfRidesText);
+        int ridesCount = (int) profileValues[4];
+        numberOfRides.setText(getText(R.string.uploaded_rides) + " " + ridesCount);
+        numberOfRides.invalidate();
+
+        // amount of co2 emissions saved by taking a bicycle instead of a car (138g/km)
+        TextView co2Savings = findViewById(R.id.co2SavingsText);
+        if ((long)profileValues[9] > 10000) {
+            co2Savings.setText(getText(R.string.co2Savings) + " " + ((Double.valueOf((long)profileValues[9])/1000)*10.0) + " kg");
         } else {
-            distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((Double.valueOf((long) profileValues[8])/1000)*100.0))/100.0) + " km");
+            co2Savings.setText(getText(R.string.co2Savings) + " " + profileValues[9] + " g");
+        }
+        co2Savings.invalidate();
+
+        // number of non-nothing incidents in uploaded rides
+        TextView numberOfIncidents = findViewById(R.id.numberOFIncidentsText);
+        numberOfIncidents.setText(getText(R.string.incidents) + " " + profileValues[6]);
+        numberOfIncidents.invalidate();
+
+        // number of scary non-nothing incidents in uploaded rides
+        TextView numberOfScary = findViewById(R.id.numberOfScaryIncidentsText);
+        numberOfScary.setText(getText(R.string.scary) + " " + profileValues[34]);
+        numberOfScary.invalidate();
+
+        // total distance of all uploaded rides
+        TextView distanceOfRides = findViewById(R.id.distanceOfRidesText);
+        double distance = Double.valueOf((long) profileValues[8]);
+        if (unit.equals("ft")) {
+            distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((distance/1600)*100.0))/100.0) + " mi");
+        } else {
+            distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((distance/1000)*100.0))/100.0) + " km");
+        }
+        distanceOfRides.invalidate();
+
+        // average distance per ride of all uploaded rides
+        TextView avgDistanceOfRides = findViewById(R.id.averageDistanceOfRidesText);
+        if (unit.equals("ft") && ridesCount > 0) {
+            avgDistanceOfRides.setText(getText(R.string.avgDistance) + " " + (Math.round(((distance/1600/ridesCount)*100.0))/100.0) + " mi");
+        } else if (unit.equals("m") && ridesCount > 0) {
+            avgDistanceOfRides.setText(getText(R.string.avgDistance) + " " + (Math.round(((distance/1000/ridesCount)*100.0))/100.0) + " km");
+        } else {
+            avgDistanceOfRides.setText(getText(R.string.avgDistance) + " - ");
         }
 
-        TextView durationOfRides = findViewById(R.id.durationOfRides);
+        avgDistanceOfRides.invalidate();
+
+        // duration of all uploaded rides in HH:MM
+        TextView durationOfRides = findViewById(R.id.durationOfRidesText);
         long rideDurationHours = ((long) profileValues[5])/3600000;
         long rideDurationMinutes = (((long) profileValues[5])%3600000)/60000;
         // Log.d(TAG, "rideDurationHours: " + rideDurationHours + " rideDurationMinutes: " + rideDurationMinutes);
@@ -93,8 +131,19 @@ public class StatisticsActivity extends AppCompatActivity {
             rideDurationM = String.valueOf(rideDurationMinutes);
         }
         durationOfRides.setText(getText(R.string.duration) + " " + rideDurationH + ":" + rideDurationM);
+        durationOfRides.invalidate();
 
-        TextView durationOfWaitedTime = findViewById(R.id.durationOfWaitedTime);
+        // average speed of per ride of all uploaded rides
+        TextView averageSpeed = findViewById(R.id.averageSpeedText);
+        if (unit.equals("ft")) {
+            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8]))/1600.0)/(((((Double.valueOf((long) profileValues[5])/1000)) - (Double.valueOf((long) profileValues[7])))/3600))) + " mph");
+        } else {
+            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8]))/1000.0)/(((((Double.valueOf((long) profileValues[5])/1000)) - (Double.valueOf((long) profileValues[7])))/3600))) + " km/h");
+        }
+        averageSpeed.invalidate();
+
+        // total duration of waited time in all uploaded rides in HH:MM
+        TextView durationOfWaitedTime = findViewById(R.id.durationOfIdleText);
         long waitDurationHours = ((long) profileValues[7]/3600);
         long waitDurationMinutes = (((long) profileValues[7]%3600)/60);
         String waitDurationH;
@@ -110,28 +159,31 @@ public class StatisticsActivity extends AppCompatActivity {
             waitDurationM = String.valueOf(waitDurationMinutes);
         }
         durationOfWaitedTime.setText(getText(R.string.idle) + " " + waitDurationH + ":" + waitDurationM);
+        durationOfWaitedTime.invalidate();
 
-        TextView averageSpeed = findViewById(R.id.averageSpeed);
-
-        if (unit.equals("ft")) {
-            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8]))/1600.0)/(((((Double.valueOf((long) profileValues[5])/1000)) - (Double.valueOf((long) profileValues[7])))/3600))) + " mph");
-        } else {
-            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8]))/1000.0)/(((((Double.valueOf((long) profileValues[5])/1000)) - (Double.valueOf((long) profileValues[7])))/3600))) + " km/h");
+        TextView averageDurationOfWaitedTime = findViewById(R.id.averageDurationOfIdleText);
+        long avgWaitDurationHours = 0L;
+        long avgWaitDurationMinutes = 0L;
+        if (ridesCount > 0) {
+            avgWaitDurationHours = (((long) profileValues[7])/3600/ridesCount);
+            avgWaitDurationMinutes = (((long) profileValues[7]%3600)/60/ridesCount);
         }
 
-        TextView numberOfIncidents = findViewById(R.id.numberOfIncidents);
-        numberOfIncidents.setText(getText(R.string.incidents) + " " + profileValues[6]);
-
-        TextView numberOfScary = findViewById(R.id.numberOfScary);
-        numberOfScary.setText(getText(R.string.scary) + " " + profileValues[34]);
-
-
-        TextView co2Savings = findViewById(R.id.co2Savings);
-        if ((long)profileValues[9] > 10000) {
-            co2Savings.setText(getText(R.string.co2Savings) + " " + ((Double.valueOf((long)profileValues[9])/1000)*10.0) + " kg");
+        String avgWaitDurationH;
+        String avgWaitDurationM;
+        if (avgWaitDurationHours < 10) {
+            avgWaitDurationH = "0" + avgWaitDurationHours;
         } else {
-            co2Savings.setText(getText(R.string.co2Savings) + " " + profileValues[9] + " g");
+            avgWaitDurationH = String.valueOf(avgWaitDurationHours);
         }
+        if (avgWaitDurationMinutes < 10) {
+            avgWaitDurationM = "0" + avgWaitDurationMinutes;
+        } else {
+            avgWaitDurationM = String.valueOf(avgWaitDurationMinutes);
+        }
+        averageDurationOfWaitedTime.setText(getText(R.string.avgIdle) + " " + avgWaitDurationH + ":" + avgWaitDurationM);
+        averageDurationOfWaitedTime.invalidate();
+
 
 
         chart = (BarChart) findViewById(R.id.timeBucketBarChart);

@@ -50,7 +50,7 @@
 
     <!--- WebActivity -->
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
-    <string name="simRaPage">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1</string>
+    <string name="simRaPage">https://www.digital-future.berlin/en/research/projects/simra/</string>
     <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Instructions.pdf</string>
     <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/en/mobil/</string>
 
@@ -226,19 +226,22 @@
     <!--- Credits -->
     <string name="bycicleCreditTxt">Icon made by Nikita Golubev from www.flaticon.com .</string>
     <string name="freepikCredit">Icon made by Freepik from www.flaticon.com .</string>
+    <string name="googleCredit">Icon made by Google from www.flaticon.com .</string>
     <string name="logoMakrCredit">Created my free logo at www.LogoMakr.com .</string>
     <string name="smashiconCredit">Icon made by Smashicon from www.flaticon.com .</string>
     <string name="pixelCredit">Icon made by Pixel perfect from www.flaticon.com .</string>
     <string name="icons8Credit">Icon made by Icons8 from https://icons8.com .</string>
 
     <!--- Statistics -->
-    <string name="uploaded_rides">Uploaded rides:</string>
+    <string name="uploaded_rides">Rides:</string>
     <string name="distance">Distance:</string>
+    <string name="avgDistance">Avg. distance:</string>
     <string name="duration">Duration:</string>
     <string name="incidents">Incidents:</string>
     <string name="scary">Scary Incidents:</string>
     <string name="idle">Idle:</string>
-    <string name="average_Speed">Average speed:</string>
+    <string name="avgIdle">Avg. idle time:</string>
+    <string name="average_Speed">Avg. speed:</string>
     <string name="co2Savings">CO2 savings:</string>
     <string name="kcalConsumption">Calories consumption:</string>
     <string name="rideDistribution">Ride distribution throughout the day</string>
@@ -268,6 +271,13 @@
     <string name="reworked_my_rides_news_40">New: Improved design of \"My Rides\".</string>
     <string name="increased_precision_news_40">New: Higher precision of distance, speed and time values in \"My Rides\" and \"Statistics\".</string>
     <string name="added_regions_news_40">New: Added regions: Augsburg, Bochum, Pforzheim/Enzkreis.</string>
+
+    <!-- 42 -->
     <string name="added_stuttgart_news_42">New region: Stuttgart</string>
+    <string name="thanks">Thank You for Your support!</string>
+
+    <!-- 46 -->
+    <string name="new_statistics_news_46">There are new categories in \"Statistics\".</string>
+    <string name="improved_calculation_speed_news_46">Increased calculation speed of incidents.</string>
 
 </resources>

@@ -40,9 +40,11 @@ import de.tuberlin.mcc.simra.app.main.HistoryActivity;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
+import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.util.Constants.LOCALE_ABVS;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
+import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileWithoutDemographics;
@@ -271,7 +273,7 @@ public class UploadService extends Service {
                                 Log.d(TAG, "PUT response: " + response);
                             }
 
-                            // if the respond is ok, mark ride as uploaded in metaData.csv
+                            // if the respond is ok, mark ride as uploaded in metaData.csv and delete "nothing" incidents from accEvents.csv
                             if (response.first.equals(200)) {
                                 metaDataLine[3] = "2";
                                 totalNumberOfRides++;
@@ -292,6 +294,29 @@ public class UploadService extends Service {
                                     timeBuckets[i] = timeBuckets[i] + (1 / duration);
                                 }
                                 totalNumberOfScary += Integer.valueOf(metaDataLine[7]);
+
+                                StringBuilder accEventsDataContent = new StringBuilder();
+                                String accEventsFileVersion = "";
+
+                                try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(accEventName)))) {
+                                    // accEventsFileVersion line: 23#7
+                                    accEventsFileVersion = br.readLine().split("#")[1];
+                                    // skip header
+                                    String accEventsLine = br.readLine();
+
+                                    while ((accEventsLine = br.readLine()) != null) {
+                                        String[] accEventsLineSplitted = accEventsLine.split(",", -1);
+                                        if (checkForAnnotation(accEventsLineSplitted)) {
+                                            accEventsDataContent.append(accEventsLine).append(System.lineSeparator());
+                                        }
+                                    }
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                String fileInfoLine = appVersion + "#" + accEventsFileVersion + System.lineSeparator();
+                                overWriteFile((fileInfoLine + ACCEVENTS_HEADER + accEventsDataContent), accEventName, context);
+
                             }
 
                         }
@@ -317,8 +342,6 @@ public class UploadService extends Service {
                     }
                     String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
                     overWriteFile((fileInfoLine + METADATA_HEADER + content.toString()), "metaData.csv", context);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

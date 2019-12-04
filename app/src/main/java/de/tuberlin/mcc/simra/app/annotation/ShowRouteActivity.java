@@ -46,6 +46,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -325,13 +326,9 @@ public class ShowRouteActivity extends BaseActivity {
                 }
             });
             tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
-
-            tempRide = new Ride(tempGpsFile, duration, String.valueOf(tempStartTime), String.valueOf(tempEndTime), state, bike, child, trailer, pLoc, true, this);
-
+            tempRide = new Ride(tempGpsFile, duration, String.valueOf(tempStartTime), state, bike, child, trailer, pLoc, this, calculate,true);
         } else {
-
-            ride = new Ride(gpsFile, duration, startTime,/*date,*/ state, bike, child, trailer, pLoc, this, calculate);
-
+            ride = new Ride(gpsFile, duration, startTime, state, bike, child, trailer, pLoc, this, calculate, false);
         }
 
         // Get the Route as a Polyline to be displayed on the map
@@ -437,7 +434,6 @@ public class ShowRouteActivity extends BaseActivity {
 
         // Show all the incidents present in our ride object
         Log.d(TAG, "showing all incidents");
-
                 myMarkerFunct.showIncidents();
             }
         });
@@ -478,9 +474,6 @@ public class ShowRouteActivity extends BaseActivity {
                 return false;
             }
         };
-
-
-
 
         routeSize = route.getPoints().size();
         if (routeSize < 2) {
@@ -601,6 +594,7 @@ public class ShowRouteActivity extends BaseActivity {
     }
 
     private void saveChanges(boolean temp) {
+        Log.d(TAG, "saveChanges(): ride.events.size(): " + ride.events.size());
         StringBuilder metaDataContent = new StringBuilder();
         int appVersion = getAppVersionNumber(ShowRouteActivity.this);
         String metaDataFileVersion = "";
@@ -612,6 +606,7 @@ public class ShowRouteActivity extends BaseActivity {
             while ((line = br.readLine()) != null) {
                 String[] metaDataLine = line.split(",", -1);
                 String metaDataRide = line;
+                Log.d(TAG, "metaDataLine[0]: " + metaDataLine[0] + " ride.getKey(): " + ride.getKey());
                 // loop through metaData.csv to find the right ride
                 if (metaDataLine[0].equals(ride.getKey())) {
                     long distance = 0;
@@ -624,8 +619,10 @@ public class ShowRouteActivity extends BaseActivity {
                         distance = Math.round(tempRide.distance);
                         waitedTime = tempRide.waitedTime;
                         ArrayList<AccEvent> accEventArrayList = tempRide.events;
+                        Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
                         for (int i = 0; i < accEventArrayList.size(); i++) {
-                            if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
+                            Log.d(TAG, "accEvent " + tempRide.events.get(i).key + ": " + tempRide.events.get(i).annotated + " scary: " + tempRide.events.get(i).scary);
+                            if(accEventArrayList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
                             if (accEventArrayList.get(i).scary.equals("1")) {
@@ -636,8 +633,10 @@ public class ShowRouteActivity extends BaseActivity {
                         distance = Math.round(ride.distance);
                         waitedTime = ride.waitedTime;
                         ArrayList<AccEvent> accEventArrayList = ride.events;
+                        Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
                         for (int i = 0; i < accEventArrayList.size(); i++) {
-                            if (!accEventArrayList.get(i).incidentType.equals("0") && !accEventArrayList.get(i).incidentType.equals("")){
+                            Log.d(TAG, "accEvent " + ride.events.get(i).key + ": " + ride.events.get(i).annotated + " scary: " + ride.events.get(i).scary);
+                            if(accEventArrayList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
                             if (accEventArrayList.get(i).scary.equals("1")) {
@@ -650,6 +649,8 @@ public class ShowRouteActivity extends BaseActivity {
                     // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
                     metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance + "," + numberOfScary);
                 }
+                Log.d(TAG, "metaDataRide: " + metaDataRide);
+                Log.d(TAG, "numberOfIncidents: " + metaDataRide.split(",")[4] + " numberOfScary: " + metaDataRide.split(",")[7]);
                 metaDataContent.append(metaDataRide).append(System.lineSeparator());
             }
         } catch (IOException ioe) {
@@ -657,7 +658,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
         String fileInfoLine = appVersion + "#" + metaDataFileVersion + System.lineSeparator();
         overWriteFile((fileInfoLine + METADATA_HEADER + metaDataContent), "metaData.csv", this);
-
+        /*
         StringBuilder accEventsDataContent = new StringBuilder();
         String accEventsFileVersion = "";
         String accEventName = "accEvents" + ride.getKey() + ".csv";
@@ -666,7 +667,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(accEventName)))) {
-            // metaDataFileVersion line: 23#7
+            // accEventsFileVersion line: 23#7
             accEventsFileVersion = br.readLine().split("#")[1];
             // skip header
             String line = br.readLine();
@@ -683,7 +684,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
         fileInfoLine = appVersion + "#" + accEventsFileVersion + System.lineSeparator();
         overWriteFile((fileInfoLine + ACCEVENTS_HEADER + accEventsDataContent), accEventName, this);
-
+        */
         // tempAccEventsPath
         // tempAccGpsPath
         if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {
@@ -726,7 +727,7 @@ public class ShowRouteActivity extends BaseActivity {
                         partOfRideNumber++;
                     }
                     if ((partOfRideNumber >= left) && (partOfRideNumber <= right)) {
-                        Log.d(TAG, "line: " + line);
+                        // Log.d(TAG, "line: " + line);
                         if(tempStartTime == null || Long.valueOf(line.split(",",-1)[5]) < tempStartTime) {
                             tempStartTime = Long.valueOf(line.split(",",-1)[5]);
                         }
@@ -759,17 +760,43 @@ public class ShowRouteActivity extends BaseActivity {
             if (resultCode == Activity.RESULT_OK) {
 
                 String result = data.getStringExtra("result");
-
                 String[] incidentProps = result.split(",", -1);
-
+                Log.d(TAG, "onActivityResult() result: " + result);
+                boolean temp = data.getBooleanExtra("temp", false);
+                Log.d(TAG, "onActivityResult() temp: " + temp);
                 boolean annotated = checkForAnnotation(incidentProps);
-                for (int i = 0; i < ride.events.size(); i++) {
-                    if ((ride.events.get(i).key) == Integer.valueOf(incidentProps[0])) {
-                        if (incidentProps[8] != null) {
-                            ride.events.get(i).incidentType = incidentProps[8];
+                if(temp) {
+                    Log.d(TAG,"tempRide.events.size(): " + tempRide.events.size());
+                    for (int i = 0; i < tempRide.events.size(); i++) {
+                        Log.d(TAG,"tempRide.events.get(i).key: " + tempRide.events.get(i).key +
+                                " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
+                        if ((tempRide.events.get(i).key) == Integer.valueOf(incidentProps[0])) {
+                            if (annotated) {
+                                tempRide.events.get(i).annotated = true;
+                            }
+                            if (incidentProps[8] != null) {
+                                tempRide.events.get(i).incidentType = incidentProps[8];
+                            }
+                            if (incidentProps[18] != null) {
+                                tempRide.events.get(i).scary = incidentProps[18];
+                            }
                         }
-                        if (incidentProps[18] != null) {
-                            ride.events.get(i).scary = incidentProps[18];
+                    }
+                } else {
+                    Log.d(TAG,"ride.events.size(): " + ride.events.size());
+                    for (int i = 0; i < ride.events.size(); i++) {
+                        Log.d(TAG,"ride.events.get(i).key: " + ride.events.get(i).key +
+                                " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
+                        if ((ride.events.get(i).key) == Integer.valueOf(incidentProps[0])) {
+                            if (annotated) {
+                                ride.events.get(i).annotated = true;
+                            }
+                            if (incidentProps[8] != null) {
+                                ride.events.get(i).incidentType = incidentProps[8];
+                            }
+                            if (incidentProps[18] != null) {
+                                ride.events.get(i).scary = incidentProps[18];
+                            }
                         }
                     }
                 }
