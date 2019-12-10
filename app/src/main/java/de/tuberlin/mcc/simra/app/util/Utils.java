@@ -107,19 +107,20 @@ public class Utils {
         StringBuilder accEventsContentToOverwrite = new StringBuilder();
         StringBuilder accEventsContentToUpload = new StringBuilder();
         int appVersion = getAppVersionNumber(context);
-        String topFileInfoLine = appVersion + "#-1" + System.lineSeparator();
+        String accEventsFileInfoLine = appVersion + "#-1" + System.lineSeparator();
 
         try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accEvents)))) {
             String line = br.readLine();
             String topFileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
-            topFileInfoLine = appVersion + "#" + topFileVersion + System.lineSeparator();
+            accEventsFileInfoLine = appVersion + "#" + topFileVersion + System.lineSeparator();
+            accEventsContentToUpload.append(accEventsFileInfoLine);
             while ((line = br.readLine()) != null) {
                 accEventsContentToOverwrite.append(line).append(System.lineSeparator());
                 if (Utils.checkForAnnotation(line.split(",",-1))) {
                     accEventsContentToUpload.append(line).append(System.lineSeparator());
                 }
             }
-            overWriteFile((topFileInfoLine + accEventsContentToOverwrite.toString()), accEvents, context);
+            overWriteFile((accEventsFileInfoLine + accEventsContentToOverwrite.toString()), accEvents, context);
 
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
@@ -140,7 +141,7 @@ public class Utils {
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
         }
-        content.append(topFileInfoLine).append(accEventsContentToUpload);
+        content.append(accEventsContentToUpload);
         content.append(System.lineSeparator()).append("=========================").append(System.lineSeparator());
         content.append(bottomFileInfoLine).append(contentBottom);
 
@@ -536,8 +537,6 @@ public class Utils {
         Log.d(TAG, "recalculateStatistics() start");
         File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
         StringBuilder contentOfMetaData = new StringBuilder();
-        contentOfMetaData.append(getAppVersionNumber(context)).append("#1").append(System.lineSeparator());
-        contentOfMetaData.append(METADATA_HEADER);
         // total number of (scary) incidents read from each accEvents csv.
         int totalNumberOfIncidents = 0;
         int totalNumberOfScary = 0;
@@ -555,7 +554,6 @@ public class Utils {
         try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
             // fileInfoLine (24#2)
             String metaDataFileVersion = metaDataReader.readLine().split("#")[1];
-
             contentOfMetaData.append(getAppVersionNumber(context)).append("#").append(metaDataFileVersion)
                     .append(System.lineSeparator())
                     .append(METADATA_HEADER);
@@ -585,8 +583,9 @@ public class Utils {
                 // loop through each line of the actual accEvents csv
                 try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(accEventsFile)))) {
                     // fileInfoLine (24#2)
-                    String accEventsLine = accEventsReader.readLine().split("#")[1];
-                    contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine)
+                    String accEventsLine = accEventsReader.readLine();
+                    Log.d(TAG, "recalculateStatistics() accEventsLine: " + accEventsLine);
+                    contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine.split("#")[1])
                             .append(System.lineSeparator())
                             .append(ACCEVENTS_HEADER);
                     // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10
@@ -606,6 +605,7 @@ public class Utils {
                         }
                     }
                 } catch (IOException e) {
+                    Log.d(TAG, "Exception in recalculateStatistics(): " + Arrays.toString(e.getStackTrace()));
                     e.printStackTrace();
                 }
                 // Update the total number of (scary) incidents only if the ride has already been uploaded.
@@ -664,6 +664,7 @@ public class Utils {
             overWriteFile(contentOfMetaData.toString(),"metaData.csv",context);
             updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
         } catch (IOException e) {
+            Log.d(TAG, "Exception in recalculateStatistics(): " + Arrays.toString(e.getStackTrace()));
             e.printStackTrace();
         }
     }

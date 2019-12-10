@@ -296,7 +296,8 @@ public class VersionUpdater {
                 updateProfile(context,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,null,-2,totalNumberOfScary);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.d(TAG, "updateToV31() exception: " + e.getLocalizedMessage());
+                Log.d(TAG, Arrays.toString(e.getStackTrace()));
             }
             overWriteFile(contentOfNewMetaData.toString(),metaDataFile.getName(),context);
         }
@@ -399,7 +400,8 @@ public class VersionUpdater {
             try {
                 recalculateStatistics(context);
             } catch (Exception e) {
-                Log.d(TAG, e.getLocalizedMessage());
+                Log.d(TAG, "updateToV47 exception: " + e.getLocalizedMessage());
+                Log.d(TAG, Arrays.toString(e.getStackTrace()));
             }
         }
     }
