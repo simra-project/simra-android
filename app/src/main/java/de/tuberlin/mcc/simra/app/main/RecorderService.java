@@ -293,7 +293,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onDestroy() {
 
-
         // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
         // with current ride and and sharedPrefs with current ride key. Do these things only,
         // if recording is allowed (see privacyDuration and privacyDistance) and we have written some
@@ -311,7 +310,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
                     + "0,0," + waitedTime + "," + Math.round(route.getDistance()) + ",0"  + System.lineSeparator(), "metaData.csv", this);
             editor.putInt("RIDE-KEY", key + 1);
-
             editor.apply();
         }
 

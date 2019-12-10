@@ -6,14 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.Date;
 
 import androidx.appcompat.app.AppCompatActivity;
-import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.main.StartActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;

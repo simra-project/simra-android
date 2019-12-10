@@ -46,7 +46,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +55,6 @@ import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
-import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
@@ -578,7 +576,7 @@ public class ShowRouteActivity extends BaseActivity {
         });
 
         saveButton.setOnClickListener((View v) -> {
-            firePrivacySliderWarningDialog(temp);
+            saveChanges(temp);
         });
 
         overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
@@ -1004,42 +1002,6 @@ public class ShowRouteActivity extends BaseActivity {
             }
         });
         alert.show();
-
-
-        return continueWithRefresh;
-
-
-    }
-
-    public boolean firePrivacySliderWarningDialog(boolean temp) {
-        View checkBoxView = View.inflate(this, R.layout.checkbox, null);
-        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                writeBooleanToSharedPrefs("DeleteEmpty-Warning", !checkBox.isChecked(), "simraPrefs", ShowRouteActivity.this);
-            }
-        });
-        checkBox.setText(getString(R.string.doNotShowAgain));
-        AlertDialog.Builder alert = new AlertDialog.Builder(ShowRouteActivity.this);
-        alert.setTitle(getString(R.string.warning));
-        alert.setMessage(getString(R.string.warningDeleteEmptyMessage));
-        alert.setView(checkBoxView);
-
-        alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                saveChanges(temp);
-            }
-        });
-        alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-            }
-        });
-        alert.show();
-
-
         return continueWithRefresh;
     }
-
 }

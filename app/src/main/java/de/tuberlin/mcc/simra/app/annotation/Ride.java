@@ -10,13 +10,9 @@ import org.osmdroid.views.overlay.Polyline;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
@@ -71,7 +67,7 @@ public class Ride {
         this.accGpsFile = accGpsFile;
         this.duration = duration;
         this.startTime = startTime;
-        Pair<Integer, Polyline> routeAndWaitedTime = getRouteAndWaitTime(accGpsFile);
+        Pair<Integer, Polyline> routeAndWaitedTime = calculateWaitedTimeAndPolyline(accGpsFile);
         this.route = routeAndWaitedTime.second;
         this.waitedTime = routeAndWaitedTime.first;
         this.distance = route.getDistance();
@@ -99,8 +95,8 @@ public class Ride {
             if (fileExists(pathToAccEventsOfRide, context)) {
                 Log.d(TAG, "reading " + pathToAccEventsOfRide + " to get accEvents");
                 try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(pathToAccEventsOfRide)))) {
-                    String line = br.readLine();
-                    while (line != null) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
                         String[] accEventLine = line.split(",", -1);
                         Log.d(TAG, "accEventLine: " + line);
                         if (!(accEventLine[0].equals("key") || (accEventLine.length < 20))) {
@@ -113,10 +109,8 @@ public class Ride {
                             String scary = accEventLine[18];
                             events.add(new AccEvent(key,lat,lon,timestamp,annotated,incidentType,scary));
                         }
-                        line = br.readLine();
                     }
                 }
-
             }
         }
 
@@ -144,7 +138,7 @@ public class Ride {
         this.duration = duration;
         this.startTime = startTime;
         // this.endTime = endTime;
-        Pair<Integer, Polyline> routeAndWaitedTime = getRouteAndWaitTime(tempAccGpsFile);
+        Pair<Integer, Polyline> routeAndWaitedTime = calculateWaitedTimeAndPolyline(tempAccGpsFile);
         this.route = routeAndWaitedTime.second;
         this.waitedTime = routeAndWaitedTime.first;
         this.distance = route.getDistance();
@@ -177,7 +171,7 @@ public class Ride {
 
     // Takes a File which contains all the data and creates a
     // PolyLine to be displayed on the map as a route.
-    public static Pair<Integer, Polyline> getRouteAndWaitTime(File gpsFile) throws IOException {
+    public static Pair<Integer, Polyline> calculateWaitedTimeAndPolyline(File gpsFile) throws IOException {
         Polyline polyLine = new Polyline();
 
         BufferedReader br = new BufferedReader(new FileReader(gpsFile));
@@ -192,8 +186,6 @@ public class Ride {
 
             if (!line.startsWith(",,")) {
                 try {
-                    double distanceToLastPoint = 0;
-
                     if (thisLocation == null) {
                         thisLocation = new Location("thisLocation");
                         thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));

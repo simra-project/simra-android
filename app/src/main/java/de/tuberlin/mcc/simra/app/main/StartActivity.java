@@ -17,7 +17,6 @@ import android.widget.Toast;
 import java.io.File;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.UploadService;
@@ -30,8 +29,10 @@ import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.showDataDirectory;
 import static de.tuberlin.mcc.simra.app.util.Utils.showKeyPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
+import static de.tuberlin.mcc.simra.app.util.Utils.showStatistics;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeLongToSharedPrefs;
@@ -58,13 +59,16 @@ public class StartActivity extends BaseActivity {
         Log.d(TAG, "onCreate() started");
         // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
         showKeyPrefs(this);
+        showDataDirectory(this);
+        Log.d(TAG, "metaData.csv: " + readContentFromFile("metaData.csv",this));
+        showStatistics(this);
         deleteErrorLogsForVersion(this, 26);
         updateToV27(this);
         updateToV30(this);
         updateToV31(this);
         updateToV32(this);
         updateToV39(this);
-        updateToV46(this);
+        updateToV47(this);
         writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request

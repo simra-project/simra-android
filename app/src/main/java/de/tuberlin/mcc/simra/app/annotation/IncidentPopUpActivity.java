@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-//import android.support.v7.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -25,7 +24,6 @@ import java.util.Arrays;
 
 import de.tuberlin.mcc.simra.app.R;
 
-import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
