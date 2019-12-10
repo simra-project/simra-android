@@ -2,7 +2,6 @@ package de.tuberlin.mcc.simra.app.annotation;
 
 
 import android.util.Log;
-
 import org.osmdroid.util.GeoPoint;
 
 public class AccEvent {

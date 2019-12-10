@@ -10,7 +10,6 @@ import org.osmdroid.views.overlay.Polyline;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
@@ -22,10 +21,10 @@ import de.tuberlin.mcc.simra.app.annotation.Ride;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
-import static de.tuberlin.mcc.simra.app.util.Utils.fixIncidentStatistics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.recalculateStatistics;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
 public class VersionUpdater {
@@ -152,7 +151,7 @@ public class VersionUpdater {
                         continue;
                     }
 
-                    Polyline routeLine = Ride.getRouteAndWaitTime(gpsFile).second;
+                    Polyline routeLine = Ride.calculateWaitedTimeAndPolyline(gpsFile).second;
                     long distance = Math.round(routeLine.getDistance());
                     if (isUploaded) {
                         totalDuration += (Long.valueOf(endTime) - Long.valueOf(startTime));
@@ -202,7 +201,7 @@ public class VersionUpdater {
 
             overWriteFile((fileInfoLine + PROFILE_HEADER + profileContent), "profile.csv", context);
             */
-            updateProfile(context,birth,gender,region,experience,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,co2,timeBuckets,-1,-1);
+            updateProfile(context,birth,gender,region,experience,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,co2,timeBuckets,-2,-1);
 
         }
 
@@ -230,8 +229,6 @@ public class VersionUpdater {
                         while ((line = accEventsReader.readLine()) != null) {
                             contentOfNewAccEvents.append(line).append(System.lineSeparator());
                         }
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -298,8 +295,6 @@ public class VersionUpdater {
                 }
                 updateProfile(context,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,null,-2,totalNumberOfScary);
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -341,16 +336,12 @@ public class VersionUpdater {
                                     totalNumberOfIncidents++;
                                 }
                             }
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
                 }
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -394,8 +385,6 @@ public class VersionUpdater {
                 String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
 
                 overWriteFile(fileInfoLine + METADATA_HEADER + contentOfNewMetaData.toString(),metaDataFile.getName(),context);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -403,12 +392,15 @@ public class VersionUpdater {
         }
     }
 
-    public static void updateToV46(Context context) {
-
+    public static void updateToV47(Context context) {
         int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 46) {
-            Log.d(TAG,"Updating to version 46");
-            fixIncidentStatistics(context);
+        if (lastCriticalAppVersion < 47) {
+            Log.d(TAG,"Updating to version 47");
+            try {
+                recalculateStatistics(context);
+            } catch (Exception e) {
+                Log.d(TAG, e.getLocalizedMessage());
+            }
         }
     }
 }

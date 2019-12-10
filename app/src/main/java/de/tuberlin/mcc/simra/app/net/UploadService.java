@@ -19,8 +19,6 @@ import android.util.Pair;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,11 +38,9 @@ import de.tuberlin.mcc.simra.app.main.HistoryActivity;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
-import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.util.Constants.LOCALE_ABVS;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
-import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileWithoutDemographics;
@@ -250,7 +246,9 @@ public class UploadService extends Service {
                             }
                             Log.d(TAG, "accEventName: " + accEventName + " accGpsName: " + accGpsName);
                             // concatenate fileInfoVersion, accEvents and accGps content
-                            String contentToSend = Utils.appendFromFileToFile(accEventName, accGpsName, context);
+                            Pair<String, String> contentToUploadAndAccEventsContentToOverwrite = Utils.appendAccGpsToAccEvents(accEventName, accGpsName, context);
+                            String contentToUpload = contentToUploadAndAccEventsContentToOverwrite.first;
+                            String accEventsContentToOverwrite = contentToUploadAndAccEventsContentToOverwrite.second;
                             String password = lookUpSharedPrefs(rideKey, "-1", "keyPrefs", context);
 
                             Log.d(TAG, "Saved password: " + password);
@@ -258,7 +256,7 @@ public class UploadService extends Service {
                             // send data with POST, if it is being sent the first time
                             if (password.equals("-1")) {
                                 Log.d(TAG, "sending ride with POST: " + rideKey);
-                                response = postFile("ride", contentToSend);
+                                response = postFile("ride", contentToUpload);
 
                                 if (response.second.split(",").length >= 2) {
                                     writeToSharedPrefs(rideKey, response.second, "keyPrefs", context);
@@ -269,7 +267,7 @@ public class UploadService extends Service {
                                 Log.d(TAG, "sending ride with PUT: " + rideKey);
                                 String fileHash = password.split(",")[0];
                                 String filePassword = password.split(",")[1];
-                                response = putFile("ride", fileHash, filePassword, contentToSend);
+                                response = putFile("ride", fileHash, filePassword, contentToUpload);
                                 Log.d(TAG, "PUT response: " + response);
                             }
 
@@ -295,28 +293,7 @@ public class UploadService extends Service {
                                 }
                                 totalNumberOfScary += Integer.valueOf(metaDataLine[7]);
 
-                                StringBuilder accEventsDataContent = new StringBuilder();
-                                String accEventsFileVersion = "";
-
-                                try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(accEventName)))) {
-                                    // accEventsFileVersion line: 23#7
-                                    accEventsFileVersion = br.readLine().split("#")[1];
-                                    // skip header
-                                    String accEventsLine = br.readLine();
-
-                                    while ((accEventsLine = br.readLine()) != null) {
-                                        String[] accEventsLineSplitted = accEventsLine.split(",", -1);
-                                        if (checkForAnnotation(accEventsLineSplitted)) {
-                                            accEventsDataContent.append(accEventsLine).append(System.lineSeparator());
-                                        }
-                                    }
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                String fileInfoLine = appVersion + "#" + accEventsFileVersion + System.lineSeparator();
-                                overWriteFile((fileInfoLine + ACCEVENTS_HEADER + accEventsDataContent), accEventName, context);
-
+                                overWriteFile(accEventsContentToOverwrite, accEventName, context);
                             }
 
                         }
@@ -373,7 +350,7 @@ public class UploadService extends Service {
                 }
                 */
                 // Now after the rides have been uploaded, we can update the profile with the new statistics
-                updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2,timeBuckets,-1,totalNumberOfScary);
+                updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2,timeBuckets,-2,totalNumberOfScary);
 
                 // StringBuilder profileContentToSend = new StringBuilder(profileInfoLine + System.lineSeparator() + PROFILE_HEADER);
                 SharedPreferences sharedPrefs = context.getApplicationContext()

@@ -11,23 +11,30 @@ import android.content.pm.PackageManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
-import de.tuberlin.mcc.simra.app.main.StartActivity;
 
+import android.content.res.Resources;
+import android.location.Location;
 import android.util.Log;
+import android.util.Pair;
+
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 
 
 import static android.content.Context.MODE_APPEND;
+import static de.tuberlin.mcc.simra.app.annotation.Ride.calculateWaitedTimeAndPolyline;
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 
@@ -92,24 +99,27 @@ public class Utils {
         }
     }
 
-    // appends content from file <fileNameBottom> to the content of file <fileNameTop>
+    // appends content from file <accGps> to the content of file <accEvents>
     // and increases both their file version number
-    public static String appendFromFileToFile(String fileNameTop, String fileNameBottom, Context context){
+    public static Pair<String, String> appendAccGpsToAccEvents(String accEvents, String accGps, Context context){
 
         StringBuilder content = new StringBuilder();
-        StringBuilder contentTop = new StringBuilder();
+        StringBuilder accEventsContentToOverwrite = new StringBuilder();
+        StringBuilder accEventsContentToUpload = new StringBuilder();
         int appVersion = getAppVersionNumber(context);
-        String topFileInfoLine = appVersion + "#-1";
+        String topFileInfoLine = appVersion + "#-1" + System.lineSeparator();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(fileNameTop)))) {
-            String line;
-            line = br.readLine();
+        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accEvents)))) {
+            String line = br.readLine();
             String topFileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
             topFileInfoLine = appVersion + "#" + topFileVersion + System.lineSeparator();
             while ((line = br.readLine()) != null) {
-                contentTop.append(line).append(System.lineSeparator());
+                accEventsContentToOverwrite.append(line).append(System.lineSeparator());
+                if (Utils.checkForAnnotation(line.split(",",-1))) {
+                    accEventsContentToUpload.append(line).append(System.lineSeparator());
+                }
             }
-            overWriteFile((topFileInfoLine + contentTop.toString()), fileNameTop, context);
+            overWriteFile((topFileInfoLine + accEventsContentToOverwrite.toString()), accEvents, context);
 
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
@@ -117,7 +127,7 @@ public class Utils {
 
         StringBuilder contentBottom = new StringBuilder();
         String bottomFileInfoLine = appVersion + "#-1";
-        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(fileNameBottom)))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accGps)))) {
             String line;
             line = br.readLine();
             String bottomFileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
@@ -125,15 +135,16 @@ public class Utils {
             while ((line = br.readLine()) != null) {
                 contentBottom.append(line).append(System.lineSeparator());
             }
-            overWriteFile((bottomFileInfoLine + contentBottom.toString()), fileNameBottom, context);
+            overWriteFile((bottomFileInfoLine + contentBottom.toString()), accGps, context);
 
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
         }
-        content.append(topFileInfoLine).append(contentTop);
+        content.append(topFileInfoLine).append(accEventsContentToUpload);
         content.append(System.lineSeparator()).append("=========================").append(System.lineSeparator());
         content.append(bottomFileInfoLine).append(contentBottom);
-        return content.toString();
+
+        return new Pair<>(content.toString(), accEventsContentToUpload.toString());
     }
 
     public static void overWriteFile(String content, String fileName, Context context) {
@@ -211,15 +222,9 @@ public class Utils {
     // Returns true, if accEvent was already annotated.
 
     public static boolean checkForAnnotation(String[] incidentProps) {
-
         // Only checking for empty strings, which means we are retaining
         // events that were labeled as 'nothing happened'
-        return !incidentProps[10].equals("") || !incidentProps[11].equals("") ||
-                !incidentProps[12].equals("") || !incidentProps[13].equals("") ||
-                !incidentProps[14].equals("") || !incidentProps[15].equals("") ||
-                !incidentProps[16].equals("") || !incidentProps[17].equals("") ||
-                !incidentProps[18].equals("") || !incidentProps[19].equals("");
-
+        return (!incidentProps[8].equals("") && !incidentProps[8].equals("0"))|| !incidentProps[19].equals("");
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -291,9 +296,30 @@ public class Utils {
 
 
     public static void showKeyPrefs(Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
+        SharedPreferences keyPrefs = context.getApplicationContext()
                 .getSharedPreferences("keyPrefs", Context.MODE_PRIVATE);
-        Log.d(TAG, "keyPrefs:" + Arrays.toString(sharedPrefs.getAll().entrySet().toArray()));
+        Log.d(TAG, "keyPrefs:" + Arrays.toString(keyPrefs.getAll().entrySet().toArray()));
+    }
+
+    public static void showDataDirectory(Context context) {
+        Log.d(TAG, "data: " + Arrays.toString(context.fileList()));
+    }
+
+    public static void showStatistics(Context context) {
+        SharedPreferences profilePrefs = context.getApplicationContext()
+                .getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        Log.d(TAG, "numberOfRides: " + profilePrefs.getInt("NumberOfRides",-1));
+        Log.d(TAG, "Distance: " + profilePrefs.getLong("Distance",-1) + "m");
+        Log.d(TAG, "Co2: " + profilePrefs.getLong("Co2",-1) + "g");
+        Log.d(TAG, "Duration: " + profilePrefs.getLong("Duration",-1) + "ms");
+        Log.d(TAG, "WaitedTime: " + profilePrefs.getLong("WaitedTime",-1) + "s");
+        Log.d(TAG, "NumberOfIncidents: " + profilePrefs.getInt("NumberOfIncidents",-1));
+        Log.d(TAG, "NumberOfScary: " + profilePrefs.getInt("NumberOfScary",-1));
+        String[] buckets = new String[24];
+        for (int i = 0; i < buckets.length; i++) {
+            buckets[i] = i + ": " + profilePrefs.getFloat(String.valueOf(i),-1.0f);
+        }
+        Log.d(TAG, "timeBuckets: " + Arrays.toString(buckets));
     }
 
     public static void updateProfile(Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
@@ -445,7 +471,6 @@ public class Utils {
             while ((metaDataLine = metaDataReader.readLine()) != null) {
                 Log.d(TAG, "metaDataLine: " + metaDataLine);
                 String[] metaDataArray = metaDataLine.split(",");
-
                 boolean isUploaded = metaDataArray[3].equals("2");
                 String key = metaDataArray[0];
                 int numberOfIncidentsCurrentAccEvent = 0;
@@ -460,9 +485,9 @@ public class Utils {
                         contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine)
                                 .append(System.lineSeparator())
                                 .append(ACCEVENTS_HEADER);
-                        // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc
-                        // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,
-                        // 20 entries per metaDataLine (index 0-19)
+                        // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10
+                        // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,,
+                        // 21 entries per metaDataLine (index 0-20)
                         accEventsLine = accEventsReader.readLine();
                         while ((accEventsLine = accEventsReader.readLine()) != null) {
                             String[] accEventsArray = accEventsLine.split(",",-1);
@@ -504,9 +529,209 @@ public class Utils {
             e.printStackTrace();
         }
         updateProfile(context,-1,-1,-1,-1,-1,-1,totalNumberOfIncidents,-1,-1,-1,null,-2,totalNumberOfScary);
-
     }
 
+    // recalculates all statistics, updates metaData.csv, Profile.xml and deletes temp files
+    public static void recalculateStatistics(Context context) {
+        Log.d(TAG, "recalculateStatistics() start");
+        File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+        StringBuilder contentOfMetaData = new StringBuilder();
+        contentOfMetaData.append(getAppVersionNumber(context)).append("#1").append(System.lineSeparator());
+        contentOfMetaData.append(METADATA_HEADER);
+        // total number of (scary) incidents read from each accEvents csv.
+        int totalNumberOfIncidents = 0;
+        int totalNumberOfScary = 0;
 
+        // number of rides, distance, duration, CO2-savings, waited time and time buckets.
+        int totalNumberOfRides = 0;
+        long totalDistance = 0; // in m
+        long totalDuration = 0; // in ms
+        int totalCO2Savings = 0; // in g
+        long totalWaitedTime = 0; // in s
+        // 0h - 23h
+        float[] timeBuckets = {0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f};
+
+        // loop through each line of metaData.csv
+        try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
+            // fileInfoLine (24#2)
+            String metaDataFileVersion = metaDataReader.readLine().split("#")[1];
+
+            contentOfMetaData.append(getAppVersionNumber(context)).append("#").append(metaDataFileVersion)
+                    .append(System.lineSeparator())
+                    .append(METADATA_HEADER);
+            // header (key,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary)
+            metaDataReader.readLine();
+            String metaDataLine;
+            // loop through the metaData.csv lines
+            // rides (0,1553426842081,1553426843354,2,0,0,0)
+            while ((metaDataLine = metaDataReader.readLine()) != null) {
+                String[] metaDataLineArray = metaDataLine.split(",");
+                String key = metaDataLineArray[0];
+                // update totalNumberOf... only, if the ride has been uploaded
+                boolean uploaded = true;
+                if (!metaDataLineArray[3].equals("2")) {
+                   uploaded = false;
+                }
+                Log.d(TAG, "key: " + key + " uploaded: " + uploaded);
+                // First part: read accEvents and calculate number of (scary) incidents.
+                File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
+                StringBuilder contentOfAccEvents = new StringBuilder();
+                if (!accEventsFile.exists()) {
+                    continue;
+                }
+                // number of (scary) incidents read from the actual accEvents csv.
+                int actualNumberOfIncidents = 0;
+                int actualNumberOfScary = 0;
+                // loop through each line of the actual accEvents csv
+                try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(accEventsFile)))) {
+                    // fileInfoLine (24#2)
+                    String accEventsLine = accEventsReader.readLine().split("#")[1];
+                    contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine)
+                            .append(System.lineSeparator())
+                            .append(ACCEVENTS_HEADER);
+                    // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10
+                    // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,,
+                    // 21 entries per metaDataLine (index 0-20)
+                    accEventsLine = accEventsReader.readLine();
+                    // skip fileInfo line and accEvents header
+                    while (((accEventsLine = accEventsReader.readLine()) != null)) {
+                        String[] accEventsLineArray = accEventsLine.split(",",-1);
+                        // if the accEvent of the actual line is annotated, update the number of (scary) incidents)
+                        if (checkForAnnotation(accEventsLineArray)) {
+                            contentOfAccEvents.append(accEventsLine).append(System.lineSeparator());
+                            actualNumberOfIncidents++;
+                            if (accEventsLineArray[18].equals("1")) {
+                                actualNumberOfScary++;
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                // Update the total number of (scary) incidents only if the ride has already been uploaded.
+                // Otherwise the statistics will be faulty, since they get updated after an upload as well.
+                if (uploaded) {
+                    totalNumberOfIncidents += actualNumberOfIncidents;
+                    totalNumberOfScary += actualNumberOfScary;
+                    overWriteFile(contentOfAccEvents.toString(),"accEvents" + key + ".csv", context);
+                }
+                Log.d(TAG,"actualNumberOfIncidents: " + actualNumberOfIncidents);
+                // Second part: read accGps and calculate number of rides, distance, duration, CO2-savings and waited time.
+                File accGpsFile = context.getFileStreamPath(key + "_accGps.csv");
+                if (!accGpsFile.exists()) {
+                    Log.d(TAG, accGpsFile.getName() + " does not exist!");
+                    continue;
+                }
+                long[] rideStatistics = calculateRideStatistics(context, key);
+                Log.d(TAG, "rideStatistics: " + Arrays.toString(rideStatistics));
+                long actualDistance = rideStatistics[0]; // distance of actual ride in m
+                long actualDuration = rideStatistics[1]; // duration of actual ride in ms
+                int actualCO2Savings = (int) rideStatistics[2]; // CO2-Savings of actual ride in g
+                long actualWaitedTime = rideStatistics[3]; // waited time of actual ride in s
+                long startTimeStamp = rideStatistics[4];
+                long endTimeStamp = rideStatistics[5];
+
+                if (uploaded) {
+                    Log.d(TAG, "ride " + key + " is uploaded");
+                    Log.d(TAG,"actualDistance: " + actualDistance + " actualDuration: " + actualDuration + " actualCO2Savings: " + actualCO2Savings + " actualWaitedTime: " + actualWaitedTime);
+                    totalNumberOfRides++;
+                    totalDistance += actualDistance;
+                    totalDuration += actualDuration;
+                    totalCO2Savings += actualCO2Savings;
+                    totalWaitedTime += actualWaitedTime;
+                    Locale locale = Resources.getSystem().getConfiguration().locale;
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
+                    int startHour = Integer.valueOf(sdf.format(new Date(startTimeStamp)));
+                    int endHour = Integer.valueOf(sdf.format(new Date(endTimeStamp)));
+                    float duration = endHour - startHour + 1;
+                    for (int i = startHour; i <= endHour; i++) {
+                        timeBuckets[i] += (1/duration);
+                    }
+                }
+                // key and state are not changed
+                contentOfMetaData
+                        .append(key).append(",")
+                        .append(startTimeStamp).append(",")
+                        .append(endTimeStamp).append(",")
+                        .append(metaDataLineArray[3]).append(",")
+                        .append(actualNumberOfIncidents).append(",")
+                        .append(actualWaitedTime).append(",")
+                        .append(actualDistance).append(",")
+                        .append(actualNumberOfScary).append(System.lineSeparator());
+
+            }
+            Log.d(TAG, "totalNumberOfRides: " + totalNumberOfRides + " totalDuration: " + totalDuration + " totalNumberOfIncidents: " + totalNumberOfIncidents + " totalWaitedTime: " + totalWaitedTime + " totalDistance: " + totalDistance + " totalCO2Savings: " + totalCO2Savings + " totalNumberOfScary: " + totalNumberOfScary);
+            overWriteFile(contentOfMetaData.toString(),"metaData.csv",context);
+            updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // returns distance (m), duration (ms), CO2-savings (g) and waited time (s) start and end time stamps (ms) of a ride
+    // long[distance, duration, CO2-savings, waitedTime, firstTimeStamp, lastTimeStamp]
+    public static long[] calculateRideStatistics(Context context, String key) {
+        long[] result = new long[6];
+        File accGpsFile = context.getFileStreamPath(key + "_accGps.csv");
+        Location previousLocation = null; // lat,lon
+        Location thisLocation = null; // lat,lon
+        long distance = 0; // meters
+        long startTimeStamp = 0; // milliseconds
+        long endTimeStamp = 0; // milliseconds
+        long waitedTime = 0; // seconds
+        // loop through each line of the accGps csv
+        try (BufferedReader accGpsReader = new BufferedReader(new InputStreamReader(new FileInputStream(accGpsFile)))) {
+            // skip fileInfo line (47#2)
+            String accGpsLine = accGpsReader.readLine();
+            // skip ACCGPS_HEADER
+            // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10
+            // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,,
+            // 21 entries per metaDataLine (index 0-20)
+            accGpsReader.readLine();
+            while ((accGpsLine = accGpsReader.readLine()) != null) {
+                String[] accGpsLineArray = accGpsLine.split(",",-1);
+                if (startTimeStamp == 0) {
+                    startTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                } else {
+                    endTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                }
+                if (!accGpsLine.startsWith(",,")) {
+                    try {
+                        // initialize this and previous locations
+                        if (thisLocation == null || previousLocation == null) {
+                            thisLocation = new Location("thisLocation");
+                            thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
+                            thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                            previousLocation = new Location("lastLocation");
+                            previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
+                            previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                        } else {
+                            thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
+                            thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                            double distanceToLastPoint = thisLocation.distanceTo(previousLocation);
+                            // if speed < 2.99km/h: waiting
+                            if (distanceToLastPoint < 2.5) {
+                                waitedTime += 3;
+                            }
+                            distance += distanceToLastPoint;
+                            previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
+                            previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                        }
+                    } catch (NumberFormatException nfe) {
+                        nfe.printStackTrace();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        result[0] = distance;
+        result[1] = endTimeStamp - startTimeStamp;
+        result[2] = distance / 1000 * 138; // CO2-Savings = 138g/km
+        result[3] = waitedTime;
+        result[4] = startTimeStamp; // for metaData.csv
+        result[5] = endTimeStamp; // for metaData.csv
+        return result;
+    }
 
 }

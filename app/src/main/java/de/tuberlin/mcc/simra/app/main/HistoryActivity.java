@@ -334,7 +334,6 @@ public class HistoryActivity extends BaseActivity {
             startDateOfRide = month + "/" + day + "/" + year + ", " + time;
         }
 
-        Log.d(TAG, "item: " + Arrays.toString(item));
         if(item.length>6) {
             return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3] + ";" + item[6];
         } else {
@@ -441,10 +440,6 @@ public class HistoryActivity extends BaseActivity {
             holder.rideTime.setText(itemComponents[1].split(",")[1]);
             // holder.message.setText(itemComponents[2]);
             Log.d(TAG, "itemComponents: " + Arrays.toString(itemComponents));
-            Log.d(TAG, "itemComponents[0]: " + itemComponents[0]);
-            Log.d(TAG, "itemComponents[1]: " + itemComponents[1]);
-            Log.d(TAG, "itemComponents[2]: " + itemComponents[2]);
-            Log.d(TAG, "itemComponents[3]: " + itemComponents[3]);
 
             if(itemComponents[2].contains(getString(R.string.rideAnnotatedInHistoryActivity))){
                 holder.status.setBackground(getDrawable(R.drawable.ic_phone_android_black_24dp));
