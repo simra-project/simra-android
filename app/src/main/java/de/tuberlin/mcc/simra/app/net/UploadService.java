@@ -48,6 +48,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFileAndIncreaseFileVersion;
+import static de.tuberlin.mcc.simra.app.util.Utils.showStatistics;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
@@ -349,9 +350,9 @@ public class UploadService extends Service {
                     profile = profileReader.readLine().split(",");
                 }
                 */
+                Log.d(TAG, "uploadFile() totalWaitedTime: " + totalWaitedTime);
                 // Now after the rides have been uploaded, we can update the profile with the new statistics
                 updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2,timeBuckets,-2,totalNumberOfScary);
-
                 // StringBuilder profileContentToSend = new StringBuilder(profileInfoLine + System.lineSeparator() + PROFILE_HEADER);
                 SharedPreferences sharedPrefs = context.getApplicationContext()
                         .getSharedPreferences("Profile", Context.MODE_PRIVATE);
