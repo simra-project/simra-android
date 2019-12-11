@@ -541,11 +541,11 @@ public class Utils {
         int totalNumberOfIncidents = 0;
         int totalNumberOfScary = 0;
 
-        // number of rides, distance, duration, CO2-savings, waited time and time buckets.
+        // number of rides, distance, duration, CO2-Savings, waited time and time buckets.
         int totalNumberOfRides = 0;
         long totalDistance = 0; // in m
         long totalDuration = 0; // in ms
-        int totalCO2Savings = 0; // in g
+        long totalCO2Savings = 0; // in g
         long totalWaitedTime = 0; // in s
         // 0h - 23h
         float[] timeBuckets = {0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f};
@@ -570,7 +570,6 @@ public class Utils {
                 if (!metaDataLineArray[3].equals("2")) {
                    uploaded = false;
                 }
-                Log.d(TAG, "key: " + key + " uploaded: " + uploaded);
                 // First part: read accEvents and calculate number of (scary) incidents.
                 File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
                 StringBuilder contentOfAccEvents = new StringBuilder();
@@ -584,7 +583,6 @@ public class Utils {
                 try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(accEventsFile)))) {
                     // fileInfoLine (24#2)
                     String accEventsLine = accEventsReader.readLine();
-                    Log.d(TAG, "recalculateStatistics() accEventsLine: " + accEventsLine);
                     contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine.split("#")[1])
                             .append(System.lineSeparator())
                             .append(ACCEVENTS_HEADER);
@@ -615,29 +613,24 @@ public class Utils {
                     totalNumberOfScary += actualNumberOfScary;
                     overWriteFile(contentOfAccEvents.toString(),"accEvents" + key + ".csv", context);
                 }
-                Log.d(TAG,"actualNumberOfIncidents: " + actualNumberOfIncidents);
                 // Second part: read accGps and calculate number of rides, distance, duration, CO2-savings and waited time.
                 File accGpsFile = context.getFileStreamPath(key + "_accGps.csv");
                 if (!accGpsFile.exists()) {
                     Log.d(TAG, accGpsFile.getName() + " does not exist!");
                     continue;
                 }
+                // long[distance, duration, waitedTime, firstTimeStamp, lastTimeStamp]
                 long[] rideStatistics = calculateRideStatistics(context, key);
-                Log.d(TAG, "rideStatistics: " + Arrays.toString(rideStatistics));
                 long actualDistance = rideStatistics[0]; // distance of actual ride in m
                 long actualDuration = rideStatistics[1]; // duration of actual ride in ms
-                int actualCO2Savings = (int) rideStatistics[2]; // CO2-Savings of actual ride in g
-                long actualWaitedTime = rideStatistics[3]; // waited time of actual ride in s
-                long startTimeStamp = rideStatistics[4];
-                long endTimeStamp = rideStatistics[5];
+                long actualWaitedTime = rideStatistics[2]; // waited time of actual ride in s
+                long startTimeStamp = rideStatistics[3];
+                long endTimeStamp = rideStatistics[4];
 
                 if (uploaded) {
-                    Log.d(TAG, "ride " + key + " is uploaded");
-                    Log.d(TAG,"actualDistance: " + actualDistance + " actualDuration: " + actualDuration + " actualCO2Savings: " + actualCO2Savings + " actualWaitedTime: " + actualWaitedTime);
                     totalNumberOfRides++;
                     totalDistance += actualDistance;
                     totalDuration += actualDuration;
-                    totalCO2Savings += actualCO2Savings;
                     totalWaitedTime += actualWaitedTime;
                     Locale locale = Resources.getSystem().getConfiguration().locale;
                     SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
@@ -660,6 +653,7 @@ public class Utils {
                         .append(actualNumberOfScary).append(System.lineSeparator());
 
             }
+            totalCO2Savings = (long) (totalDistance / 1000.0 * 138.0);
             Log.d(TAG, "totalNumberOfRides: " + totalNumberOfRides + " totalDuration: " + totalDuration + " totalNumberOfIncidents: " + totalNumberOfIncidents + " totalWaitedTime: " + totalWaitedTime + " totalDistance: " + totalDistance + " totalCO2Savings: " + totalCO2Savings + " totalNumberOfScary: " + totalNumberOfScary);
             overWriteFile(contentOfMetaData.toString(),"metaData.csv",context);
             updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
@@ -669,10 +663,10 @@ public class Utils {
         }
     }
 
-    // returns distance (m), duration (ms), CO2-savings (g) and waited time (s) start and end time stamps (ms) of a ride
-    // long[distance, duration, CO2-savings, waitedTime, firstTimeStamp, lastTimeStamp]
+    // returns distance (m), duration (ms) and waited time (s) start and end time stamps (ms) of a ride
+    // long[distance, duration, waitedTime, firstTimeStamp, lastTimeStamp]
     public static long[] calculateRideStatistics(Context context, String key) {
-        long[] result = new long[6];
+        long[] result = new long[5];
         File accGpsFile = context.getFileStreamPath(key + "_accGps.csv");
         Location previousLocation = null; // lat,lon
         Location thisLocation = null; // lat,lon
@@ -728,10 +722,10 @@ public class Utils {
         }
         result[0] = distance;
         result[1] = endTimeStamp - startTimeStamp;
-        result[2] = distance / 1000 * 138; // CO2-Savings = 138g/km
-        result[3] = waitedTime;
-        result[4] = startTimeStamp; // for metaData.csv
-        result[5] = endTimeStamp; // for metaData.csv
+        // result[2] = (long)(distance / 1000.0 * 138.0); // CO2-Savings = 138g/km
+        result[2] = waitedTime;
+        result[3] = startTimeStamp; // for metaData.csv
+        result[4] = endTimeStamp; // for metaData.csv
         return result;
     }
 
