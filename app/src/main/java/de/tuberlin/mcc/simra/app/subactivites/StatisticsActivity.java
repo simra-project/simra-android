@@ -72,13 +72,10 @@ public class StatisticsActivity extends AppCompatActivity {
 
         // amount of co2 emissions saved by taking a bicycle instead of a car (138g/km)
         TextView co2Savings = findViewById(R.id.co2SavingsText);
-        if ((long)profileValues[9] > 10000) {
-           co2Savings.setText(getText(R.string.co2Savings) + " " + (Math.round((Double.valueOf((long)profileValues[9])/1000.0)*100.0)/100.0) + " kg");
-        } else {
-           co2Savings.setText(getText(R.string.co2Savings) + " " + profileValues[9] + " g");
-        }
+
+        co2Savings.setText(getText(R.string.co2Savings) + " " + (Math.round((Double.valueOf((long)profileValues[9])/1000.0)*100.0)/100.0) + " kg");
+
         co2Savings.invalidate();
-        Log.d(TAG, getText(R.string.co2Savings) + " " + (Math.round((Double.valueOf((long)6678600)/1000.0)*100.0)/100.0) + " kg");
 
         // number of non-nothing incidents in uploaded rides
         TextView numberOfIncidents = findViewById(R.id.numberOFIncidentsText);
