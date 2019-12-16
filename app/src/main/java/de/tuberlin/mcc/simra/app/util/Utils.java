@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-//import android.support.v7.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -16,9 +15,6 @@ import android.content.res.Resources;
 import android.location.Location;
 import android.util.Log;
 import android.util.Pair;
-
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.overlay.Polyline;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,7 +30,6 @@ import java.util.Locale;
 
 
 import static android.content.Context.MODE_APPEND;
-import static de.tuberlin.mcc.simra.app.annotation.Ride.calculateWaitedTimeAndPolyline;
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 
@@ -61,7 +56,7 @@ public class Utils {
                 content.append(line).append(System.lineSeparator());
             }
         } catch (IOException ioe) {
-            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
+            Log.d(TAG, "readContentFromFile() Exception: " + Arrays.toString(ioe.getStackTrace()));
         }
         return content.toString();
     }
@@ -299,16 +294,21 @@ public class Utils {
     public static void showKeyPrefs(Context context) {
         SharedPreferences keyPrefs = context.getApplicationContext()
                 .getSharedPreferences("keyPrefs", Context.MODE_PRIVATE);
+        Log.d(TAG, "===========================V=keyPrefs=V===========================");
         Log.d(TAG, "keyPrefs:" + Arrays.toString(keyPrefs.getAll().entrySet().toArray()));
+        Log.d(TAG, "===========================^=keyPrefs=^===========================");
     }
 
     public static void showDataDirectory(Context context) {
+        Log.d(TAG, "===========================V=Directory=V===========================");
         Log.d(TAG, "data: " + Arrays.toString(context.fileList()));
+        Log.d(TAG, "===========================^=Directory=^===========================");
     }
 
     public static void showStatistics(Context context) {
         SharedPreferences profilePrefs = context.getApplicationContext()
                 .getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        Log.d(TAG, "===========================V=Statistics=V===========================");
         Log.d(TAG, "numberOfRides: " + profilePrefs.getInt("NumberOfRides",-1));
         Log.d(TAG, "Distance: " + profilePrefs.getLong("Distance",-1) + "m");
         Log.d(TAG, "Co2: " + profilePrefs.getLong("Co2",-1) + "g");
@@ -321,6 +321,7 @@ public class Utils {
             buckets[i] = i + ": " + profilePrefs.getFloat(String.valueOf(i),-1.0f);
         }
         Log.d(TAG, "timeBuckets: " + Arrays.toString(buckets));
+        Log.d(TAG, "===========================^=Statistics=^===========================");
     }
 
     public static void updateProfile(Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
@@ -471,7 +472,7 @@ public class Utils {
             // rides (0,1553426842081,1553426843354,2,0,0,0)
             while ((metaDataLine = metaDataReader.readLine()) != null) {
                 Log.d(TAG, "metaDataLine: " + metaDataLine);
-                String[] metaDataArray = metaDataLine.split(",");
+                String[] metaDataArray = metaDataLine.split(",",-1);
                 boolean isUploaded = metaDataArray[3].equals("2");
                 String key = metaDataArray[0];
                 int numberOfIncidentsCurrentAccEvent = 0;
@@ -482,7 +483,7 @@ public class Utils {
                     // loop through accEvents lines
                     try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/accEvents" + key + ".csv"))))) {
                         // fileInfoLine (24#2)
-                        String accEventsLine = accEventsReader.readLine().split("#")[1];
+                        String accEventsLine = accEventsReader.readLine().split("#",-1)[1];
                         contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine)
                                 .append(System.lineSeparator())
                                 .append(ACCEVENTS_HEADER);
@@ -521,20 +522,20 @@ public class Utils {
                                 .append(System.lineSeparator());
                         overWriteFile(contentOfMetaData.toString(),"metaData.csv",context);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(e.getStackTrace()));
                     }
                 }
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(e.getStackTrace()));
         }
         updateProfile(context,-1,-1,-1,-1,-1,-1,totalNumberOfIncidents,-1,-1,-1,null,-2,totalNumberOfScary);
     }
 
     // recalculates all statistics, updates metaData.csv, Profile.xml and deletes temp files
     public static void recalculateStatistics(Context context) {
-        Log.d(TAG, "recalculateStatistics() start");
+        Log.d(TAG, "===========================V=recalculateStatistics=V===========================");
         File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
         StringBuilder contentOfMetaData = new StringBuilder();
         // total number of (scary) incidents read from each accEvents csv.
@@ -553,17 +554,19 @@ public class Utils {
         // loop through each line of metaData.csv
         try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
             // fileInfoLine (24#2)
-            String metaDataFileVersion = metaDataReader.readLine().split("#")[1];
+            String metaDataFileVersion = metaDataReader.readLine().split("#",-1)[1];
             contentOfMetaData.append(getAppVersionNumber(context)).append("#").append(metaDataFileVersion)
                     .append(System.lineSeparator())
                     .append(METADATA_HEADER);
             // header (key,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary)
-            metaDataReader.readLine();
-            String metaDataLine;
+            String metaDataLine = metaDataReader.readLine();
             // loop through the metaData.csv lines
             // rides (0,1553426842081,1553426843354,2,0,0,0)
             while ((metaDataLine = metaDataReader.readLine()) != null) {
-                String[] metaDataLineArray = metaDataLine.split(",");
+                String[] metaDataLineArray = metaDataLine.split(",",-1);
+                if(metaDataLineArray.length<3) {
+                    continue;
+                }
                 String key = metaDataLineArray[0];
                 // update totalNumberOf... only, if the ride has been uploaded
                 boolean uploaded = true;
@@ -574,6 +577,24 @@ public class Utils {
                 File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
                 StringBuilder contentOfAccEvents = new StringBuilder();
                 if (!accEventsFile.exists()) {
+                    contentOfMetaData.append(metaDataLine).append(System.lineSeparator());
+                    // updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
+                   if (uploaded) {
+                       totalNumberOfRides++;
+                       totalDuration += (Long.valueOf(metaDataLineArray[2]) - Long.valueOf(metaDataLineArray[1]));
+                       totalNumberOfIncidents += Integer.valueOf(metaDataLineArray[4]);
+                       totalWaitedTime += Long.valueOf(metaDataLineArray[4]);
+                       totalDistance += Long.valueOf(metaDataLineArray[5]);
+                       Locale locale = Resources.getSystem().getConfiguration().locale;
+                       SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
+                       int startHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[1]))));
+                       int endHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[2]))));
+                       float duration = endHour - startHour + 1;
+                       for (int i = startHour; i <= endHour; i++) {
+                           timeBuckets[i] += (1/duration);
+                       }
+                       totalNumberOfScary += Integer.valueOf(metaDataLineArray[7]);
+                   }
                     continue;
                 }
                 // number of (scary) incidents read from the actual accEvents csv.
@@ -583,15 +604,18 @@ public class Utils {
                 try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(accEventsFile)))) {
                     // fileInfoLine (24#2)
                     String accEventsLine = accEventsReader.readLine();
-                    contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine.split("#")[1])
+                    contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine.split("#",-1)[1])
                             .append(System.lineSeparator())
                             .append(ACCEVENTS_HEADER);
+                    Log.d(TAG, "recalculateStatistics() " + accEventsFile.getName() + " fileInfoLine + new header: " + contentOfAccEvents.toString());
                     // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10
                     // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,,
                     // 21 entries per metaDataLine (index 0-20)
                     accEventsLine = accEventsReader.readLine();
+                    Log.d(TAG, "recalculateStatistics() " + accEventsFile.getName() + " old header: " + accEventsLine);
                     // skip fileInfo line and accEvents header
                     while (((accEventsLine = accEventsReader.readLine()) != null)) {
+                        Log.d(TAG, "recalculateStatistics() " + accEventsFile.getName() + ": " + accEventsLine);
                         String[] accEventsLineArray = accEventsLine.split(",",-1);
                         // if the accEvent of the actual line is annotated, update the number of (scary) incidents)
                         if (checkForAnnotation(accEventsLineArray)) {
@@ -611,12 +635,26 @@ public class Utils {
                 if (uploaded) {
                     totalNumberOfIncidents += actualNumberOfIncidents;
                     totalNumberOfScary += actualNumberOfScary;
-                    overWriteFile(contentOfAccEvents.toString(),"accEvents" + key + ".csv", context);
+                    // overWriteFile(contentOfAccEvents.toString(),"accEvents" + key + ".csv", context);
                 }
                 // Second part: read accGps and calculate number of rides, distance, duration, CO2-savings and waited time.
                 File accGpsFile = context.getFileStreamPath(key + "_accGps.csv");
                 if (!accGpsFile.exists()) {
                     Log.d(TAG, accGpsFile.getName() + " does not exist!");
+                    if (uploaded) {
+                        totalNumberOfRides++;
+                        totalDuration += (Long.valueOf(metaDataLineArray[2]) - Long.valueOf(metaDataLineArray[1]));
+                        totalWaitedTime += Long.valueOf(metaDataLineArray[4]);
+                        totalDistance += Long.valueOf(metaDataLineArray[5]);
+                        Locale locale = Resources.getSystem().getConfiguration().locale;
+                        SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
+                        int startHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[1]))));
+                        int endHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[2]))));
+                        float duration = endHour - startHour + 1;
+                        for (int i = startHour; i <= endHour; i++) {
+                            timeBuckets[i] += (1/duration);
+                        }
+                    }
                     continue;
                 }
                 // long[distance, duration, waitedTime, firstTimeStamp, lastTimeStamp]
@@ -654,13 +692,23 @@ public class Utils {
 
             }
             totalCO2Savings = (long) (totalDistance / 1000.0 * 138.0);
-            Log.d(TAG, "totalNumberOfRides: " + totalNumberOfRides + " totalDuration: " + totalDuration + " totalNumberOfIncidents: " + totalNumberOfIncidents + " totalWaitedTime: " + totalWaitedTime + " totalDistance: " + totalDistance + " totalCO2Savings: " + totalCO2Savings + " totalNumberOfScary: " + totalNumberOfScary);
-            overWriteFile(contentOfMetaData.toString(),"metaData.csv",context);
-            updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
+            Log.d(TAG, "recalculateStatistics() overwriting profile with following statistics");
+            Log.d(TAG, "totalNumberOfRides: " + totalNumberOfRides);
+            Log.d(TAG, "totalDuration: " + totalDuration);
+            Log.d(TAG, "totalNumberOfIncidents: " + totalNumberOfIncidents);
+            Log.d(TAG, "totalWaitedTime: " + totalWaitedTime);
+            Log.d(TAG, "totalDistance: " + totalDistance);
+            Log.d(TAG, "totalCO2Savings: " + totalCO2Savings);
+            Log.d(TAG, "totalNumberOfScary: " + totalNumberOfScary);
+            Log.d(TAG, "recalculateStatistics() overwriting metaData.csv with: ");
+            Log.d(TAG, contentOfMetaData.toString());
+            // overWriteFile(contentOfMetaData.toString(),"metaData.csv",context);
+            // updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
         } catch (IOException e) {
             Log.d(TAG, "Exception in recalculateStatistics(): " + Arrays.toString(e.getStackTrace()));
             e.printStackTrace();
         }
+        Log.d(TAG, "===========================^=recalculateStatistics=^===========================");
     }
 
     // returns distance (m), duration (ms) and waited time (s) start and end time stamps (ms) of a ride
@@ -713,12 +761,12 @@ public class Utils {
                             previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
                         }
                     } catch (NumberFormatException nfe) {
-                        nfe.printStackTrace();
+                        Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(nfe.getStackTrace()));
                     }
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(e.getStackTrace()));
         }
         result[0] = distance;
         result[1] = endTimeStamp - startTimeStamp;

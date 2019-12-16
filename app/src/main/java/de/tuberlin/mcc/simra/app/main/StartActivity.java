@@ -60,7 +60,9 @@ public class StartActivity extends BaseActivity {
         // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
         showKeyPrefs(this);
         showDataDirectory(this);
+        Log.d(TAG, "===========================V=metaData=V===========================");
         Log.d(TAG, "metaData.csv: " + readContentFromFile("metaData.csv",this));
+        Log.d(TAG, "===========================^=metaData=^===========================");
         showStatistics(this);
         deleteErrorLogsForVersion(this, 26);
         updateToV27(this);
@@ -69,7 +71,7 @@ public class StartActivity extends BaseActivity {
         updateToV32(this);
         updateToV39(this);
         updateToV47(this);
-        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
+        // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request
         int LOCATION_ACCESS_CODE = 1;
