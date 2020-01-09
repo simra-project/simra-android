@@ -614,7 +614,7 @@ public class ShowRouteActivity extends BaseActivity {
                     if (temp) {
                         metaDataLine[1] = String.valueOf(tempStartTime);
                         metaDataLine[2] = String.valueOf(tempEndTime);
-                        distance = Math.round(tempRide.distance);
+                        distance = tempRide.distance;
                         waitedTime = tempRide.waitedTime;
                         ArrayList<AccEvent> accEventArrayList = tempRide.events;
                         Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
@@ -628,7 +628,7 @@ public class ShowRouteActivity extends BaseActivity {
                             }
                         }
                     } else {
-                        distance = Math.round(ride.distance);
+                        distance = ride.distance;
                         waitedTime = ride.waitedTime;
                         ArrayList<AccEvent> accEventArrayList = ride.events;
                         Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());

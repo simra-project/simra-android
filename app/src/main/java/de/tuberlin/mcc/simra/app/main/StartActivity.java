@@ -32,6 +32,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.showDataDirectory;
 import static de.tuberlin.mcc.simra.app.util.Utils.showKeyPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.showMetadata;
 import static de.tuberlin.mcc.simra.app.util.Utils.showStatistics;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
@@ -60,9 +61,10 @@ public class StartActivity extends BaseActivity {
         // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
         showKeyPrefs(this);
         showDataDirectory(this);
+        showMetadata(this);
         Log.d(TAG, "===========================V=metaData=V===========================");
         Log.d(TAG, "metaData.csv: " + readContentFromFile("metaData.csv",this));
-        Log.d(TAG, "===========================^=metaData=^===========================");
+        Log.d(TAG, "===========================Λ=metaData=Λ===========================");
         showStatistics(this);
         deleteErrorLogsForVersion(this, 26);
         updateToV27(this);
@@ -70,8 +72,8 @@ public class StartActivity extends BaseActivity {
         updateToV31(this);
         updateToV32(this);
         updateToV39(this);
-        updateToV47(this);
-        // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
+        updateToV50(this);
+        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request
         int LOCATION_ACCESS_CODE = 1;

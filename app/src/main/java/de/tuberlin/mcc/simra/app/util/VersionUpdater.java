@@ -150,13 +150,11 @@ public class VersionUpdater {
                     } else {
                         continue;
                     }
-
-                    Polyline routeLine = Ride.calculateWaitedTimeAndPolyline(gpsFile).second;
-                    long distance = Math.round(routeLine.getDistance());
+                    Object[] waitedTimeRouteAndDistance = Ride.calculateWaitedTimePolylineDistance(gpsFile);
                     if (isUploaded) {
                         totalDuration += (Long.valueOf(endTime) - Long.valueOf(startTime));
                         totalNumberOfRides++;
-                        totalDistance += distance;
+                        totalDistance += (long) waitedTimeRouteAndDistance[2];
                         Date startDate = new Date(Long.valueOf(startTime));
                         Date endDate = new Date(Long.valueOf(endTime));
                         Locale locale = Resources.getSystem().getConfiguration().locale;
@@ -171,7 +169,7 @@ public class VersionUpdater {
 
                     }
                     // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
-                    line = key + "," + startTime + "," + endTime + "," + lineArray[3] + "," + incidents  + "," + waitedTime + "," + distance;
+                    line = key + "," + startTime + "," + endTime + "," + lineArray[3] + "," + incidents  + "," + waitedTime + "," + waitedTimeRouteAndDistance[2];
                     contentOfNewMetaData.append(line).append(System.lineSeparator());
                 }
                 Log.d(TAG, "metaData.csv new content: " + contentOfNewMetaData.toString());
@@ -393,14 +391,14 @@ public class VersionUpdater {
         }
     }
 
-    public static void updateToV47(Context context) {
+    public static void updateToV50(Context context) {
         int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 47) {
-            Log.d(TAG,"Updating to version 47");
+        if (lastCriticalAppVersion < 50) {
+            Log.d(TAG,"Updating to version 50");
             try {
                 recalculateStatistics(context);
             } catch (Exception e) {
-                Log.d(TAG, "updateToV47 exception: " + e.getLocalizedMessage());
+                Log.d(TAG, "updateToV50 exception: " + e.getLocalizedMessage());
                 Log.d(TAG, Arrays.toString(e.getStackTrace()));
             }
         }

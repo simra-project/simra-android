@@ -3,7 +3,6 @@ package de.tuberlin.mcc.simra.app.annotation;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
-import android.util.Pair;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
@@ -39,7 +38,7 @@ public class Ride {
     String duration;
     String startTime;
     String endTime;
-    public double distance;
+    public long distance;
     int waitedTime;
     Context context;
     static String TAG = "Ride_LOG";
@@ -67,10 +66,10 @@ public class Ride {
         this.accGpsFile = accGpsFile;
         this.duration = duration;
         this.startTime = startTime;
-        Pair<Integer, Polyline> routeAndWaitedTime = calculateWaitedTimeAndPolyline(accGpsFile);
-        this.route = routeAndWaitedTime.second;
-        this.waitedTime = routeAndWaitedTime.first;
-        this.distance = route.getDistance();
+        Object[] waitedTimeRouteAndDistance = calculateWaitedTimePolylineDistance(accGpsFile);
+        this.waitedTime = (int) waitedTimeRouteAndDistance[0];
+        this.route = (Polyline) waitedTimeRouteAndDistance[1];
+        this.distance = (long) waitedTimeRouteAndDistance[2];
         Log.d(TAG,"distance: " + distance + " waitedTime: " + waitedTime);
         this.state = state;
         this.bike = bike;
@@ -138,7 +137,7 @@ public class Ride {
         this.duration = duration;
         this.startTime = startTime;
         // this.endTime = endTime;
-        Pair<Integer, Polyline> routeAndWaitedTime = calculateWaitedTimeAndPolyline(tempAccGpsFile);
+        Pair<Integer, Polyline> routeAndWaitedTime = calculateWaitedTimePolylineDistance(tempAccGpsFile);
         this.route = routeAndWaitedTime.second;
         this.waitedTime = routeAndWaitedTime.first;
         this.distance = route.getDistance();
@@ -171,38 +170,51 @@ public class Ride {
 
     // Takes a File which contains all the data and creates a
     // PolyLine to be displayed on the map as a route.
-    public static Pair<Integer, Polyline> calculateWaitedTimeAndPolyline(File gpsFile) throws IOException {
+    public static Object[] calculateWaitedTimePolylineDistance(File gpsFile) throws IOException {
         Polyline polyLine = new Polyline();
 
         BufferedReader br = new BufferedReader(new FileReader(gpsFile));
         // br.readLine() to skip the first two lines which contain the file version info and headers
         String line = br.readLine();
         line = br.readLine();
-        int waitedTime = 0;
-        Location lastLocation = null;
+        int waitedTime = 0; // seconds
+        Location previousLocation = null;
         Location thisLocation = null;
+        long previousTimeStamp = 0; // milliseconds
+        long thisTimeStamp = 0; // milliseconds
+        long distance = 0; // meters
         while ((line = br.readLine()) != null) {
-            String[] accGpsArray = line.split(",");
-
+            String[] accGpsLineArray = line.split(",");
             if (!line.startsWith(",,")) {
                 try {
                     if (thisLocation == null) {
                         thisLocation = new Location("thisLocation");
-                        thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                        thisLocation.setLongitude(Double.valueOf(accGpsArray[1]));
-                        lastLocation = new Location("lastLocation");
-                        lastLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                        lastLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                        thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
+                        thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                        previousLocation = new Location("previousLocation");
+                        previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
+                        previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                        thisTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                        previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
                     } else {
-                        thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                        thisLocation.setLongitude(Double.valueOf(accGpsArray[1]));
-                        if (thisLocation.distanceTo(lastLocation) < 2.5) {
-                            waitedTime += 3;
+                        thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
+                        thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                        thisTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                        double distanceToLastPoint = thisLocation.distanceTo(previousLocation);
+                        long timePassed = (thisTimeStamp - previousTimeStamp)/1000;
+                        // if speed < 2.99km/h: waiting
+                        if (distanceToLastPoint < 2.5) {
+                            waitedTime += timePassed;
                         }
-                        lastLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                        lastLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                        // if speed > 80km/h: too fast, do not consider for distance
+                        if (distanceToLastPoint < 66) {
+                            distance += (long) distanceToLastPoint;
+                            polyLine.addPoint(new GeoPoint(thisLocation));
+                        }
+                        previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
+                        previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                        previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
                     }
-                    polyLine.addPoint(new GeoPoint(thisLocation));
                 } catch (NumberFormatException nfe) {
                     nfe.printStackTrace();
                 }
@@ -211,8 +223,7 @@ public class Ride {
         }
 
         br.close();
-        Pair<Integer, Polyline> result = new Pair<>(waitedTime, polyLine);
-        return result;
+        return new Object[]{waitedTime, polyLine, distance};
     }
 
     public ArrayList<AccEvent> findAccEvents() {

@@ -127,7 +127,7 @@ public class StatisticsActivity extends AppCompatActivity {
         } else {
             rideDurationM = String.valueOf(rideDurationMinutes);
         }
-        durationOfRides.setText(getText(R.string.duration) + " " + rideDurationH + ":" + rideDurationM);
+        durationOfRides.setText(getText(R.string.duration) + " " + rideDurationH + ":" + rideDurationM + " h");
         durationOfRides.invalidate();
 
         // average speed of per ride of all uploaded rides
@@ -155,7 +155,7 @@ public class StatisticsActivity extends AppCompatActivity {
         } else {
             waitDurationM = String.valueOf(waitDurationMinutes);
         }
-        durationOfWaitedTime.setText(getText(R.string.idle) + " " + waitDurationH + ":" + waitDurationM);
+        durationOfWaitedTime.setText(getText(R.string.idle) + " " + waitDurationH + ":" + waitDurationM + " h");
         durationOfWaitedTime.invalidate();
 
         TextView averageDurationOfWaitedTime = findViewById(R.id.averageDurationOfIdleText);
@@ -178,7 +178,7 @@ public class StatisticsActivity extends AppCompatActivity {
         } else {
             avgWaitDurationM = String.valueOf(avgWaitDurationMinutes);
         }
-        averageDurationOfWaitedTime.setText(getText(R.string.avgIdle) + " " + avgWaitDurationH + ":" + avgWaitDurationM);
+        averageDurationOfWaitedTime.setText(getText(R.string.avgIdle) + " " + avgWaitDurationH + ":" + avgWaitDurationM + " h");
         averageDurationOfWaitedTime.invalidate();
 
 
