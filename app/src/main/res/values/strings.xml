@@ -234,15 +234,15 @@
     <string name="icons8Credit">Icon gestaltet von Icons8, bereitgestellt auf https://icons8.com .</string>
 
     <!--- Statistics -->
-    <string name="uploaded_rides">Fahrten:</string>
-    <string name="distance">Distanz:</string>
-    <string name="avgDistance">Durschn. Distanz:</string>
-    <string name="duration">Streckendauer:</string>
-    <string name="incidents">Ereignisse:</string>
-    <string name="scary">Beängstigend:</string>
-    <string name="idle">Stillstand:</string>
-    <string name="avgIdle">Durchschn. Stillst.:</string>
-    <string name="average_Speed">Durchschn. Geschw.:</string>
+    <string name="uploaded_rides">Hochgeladene Fahrten:</string>
+    <string name="distance">Zurückgelegte Strecke:</string>
+    <string name="avgDistance">Durchschnittliche Distanz:</string>
+    <string name="duration">Gesamte Streckendauer:</string>
+    <string name="incidents">Alle Ereignisse:</string>
+    <string name="scary">Davon Beängstigend:</string>
+    <string name="idle">Gesamte Stillstanddauer:</string>
+    <string name="avgIdle">Durchschnittliche Stillstanddauer:</string>
+    <string name="average_Speed">Durchschnittliche Geschwindigkeit:</string>
     <string name="co2Savings">CO2-Ersparnisse:</string>
     <string name="kcalConsumption">Kalorienverbrauch:</string>
     <string name="rideDistribution">Fahrtverteilung über den Tag</string>
@@ -283,5 +283,10 @@
     <!-- 46 -->
     <string name="new_statistics_news_46">In den \"Statistiken\" befinden sich nun neue Kategorien.</string>
     <string name="improved_calculation_speed_news_46">Schnelleres Berechnen der Beinaheunfälle.</string>
+
+    <!-- 50 -->
+    <string name="new_region_news_50">SimRa wird jetzt in ganz Ruhrgebiet unterstütz! Bitte im \"Profil\"-Menü die entsprechende Region auswählen.</string>
+    <string name="statistics_changed_news_50"> In den \"Statistiken\" wurden einige Fehler korrigiert, sowie das Design verändert.</string>
+    <string name="settings_and_profile"> Bitte die Angaben unter \"Einstellungen\" und \"Profil\" überprüfen.</string>
 
 </resources>

@@ -27,6 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 
 import static android.content.Context.MODE_APPEND;
@@ -295,17 +297,39 @@ public class Utils {
         SharedPreferences keyPrefs = context.getApplicationContext()
                 .getSharedPreferences("keyPrefs", Context.MODE_PRIVATE);
         Log.d(TAG, "===========================V=keyPrefs=V===========================");
-        Log.d(TAG, "keyPrefs:" + Arrays.toString(keyPrefs.getAll().entrySet().toArray()));
-        Log.d(TAG, "===========================^=keyPrefs=^===========================");
+        Object[] keyPrefsArray = keyPrefs.getAll().entrySet().toArray();
+        for (Object keyPrefsEntry : keyPrefsArray) {
+            Log.d(TAG, keyPrefsEntry + "");
+        }
+        Log.d(TAG, "===========================Λ=keyPrefs=Λ===========================");
     }
 
     public static void showDataDirectory(Context context) {
         Log.d(TAG, "===========================V=Directory=V===========================");
-        Log.d(TAG, "data: " + Arrays.toString(context.fileList()));
-        Log.d(TAG, "===========================^=Directory=^===========================");
+        String[] fileList = context.fileList();
+        for (String fileName : fileList) {
+            Log.d(TAG, fileName);
+        }
+        Log.d(TAG, "===========================Λ=Directory=Λ===========================");
     }
 
-    public static void showStatistics(Context context) {
+    public static void showMetadata(Context context) {
+        Log.d(TAG, "===========================V=metaData=V===========================");
+        File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+        try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
+            String metaDataLine;
+            // loop through the metaData.csv lines
+            while ((metaDataLine = metaDataReader.readLine()) != null) {
+                Log.d(TAG, metaDataLine);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, "Exception in showMetadata(): " + Arrays.toString(e.getStackTrace()));
+        }
+        Log.d(TAG, "===========================Λ=metaData=Λ===========================");
+    }
+
+        public static void showStatistics(Context context) {
         SharedPreferences profilePrefs = context.getApplicationContext()
                 .getSharedPreferences("Profile", Context.MODE_PRIVATE);
         Log.d(TAG, "===========================V=Statistics=V===========================");
@@ -321,7 +345,7 @@ public class Utils {
             buckets[i] = i + ": " + profilePrefs.getFloat(String.valueOf(i),-1.0f);
         }
         Log.d(TAG, "timeBuckets: " + Arrays.toString(buckets));
-        Log.d(TAG, "===========================^=Statistics=^===========================");
+        Log.d(TAG, "===========================Λ=Statistics=Λ===========================");
     }
 
     public static void updateProfile(Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
@@ -607,12 +631,10 @@ public class Utils {
                     contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine.split("#",-1)[1])
                             .append(System.lineSeparator())
                             .append(ACCEVENTS_HEADER);
-                    Log.d(TAG, "recalculateStatistics() " + accEventsFile.getName() + " fileInfoLine + new header: " + contentOfAccEvents.toString());
                     // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10
                     // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,,
                     // 21 entries per metaDataLine (index 0-20)
                     accEventsLine = accEventsReader.readLine();
-                    Log.d(TAG, "recalculateStatistics() " + accEventsFile.getName() + " old header: " + accEventsLine);
                     // skip fileInfo line and accEvents header
                     while (((accEventsLine = accEventsReader.readLine()) != null)) {
                         Log.d(TAG, "recalculateStatistics() " + accEventsFile.getName() + ": " + accEventsLine);
@@ -635,7 +657,7 @@ public class Utils {
                 if (uploaded) {
                     totalNumberOfIncidents += actualNumberOfIncidents;
                     totalNumberOfScary += actualNumberOfScary;
-                    // overWriteFile(contentOfAccEvents.toString(),"accEvents" + key + ".csv", context);
+                    overWriteFile(contentOfAccEvents.toString(),"accEvents" + key + ".csv", context);
                 }
                 // Second part: read accGps and calculate number of rides, distance, duration, CO2-savings and waited time.
                 File accGpsFile = context.getFileStreamPath(key + "_accGps.csv");
@@ -702,13 +724,13 @@ public class Utils {
             Log.d(TAG, "totalNumberOfScary: " + totalNumberOfScary);
             Log.d(TAG, "recalculateStatistics() overwriting metaData.csv with: ");
             Log.d(TAG, contentOfMetaData.toString());
-            // overWriteFile(contentOfMetaData.toString(),"metaData.csv",context);
-            // updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
+            overWriteFile(contentOfMetaData.toString(),"metaData.csv",context);
+            updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
         } catch (IOException e) {
             Log.d(TAG, "Exception in recalculateStatistics(): " + Arrays.toString(e.getStackTrace()));
             e.printStackTrace();
         }
-        Log.d(TAG, "===========================^=recalculateStatistics=^===========================");
+        Log.d(TAG, "===========================Λ=recalculateStatistics=Λ===========================");
     }
 
     // returns distance (m), duration (ms) and waited time (s) start and end time stamps (ms) of a ride
@@ -718,6 +740,8 @@ public class Utils {
         File accGpsFile = context.getFileStreamPath(key + "_accGps.csv");
         Location previousLocation = null; // lat,lon
         Location thisLocation = null; // lat,lon
+        long previousTimeStamp = 0; // milliseconds
+        long thisTimeStamp = 0; // milliseconds
         long distance = 0; // meters
         long startTimeStamp = 0; // milliseconds
         long endTimeStamp = 0; // milliseconds
@@ -748,17 +772,26 @@ public class Utils {
                             previousLocation = new Location("lastLocation");
                             previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
                             previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                            previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
                         } else {
                             thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
                             thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                            thisTimeStamp = Long.valueOf(accGpsLineArray[5]);
                             double distanceToLastPoint = thisLocation.distanceTo(previousLocation);
+                            long timePassed = (thisTimeStamp - previousTimeStamp)/1000;
                             // if speed < 2.99km/h: waiting
                             if (distanceToLastPoint < 2.5) {
-                                waitedTime += 3;
+                                waitedTime += timePassed;
                             }
-                            distance += distanceToLastPoint;
+                            // if speed > 80km/h: too fast, do not consider for distance
+                            if (distanceToLastPoint < 66) {
+                                distance += distanceToLastPoint;
+                            } else {
+                                Log.d(TAG, "speed between " + previousLocation.getLatitude() + "," + previousLocation.getLongitude() + " and " + thisLocation.getLatitude() + "," + thisLocation.getLongitude() + " was " + (int)distanceToLastPoint/timePassed + " m/s or " + (int)(distanceToLastPoint/timePassed)*3.6 + " km/h.");
+                            }
                             previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
                             previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                            previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
                         }
                     } catch (NumberFormatException nfe) {
                         Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(nfe.getStackTrace()));

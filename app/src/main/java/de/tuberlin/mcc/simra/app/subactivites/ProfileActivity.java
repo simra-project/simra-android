@@ -90,17 +90,17 @@ public class ProfileActivity extends AppCompatActivity {
             case 4:
                 regionSpinner.setSelection(3);
                 break;
-            // 5 = Pforzheim/Enzkreis = setSelection(5)
+            // 5 = Pforzheim/Enzkreis = setSelection(4)
             case 5:
-                regionSpinner.setSelection(5);
+                regionSpinner.setSelection(4);
                 break;
             // 6 = Augsburg = setSelection(1)
             case 6:
                 regionSpinner.setSelection(1);
                 break;
-            // 7 = Bochum = setSelection(4)
+            // 7 = Ruhrgebiet = setSelection(5)
             case 7:
-                regionSpinner.setSelection(4);
+                regionSpinner.setSelection(5);
                 break;
             // 8 = Stuttgart = setSelection(6)
             case 8:
@@ -157,7 +157,7 @@ public class ProfileActivity extends AppCompatActivity {
             case "Augsburg":
                 region = 6;
                 break;
-            case "Bochum":
+            case "Ruhrgebiet":
                 region = 7;
                 break;
             case "Stuttgart":

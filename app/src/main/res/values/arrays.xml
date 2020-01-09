@@ -56,8 +56,8 @@
         <item>Augsburg</item>
         <item>Berlin/Potsdam</item>
         <item>Bern</item>
-        <item>Bochum</item>
         <item>Pforzheim/Enzkreis</item>
+        <item>Ruhrgebiet</item>
         <item>Stuttgart</item>
         <item>@string/other</item>
     </string-array>
