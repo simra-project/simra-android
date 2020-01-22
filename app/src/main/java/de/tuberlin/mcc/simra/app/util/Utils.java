@@ -10,7 +10,9 @@ import android.content.pm.PackageManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import de.tuberlin.mcc.simra.app.subactivites.ProfileActivity;
 
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.location.Location;
 import android.util.Log;
@@ -22,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -808,6 +811,29 @@ public class Utils {
         result[3] = startTimeStamp; // for metaData.csv
         result[4] = endTimeStamp; // for metaData.csv
         return result;
+    }
+
+    public static String[] getRegions(Context context) {
+        String[] simRa_regions_config = (Utils.readContentFromFile("simRa_regions.config", context)).split(System.lineSeparator());
+        if (simRa_regions_config.length < 8) {
+            try{
+                AssetManager am = context.getApplicationContext().getAssets();
+                InputStream is = am.open("simRa_regions.config");
+                InputStreamReader inputStreamReader = new InputStreamReader(is, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+
+                    stringBuilder.append(receiveString.trim() + System.lineSeparator());
+
+                }
+                is.close();
+                simRa_regions_config = stringBuilder.toString().split(System.lineSeparator());
+            } catch (IOException e) {e.printStackTrace();}
+        }
+        return simRa_regions_config;
     }
 
 }

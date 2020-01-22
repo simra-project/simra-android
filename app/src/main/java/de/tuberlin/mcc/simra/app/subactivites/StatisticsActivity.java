@@ -30,13 +30,9 @@ public class StatisticsActivity extends AppCompatActivity {
     // Log tag
     private static final String TAG = "StatisticsActivity_LOG";
 
-
-
     ImageButton backBtn;
     TextView toolbarTxt;
     BarChart chart;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,29 +155,12 @@ public class StatisticsActivity extends AppCompatActivity {
         durationOfWaitedTime.invalidate();
 
         TextView averageDurationOfWaitedTime = findViewById(R.id.averageDurationOfIdleText);
-        long avgWaitDurationHours = 0L;
         long avgWaitDurationMinutes = 0L;
         if (ridesCount > 0) {
-            avgWaitDurationHours = (((long) profileValues[7])/3600/ridesCount);
-            avgWaitDurationMinutes = (((long) profileValues[7]%3600)/60/ridesCount);
+            avgWaitDurationMinutes = ((long) profileValues[7]/60/ridesCount);
         }
-
-        String avgWaitDurationH;
-        String avgWaitDurationM;
-        if (avgWaitDurationHours < 10) {
-            avgWaitDurationH = "0" + avgWaitDurationHours;
-        } else {
-            avgWaitDurationH = String.valueOf(avgWaitDurationHours);
-        }
-        if (avgWaitDurationMinutes < 10) {
-            avgWaitDurationM = "0" + avgWaitDurationMinutes;
-        } else {
-            avgWaitDurationM = String.valueOf(avgWaitDurationMinutes);
-        }
-        averageDurationOfWaitedTime.setText(getText(R.string.avgIdle) + " " + avgWaitDurationH + ":" + avgWaitDurationM + " h");
+        averageDurationOfWaitedTime.setText(getText(R.string.avgIdle) + " " + avgWaitDurationMinutes + " min");
         averageDurationOfWaitedTime.invalidate();
-
-
 
         chart = (BarChart) findViewById(R.id.timeBucketBarChart);
         XAxis xAxis = chart.getXAxis();

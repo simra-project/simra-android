@@ -3,9 +3,12 @@ package de.tuberlin.mcc.simra.app.subactivites;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -13,11 +16,22 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
+import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -25,7 +39,7 @@ public class ProfileActivity extends AppCompatActivity {
     // Log tag
     private static final String TAG = "ProfileActivity_LOG";
 
-
+    String[] simRa_regions_config;
 
     ImageButton backBtn;
     TextView toolbarTxt;
@@ -59,6 +73,9 @@ public class ProfileActivity extends AppCompatActivity {
                                        }
                                    }
         );
+
+        simRa_regions_config = getRegions(this);
+
         // Building the view
         ageGroupSpinner = findViewById(R.id.ageGroupSpinner);
         genderSpinner = findViewById(R.id.genderSpinner);
@@ -67,48 +84,38 @@ public class ProfileActivity extends AppCompatActivity {
         behaviourSeekBar = (SeekBar) findViewById(R.id.behaviourSeekBar);
         activateBehaviourToggleButton = findViewById(R.id.activateBehaviourSeekBar);
 
+        String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
+        List<String> regionContentArray =  new ArrayList<String>();
+        boolean languageIsEnglish = locale.equals(new Locale("en").getLanguage());
+        for (String s : simRa_regions_config) {
+            if (!(s.startsWith("!")||s.startsWith("Please Choose"))) {
+                if (languageIsEnglish) {
+                    regionContentArray.add(s.split("=")[0]);
+                } else {
+                    regionContentArray.add(s.split("=")[1]);
+                }
+            }
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_item, regionContentArray);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Collections.sort(regionContentArray);
+        regionContentArray.add(0,getText(R.string.pleaseChoose).toString());
+        regionSpinner.setAdapter(adapter);
+
         // Get the previous saved settings
         int[] previousProfile = getProfileDemographics(this);
         ageGroupSpinner.setSelection(previousProfile[0]);
         genderSpinner.setSelection(previousProfile[1]);
-        regionSpinner.setSelection(previousProfile[2]);
-        switch (previousProfile[2]) {
-            // 1 = Berlin = setSelection(2)
-            case 1:
-                regionSpinner.setSelection(2);
-                break;
-            /*// 2 = London = setSelection(6)
-            case 2:
-                regionSpinner.setSelection(6);
-                break;
-             */
-            // 3 = Other = setSelection(7)
-            case 3:
-                regionSpinner.setSelection(7);
-                break;
-            // 4 = Bern = setSelection(3)
-            case 4:
-                regionSpinner.setSelection(3);
-                break;
-            // 5 = Pforzheim/Enzkreis = setSelection(4)
-            case 5:
-                regionSpinner.setSelection(4);
-                break;
-            // 6 = Augsburg = setSelection(1)
-            case 6:
-                regionSpinner.setSelection(1);
-                break;
-            // 7 = Ruhrgebiet = setSelection(5)
-            case 7:
-                regionSpinner.setSelection(5);
-                break;
-            // 8 = Stuttgart = setSelection(6)
-            case 8:
-                regionSpinner.setSelection(6);
-                break;
-            // 0 = UNKNOWN = setSelection(0)
-            default:
-                regionSpinner.setSelection(0);
+        String region = simRa_regions_config[previousProfile[2]];
+        if (!region.startsWith("!")) {
+            if(languageIsEnglish) {
+                regionSpinner.setSelection(regionContentArray.indexOf(region.split("=")[0]));
+            } else {
+                regionSpinner.setSelection(regionContentArray.indexOf(region.split("=")[1]));
+            }
+        } else {
+            regionSpinner.setSelection(0);
         }
         experienceSpinner.setSelection(previousProfile[3]);
         if (previousProfile[4] == -1) {
@@ -137,6 +144,14 @@ public class ProfileActivity extends AppCompatActivity {
         int gender = genderSpinner.getSelectedItemPosition();
         int region = -1;
         Log.d(TAG, "regionSpinner.getSelectedItem().toString(): " + regionSpinner.getSelectedItem().toString());
+        String selectedRegion = regionSpinner.getSelectedItem().toString();
+        for (int i = 0; i < simRa_regions_config.length; i++) {
+            if (selectedRegion.equals(simRa_regions_config[i].split("=")[0])||selectedRegion.equals(simRa_regions_config[i].split("=")[1])) {
+                region = i;
+                break;
+            }
+        }
+        /*
         switch (regionSpinner.getSelectedItem().toString()) {
             case "Berlin/Potsdam":
                 region = 1;
@@ -165,7 +180,7 @@ public class ProfileActivity extends AppCompatActivity {
                 break;
             default:
                 region = 0;
-        }
+        }*/
         int experience = experienceSpinner.getSelectedItemPosition();
         int behaviour = behaviourSeekBar.getProgress();
         // Log.d(TAG, "behaviour: " + behaviourSeekBar.getProgress() + " isEnabled: " + behaviourSeekBar.isEnabled());
@@ -212,6 +227,15 @@ public class ProfileActivity extends AppCompatActivity {
         };
 
         return onSeekBarChangeListener;
+    }
+
+    String getRegion(int regionCode) {
+        for (int i = 0; i < regionSpinner.getAdapter().getCount(); i++) {
+            if(regionSpinner.getAdapter().getItem(i) == Integer.valueOf(regionCode)) {
+
+            }
+        }
+        return "";
     }
 
 

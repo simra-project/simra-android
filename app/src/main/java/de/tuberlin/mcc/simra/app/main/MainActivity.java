@@ -46,7 +46,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -635,12 +634,39 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         @Override
         protected String doInBackground(String... strings) {
+
+            StringBuilder checkRegionsResponse = new StringBuilder();
+            int status = 0;
+            try {
+                URL url = new URL(Constants.MCC_VM2 + "check/regions?clientHash=" + SimRAuthenticator.getClientHash(MainActivity.this));
+                Log.d(TAG, "URL: " + url.toString());
+                HttpsURLConnection urlConnection =
+                        (HttpsURLConnection)url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setReadTimeout(10000);
+                urlConnection.setConnectTimeout(15000);
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    checkRegionsResponse.append(inputLine).append(System.lineSeparator());
+                }
+                in.close();
+                status = urlConnection.getResponseCode();
+                Log.d(TAG, "Server status: " + status);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, "GET regions response: " + checkRegionsResponse.toString());
+            if (status == 200) {
+                Utils.overWriteFile(checkRegionsResponse.toString(),"simRa_regions.config",MainActivity.this);
+            }
             installedAppVersion = getAppVersionNumber(MainActivity.this);
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            StringBuilder response = new StringBuilder();
+            StringBuilder checkVersionResponse = new StringBuilder();
             try {
-                URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + "version?clientHash=" + SimRAuthenticator.getClientHash(MainActivity.this));
+                URL url = new URL(Constants.MCC_VM2 + "check/version?clientHash=" + SimRAuthenticator.getClientHash(MainActivity.this));
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection =
                         (HttpsURLConnection)url.openConnection();
@@ -655,25 +681,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 String inputLine;
 
                 while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                    checkVersionResponse.append(inputLine);
                 }
                 in.close();
-                int status = urlConnection.getResponseCode();
+                status = urlConnection.getResponseCode();
                 Log.d(TAG, "Server status: " + status);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Log.d(TAG, "GET version response: " + response.toString());
-            String[] responseArray = response.toString().split("splitter");
+            Log.d(TAG, "GET version response: " + checkVersionResponse.toString());
+            String[] responseArray = checkVersionResponse.toString().split("splitter");
             if (responseArray.length > 2) {
                 critical = Boolean.valueOf(responseArray[0]);
                 newestAppVersion = Integer.valueOf(responseArray[1]);
                 urlToNewestAPK = responseArray[2];
-                return response.toString();
+                return checkVersionResponse.toString();
             } else {
                 return null;
             }
