@@ -33,22 +33,21 @@ import javax.net.ssl.HttpsURLConnection;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import de.tuberlin.mcc.simra.app.util.Constants;
-import de.tuberlin.mcc.simra.app.main.HistoryActivity;
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.main.HistoryActivity;
+import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
-import static de.tuberlin.mcc.simra.app.util.Constants.LOCALE_ABVS;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileWithoutDemographics;
+import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFileAndIncreaseFileVersion;
-import static de.tuberlin.mcc.simra.app.util.Utils.showStatistics;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
@@ -413,7 +412,9 @@ public class UploadService extends Service {
         private Pair<Integer, String> postFile(String fileType, String contentToSend) throws IOException {
 
             int localeInt = lookUpIntSharedPrefs("Region", 0, "Profile", context);
-            String locale = LOCALE_ABVS[localeInt];
+
+            String[] simRa_regions_config = getRegions(context);
+            String locale = simRa_regions_config[localeInt].split("=")[2];
             Log.d(TAG, "localeInt: " + localeInt + " locale: " + locale);
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -457,8 +458,8 @@ public class UploadService extends Service {
         private Pair<Integer, String> putFile(String fileType, String fileHash, String filePassword, String contentToSend) throws IOException {
 
             int localeInt = lookUpIntSharedPrefs("Region", 0, "Profile", context);
-            String locale = LOCALE_ABVS[localeInt];
-
+            String[] simRa_regions_config = getRegions(context);
+            String locale = simRa_regions_config[localeInt].split("=")[2];
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
