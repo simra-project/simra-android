@@ -1,9 +1,16 @@
 package de.tuberlin.mcc.simra.app.util;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.location.Location;
 import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.Spinner;
 
 import org.osmdroid.views.overlay.Polyline;
 
@@ -11,13 +18,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import androidx.appcompat.app.AlertDialog;
+import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.annotation.Ride;
+import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
@@ -39,9 +53,8 @@ public class VersionUpdater {
      * Also, renaming accGps files: removing timestamp from filename.
      *
      */
-    public static void updateToV27(Context context) {
-        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 27) {
+    public static void updateToV27(Context context, int lastAppVersion) {
+        if (lastAppVersion < 27) {
 
             // rename accGps files
             File directory = context.getFilesDir();
@@ -205,9 +218,8 @@ public class VersionUpdater {
 
     }
 
-    public static void updateToV30(Context context) {
-        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 30) {
+    public static void updateToV30(Context context, int lastAppVersion) {
+        if (lastAppVersion < 30) {
             File directory = context.getFilesDir();
             File[] fileList = directory.listFiles();
             String name;
@@ -235,9 +247,8 @@ public class VersionUpdater {
             }
         }
     }
-    public static void updateToV31(Context context) {
-        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 31) {
+    public static void updateToV31(Context context, int lastAppVersion) {
+        if (lastAppVersion < 31) {
             File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
             StringBuilder contentOfNewMetaData = new StringBuilder();
             int totalNumberOfScary = 0;
@@ -301,9 +312,8 @@ public class VersionUpdater {
         }
     }
 
-    public static void updateToV32(Context context) {
-        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 32) {
+    public static void updateToV32(Context context, int lastAppVersion) {
+        if (lastAppVersion < 32) {
             File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
             int totalNumberOfIncidents = 0;
             try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
@@ -350,9 +360,8 @@ public class VersionUpdater {
     }
     // There was a bug in which METADATA_HEADER was not written as metaData.csv was overwritten after
     // each "save ride". This is to fix the metaData.csv files without METADATA_HEADER.
-    public static void updateToV39(Context context) {
-        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 39) {
+    public static void updateToV39(Context context, int lastAppVersion) {
+        if (lastAppVersion < 39) {
             File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
             StringBuilder contentOfNewMetaData = new StringBuilder();
             try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
@@ -391,9 +400,8 @@ public class VersionUpdater {
         }
     }
 
-    public static void updateToV50(Context context) {
-        int lastCriticalAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-        if (lastCriticalAppVersion < 50) {
+    public static void updateToV50(Context context, int lastAppVersion) {
+        if (lastAppVersion < 50) {
             Log.d(TAG,"Updating to version 50");
             try {
                 recalculateStatistics(context);
@@ -401,6 +409,19 @@ public class VersionUpdater {
                 Log.d(TAG, "updateToV50 exception: " + e.getLocalizedMessage());
                 Log.d(TAG, Arrays.toString(e.getStackTrace()));
             }
+        }
+    }
+
+    // changes region from 2 (London) to 1 (Berlin) because they were mixed up in the previous version
+    public static void updateToV52(Context context, int lastAppVersion) {
+        if (lastAppVersion < 52) {
+            // get previous chosen region
+            int region = Utils.lookUpIntSharedPrefs("Region", 0,"Profile",context);
+            // change region from London to Berlin
+            if (region == 2) {
+                Utils.writeIntToSharedPrefs("Region",1,"Profile",context);
+            }
+
         }
     }
 }

@@ -283,7 +283,7 @@
                 android:layout_weight="5"
                 android:fontFamily="@font/assistant_extralight"
                 android:gravity="center"
-                android:text="@string/doneEditingIncident"
+                android:text="@string/done"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />

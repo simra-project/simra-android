@@ -154,7 +154,7 @@
     <string name="locationType5">Basket/Pannier</string>
     <string name="locationType6">Backpack/Bag</string>
     <string name="locationType7">Other (Please specify below)</string>
-    <string name="doneEditingIncident">Done</string>
+    <string name="done">Done</string>
     <string name="editingIncidentAborted">Changes not saved</string>
     <string name="editingIncidentCompleted">Changes saved</string>
     <string name="involved_type">other road user involved</string>
@@ -284,5 +284,6 @@
     <string name="new_region_news_50">SimRa now supports the region Ruhrgebiet! Please choose your region in \"Profile\".</string>
     <string name="statistics_changed_news_50"> Some bugs in \"Statistics\" are now fixed.</string>
     <string name="settings_and_profile"> Please go to \"Settings\" and \"Profile\" and make sure that the correct options are chosen!</string>
+    <string name="chooseRegion">Please choose a region</string>
 
 </resources>

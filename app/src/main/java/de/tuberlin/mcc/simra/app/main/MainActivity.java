@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -24,9 +25,11 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,8 +48,11 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -69,12 +75,15 @@ import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.Utils;
 import de.tuberlin.mcc.simra.app.util.WebActivity;
 
-import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
+import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
@@ -380,6 +389,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
         });
         new CheckVersionTask().execute();
+        if (lookUpIntSharedPrefs("regionLastChangedAtVersion",-1,"sharedPrefs",MainActivity.this) < 52) {
+            fireRegionPrompt();
+            writeIntToSharedPrefs("regionLastChangedAtVersion",getAppVersionNumber(MainActivity.this),"simraPrefs",MainActivity.this);
+        }
         Log.d(TAG, "OnCreate finished");
 
     }
@@ -821,6 +834,66 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         alertDialog.setCancelable(false);
         alertDialog.show();
 
+    }
+
+    public void fireRegionPrompt() {
+        // get the regions from the asset
+        String[] simRa_regions_config;
+        View spinnerView = View.inflate(MainActivity.this, R.layout.spinner, null);
+        Spinner spinner = (Spinner) spinnerView.findViewById(R.id.spinner);
+        simRa_regions_config = getRegions(MainActivity.this);
+        int region = lookUpIntSharedPrefs("Region",0,"Profile",MainActivity.this);
+
+        String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
+        List<String> regionContentArray =  new ArrayList<String>();
+        boolean languageIsEnglish = locale.equals(new Locale("en").getLanguage());
+        for (String s : simRa_regions_config) {
+            if (!(s.startsWith("!")||s.startsWith("Please Choose"))) {
+                if (languageIsEnglish) {
+                    regionContentArray.add(s.split("=")[0]);
+                } else {
+                    regionContentArray.add(s.split("=")[1]);
+                }
+            }
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                MainActivity.this, android.R.layout.simple_spinner_item, regionContentArray);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Collections.sort(regionContentArray);
+        regionContentArray.add(0,getText(R.string.pleaseChoose).toString());
+        spinner.setAdapter(adapter);
+        String regionString = simRa_regions_config[region];
+        if (!regionString.startsWith("!")) {
+            if(languageIsEnglish) {
+                spinner.setSelection(regionContentArray.indexOf(regionString.split("=")[0]));
+            } else {
+                spinner.setSelection(regionContentArray.indexOf(regionString.split("=")[1]));
+            }
+        } else {
+            spinner.setSelection(0);
+        }
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+        alert.setTitle(getString(R.string.chooseRegion));
+        alert.setView(spinnerView);
+        alert.setNeutralButton(R.string.done, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int j) {
+
+                int region = -1;
+                String selectedRegion = spinner.getSelectedItem().toString();
+                for (int i = 0; i < simRa_regions_config.length; i++) {
+                    if (selectedRegion.equals(simRa_regions_config[i].split("=")[0])||selectedRegion.equals(simRa_regions_config[i].split("=")[1])) {
+                        region = i;
+                        break;
+                    }
+                }
+                updateProfile(MainActivity.this,-1,-1,region,-1,-2);
+
+            }
+        });
+        alert.setCancelable(false);
+        alert.show();
     }
 
 }
