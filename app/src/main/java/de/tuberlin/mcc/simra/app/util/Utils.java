@@ -6,12 +6,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import de.tuberlin.mcc.simra.app.subactivites.ProfileActivity;
-
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.location.Location;
@@ -30,9 +24,10 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import static android.content.Context.MODE_APPEND;
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
