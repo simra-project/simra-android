@@ -230,15 +230,4 @@ public class ProfileActivity extends AppCompatActivity {
 
         return onSeekBarChangeListener;
     }
-
-    String getRegion(int regionCode) {
-        for (int i = 0; i < regionSpinner.getAdapter().getCount(); i++) {
-            if(regionSpinner.getAdapter().getItem(i) == Integer.valueOf(regionCode)) {
-
-            }
-        }
-        return "";
-    }
-
-
 }

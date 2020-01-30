@@ -27,6 +27,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.deleteErrorLogsForVersion;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFile;
@@ -67,13 +68,16 @@ public class StartActivity extends BaseActivity {
         Log.d(TAG, "===========================Λ=metaData=Λ===========================");
         showStatistics(this);
         deleteErrorLogsForVersion(this, 26);
-        updateToV27(this);
-        updateToV30(this);
-        updateToV31(this);
-        updateToV32(this);
-        updateToV39(this);
-        updateToV50(this);
-        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
+        int lastAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
+
+        updateToV27(this,lastAppVersion);
+        updateToV30(this,lastAppVersion);
+        updateToV31(this,lastAppVersion);
+        updateToV32(this,lastAppVersion);
+        updateToV39(this,lastAppVersion);
+        updateToV50(this,lastAppVersion);
+        updateToV52(this,lastAppVersion);
+        // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request
         int LOCATION_ACCESS_CODE = 1;

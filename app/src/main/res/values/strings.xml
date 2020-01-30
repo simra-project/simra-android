@@ -155,7 +155,7 @@
     <string name="locationType5">Fahrradkorb/Satteltasche</string>
     <string name="locationType6">Rucksack o.ä.</string>
     <string name="locationType7">Sonstiges (Bitte unten angeben)</string>
-    <string name="doneEditingIncident">Fertig</string>
+    <string name="done">Fertig</string>
     <string name="editingIncidentAborted">Änderungen wurden nicht gespeichert</string>
     <string name="editingIncidentCompleted">Änderungen wurden gespeichert</string>
     <string name="involved_type">Beteiligte Verkehrsteilnehmer</string>
@@ -288,5 +288,6 @@
     <string name="new_region_news_50">SimRa wird jetzt in ganz Ruhrgebiet unterstütz! Bitte im \"Profil\"-Menü die entsprechende Region auswählen.</string>
     <string name="statistics_changed_news_50"> In den \"Statistiken\" wurden einige Fehler korrigiert, sowie das Design verändert.</string>
     <string name="settings_and_profile"> Bitte die Angaben unter \"Einstellungen\" und \"Profil\" überprüfen.</string>
+    <string name="chooseRegion">Bitte Region auswählen</string>
 
 </resources>
