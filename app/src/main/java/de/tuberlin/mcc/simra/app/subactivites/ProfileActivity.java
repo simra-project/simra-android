@@ -143,7 +143,6 @@ public class ProfileActivity extends AppCompatActivity {
         int ageGroup = ageGroupSpinner.getSelectedItemPosition();
         int gender = genderSpinner.getSelectedItemPosition();
         int region = -1;
-        Log.d(TAG, "regionSpinner.getSelectedItem().toString(): " + regionSpinner.getSelectedItem().toString());
         String selectedRegion = regionSpinner.getSelectedItem().toString();
         for (int i = 0; i < simRa_regions_config.length; i++) {
             if (selectedRegion.equals(simRa_regions_config[i].split("=")[0])||selectedRegion.equals(simRa_regions_config[i].split("=")[1])) {
@@ -151,6 +150,9 @@ public class ProfileActivity extends AppCompatActivity {
                 break;
             }
         }
+        Log.d(TAG, "regionSpinner.getSelectedItem().toString(): " + regionSpinner.getSelectedItem().toString());
+        Log.d(TAG, "region index: " + region);
+
         /*
         switch (regionSpinner.getSelectedItem().toString()) {
             case "Berlin/Potsdam":
