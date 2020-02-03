@@ -77,7 +77,7 @@ public class StartActivity extends BaseActivity {
         updateToV39(this,lastAppVersion);
         updateToV50(this,lastAppVersion);
         updateToV52(this,lastAppVersion);
-        // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
+        writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request
         int LOCATION_ACCESS_CODE = 1;
