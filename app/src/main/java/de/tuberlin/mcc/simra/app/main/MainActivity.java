@@ -389,9 +389,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
         });
         new CheckVersionTask().execute();
-        if (lookUpIntSharedPrefs("regionLastChangedAtVersion",-1,"simraPrefs",MainActivity.this) < 52) {
-            fireRegionPrompt();
-            writeIntToSharedPrefs("regionLastChangedAtVersion",getAppVersionNumber(MainActivity.this),"sharedPrefs",MainActivity.this);
+        if (lookUpIntSharedPrefs("regionLastChangedAtVersion",-1,"simraPrefs",MainActivity.this) < 53) {
+            int region = lookUpIntSharedPrefs("Region",-1,"Profile",MainActivity.this);
+            if(region == 2 || region == 3 || region == 8) {
+                fireRegionPrompt();
+                writeIntToSharedPrefs("regionLastChangedAtVersion",getAppVersionNumber(MainActivity.this),"sharedPrefs",MainActivity.this);
+            }
         }
         Log.d(TAG, "OnCreate finished");
 
