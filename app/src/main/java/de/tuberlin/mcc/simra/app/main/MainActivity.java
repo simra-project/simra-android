@@ -393,7 +393,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             int region = lookUpIntSharedPrefs("Region",-1,"Profile",MainActivity.this);
             if(region == 2 || region == 3 || region == 8) {
                 fireRegionPrompt();
-                writeIntToSharedPrefs("regionLastChangedAtVersion",getAppVersionNumber(MainActivity.this),"sharedPrefs",MainActivity.this);
+                writeIntToSharedPrefs("regionLastChangedAtVersion",getAppVersionNumber(MainActivity.this),"simraPrefs",MainActivity.this);
             }
         }
         Log.d(TAG, "OnCreate finished");
