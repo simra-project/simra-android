@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -82,10 +83,19 @@ public class StartActivity extends BaseActivity {
         // For permission request
         int LOCATION_ACCESS_CODE = 1;
         String[] locationPermissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
-        Utils.permissionRequest(StartActivity.this, locationPermissions, StartActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
+        Utils.permissionRequest(StartActivity.this, locationPermissions, StartActivity.this.getString(R.string.locationPermissionRequestRationale), LOCATION_ACCESS_CODE);
+        // Android 10 and above need external storage rights to show OSM
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            int STORAGE_ACCESS_CODE = 2;
+            String[] storagePermissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            Utils.permissionRequest(StartActivity.this, storagePermissions, StartActivity.this.getString(R.string.storagePermissionRequestRationale), STORAGE_ACCESS_CODE);
+        }
+
+
 
         if ((!isFirstTime()) & (privacyPolicyAccepted()) & (!showUnsentErrorDialogPermitted()) && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED)) {
+                == PackageManager.PERMISSION_GRANTED) && (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED))) {
             Intent intent = new Intent(StartActivity.this, MainActivity.class);
             startActivity(intent);
             finish();

@@ -46,7 +46,8 @@
 
     <!--- Permission -->
     <string name="permissionFineLocation">In order to continue, please allow SimRa to access your location.</string>
-    <string name="permissionRequestRationale">This app needs permission to access your location data in order to show you your location on the map and to record your rides.</string>
+    <string name="locationPermissionRequestRationale">This app needs permission to access your location data in order to show you your location on the map and to record your rides.</string>
+    <string name="storagePermissionRequestRationale">This app needs permission to access your storage in order to show you the map.</string>
 
     <!--- WebActivity -->
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>

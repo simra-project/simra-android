@@ -45,8 +45,10 @@
     <string name="link_to_twitter">https://twitter.com/SimRa_Berlin</string>
 
     <!--- Permission -->
-    <string name="permissionRequestRationale">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
+    <string name="locationPermissionRequestRationale">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
     <string name="permissionFineLocation">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten.</string>
+    <string name="storagePermissionRequestRationale">Diese App benötigt den Zugriff auf den Speicher deines Smartphones, um die Karte richtig anzeigen zu können.</string>
+
 
     <!--- WebActivity -->
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
