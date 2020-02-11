@@ -295,7 +295,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
                     String[] locationPermissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
-                    Utils.permissionRequest(MainActivity.this, locationPermissions, MainActivity.this.getString(R.string.permissionRequestRationale), LOCATION_ACCESS_CODE);
+                    Utils.permissionRequest(MainActivity.this, locationPermissions, MainActivity.this.getString(R.string.locationPermissionRequestRationale), LOCATION_ACCESS_CODE);
                     Toast.makeText(MainActivity.this, R.string.recording_not_started,Toast.LENGTH_LONG).show();
                 } else {
                     if (isLocationServiceOff(MainActivity.this)) {
@@ -453,7 +453,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Refresh the osmdroid configuration on resuming.
         mMapView.onResume(); // needed for compass and icons
-
+        mLocationOverlay.onResume();
+        mLocationOverlay.enableMyLocation();
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -470,7 +471,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Refresh the osmdroid configuration on pausing.
         mMapView.onPause(); // needed for compass and icons
-
+        locationManager.removeUpdates(MainActivity.this);
+        mLocationOverlay.onPause();
+        mLocationOverlay.disableMyLocation();
         Log.d(TAG, "OnPause finished");
     }
 
