@@ -46,7 +46,7 @@ public class VersionUpdater {
             String name;
             for (int i = 0; i < fileList.length; i++) {
                 name = fileList[i].getName();
-                if (!(name.equals("metaData.csv") || name.equals("profile.csv") || fileList[i].isDirectory() || name.startsWith("accEvents") || name.startsWith("CRASH"))) {
+                if (!(name.equals("metaData.csv") || name.equals("profile.csv") || fileList[i].isDirectory() || name.startsWith("accEvents") || name.startsWith("CRASH") || name.startsWith("simRa_regions.conf"))) {
                     fileList[i].renameTo(new File(directory.toString() + File.separator + name.split("_")[0] + "_accGps.csv"));
                 }
             }

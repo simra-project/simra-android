@@ -287,4 +287,8 @@
     <string name="settings_and_profile"> Please go to \"Settings\" and \"Profile\" and make sure that the correct options are chosen!</string>
     <string name="chooseRegion">Please choose a region</string>
 
+    <!-- 55 -->
+    <string name="wegli_news_55">Ever heard of <a href="https://www.weg-li.de">weg-li</a>? It is a website were you can easily report a parking violator.</string>
+    <string name="power_save_news_55">SimRa should consume less battery now. Please contact us, if problems arise.</string>
+
 </resources>
