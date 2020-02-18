@@ -292,4 +292,8 @@
     <string name="settings_and_profile"> Bitte die Angaben unter \"Einstellungen\" und \"Profil\" überprüfen.</string>
     <string name="chooseRegion">Bitte Region auswählen</string>
 
+    <!-- 55 -->
+    <string name="wegli_news_55">Kennt ihr schon <a href="https://www.weg-li.de">weg-li</a>? Auf der Seite könnt ihr Falschparker ganz einfach melden.</string>
+    <string name="power_save_news_55">SimRa sollte jetzt weniger Energie verbrauchen. Sollten Probleme auftreten bitte sofort melden! (Links im Menü auf Feedback)</string>
+
 </resources>
