@@ -200,16 +200,29 @@ public class Ride {
                         thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
                         thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
                         thisTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                        // distance to last location in meters
                         double distanceToLastPoint = thisLocation.distanceTo(previousLocation);
+                        // time passed from last point in seconds
                         long timePassed = (thisTimeStamp - previousTimeStamp)/1000;
                         // if speed < 2.99km/h: waiting
                         if (distanceToLastPoint < 2.5) {
                             waitedTime += timePassed;
                         }
                         // if speed > 80km/h: too fast, do not consider for distance
-                        if (distanceToLastPoint < 66) {
+                        if ((distanceToLastPoint/timePassed) < 22) {
                             distance += (long) distanceToLastPoint;
                             polyLine.addPoint(new GeoPoint(thisLocation));
+                        } else {
+                            /*
+                            Log.d(TAG, "last location: " + previousLocation.getLatitude()
+                                    + "," + previousLocation.getLongitude());
+                            Log.d(TAG, "this location: "  + thisLocation.getLatitude()
+                                    + "," + thisLocation.getLongitude());
+                            Log.d(TAG, "last time: " + previousTimeStamp);
+                            Log.d(TAG, "this time: " + thisTimeStamp);
+                            Log.d(TAG, "distanceToLastPoint: " + distanceToLastPoint + "m"
+                                    + " timePassed: " + timePassed + " speed: " + (distanceToLastPoint/timePassed));
+                            */
                         }
                         previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
                         previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));

@@ -31,7 +31,7 @@ public class Constants {
 
     public static final String PROFILE_HEADER = "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents,waitedTime,distance,co2,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,behaviour,numberOfScary" + System.lineSeparator();
 
-    public static final String METADATA_HEADER = "key,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary" + System.lineSeparator();
+    public static final String METADATA_HEADER = "key,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary,region" + System.lineSeparator();
 
     public static final String ACCEVENTS_HEADER = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10" + System.lineSeparator();
 

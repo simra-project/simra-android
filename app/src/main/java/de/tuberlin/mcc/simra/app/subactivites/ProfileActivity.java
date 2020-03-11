@@ -180,7 +180,7 @@ public class ProfileActivity extends AppCompatActivity {
         int experience = experienceSpinner.getSelectedItemPosition();
         int behaviour = behaviourSeekBar.getProgress();
         // Log.d(TAG, "behaviour: " + behaviourSeekBar.getProgress() + " isEnabled: " + behaviourSeekBar.isEnabled());
-        updateProfile(this,ageGroup,gender,region,experience,behaviour);
+        updateProfile(true,this,ageGroup,gender,region,experience,behaviour);
         if (!behaviourSeekBar.isEnabled()) {
             SharedPreferences mySPrefs = getApplicationContext()
                     .getSharedPreferences("Profile", Context.MODE_PRIVATE);

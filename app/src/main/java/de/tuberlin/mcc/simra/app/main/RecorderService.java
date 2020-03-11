@@ -40,6 +40,7 @@ import de.tuberlin.mcc.simra.app.util.Constants;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 
 public class RecorderService extends Service implements SensorEventListener, LocationListener {
 
@@ -301,14 +302,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
             String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
             Log.d(TAG, "fileInfoLine: " + fileInfoLine);
-
+            int region = lookUpIntSharedPrefs("Region",0,"Profile",this);
             // Create head of the csv-file
             appendToFile((fileInfoLine + "lat,lon,X,Y,Z,timeStamp,acc,a,b,c" + System.lineSeparator()), pathToAccGpsFile, this);
             // Write String data to files
             appendToFile(accGpsString.toString(), pathToAccGpsFile, this);
             appendToFile(key + ","
                     + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
-                    + "0,0," + waitedTime + "," + Math.round(route.getDistance()) + ",0"  + System.lineSeparator(), "metaData.csv", this);
+                    + "0,0," + waitedTime + "," + Math.round(route.getDistance()) + ",0," + region + System.lineSeparator(), "metaData.csv", this);
             editor.putInt("RIDE-KEY", key + 1);
             editor.apply();
         }

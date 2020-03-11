@@ -24,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
@@ -346,61 +348,68 @@ public class Utils {
         Log.d(TAG, "===========================Λ=Statistics=Λ===========================");
     }
 
-    public static void updateProfile(Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
+    public static void updateProfile(boolean global, Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
 
-        updateProfile(context, ageGroup, gender, region, experience, -1,-1,-1,-1,-1,-1,null,behaviour,-1);
+        updateProfile(global, context, ageGroup, gender, region, experience, -1,-1,-1,-1,-1,-1,null,behaviour,-1);
 
     }
 
-    public static void updateProfile(Context context, int ageGroup, int gender, int region, int experience, int numberOfRides, long duration, int numberOfIncidents, long waitedTime, long distance, long co2, float[] timeBuckets, int behaviour, int numberOfScary) {
+    public static void updateProfile(boolean global, Context context, int ageGroup, int gender, int region, int experience, int numberOfRides, long duration, int numberOfIncidents, long waitedTime, long distance, long co2, Object[] timeBuckets, int behaviour, int numberOfScary) {
 
-    SharedPreferences sharedPrefs = context.getApplicationContext()
-            .getSharedPreferences("Profile", Context.MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedPrefs.edit();
-    if (ageGroup > -1) {
-        editor.putInt("Birth", ageGroup);
-    }
-    if (gender > -1) {
-        editor.putInt("Gender", gender);
-    }
-    if (region > -1) {
-        editor.putInt("Region", region);
-    }
-    if (experience > -1) {
-        editor.putInt("Experience", experience);
-    }
-    if (numberOfRides > -1) {
-        editor.putInt("NumberOfRides", numberOfRides);
-    }
-    if (duration > -1) {
-        editor.putLong("Duration", duration);
-    }
-    if (numberOfIncidents > -1) {
-        editor.putInt("NumberOfIncidents", numberOfIncidents);
-    }
-    if (waitedTime > -1) {
-        editor.putLong("WaitedTime", waitedTime);
-    }
-    if (distance > -1) {
-        editor.putLong("Distance", distance);
-    }
-    if (co2 > -1) {
-        editor.putLong("Co2", co2);
-    }
-    if (timeBuckets != null) {
-        for (int i = 0; i < timeBuckets.length; i++) {
-            editor.putFloat(i+"",timeBuckets[i]);
+        SharedPreferences sharedPrefs;
+        if (global) {
+            sharedPrefs = context.getApplicationContext()
+                    .getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        } else {
+            sharedPrefs = context.getApplicationContext()
+                    .getSharedPreferences("Profile_" + region, Context.MODE_PRIVATE);
         }
-    }
-    if (behaviour > -2) {
-        editor.putInt("Behaviour", behaviour);
-    }
-    if (numberOfScary > -1) {
-        editor.putInt("NumberOfScary", numberOfScary);
-    }
-    editor.apply();
 
-}
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        if (ageGroup > -1) {
+            editor.putInt("Birth", ageGroup);
+        }
+        if (gender > -1) {
+            editor.putInt("Gender", gender);
+        }
+        if (region > -1) {
+            editor.putInt("Region", region);
+        }
+        if (experience > -1) {
+            editor.putInt("Experience", experience);
+        }
+        if (numberOfRides > -1) {
+            editor.putInt("NumberOfRides", numberOfRides);
+        }
+        if (duration > -1) {
+            editor.putLong("Duration", duration);
+        }
+        if (numberOfIncidents > -1) {
+            editor.putInt("NumberOfIncidents", numberOfIncidents);
+        }
+        if (waitedTime > -1) {
+            editor.putLong("WaitedTime", waitedTime);
+        }
+        if (distance > -1) {
+            editor.putLong("Distance", distance);
+        }
+        if (co2 > -1) {
+            editor.putLong("Co2", co2);
+        }
+        if (timeBuckets != null) {
+            for (int i = 0; i < timeBuckets.length; i++) {
+                editor.putFloat(i+"",(Float)timeBuckets[i]);
+            }
+        }
+        if (behaviour > -2) {
+            editor.putInt("Behaviour", behaviour);
+        }
+        if (numberOfScary > -1) {
+            editor.putInt("NumberOfScary", numberOfScary);
+        }
+        editor.apply();
+
+    }
 
     public static int[] getProfileDemographics(Context context) {
         // {ageGroup, gender, region, experience, behaviour}
@@ -415,11 +424,14 @@ public class Utils {
         return result;
     }
 
-    public static Object[] getProfileWithoutDemographics(Context context) {
+    /**
+    @param region must be "Profile" for global or "Profile_0" for Profile of region 0.
+     */
+    public static Object[] getProfileWithoutDemographics(String region, Context context) {
         // {numberOfRides,duration,numberOfIncidents,waitedTime,distance,co2,0,1,2,...,23,numberOfScary}
         Object[] result = new Object[31];
         SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences("Profile", Context.MODE_PRIVATE);
+                .getSharedPreferences(region, Context.MODE_PRIVATE);
         result[0] = sharedPrefs.getInt("NumberOfRides", 0);
         result[1] = sharedPrefs.getLong("Duration", 0);
         result[2] = sharedPrefs.getInt("NumberOfIncidents", 0);
@@ -435,10 +447,11 @@ public class Utils {
 
     // returns values of
     // {(int)ageGroup,(int)gender,(int)region,(int)experience,(int)numberOfRides,(long)duration,(int)numberOfIncidents,(long)waitedTime,(long)distance,(long)co2,(int)0,1,2,...,23,(int)numberOfScary,(int)behaviour}
-    public static Object[] getProfile(Context context) {
+    // for a specific region or global
+    public static Object[] getGlobalProfile(Context context) {
         Object[] result = new Object[36];
         int[] demographics = getProfileDemographics(context);
-        Object[] rest = getProfileWithoutDemographics(context);
+        Object[] rest = getProfileWithoutDemographics("Profile",context);
 
         for (int j = 0; j < demographics.length-1; j++) {
             result[j] = demographics[j];
@@ -450,6 +463,18 @@ public class Utils {
         result[35] = demographics[4];
         Log.d(TAG, "profile: " + Arrays.toString(result));
         return result;
+    }
+
+    /**
+     returns {NumberOfRides,Duration,NumberOfIncidents,WaitedTime,Distance,Co2,0,...,23,NumberOfScary}
+     for each region
+     */
+    public static Object[][] getRegionProfilesArrays(int numberOfRegions, Context context) {
+       Object[][] result = new Object[numberOfRegions][31];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = getProfileWithoutDemographics("Profile_" + i,context);
+            }
+       return result;
     }
 
     public static void permissionRequest(Activity activity, final String[] requestedPermission, String rationaleMessage, final int accessCode) {
@@ -552,7 +577,7 @@ public class Utils {
         } catch (IOException e) {
             Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(e.getStackTrace()));
         }
-        updateProfile(context,-1,-1,-1,-1,-1,-1,totalNumberOfIncidents,-1,-1,-1,null,-2,totalNumberOfScary);
+        updateProfile(true, context,-1,-1,-1,-1,-1,-1,totalNumberOfIncidents,-1,-1,-1,null,-2,totalNumberOfScary);
     }
 
     // recalculates all statistics, updates metaData.csv, Profile.xml and deletes temp files
@@ -571,7 +596,7 @@ public class Utils {
         long totalCO2Savings = 0; // in g
         long totalWaitedTime = 0; // in s
         // 0h - 23h
-        float[] timeBuckets = {0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f};
+        Float[] timeBuckets = {0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f};
 
         // loop through each line of metaData.csv
         try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
@@ -723,7 +748,7 @@ public class Utils {
             Log.d(TAG, "recalculateStatistics() overwriting metaData.csv with: ");
             Log.d(TAG, contentOfMetaData.toString());
             overWriteFile(contentOfMetaData.toString(),"metaData.csv",context);
-            updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
+            updateProfile(true,context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
         } catch (IOException e) {
             Log.d(TAG, "Exception in recalculateStatistics(): " + Arrays.toString(e.getStackTrace()));
             e.printStackTrace();
@@ -830,5 +855,31 @@ public class Utils {
         }
         return simRa_regions_config;
     }
+
+    public static void copySharedPreferences(String sourceSharedPref, String newSharedPref, Context context) {
+        SharedPreferences sourceSP = context.getApplicationContext()
+                .getSharedPreferences(sourceSharedPref, Context.MODE_PRIVATE);
+
+        SharedPreferences newSP = context.getApplicationContext()
+                .getSharedPreferences(newSharedPref,Context.MODE_PRIVATE);
+        SharedPreferences.Editor newE = newSP.edit();
+
+        for(Map.Entry<String,?> kvPair : sourceSP.getAll().entrySet()){
+            String key = kvPair.getKey();
+            Object value = kvPair.getValue();
+            if (value instanceof Float) {
+                newE.putFloat(key, (Float) value);
+            } else if (value instanceof Integer) {
+                newE.putInt(key, (Integer) value);
+            } else if (value instanceof String) {
+                newE.putString(key, (String) value);
+            } else if (value instanceof Boolean) {
+                newE.putBoolean(key, (Boolean) value);
+            } else if (value instanceof Long) {
+                newE.putLong(key, (Long) value);
+            }
+        }
+        newE.apply();
+        }
 
 }

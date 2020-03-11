@@ -250,9 +250,7 @@ public class HistoryActivity extends BaseActivity {
                     }
                 }
                 Log.d(TAG, "metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            }catch (IOException e) {
                 e.printStackTrace();
             }
 
