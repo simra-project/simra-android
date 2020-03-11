@@ -19,6 +19,7 @@ import de.tuberlin.mcc.simra.app.annotation.Ride;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
+import static de.tuberlin.mcc.simra.app.util.Utils.copySharedPreferences;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
@@ -60,7 +61,7 @@ public class VersionUpdater {
             long totalDistance = 0;
             long totalWaitedTime = 0;
             // 0h - 23h
-            float[] timeBuckets = {0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f};
+            Float[] timeBuckets = {0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f};
             try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
                 // fileInfoLine (24#2)
                 String line = metaDataReader.readLine();
@@ -196,7 +197,7 @@ public class VersionUpdater {
 
             overWriteFile((fileInfoLine + PROFILE_HEADER + profileContent), "profile.csv", context);
             */
-            updateProfile(context,birth,gender,region,experience,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,co2,timeBuckets,-2,-1);
+            updateProfile(true,context,birth,gender,region,experience,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,co2,timeBuckets,-2,-1);
 
         }
 
@@ -286,7 +287,7 @@ public class VersionUpdater {
                     }
                     contentOfNewMetaData.append(line).append(System.lineSeparator());
                 }
-                updateProfile(context,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,null,-2,totalNumberOfScary);
+                updateProfile(true,context,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,null,-2,totalNumberOfScary);
 
             } catch (IOException e) {
                 Log.d(TAG, "updateToV31() exception: " + e.getLocalizedMessage());
@@ -338,7 +339,7 @@ public class VersionUpdater {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            updateProfile(context,-1,-1,-1,-1,-1,-1,totalNumberOfIncidents,-1,-1,-1,null,-2,-1);
+            updateProfile(true,context,-1,-1,-1,-1,-1,-1,totalNumberOfIncidents,-1,-1,-1,null,-2,-1);
 
         }
     }
@@ -406,6 +407,44 @@ public class VersionUpdater {
                 Utils.writeIntToSharedPrefs("Region",1,"Profile",context);
             }
 
+        }
+    }
+
+    // introduces profile data per region
+    public static void updateToV58(Context context,  int lastAppVersion) {
+        if (lastAppVersion < 58) {
+            int region = lookUpIntSharedPrefs("Region",0,"Profile",context);
+            copySharedPreferences("Profile","Profile_"+region,context);
+            File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+            StringBuilder contentOfNewMetaData = new StringBuilder();
+            try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
+
+                // fileInfoLine (24#2)
+                String line = metaDataReader.readLine();
+                contentOfNewMetaData.append(line).append(System.lineSeparator());
+                // header (kkey,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary,region" + System.lineSeparator())
+                metaDataReader.readLine();
+                contentOfNewMetaData.append(METADATA_HEADER);
+
+                // loop through the metaData.csv lines
+                // rides (2,1553501618290,1553504544190,2,0,1415,14042,0)
+                while ((line = metaDataReader.readLine()) != null) {
+                    String[] metaDataLine = line.split(",");
+                    contentOfNewMetaData.append(metaDataLine[0]).append(",")
+                            .append(metaDataLine[1]).append(",")
+                            .append(metaDataLine[2]).append(",")
+                            .append(metaDataLine[3]).append(",")
+                            .append(metaDataLine[4]).append(",")
+                            .append(metaDataLine[5]).append(",")
+                            .append(metaDataLine[6]).append(",")
+                            .append(metaDataLine[7]).append(",")
+                            .append(region).append(System.lineSeparator());
+                }
+                overWriteFile(contentOfNewMetaData.toString(),metaDataFile.getName(),context);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

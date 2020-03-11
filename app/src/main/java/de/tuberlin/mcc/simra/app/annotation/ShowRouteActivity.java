@@ -645,7 +645,7 @@ public class ShowRouteActivity extends BaseActivity {
                     metaDataLine[3] = "1";
 
                     // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
-                    metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance + "," + numberOfScary);
+                    metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance + "," + numberOfScary + "," + lookUpIntSharedPrefs("Region",0,"Profile",this));
                 }
                 Log.d(TAG, "metaDataRide: " + metaDataRide);
                 Log.d(TAG, "numberOfIncidents: " + metaDataRide.split(",")[4] + " numberOfScary: " + metaDataRide.split(",")[7]);

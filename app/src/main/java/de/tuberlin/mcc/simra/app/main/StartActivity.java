@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.Arrays;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
@@ -58,7 +59,7 @@ public class StartActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-
+        Log.d(TAG, "getFilesDir(): " + Arrays.toString(new File(getFilesDir(),"../shared_prefs").listFiles()));
         Log.d(TAG, "onCreate() started");
         // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
         showKeyPrefs(this);
@@ -78,6 +79,7 @@ public class StartActivity extends BaseActivity {
         updateToV39(this,lastAppVersion);
         updateToV50(this,lastAppVersion);
         updateToV52(this,lastAppVersion);
+        updateToV58(this,lastAppVersion);
         writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request
@@ -91,8 +93,6 @@ public class StartActivity extends BaseActivity {
             Utils.permissionRequest(StartActivity.this, storagePermissions, StartActivity.this.getString(R.string.storagePermissionRequestRationale), STORAGE_ACCESS_CODE);
         }
 
-
-
         if ((!isFirstTime()) & (privacyPolicyAccepted()) & (!showUnsentErrorDialogPermitted()) && (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) && (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || (ContextCompat.checkSelfPermission(StartActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED))) {
@@ -100,7 +100,6 @@ public class StartActivity extends BaseActivity {
             startActivity(intent);
             finish();
         } else {
-
             // start MainActivity when Button is clicked
             next = findViewById(R.id.nextBtn);
             next.setOnClickListener(new View.OnClickListener() {

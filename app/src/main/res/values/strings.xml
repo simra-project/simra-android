@@ -296,4 +296,7 @@
     <string name="wegli_news_55">Kennt ihr schon <a href="https://www.weg-li.de">weg-li.de</a>? Auf der Seite könnt ihr Falschparker ganz einfach melden.</string>
     <string name="power_save_news_55">SimRa sollte jetzt weniger Energie verbrauchen. Sollten Probleme auftreten bitte sofort melden! (Links im Menü auf Feedback)</string>
 
+    <!-- 58 -->
+    <string name="added_new_regions_news_58">Folgende Regionen wurden freigeschaltet: Leipzig, Wuppertal/Solingen/Remscheid und Düsseldorf</string>
+
 </resources>

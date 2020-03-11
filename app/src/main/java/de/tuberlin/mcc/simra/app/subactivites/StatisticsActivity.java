@@ -22,7 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 
-import static de.tuberlin.mcc.simra.app.util.Utils.getProfile;
+import static de.tuberlin.mcc.simra.app.util.Utils.getGlobalProfile;
 import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 
 public class StatisticsActivity extends AppCompatActivity {
@@ -58,7 +58,7 @@ public class StatisticsActivity extends AppCompatActivity {
         String unit = lookUpSharedPrefs("Settings-Unit","m","simraPrefs",this);
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
         // String[] profileValues = readContentFromFile("profile.csv", this).split(System.lineSeparator())[2].split(",");
-        Object[] profileValues = getProfile(this);
+        Object[] profileValues = getGlobalProfile(this);
 
         // number of uploaded rides
         TextView numberOfRides = findViewById(R.id.numberOfRidesText);
