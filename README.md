@@ -1,4 +1,4 @@
-# SimRa
+# SimRa Android App
 
 [![CodeFactor](https://www.codefactor.io/repository/github/simra-project/simra-android/badge)](https://www.codefactor.io/repository/github/simra-project/simra-android)
 
