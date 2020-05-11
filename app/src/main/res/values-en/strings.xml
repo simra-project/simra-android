@@ -13,6 +13,7 @@
     <string name="title_activity_library_license">Third Party Licenses</string>
     <string name="title_activity_about_simra">About SimRa</string>
     <string name="title_activity_statistics">Statistics</string>
+    <string name="title_activity_bluetooth_connection">Bluetooth connection</string>
 
 
     <!--- Start -->

@@ -67,6 +67,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.subactivites.AboutActivity;
+import de.tuberlin.mcc.simra.app.subactivites.BluetoothConnection;
 import de.tuberlin.mcc.simra.app.subactivites.ProfileActivity;
 import de.tuberlin.mcc.simra.app.subactivites.SettingsActivity;
 import de.tuberlin.mcc.simra.app.subactivites.StatisticsActivity;
@@ -578,6 +579,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(getString(R.string.link_to_twitter)));
             startActivity(i);
+        }else if (id == R.id.nav_bluetooth_connection){
+            Intent intent = new Intent(MainActivity.this, BluetoothConnection.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

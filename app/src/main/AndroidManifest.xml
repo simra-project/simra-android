@@ -4,6 +4,8 @@
     package="de.tuberlin.mcc.simra.app">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <!--
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
     <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
@@ -41,6 +43,9 @@
         <activity
             android:name=".util.HelpActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".subactivites.BluetoothConnection"
+            android:label="@string/title_activity_bluetooth_connection" />
         <activity
             android:name=".annotation.RideSettingsActivity"
             android:configChanges="orientation|screenSize"
