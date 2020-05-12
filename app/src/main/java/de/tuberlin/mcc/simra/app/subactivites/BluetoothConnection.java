@@ -36,17 +36,27 @@ public class BluetoothConnection extends AppCompatActivity {
                 BluetoothDevice device =
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Add the name and address to an array adapter to show in a ListView
-                if (device != null) {
+                if (device != null && device.getName() != null) {
+                    LinearLayout deviceLayout = createLinearLayout();
                     String deviceFound = device.getName() + "\n" + device.getAddress();
                     // Das hier soll gewrapped werden in ein anderes Layout mit einem Button, der das Verbinden erlaubt
-                    TextView deviceView = createTextView();
-                    deviceView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                    TextView deviceInfo = createTextView();
+                    deviceInfo.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT));
                     String toSet = deviceFound + "\n";
-                    deviceView.setText(toSet);
-                    deviceView.setPadding(20, 20, 20, 20);// in pixels (left, top, right, bottom)
-                    deviceView.setLines(2);
-                    discoveredDevicesLayout.addView(deviceView);
+                    deviceInfo.setText(toSet);
+                    deviceInfo.setPadding(20, 20, 20, 20);// in pixels (left, top, right, bottom)
+                    Button connectButton = createButton();
+                    connectButton.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            // Here later connect to this device addres
+                            System.out.println("Device address : " + device.getAddress());
+                        }
+                    });
+                    connectButton.setText("Connect");
+                    deviceLayout.addView(deviceInfo);
+                    deviceLayout.addView(connectButton);
+                    discoveredDevicesLayout.addView(deviceLayout);
                 }
             }
         }
@@ -62,7 +72,7 @@ public class BluetoothConnection extends AppCompatActivity {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(bluetoothConnectionReciever, filter); // unregister onDestroy
-        
+
         if (bluetoothAdapter == null) {
             // Device does not support Bluetooth
         }
@@ -79,6 +89,13 @@ public class BluetoothConnection extends AppCompatActivity {
         unregisterReceiver(bluetoothConnectionReciever);
     }
 
+    LinearLayout createLinearLayout(){
+        return new LinearLayout(this);
+    }
+
+    Button createButton(){
+        return new Button(this);
+    }
 
     TextView createTextView() {
         return new TextView(this);
@@ -121,6 +138,7 @@ public class BluetoothConnection extends AppCompatActivity {
     private void discoverDevices() {
         bluetoothAdapter.startDiscovery();
         discoveredDevicesLayout = new LinearLayout(this);
+        discoveredDevicesLayout.setOrientation(LinearLayout.VERTICAL);
         rootLayout.addView(discoveredDevicesLayout);
     }
 
