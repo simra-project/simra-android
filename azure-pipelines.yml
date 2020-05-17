@@ -4,17 +4,106 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/android
 
 trigger:
-- master
+  branches:
+    include:
+    - master
 
-pool:
-  vmImage: 'macos-latest'
+pr:
+ branches:
+  include:
+    - master
 
-steps:
-- task: Gradle@2
-  inputs:
-    workingDirectory: ''
-    gradleWrapperFile: 'gradlew'
-    gradleOptions: '-Xmx3072m'
-    publishJUnitResults: false
-    testResultsFiles: '**/TEST-*.xml'
-    tasks: 'assembleDebug'
+
+jobs:
+- job: bundle
+  displayName: 'Build bundle'
+  pool:
+    vmImage: 'macos-latest'
+  steps:
+    - task: Gradle@2
+      inputs:
+        gradleWrapperFile: 'gradlew'
+        tasks: 'bundleRelease'
+        publishJUnitResults: false
+        javaHomeOption: 'JDKVersion'
+        gradleOptions: '-Xmx3072m'
+        sonarQubeRunAnalysis: false
+        checkStyleRunAnalysis: true
+        findBugsRunAnalysis: true
+        pmdRunAnalysis: true
+
+    - task: AndroidSigning@2
+      displayName: 'sign bundle'
+      inputs:
+        apkFiles: '**/*.aab'
+        jarsign: true
+        jarsignerKeystoreFile: 'simra-dsp2020.jks'
+        jarsignerKeystorePassword: '$(jarsignerKeyPassword)'
+        jarsignerKeystoreAlias: 'simra-dsp2020.uploadTest'
+        jarsignerKeyPassword: '$(jarsignerKeyPassword)'
+        jarsignerArguments: '-sigalg SHA256withRSA -digestalg SHA-256'
+        zipalign: true
+
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: $(Build.SourcesDirectory)
+        contents: '**/*.aab'
+        targetFolder: '$(build.artifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/app/build/outputs/bundle/release'
+        artifactName: 'bundle-files'
+        artifactType: 'container'
+
+    # - task: CopyFiles@2
+    #   inputs:
+    #     SourceFolder: $(Build.SourcesDirectory)
+    #     contents: 'metadata/**'
+    #     targetFolder: '$(build.artifactStagingDirectory)'
+
+    # - task: PublishBuildArtifacts@1
+    #   inputs:
+    #     pathtoPublish: '$(Build.ArtifactStagingDirectory)/metadata/android'
+    #     artifactName: 'metadata-files'
+    #     artifactType: 'container'
+
+
+- job: apk
+  displayName: 'Build APK'
+  pool:
+    vmImage: 'macos-latest'
+  steps:
+    - task: Gradle@2
+      displayName: 'build apk'
+      inputs:
+        gradleWrapperFile: 'gradlew'
+        tasks: 'assembleRelease'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        javaHomeOption: 'JDKVersion'
+        gradleOptions: '-Xmx3072m'
+        sonarQubeRunAnalysis: false
+
+    - task: AndroidSigning@2
+      displayName: 'sign apk'
+      inputs:
+        apkFiles: '**/*.apk'
+        jarsign: true
+        jarsignerKeystoreFile: 'simra-dsp2020.jks'
+        jarsignerKeystorePassword: '$(jarsignerKeyPassword)'
+        jarsignerKeystoreAlias: 'simra-dsp2020.uploadTest'
+        jarsignerKeyPassword: '$(jarsignerKeyPassword)'
+        zipalign: true
+
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: $(Build.SourcesDirectory)
+        contents: '**/*.apk'
+        targetFolder: '$(build.artifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/app/build/outputs/apk/release/'
+        artifactName: 'apk-files'
+        artifactType: 'container'
