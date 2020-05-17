@@ -1,9 +1,11 @@
 # SimRa Android App
 
+This is a fork of the original [simra-android](https://github.com/simra-project/simra-android/) project.
+
 [![CodeFactor](https://www.codefactor.io/repository/github/simra-project/simra-android/badge)](https://www.codefactor.io/repository/github/simra-project/simra-android)
 
 This project is part of the SimRa research project which includes the following subprojects:
-- [sirma-android](https://github.com/simra-project/simra-android/): The SimRa app for Android.
+- [simra-android](https://github.com/simra-project/simra-android/): The SimRa app for Android.
 - [simra-ios](https://github.com/simra-project/simra-ios): The SimRa app for iOS.
 - [backend](https://github.com/simra-project/backend): The SimRa backend software.
 - [dataset](https://github.com/simra-project/dataset): Result data from the SimRa project.
@@ -21,3 +23,4 @@ To compile the project:
 - copy the file `Hash-Suffix.h.sample` to `Hash-Suffix.h`
 - replace the sample suffix `mcc_simra` with the suffix provided from the backend operator
 - compile
+
