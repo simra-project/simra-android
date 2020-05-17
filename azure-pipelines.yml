@@ -39,7 +39,7 @@ jobs:
         jarsign: true
         jarsignerKeystoreFile: 'simra-dsp2020.jks'
         jarsignerKeystorePassword: '$(jarsignerKeyPassword)'
-        jarsignerKeystoreAlias: 'simra-dsp2020.uploadTest'
+        jarsignerKeystoreAlias: 'simra-dsp2020.uploadtest'
         jarsignerKeyPassword: '$(jarsignerKeyPassword)'
         jarsignerArguments: '-sigalg SHA256withRSA -digestalg SHA-256'
         zipalign: true
@@ -92,7 +92,7 @@ jobs:
         jarsign: true
         jarsignerKeystoreFile: 'simra-dsp2020.jks'
         jarsignerKeystorePassword: '$(jarsignerKeyPassword)'
-        jarsignerKeystoreAlias: 'simra-dsp2020.uploadTest'
+        jarsignerKeystoreAlias: 'simra-dsp2020.uploadtest'
         jarsignerKeyPassword: '$(jarsignerKeyPassword)'
         zipalign: true
 
