@@ -7,7 +7,7 @@ def API_SECRET = "API_SECRET"
 android {
     compileSdkVersion 29
     defaultConfig {
-        applicationId "de.tuberlin.mcc.simra.app"
+        applicationId "dsp2020.simra.app"
         minSdkVersion 23
         targetSdkVersion 29
         versionCode 58
