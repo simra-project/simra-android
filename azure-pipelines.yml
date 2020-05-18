@@ -62,9 +62,17 @@ jobs:
         targetFolder: '$(build.artifactStagingDirectory)'
 
     - task: PublishBuildArtifacts@1
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)/app/build/outputs/bundle/release'
         artifactName: 'bundle-files'
+        artifactType: 'container'
+
+    - task: PublishBuildArtifacts@1
+      condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/app/build/outputs/bundle/qa'
+        artifactName: 'bundle-files-qa'
         artifactType: 'container'
 
     # - task: CopyFiles@2
@@ -133,7 +141,15 @@ jobs:
         targetFolder: '$(build.artifactStagingDirectory)'
 
     - task: PublishBuildArtifacts@1
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)/app/build/outputs/apk/release/'
         artifactName: 'apk-files'
+        artifactType: 'container'
+
+    - task: PublishBuildArtifacts@1
+      condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/app/build/outputs/apk/qa/'
+        artifactName: 'apk-files-qa'
         artifactType: 'container'
