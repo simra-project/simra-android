@@ -1,5 +1,7 @@
 # SimRa Android App
 
+This is a fork of the original [simra-android](https://github.com/simra-project/simra-android/) project.
+
 [![CodeFactor](https://www.codefactor.io/repository/github/simra-project/simra-android/badge)](https://www.codefactor.io/repository/github/simra-project/simra-android)
 
 This project is part of the SimRa research project which includes the following subprojects:
