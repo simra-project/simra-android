@@ -10,5 +10,5 @@ hash-suffix.h
 *.apk
 .idea/*
 *.properties
-qa
-release
+app/qa
+app/release
