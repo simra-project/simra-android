@@ -17,6 +17,9 @@ pr:
 jobs:
 - job: bundle
   displayName: 'Build bundle'
+  variables:
+    API_ENDPOINT: $(apiEndpoint)
+    API_SECRET: $(apiSecret)
   pool:
     vmImage: 'macos-latest'
   steps:
@@ -71,6 +74,9 @@ jobs:
 
 - job: apk
   displayName: 'Build APK'
+  variables:
+    API_ENDPOINT: $(apiEndpoint)
+    API_SECRET: $(apiSecret)
   pool:
     vmImage: 'macos-latest'
   steps:
