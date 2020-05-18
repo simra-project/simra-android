@@ -21,7 +21,9 @@ android {
 
         // Load `local.properties` (from root) for development configuration
         Properties properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        }
 
         buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "https://localhost:8082/"
         buildConfigField "String", API_SECRET, properties.getProperty(API_SECRET) ?: "mysecret"
