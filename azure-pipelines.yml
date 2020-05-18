@@ -36,8 +36,8 @@ jobs:
         findBugsRunAnalysis: true
         pmdRunAnalysis: true
       env:
-        API_ENDPOINT: $(apiEndpoint)
-        API_SECRET: $(apiSecret)
+        SIMRA_API_ENDPOINT: $(apiEndpoint)
+        SIMRA_API_SECRET: $(apiSecret)
 
     - task: Gradle@2
       condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
@@ -52,8 +52,8 @@ jobs:
         findBugsRunAnalysis: true
         pmdRunAnalysis: true
       env:
-        API_ENDPOINT: $(apiEndpoint)
-        API_SECRET: $(apiSecret)
+        SIMRA_API_ENDPOINT: $(apiEndpoint)
+        SIMRA_API_SECRET: $(apiSecret)
 
     - task: CopyFiles@2
       inputs:
@@ -105,8 +105,8 @@ jobs:
         gradleOptions: '-Xmx3072m'
         sonarQubeRunAnalysis: false
       env:
-        API_ENDPOINT: $(apiEndpoint)
-        API_SECRET: $(apiSecret)
+        SIMRA_API_ENDPOINT: $(apiEndpoint)
+        SIMRA_API_SECRET: $(apiSecret)
 
     - task: Gradle@2
       displayName: 'build apk'
@@ -120,8 +120,8 @@ jobs:
         gradleOptions: '-Xmx3072m'
         sonarQubeRunAnalysis: false
       env:
-        API_ENDPOINT: $(apiEndpoint)
-        API_SECRET: $(apiSecret)
+        SIMRA_API_ENDPOINT: $(apiEndpoint)
+        SIMRA_API_SECRET: $(apiSecret)
 
     - task: AndroidSigning@2
       displayName: 'sign apk'
