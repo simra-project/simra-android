@@ -13,7 +13,7 @@
     <string name="title_activity_library_license">Third Party Licenses</string>
     <string name="title_activity_about_simra">About SimRa</string>
     <string name="title_activity_statistics">Statistics</string>
-    <string name="title_activity_bluetooth_connection">Bluetooth connection</string>
+    <string name="title_activity_bluetooth_connection">Radmesser</string>
 
 
     <!--- Start -->
@@ -74,6 +74,7 @@
     <string name="later">Later</string>
     <string name="recording_not_started">Recording did NOT start.</string>
     <string name="recording_started">Recording started.</string>
+
 
     <!--- RecorderService -->
     <string name="recorder_channel_name">Recording</string>
@@ -181,6 +182,10 @@
     <string name="dateFormatDescription">Date Format</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
+    <!--- Radmesser -->
+    <string name="radmesserConnection">Radmesser connection</string>
+
+
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Year of Birth</string>

@@ -1,28 +1,46 @@
-package de.tuberlin.mcc.simra.app.subactivites;
+package de.tuberlin.mcc.simra.app.main;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.os.Binder;
+import android.os.IBinder;
 
-import de.tuberlin.mcc.simra.app.R;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+public class RadmesserService extends Service {
+    private IBinder mBinder = new MyBinder();
+    private int connectionStatus = 0;
 
 
-public class BluetoothConnection extends AppCompatActivity {
-    private final static int REQUEST_ENABLE_BT = 1;
-    LinearLayout rootLayout;
-    LinearLayout enableBluetoothLayout;
+
+
+    // das soll mit einem Listener passieren
+    public int getConnectionStatus(){
+        return connectionStatus;
+    }
+
+    public void setConnectionStatus(int newStatus){
+        this.connectionStatus = newStatus;
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+       return mBinder;
+    }
+
+    public class MyBinder extends Binder {
+        public RadmesserService getService() {
+            return RadmesserService.this;
+        }
+    }
+}
+
+
+/*
+
+    LINUS FALLS DU ETWAS VON DIESEM CODE BRAUCHST , VERWENDE DIE GERNE, ANSONSTEN KANN VON MIR AUS WEG
+
+
+      private final static int REQUEST_ENABLE_BT = 1;
+
     LinearLayout discoveredDevicesLayout;
     BluetoothAdapter bluetoothAdapter;
 
@@ -62,7 +80,8 @@ public class BluetoothConnection extends AppCompatActivity {
         }
     };
 
-    @Override
+
+  @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_connection);
@@ -88,6 +107,8 @@ public class BluetoothConnection extends AppCompatActivity {
         super.onDestroy();
         unregisterReceiver(bluetoothConnectionReciever);
     }
+
+
 
     LinearLayout createLinearLayout(){
         return new LinearLayout(this);
@@ -153,23 +174,5 @@ public class BluetoothConnection extends AppCompatActivity {
         rootLayout.addView(discoverButton);
     }
 
-    private void initializeToolBar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle("");
-        toolbar.setSubtitle("");
-        TextView toolbarTxt = findViewById(R.id.toolbar_title);
-        toolbarTxt.setText("Bluetooth connection");
 
-        ImageButton backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           finish();
-                                       }
-                                   }
-        );
-    }
-}
-
+*/

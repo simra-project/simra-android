@@ -30,6 +30,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+        <service
+            android:name=".main.RadmesserService"
+            android:enabled="true"
+            android:exported="true"></service>
+
         <activity
             android:name=".subactivites.StatisticsActivity"
             android:configChanges="orientation|screenSize"
@@ -44,7 +49,7 @@
             android:name=".util.HelpActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".subactivites.BluetoothConnection"
+            android:name=".subactivites.RadmesserActivity"
             android:label="@string/title_activity_bluetooth_connection" />
         <activity
             android:name=".annotation.RideSettingsActivity"

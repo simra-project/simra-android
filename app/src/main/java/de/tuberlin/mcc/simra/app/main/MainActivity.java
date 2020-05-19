@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -67,7 +68,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.subactivites.AboutActivity;
-import de.tuberlin.mcc.simra.app.subactivites.BluetoothConnection;
+import de.tuberlin.mcc.simra.app.subactivites.RadmesserActivity;
 import de.tuberlin.mcc.simra.app.subactivites.ProfileActivity;
 import de.tuberlin.mcc.simra.app.subactivites.SettingsActivity;
 import de.tuberlin.mcc.simra.app.subactivites.StatisticsActivity;
@@ -130,6 +131,25 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private static final String TAG = "MainActivity_LOG";
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Radmesser
+    private RelativeLayout radmesserStatus;
+    RadmesserService mBoundRadmesserService;
+    private ServiceConnection mRadmesserServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "Connecting zo service");
+            RadmesserService.MyBinder myBinder = (RadmesserService.MyBinder) service;
+            mBoundRadmesserService= myBinder.getService();
+            setRadmesserStatusVisibility();
+            // LINUS Hier listeners einbauen
+
+        }
+    };
 
     @SuppressLint("MissingPermission")
     @Override
@@ -137,6 +157,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         Log.d(TAG, "OnCreate called");
         super.onCreate(savedInstanceState);
+
+        connectToRadmesserService();
+
 
         myEx = Executors.newFixedThreadPool(4);
 
@@ -397,8 +420,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 writeIntToSharedPrefs("regionLastChangedAtVersion",getAppVersionNumber(MainActivity.this),"simraPrefs",MainActivity.this);
             }
         }
+
+        radmesserStatus = findViewById(R.id.radmesserStatus);
+
         Log.d(TAG, "OnCreate finished");
 
+    }
+
+    private void connectToRadmesserService(){
+        Intent intent = new Intent(MainActivity.this, RadmesserService.class);
+        startService(intent);
+        bindService(intent, mRadmesserServiceConnection, Context.BIND_IMPORTANT);
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -413,6 +445,63 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         stopBtn.setVisibility(View.INVISIBLE);
 
     }
+
+    private void setRadmesserStatusVisibility(){
+        int radmesserEnabled =  lookUpIntSharedPrefs("RadmesserStatus", 0, "simraPrefs",this);
+
+        // @LINUS Das hier soll mit eine Notification/Listener passieren, (kann ausserhalb dieser Funktion passieren, am besten in onCreate() soll der Listener eingebaut werden)
+        int connectionStatus = (mBoundRadmesserService != null) ? mBoundRadmesserService.getConnectionStatus() : 0;
+
+        Log.d(TAG, "(resume) Radmesser value : " + radmesserEnabled);
+        Button statusButton = findViewById(R.id.radmesserStatusButton);
+        TextView radmesserStatusText = findViewById(R.id.radmesserStatusText);
+
+        statusButton.setTextSize(7);
+        // No Uppercase
+        statusButton.setTransformationMethod(null);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
+
+        if(radmesserEnabled == 0){
+            // ausblenden
+            navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
+            radmesserStatus.setVisibility(View.GONE);
+        }else{
+            // einblenden
+            setRadmesserButton(connectionStatus, statusButton, radmesserStatusText);
+            navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(true);
+            radmesserStatus.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setRadmesserButton(int status, Button statusButton, TextView radmesserText){
+        switch (status){
+            case 0:
+                statusButton.setText("Verbinden");
+                radmesserText.setText("Radmesser nicht verbunden");
+                radmesserText.setTextColor(Color.WHITE);
+                radmesserText.setBackgroundColor(Color.RED);
+                // LINUS hier nochmal den Radmesser verbindung versuchen
+
+                break;
+            case 1:
+                statusButton.setEnabled(false);
+                statusButton.setText("...");
+                radmesserText.setText("Verbinde");
+                radmesserText.setTextColor(Color.BLACK);
+                radmesserText.setBackgroundColor(Color.LTGRAY);
+                break;
+            case 2:
+                radmesserText.setText("Radmesser verbunden");
+                statusButton.setText("Siehe");
+                radmesserText.setTextColor(Color.WHITE);
+                radmesserText.setBackgroundColor(Color.GREEN);
+                break;
+            default:
+                break;
+        }
+    }
+
 
     // (2) stop button visible, start button invisible
 
@@ -456,6 +545,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mMapView.onResume(); // needed for compass and icons
         mLocationOverlay.onResume();
         mLocationOverlay.enableMyLocation();
+
+        // show or shide the radmesser status acording to the shared settings
+        setRadmesserStatusVisibility();
+
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -580,7 +674,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             i.setData(Uri.parse(getString(R.string.link_to_twitter)));
             startActivity(i);
         }else if (id == R.id.nav_bluetooth_connection){
-            Intent intent = new Intent(MainActivity.this, BluetoothConnection.class);
+            Intent intent = new Intent(MainActivity.this, RadmesserActivity.class);
             startActivity(intent);
         }
 
@@ -624,6 +718,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             mBoundRecorderService = myBinder.getService();
         }
     };
+
+
+
 
     private static boolean isLocationServiceOff(MainActivity mainActivity) {
 
