@@ -16,18 +16,11 @@ public class Constants {
 
     public static final int GPS_FREQUENCY = 3000;
 
-    public static final String MCC_VM1 = "https://vm1.mcc.tu-berlin.de:8082/";
-    public static final String MCC_VM2 = "https://vm2.mcc.tu-berlin.de:8082/";
-    public static final String MCC_VM3 = "https://vm3.mcc.tu-berlin.de:8082/";
-
     // Every GPS fix has to be at least this accurate to be taken into account.
     public static final double GPS_ACCURACY_THRESHOLD = 30.0;
 
     // Backend Interface Version
     public static final int BACKEND_VERSION = 10;
-
-    // Locales
-    public static final String[] LOCALE_ABVS = {"UNKNOWN", "Berlin", "London", "other", "Bern", "Pforzheim", "Augsburg", "Ruhrgebiet", "Stuttgart"};
 
     public static final String PROFILE_HEADER = "birth,gender,region,experience,numberOfRides,duration,numberOfIncidents,waitedTime,distance,co2,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,behaviour,numberOfScary" + System.lineSeparator();
 

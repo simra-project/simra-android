@@ -1,19 +1,59 @@
 apply plugin: 'com.android.application'
 
+def ENV_VARIABLE_PREFIX = "SIMRA_"
+def API_ENDPOINT = "API_ENDPOINT"
+def API_SECRET = "API_SECRET"
+
 android {
     compileSdkVersion 29
     defaultConfig {
-        applicationId "de.tuberlin.mcc.simra.app"
+        applicationId "dsp2020.simra.app"
         minSdkVersion 23
         targetSdkVersion 29
         versionCode 58
         versionName "58.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // defining the build date
+        buildConfigField "long", "BUILD_DATE", System.currentTimeMillis() + "L"
+        // define whether this build is a production build
+        buildConfigField "boolean", "IS_PRODUCTION", "false"
+
+        // Load `local.properties` (from root) for development configuration
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        }
+
+        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://localhost:8082/\""
+        buildConfigField "String", API_SECRET, properties.getProperty(API_SECRET) ?: "\"mysecret\""
+
     }
     buildTypes {
+
         release {
             minifyEnabled false
+            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            // Allow loading the configuration Settings from environment variables
+            buildConfigField "boolean", "IS_PRODUCTION", "true"
+            def VAR_API_ENDPOINT = System.getenv(ENV_VARIABLE_PREFIX + API_ENDPOINT)
+            if(VAR_API_ENDPOINT != null) {
+                buildConfigField "String", API_ENDPOINT, "\"" + VAR_API_ENDPOINT + "\""
+            }
+            def VAR_API_SECRET = System.getenv(ENV_VARIABLE_PREFIX + API_SECRET)
+            if(VAR_API_SECRET != null){
+                buildConfigField "String", API_SECRET, "\"" + VAR_API_SECRET + "\""
+            }
+        }
+        debug {
+            debuggable true
+            applicationIdSuffix ".debug"
+        }
+        qa {
+            initWith buildTypes.release
+            applicationIdSuffix ".qa"
         }
     }
     compileOptions {

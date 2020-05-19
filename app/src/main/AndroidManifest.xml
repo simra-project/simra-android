@@ -28,6 +28,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+
+        <activity
+            android:name=".main.StartActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".subactivites.StatisticsActivity"
             android:configChanges="orientation|screenSize"
@@ -57,36 +67,6 @@
             android:label="@string/title_activity_library_license"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <meta-data
-            android:name="MAPBOX_MAPID"
-            android:value="mapbox.mapbox-light-v9" />
-        <meta-data
-            android:name="MAPBOX_ACCESS_TOKEN"
-            android:value="pk.eyJ1IjoibWVlcmthdG1lIiwiYSI6ImNqb3IzanczdjBhcmEzd285bGN3M2tmYzYifQ.dK_okt0sWZHXc5zwSE4RzQ" />
-        <meta-data
-            android:name="HEREWEGO_MAPID"
-            android:value="hybrid.day" />
-        <meta-data
-            android:name="HEREWEGO_APPID"
-            android:value="t17LkxdBtMj55CyljUxT" />
-        <meta-data
-            android:name="HEREWEGO_APPCODE"
-            android:value="Dv1l6L3uczbBmhFasUc1Eg" />
-
-        <activity
-            android:name=".main.StartActivity"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
-
         <activity
             android:name=".main.MainActivity"
             android:configChanges="orientation|screenSize"
@@ -111,14 +91,6 @@
             android:label="@string/title_activity_settings"
             android:parentActivityName=".main.MainActivity" />
 
-        <service
-            android:name=".main.RecorderService"
-            android:parentActivityName=".MainActivity" />
-        <service
-            android:name=".net.UploadService"
-            android:enabled="true"
-            android:parentActivityName=".HistoryActivity" />
-
         <activity
             android:name=".main.HistoryActivity"
             android:configChanges="orientation|screenSize"
@@ -140,6 +112,34 @@
             android:name=".subactivites.CreditsActivity"
             android:label="@string/title_activity_credits"
             android:theme="@style/AppTheme" />
+
+        <service
+            android:name=".main.RecorderService"
+            android:parentActivityName=".MainActivity" />
+        <service
+            android:name=".net.UploadService"
+            android:enabled="true"
+            android:parentActivityName=".HistoryActivity" />
+
+        <meta-data
+            android:name="MAPBOX_MAPID"
+            android:value="mapbox.mapbox-light-v9" />
+        <meta-data
+            android:name="MAPBOX_ACCESS_TOKEN"
+            android:value="pk.eyJ1IjoibWVlcmthdG1lIiwiYSI6ImNqb3IzanczdjBhcmEzd285bGN3M2tmYzYifQ.dK_okt0sWZHXc5zwSE4RzQ" />
+        <meta-data
+            android:name="HEREWEGO_MAPID"
+            android:value="hybrid.day" />
+        <meta-data
+            android:name="HEREWEGO_APPID"
+            android:value="t17LkxdBtMj55CyljUxT" />
+        <meta-data
+            android:name="HEREWEGO_APPCODE"
+            android:value="Dv1l6L3uczbBmhFasUc1Eg" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

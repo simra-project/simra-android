@@ -33,6 +33,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
+import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.main.HistoryActivity;
 import de.tuberlin.mcc.simra.app.util.Constants;
@@ -464,7 +466,7 @@ public class UploadService extends Service {
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileName + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + fileType + "?loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash(context));
+            URL url = new URL(BuildConfig.API_ENDPOINT + BACKEND_VERSION + "/" + fileType + "?loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection) url.openConnection();
@@ -506,7 +508,7 @@ public class UploadService extends Service {
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(Constants.MCC_VM2 + BACKEND_VERSION + "/" + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash(context));
+            URL url = new URL(BuildConfig.API_ENDPOINT + BACKEND_VERSION + "/" + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection) url.openConnection();
