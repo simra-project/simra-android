@@ -65,6 +65,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
+import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.subactivites.AboutActivity;
@@ -758,7 +760,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             StringBuilder checkRegionsResponse = new StringBuilder();
             int status = 0;
             try {
-                URL url = new URL(Constants.MCC_VM2 + "check/regions?clientHash=" + SimRAuthenticator.getClientHash(MainActivity.this));
+
+                URL url = new URL(BuildConfig.API_ENDPOINT + "check/regions?clientHash=" + SimRAuthenticator.getClientHash());
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection =
                         (HttpsURLConnection)url.openConnection();
@@ -786,7 +789,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             StringBuilder checkVersionResponse = new StringBuilder();
             try {
-                URL url = new URL(Constants.MCC_VM2 + "check/version?clientHash=" + SimRAuthenticator.getClientHash(MainActivity.this));
+                URL url = new URL(BuildConfig.API_ENDPOINT + "check/version?clientHash=" + SimRAuthenticator.getClientHash());
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection =
                         (HttpsURLConnection)url.openConnection();
