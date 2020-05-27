@@ -13,6 +13,7 @@
     <string name="title_activity_credits">Grafikreferenzen</string>
     <string name="title_activity_about_simra">Über SimRa</string>
     <string name="title_activity_statistics">Statistiken</string>
+    <string name="title_activity_bluetooth_connection">Radmesser</string>
 
 
     <!--- Start -->
@@ -75,6 +76,9 @@
     <string name="later">Später</string>
     <string name="recording_not_started">Fahrtaufzeichnung wurde NICHT gestartet.</string>
     <string name="recording_started">Fahrtaufzeichnung wurde gestartet.</string>
+
+
+
 
     <!--- RecorderService -->
     <string name="recorder_channel_name">Aufzeichnung</string>
@@ -182,6 +186,8 @@
     <string name="dateFormatDescription">Datumsformat</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
+    <!--- Radmesser -->
+    <string name="radmesserConnection">Radmesser verbinden</string>
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>

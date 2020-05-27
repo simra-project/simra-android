@@ -344,6 +344,34 @@
                 android:layout_toEndOf="@id/dateFormatSwitch"/>
         </RelativeLayout>
 
+        <TextView
+            android:id="@+id/BluetoothConnection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radmesserConnection"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Space
+            android:id="@+id/generalSettingsSpace4"
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Switch
+                android:id="@+id/radmesserSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+        </RelativeLayout>
+        <Space
+            android:id="@+id/generalSettingsSpace5"
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
     </LinearLayout>
             <Space
                 android:layout_width="match_parent"

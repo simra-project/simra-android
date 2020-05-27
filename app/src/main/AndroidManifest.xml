@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="de.tuberlin.mcc.simra.app">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" 
+    xmlns:tools="http://schemas.android.com/tools" package="de.tuberlin.mcc.simra.app">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <!--
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
     <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
@@ -20,126 +21,51 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/simra_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/simra_launcher"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:replace="android:allowBackup">
+    <application android:allowBackup="true" android:icon="@mipmap/simra_launcher" android:label="@string/app_name" android:roundIcon="@mipmap/simra_launcher" android:supportsRtl="true" android:theme="@style/AppTheme" tools:replace="android:allowBackup">
 
-        <activity
-            android:name=".main.StartActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop">
+        <!-- Activities -->
+        <activity android:name=".main.StartActivity" android:label="@string/app_name" android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".subactivites.StatisticsActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_statistics"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".subactivites.AboutActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_about_simra"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".util.HelpActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".annotation.RideSettingsActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_ride_settings"
-            android:parentActivityName=".annotation.ShowRouteActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity" />
+        <activity android:name=".subactivites.StatisticsActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_statistics" android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".subactivites.AboutActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_about_simra" android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".util.HelpActivity" android:configChanges="orientation|screenSize" />
+        <activity android:name=".subactivites.RadmesserActivity" android:label="@string/title_activity_bluetooth_connection" />
+        <activity android:name=".annotation.RideSettingsActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_ride_settings" android:parentActivityName=".annotation.ShowRouteActivity" android:theme="@style/AppTheme.NoActionBar">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity" />
         </activity>
-        <activity
-            android:name=".subactivites.LicenseActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_library_license"
-            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".subactivites.LicenseActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_library_license" android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity
-            android:name=".main.MainActivity"
-            android:configChanges="orientation|screenSize"
-            android:launchMode="singleTop" />
-        <activity
-            android:name=".util.WebActivity"
-            android:configChanges="orientation|screenSize"
-            android:parentActivityName=".main.MainActivity" />
-        <activity
-            android:name=".subactivites.ProfileActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_profile"
-            android:parentActivityName=".main.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.tuberlin.mcc.simra.app.main.MainActivity" />
+        <activity android:name=".main.MainActivity" android:configChanges="orientation|screenSize" android:launchMode="singleTop" />
+        <activity android:name=".util.WebActivity" android:configChanges="orientation|screenSize" android:parentActivityName=".main.MainActivity" />
+        <activity android:name=".subactivites.ProfileActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_profile" android:parentActivityName=".main.MainActivity" android:theme="@style/AppTheme.NoActionBar">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="de.tuberlin.mcc.simra.app.main.MainActivity" />
         </activity>
-        <activity
-            android:name=".subactivites.SettingsActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".main.MainActivity" />
+        <activity android:name=".subactivites.SettingsActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_settings" android:parentActivityName=".main.MainActivity" />
 
-        <activity
-            android:name=".main.HistoryActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_history"
-            android:parentActivityName=".main.MainActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.tuberlin.mcc.simra.app.main.MainActivity" />
+        <activity android:name=".main.HistoryActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_history" android:parentActivityName=".main.MainActivity" android:theme="@style/AppTheme">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="de.tuberlin.mcc.simra.app.main.MainActivity" />
         </activity>
-        <activity
-            android:name=".annotation.ShowRouteActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".annotation.IncidentPopUpActivity"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.PopUpWindow" />
-        <activity
-            android:name=".subactivites.CreditsActivity"
-            android:label="@string/title_activity_credits"
-            android:theme="@style/AppTheme" />
+        <activity android:name=".annotation.ShowRouteActivity" android:configChanges="orientation|screenSize" />
+        <activity android:name=".annotation.IncidentPopUpActivity" android:configChanges="orientation|screenSize" android:theme="@style/AppTheme.PopUpWindow" />
+        <activity android:name=".subactivites.CreditsActivity" android:label="@string/title_activity_credits" android:theme="@style/AppTheme" />
 
-        <service
-            android:name=".main.RecorderService"
-            android:parentActivityName=".MainActivity" />
-        <service
-            android:name=".net.UploadService"
-            android:enabled="true"
-            android:parentActivityName=".HistoryActivity" />
+        <!-- Services -->
+        <service android:name=".main.RecorderService" android:parentActivityName=".MainActivity" />
+        <service android:name=".net.UploadService" android:enabled="true" android:parentActivityName=".HistoryActivity" />
+        <service android:name=".main.RadmesserService" android:enabled="true" android:exported="true"></service>
 
-        <meta-data
-            android:name="MAPBOX_MAPID"
-            android:value="mapbox.mapbox-light-v9" />
-        <meta-data
-            android:name="MAPBOX_ACCESS_TOKEN"
-            android:value="pk.eyJ1IjoibWVlcmthdG1lIiwiYSI6ImNqb3IzanczdjBhcmEzd285bGN3M2tmYzYifQ.dK_okt0sWZHXc5zwSE4RzQ" />
-        <meta-data
-            android:name="HEREWEGO_MAPID"
-            android:value="hybrid.day" />
-        <meta-data
-            android:name="HEREWEGO_APPID"
-            android:value="t17LkxdBtMj55CyljUxT" />
-        <meta-data
-            android:name="HEREWEGO_APPCODE"
-            android:value="Dv1l6L3uczbBmhFasUc1Eg" />
+        <!-- MetaData -->
+        <meta-data android:name="MAPBOX_MAPID" android:value="mapbox.mapbox-light-v9" />
+        <meta-data android:name="MAPBOX_ACCESS_TOKEN" android:value="pk.eyJ1IjoibWVlcmthdG1lIiwiYSI6ImNqb3IzanczdjBhcmEzd285bGN3M2tmYzYifQ.dK_okt0sWZHXc5zwSE4RzQ" />
+        <meta-data android:name="HEREWEGO_MAPID" android:value="hybrid.day" />
+        <meta-data android:name="HEREWEGO_APPID" android:value="t17LkxdBtMj55CyljUxT" />
+        <meta-data android:name="HEREWEGO_APPCODE" android:value="Dv1l6L3uczbBmhFasUc1Eg" />
 
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
+        <meta-data android:name="preloaded_fonts" android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

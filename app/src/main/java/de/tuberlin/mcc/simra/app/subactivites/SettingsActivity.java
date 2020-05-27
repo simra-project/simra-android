@@ -1,5 +1,7 @@
 package de.tuberlin.mcc.simra.app.subactivites;
 
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +32,7 @@ public class SettingsActivity extends BaseActivity {
     int trailer;
     String unit;
     int dateFormat;
+    int radmesserConnectionStatus;
 
     // Bike Type and Phone Location Items
     Spinner bikeTypeSpinner;
@@ -41,6 +44,12 @@ public class SettingsActivity extends BaseActivity {
 
     Switch unitSwitch;
     Switch dateFormatSwitch;
+    Switch radmesserConnectionSwitch;
+    private final static int REQUEST_ENABLE_BT = 1;
+    private final static int BLUETOOTH_SUCCESS = -1;
+    private final static int CONNECTED = 2;
+    private final static int CONNECTING = 1;
+    private final static int NOT_CONNECTED = 0;
 
 
 
@@ -181,7 +190,51 @@ public class SettingsActivity extends BaseActivity {
 
         TextView appVersionTextView = findViewById(R.id.appVersionTextView);
         appVersionTextView.setText("Version: " + getAppVersionNumber(this));
+
+        // set radmesser connection
+        radmesserConnectionStatus = lookUpIntSharedPrefs("RadmesserStatus", 0, "simraPrefs",this);
+        radmesserConnectionSwitch = findViewById(R.id.radmesserSwitch);
+        radmesserConnectionSwitch.setChecked(radmesserConnectionStatus > 0); // 0 not connected, 1 connecting, 2 connected
+        radmesserConnectionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                radmesserConnectionStatus = isChecked ? 1 : 0;
+                setRadmesserStatus(radmesserConnectionStatus);
+                if(BluetoothAdapter.getDefaultAdapter() == null){
+                    // Device does not support Bluetooth
+                }
+                if (!BluetoothAdapter.getDefaultAdapter().isEnabled() && isChecked) {
+                    enableBluetooth();
+                }
+            }
+        });
+
     }
+
+    private void setRadmesserStatus(int newStatus){
+        writeIntToSharedPrefs("RadmesserStatus",newStatus,"simraPrefs", this);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == BLUETOOTH_SUCCESS && requestCode == REQUEST_ENABLE_BT) {
+            // Bluetooth successfully enabled, i dont know why the F**k is -1 instead a positive number
+            radmesserConnectionSwitch.setChecked(true);
+            setRadmesserStatus(CONNECTED);
+            // LINUS Hier Vielleicht verbindung anfragen zu Radmesser
+
+        }else{
+            radmesserConnectionSwitch.setChecked(false);
+            setRadmesserStatus(NOT_CONNECTED);
+        }
+    }
+
+    private void enableBluetooth() {
+        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+    }
+
+
 
     // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)
     private SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener(TextView tV, String unit, String privacyOption) {

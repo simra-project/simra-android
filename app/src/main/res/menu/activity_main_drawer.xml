@@ -21,6 +21,10 @@
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/title_activity_settings" />
         <item
+            android:id="@+id/nav_bluetooth_connection"
+            android:icon="@drawable/bluetooth_icon"
+            android:title="@string/title_activity_bluetooth_connection" />
+        <item
             android:id="@+id/nav_aboutSimRa"
             android:icon="@drawable/helmet"
             android:title="@string/about_simra" />
