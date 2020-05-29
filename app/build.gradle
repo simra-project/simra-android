@@ -83,4 +83,5 @@ dependencies {
     api 'com.github.MKergall:osmbonuspack:6.5.3'
     implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.4'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.4'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
 }
