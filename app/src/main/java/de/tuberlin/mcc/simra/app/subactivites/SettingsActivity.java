@@ -1,6 +1,8 @@
 package de.tuberlin.mcc.simra.app.subactivites;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import pl.droidsonroids.gif.GifImageView;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.*;
 
@@ -206,6 +210,9 @@ public class SettingsActivity extends BaseActivity {
                 if (!BluetoothAdapter.getDefaultAdapter().isEnabled() && isChecked) {
                     enableBluetooth();
                 }
+                if(isChecked){
+                    showTutorialDialog();
+                }
             }
         });
 
@@ -213,6 +220,26 @@ public class SettingsActivity extends BaseActivity {
 
     private void setRadmesserStatus(int newStatus){
         writeIntToSharedPrefs("RadmesserStatus",newStatus,"simraPrefs", this);
+    }
+
+    private void showTutorialDialog(){
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Verbindung mit Radmesser");
+        alert.setMessage("\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden");
+
+        LinearLayout gifLayout = new LinearLayout(this);
+        LinearLayout.LayoutParams gifMargins = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        GifImageView gif = new GifImageView(this);
+        gif.setImageResource(R.drawable.tutorial);
+        gif.setVisibility(View.VISIBLE);
+        gifMargins.setMargins(50, 0, 50, 0);
+        gif.setLayoutParams(gifMargins);
+        gifLayout.addView(gif);
+        alert.setView(gifLayout);
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) { }
+        });
+        alert.show();
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
