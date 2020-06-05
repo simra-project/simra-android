@@ -38,33 +38,24 @@
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity" />
         </activity>
         <activity android:name=".subactivites.LicenseActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_library_license" android:theme="@style/AppTheme.NoActionBar" />
-
         <activity android:name=".main.MainActivity" android:configChanges="orientation|screenSize" android:launchMode="singleTop" />
         <activity android:name=".util.WebActivity" android:configChanges="orientation|screenSize" android:parentActivityName=".main.MainActivity" />
         <activity android:name=".subactivites.ProfileActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_profile" android:parentActivityName=".main.MainActivity" android:theme="@style/AppTheme.NoActionBar">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="de.tuberlin.mcc.simra.app.main.MainActivity" />
         </activity>
         <activity android:name=".subactivites.SettingsActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_settings" android:parentActivityName=".main.MainActivity" />
-
         <activity android:name=".main.HistoryActivity" android:configChanges="orientation|screenSize" android:label="@string/title_activity_history" android:parentActivityName=".main.MainActivity" android:theme="@style/AppTheme">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="de.tuberlin.mcc.simra.app.main.MainActivity" />
         </activity>
         <activity android:name=".annotation.ShowRouteActivity" android:configChanges="orientation|screenSize" />
         <activity android:name=".annotation.IncidentPopUpActivity" android:configChanges="orientation|screenSize" android:theme="@style/AppTheme.PopUpWindow" />
         <activity android:name=".subactivites.CreditsActivity" android:label="@string/title_activity_credits" android:theme="@style/AppTheme" />
-
         <!-- Services -->
         <service android:name=".main.RecorderService" android:parentActivityName=".MainActivity" />
         <service android:name=".net.UploadService" android:enabled="true" android:parentActivityName=".HistoryActivity" />
-        <service android:name=".main.RadmesserService" android:enabled="true" android:exported="true"></service>
+        <service android:name=".main.RadmesserService" android:enabled="true" android:exported="true" />
 
         <!-- MetaData -->
-        <meta-data android:name="MAPBOX_MAPID" android:value="mapbox.mapbox-light-v9" />
-        <meta-data android:name="MAPBOX_ACCESS_TOKEN" android:value="pk.eyJ1IjoibWVlcmthdG1lIiwiYSI6ImNqb3IzanczdjBhcmEzd285bGN3M2tmYzYifQ.dK_okt0sWZHXc5zwSE4RzQ" />
-        <meta-data android:name="HEREWEGO_MAPID" android:value="hybrid.day" />
-        <meta-data android:name="HEREWEGO_APPID" android:value="t17LkxdBtMj55CyljUxT" />
-        <meta-data android:name="HEREWEGO_APPCODE" android:value="Dv1l6L3uczbBmhFasUc1Eg" />
-
         <meta-data android:name="preloaded_fonts" android:resource="@array/preloaded_fonts" />
     </application>
 
