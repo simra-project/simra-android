@@ -1,12 +1,8 @@
 package de.tuberlin.mcc.simra.app.subactivites;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -17,8 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.main.MainActivity;
-import de.tuberlin.mcc.simra.app.main.RadmesserService;
+import de.tuberlin.mcc.simra.app.services.RadmesserService;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;

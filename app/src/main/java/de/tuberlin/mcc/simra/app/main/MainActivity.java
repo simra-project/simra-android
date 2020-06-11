@@ -69,13 +69,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.SimRAuthenticator;
+import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.subactivites.AboutActivity;
 import de.tuberlin.mcc.simra.app.subactivites.RadmesserActivity;
 import de.tuberlin.mcc.simra.app.subactivites.ProfileActivity;
 import de.tuberlin.mcc.simra.app.subactivites.SettingsActivity;
 import de.tuberlin.mcc.simra.app.subactivites.StatisticsActivity;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
-import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.Utils;
 import de.tuberlin.mcc.simra.app.util.WebActivity;
 
