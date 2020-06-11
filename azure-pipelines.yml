@@ -6,150 +6,154 @@
 trigger:
   branches:
     include:
-    - master
+      - master
 
 pr:
- branches:
-  include:
-    - master
-
+  branches:
+    include:
+      - master
 
 jobs:
-- job: bundle
-  displayName: 'Build bundle'
-  variables:
-    API_ENDPOINT: $(apiEndpoint)
-    API_SECRET: $(apiSecret)
-  pool:
-    vmImage: 'macos-latest'
-  steps:
-    - task: Gradle@2
-      condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
-      inputs:
-        gradleWrapperFile: 'gradlew'
-        tasks: 'bundleQa'
-        publishJUnitResults: false
-        javaHomeOption: 'JDKVersion'
-        gradleOptions: '-Xmx3072m'
-        sonarQubeRunAnalysis: false
-        checkStyleRunAnalysis: true
-        findBugsRunAnalysis: true
-        pmdRunAnalysis: true
-      env:
-        SIMRA_API_ENDPOINT: $(apiEndpoint)
-        SIMRA_API_SECRET: $(apiSecret)
+  - job: bundle
+    displayName: "Build bundle"
+    variables:
+      API_ENDPOINT: $(apiEndpoint)
+      API_SECRET: $(apiSecret)
+    pool:
+      vmImage: "macos-latest"
+    steps:
+      - task: Gradle@2
+        condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          gradleWrapperFile: "gradlew"
+          tasks: "bundleQa"
+          publishJUnitResults: false
+          javaHomeOption: "JDKVersion"
+          gradleOptions: "-Xmx3072m"
+          sonarQubeRunAnalysis: false
+          checkStyleRunAnalysis: true
+          findBugsRunAnalysis: true
+          pmdRunAnalysis: true
+        env:
+          SIMRA_API_ENDPOINT: $(apiEndpoint)
+          SIMRA_API_SECRET: $(apiSecret)
+          SIMRA_SENTRY_DSN: $(sentryDSN)
 
-    - task: Gradle@2
-      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
-      inputs:
-        gradleWrapperFile: 'gradlew'
-        tasks: 'bundleRelease'
-        publishJUnitResults: false
-        javaHomeOption: 'JDKVersion'
-        gradleOptions: '-Xmx3072m'
-        sonarQubeRunAnalysis: false
-        checkStyleRunAnalysis: true
-        findBugsRunAnalysis: true
-        pmdRunAnalysis: true
-      env:
-        SIMRA_API_ENDPOINT: $(apiEndpoint)
-        SIMRA_API_SECRET: $(apiSecret)
+      - task: Gradle@2
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          gradleWrapperFile: "gradlew"
+          tasks: "bundleRelease"
+          publishJUnitResults: false
+          javaHomeOption: "JDKVersion"
+          gradleOptions: "-Xmx3072m"
+          sonarQubeRunAnalysis: false
+          checkStyleRunAnalysis: true
+          findBugsRunAnalysis: true
+          pmdRunAnalysis: true
+        env:
+          SIMRA_API_ENDPOINT: $(apiEndpoint)
+          SIMRA_API_SECRET: $(apiSecret)
+          SIMRA_SENTRY_DSN: $(sentryDSN)
 
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: $(Build.SourcesDirectory)
-        contents: '**/*.aab'
-        targetFolder: '$(build.artifactStagingDirectory)'
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: $(Build.SourcesDirectory)
+          contents: "**/*.aab"
+          targetFolder: "$(build.artifactStagingDirectory)"
 
-    - task: PublishBuildArtifacts@1
-      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
-      inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)/app/build/outputs/bundle/release'
-        artifactName: 'bundle-files'
-        artifactType: 'container'
+      - task: PublishBuildArtifacts@1
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          pathtoPublish: "$(Build.ArtifactStagingDirectory)/app/build/outputs/bundle/release"
+          artifactName: "bundle-files"
+          artifactType: "container"
 
-    - task: PublishBuildArtifacts@1
-      condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
-      inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)/app/build/outputs/bundle/qa'
-        artifactName: 'bundle-files-qa'
-        artifactType: 'container'
+      - task: PublishBuildArtifacts@1
+        condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          pathtoPublish: "$(Build.ArtifactStagingDirectory)/app/build/outputs/bundle/qa"
+          artifactName: "bundle-files-qa"
+          artifactType: "container"
 
-    # - task: CopyFiles@2
-    #   inputs:
-    #     SourceFolder: $(Build.SourcesDirectory)
-    #     contents: 'metadata/**'
-    #     targetFolder: '$(build.artifactStagingDirectory)'
+      - task: CopyFiles@2
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          SourceFolder: $(Build.SourcesDirectory)
+          contents: "metadata/**"
+          targetFolder: "$(build.artifactStagingDirectory)"
 
-    # - task: PublishBuildArtifacts@1
-    #   inputs:
-    #     pathtoPublish: '$(Build.ArtifactStagingDirectory)/metadata/android'
-    #     artifactName: 'metadata-files'
-    #     artifactType: 'container'
+      - task: PublishBuildArtifacts@1
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          pathtoPublish: "$(Build.ArtifactStagingDirectory)/metadata/android"
+          artifactName: "metadata-files"
+          artifactType: "container"
 
+  - job: apk
+    displayName: "Build APK"
+    pool:
+      vmImage: "macos-latest"
+    steps:
+      - task: Gradle@2
+        displayName: "build apk"
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          gradleWrapperFile: "gradlew"
+          tasks: "assembleRelease"
+          publishJUnitResults: false
+          testResultsFiles: "**/TEST-*.xml"
+          javaHomeOption: "JDKVersion"
+          gradleOptions: "-Xmx3072m"
+          sonarQubeRunAnalysis: false
+        env:
+          SIMRA_API_ENDPOINT: $(apiEndpoint)
+          SIMRA_API_SECRET: $(apiSecret)
+          SIMRA_SENTRY_DSN: $(sentryDSN)
 
-- job: apk
-  displayName: 'Build APK'
-  pool:
-    vmImage: 'macos-latest'
-  steps:
-    - task: Gradle@2
-      displayName: 'build apk'
-      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
-      inputs:
-        gradleWrapperFile: 'gradlew'
-        tasks: 'assembleRelease'
-        publishJUnitResults: false
-        testResultsFiles: '**/TEST-*.xml'
-        javaHomeOption: 'JDKVersion'
-        gradleOptions: '-Xmx3072m'
-        sonarQubeRunAnalysis: false
-      env:
-        SIMRA_API_ENDPOINT: $(apiEndpoint)
-        SIMRA_API_SECRET: $(apiSecret)
+      - task: Gradle@2
+        displayName: "build apk"
+        condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          gradleWrapperFile: "gradlew"
+          tasks: "assembleQa"
+          publishJUnitResults: false
+          testResultsFiles: "**/TEST-*.xml"
+          javaHomeOption: "JDKVersion"
+          gradleOptions: "-Xmx3072m"
+          sonarQubeRunAnalysis: false
+        env:
+          SIMRA_API_ENDPOINT: $(apiEndpoint)
+          SIMRA_API_SECRET: $(apiSecret)
+          SIMRA_SENTRY_DSN: $(sentryDSN)
 
-    - task: Gradle@2
-      displayName: 'build apk'
-      condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
-      inputs:
-        gradleWrapperFile: 'gradlew'
-        tasks: 'assembleQa'
-        publishJUnitResults: false
-        testResultsFiles: '**/TEST-*.xml'
-        javaHomeOption: 'JDKVersion'
-        gradleOptions: '-Xmx3072m'
-        sonarQubeRunAnalysis: false
-      env:
-        SIMRA_API_ENDPOINT: $(apiEndpoint)
-        SIMRA_API_SECRET: $(apiSecret)
+      - task: AndroidSigning@2
+        displayName: "sign apk"
+        inputs:
+          apkFiles: "**/*.apk"
+          jarsign: true
+          jarsignerKeystoreFile: "simra-dsp2020.jks"
+          jarsignerKeystorePassword: "$(jarsignerKeyPassword)"
+          jarsignerKeystoreAlias: "uploadtest"
+          jarsignerKeyPassword: "$(jarsignerKeyPassword)"
+          zipalign: true
 
-    - task: AndroidSigning@2
-      displayName: 'sign apk'
-      inputs:
-        apkFiles: '**/*.apk'
-        jarsign: true
-        jarsignerKeystoreFile: 'simra-dsp2020.jks'
-        jarsignerKeystorePassword: '$(jarsignerKeyPassword)'
-        jarsignerKeystoreAlias: 'uploadtest'
-        jarsignerKeyPassword: '$(jarsignerKeyPassword)'
-        zipalign: true
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: $(Build.SourcesDirectory)
+          contents: "**/*.apk"
+          targetFolder: "$(build.artifactStagingDirectory)"
 
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: $(Build.SourcesDirectory)
-        contents: '**/*.apk'
-        targetFolder: '$(build.artifactStagingDirectory)'
+      - task: PublishBuildArtifacts@1
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          pathtoPublish: "$(Build.ArtifactStagingDirectory)/app/build/outputs/apk/release/"
+          artifactName: "apk-files"
+          artifactType: "container"
 
-    - task: PublishBuildArtifacts@1
-      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
-      inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)/app/build/outputs/apk/release/'
-        artifactName: 'apk-files'
-        artifactType: 'container'
-
-    - task: PublishBuildArtifacts@1
-      condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
-      inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)/app/build/outputs/apk/qa/'
-        artifactName: 'apk-files-qa'
-        artifactType: 'container'
+      - task: PublishBuildArtifacts@1
+        condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          pathtoPublish: "$(Build.ArtifactStagingDirectory)/app/build/outputs/apk/qa/"
+          artifactName: "apk-files-qa"
+          artifactType: "container"
