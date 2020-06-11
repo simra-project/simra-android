@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 def ENV_VARIABLE_PREFIX = "SIMRA_"
 def API_ENDPOINT = "API_ENDPOINT"
 def API_SECRET = "API_SECRET"
+def SENTRY_DSN = "SENTRY_DSN"
 
 android {
     compileSdkVersion 29
@@ -24,6 +25,15 @@ android {
         if (project.rootProject.file('local.properties').exists()) {
             properties.load(project.rootProject.file('local.properties').newDataInputStream())
         }
+
+        if(properties.getProperty(SENTRY_DSN) != null){
+            buildConfigField "String", SENTRY_DSN, properties.getProperty(SENTRY_DSN)
+        }
+        def VAR_SENTRY_DSN = System.getenv(ENV_VARIABLE_PREFIX + SENTRY_DSN)
+        if(VAR_SENTRY_DSN != null){
+            buildConfigField "String", SENTRY_DSN, "\"" + VAR_SENTRY_DSN + "\""
+        }
+
 
         buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://localhost:8082/\""
         buildConfigField "String", API_SECRET, properties.getProperty(API_SECRET) ?: "\"mysecret\""
@@ -50,6 +60,7 @@ android {
         debug {
             debuggable true
             applicationIdSuffix ".debug"
+            buildConfigField "String", SENTRY_DSN, "\"debug\""
         }
         qa {
             initWith buildTypes.release
@@ -84,4 +95,7 @@ dependencies {
     implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.4'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.4'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
+
+    // Sentry Bug Reporting
+    implementation 'io.sentry:sentry-android:2.1.6'
 }
