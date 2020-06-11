@@ -77,7 +77,7 @@ import de.tuberlin.mcc.simra.app.subactivites.SettingsActivity;
 import de.tuberlin.mcc.simra.app.subactivites.StatisticsActivity;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.Utils;
-import de.tuberlin.mcc.simra.app.util.WebActivity;
+import de.tuberlin.mcc.simra.app.subactivites.WebActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
