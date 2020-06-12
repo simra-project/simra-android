@@ -11,6 +11,8 @@ import android.util.Log;
 import java.util.Date;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.main.StartActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
@@ -28,6 +30,9 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
         this.context = context;
         // we should store the current exception handler -- to invoke it for all not handled exceptions ...
         rootHandler = Thread.getDefaultUncaughtExceptionHandler();
+        if(BuildConfig.DEBUG){
+            return;
+        }
         // we replace the exception handler now with us -- we will properly dispatch the exceptions ...
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
