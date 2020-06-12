@@ -32,8 +32,9 @@ public class BLEScanner {
         this.callbacks = callbacks;
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-
+        if(bluetoothAdapter != null && bluetoothAdapter.isEnabled()){
+            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        }
     }
 
     private interface ScanResultCallback {

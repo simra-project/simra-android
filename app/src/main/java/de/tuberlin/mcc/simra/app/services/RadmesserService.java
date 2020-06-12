@@ -2,6 +2,7 @@ package de.tuberlin.mcc.simra.app.services;
 
 import android.app.Notification;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
@@ -17,10 +18,15 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
+
+import static androidx.core.app.ActivityCompat.startActivityForResult;
 
 public class RadmesserService extends Service {
 
@@ -47,7 +53,7 @@ public class RadmesserService extends Service {
 
     private void setConnectionStatus(ConnectionStatus newStatus) {
         this.connectionStatus = newStatus;
-        serviceCallbacks.connectionStatusChanged(newStatus);
+        sendMessage(BroadcastMessages.ConnectionStatusChange, null);
         ForegroundServiceNotificationManager.createOrUpdateNotification(
                 this,
                 "SimRa RadmesseR connection",
@@ -57,6 +63,7 @@ public class RadmesserService extends Service {
 
     @Override
     public void onCreate(){
+        Log.i(TAG, "created");
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mHandlerThread = new HandlerThread(TAG + ".HandlerThread");
         mHandlerThread.start();
@@ -87,6 +94,7 @@ public class RadmesserService extends Service {
 
     @Override
     public void onDestroy(){
+        Log.i(TAG, "stopped");
         // Cleanup service before destruction
         mHandlerThread.quit();
     }
@@ -95,7 +103,6 @@ public class RadmesserService extends Service {
      * Bound Service interface
      */
     private final IBinder binder = new LocalBinder();
-    private RadmesserServiceCallbacks serviceCallbacks;
     public class LocalBinder extends Binder {
         public RadmesserService getService() {
 
@@ -107,14 +114,6 @@ public class RadmesserService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
-    }
-
-    public void registerCallbacks(RadmesserServiceCallbacks callbacks) {
-        serviceCallbacks = callbacks;
-    }
-
-    public void unregisterCallback(){
-        serviceCallbacks = null;
     }
 
     private RadmesserDevice connectedDevice;
@@ -141,6 +140,21 @@ public class RadmesserService extends Service {
         }
     };
 
+    // Send an Intent with an action named "custom-event-name". The Intent
+    // sent should
+    // be received by the ReceiverActivity.
+    private void sendMessage(String service, @Nullable Map<String, String> data) {
+        Log.d("sender", "Broadcasting message to: " + service);
+        Intent intent = new Intent(service);
+        // You can also include some extra data.
+        if(data != null){
+            for (String key : data.keySet()){
+                intent.putExtra(key, data.get(key));
+            }
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
 
 
     private BLEServiceManager registerBLEServices() {
@@ -149,7 +163,9 @@ public class RadmesserService extends Service {
         bleServices.addService(
                 RadmesserDevice.UUID_SERVICE_HEARTRATE,
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_HEARTRATE,
-                val -> Log.i(TAG, "new HEARTRATE Value:" + val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1))
+                val -> sendMessage(RadmesserDevice.UUID_SERVICE_HEARTRATE, (Map)new HashMap<String, String>() {{
+                    put("heartrate", val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1).toString());
+                }})
         );
 
 
@@ -162,7 +178,9 @@ public class RadmesserService extends Service {
         bleServices.addService(
                 RadmesserDevice.UUID_SERVICE_DISTANCE,
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_DISTANCE,
-                val -> Log.i(TAG, "new DISTANCE Value:" + val.getStringValue(0))
+                val -> sendMessage(RadmesserDevice.UUID_SERVICE_DISTANCE, (Map)new HashMap<String, String>() {{
+                    put("distance", val.getStringValue(0));
+                }})
         );
 
         bleServices.addService(
@@ -232,8 +250,8 @@ public class RadmesserService extends Service {
         getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().remove(sharedPrefsKeyRadmesserID).apply();
     }
 
-    public interface RadmesserServiceCallbacks {
-        void connectionStatusChanged(RadmesserService.ConnectionStatus status);
+    public static class BroadcastMessages{
+        public static final String ConnectionStatusChange = "ConnectionStatusChange";
     }
 
     public enum ConnectionStatus {
