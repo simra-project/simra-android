@@ -1,6 +1,9 @@
 package de.tuberlin.mcc.simra.app.services.radmesser;
 
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +17,7 @@ public class BLEServiceManager {
     private HashMap<String, BLEService> byCharakteristic = new HashMap<>();
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public Set<UUID> getAllUUIDs() {
         return byService.keySet().stream().map(UUID::fromString).collect(Collectors.toSet());
     }

@@ -20,49 +20,48 @@ import de.tuberlin.mcc.simra.app.services.RadmesserService;
 public class RadmesserDevice {
     private final String TAG = "RadmesserDevice";
     private final BluetoothDevice bluetoothDevice;
-    private final RadmesserService.BLECallbacks callbacks;
+    private final RadmesserDeviceCallbacks callbacks;
     private de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices;
 
-    public ConnectionStage connectionState = ConnectionStage.gattDisconnected;
+    private ConnectionStatus connectionState = ConnectionStatus.gattDisconnected;
 
-    public ConnectionStage getConnectionState() {
+    public ConnectionStatus getConnectionState() {
         return connectionState;
     }
 
-    public void setConnectionState(ConnectionStage newState) {
+    public void setConnectionState(ConnectionStatus newState) {
         connectionState = newState;
         callbacks.onConnectionStateChange();
     }
 
-    public enum ConnectionStage {
+    private enum ConnectionStatus {
         startConnecting,
         gattConnected,
-        PairingCompleted,
         gattDisconnected,
     }
 
 
-    public RadmesserDevice(BluetoothDevice bluetoothDevice, RadmesserService.BLECallbacks callbacks, de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices) {
+    public RadmesserDevice(BluetoothDevice bluetoothDevice, RadmesserDeviceCallbacks callbacks, de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices) {
         this.bluetoothDevice = bluetoothDevice;
         this.callbacks = callbacks;
         this.bleServices = bleServices;
 
     }
 
-    public void connect(Context c) {
-        setConnectionState(ConnectionStage.startConnecting);
+    public void connect(Context ctx) {
+        setConnectionState(ConnectionStatus.startConnecting);
         bluetoothDevice.createBond();   //start connect to device
         bluetoothDevice.fetchUuidsWithSdp();   //start discover services on that device
-        bluetoothDevice.connectGatt(c, true, new BluetoothGattCallback() {
+        bluetoothDevice.connectGatt(ctx, true, new BluetoothGattCallback() {
             @Override
             public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                 Log.i(TAG, "onConnectionStateChange: " + gatt.getServices().size());
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    setConnectionState(ConnectionStage.gattConnected);
+                    setConnectionState(ConnectionStatus.gattConnected);
                     gatt.discoverServices();
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     // if not paired,
-                    setConnectionState(ConnectionStage.gattDisconnected);
+                    setConnectionState(ConnectionStatus.gattDisconnected);
                 } else {
                     return;
                 }
@@ -83,7 +82,7 @@ public class RadmesserDevice {
                                 .getService(UUID.fromString(requestedService.serviceUUID))
                                 .getCharacteristic(UUID.fromString(requestedService.charackteristicUUIDs));
                         if (characteristic == null) {
-                            Log.i(TAG, "Error connecting to Charakteristic: " + requestedService.charackteristicUUIDs);
+                            Log.i(TAG, "Error connecting to Characteristic: " + requestedService.charackteristicUUIDs);
                             continue;
                         }
 
@@ -118,5 +117,25 @@ public class RadmesserDevice {
     public String getID() {
         return bluetoothDevice.getAddress();
     }
+
+    public interface RadmesserDeviceCallbacks {
+        public void onConnectionStateChange();
+    }
+
+    /**
+     * Bluetooth Service UUIDs
+     */
+    public static final String UUID_SERVICE_HEARTRATE = "0000180D-0000-1000-8000-00805F9B34FB";
+    public static final String UUID_SERVICE_CHARACTERISTIC_HEARTRATE = "00002a37-0000-1000-8000-00805f9b34fb";
+
+    public static final String UUID_SERVICE_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000000";
+    public static final String UUID_SERVICE_CHARACTERISTIC_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000001";
+
+    public static final String UUID_SERVICE_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000000";
+    public static final String UUID_SERVICE_CHARACTERISTIC_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000001";
+
+    public static final String UUID_SERVICE_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000000";
+    public static final String UUID_SERVICE_CHARACTERISTIC_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000001";
+
 
 }

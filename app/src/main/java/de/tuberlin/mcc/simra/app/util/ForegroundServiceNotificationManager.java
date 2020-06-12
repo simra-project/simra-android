@@ -29,18 +29,16 @@ public class ForegroundServiceNotificationManager {
         PendingIntent snoozePendingIntent =
                 PendingIntent.getBroadcast(ctx, 0, mainActivityIntent, 0);
 
-        if(notification == null) {
-            notification = new NotificationCompat.Builder(ctx, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.helmet)
-                    .setContentTitle(title)
-                    .setContentText(text)
-                    .setPriority(NotificationCompat.PRIORITY_LOW)
-                    // Set the intent that will fire when the user taps the notification
-                    .setContentIntent(pendingIntent)
-                    .addAction(R.drawable.bluetooth_icon, ctx.getResources().getString(R.string.foregroundNotificationButtonBack),
-                            pendingIntent)
-                    .build();
-        }
+        notification = new NotificationCompat.Builder(ctx, CHANNEL_ID)
+                .setSmallIcon(R.drawable.helmet)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                // Set the intent that will fire when the user taps the notification
+                .setContentIntent(pendingIntent)
+                .addAction(R.drawable.bluetooth_icon, ctx.getResources().getString(R.string.foregroundNotificationButtonBack),
+                        pendingIntent)
+                .build();
         notificationManager.notify(NOTIFICATION_ID, notification);
 
         return notification;

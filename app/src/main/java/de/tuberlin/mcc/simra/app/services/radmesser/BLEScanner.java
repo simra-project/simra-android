@@ -2,39 +2,36 @@ package de.tuberlin.mcc.simra.app.services.radmesser;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
-import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ParcelUuid;
 import android.util.Log;
 
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import de.tuberlin.mcc.simra.app.services.RadmesserService;
-
 
 public class BLEScanner {
     private final String TAG = "BLEScanner";
-    private final int DEFAULT_SCANNING_DURATION_SECONSA = 8;
+    private final int DEFAULT_SCANNING_DURATION_SECONDS = 8;
     private BluetoothLeScanner bluetoothLeScanner;
-    private RadmesserService.BLECallbacks callbacks;
+    private BLEScannerCallbacks callbacks;
 
 
     private HashMap<String,BluetoothDevice> foundDevices;
 
-    public BLEScanner(RadmesserService.BLECallbacks callbacks, Context c) {
+    public BLEScanner(BLEScannerCallbacks callbacks) {
         this.callbacks = callbacks;
-        BluetoothAdapter bluetoothAdapter = ((BluetoothManager) c.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
+
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
 
     }
@@ -68,7 +65,7 @@ public class BLEScanner {
         return true;
     }
 
-    public void connectAnyNewDevice(de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices, SingleDeviceScanCB then) {
+    public void connectAnyNewDevice(BLEServiceManager bleServices, SingleDeviceScanCB then) {
         startScan(
                 8,
                 createFilterListFromBLEServiceManager(bleServices),
@@ -78,7 +75,7 @@ public class BLEScanner {
                 });
     }
 
-    public void scanDevices(de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices) {
+    public void scanDevices(BLEServiceManager bleServices) {
         startScan(
                 8,
                 createFilterListFromBLEServiceManager(bleServices),
@@ -87,19 +84,21 @@ public class BLEScanner {
                 });
     }
 
-    private ArrayList<ScanFilter> createFilterListFromBLEServiceManager(de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices) {
-        ArrayList<ScanFilter> fitlerList = new ArrayList();
-        for (UUID serviceUUID : bleServices.getAllUUIDs()) {
-            ScanFilter.Builder builder = new ScanFilter.Builder();
-            builder.setServiceUuid(new ParcelUuid(serviceUUID));
-            fitlerList.add(builder.build());
+    private ArrayList<ScanFilter> createFilterListFromBLEServiceManager(BLEServiceManager bleServices) {
+        ArrayList<ScanFilter> filterList = new ArrayList();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            for (UUID serviceUUID : bleServices.getAllUUIDs()) {
+                ScanFilter.Builder builder = new ScanFilter.Builder();
+                builder.setServiceUuid(new ParcelUuid(serviceUUID));
+                filterList.add(builder.build());
+            }
         }
-        return fitlerList;
+        return filterList;
     }
 
     private boolean startScan(int duration, ArrayList<ScanFilter> fitlerList, ScanResultCallback then) {
         if (duration <= 0 || duration > 10)
-            duration = DEFAULT_SCANNING_DURATION_SECONSA;
+            duration = DEFAULT_SCANNING_DURATION_SECONDS;
 
         ScanSettings scanSettings = new ScanSettings.Builder().build();
 
@@ -118,7 +117,7 @@ public class BLEScanner {
 
         try {
             bluetoothLeScanner.startScan(fitlerList, scanSettings, scanCallabck);
-            callbacks.onScanstarted();
+            callbacks.onScanStarted();
             Log.i(TAG, "scan started");
         } catch (NullPointerException nex) {
             //errorStatus = ErrorStatus.bluetooth_not_ready;
@@ -142,5 +141,13 @@ public class BLEScanner {
 
     public HashMap<String,BluetoothDevice> getFoundDevices() {
         return foundDevices;
+    }
+
+    public interface BLEScannerCallbacks {
+        void onNewDeviceFound(BluetoothDevice device);
+
+        void onScanStarted();
+
+        void onScanStopped();
     }
 }

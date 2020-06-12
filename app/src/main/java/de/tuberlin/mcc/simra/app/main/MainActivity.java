@@ -90,7 +90,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener, RadmesserService.RadmesserServiceCallbacks {
 
     public static ExecutorService myEx;
 
@@ -135,23 +135,35 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Radmesser
     private RelativeLayout radmesserStatus;
-    RadmesserService mBoundRadmesserService;
-    private ServiceConnection mRadmesserServiceConnection = new ServiceConnection() {
+    private RadmesserService radmesserService;
+    private boolean radmesserServiceBound = false;
+    boolean radmesserEnabled =  false;
+
+    private ServiceConnection radmesserServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            radmesserServiceBound = false;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(TAG, "Connecting zo service");
-            RadmesserService.MyBinder myBinder = (RadmesserService.MyBinder) service;
-            mBoundRadmesserService= myBinder.getService();
+            RadmesserService.LocalBinder myBinder = (RadmesserService.LocalBinder) service;
+            radmesserService = myBinder.getService();
+            radmesserService.registerCallbacks(MainActivity.this);
             setRadmesserStatusVisibility();
+            radmesserServiceBound = true;
             // LINUS Hier listeners einbauen
 
         }
     };
+
+    private void connectToRadmesserService(){
+        Intent intent = new Intent(this, RadmesserService.class);
+        startService(intent);
+        bindService(intent, radmesserServiceConnection, Context.BIND_IMPORTANT);
+    }
 
     @SuppressLint("MissingPermission")
     @Override
@@ -160,7 +172,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Log.d(TAG, "OnCreate called");
         super.onCreate(savedInstanceState);
 
-        connectToRadmesserService();
+        radmesserEnabled = lookUpIntSharedPrefs("RadmesserStatus", 0, "simraPrefs",this) == 1 ?  true : false;
+        if(radmesserEnabled){
+            connectToRadmesserService();
+        }
 
 
         myEx = Executors.newFixedThreadPool(4);
@@ -429,12 +444,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
-    private void connectToRadmesserService(){
-        Intent intent = new Intent(MainActivity.this, RadmesserService.class);
-        startService(intent);
-        bindService(intent, mRadmesserServiceConnection, Context.BIND_IMPORTANT);
-    }
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Switching between buttons:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -449,10 +458,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void setRadmesserStatusVisibility(){
-        int radmesserEnabled =  lookUpIntSharedPrefs("RadmesserStatus", 0, "simraPrefs",this);
-
         // @LINUS Das hier soll mit eine Notification/Listener passieren, (kann ausserhalb dieser Funktion passieren, am besten in onCreate() soll der Listener eingebaut werden)
-        int connectionStatus = (mBoundRadmesserService != null) ? mBoundRadmesserService.getConnectionStatus() : 0;
+        RadmesserService.ConnectionStatus connectionStatus = (radmesserService != null) ? radmesserService.getCurrentConnectionStatus() : RadmesserService.ConnectionStatus.DISCONNECTED;
 
         Log.d(TAG, "(resume) Radmesser value : " + radmesserEnabled);
         Button statusButton = findViewById(R.id.radmesserStatusButton);
@@ -464,21 +471,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         NavigationView navigationView = findViewById(R.id.nav_view);
 
 
-        if(radmesserEnabled == 0){
-            // ausblenden
-            navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
-            radmesserStatus.setVisibility(View.GONE);
-        }else{
+        if(radmesserEnabled){
             // einblenden
             setRadmesserButton(connectionStatus, statusButton, radmesserStatusText);
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(true);
             radmesserStatus.setVisibility(View.VISIBLE);
+        }else{
+            // ausblenden
+            navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
+            radmesserStatus.setVisibility(View.GONE);
         }
     }
 
-    private void setRadmesserButton(int status, Button statusButton, TextView radmesserText){
+    private void setRadmesserButton(RadmesserService.ConnectionStatus status, Button statusButton, TextView radmesserText){
         switch (status){
-            case 0:
+            case DISCONNECTED:
                 statusButton.setText("Verbinden");
                 radmesserText.setText("Radmesser nicht verbunden");
                 radmesserText.setTextColor(Color.WHITE);
@@ -486,14 +493,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 // LINUS hier nochmal den Radmesser verbindung versuchen
 
                 break;
-            case 1:
+            case PAIRING:
                 statusButton.setEnabled(false);
                 statusButton.setText("...");
                 radmesserText.setText("Verbinde");
                 radmesserText.setTextColor(Color.BLACK);
                 radmesserText.setBackgroundColor(Color.LTGRAY);
                 break;
-            case 2:
+            case CONNECTED:
                 radmesserText.setText("Radmesser verbunden");
                 statusButton.setText("Siehe");
                 radmesserText.setTextColor(Color.WHITE);
@@ -521,6 +528,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void onResume() {
 
         Log.d(TAG, "OnResume called");
+        radmesserEnabled = lookUpIntSharedPrefs("RadmesserStatus", 0, "simraPrefs",this) == 1 ?  true : false;
+
 
         super.onResume();
 
@@ -578,10 +587,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     @SuppressLint("MissingPermission")
     public void onStop() {
-
+        super.onStop();
         Log.d(TAG, "OnStop called");
 
-        super.onStop();
+        try{
+            radmesserService.unregisterCallback();
+            unbindService(radmesserServiceConnection);
+        } catch (Exception e){}
 
         try {
             final Location myLocation = mLocationOverlay.getLastFix();
@@ -735,6 +747,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
 
         return (!gps_enabled);
+    }
+
+    @Override
+    public void connectionStatusChanged(RadmesserService.ConnectionStatus status) {
+        setRadmesserStatusVisibility();
     }
 
     private class CheckVersionTask extends AsyncTask<String, String, String> {

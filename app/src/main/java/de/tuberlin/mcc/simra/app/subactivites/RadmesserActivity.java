@@ -23,6 +23,8 @@ public class RadmesserActivity extends AppCompatActivity {
 
     LinearLayout rootLayout;
     RadmesserService mBoundRadmesserService;
+    Button b1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,35 +32,37 @@ public class RadmesserActivity extends AppCompatActivity {
         setContentView(R.layout.bluetooth_connection);
         initializeToolBar();
         rootLayout = findViewById(R.id.bluetooth_screen);
-        // DEBUG
-        Button b1 = new Button(this);
-        b1.setText("Not connected");
-        Button b2 = new Button(this);
-        b2.setText("Connecting");
-        Button b3 = new Button(this);
-        b3.setText("Connected");
-
 
         Intent intent = new Intent(RadmesserActivity.this, RadmesserService.class);
         startService(intent);
         bindService(intent, mRadmesserServiceConnection, Context.BIND_IMPORTANT);
 
+        // DEBUG
+        b1 = new Button(this);
+        Button b2 = new Button(this);
+        b2.setText("Connecting");
+        Button b3 = new Button(this);
+
+        b3.setText("Connected");
+
+
+
+
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mBoundRadmesserService.setConnectionStatus(0);
             }
         });
         b2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mBoundRadmesserService.setConnectionStatus(1);
+
             }
         });
         b3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mBoundRadmesserService.setConnectionStatus(2);
+                //mBoundRadmesserService.setConnectionStatus(2);
             }
         });
 
@@ -78,8 +82,10 @@ public class RadmesserActivity extends AppCompatActivity {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            RadmesserService.MyBinder myBinder = (RadmesserService.MyBinder) service;
-            mBoundRadmesserService= myBinder.getService();
+            RadmesserService.LocalBinder myBinder = (RadmesserService.LocalBinder) service;
+            mBoundRadmesserService = myBinder.getService();
+            b1.setText(mBoundRadmesserService.getCurrentConnectionStatus().toString());
+
         }
     };
 
