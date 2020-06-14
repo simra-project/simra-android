@@ -28,7 +28,8 @@
     <string name="close_simra">SimRa beenden</string>
     <string name="iAccept">Ich akzeptiere die Datenschutzerklärung</string>
     <string name="privacyAgreementTitle">Datenschutzerklärung</string>
-    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrt Standort- und Sensordaten auf, sowie von Ihnen eingegebene demografische Daten. Weitere Informationen finden Sie in unserer <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1">Datenschutzerklärung</a>.</string>
+    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrt Standort- und Sensordaten auf, sowie von Ihnen eingegebene demografische Daten. Weitere Informationen finden Sie in unserer <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1">Datenschutzerklärung</a>.
+    </string>
 
     <!--- Menu -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -59,7 +60,7 @@
 
 
     <!--- MainActivity -->
-    <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
+    <string name="osmCopyright">©        <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
     <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um ihre Privatsphäre zu schützen.\nSie können dies im Menü "Einstellungen" anpassen.</string>
     <string name="startButtonText">Aufzeichnung\nstarten</string>
     <string name="stopButtonText">Aufzeichnung\nbeenden</string>
@@ -81,10 +82,9 @@
 
 
     <!--- RecorderService -->
-    <string name="recorder_channel_name">Aufzeichnung</string>
-    <string name="recorder_channel_description">Fahrt wird aufgezeichnet</string>
-    <string name="recordingNotificationTitle">Aufzeichnung der Fahrt</string>
-    <string name="recordingNotificationBody">Ihre Fahrt wird aufgezeichnet.</string>
+    <string name="foregroundNotificationTitle_record">Aufzeichnung der Fahrt</string>
+    <string name="foregroundNotificationBody_record">Ihre Fahrt wird aufgezeichnet.</string>
+    <string name="foregroundNotificationButtonBack">Zurück zur App</string>
 
     <!--- History -->
     <string name="noHistory"> Es wurden keine Fahrten gefunden.</string>
@@ -108,8 +108,6 @@
     <string name="uploadingNotificationTitle">SimRa</string>
     <string name="uploadingNotificationBody">SimRa lädt Fahrten hoch</string>
     <string name="upload_started">SimRa Hochladen gestartet</string>
-    <string name="upload_channel_name">Hochladen</string>
-    <string name="upload_channel_description">Fahrten werden hochgeladen</string>
     <string name="upload_completed">SimRa Hochladen abgeschlossen.</string>
     <string name="upload_failed">SimRa Hochladen fehlgeschlagen. Versuchen Sie es später erneut.</string>
     <string name="nothing_to_upload">SimRa: Keine Fahrt bereit zum Hochladen</string>

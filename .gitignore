@@ -12,3 +12,4 @@ hash-suffix.h
 *.properties
 app/qa
 app/release
+lint-report.html

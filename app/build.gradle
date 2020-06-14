@@ -72,6 +72,13 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    lintOptions {
+       htmlReport true
+       htmlOutput file("lint-report.html")
+       // Not yet enabled, too many errors. 
+       //warningsAsErrors true
+       abortOnError true
+   }
     buildToolsVersion = '29.0.2'
 }
 
@@ -83,10 +90,6 @@ dependencies {
     // implementation 'org.apache.commons:commons-csv:1.6'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
-    // implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    // testImplementation 'junit:junit:4.12'
-    // androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    // androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     api 'org.osmdroid:osmdroid-android:6.0.3'
     // api 'org.osmdroid:osmdroid-wms:6.0.3'
     // api 'org.osmdroid:osmdroid-mapsforge:6.0.3'
@@ -98,4 +101,8 @@ dependencies {
 
     // Sentry Bug Reporting
     implementation 'io.sentry:sentry-android:2.1.6'
+    // Tests
+    testImplementation 'junit:junit:4.12'
+    // androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    // androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

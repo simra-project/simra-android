@@ -14,6 +14,23 @@ pr:
       - master
 
 jobs:
+  - job: lint
+    displayName: "Lint app"
+    pool:
+      vmImage: "macos-latest"
+    steps:
+      - task: Gradle@2
+        inputs:
+          gradleWrapperFile: "gradlew"
+          tasks: "clean assembleDebug test lint"
+          publishJUnitResults: false
+          javaHomeOption: "JDKVersion"
+          gradleOptions: "-Xmx3072m"
+          sonarQubeRunAnalysis: false
+          checkStyleRunAnalysis: true
+          findBugsRunAnalysis: false
+          pmdRunAnalysis: true
+
   - job: bundle
     displayName: "Build bundle"
     variables:
@@ -32,7 +49,7 @@ jobs:
           gradleOptions: "-Xmx3072m"
           sonarQubeRunAnalysis: false
           checkStyleRunAnalysis: true
-          findBugsRunAnalysis: true
+          findBugsRunAnalysis: false
           pmdRunAnalysis: true
         env:
           SIMRA_API_ENDPOINT: $(apiEndpoint)
@@ -49,7 +66,7 @@ jobs:
           gradleOptions: "-Xmx3072m"
           sonarQubeRunAnalysis: false
           checkStyleRunAnalysis: true
-          findBugsRunAnalysis: true
+          findBugsRunAnalysis: false
           pmdRunAnalysis: true
         env:
           SIMRA_API_ENDPOINT: $(apiEndpoint)

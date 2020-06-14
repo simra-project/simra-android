@@ -38,6 +38,7 @@ import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.main.HistoryActivity;
 import de.tuberlin.mcc.simra.app.util.Constants;
+import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
@@ -58,11 +59,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.writeToSharedPrefs;
 
 public class UploadService extends Service {
 
-    NotificationManagerCompat notificationManager;
     private PowerManager.WakeLock wakeLock = null;
-    // For Managing the notification shown while the service is running
-    int notificationId = 1453;
-
     int numberOfTasks = 0;
 
     private boolean uploadSuccessful = false;
@@ -100,7 +97,7 @@ public class UploadService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy()");
-        notificationManager.cancel(notificationId);
+        ForegroundServiceNotificationManager.cancelNotification(this);
         wakeLock.release();
     }
 
@@ -119,11 +116,14 @@ public class UploadService extends Service {
 
         Log.d(TAG, "onStartCommand() called");
 
-        Notification notification = createNotification().build();
-        notificationManager = NotificationManagerCompat.from(this);
-        // Send the notification.
-        notificationManager.notify(notificationId, notification);
-        startForeground(notificationId, notification);
+
+        Notification notification =
+                ForegroundServiceNotificationManager.createOrUpdateNotification(
+                        this,
+                        getResources().getString(R.string.uploadingNotificationTitle),
+                        getResources().getString(R.string.uploadingNotificationBody)
+                );
+        startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
         wakeLock.acquire(1000 * 60 * 15);
 
         new UpdateTask(this, intent).execute();
@@ -565,36 +565,5 @@ public class UploadService extends Service {
             }
             return result;
         }*/
-    }
-
-
-    private NotificationCompat.Builder createNotification() {
-        String CHANNEL_ID = "UploadServiceNotification";
-        Intent contentIntent = new Intent(this, HistoryActivity.class);
-        contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, contentIntent, 0);
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.upload_channel_name);
-            String description = getString(R.string.upload_channel_description);
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.helmet)
-                .setContentTitle(getResources().getString(R.string.uploadingNotificationTitle))
-                .setContentText(getResources().getString(R.string.uploadingNotificationBody))
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(pendingIntent);
-
-        return mBuilder;
-
     }
 }
