@@ -180,8 +180,10 @@
     <string name="dateFormatDescription">Date Format</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
+    <string name="devices">Devices</string>
     <!--- Radmesser -->
-    <string name="radmesserConnection">Radmesser connection</string>
+    <string name="radmesserSwitchTitle">Radmesser connection</string>
+    <string name="radmesserButton">Open Radmesser settings</string>
 
 
 

@@ -184,8 +184,10 @@
     <string name="dateFormatDescription">Datumsformat</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
+    <string name="devices">Geräte</string>
     <!--- Radmesser -->
-    <string name="radmesserConnection">Radmesser verbinden</string>
+    <string name="radmesserSwitchTitle">Radmesser verbinden</string>
+    <string name="radmesserButton">Radmesser Einstellungen öffnen</string>
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>

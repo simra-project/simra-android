@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
@@ -21,14 +22,20 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
+
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.main.MainActivity;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import pl.droidsonroids.gif.GifImageView;
 
-import static de.tuberlin.mcc.simra.app.util.Utils.*;
+import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpLongSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeLongToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.writeToSharedPrefs;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -55,6 +62,7 @@ public class SettingsActivity extends BaseActivity {
     Switch unitSwitch;
     Switch dateFormatSwitch;
     Switch radmesserConnectionSwitch;
+    Button radmesserButton;
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int BLUETOOTH_SUCCESS = -1;
     private final static int CONNECTED = 2;
@@ -201,28 +209,34 @@ public class SettingsActivity extends BaseActivity {
         appVersionTextView.setText("Version: " + getAppVersionNumber(this));
 
         // set radmesser connection
+        boolean radmesserActivated = SharedPref.Settings.Radmesser.isEnabled(this);
+
         radmesserConnectionSwitch = findViewById(R.id.radmesserSwitch);
-        if(BluetoothAdapter.getDefaultAdapter() == null){
+        if (BluetoothAdapter.getDefaultAdapter() == null) {
             // Device does not support Bluetooth
             radmesserConnectionSwitch.setEnabled(false);
         }
-        radmesserConnectionSwitch.setChecked(SharedPref.Settings.Radmesser.isEnabled(this));
-        radmesserConnectionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPref.Settings.Radmesser.setEnabled(isChecked, SettingsActivity.this);
-                if(isChecked){
-                    if (!BluetoothAdapter.getDefaultAdapter().isEnabled() && isChecked) {
-                        enableBluetooth();
-                    }else{
-                        startRadmesserService();
-                        showTutorialDialog();
-                    }
-                }else{
-                    Intent intent = new Intent(SettingsActivity.this, RadmesserService.class);
-                    stopService(intent);
+        radmesserConnectionSwitch.setChecked(radmesserActivated);
+        radmesserConnectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPref.Settings.Radmesser.setEnabled(isChecked, SettingsActivity.this);
+            radmesserButton.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+
+            if (isChecked) {
+                if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+                    enableBluetooth();
+                } else {
+                    startRadmesserService();
+//                    showTutorialDialog();
                 }
+            } else {
+                stopService(new Intent(this, RadmesserService.class));
             }
+        });
+
+        radmesserButton = findViewById(R.id.radmesserButton);
+        radmesserButton.setVisibility(radmesserActivated ? View.VISIBLE : View.GONE);
+        radmesserButton.setOnClickListener(view -> {
+            startActivity(new Intent(this, RadmesserActivity.class));
         });
 
     }
@@ -284,8 +298,6 @@ public class SettingsActivity extends BaseActivity {
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
     }
-
-
 
     // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)
     private SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener(TextView tV, String unit, String privacyOption) {
