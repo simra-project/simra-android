@@ -29,6 +29,13 @@ public class ForegroundServiceNotificationManager {
         PendingIntent snoozePendingIntent =
                 PendingIntent.getBroadcast(ctx, 0, mainActivityIntent, 0);
 
+        // From API 26+ onwards a NotificationChannel has to be created
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Ride Information", NotificationManager.IMPORTANCE_LOW);
+            channel.setDescription("SimRa Channel");
+            notificationManager.createNotificationChannel(channel);
+        }
+
         notification = new NotificationCompat.Builder(ctx, CHANNEL_ID)
                 .setSmallIcon(R.drawable.helmet)
                 .setContentTitle(title)
