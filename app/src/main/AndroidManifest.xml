@@ -52,7 +52,7 @@
         <!-- Services -->
         <service android:name=".main.RecorderService" android:parentActivityName=".MainActivity" />
         <service android:name=".net.UploadService" android:enabled="true" android:parentActivityName=".HistoryActivity" />
-        <service android:name=".services.RadmesserService" android:enabled="true" android:exported="true" />
+        <service android:name=".services.RadmesserService" android:enabled="true" android:exported="false" />
 
         <!-- MetaData -->
         <meta-data android:name="preloaded_fonts" android:resource="@array/preloaded_fonts" />
