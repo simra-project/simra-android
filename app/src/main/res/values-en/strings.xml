@@ -28,7 +28,8 @@
     <string name="close_simra">Close SimRa</string>
     <string name="iAccept">I accept the privacy policy statement</string>
     <string name="privacyAgreementTitle">Privacy Policy Statement</string>
-    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).</string>
+    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).
+    </string>
 
     <!--- Menu -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -57,7 +58,7 @@
     <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/en/mobil/</string>
 
     <!--- MainActivity -->
-    <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
+    <string name="osmCopyright">©        <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
     <string name="errorRideNotRecorded">The ride was not recorded due to privacy settings!\nYou can check your privacy settings in the settings menu.</string>
     <string name="cancel">Cancel</string>
     <string name="startButtonText">Start\nRecording</string>
@@ -76,11 +77,10 @@
     <string name="recording_started">Recording started.</string>
 
 
-    <!--- RecorderService -->
-    <string name="recorder_channel_name">Recording</string>
-    <string name="recorder_channel_description">Recording ride</string>
-    <string name="recordingNotificationTitle">Recording Ride</string>
-    <string name="recordingNotificationBody">Your Ride is being recorded.</string>
+    <!--- ForegroundNotification -->
+    <string name="foregroundNotificationTitle_record">Recording Ride</string>
+    <string name="foregroundNotificationBody_record">Your Ride is being recorded.</string>
+    <string name="foregroundNotificationButtonBack">Back to the App</string>
 
     <!--- History -->
     <string name="noHistory">"No rides found."</string>
@@ -104,8 +104,6 @@
     <string name="uploadingNotificationTitle">SimRa</string>
     <string name="uploadingNotificationBody">SimRa is uploading rides</string>
     <string name="upload_started">SimRa ride upload started</string>
-    <string name="upload_channel_name">Uploading</string>
-    <string name="upload_channel_description">Uploading rides</string>
     <string name="upload_completed">SimRa upload completed.</string>
     <string name="upload_failed">SimRa failed to upload. Please try again later</string>
     <string name="nothing_to_upload">SimRa could not find a ride to upload</string>

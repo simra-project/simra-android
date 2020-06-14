@@ -2,9 +2,13 @@ package de.tuberlin.mcc.simra.app.subactivites;
 
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -18,15 +22,18 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.main.MainActivity;
+import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.SharedPref;
 import pl.droidsonroids.gif.GifImageView;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.*;
 
 public class SettingsActivity extends BaseActivity {
 
-    // Log tag
     private static final String TAG = "SettingsActivity_LOG";
+
     ImageButton backBtn;
     TextView toolbarTxt;
 
@@ -36,7 +43,6 @@ public class SettingsActivity extends BaseActivity {
     int trailer;
     String unit;
     int dateFormat;
-    int radmesserConnectionStatus;
 
     // Bike Type and Phone Location Items
     Spinner bikeTypeSpinner;
@@ -52,7 +58,6 @@ public class SettingsActivity extends BaseActivity {
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int BLUETOOTH_SUCCESS = -1;
     private final static int CONNECTED = 2;
-    private final static int CONNECTING = 1;
     private final static int NOT_CONNECTED = 0;
 
 
@@ -196,30 +201,30 @@ public class SettingsActivity extends BaseActivity {
         appVersionTextView.setText("Version: " + getAppVersionNumber(this));
 
         // set radmesser connection
-        radmesserConnectionStatus = lookUpIntSharedPrefs("RadmesserStatus", 0, "simraPrefs",this);
         radmesserConnectionSwitch = findViewById(R.id.radmesserSwitch);
-        radmesserConnectionSwitch.setChecked(radmesserConnectionStatus > 0); // 0 not connected, 1 connecting, 2 connected
+        if(BluetoothAdapter.getDefaultAdapter() == null){
+            // Device does not support Bluetooth
+            radmesserConnectionSwitch.setEnabled(false);
+        }
+        radmesserConnectionSwitch.setChecked(SharedPref.Settings.Radmesser.isEnabled(this));
         radmesserConnectionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                radmesserConnectionStatus = isChecked ? 1 : 0;
-                setRadmesserStatus(radmesserConnectionStatus);
-                if(BluetoothAdapter.getDefaultAdapter() == null){
-                    // Device does not support Bluetooth
-                }
-                if (!BluetoothAdapter.getDefaultAdapter().isEnabled() && isChecked) {
-                    enableBluetooth();
-                }
+                SharedPref.Settings.Radmesser.setEnabled(isChecked, SettingsActivity.this);
                 if(isChecked){
-                    showTutorialDialog();
+                    if (!BluetoothAdapter.getDefaultAdapter().isEnabled() && isChecked) {
+                        enableBluetooth();
+                    }else{
+                        startRadmesserService();
+                        showTutorialDialog();
+                    }
+                }else{
+                    Intent intent = new Intent(SettingsActivity.this, RadmesserService.class);
+                    stopService(intent);
                 }
             }
         });
 
-    }
-
-    private void setRadmesserStatus(int newStatus){
-        writeIntToSharedPrefs("RadmesserStatus",newStatus,"simraPrefs", this);
     }
 
     private void showTutorialDialog(){
@@ -245,16 +250,35 @@ public class SettingsActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == BLUETOOTH_SUCCESS && requestCode == REQUEST_ENABLE_BT) {
-            // Bluetooth successfully enabled, i dont know why the F**k is -1 instead a positive number
-            radmesserConnectionSwitch.setChecked(true);
-            setRadmesserStatus(CONNECTED);
-            // LINUS Hier Vielleicht verbindung anfragen zu Radmesser
-
+            startRadmesserService();
+            showTutorialDialog();
         }else{
-            radmesserConnectionSwitch.setChecked(false);
-            setRadmesserStatus(NOT_CONNECTED);
+            // Try to start again?
+            enableBluetooth();
         }
     }
+
+    private void startRadmesserService(){
+        Intent intent = new Intent(this, RadmesserService.class);
+        startService(intent);
+        bindService(intent, radmesserServiceConnection, Context.BIND_IMPORTANT);
+    }
+
+    private RadmesserService radmesserService;
+    private ServiceConnection radmesserServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "Connecting to service");
+            RadmesserService.LocalBinder myBinder = (RadmesserService.LocalBinder) service;
+            radmesserService = myBinder.getService();
+        }
+    };
 
     private void enableBluetooth() {
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -323,6 +347,10 @@ public class SettingsActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop called");
+        try{
+            unbindService(radmesserServiceConnection);
+        } catch (Exception e){}
+
         writeLongToSharedPrefs("Privacy-Duration", privacyDuration, "simraPrefs", this);
         writeIntToSharedPrefs("Privacy-Distance", privacyDistance, "simraPrefs", this);
         writeIntToSharedPrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", this);

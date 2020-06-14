@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
-import de.tuberlin.mcc.simra.app.util.WebActivity;
 
 public class AboutActivity extends BaseActivity {
 

@@ -2,9 +2,6 @@ package de.tuberlin.mcc.simra.app.main;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +14,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -33,10 +29,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
+
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.Constants;
+import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
@@ -71,9 +67,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Strings for storing data to enable continued use by other activities
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // For Managing the notification shown while the service is running
-    int notificationId = 1337;
-    NotificationManagerCompat notificationManager;
     Queue<Float> accXQueue;
     Queue<Float> accYQueue;
     Queue<Float> accZQueue;
@@ -277,10 +270,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         pathToAccGpsFile = key + "_accGps.csv";
 
         // Fire the notification while recording
-        Notification notification = createNotification().build();
-        notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(notificationId, notification);
-        startForeground(notificationId, notification);
+        Notification notification =
+                ForegroundServiceNotificationManager.createOrUpdateNotification(
+                        this,
+                        getResources().getString(R.string.foregroundNotificationTitle_record),
+                        getResources().getString(R.string.foregroundNotificationBody_record)
+                );
+        startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
         wakeLock.acquire(14400000);
 
         // Register Accelerometer and Gyroscope
@@ -325,7 +321,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         locationManager.removeUpdates(this);
 
         // Remove the Notification
-        notificationManager.cancel(notificationId);
+        ForegroundServiceNotificationManager.cancelNotification(this);
 
         // Create new thread to wait for gpsExecutor to clear queue and wait for termination
         new Thread(() -> {
@@ -357,35 +353,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             sum += f;
         }
         return sum / myVals.size();
-    }
-
-    private NotificationCompat.Builder createNotification() {
-        String CHANNEL_ID = "RecorderServiceNotification";
-        Intent contentIntent = new Intent(this, MainActivity.class);
-        contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, contentIntent, 0);
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.recorder_channel_name);
-            String description = getString(R.string.recorder_channel_description);
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.helmet)
-                .setContentTitle(getResources().getString(R.string.recordingNotificationTitle))
-                .setContentText(getResources().getString(R.string.recordingNotificationBody))
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(pendingIntent);
-
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
