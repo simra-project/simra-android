@@ -254,6 +254,9 @@
     <string name="rideDistribution">Ride distribution throughout the day</string>
     <string name="hourOfDay">Hour</string>
 
+    <!-- Radmesser Activity -->
+    <string name="availableDevices">Available Devices</string>
+
     <!--- News -->
     <string name="what_is_new_title">What is new?</string>
     <!--- 24 -->

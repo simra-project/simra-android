@@ -256,6 +256,9 @@
     <string name="rideDistribution">Fahrtverteilung über den Tag</string>
     <string name="hourOfDay">Uhrzeit</string>
 
+    <!-- Radmesser Activity -->
+    <string name="availableDevices">Verfügbare Geräte</string>
+
     <!--- News -->
     <string name="what_is_new_title">Was ist neu?</string>
 

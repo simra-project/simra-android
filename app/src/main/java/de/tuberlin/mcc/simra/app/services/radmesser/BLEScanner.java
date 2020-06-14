@@ -50,14 +50,14 @@ public class BLEScanner {
             return false;
 
         //create filter matching this device
-        ArrayList<ScanFilter> fitlerList = new ArrayList();
+        ArrayList<ScanFilter> filterList = new ArrayList<>();
         ScanFilter.Builder builder = new ScanFilter.Builder();
         builder.setDeviceAddress(pairedRadmesserID);
-        fitlerList.add(builder.build());
+        filterList.add(builder.build());
 
         startScan(
                 5,
-                fitlerList,
+                filterList,
                 (device, callback) -> {
                     then.onSpecificDeviceFound(device);
                     stopScan(callback);

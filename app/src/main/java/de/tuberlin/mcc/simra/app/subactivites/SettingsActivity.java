@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -255,9 +254,7 @@ public class SettingsActivity extends BaseActivity {
         gif.setLayoutParams(gifMargins);
         gifLayout.addView(gif);
         alert.setView(gifLayout);
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) { }
-        });
+        alert.setPositiveButton("Ok", (dialog, whichButton) -> { });
         alert.show();
     }
 
