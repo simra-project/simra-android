@@ -1,11 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bluetooth_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/bluetooth_screen"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    tools:ignore="RtlHardcoded">
+
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
+
+    <LinearLayout
+        android:id="@+id/connectDevicesLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/connectDevicesText"
+                style="@style/TextAppearance.AppCompat.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/availableDevices" />
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/connectDevicesText"
+                android:layout_alignBottom="@id/connectDevicesText"
+                android:layout_marginLeft="4dp"
+                android:layout_toRightOf="@id/connectDevicesText"
+                android:indeterminate="true" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/devicesList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:text="Verbinden mit A4:CF:12:9A:15:5A" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/deviceLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:visibility="visible">
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mit Gerät verbunden" />
+
+        <TextView
+            android:id="@+id/deviceInfoTextView"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:text="Geräte-Info" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Verbindung aufheben (TODO)" />
+    </LinearLayout>
+
 
 </LinearLayout>

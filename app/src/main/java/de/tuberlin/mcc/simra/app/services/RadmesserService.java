@@ -2,7 +2,6 @@ package de.tuberlin.mcc.simra.app.services;
 
 import android.app.Notification;
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
@@ -12,7 +11,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -26,8 +24,6 @@ import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 
-import static androidx.core.app.ActivityCompat.startActivityForResult;
-
 public class RadmesserService extends Service {
 
     private static final String TAG = "RadmesserService";
@@ -38,8 +34,9 @@ public class RadmesserService extends Service {
     private ServiceHandler mServiceHandler;
     private LocalBroadcastManager mLocalBroadcastManager;
 
+    BLEServiceManager serviceManager;
 
-    private final class ServiceHandler extends Handler {
+    private static final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
             super(looper);
         }
@@ -77,19 +74,22 @@ public class RadmesserService extends Service {
                 );
 
         mServiceHandler.post(() -> {
-            BLEServiceManager serviceManager = registerBLEServices();
-            scanner.connectAnyNewDevice(
-                    serviceManager,
-                    device -> {
-                        connectedDevice = new RadmesserDevice(device, radmesserCallbacks, serviceManager);
-                        connectedDevice.connect(this);
-                        setConnectionStatus(ConnectionStatus.PAIRING);
-                    }
-            );
+            serviceManager = registerBLEServices();
+            scanner.scanDevices(serviceManager);
             // stopSelf();
         });
 
         startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
+    }
+
+    public void connectToDevice(String deviceId, BLEScanner.SingleDeviceScanCB then) {
+        scanner.tryConnectPairedDevice(deviceId, device -> {
+            connectedDevice = new RadmesserDevice(device, radmesserCallbacks, serviceManager);
+            connectedDevice.connect(this);
+            setConnectionStatus(ConnectionStatus.PAIRING);
+
+            then.onSpecificDeviceFound(device);
+        });
     }
 
     @Override
@@ -116,9 +116,9 @@ public class RadmesserService extends Service {
         return binder;
     }
 
-    private RadmesserDevice connectedDevice;
+    public RadmesserDevice connectedDevice;
 
-    private BLEScanner scanner = new BLEScanner(new BLEScanner.BLEScannerCallbacks() {
+    public BLEScanner scanner = new BLEScanner(new BLEScanner.BLEScannerCallbacks() {
         @Override
         public void onNewDeviceFound(BluetoothDevice device) {
         }

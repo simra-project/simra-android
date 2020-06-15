@@ -184,8 +184,10 @@
     <string name="dateFormatDescription">Datumsformat</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
+    <string name="devices">Geräte</string>
     <!--- Radmesser -->
-    <string name="radmesserConnection">Radmesser verbinden</string>
+    <string name="radmesserSwitchTitle">Radmesser verbinden</string>
+    <string name="radmesserButton">Radmesser Einstellungen öffnen</string>
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
@@ -253,6 +255,9 @@
     <string name="kcalConsumption">Kalorienverbrauch:</string>
     <string name="rideDistribution">Fahrtverteilung über den Tag</string>
     <string name="hourOfDay">Uhrzeit</string>
+
+    <!-- Radmesser Activity -->
+    <string name="availableDevices">Verfügbare Geräte</string>
 
     <!--- News -->
     <string name="what_is_new_title">Was ist neu?</string>
