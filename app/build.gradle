@@ -26,9 +26,7 @@ android {
             properties.load(project.rootProject.file('local.properties').newDataInputStream())
         }
 
-        if(properties.getProperty(SENTRY_DSN) != null){
-            buildConfigField "String", SENTRY_DSN, properties.getProperty(SENTRY_DSN)
-        }
+        buildConfigField "String", SENTRY_DSN, properties.getProperty(SENTRY_DSN) ?: "null"
         def VAR_SENTRY_DSN = System.getenv(ENV_VARIABLE_PREFIX + SENTRY_DSN)
         if(VAR_SENTRY_DSN != null){
             buildConfigField "String", SENTRY_DSN, "\"" + VAR_SENTRY_DSN + "\""
@@ -60,7 +58,6 @@ android {
         debug {
             debuggable true
             applicationIdSuffix ".debug"
-            buildConfigField "String", SENTRY_DSN, "\"debug\""
         }
         qa {
             initWith buildTypes.release
