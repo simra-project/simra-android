@@ -47,12 +47,12 @@ import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 
 public class HistoryActivity extends BaseActivity {
 

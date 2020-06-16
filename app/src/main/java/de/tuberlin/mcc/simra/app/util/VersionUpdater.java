@@ -19,9 +19,9 @@ import de.tuberlin.mcc.simra.app.annotation.Ride;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
-import static de.tuberlin.mcc.simra.app.util.Utils.copySharedPreferences;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.copySharedPreferences;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.recalculateStatistics;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
@@ -402,10 +402,10 @@ public class VersionUpdater {
     public static void updateToV52(Context context, int lastAppVersion) {
         if (lastAppVersion < 52) {
             // get previous chosen region
-            int region = Utils.lookUpIntSharedPrefs("Region", 0, "Profile", context);
+            int region = SharedPref.lookUpIntSharedPrefs("Region", 0, "Profile", context);
             // change region from London to Berlin
             if (region == 2) {
-                Utils.writeIntToSharedPrefs("Region", 1, "Profile", context);
+                SharedPref.writeIntToSharedPrefs("Region", 1, "Profile", context);
             }
 
         }

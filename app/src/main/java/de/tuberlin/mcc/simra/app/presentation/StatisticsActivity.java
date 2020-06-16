@@ -23,8 +23,8 @@ import java.util.Locale;
 
 import de.tuberlin.mcc.simra.app.R;
 
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getGlobalProfile;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 
 public class StatisticsActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

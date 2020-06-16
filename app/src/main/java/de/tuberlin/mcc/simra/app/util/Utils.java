@@ -28,7 +28,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
@@ -164,62 +163,6 @@ public class Utils {
         return ctx.getFilesDir() + "/";
     }
 
-    public static String lookUpSharedPrefs(String key, String defValue, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        return sharedPrefs.getString(key, defValue);
-    }
-
-    public static int lookUpIntSharedPrefs(String key, int defValue, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        return sharedPrefs.getInt(key, defValue);
-    }
-
-    public static long lookUpLongSharedPrefs(String key, long defValue, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        return sharedPrefs.getLong(key, defValue);
-    }
-
-    public static boolean lookUpBooleanSharedPrefs(String key, boolean defValue, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        return sharedPrefs.getBoolean(key, defValue);
-    }
-
-    public static void writeToSharedPrefs(String key, String value, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putString(key, value);
-        editor.apply();
-    }
-
-    public static void writeIntToSharedPrefs(String key, int value, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putInt(key, value);
-        editor.apply();
-    }
-
-    public static void writeLongToSharedPrefs(String key, long value, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putLong(key, value);
-        editor.apply();
-    }
-
-    public static void writeBooleanToSharedPrefs(String key, boolean value, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean(key, value);
-        editor.apply();
-    }
-
 
     // Check if an accEvent has already been annotated based on one line of the accEvents csv file.
     // Returns true, if accEvent was already annotated.
@@ -256,9 +199,9 @@ public class Utils {
     }
 
     public static void deleteErrorLogsForVersion(Context context, int version) {
-        int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        int appVersion = SharedPref.lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
         if (appVersion < version) {
-            writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", context);
+            SharedPref.writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", context);
             File[] dirFiles = context.getFilesDir().listFiles();
             String path;
             for (int i = 0; i < dirFiles.length; i++) {
@@ -272,61 +215,6 @@ public class Utils {
         //writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
 
 
-    }
-
-    public static void showKeyPrefs(Context context) {
-        SharedPreferences keyPrefs = context.getApplicationContext()
-                .getSharedPreferences("keyPrefs", Context.MODE_PRIVATE);
-        Log.d(TAG, "===========================V=keyPrefs=V===========================");
-        Object[] keyPrefsArray = keyPrefs.getAll().entrySet().toArray();
-        for (Object keyPrefsEntry : keyPrefsArray) {
-            Log.d(TAG, keyPrefsEntry + "");
-        }
-        Log.d(TAG, "===========================Λ=keyPrefs=Λ===========================");
-    }
-
-    public static void showDataDirectory(Context context) {
-        Log.d(TAG, "===========================V=Directory=V===========================");
-        String[] fileList = context.fileList();
-        for (String fileName : fileList) {
-            Log.d(TAG, fileName);
-        }
-        Log.d(TAG, "===========================Λ=Directory=Λ===========================");
-    }
-
-    public static void showMetadata(Context context) {
-        Log.d(TAG, "===========================V=metaData=V===========================");
-        File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
-        try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
-            String metaDataLine;
-            // loop through the metaData.csv lines
-            while ((metaDataLine = metaDataReader.readLine()) != null) {
-                Log.d(TAG, metaDataLine);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d(TAG, "Exception in showMetadata(): " + Arrays.toString(e.getStackTrace()));
-        }
-        Log.d(TAG, "===========================Λ=metaData=Λ===========================");
-    }
-
-    public static void showStatistics(Context context) {
-        SharedPreferences profilePrefs = context.getApplicationContext()
-                .getSharedPreferences("Profile", Context.MODE_PRIVATE);
-        Log.d(TAG, "===========================V=Statistics=V===========================");
-        Log.d(TAG, "numberOfRides: " + profilePrefs.getInt("NumberOfRides", -1));
-        Log.d(TAG, "Distance: " + profilePrefs.getLong("Distance", -1) + "m");
-        Log.d(TAG, "Co2: " + profilePrefs.getLong("Co2", -1) + "g");
-        Log.d(TAG, "Duration: " + profilePrefs.getLong("Duration", -1) + "ms");
-        Log.d(TAG, "WaitedTime: " + profilePrefs.getLong("WaitedTime", -1) + "s");
-        Log.d(TAG, "NumberOfIncidents: " + profilePrefs.getInt("NumberOfIncidents", -1));
-        Log.d(TAG, "NumberOfScary: " + profilePrefs.getInt("NumberOfScary", -1));
-        String[] buckets = new String[24];
-        for (int i = 0; i < buckets.length; i++) {
-            buckets[i] = i + ": " + profilePrefs.getFloat(String.valueOf(i), -1.0f);
-        }
-        Log.d(TAG, "timeBuckets: " + Arrays.toString(buckets));
-        Log.d(TAG, "===========================Λ=Statistics=Λ===========================");
     }
 
     public static void updateProfile(boolean global, Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
@@ -839,34 +727,8 @@ public class Utils {
         return simRa_regions_config;
     }
 
-    public static void copySharedPreferences(String sourceSharedPref, String newSharedPref, Context context) {
-        SharedPreferences sourceSP = context.getApplicationContext()
-                .getSharedPreferences(sourceSharedPref, Context.MODE_PRIVATE);
-
-        SharedPreferences newSP = context.getApplicationContext()
-                .getSharedPreferences(newSharedPref, Context.MODE_PRIVATE);
-        SharedPreferences.Editor newE = newSP.edit();
-
-        for (Map.Entry<String, ?> kvPair : sourceSP.getAll().entrySet()) {
-            String key = kvPair.getKey();
-            Object value = kvPair.getValue();
-            if (value instanceof Float) {
-                newE.putFloat(key, (Float) value);
-            } else if (value instanceof Integer) {
-                newE.putInt(key, (Integer) value);
-            } else if (value instanceof String) {
-                newE.putString(key, (String) value);
-            } else if (value instanceof Boolean) {
-                newE.putBoolean(key, (Boolean) value);
-            } else if (value instanceof Long) {
-                newE.putLong(key, (Long) value);
-            }
-        }
-        newE.apply();
-    }
-
     public void resetAppIfVersionIsBelow(Context context, int version) {
-        int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        int appVersion = SharedPref.lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
 
         if (appVersion < version) {
             File[] dirFiles = context.getFilesDir().listFiles();
@@ -883,9 +745,9 @@ public class Utils {
             String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
 
             overWriteFile((fileInfoLine + METADATA_HEADER), "metaData.csv", context);
-            writeIntToSharedPrefs("RIDE-KEY", 0, "simraPrefs", context);
+            SharedPref.writeIntToSharedPrefs("RIDE-KEY", 0, "simraPrefs", context);
         }
-        writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
+        SharedPref.writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
     }
 
 }
