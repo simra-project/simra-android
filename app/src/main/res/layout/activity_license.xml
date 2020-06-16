@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:id="@+id/activity_licenses"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_licenses"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".subactivites.LicenseActivity">
+    tools:context=".presentation.LicenseActivity">
 
     <include
         android:id="@+id/toolbar"
@@ -14,13 +13,12 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_centerHorizontal="true"
         android:layout_below="@id/toolbar"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
         android:fadingEdgeLength="80dp"
         android:requiresFadingEdge="vertical"
-        android:scrollbars="vertical"
-        >
+        android:scrollbars="vertical">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -30,94 +28,108 @@
 
             <Button
                 android:id="@+id/android_support_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Android Support Library"/>
+                android:layout_margin="5dp"
+                android:text="Android Support Library" />
+
             <Button
                 android:id="@+id/apache_commons_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Apache Commons"/>
+                android:layout_margin="5dp"
+                android:text="Apache Commons" />
+
             <Button
                 android:id="@+id/fbase_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="FBase"/>
+                android:layout_margin="5dp"
+                android:text="FBase" />
+
             <Button
                 android:id="@+id/gson_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Gson"/>
+                android:layout_margin="5dp"
+                android:text="Gson" />
+
             <Button
                 android:id="@+id/javax_activation_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Javax Activation"/>
+                android:layout_margin="5dp"
+                android:text="Javax Activation" />
+
             <Button
                 android:id="@+id/jersey_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Jersey"/>
+                android:layout_margin="5dp"
+                android:text="Jersey" />
+
             <Button
                 android:id="@+id/jetty_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Jetty"/>
+                android:layout_margin="5dp"
+                android:text="Jetty" />
+
             <Button
                 android:id="@+id/logback_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Logback"/>
+                android:layout_margin="5dp"
+                android:text="Logback" />
+
             <Button
                 android:id="@+id/mpandroidchart_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="MPAndroidChart"/>
+                android:layout_margin="5dp"
+                android:text="MPAndroidChart" />
+
             <Button
                 android:id="@+id/okhttp_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="OkHttp"/>
+                android:layout_margin="5dp"
+                android:text="OkHttp" />
+
             <Button
                 android:id="@+id/osmbonuspack_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Osmbonuspack"/>
+                android:layout_margin="5dp"
+                android:text="Osmbonuspack" />
+
             <Button
                 android:id="@+id/osmdroid_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Osmdroid"/>
+                android:layout_margin="5dp"
+                android:text="Osmdroid" />
+
             <Button
                 android:id="@+id/rangeseekbar_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="RangeSeekBar"/>
+                android:layout_margin="5dp"
+                android:text="RangeSeekBar" />
+
             <Button
                 android:id="@+id/slf4j_api_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="SLF4J API"/>
+                android:layout_margin="5dp"
+                android:text="SLF4J API" />
+
             <Button
                 android:id="@+id/slf4j_simple_library"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="SLF4J Simple"/>
+                android:layout_margin="5dp"
+                android:text="SLF4J Simple" />
 
         </LinearLayout>
 

@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.Date;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
-import de.tuberlin.mcc.simra.app.main.StartActivity;
+import de.tuberlin.mcc.simra.app.presentation.StartActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;

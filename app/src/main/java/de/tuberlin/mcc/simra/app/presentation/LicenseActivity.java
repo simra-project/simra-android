@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.subactivites;
+package de.tuberlin.mcc.simra.app.presentation;
 
 import android.app.Dialog;
 import android.content.res.AssetManager;

@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    android:id="@+id/activity_settings"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_settings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".subactivites.SettingsActivity">
+    tools:context=".presentation.SettingsActivity">
 
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
-<androidx.core.widget.NestedScrollView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:layout_marginTop="@dimen/toolbar_space"
-    android:fadingEdgeLength="80dp"
-    android:layout_margin="10dp"
-    android:requiresFadingEdge="vertical"
-    android:scrollbars="vertical"
-    >
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp"
+        android:layout_marginTop="@dimen/toolbar_space"
+        android:fadingEdgeLength="80dp"
+        android:requiresFadingEdge="vertical"
+        android:scrollbars="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,8 +34,9 @@
                 android:id="@+id/privacySettingsLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center_horizontal">
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical">
+
                 <Space
                     android:id="@+id/settingsSpace1"
                     android:layout_width="match_parent"
@@ -109,6 +108,7 @@
                     android:textAlignment="center"
                     android:textSize="15sp" />
             </LinearLayout>
+
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="25dp" />
@@ -162,24 +162,28 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="20dp" />
-            <CheckBox android:id="@+id/childCheckBox"
+
+            <CheckBox
+                android:id="@+id/childCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/childString"
-                android:singleLine="false"
+                android:checked="false"
                 android:maxEms="15"
-                android:checked="false"/>
+                android:singleLine="false"
+                android:text="@string/childString" />
 
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="10dp" />
-            <CheckBox android:id="@+id/trailerCheckBox"
+
+            <CheckBox
+                android:id="@+id/trailerCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/trailerString"
-                android:singleLine="false"
+                android:checked="false"
                 android:maxEms="15"
-                android:checked="false"/>
+                android:singleLine="false"
+                android:text="@string/trailerString" />
             <!--
                     <RelativeLayout
                     android:layout_width="match_parent"
@@ -256,149 +260,155 @@
 
                 </RelativeLayout>
                 -->
-    <LinearLayout
-        android:id="@+id/generalSettingsLinearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center_horizontal">
-        <Space
-            android:id="@+id/generalSettingsSpace1"
-            android:layout_width="match_parent"
-            android:layout_height="25dp" />
-
-        <TextView
-            android:id="@+id/GeneralSettingsTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/general_settings_title"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <Space
-            android:id="@+id/generalSettingsSpace2"
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
-
-        <TextView
-            android:id="@+id/unitTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/unitDescription"
-            android:textAlignment="center"
-            android:textSize="15sp" />
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/metricSystemTextView"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/generalSettingsLinearLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/metric"
-                />
-            <Switch
-                android:id="@+id/unitSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/metricSystemTextView"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/imperial"
-                android:layout_toEndOf="@id/unitSwitch"/>
-        </RelativeLayout>
-        <Space
-            android:id="@+id/generalSettingsSpace3"
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/dateTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dateFormatDescription"
-            android:textAlignment="center"
-            android:textSize="15sp" />
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+                <Space
+                    android:id="@+id/generalSettingsSpace1"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp" />
 
-            <TextView
-                android:id="@+id/GermanDateTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/metric"
-                />
-            <Switch
-                android:id="@+id/dateFormatSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/GermanDateTextView"
-                />
+                <TextView
+                    android:id="@+id/GeneralSettingsTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/general_settings_title"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/imperial"
-                android:layout_toEndOf="@id/dateFormatSwitch"/>
-        </RelativeLayout>
+                <Space
+                    android:id="@+id/generalSettingsSpace2"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp" />
 
-        <Space
-            android:id="@+id/generalSettingsSpace4"
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
+                <TextView
+                    android:id="@+id/unitTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unitDescription"
+                    android:textAlignment="center"
+                    android:textSize="15sp" />
 
-        <TextView
-            android:id="@+id/devicesTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/devices"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/metricSystemTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/metric" />
 
-            <TextView
-                android:id="@+id/radmesserTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/radmesserSwitchTitle"
-                android:textSize="15sp" />
+                    <Switch
+                        android:id="@+id/unitSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/metricSystemTextView" />
 
-            <Switch
-                android:id="@+id/radmesserSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/unitSwitch"
+                        android:text="@string/imperial" />
+                </RelativeLayout>
 
-        <Button
-            android:id="@+id/radmesserButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/radmesserButton"
-            android:visibility="gone" />
+                <Space
+                    android:id="@+id/generalSettingsSpace3"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp" />
 
-        <Space
-            android:id="@+id/generalSettingsSpace5"
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
+                <TextView
+                    android:id="@+id/dateTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dateFormatDescription"
+                    android:textAlignment="center"
+                    android:textSize="15sp" />
 
-    </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/GermanDateTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/metric" />
+
+                    <Switch
+                        android:id="@+id/dateFormatSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/GermanDateTextView" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/dateFormatSwitch"
+                        android:text="@string/imperial" />
+                </RelativeLayout>
+
+                <Space
+                    android:id="@+id/generalSettingsSpace4"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp" />
+
+                <TextView
+                    android:id="@+id/devicesTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/devices"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/radmesserTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/radmesserSwitchTitle"
+                        android:textSize="15sp" />
+
+                    <Switch
+                        android:id="@+id/radmesserSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/radmesserButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/radmesserButton"
+                    android:visibility="gone" />
+
+                <Space
+                    android:id="@+id/generalSettingsSpace5"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp" />
+
+            </LinearLayout>
+
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="20dp" />
+
             <TextView
                 android:id="@+id/appVersionTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAlignment="viewEnd"
-                android:text="Version: "/>
+                android:text="Version: "
+                android:textAlignment="viewEnd" />
         </LinearLayout>
 
 
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

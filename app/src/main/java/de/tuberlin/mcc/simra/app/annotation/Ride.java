@@ -13,6 +13,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import de.tuberlin.mcc.simra.app.entities.AccEvent;
+
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;

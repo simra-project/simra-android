@@ -54,6 +54,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.AccEvent;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;

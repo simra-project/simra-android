@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.main;
+package de.tuberlin.mcc.simra.app.presentation;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -73,12 +73,6 @@ import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
-import de.tuberlin.mcc.simra.app.subactivites.AboutActivity;
-import de.tuberlin.mcc.simra.app.subactivites.ProfileActivity;
-import de.tuberlin.mcc.simra.app.subactivites.RadmesserActivity;
-import de.tuberlin.mcc.simra.app.subactivites.SettingsActivity;
-import de.tuberlin.mcc.simra.app.subactivites.StatisticsActivity;
-import de.tuberlin.mcc.simra.app.subactivites.WebActivity;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;

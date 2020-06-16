@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.main;
+package de.tuberlin.mcc.simra.app.presentation;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;

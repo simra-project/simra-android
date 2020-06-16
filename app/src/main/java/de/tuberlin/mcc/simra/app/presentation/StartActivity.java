@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.main;
+package de.tuberlin.mcc.simra.app.presentation;
 
 import android.Manifest;
 import android.content.DialogInterface;

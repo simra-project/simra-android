@@ -33,7 +33,7 @@
 
         <!-- Activities -->
         <activity
-            android:name=".main.StartActivity"
+            android:name=".presentation.StartActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>
@@ -42,17 +42,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".subactivites.StatisticsActivity"
+            android:name=".presentation.StatisticsActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_statistics"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".subactivites.AboutActivity"
+            android:name=".presentation.AboutActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_about_simra"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".subactivites.RadmesserActivity"
+            android:name=".presentation.RadmesserActivity"
             android:label="@string/title_activity_bluetooth_connection" />
         <activity
             android:name=".annotation.RideSettingsActivity"
@@ -65,42 +65,42 @@
                 android:value="de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity" />
         </activity>
         <activity
-            android:name=".subactivites.LicenseActivity"
+            android:name=".presentation.LicenseActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_library_license"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".main.MainActivity"
+            android:name=".presentation.MainActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTop" />
         <activity
-            android:name=".subactivites.WebActivity"
+            android:name=".presentation.WebActivity"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".main.MainActivity" />
+            android:parentActivityName=".presentation.MainActivity" />
         <activity
-            android:name=".subactivites.ProfileActivity"
+            android:name=".presentation.ProfileActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_profile"
-            android:parentActivityName=".main.MainActivity"
+            android:parentActivityName=".presentation.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.tuberlin.mcc.simra.app.main.MainActivity" />
+                android:value="de.tuberlin.mcc.simra.app.presentation.MainActivity" />
         </activity>
         <activity
-            android:name=".subactivites.SettingsActivity"
+            android:name=".presentation.SettingsActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".main.MainActivity" />
+            android:parentActivityName=".presentation.MainActivity" />
         <activity
-            android:name=".main.HistoryActivity"
+            android:name=".presentation.HistoryActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_history"
-            android:parentActivityName=".main.MainActivity"
+            android:parentActivityName=".presentation.MainActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.tuberlin.mcc.simra.app.main.MainActivity" />
+                android:value="de.tuberlin.mcc.simra.app.presentation.MainActivity" />
         </activity>
         <activity
             android:name=".annotation.ShowRouteActivity"
@@ -110,7 +110,7 @@
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.PopUpWindow" />
         <activity
-            android:name=".subactivites.CreditsActivity"
+            android:name=".presentation.CreditsActivity"
             android:label="@string/title_activity_credits"
             android:theme="@style/AppTheme" />
         <!-- Services -->
