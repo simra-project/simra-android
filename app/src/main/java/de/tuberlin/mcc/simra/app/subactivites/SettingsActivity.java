@@ -39,35 +39,43 @@ import static de.tuberlin.mcc.simra.app.util.Utils.writeToSharedPrefs;
 public class SettingsActivity extends BaseActivity {
 
     private static final String TAG = "SettingsActivity_LOG";
-
+    private final static int REQUEST_ENABLE_BT = 1;
+    private final static int BLUETOOTH_SUCCESS = -1;
+    private final static int CONNECTED = 2;
+    private final static int NOT_CONNECTED = 0;
     ImageButton backBtn;
     TextView toolbarTxt;
-
     long privacyDuration;
     int privacyDistance;
     int child;
     int trailer;
     String unit;
     int dateFormat;
-
     // Bike Type and Phone Location Items
     Spinner bikeTypeSpinner;
     Spinner phoneLocationSpinner;
-
     // Child and Trailer
     CheckBox childCheckBox;
     CheckBox trailerCheckBox;
-
     Switch unitSwitch;
     Switch dateFormatSwitch;
     Switch radmesserConnectionSwitch;
     Button radmesserButton;
-    private final static int REQUEST_ENABLE_BT = 1;
-    private final static int BLUETOOTH_SUCCESS = -1;
-    private final static int CONNECTED = 2;
-    private final static int NOT_CONNECTED = 0;
+    private RadmesserService radmesserService;
+    private ServiceConnection radmesserServiceConnection = new ServiceConnection() {
 
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
 
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "Connecting to service");
+            RadmesserService.LocalBinder myBinder = (RadmesserService.LocalBinder) service;
+            radmesserService = myBinder.getService();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,8 +99,8 @@ public class SettingsActivity extends BaseActivity {
         );
 
         // load unit and date format
-        unit = lookUpSharedPrefs("Settings-Unit","m","simraPrefs",this);
-        dateFormat = lookUpIntSharedPrefs("Settings-DateFormat",0,"simraPrefs",this);
+        unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", this);
+        dateFormat = lookUpIntSharedPrefs("Settings-DateFormat", 0, "simraPrefs", this);
 
         // Set switches
         unitSwitch = findViewById(R.id.unitSwitch);
@@ -188,7 +196,7 @@ public class SettingsActivity extends BaseActivity {
             }
         });
 
-        if (trailer == 1){
+        if (trailer == 1) {
             trailerCheckBox.setChecked(true);
         }
         trailerCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -201,7 +209,6 @@ public class SettingsActivity extends BaseActivity {
                 }
             }
         });
-
 
 
         TextView appVersionTextView = findViewById(R.id.appVersionTextView);
@@ -240,7 +247,7 @@ public class SettingsActivity extends BaseActivity {
 
     }
 
-    private void showTutorialDialog(){
+    private void showTutorialDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Verbindung mit Radmesser");
         alert.setMessage("\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden");
@@ -254,7 +261,8 @@ public class SettingsActivity extends BaseActivity {
         gif.setLayoutParams(gifMargins);
         gifLayout.addView(gif);
         alert.setView(gifLayout);
-        alert.setPositiveButton("Ok", (dialog, whichButton) -> { });
+        alert.setPositiveButton("Ok", (dialog, whichButton) -> {
+        });
         alert.show();
     }
 
@@ -263,33 +271,17 @@ public class SettingsActivity extends BaseActivity {
         if (resultCode == BLUETOOTH_SUCCESS && requestCode == REQUEST_ENABLE_BT) {
             startRadmesserService();
             showTutorialDialog();
-        }else{
+        } else {
             // Try to start again?
             enableBluetooth();
         }
     }
 
-    private void startRadmesserService(){
+    private void startRadmesserService() {
         Intent intent = new Intent(this, RadmesserService.class);
         startService(intent);
         bindService(intent, radmesserServiceConnection, Context.BIND_IMPORTANT);
     }
-
-    private RadmesserService radmesserService;
-    private ServiceConnection radmesserServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "Connecting to service");
-            RadmesserService.LocalBinder myBinder = (RadmesserService.LocalBinder) service;
-            radmesserService = myBinder.getService();
-        }
-    };
 
     private void enableBluetooth() {
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -356,9 +348,10 @@ public class SettingsActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop called");
-        try{
+        try {
             unbindService(radmesserServiceConnection);
-        } catch (Exception e){}
+        } catch (Exception e) {
+        }
 
         writeLongToSharedPrefs("Privacy-Duration", privacyDuration, "simraPrefs", this);
         writeIntToSharedPrefs("Privacy-Distance", privacyDistance, "simraPrefs", this);
@@ -366,8 +359,8 @@ public class SettingsActivity extends BaseActivity {
         writeIntToSharedPrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", this);
         writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", this);
         writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", this);
-        writeToSharedPrefs("Settings-Unit",unit,"simraPrefs",this);
-        writeIntToSharedPrefs("Settings-DateFormat",dateFormat,"simraPrefs", this);
+        writeToSharedPrefs("Settings-Unit", unit, "simraPrefs", this);
+        writeIntToSharedPrefs("Settings-DateFormat", dateFormat, "simraPrefs", this);
     }
 
 }

@@ -55,7 +55,7 @@ public class ForegroundServiceNotificationManager {
         return NOTIFICATION_ID;
     }
 
-    public static void cancelNotification(Context ctx){
+    public static void cancelNotification(Context ctx) {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(ctx);
         notificationManager.cancel(NOTIFICATION_ID);
     }

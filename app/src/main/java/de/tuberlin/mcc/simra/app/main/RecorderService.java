@@ -27,14 +27,12 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
-import java.nio.Buffer;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
@@ -140,7 +138,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     recordingAllowed = true;
                 }
             }
-                accelerometerMatrix = event.values;
+            accelerometerMatrix = event.values;
 
 
             if (((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) && recordingAllowed) {
@@ -248,7 +246,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         Log.d(TAG, "privacyDistance: " + privacyDistance + " privacyDuration: " + privacyDuration);
 
 
-
         // Prevent the App to be killed while recording
         PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG + ":RecorderService");
@@ -319,7 +316,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
             String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
             Log.d(TAG, "fileInfoLine: " + fileInfoLine);
-            int region = lookUpIntSharedPrefs("Region",0,"Profile",this);
+            int region = lookUpIntSharedPrefs("Region", 0, "Profile", this);
             // Create head of the csv-file
             appendToFile((fileInfoLine + "lat,lon,X,Y,Z,timeStamp,acc,a,b,c" + System.lineSeparator()), pathToAccGpsFile, this);
             // Write String data to files
@@ -432,14 +429,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                                 .GPS_PROVIDER);
                     }
 
-                    route.addPoint(new GeoPoint(lastLocation.getLatitude(),lastLocation.getLongitude()));
+                    route.addPoint(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
                     if (lastLocation.getSpeed() <= 3.0) {
                         waitedTime += 3;
                     }
-                    gps =   String.valueOf(lastLocation.getLatitude()) + "," +
+                    gps = String.valueOf(lastLocation.getLatitude()) + "," +
                             String.valueOf(lastLocation.getLongitude());
-                    accuracy =  String.valueOf(lastAccuracy);
-                    gyro =  String.valueOf(gyroscopeMatrix[0]) + "," +
+                    accuracy = String.valueOf(lastAccuracy);
+                    gyro = String.valueOf(gyroscopeMatrix[0]) + "," +
                             String.valueOf(gyroscopeMatrix[1]) + "," +
                             String.valueOf(gyroscopeMatrix[2]);
                 }
@@ -453,18 +450,18 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 // Put the averages + time data into a string and append to file.
                 String str =
                         gps + "," +
-                        String.valueOf(xAvg) + "," +
-                        String.valueOf(yAvg) + "," +
-                        String.valueOf(zAvg) + "," +
-                        curTime + "," +
-                        accuracy + "," +
-                        gyro;
-                if(!radmesserQueue.isEmpty()){
-                    str =  str + "," + radmesserQueue.element();
+                                String.valueOf(xAvg) + "," +
+                                String.valueOf(yAvg) + "," +
+                                String.valueOf(zAvg) + "," +
+                                curTime + "," +
+                                accuracy + "," +
+                                gyro;
+                if (!radmesserQueue.isEmpty()) {
+                    str = str + "," + radmesserQueue.element();
                 }
 
 
-                Log.i(TAG,str);
+                Log.i(TAG, str);
 
                 accGpsString.append(str).append(System.getProperty("line.separator"));
                 lineAdded = true;

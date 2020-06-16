@@ -10,20 +10,34 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
 
-
 import java.util.HashSet;
 import java.util.UUID;
 
-import de.tuberlin.mcc.simra.app.services.RadmesserService;
-
 
 public class RadmesserDevice {
+    /**
+     * Bluetooth Service UUIDs
+     */
+    public static final String UUID_SERVICE_HEARTRATE = "0000180D-0000-1000-8000-00805F9B34FB";
+    public static final String UUID_SERVICE_CHARACTERISTIC_HEARTRATE = "00002a37-0000-1000-8000-00805f9b34fb";
+    public static final String UUID_SERVICE_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000000";
+    public static final String UUID_SERVICE_CHARACTERISTIC_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000001";
+    public static final String UUID_SERVICE_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000000";
+    public static final String UUID_SERVICE_CHARACTERISTIC_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000001";
+    public static final String UUID_SERVICE_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000000";
+    public static final String UUID_SERVICE_CHARACTERISTIC_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000001";
     private final String TAG = "RadmesserDevice";
     private final BluetoothDevice bluetoothDevice;
     private final RadmesserDeviceCallbacks callbacks;
     private de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices;
-
     private ConnectionStatus connectionState = ConnectionStatus.gattDisconnected;
+
+    public RadmesserDevice(BluetoothDevice bluetoothDevice, RadmesserDeviceCallbacks callbacks, de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices) {
+        this.bluetoothDevice = bluetoothDevice;
+        this.callbacks = callbacks;
+        this.bleServices = bleServices;
+
+    }
 
     public ConnectionStatus getConnectionState() {
         return connectionState;
@@ -32,20 +46,6 @@ public class RadmesserDevice {
     public void setConnectionState(ConnectionStatus newState) {
         connectionState = newState;
         callbacks.onConnectionStateChange();
-    }
-
-    private enum ConnectionStatus {
-        startConnecting,
-        gattConnected,
-        gattDisconnected,
-    }
-
-
-    public RadmesserDevice(BluetoothDevice bluetoothDevice, RadmesserDeviceCallbacks callbacks, de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices) {
-        this.bluetoothDevice = bluetoothDevice;
-        this.callbacks = callbacks;
-        this.bleServices = bleServices;
-
     }
 
     public void connect(Context ctx) {
@@ -109,7 +109,6 @@ public class RadmesserDevice {
         });
     }
 
-
     public String getName() {
         return bluetoothDevice.getName();
     }
@@ -118,24 +117,15 @@ public class RadmesserDevice {
         return bluetoothDevice.getAddress();
     }
 
+    private enum ConnectionStatus {
+        startConnecting,
+        gattConnected,
+        gattDisconnected,
+    }
+
     public interface RadmesserDeviceCallbacks {
         public void onConnectionStateChange();
     }
-
-    /**
-     * Bluetooth Service UUIDs
-     */
-    public static final String UUID_SERVICE_HEARTRATE = "0000180D-0000-1000-8000-00805F9B34FB";
-    public static final String UUID_SERVICE_CHARACTERISTIC_HEARTRATE = "00002a37-0000-1000-8000-00805f9b34fb";
-
-    public static final String UUID_SERVICE_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000000";
-    public static final String UUID_SERVICE_CHARACTERISTIC_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000001";
-
-    public static final String UUID_SERVICE_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000000";
-    public static final String UUID_SERVICE_CHARACTERISTIC_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000001";
-
-    public static final String UUID_SERVICE_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000000";
-    public static final String UUID_SERVICE_CHARACTERISTIC_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000001";
 
 
 }

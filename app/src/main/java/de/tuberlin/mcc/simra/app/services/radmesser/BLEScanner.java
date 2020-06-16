@@ -13,7 +13,6 @@ import android.os.Looper;
 import android.os.ParcelUuid;
 import android.util.Log;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -26,23 +25,15 @@ public class BLEScanner {
     private BLEScannerCallbacks callbacks;
 
 
-    private HashMap<String,BluetoothDevice> foundDevices;
+    private HashMap<String, BluetoothDevice> foundDevices;
 
     public BLEScanner(BLEScannerCallbacks callbacks) {
         this.callbacks = callbacks;
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(bluetoothAdapter != null && bluetoothAdapter.isEnabled()){
+        if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         }
-    }
-
-    private interface ScanResultCallback {
-        void onNewDeviceFound(BluetoothDevice device, ScanCallback callback);
-    }
-
-    public interface SingleDeviceScanCB {
-        void onSpecificDeviceFound(BluetoothDevice device);
     }
 
     public boolean tryConnectPairedDevice(String pairedRadmesserID, SingleDeviceScanCB then) {
@@ -140,8 +131,16 @@ public class BLEScanner {
         callbacks.onScanStopped();
     }
 
-    public HashMap<String,BluetoothDevice> getFoundDevices() {
+    public HashMap<String, BluetoothDevice> getFoundDevices() {
         return foundDevices;
+    }
+
+    private interface ScanResultCallback {
+        void onNewDeviceFound(BluetoothDevice device, ScanCallback callback);
+    }
+
+    public interface SingleDeviceScanCB {
+        void onSpecificDeviceFound(BluetoothDevice device);
     }
 
     public interface BLEScannerCallbacks {

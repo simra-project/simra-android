@@ -22,44 +22,23 @@ import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class Ride {
 
-    private String key = "";
-
-    public String getKey() {
-        return key;
-    }
-
+    static String TAG = "Ride_LOG";
     public File accGpsFile;
     public ArrayList<AccEvent> events;
-
-    public ArrayList<AccEvent> getEvents() {
-        return events;
-    }
-
-    String duration;
-    String startTime;
-    String endTime;
     public long distance;
-    int waitedTime;
-    Context context;
-    static String TAG = "Ride_LOG";
-    Polyline route;
-
     public int bike;
     public int child;
     public int trailer;
     public int pLoc;
+    String duration;
+    String startTime;
+    String endTime;
+    int waitedTime;
+    Context context;
+    Polyline route;
     boolean temp = false;
-
-    public String getDuration() {
-        return duration;
-    }
-
-    public Polyline getRoute() {
-        return this.route;
-    }
-
     int state;
-
+    private String key = "";
 
     // Non-temp ride.
     public Ride(File accGpsFile, String duration, String startTime, int state, int bike, int child, int trailer, int pLoc, Context context, boolean calculateEvents, boolean temp) throws IOException {
@@ -70,7 +49,7 @@ public class Ride {
         this.waitedTime = (int) waitedTimeRouteAndDistance[0];
         this.route = (Polyline) waitedTimeRouteAndDistance[1];
         this.distance = (long) waitedTimeRouteAndDistance[2];
-        Log.d(TAG,"distance: " + distance + " waitedTime: " + waitedTime);
+        Log.d(TAG, "distance: " + distance + " waitedTime: " + waitedTime);
         this.state = state;
         this.bike = bike;
         this.child = child;
@@ -80,7 +59,7 @@ public class Ride {
         this.temp = temp;
         this.key = accGpsFile.getName().split("_")[0];
         String pathToAccEventsOfRide = "accEvents" + key + ".csv";
-        if(temp) {
+        if (temp) {
             this.key = accGpsFile.getName().split("_")[0].replace("Temp", "");
             pathToAccEventsOfRide = "TempaccEvents" + key + ".csv";
         }
@@ -106,14 +85,12 @@ public class Ride {
                             boolean annotated = checkForAnnotation(accEventLine);
                             String incidentType = accEventLine[8];
                             String scary = accEventLine[18];
-                            events.add(new AccEvent(key,lat,lon,timestamp,annotated,incidentType,scary));
+                            events.add(new AccEvent(key, lat, lon, timestamp, annotated, incidentType, scary));
                         }
                     }
                 }
             }
         }
-
-
 
 
         for (int i = 0; i < events.size(); i++) {
@@ -129,44 +106,6 @@ public class Ride {
         }
 
     }
-
-    /*
-    // temp ride
-    public Ride(File tempAccGpsFile, String duration, String startTime, String endTime, int state, int bike, int child, int trailer, int pLoc, boolean temp, Context context) throws IOException {
-        this.accGpsFile = tempAccGpsFile;
-        this.duration = duration;
-        this.startTime = startTime;
-        // this.endTime = endTime;
-        Pair<Integer, Polyline> routeAndWaitedTime = calculateWaitedTimePolylineDistance(tempAccGpsFile);
-        this.route = routeAndWaitedTime.second;
-        this.waitedTime = routeAndWaitedTime.first;
-        this.distance = route.getDistance();
-        Log.d(TAG,"distance: " + distance + " waitedTime: " + waitedTime);
-        this.state = state;
-        this.bike = bike;
-        this.child = child;
-        this.trailer = trailer;
-        this.pLoc = pLoc;
-        this.context = context;
-        this.key = tempAccGpsFile.getName().split("_")[0].replace("Temp", "");
-        this.temp = temp;
-        this.events = findAccEvents();
-
-        String pathToAccEventsOfRide = "TempaccEvents" + key + ".csv";
-        String content = ACCEVENTS_HEADER;
-        String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
-
-        for (int i = 0; i < events.size(); i++) {
-
-            AccEvent actualAccEvent = events.get(i);
-
-            content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + ",,,,,,,,,,,," + System.lineSeparator();
-        }
-
-        overWriteFile((fileInfoLine + content), pathToAccEventsOfRide, context);
-
-    }
-    */
 
     // Takes a File which contains all the data and creates a
     // PolyLine to be displayed on the map as a route.
@@ -203,13 +142,13 @@ public class Ride {
                         // distance to last location in meters
                         double distanceToLastPoint = thisLocation.distanceTo(previousLocation);
                         // time passed from last point in seconds
-                        long timePassed = (thisTimeStamp - previousTimeStamp)/1000;
+                        long timePassed = (thisTimeStamp - previousTimeStamp) / 1000;
                         // if speed < 2.99km/h: waiting
                         if (distanceToLastPoint < 2.5) {
                             waitedTime += timePassed;
                         }
                         // if speed > 80km/h: too fast, do not consider for distance
-                        if ((distanceToLastPoint/timePassed) < 22) {
+                        if ((distanceToLastPoint / timePassed) < 22) {
                             distance += (long) distanceToLastPoint;
                             polyLine.addPoint(new GeoPoint(thisLocation));
                         } else {
@@ -239,6 +178,22 @@ public class Ride {
         return new Object[]{waitedTime, polyLine, distance};
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public ArrayList<AccEvent> getEvents() {
+        return events;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public Polyline getRoute() {
+        return this.route;
+    }
+
     public ArrayList<AccEvent> findAccEvents() {
         ArrayList<AccEvent> accEvents = new ArrayList<>(6);
 
@@ -259,12 +214,12 @@ public class Ride {
         // Each String[] in ride is a part of the ride which is ca. 3 seconds long.
         ArrayList<String[]> ride = new ArrayList<>();
         ArrayList<String[]> events = new ArrayList<>(6);
-        accEvents.add(new AccEvent(0,999.0,999.0,0,false,"0","0"));
-        accEvents.add(new AccEvent(1,999.0,999.0,0,false,"0","0"));
-        accEvents.add(new AccEvent(2,999.0,999.0,0,false,"0","0"));
-        accEvents.add(new AccEvent(3,999.0,999.0,0,false,"0","0"));
-        accEvents.add(new AccEvent(4,999.0,999.0,0,false,"0","0"));
-        accEvents.add(new AccEvent(5,999.0,999.0,0,false,"0","0"));
+        accEvents.add(new AccEvent(0, 999.0, 999.0, 0, false, "0", "0"));
+        accEvents.add(new AccEvent(1, 999.0, 999.0, 0, false, "0", "0"));
+        accEvents.add(new AccEvent(2, 999.0, 999.0, 0, false, "0", "0"));
+        accEvents.add(new AccEvent(3, 999.0, 999.0, 0, false, "0", "0"));
+        accEvents.add(new AccEvent(4, 999.0, 999.0, 0, false, "0", "0"));
+        accEvents.add(new AccEvent(5, 999.0, 999.0, 0, false, "0", "0"));
 
         String[] template = {"0.0", "0.0", "0.0", "0.0", "0.0", "0"};
         events.add(template);
@@ -367,15 +322,15 @@ public class Ride {
 
                 String[] temp = events.get(0);
                 events.set(0, partOfRide);
-                accEvents.set(0, new AccEvent(0,Double.valueOf(partOfRide[0]),Double.valueOf(partOfRide[1]),Long.valueOf(partOfRide[5]),false,"0","0"));
+                accEvents.set(0, new AccEvent(0, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
 
                 events.set(1, temp);
-                accEvents.set(1, new AccEvent(1,Double.valueOf(temp[0]),Double.valueOf(temp[1]),Long.valueOf(temp[5]),false,"0","0"));
+                accEvents.set(1, new AccEvent(1, Double.valueOf(temp[0]), Double.valueOf(temp[1]), Long.valueOf(temp[5]), false, "0", "0"));
                 eventAdded = true;
             } else if (maxXDelta > Double.valueOf(events.get(1)[2]) && !eventAdded && enoughTimePassed) {
 
                 events.set(1, partOfRide);
-                accEvents.set(1, new AccEvent(1,Double.valueOf(partOfRide[0]),Double.valueOf(partOfRide[1]),Long.valueOf(partOfRide[5]),false,"0","0"));
+                accEvents.set(1, new AccEvent(1, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
                 eventAdded = true;
             }
             // Check whether actualY is one of the top 2 events
@@ -383,27 +338,27 @@ public class Ride {
 
                 String[] temp = events.get(2);
                 events.set(2, partOfRide);
-                accEvents.set(2, new AccEvent(2,Double.valueOf(partOfRide[0]),Double.valueOf(partOfRide[1]),Long.valueOf(partOfRide[5]),false,"0","0"));
+                accEvents.set(2, new AccEvent(2, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
                 events.set(3, temp);
-                accEvents.set(3, new AccEvent(3,Double.valueOf(temp[0]),Double.valueOf(temp[1]),Long.valueOf(temp[5]),false,"0","0"));
+                accEvents.set(3, new AccEvent(3, Double.valueOf(temp[0]), Double.valueOf(temp[1]), Long.valueOf(temp[5]), false, "0", "0"));
                 eventAdded = true;
 
             } else if (maxYDelta > Double.valueOf(events.get(3)[3]) && !eventAdded && enoughTimePassed) {
                 events.set(3, partOfRide);
-                accEvents.set(3, new AccEvent(3,Double.valueOf(partOfRide[0]),Double.valueOf(partOfRide[1]),Long.valueOf(partOfRide[5]),false,"0","0"));
+                accEvents.set(3, new AccEvent(3, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
                 eventAdded = true;
             }
             // Check whether actualZ is one of the top 2 events
             else if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded && enoughTimePassed) {
                 String[] temp = events.get(4);
                 events.set(4, partOfRide);
-                accEvents.set(4, new AccEvent(4,Double.valueOf(partOfRide[0]),Double.valueOf(partOfRide[1]),Long.valueOf(partOfRide[5]),false,"0","0"));
+                accEvents.set(4, new AccEvent(4, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
                 events.set(5, temp);
-                accEvents.set(5, new AccEvent(5,Double.valueOf(temp[0]),Double.valueOf(temp[1]),Long.valueOf(temp[5]),false,"0","0"));
+                accEvents.set(5, new AccEvent(5, Double.valueOf(temp[0]), Double.valueOf(temp[1]), Long.valueOf(temp[5]), false, "0", "0"));
 
             } else if (maxZDelta > Double.valueOf(events.get(5)[4]) && !eventAdded && enoughTimePassed) {
                 events.set(5, partOfRide);
-                accEvents.set(5, new AccEvent(5,Double.valueOf(partOfRide[0]),Double.valueOf(partOfRide[1]),Long.valueOf(partOfRide[5]),false,"0","0"));
+                accEvents.set(5, new AccEvent(5, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
                 eventAdded = true;
             }
 
@@ -415,7 +370,6 @@ public class Ride {
             Log.d(TAG, "accEvents.get(" + i + ") Position: " + (accEvents.get(i).position.toString())
                     + " timeStamp: " + (accEvents.get(i).timeStamp));
         }
-
 
 
         return accEvents;

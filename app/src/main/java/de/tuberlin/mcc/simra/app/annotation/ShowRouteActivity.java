@@ -21,6 +21,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.material.button.MaterialButton;
 import com.jaygoo.widget.OnRangeChangedListener;
 import com.jaygoo.widget.RangeSeekBar;
@@ -50,8 +53,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
@@ -68,46 +69,35 @@ import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 
 public class ShowRouteActivity extends BaseActivity {
 
-    ImageButton backBtn;
-    TextView toolbarTxt;
-
-    String startTime = "";
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Map stuff, Overlays
-    private MapView mMapView;
-    private RelativeLayout addIncBttn;
-    private RelativeLayout exitAddIncBttn;
-    RelativeLayout saveButton;
-    RelativeLayout exitButton;
-    IconOverlay startFlagOverlay;
-    IconOverlay finishFlagOverlay;
-
-    ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Our ride
-    public Ride ride;
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
     private static final String TAG = "ShowRouteActivity_LOG";
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // GEOCODER --> obtain GeoPoint from address
-
+    final int[] left = {0};
+    final int[] right = {0};
+    ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Our ride
+    public Ride ride;
     public ExecutorService pool;
-
-    public MapView getmMapView() {
-        return mMapView;
-    }
-
-    MapEventsOverlay overlayEvents;
-
-    // Marker-icons for different types/states of events:
-    // Automatically detected/custom; to be annotated/already annotated
-
     public Drawable editMarkerDefault;
     public Drawable editCustMarker;
     public Drawable editDoneDefault;
     public Drawable editDoneCust;
+    public int state;
+    public Ride tempRide;
+    ImageButton backBtn;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // GEOCODER --> obtain GeoPoint from address
+    TextView toolbarTxt;
+    String startTime = "";
+    RelativeLayout saveButton;
+
+    // Marker-icons for different types/states of events:
+    // Automatically detected/custom; to be annotated/already annotated
+    RelativeLayout exitButton;
+    IconOverlay startFlagOverlay;
+    IconOverlay finishFlagOverlay;
+    MapEventsOverlay overlayEvents;
     boolean addCustomMarkerMode;
     MarkerFunct myMarkerFunct;
     AlertDialog alertDialog;
@@ -116,15 +106,11 @@ public class ShowRouteActivity extends BaseActivity {
     int child;
     int trailer;
     int pLoc;
-
-    public int state;
     String duration;
     String pathToAccGpsFile;
     File gpsFile;
     Polyline route;
     Polyline editableRoute;
-
-    public Ride tempRide;
     File tempGpsFile;
     String tempAccGpsPath;
     String tempAccEventsPath;
@@ -133,18 +119,52 @@ public class ShowRouteActivity extends BaseActivity {
     Long tempEndTime;
     boolean showWarning = true;
     boolean continueWithRefresh = true;
-
     int lastLeft;
     int lastRight;
-
     RangeSeekBar privacySlider;
-
-    final int[] left = {0};
-    final int[] right = {0};
-
     int routeSize = 3;
-    private View progressBarRelativeLayout;
     BoundingBox bBox;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Map stuff, Overlays
+    private MapView mMapView;
+    private RelativeLayout addIncBttn;
+    private RelativeLayout exitAddIncBttn;
+    private View progressBarRelativeLayout;
+
+    // Returns the longitudes of the southern- and northernmost points
+    // as well as the latitudes of the western- and easternmost points
+    // in a double Array {South, North, West, East}
+    static BoundingBox getBoundingBox(Polyline pl) {
+
+        // {North, East, South, West}
+        ArrayList<GeoPoint> geoPoints = pl.getPoints();
+
+        double[] border = {geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude(), geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude()};
+
+        for (int i = 0; i < geoPoints.size(); i++) {
+            // Check for south/north
+            if (geoPoints.get(i).getLatitude() < border[2]) {
+                border[2] = geoPoints.get(i).getLatitude();
+            }
+            if (geoPoints.get(i).getLatitude() > border[0]) {
+                border[0] = geoPoints.get(i).getLatitude();
+            }
+            // Check for west/east
+            if (geoPoints.get(i).getLongitude() < border[3]) {
+                border[3] = geoPoints.get(i).getLongitude();
+            }
+            if (geoPoints.get(i).getLongitude() > border[1]) {
+                border[1] = geoPoints.get(i).getLongitude();
+            }
+
+        }
+
+        return new BoundingBox(border[0] + 0.001, border[1] + 0.001, border[2] - 0.001, border[3] - 0.001);
+    }
+
+    public MapView getmMapView() {
+        return mMapView;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,7 +203,6 @@ public class ShowRouteActivity extends BaseActivity {
         mMapController.setZoom(ZOOM_LEVEL);
         TextView copyrightTxt = (TextView) findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
-
 
 
         pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
@@ -271,46 +290,6 @@ public class ShowRouteActivity extends BaseActivity {
 
     }
 
-    private class RideUpdateTask extends AsyncTask<String, String, String> {
-
-        private boolean temp;
-        private boolean calculateEvents;
-
-        private RideUpdateTask(boolean temp, boolean calculateEvents) {
-            this.temp = temp;
-            this.calculateEvents = calculateEvents;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
-
-        protected String doInBackground(String... urls) {
-            Log.d(TAG, "doInBackground()");
-            try {
-                refreshRoute(temp, calculateEvents);
-            } catch (IOException e) {
-                e.printStackTrace();
-                cancel(true);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            Log.d(TAG, "onPostExecute()");
-            super.onPostExecute(s);
-            progressBarRelativeLayout.setVisibility(View.GONE);
-            if (temp) {
-                Toast.makeText(ShowRouteActivity.this, getString(R.string.newIncidents), Toast.LENGTH_LONG).show();
-                InfoWindow.closeAllInfoWindowsOn(mMapView);
-            }
-
-        }
-    }
-
     private void refreshRoute(boolean temp, boolean calculate) throws IOException {
 
         // Create a ride object with the accelerometer, gps and time data
@@ -324,7 +303,7 @@ public class ShowRouteActivity extends BaseActivity {
                 }
             });
             tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
-            tempRide = new Ride(tempGpsFile, duration, String.valueOf(tempStartTime), state, bike, child, trailer, pLoc, this, calculate,true);
+            tempRide = new Ride(tempGpsFile, duration, String.valueOf(tempStartTime), state, bike, child, trailer, pLoc, this, calculate, true);
         } else {
             ride = new Ride(gpsFile, duration, startTime, state, bike, child, trailer, pLoc, this, calculate, false);
         }
@@ -366,7 +345,7 @@ public class ShowRouteActivity extends BaseActivity {
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
         // set accordingly
 
-        if(!temp) {
+        if (!temp) {
             runOnUiThread(new Runnable() {
 
                 @Override
@@ -421,17 +400,17 @@ public class ShowRouteActivity extends BaseActivity {
 
             @Override
             public void run() {
-        if (temp) {
-            if (myMarkerFunct != null) {
-                myMarkerFunct.deleteAllMarkers();
-            }
-            myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, true);
-        } else {
-            myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, false);
-        }
+                if (temp) {
+                    if (myMarkerFunct != null) {
+                        myMarkerFunct.deleteAllMarkers();
+                    }
+                    myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, true);
+                } else {
+                    myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, false);
+                }
 
-        // Show all the incidents present in our ride object
-        Log.d(TAG, "showing all incidents");
+                // Show all the incidents present in our ride object
+                Log.d(TAG, "showing all incidents");
                 myMarkerFunct.showIncidents();
             }
         });
@@ -483,20 +462,20 @@ public class ShowRouteActivity extends BaseActivity {
             public void run() {
                 privacySlider.setRange(0, routeSize);
                 ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-                Drawable startFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.startblack,null);
-                Drawable finishFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.racingflagblack,null);
+                Drawable startFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.startblack, null);
+                Drawable finishFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.racingflagblack, null);
                 GeoPoint startFlagPoint;
                 GeoPoint finishFlagPoint;
                 if (temp) {
                     startFlagPoint = tempRoute.getPoints().get(0);
-                    finishFlagPoint = tempRoute.getPoints().get(tempRoute.getPoints().size()-1);
+                    finishFlagPoint = tempRoute.getPoints().get(tempRoute.getPoints().size() - 1);
                 } else {
                     startFlagPoint = route.getPoints().get(0);
-                    finishFlagPoint = route.getPoints().get(route.getPoints().size()-1);
+                    finishFlagPoint = route.getPoints().get(route.getPoints().size() - 1);
                     privacySlider.setValue(0, routeSize);
                 }
 
-                startFlagOverlay = new IconOverlay(startFlagPoint,startFlag);
+                startFlagOverlay = new IconOverlay(startFlagPoint, startFlag);
                 finishFlagOverlay = new IconOverlay(finishFlagPoint, finishFlag);
                 mMapView.getOverlays().add(startFlagOverlay);
                 mMapView.getOverlays().add(finishFlagOverlay);
@@ -515,10 +494,10 @@ public class ShowRouteActivity extends BaseActivity {
                 left[0] = (int) leftValue;
                 right[0] = (int) rightValue;
                 int routeSize = route.getPoints().size();
-                if(rightValue > routeSize) {
+                if (rightValue > routeSize) {
                     rightValue = routeSize;
                 }
-                editableRoute.setPoints(route.getPoints().subList((int)leftValue,(int)rightValue));
+                editableRoute.setPoints(route.getPoints().subList((int) leftValue, (int) rightValue));
                 mMapView.invalidate();
             }
 
@@ -536,8 +515,8 @@ public class ShowRouteActivity extends BaseActivity {
                     //stop tracking touch
                     Log.d(TAG, "left: " + left[0] + " right: " + right[0]);
                     Log.d(TAG, "lastLeft: " + lastLeft + " lastRight: " + lastRight);
-                        mMapView.getOverlays().remove(startFlagOverlay);
-                        mMapView.getOverlays().remove(finishFlagOverlay);
+                    mMapView.getOverlays().remove(startFlagOverlay);
+                    mMapView.getOverlays().remove(finishFlagOverlay);
 
 
                     new RideUpdateTask(true, true).execute();
@@ -620,7 +599,7 @@ public class ShowRouteActivity extends BaseActivity {
                         Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
                         for (int i = 0; i < accEventArrayList.size(); i++) {
                             Log.d(TAG, "accEvent " + tempRide.events.get(i).key + ": " + tempRide.events.get(i).annotated + " scary: " + tempRide.events.get(i).scary);
-                            if(accEventArrayList.get(i).annotated) {
+                            if (accEventArrayList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
                             if (accEventArrayList.get(i).scary.equals("1")) {
@@ -634,7 +613,7 @@ public class ShowRouteActivity extends BaseActivity {
                         Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
                         for (int i = 0; i < accEventArrayList.size(); i++) {
                             Log.d(TAG, "accEvent " + ride.events.get(i).key + ": " + ride.events.get(i).annotated + " scary: " + ride.events.get(i).scary);
-                            if(accEventArrayList.get(i).annotated) {
+                            if (accEventArrayList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
                             if (accEventArrayList.get(i).scary.equals("1")) {
@@ -645,7 +624,7 @@ public class ShowRouteActivity extends BaseActivity {
                     metaDataLine[3] = "1";
 
                     // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
-                    metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance + "," + numberOfScary + "," + lookUpIntSharedPrefs("Region",0,"Profile",this));
+                    metaDataRide = (metaDataLine[0] + "," + metaDataLine[1] + "," + metaDataLine[2] + "," + metaDataLine[3] + "," + numberOfIncidents + "," + waitedTime + "," + distance + "," + numberOfScary + "," + lookUpIntSharedPrefs("Region", 0, "Profile", this));
                 }
                 Log.d(TAG, "metaDataRide: " + metaDataRide);
                 Log.d(TAG, "numberOfIncidents: " + metaDataRide.split(",")[4] + " numberOfScary: " + metaDataRide.split(",")[7]);
@@ -713,7 +692,7 @@ public class ShowRouteActivity extends BaseActivity {
         File inputFile = getFileStreamPath(pathToAccGpsFile);
         StringBuilder content = new StringBuilder();
         //String content = "";
-        try(BufferedWriter writer = new BufferedWriter((new FileWriter(inputFile,false)))) {
+        try (BufferedWriter writer = new BufferedWriter((new FileWriter(inputFile, false)))) {
 
             try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(ride.accGpsFile)))) {
                 String line;
@@ -726,11 +705,11 @@ public class ShowRouteActivity extends BaseActivity {
                     }
                     if ((partOfRideNumber >= left) && (partOfRideNumber <= right)) {
                         // Log.d(TAG, "line: " + line);
-                        if(tempStartTime == null || Long.valueOf(line.split(",",-1)[5]) < tempStartTime) {
-                            tempStartTime = Long.valueOf(line.split(",",-1)[5]);
+                        if (tempStartTime == null || Long.valueOf(line.split(",", -1)[5]) < tempStartTime) {
+                            tempStartTime = Long.valueOf(line.split(",", -1)[5]);
                         }
-                        if(tempEndTime == null || Long.valueOf(line.split(",",-1)[5]) > tempEndTime) {
-                            tempEndTime = Long.valueOf(line.split(",",-1)[5]);
+                        if (tempEndTime == null || Long.valueOf(line.split(",", -1)[5]) > tempEndTime) {
+                            tempEndTime = Long.valueOf(line.split(",", -1)[5]);
                         }
                         content.append(line).append(System.lineSeparator());
                     }
@@ -763,10 +742,10 @@ public class ShowRouteActivity extends BaseActivity {
                 boolean temp = data.getBooleanExtra("temp", false);
                 Log.d(TAG, "onActivityResult() temp: " + temp);
                 boolean annotated = checkForAnnotation(incidentProps);
-                if(temp) {
-                    Log.d(TAG,"tempRide.events.size(): " + tempRide.events.size());
+                if (temp) {
+                    Log.d(TAG, "tempRide.events.size(): " + tempRide.events.size());
                     for (int i = 0; i < tempRide.events.size(); i++) {
-                        Log.d(TAG,"tempRide.events.get(i).key: " + tempRide.events.get(i).key +
+                        Log.d(TAG, "tempRide.events.get(i).key: " + tempRide.events.get(i).key +
                                 " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
                         if ((tempRide.events.get(i).key) == Integer.valueOf(incidentProps[0])) {
                             if (annotated) {
@@ -781,9 +760,9 @@ public class ShowRouteActivity extends BaseActivity {
                         }
                     }
                 } else {
-                    Log.d(TAG,"ride.events.size(): " + ride.events.size());
+                    Log.d(TAG, "ride.events.size(): " + ride.events.size());
                     for (int i = 0; i < ride.events.size(); i++) {
-                        Log.d(TAG,"ride.events.get(i).key: " + ride.events.get(i).key +
+                        Log.d(TAG, "ride.events.get(i).key: " + ride.events.get(i).key +
                                 " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
                         if ((ride.events.get(i).key) == Integer.valueOf(incidentProps[0])) {
                             if (annotated) {
@@ -831,37 +810,6 @@ public class ShowRouteActivity extends BaseActivity {
         } catch (InterruptedException | NullPointerException ie) {
             ie.printStackTrace();
         }
-    }
-
-    // Returns the longitudes of the southern- and northernmost points
-    // as well as the latitudes of the western- and easternmost points
-    // in a double Array {South, North, West, East}
-    static BoundingBox getBoundingBox(Polyline pl) {
-
-        // {North, East, South, West}
-        ArrayList<GeoPoint> geoPoints = pl.getPoints();
-
-        double[] border = {geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude(), geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude()};
-
-        for (int i = 0; i < geoPoints.size(); i++) {
-            // Check for south/north
-            if (geoPoints.get(i).getLatitude() < border[2]) {
-                border[2] = geoPoints.get(i).getLatitude();
-            }
-            if (geoPoints.get(i).getLatitude() > border[0]) {
-                border[0] = geoPoints.get(i).getLatitude();
-            }
-            // Check for west/east
-            if (geoPoints.get(i).getLongitude() < border[3]) {
-                border[3] = geoPoints.get(i).getLongitude();
-            }
-            if (geoPoints.get(i).getLongitude() > border[1]) {
-                border[1] = geoPoints.get(i).getLongitude();
-            }
-
-        }
-
-        return new BoundingBox(border[0] + 0.001, border[1] + 0.001, border[2] - 0.001, border[3] - 0.001);
     }
 
     // zoom automatically to the bounding box. Usually the command in the if body should suffice
@@ -970,7 +918,6 @@ public class ShowRouteActivity extends BaseActivity {
         alertDialog.show();
     }
 
-
     public boolean firePrivacySliderWarningDialog(int left, int right) {
 
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
@@ -1003,5 +950,45 @@ public class ShowRouteActivity extends BaseActivity {
         });
         alert.show();
         return continueWithRefresh;
+    }
+
+    private class RideUpdateTask extends AsyncTask<String, String, String> {
+
+        private boolean temp;
+        private boolean calculateEvents;
+
+        private RideUpdateTask(boolean temp, boolean calculateEvents) {
+            this.temp = temp;
+            this.calculateEvents = calculateEvents;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        protected String doInBackground(String... urls) {
+            Log.d(TAG, "doInBackground()");
+            try {
+                refreshRoute(temp, calculateEvents);
+            } catch (IOException e) {
+                e.printStackTrace();
+                cancel(true);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            Log.d(TAG, "onPostExecute()");
+            super.onPostExecute(s);
+            progressBarRelativeLayout.setVisibility(View.GONE);
+            if (temp) {
+                Toast.makeText(ShowRouteActivity.this, getString(R.string.newIncidents), Toast.LENGTH_LONG).show();
+                InfoWindow.closeAllInfoWindowsOn(mMapView);
+            }
+
+        }
     }
 }

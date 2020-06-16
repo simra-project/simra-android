@@ -27,7 +27,6 @@ public class MyInfoWindow extends InfoWindow {
     private int state;
 
 
-
     public MyInfoWindow(int layoutResId, MapView mapView, AccEvent mAccEvent,
                         String addressForLoc, ShowRouteActivity motherActivity,
                         int accEventKey, boolean temp, int state) {

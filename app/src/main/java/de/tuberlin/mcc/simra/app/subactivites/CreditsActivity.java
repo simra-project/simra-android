@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import de.tuberlin.mcc.simra.app.R;
 
 public class CreditsActivity extends AppCompatActivity {

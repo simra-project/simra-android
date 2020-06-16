@@ -146,7 +146,7 @@ public class RadmesserActivity extends AppCompatActivity {
         });
     }
 
-    private void showTutorialDialog(){
+    private void showTutorialDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Verbindung mit Radmesser");
         alert.setMessage("\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden");
@@ -160,12 +160,13 @@ public class RadmesserActivity extends AppCompatActivity {
         gif.setLayoutParams(gifMargins);
         gifLayout.addView(gif);
         alert.setView(gifLayout);
-        alert.setPositiveButton("Ok", (dialog, whichButton) -> { });
+        alert.setPositiveButton("Ok", (dialog, whichButton) -> {
+        });
         alert.show();
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(distanceReceiver);
         super.onPause();

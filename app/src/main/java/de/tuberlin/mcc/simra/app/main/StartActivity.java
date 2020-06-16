@@ -15,11 +15,12 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+
 import java.io.File;
 import java.util.Arrays;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.net.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
@@ -41,7 +42,14 @@ import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeLongToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.VersionUpdater.*;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV27;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV30;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV31;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV32;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV39;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV50;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV52;
+import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV58;
 
 /**
  * Shows general info about the app, if the app is run the first time.
@@ -50,36 +58,35 @@ import static de.tuberlin.mcc.simra.app.util.VersionUpdater.*;
 
 public class StartActivity extends BaseActivity {
 
-    Button next;
-
     // Log tag
     private static final String TAG = "StartActivity_LOG";
+    Button next;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-        Log.d(TAG, "getFilesDir(): " + Arrays.toString(new File(getFilesDir(),"../shared_prefs").listFiles()));
+        Log.d(TAG, "getFilesDir(): " + Arrays.toString(new File(getFilesDir(), "../shared_prefs").listFiles()));
         Log.d(TAG, "onCreate() started");
         // writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
         showKeyPrefs(this);
         showDataDirectory(this);
         showMetadata(this);
         Log.d(TAG, "===========================V=metaData=V===========================");
-        Log.d(TAG, "metaData.csv: " + readContentFromFile("metaData.csv",this));
+        Log.d(TAG, "metaData.csv: " + readContentFromFile("metaData.csv", this));
         Log.d(TAG, "===========================Λ=metaData=Λ===========================");
         showStatistics(this);
         deleteErrorLogsForVersion(this, 26);
         int lastAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
 
-        updateToV27(this,lastAppVersion);
-        updateToV30(this,lastAppVersion);
-        updateToV31(this,lastAppVersion);
-        updateToV32(this,lastAppVersion);
-        updateToV39(this,lastAppVersion);
-        updateToV50(this,lastAppVersion);
-        updateToV52(this,lastAppVersion);
-        updateToV58(this,lastAppVersion);
+        updateToV27(this, lastAppVersion);
+        updateToV30(this, lastAppVersion);
+        updateToV31(this, lastAppVersion);
+        updateToV32(this, lastAppVersion);
+        updateToV39(this, lastAppVersion);
+        updateToV50(this, lastAppVersion);
+        updateToV52(this, lastAppVersion);
+        updateToV58(this, lastAppVersion);
         writeIntToSharedPrefs("App-Version", getAppVersionNumber(this), "simraPrefs", this);
 
         // For permission request
@@ -125,9 +132,9 @@ public class StartActivity extends BaseActivity {
      * @return boolean
      */
     private boolean isFirstTime() {
-        boolean firstTime = lookUpBooleanSharedPrefs("firstTime",true,"simraPrefs",this);
-        if(firstTime) {
-            writeBooleanToSharedPrefs("firstTime",false,"simraPrefs", this);
+        boolean firstTime = lookUpBooleanSharedPrefs("firstTime", true, "simraPrefs", this);
+        if (firstTime) {
+            writeBooleanToSharedPrefs("firstTime", false, "simraPrefs", this);
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // META-FILE (one per user): contains ...
             // * the information required to display rides in the ride history (See RecorderService)
@@ -136,7 +143,7 @@ public class StartActivity extends BaseActivity {
             //   a ride. => Use case: user wants to view a ride from history - retrieve data
             // * one meta file per user, so we only want to create it if it doesn't exist yet.
             //   (fileExists and appendToFile can be found in the Utils.java class)
-            if ((!fileExists("metaData.csv", this))||(new File(getFilesDir() + "/metaData.csv").length() == 0)) {
+            if ((!fileExists("metaData.csv", this)) || (new File(getFilesDir() + "/metaData.csv").length() == 0)) {
                 String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
                 Log.d(TAG, "firstTime. Creating metaData.csv");
                 overWriteFile((fileInfoLine + "key, startTime, endTime, annotated, distance, waitTime"
@@ -158,16 +165,16 @@ public class StartActivity extends BaseActivity {
 
             // don't start to record the ride, until user is 30 meters away
             // from his starting position.
-            writeLongToSharedPrefs("Privacy-Duration",30,"simraPrefs",this);
+            writeLongToSharedPrefs("Privacy-Duration", 30, "simraPrefs", this);
             // don't start to record the ride, until user 30 seconds passed
             // from recording start time.
-            writeIntToSharedPrefs("Privacy-Distance",30,"simraPrefs",this);
+            writeIntToSharedPrefs("Privacy-Distance", 30, "simraPrefs", this);
         }
         return firstTime;
     }
 
     private boolean privacyPolicyAccepted() {
-        boolean accepted = lookUpBooleanSharedPrefs("Privacy-Policy-Accepted",false,"simraPrefs", this);
+        boolean accepted = lookUpBooleanSharedPrefs("Privacy-Policy-Accepted", false, "simraPrefs", this);
         if (!accepted) {
             firePrivacyDialog();
         }
@@ -177,8 +184,8 @@ public class StartActivity extends BaseActivity {
     // Look up whether to ask the user for a permission to
     // send the crash logs to the server. If the user gives permission, upload the crash report(s).
     private boolean showUnsentErrorDialogPermitted() {
-        String crashSendState = lookUpSharedPrefs("SEND-CRASH","UNKNOWN","simraPrefs",this);
-        boolean newCrash = lookUpBooleanSharedPrefs("NEW-UNSENT-ERROR",false,"simraPrefs", this);
+        String crashSendState = lookUpSharedPrefs("SEND-CRASH", "UNKNOWN", "simraPrefs", this);
+        boolean newCrash = lookUpBooleanSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", this);
         if (crashSendState.equals("UNKNOWN") && newCrash) {
             fireSendErrorDialog();
             return true;
@@ -212,7 +219,7 @@ public class StartActivity extends BaseActivity {
         alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 if (rememberChoice[0]) {
-                    writeToSharedPrefs("SEND-CRASH","ALWAYS-SEND","simraPrefs",StartActivity.this);
+                    writeToSharedPrefs("SEND-CRASH", "ALWAYS-SEND", "simraPrefs", StartActivity.this);
                 }
                 Intent intent = new Intent(StartActivity.this, UploadService.class);
                 intent.putExtra("CRASH_REPORT", true);
@@ -222,13 +229,12 @@ public class StartActivity extends BaseActivity {
         alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 if (rememberChoice[0]) {
-                    writeToSharedPrefs("SEND-CRASH", "NEVER-SEND", "simraPrefs",StartActivity.this);
+                    writeToSharedPrefs("SEND-CRASH", "NEVER-SEND", "simraPrefs", StartActivity.this);
                 }
             }
         });
         alert.show();
     }
-
 
 
     public void firePrivacyDialog() {
@@ -244,19 +250,19 @@ public class StartActivity extends BaseActivity {
         builder.setView(checkBoxView);
         builder.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                writeBooleanToSharedPrefs("Privacy-Policy-Accepted",checkBox.isChecked(),"simraPrefs",StartActivity.this);
+                writeBooleanToSharedPrefs("Privacy-Policy-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this);
             }
         });
         builder.setNegativeButton(R.string.close_simra, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                writeBooleanToSharedPrefs("firstTime",true,"simraPrefs",StartActivity.this);
+                writeBooleanToSharedPrefs("firstTime", true, "simraPrefs", StartActivity.this);
                 finish();
-                Toast.makeText(StartActivity.this,getString(R.string.simra_closed),Toast.LENGTH_LONG).show();
+                Toast.makeText(StartActivity.this, getString(R.string.simra_closed), Toast.LENGTH_LONG).show();
             }
         });
         final AlertDialog dialog = builder.create();
         dialog.show();
-        ((TextView)dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
+        ((TextView) dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 
         // Initially disable the button
         ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);

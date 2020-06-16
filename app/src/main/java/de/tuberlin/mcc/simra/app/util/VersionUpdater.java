@@ -36,7 +36,6 @@ public class VersionUpdater {
      * updating metaData.csv with column "distance" and "waitTime" and calculating distance for
      * already existing rides.
      * Also, renaming accGps files: removing timestamp from filename.
-     *
      */
     public static void updateToV27(Context context, int lastAppVersion) {
         if (lastAppVersion < 27) {
@@ -61,7 +60,7 @@ public class VersionUpdater {
             long totalDistance = 0;
             long totalWaitedTime = 0;
             // 0h - 23h
-            Float[] timeBuckets = {0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f};
+            Float[] timeBuckets = {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f};
             try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
                 // fileInfoLine (24#2)
                 String line = metaDataReader.readLine();
@@ -90,7 +89,7 @@ public class VersionUpdater {
                             Location thisLocation = null;
                             // loop through the accGps file and find startTime, endtime, distance and waitedTime
                             while ((accGpsLine = accGpsReader.readLine()) != null) {
-                                String[] accGpsArray = accGpsLine.split(",",-1);
+                                String[] accGpsArray = accGpsLine.split(",", -1);
                                 if (startTime == null) {
                                     startTime = accGpsArray[5];
                                 } else {
@@ -126,9 +125,9 @@ public class VersionUpdater {
                     }
 
                     File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
-                    if (accEventsFile.exists()){
+                    if (accEventsFile.exists()) {
                         // loop through accEvents lines
-                        try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/accEvents" + key + ".csv") )))) {
+                        try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/accEvents" + key + ".csv"))))) {
                             // fileInfoLine (24#2)
                             String accEventsLine = accEventsReader.readLine();
                             // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc
@@ -136,8 +135,8 @@ public class VersionUpdater {
                             // 20 entries per line (index 0-19)
                             accEventsReader.readLine();
                             while ((accEventsLine = accEventsReader.readLine()) != null) {
-                                String[] accEventsArray = accEventsLine.split(",",-1);
-                                if(!accEventsArray[8].equals("0") && !accEventsArray[8].equals("")) {
+                                String[] accEventsArray = accEventsLine.split(",", -1);
+                                if (!accEventsArray[8].equals("0") && !accEventsArray[8].equals("")) {
                                     incidents++;
                                     if (isUploaded) {
                                         totalNumberOfIncidents++;
@@ -161,17 +160,17 @@ public class VersionUpdater {
                         int endHour = Integer.valueOf(sdf.format(endDate));
                         float duration = endHour - startHour + 1;
                         for (int i = startHour; i <= endHour; i++) {
-                            timeBuckets[i] += (1/duration);
+                            timeBuckets[i] += (1 / duration);
                         }
                         Log.d(TAG, key + " startHour:" + startHour + " endHour: " + endHour);
 
                     }
                     // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance
-                    line = key + "," + startTime + "," + endTime + "," + lineArray[3] + "," + incidents  + "," + waitedTime + "," + waitedTimeRouteAndDistance[2];
+                    line = key + "," + startTime + "," + endTime + "," + lineArray[3] + "," + incidents + "," + waitedTime + "," + waitedTimeRouteAndDistance[2];
                     contentOfNewMetaData.append(line).append(System.lineSeparator());
                 }
                 Log.d(TAG, "metaData.csv new content: " + contentOfNewMetaData.toString());
-                overWriteFile(contentOfNewMetaData.toString(),"metaData.csv",context);
+                overWriteFile(contentOfNewMetaData.toString(), "metaData.csv", context);
             } catch (IOException ioe) {
                 Log.d(TAG, "++++++++++++++++++++++++++++++");
                 Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
@@ -179,13 +178,13 @@ public class VersionUpdater {
             }
 
             // renew profile.csv
-            int birth = lookUpIntSharedPrefs("Profile-Age",0,"simraPrefs", context);
-            int gender = lookUpIntSharedPrefs("Profile-Gender",0,"simraPrefs",context);
-            int region = lookUpIntSharedPrefs("Profile-Region",0,"simraPrefs",context);
-            int experience = lookUpIntSharedPrefs("Profile-Experience",0,"simraPrefs",context);
+            int birth = lookUpIntSharedPrefs("Profile-Age", 0, "simraPrefs", context);
+            int gender = lookUpIntSharedPrefs("Profile-Gender", 0, "simraPrefs", context);
+            int region = lookUpIntSharedPrefs("Profile-Region", 0, "simraPrefs", context);
+            int experience = lookUpIntSharedPrefs("Profile-Experience", 0, "simraPrefs", context);
 
             // co2 savings on a bike per kilometer: 138g CO2
-            long co2 = (long)((totalDistance/(float)1000)*138);
+            long co2 = (long) ((totalDistance / (float) 1000) * 138);
             /*
             StringBuilder timeBucketsEntries = new StringBuilder();
             for (int i = 0; i <= 22; i++) {
@@ -197,7 +196,7 @@ public class VersionUpdater {
 
             overWriteFile((fileInfoLine + PROFILE_HEADER + profileContent), "profile.csv", context);
             */
-            updateProfile(true,context,birth,gender,region,experience,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,co2,timeBuckets,-2,-1);
+            updateProfile(true, context, birth, gender, region, experience, totalNumberOfRides, totalDuration, totalNumberOfIncidents, totalWaitedTime, totalDistance, co2, timeBuckets, -2, -1);
 
         }
 
@@ -227,11 +226,12 @@ public class VersionUpdater {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    overWriteFile(contentOfNewAccEvents.toString(),fileList[i].getName(),context);
+                    overWriteFile(contentOfNewAccEvents.toString(), fileList[i].getName(), context);
                 }
             }
         }
     }
+
     public static void updateToV31(Context context, int lastAppVersion) {
         if (lastAppVersion < 31) {
             File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
@@ -257,9 +257,9 @@ public class VersionUpdater {
                     int numberOfScary = 0;
 
                     File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
-                    if (accEventsFile.exists()){
+                    if (accEventsFile.exists()) {
                         // loop through accEvents lines
-                        try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/accEvents" + key + ".csv") )))) {
+                        try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/accEvents" + key + ".csv"))))) {
                             // fileInfoLine (24#2)
                             String accEventsLine = accEventsReader.readLine();
                             // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc
@@ -267,8 +267,8 @@ public class VersionUpdater {
                             // 20 entries per line (index 0-19)
                             accEventsReader.readLine();
                             while ((accEventsLine = accEventsReader.readLine()) != null) {
-                                String[] accEventsArray = accEventsLine.split(",",-1);
-                                if(accEventsArray[18].equals("1") && !accEventsArray[8].equals("")) {
+                                String[] accEventsArray = accEventsLine.split(",", -1);
+                                if (accEventsArray[18].equals("1") && !accEventsArray[8].equals("")) {
                                     numberOfScary++;
                                     if (isUploaded) {
                                         totalNumberOfScary++;
@@ -287,13 +287,13 @@ public class VersionUpdater {
                     }
                     contentOfNewMetaData.append(line).append(System.lineSeparator());
                 }
-                updateProfile(true,context,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,null,-2,totalNumberOfScary);
+                updateProfile(true, context, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, null, -2, totalNumberOfScary);
 
             } catch (IOException e) {
                 Log.d(TAG, "updateToV31() exception: " + e.getLocalizedMessage());
                 Log.d(TAG, Arrays.toString(e.getStackTrace()));
             }
-            overWriteFile(contentOfNewMetaData.toString(),metaDataFile.getName(),context);
+            overWriteFile(contentOfNewMetaData.toString(), metaDataFile.getName(), context);
         }
     }
 
@@ -325,8 +325,8 @@ public class VersionUpdater {
                             // 20 entries per line (index 0-19)
                             accEventsReader.readLine();
                             while ((accEventsLine = accEventsReader.readLine()) != null) {
-                                String[] accEventsArray = accEventsLine.split(",",-1);
-                                if(!accEventsArray[8].equals("") && !accEventsArray[8].equals("0")) {
+                                String[] accEventsArray = accEventsLine.split(",", -1);
+                                if (!accEventsArray[8].equals("") && !accEventsArray[8].equals("0")) {
                                     totalNumberOfIncidents++;
                                 }
                             }
@@ -339,10 +339,11 @@ public class VersionUpdater {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            updateProfile(true,context,-1,-1,-1,-1,-1,-1,totalNumberOfIncidents,-1,-1,-1,null,-2,-1);
+            updateProfile(true, context, -1, -1, -1, -1, -1, -1, totalNumberOfIncidents, -1, -1, -1, null, -2, -1);
 
         }
     }
+
     // There was a bug in which METADATA_HEADER was not written as metaData.csv was overwritten after
     // each "save ride". This is to fix the metaData.csv files without METADATA_HEADER.
     public static void updateToV39(Context context, int lastAppVersion) {
@@ -371,13 +372,13 @@ public class VersionUpdater {
                 // following lines should be rides
                 */
                 while (line != null) {
-                    if(!line.startsWith("key") && !line.startsWith("null") && line.split(",",-1).length > 2)
-                    contentOfNewMetaData.append(line).append(System.lineSeparator());
+                    if (!line.startsWith("key") && !line.startsWith("null") && line.split(",", -1).length > 2)
+                        contentOfNewMetaData.append(line).append(System.lineSeparator());
                     line = metaDataReader.readLine();
                 }
                 String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
 
-                overWriteFile(fileInfoLine + METADATA_HEADER + contentOfNewMetaData.toString(),metaDataFile.getName(),context);
+                overWriteFile(fileInfoLine + METADATA_HEADER + contentOfNewMetaData.toString(), metaDataFile.getName(), context);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -387,7 +388,7 @@ public class VersionUpdater {
 
     public static void updateToV50(Context context, int lastAppVersion) {
         if (lastAppVersion < 50) {
-            Log.d(TAG,"Updating to version 50");
+            Log.d(TAG, "Updating to version 50");
             try {
                 recalculateStatistics(context);
             } catch (Exception e) {
@@ -401,20 +402,20 @@ public class VersionUpdater {
     public static void updateToV52(Context context, int lastAppVersion) {
         if (lastAppVersion < 52) {
             // get previous chosen region
-            int region = Utils.lookUpIntSharedPrefs("Region", 0,"Profile",context);
+            int region = Utils.lookUpIntSharedPrefs("Region", 0, "Profile", context);
             // change region from London to Berlin
             if (region == 2) {
-                Utils.writeIntToSharedPrefs("Region",1,"Profile",context);
+                Utils.writeIntToSharedPrefs("Region", 1, "Profile", context);
             }
 
         }
     }
 
     // introduces profile data per region
-    public static void updateToV58(Context context,  int lastAppVersion) {
+    public static void updateToV58(Context context, int lastAppVersion) {
         if (lastAppVersion < 58) {
-            int region = lookUpIntSharedPrefs("Region",0,"Profile",context);
-            copySharedPreferences("Profile","Profile_"+region,context);
+            int region = lookUpIntSharedPrefs("Region", 0, "Profile", context);
+            copySharedPreferences("Profile", "Profile_" + region, context);
             File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
             StringBuilder contentOfNewMetaData = new StringBuilder();
             try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
@@ -440,7 +441,7 @@ public class VersionUpdater {
                             .append(metaDataLine[7]).append(",")
                             .append(region).append(System.lineSeparator());
                 }
-                overWriteFile(contentOfNewMetaData.toString(),metaDataFile.getName(),context);
+                overWriteFile(contentOfNewMetaData.toString(), metaDataFile.getName(), context);
 
             } catch (IOException e) {
                 e.printStackTrace();

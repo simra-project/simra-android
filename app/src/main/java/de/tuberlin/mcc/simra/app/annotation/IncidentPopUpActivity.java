@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -15,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -30,6 +31,9 @@ import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class IncidentPopUpActivity extends AppCompatActivity {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Log tag
+    private static final String TAG = "IncidentPopUpAct_LOG";
     String[] incidentTypes = new String[9];
     String[] locations = new String[7];
     LinearLayout doneButton;
@@ -42,10 +46,6 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     boolean temp;
     int state = 0;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Log tag
-    private static final String TAG = "IncidentPopUpAct_LOG";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +55,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         temp = getIntent().getBooleanExtra("Incident_temp", false);
 
-        state = getIntent().getIntExtra("State",0);
+        state = getIntent().getIntExtra("State", 0);
         if (state < 2) {
             setContentView(R.layout.incident_popup_layout);
         } else {
@@ -143,7 +143,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 }
             }
             incidentDescription.setText(previousAnnotation[19].replaceAll(";linebreak;", System.lineSeparator()).replaceAll(";komma;", ","));
-            if (previousAnnotation.length>20 && previousAnnotation[20].equals("1")) {
+            if (previousAnnotation.length > 20 && previousAnnotation[20].equals("1")) {
                 involvedType10CheckBox.setChecked(true);
             }
         }
@@ -250,7 +250,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     incidentSaved = true;
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra("result", incidentString);
-                    returnIntent.putExtra("temp",temp);
+                    returnIntent.putExtra("temp", temp);
                     setResult(Activity.RESULT_OK, returnIntent);
                     finish();
                 });

@@ -51,11 +51,8 @@ public class BLEServiceManager {
     public abstract class BLEService {
         public final String serviceUUID;
         public final String charackteristicUUIDs;
-
-        public abstract void onValue(BluetoothGattCharacteristic characteristic);
-
-
         public boolean registered;
+
 
         public BLEService(String serviceUUID, String charackteristicUUIDs) {
             this.serviceUUID = serviceUUID;
@@ -67,5 +64,7 @@ public class BLEServiceManager {
                 byService.put(serviceUUID, new HashSet<>());
             byService.get(serviceUUID).add(this);
         }
+
+        public abstract void onValue(BluetoothGattCharacteristic characteristic);
     }
 }

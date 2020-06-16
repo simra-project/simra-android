@@ -37,13 +37,12 @@ public class MarkerFunct {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
     private static final String TAG = "MarkerFunct_LOG";
-
+    private final String userAgent = "SimRa/alpha";
     private ShowRouteActivity mother;
     private ExecutorService pool;
     private String rideID;
     private ArrayList<Marker> markers = new ArrayList<>();
     private GeocoderNominatim geocoderNominatim;
-    private final String userAgent = "SimRa/alpha";
     private boolean temp;
     private int state;
     private int numEvents;
@@ -80,7 +79,7 @@ public class MarkerFunct {
 
     public void showIncidents() {
 
-        if(temp) {
+        if (temp) {
             for (int i = 0; i < mother.tempRide.events.size(); i++) {
                 // Log.d(TAG,"showIncidents() mother.tempRide.events.get(i).key: " + mother.tempRide.events.get(i).key);
                 setMarker(mother.tempRide.events.get(i), mother.tempRide.events.get(i).key);
@@ -184,8 +183,8 @@ public class MarkerFunct {
         // Create a new AccEvent
         int eventCount = ++this.numEvents;
         AccEvent newAcc = new AccEvent(eventCount, closestOnRoute.getLatitude(),
-                closestOnRoute.getLongitude(), 1337, false,"","0");
-        Log.d(TAG,"newAcc: " + newAcc.toString());
+                closestOnRoute.getLongitude(), 1337, false, "", "0");
+        Log.d(TAG, "newAcc: " + newAcc.toString());
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // set Marker for new AccEvent, refresh map
@@ -232,15 +231,15 @@ public class MarkerFunct {
 
                     String fileInfoLine = getAppVersionNumber(mother) + "#1" + System.lineSeparator();
 
-                    int bike = lookUpIntSharedPrefs("Settings-BikeType",0,"simraPrefs",mother);
-                    int child = lookUpIntSharedPrefs("Settings-Child",0,"simraPrefs",mother);
-                    int trailer = lookUpIntSharedPrefs("Settings-Trailer",0,"simraPrefs",mother);
-                    int pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation",0,"simraPrefs",mother);
+                    int bike = lookUpIntSharedPrefs("Settings-BikeType", 0, "simraPrefs", mother);
+                    int child = lookUpIntSharedPrefs("Settings-Child", 0, "simraPrefs", mother);
+                    int trailer = lookUpIntSharedPrefs("Settings-Trailer", 0, "simraPrefs", mother);
+                    int pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", mother);
 
                     // eventline = key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,,,,,,,,,,,,
                     String eventLine = newAcc.key + ","
                             + newAcc.position.getLatitude() + "," + newAcc.position.getLongitude()
-                            + "," + newAcc.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + "," + /*incident*/"," + /*i1*/"," + /*i2*/"," + /*i3*/"," + /*i4*/"," + /*i5*/"," + /*i6*/"," + /*i7*/"," + /*i8*/"," + /*i9*/"," + /*scary*/"," + /*desc*/"," + /*i10*/"," +System.lineSeparator();
+                            + "," + newAcc.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + "," + /*incident*/"," + /*i1*/"," + /*i2*/"," + /*i3*/"," + /*i4*/"," + /*i5*/"," + /*i6*/"," + /*i7*/"," + /*i8*/"," + /*i9*/"," + /*scary*/"," + /*desc*/"," + /*i10*/"," + System.lineSeparator();
 
                     if (!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())) {
                         overWriteFile((fileInfoLine + ACCEVENTS_HEADER + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());

@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -18,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.getGlobalProfile;
@@ -55,7 +56,7 @@ public class StatisticsActivity extends AppCompatActivity {
                                        }
                                    }
         );
-        String unit = lookUpSharedPrefs("Settings-Unit","m","simraPrefs",this);
+        String unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", this);
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
         // String[] profileValues = readContentFromFile("profile.csv", this).split(System.lineSeparator())[2].split(",");
         Object[] profileValues = getGlobalProfile(this);
@@ -69,7 +70,7 @@ public class StatisticsActivity extends AppCompatActivity {
         // amount of co2 emissions saved by taking a bicycle instead of a car (138g/km)
         TextView co2Savings = findViewById(R.id.co2SavingsText);
 
-        co2Savings.setText(getText(R.string.co2Savings) + " " + (Math.round((Double.valueOf((long)profileValues[9])/1000.0)*100.0)/100.0) + " kg");
+        co2Savings.setText(getText(R.string.co2Savings) + " " + (Math.round((Double.valueOf((long) profileValues[9]) / 1000.0) * 100.0) / 100.0) + " kg");
 
         co2Savings.invalidate();
 
@@ -87,18 +88,18 @@ public class StatisticsActivity extends AppCompatActivity {
         TextView distanceOfRides = findViewById(R.id.distanceOfRidesText);
         double distance = Double.valueOf((long) profileValues[8]);
         if (unit.equals("ft")) {
-            distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((distance/1600)*100.0))/100.0) + " mi");
+            distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((distance / 1600) * 100.0)) / 100.0) + " mi");
         } else {
-            distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((distance/1000)*100.0))/100.0) + " km");
+            distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((distance / 1000) * 100.0)) / 100.0) + " km");
         }
         distanceOfRides.invalidate();
 
         // average distance per ride of all uploaded rides
         TextView avgDistanceOfRides = findViewById(R.id.averageDistanceOfRidesText);
         if (unit.equals("ft") && ridesCount > 0) {
-            avgDistanceOfRides.setText(getText(R.string.avgDistance) + " " + (Math.round(((distance/1600/ridesCount)*100.0))/100.0) + " mi");
+            avgDistanceOfRides.setText(getText(R.string.avgDistance) + " " + (Math.round(((distance / 1600 / ridesCount) * 100.0)) / 100.0) + " mi");
         } else if (unit.equals("m") && ridesCount > 0) {
-            avgDistanceOfRides.setText(getText(R.string.avgDistance) + " " + (Math.round(((distance/1000/ridesCount)*100.0))/100.0) + " km");
+            avgDistanceOfRides.setText(getText(R.string.avgDistance) + " " + (Math.round(((distance / 1000 / ridesCount) * 100.0)) / 100.0) + " km");
         } else {
             avgDistanceOfRides.setText(getText(R.string.avgDistance) + " - ");
         }
@@ -107,10 +108,10 @@ public class StatisticsActivity extends AppCompatActivity {
 
         // duration of all uploaded rides in HH:MM
         TextView durationOfRides = findViewById(R.id.durationOfRidesText);
-        long rideDurationHours = ((long) profileValues[5])/3600000;
-        long rideDurationMinutes = (((long) profileValues[5])%3600000)/60000;
+        long rideDurationHours = ((long) profileValues[5]) / 3600000;
+        long rideDurationMinutes = (((long) profileValues[5]) % 3600000) / 60000;
         // Log.d(TAG, "rideDurationHours: " + rideDurationHours + " rideDurationMinutes: " + rideDurationMinutes);
-                //(new BigDecimal((long)profileValues[5])).divide(new BigDecimal(3600000),2,BigDecimal.ROUND_CEILING) + " h")
+        //(new BigDecimal((long)profileValues[5])).divide(new BigDecimal(3600000),2,BigDecimal.ROUND_CEILING) + " h")
         String rideDurationH;
         String rideDurationM;
         if (rideDurationHours < 10) {
@@ -129,16 +130,16 @@ public class StatisticsActivity extends AppCompatActivity {
         // average speed of per ride of all uploaded rides
         TextView averageSpeed = findViewById(R.id.averageSpeedText);
         if (unit.equals("ft")) {
-            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8]))/1600.0)/(((((Double.valueOf((long) profileValues[5])/1000)) - (Double.valueOf((long) profileValues[7])))/3600))) + " mph");
+            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8])) / 1600.0) / (((((Double.valueOf((long) profileValues[5]) / 1000)) - (Double.valueOf((long) profileValues[7]))) / 3600))) + " mph");
         } else {
-            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8]))/1000.0)/(((((Double.valueOf((long) profileValues[5])/1000)) - (Double.valueOf((long) profileValues[7])))/3600))) + " km/h");
+            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8])) / 1000.0) / (((((Double.valueOf((long) profileValues[5]) / 1000)) - (Double.valueOf((long) profileValues[7]))) / 3600))) + " km/h");
         }
         averageSpeed.invalidate();
 
         // total duration of waited time in all uploaded rides in HH:MM
         TextView durationOfWaitedTime = findViewById(R.id.durationOfIdleText);
-        long waitDurationHours = ((long) profileValues[7]/3600);
-        long waitDurationMinutes = (((long) profileValues[7]%3600)/60);
+        long waitDurationHours = ((long) profileValues[7] / 3600);
+        long waitDurationMinutes = (((long) profileValues[7] % 3600) / 60);
         String waitDurationH;
         String waitDurationM;
         if (waitDurationHours < 10) {
@@ -157,7 +158,7 @@ public class StatisticsActivity extends AppCompatActivity {
         TextView averageDurationOfWaitedTime = findViewById(R.id.averageDurationOfIdleText);
         long avgWaitDurationMinutes = 0L;
         if (ridesCount > 0) {
-            avgWaitDurationMinutes = ((long) profileValues[7]/60/ridesCount);
+            avgWaitDurationMinutes = ((long) profileValues[7] / 60 / ridesCount);
         }
         averageDurationOfWaitedTime.setText(getText(R.string.avgIdle) + " " + avgWaitDurationMinutes + " min");
         averageDurationOfWaitedTime.invalidate();
@@ -168,8 +169,8 @@ public class StatisticsActivity extends AppCompatActivity {
         xAxis.setLabelsToSkip(0);
         ArrayList<BarEntry> entries = new ArrayList<>();
         for (int i = 11; i < 34; i++) {
-            entries.add(new BarEntry((float)profileValues[i],i-10));
-            if(entries.get(i-11).getVal() == 0.0) {
+            entries.add(new BarEntry((float) profileValues[i], i - 10));
+            if (entries.get(i - 11).getVal() == 0.0) {
                 xAxis.setPosition(XAxis.XAxisPosition.BOTTOM_INSIDE);
             }
         }
@@ -231,11 +232,11 @@ public class StatisticsActivity extends AppCompatActivity {
             labels.add("22");
             labels.add("23");
         }
-        BarData data = new BarData(labels,bardataset);
+        BarData data = new BarData(labels, bardataset);
         chart.setData(data); // set the data and list of lables into chart
 
         // bardataset.setColors(ColorTemplate.PASTEL_COLORS);
-        bardataset.setColor(getResources().getColor(R.color.colorAccent,this.getTheme()));
+        bardataset.setColor(getResources().getColor(R.color.colorAccent, this.getTheme()));
         bardataset.setDrawValues(false);
 
         chart.animateY(2000);

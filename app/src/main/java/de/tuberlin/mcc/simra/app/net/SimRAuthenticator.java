@@ -1,7 +1,5 @@
 package de.tuberlin.mcc.simra.app.net;
 
-import java.text.SimpleDateFormat;
-
 import de.tuberlin.mcc.simra.app.BuildConfig;
 
 public class SimRAuthenticator {

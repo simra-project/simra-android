@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
@@ -35,11 +36,11 @@ public class AboutActivity extends BaseActivity {
 
         backBtn = findViewById(R.id.back_button);
         backBtn.setOnClickListener(new View.OnClickListener() {
-               @Override
-               public void onClick(View v) {
-                   finish();
-               }
-           }
+                                       @Override
+                                       public void onClick(View v) {
+                                           finish();
+                                       }
+                                   }
         );
 
         listView = findViewById(R.id.listView);
@@ -52,23 +53,23 @@ public class AboutActivity extends BaseActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = null;
                 switch (position) {
-                    case 0 :
+                    case 0:
                         intent = new Intent(AboutActivity.this, WebActivity.class);
                         intent.putExtra("URL", getString(R.string.simRaPage));
                         break;
-                    case 1 :
+                    case 1:
                         intent = new Intent(AboutActivity.this, WebActivity.class);
                         intent.putExtra("URL", getString(R.string.privacyLink));
 
                         break;
-                    case 2 :
+                    case 2:
                         intent = new Intent(AboutActivity.this, LicenseActivity.class);
                         break;
-                    case 3 :
+                    case 3:
                         intent = new Intent(AboutActivity.this, CreditsActivity.class);
                         break;
-                    default :
-                        Toast.makeText(AboutActivity.this,R.string.notReady, Toast.LENGTH_SHORT).show();
+                    default:
+                        Toast.makeText(AboutActivity.this, R.string.notReady, Toast.LENGTH_SHORT).show();
                 }
                 if (intent != null) {
                     startActivity(intent);

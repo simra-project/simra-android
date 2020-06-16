@@ -15,13 +15,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
@@ -79,10 +80,10 @@ public class ProfileActivity extends AppCompatActivity {
         activateBehaviourToggleButton = findViewById(R.id.activateBehaviourSeekBar);
 
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
-        List<String> regionContentArray =  new ArrayList<String>();
+        List<String> regionContentArray = new ArrayList<String>();
         boolean languageIsEnglish = locale.equals(new Locale("en").getLanguage());
         for (String s : simRa_regions_config) {
-            if (!(s.startsWith("!")||s.startsWith("Please Choose"))) {
+            if (!(s.startsWith("!") || s.startsWith("Please Choose"))) {
                 if (languageIsEnglish) {
                     regionContentArray.add(s.split("=")[0]);
                 } else {
@@ -94,7 +95,7 @@ public class ProfileActivity extends AppCompatActivity {
                 this, android.R.layout.simple_spinner_item, regionContentArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Collections.sort(regionContentArray);
-        regionContentArray.add(0,getText(R.string.pleaseChoose).toString());
+        regionContentArray.add(0, getText(R.string.pleaseChoose).toString());
         regionSpinner.setAdapter(adapter);
 
         // Get the previous saved settings
@@ -103,7 +104,7 @@ public class ProfileActivity extends AppCompatActivity {
         genderSpinner.setSelection(previousProfile[1]);
         String region = simRa_regions_config[previousProfile[2]];
         if (!region.startsWith("!")) {
-            if(languageIsEnglish) {
+            if (languageIsEnglish) {
                 regionSpinner.setSelection(regionContentArray.indexOf(region.split("=")[0]));
             } else {
                 regionSpinner.setSelection(regionContentArray.indexOf(region.split("=")[1]));
@@ -139,7 +140,7 @@ public class ProfileActivity extends AppCompatActivity {
         int region = -1;
         String selectedRegion = regionSpinner.getSelectedItem().toString();
         for (int i = 0; i < simRa_regions_config.length; i++) {
-            if (selectedRegion.equals(simRa_regions_config[i].split("=")[0])||selectedRegion.equals(simRa_regions_config[i].split("=")[1])) {
+            if (selectedRegion.equals(simRa_regions_config[i].split("=")[0]) || selectedRegion.equals(simRa_regions_config[i].split("=")[1])) {
                 region = i;
                 break;
             }
@@ -180,7 +181,7 @@ public class ProfileActivity extends AppCompatActivity {
         int experience = experienceSpinner.getSelectedItemPosition();
         int behaviour = behaviourSeekBar.getProgress();
         // Log.d(TAG, "behaviour: " + behaviourSeekBar.getProgress() + " isEnabled: " + behaviourSeekBar.isEnabled());
-        updateProfile(true,this,ageGroup,gender,region,experience,behaviour);
+        updateProfile(true, this, ageGroup, gender, region, experience, behaviour);
         if (!behaviourSeekBar.isEnabled()) {
             SharedPreferences mySPrefs = getApplicationContext()
                     .getSharedPreferences("Profile", Context.MODE_PRIVATE);

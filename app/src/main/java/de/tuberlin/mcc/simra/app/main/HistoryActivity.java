@@ -25,11 +25,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -40,11 +42,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.net.UploadService;
 import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
+import de.tuberlin.mcc.simra.app.net.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
@@ -80,23 +80,24 @@ public class HistoryActivity extends BaseActivity {
 
 
     BroadcastReceiver br;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ServiceConnection for communicating with RecorderService
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private ServiceConnection mUploadServiceConnection = new ServiceConnection() {
 
-    public class MyBroadcastReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean uploadSuccessful = intent.getBooleanExtra("uploadSuccessful",false);
-            boolean foundARideToUpload = intent.getBooleanExtra("foundARideToUpload", true);
-            if (!foundARideToUpload) {
-                Toast.makeText(getApplicationContext(), R.string.nothing_to_upload, Toast.LENGTH_LONG).show();
-            } else if (!uploadSuccessful) {
-                Toast.makeText(getApplicationContext(), R.string.upload_failed, Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(getApplicationContext(), R.string.upload_completed, Toast.LENGTH_LONG).show();
-            }
-
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "onServiceDisconnected");
             refreshMyRides();
         }
-    }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected() called");
+            UploadService.MyBinder myBinder = (UploadService.MyBinder) service;
+            mBoundUploadService = myBinder.getService();
+        }
+    };
 
     /**
      * When this Activity gets started automatically after the route recording is finished,
@@ -133,24 +134,25 @@ public class HistoryActivity extends BaseActivity {
                                    }
         );
 
-        unit = lookUpSharedPrefs("Settings-Unit","m","simraPrefs",HistoryActivity.this);
+        unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", HistoryActivity.this);
         dateFormat = lookUpIntSharedPrefs("Settings-DateFormat", 0, "simraPrefs", HistoryActivity.this);
 
         listView = findViewById(R.id.listView);
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-            }
             LinearLayout historyButtons = findViewById(R.id.historyButtons);
             boolean isUp = true;
 
             @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 // Log.d(TAG, view.getLastVisiblePosition() + " " + firstVisibleItem + " " + visibleItemCount + " " + totalItemCount);
-                if ( isUp && view.getLastVisiblePosition() + 1 == totalItemCount ) {
+                if (isUp && view.getLastVisiblePosition() + 1 == totalItemCount) {
                     Log.d(TAG, "hide buttons");
-                    historyButtons.animate().translationX(historyButtons.getWidth()/2f);
+                    historyButtons.animate().translationX(historyButtons.getWidth() / 2f);
                     isUp = false;
                     // historyButtons.setVisibility(View.INVISIBLE);
                 } else if (!isUp && !(view.getLastVisiblePosition() + 1 == totalItemCount)) {
@@ -181,12 +183,12 @@ public class HistoryActivity extends BaseActivity {
         justUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!lookUpBooleanSharedPrefs("uploadWarningShown",false,"simraPrefs",HistoryActivity.this)){
+                if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", HistoryActivity.this)) {
                     fireUploadPrompt();
                 } else {
                     Intent intent = new Intent(HistoryActivity.this, UploadService.class);
                     startService(intent);
-                    Toast.makeText(HistoryActivity.this,getString(R.string.upload_started),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -212,7 +214,7 @@ public class HistoryActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 exitWhenDone = true;
-                if(!lookUpBooleanSharedPrefs("uploadWarningShown",false,"simraPrefs",HistoryActivity.this)){
+                if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", HistoryActivity.this)) {
                     fireUploadPrompt();
                 } else {
                     justUploadButton.performClick();
@@ -250,7 +252,7 @@ public class HistoryActivity extends BaseActivity {
                     }
                 }
                 Log.d(TAG, "metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
-            }catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -258,7 +260,7 @@ public class HistoryActivity extends BaseActivity {
             Log.d(TAG, "refreshMyRides(): metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             for (int i = 0; i < metaDataLines.size(); i++) {
                 String[] metaDataLine = metaDataLines.get(i);
-                if(metaDataLine.length > 2 && !(metaDataLine[0].equals("key"))) {
+                if (metaDataLine.length > 2 && !(metaDataLine[0].equals("key"))) {
                     ridesArr[((metaDataLines.size()) - i) - 1] = listToTextShape(metaDataLine);
                 }
             }
@@ -306,13 +308,13 @@ public class HistoryActivity extends BaseActivity {
         }
 
         long millis = Long.valueOf(item[2]) - Long.valueOf(item[1]);
-        int minutes = Math.round((millis/1000/60));
+        int minutes = Math.round((millis / 1000 / 60));
         Date dt = new Date(Long.valueOf(item[1]));
         Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
         localCalendar.setTime(dt);
         String day = String.valueOf(localCalendar.get(Calendar.DATE));
         String month = String.valueOf(localCalendar.get(Calendar.MONTH) + 1);
-        String year = String.valueOf(localCalendar.get(Calendar.YEAR)).substring(2,4);
+        String year = String.valueOf(localCalendar.get(Calendar.YEAR)).substring(2, 4);
         Locale locale = Resources.getSystem().getConfiguration().locale;
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", locale);
         if (dateFormat == 1) {
@@ -320,7 +322,7 @@ public class HistoryActivity extends BaseActivity {
         }
         String time = sdf.format(dt);
         if (month.length() < 2) {
-           month = "0" + month;
+            month = "0" + month;
         }
         if (day.length() < 2) {
             day = "0" + day;
@@ -332,7 +334,7 @@ public class HistoryActivity extends BaseActivity {
             startDateOfRide = month + "/" + day + "/" + year + ", " + time;
         }
 
-        if(item.length>6) {
+        if (item.length > 6) {
             return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3] + ";" + item[6];
         } else {
             return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3] + ";" + 0;
@@ -372,24 +374,93 @@ public class HistoryActivity extends BaseActivity {
 
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // ServiceConnection for communicating with RecorderService
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private ServiceConnection mUploadServiceConnection = new ServiceConnection() {
+    public void fireDeletePrompt(int position, MyArrayAdapter arrayAdapter) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
+        alert.setTitle(getString(R.string.warning));
+        alert.setMessage(getString(R.string.delete_file_warning));
+        alert.setPositiveButton(R.string.delete_ride_approve, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                File[] dirFiles = getFilesDir().listFiles();
+                Log.d(TAG, "btnDelete.onClick() dirFiles: " + Arrays.deepToString(dirFiles));
+                String clicked = (String) listView.getItemAtPosition(position);
+                Log.d(TAG, "btnDelete.onClick() clicked: " + clicked);
+                clicked = clicked.replace("#", "").split(";")[0];
+                if (dirFiles.length != 0) {
+                    for (int i = 0; i < dirFiles.length; i++) {
+                        File actualFile = dirFiles[i];
+                        if (actualFile.getName().startsWith(clicked + "_") || actualFile.getName().startsWith("accEvents" + clicked)) {
 
+                            /** don't delete the following line! */
+                            Log.i(TAG, actualFile.getName() + " deleted: " + actualFile.delete());
+                        }
+                    }
+                }
+                String content = "";
+                try (BufferedReader br = new BufferedReader(new FileReader(HistoryActivity.this.getFileStreamPath("metaData.csv")))) {
+                    String line;
+
+                    while ((line = br.readLine()) != null) {
+                        if (!line.split(",")[0].equals(clicked)) {
+                            content += line += System.lineSeparator();
+                        }
+                    }
+                    overWriteFile(content, "metaData.csv", HistoryActivity.this);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+                Toast.makeText(HistoryActivity.this, R.string.ride_deleted, Toast.LENGTH_SHORT).show();
+                refreshMyRides();
+            }
+        });
+        alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        alert.show();
+
+    }
+
+    public void fireUploadPrompt() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
+        alert.setTitle(getString(R.string.warning));
+        alert.setMessage(getString(R.string.upload_file_warning));
+        alert.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                writeBooleanToSharedPrefs("uploadWarningShown", true, "simraPrefs", HistoryActivity.this);
+                Intent intent = new Intent(HistoryActivity.this, UploadService.class);
+                startService(intent);
+                Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
+                if (exitWhenDone) {
+                    HistoryActivity.this.moveTaskToBack(true);
+                }
+            }
+        });
+        alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        alert.show();
+
+    }
+
+    public class MyBroadcastReceiver extends BroadcastReceiver {
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "onServiceDisconnected");
+        public void onReceive(Context context, Intent intent) {
+            boolean uploadSuccessful = intent.getBooleanExtra("uploadSuccessful", false);
+            boolean foundARideToUpload = intent.getBooleanExtra("foundARideToUpload", true);
+            if (!foundARideToUpload) {
+                Toast.makeText(getApplicationContext(), R.string.nothing_to_upload, Toast.LENGTH_LONG).show();
+            } else if (!uploadSuccessful) {
+                Toast.makeText(getApplicationContext(), R.string.upload_failed, Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.upload_completed, Toast.LENGTH_LONG).show();
+            }
+
             refreshMyRides();
         }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "onServiceConnected() called");
-            UploadService.MyBinder myBinder = (UploadService.MyBinder) service;
-            mBoundUploadService = myBinder.getService();
-        }
-    };
+    }
 
     public class MyArrayAdapter extends ArrayAdapter<String> {
         String TAG = "MyArrayAdapter_LOG";
@@ -400,7 +471,7 @@ public class HistoryActivity extends BaseActivity {
         ArrayList<String[]> metaDataLines = new ArrayList<String[]>();
 
         public MyArrayAdapter(Context context, int layoutResourceId,
-                              ArrayList<String> stringArrayList, ArrayList<String[]> metaDataLines ) {
+                              ArrayList<String> stringArrayList, ArrayList<String[]> metaDataLines) {
 
             super(context, layoutResourceId, stringArrayList);
             this.layoutResourceId = layoutResourceId;
@@ -439,19 +510,19 @@ public class HistoryActivity extends BaseActivity {
             // holder.message.setText(itemComponents[2]);
             Log.d(TAG, "itemComponents: " + Arrays.toString(itemComponents));
 
-            if(itemComponents[2].contains(getString(R.string.rideAnnotatedInHistoryActivity))){
+            if (itemComponents[2].contains(getString(R.string.rideAnnotatedInHistoryActivity))) {
                 holder.status.setBackground(getDrawable(R.drawable.ic_phone_android_black_24dp));
-            }else if(itemComponents[2].contains(getString(R.string.rideUploadedInHistoryActivity))){
+            } else if (itemComponents[2].contains(getString(R.string.rideUploadedInHistoryActivity))) {
                 holder.status.setBackground(getDrawable(R.drawable.ic_cloud_done_black_24dp));
             } else {
                 holder.status.setBackground(null);
             }
             holder.duration.setText(itemComponents[3]);
             if (unit.equals("ft")) {
-                holder.distance.setText(String.valueOf(Math.round(((Double.valueOf(itemComponents[5])/1600)*100.0))/100.0));
+                holder.distance.setText(String.valueOf(Math.round(((Double.valueOf(itemComponents[5]) / 1600) * 100.0)) / 100.0));
                 holder.distanceUnit.setText("mi");
             } else {
-                holder.distance.setText(String.valueOf(Math.round(((Double.valueOf(itemComponents[5])/1000)*100.0))/100.0));
+                holder.distance.setText(String.valueOf(Math.round(((Double.valueOf(itemComponents[5]) / 1000) * 100.0)) / 100.0));
                 holder.distanceUnit.setText("km");
             }
             if (!itemComponents[4].equals("2")) {
@@ -497,7 +568,7 @@ public class HistoryActivity extends BaseActivity {
 
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG,"Delete Button Clicked");
+                    Log.d(TAG, "Delete Button Clicked");
                     fireDeletePrompt(position, MyArrayAdapter.this);
                 }
             });
@@ -514,76 +585,5 @@ public class HistoryActivity extends BaseActivity {
             ImageButton status;
             ImageButton btnDelete;
         }
-    }
-
-    public void fireDeletePrompt(int position, MyArrayAdapter arrayAdapter) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
-        alert.setTitle(getString(R.string.warning));
-        alert.setMessage(getString(R.string.delete_file_warning));
-        alert.setPositiveButton(R.string.delete_ride_approve, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                File[] dirFiles = getFilesDir().listFiles();
-                Log.d(TAG, "btnDelete.onClick() dirFiles: " + Arrays.deepToString(dirFiles));
-                String clicked = (String) listView.getItemAtPosition(position);
-                Log.d(TAG, "btnDelete.onClick() clicked: " + clicked);
-                clicked = clicked.replace("#", "").split(";")[0];
-                if (dirFiles.length != 0) {
-                    for (int i = 0; i < dirFiles.length; i++) {
-                        File actualFile = dirFiles[i];
-                        if (actualFile.getName().startsWith(clicked + "_") || actualFile.getName().startsWith("accEvents"+clicked)) {
-
-                            /** don't delete the following line! */
-                            Log.i(TAG, actualFile.getName() + " deleted: " + actualFile.delete());
-                        }
-                    }
-                }
-                String content = "";
-                try (BufferedReader br = new BufferedReader(new FileReader(HistoryActivity.this.getFileStreamPath("metaData.csv")))) {
-                    String line;
-
-                    while ((line = br.readLine()) != null) {
-                        if (!line.split(",")[0].equals(clicked)) {
-                            content += line += System.lineSeparator();
-                        }
-                    }
-                    overWriteFile(content,"metaData.csv", HistoryActivity.this);
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
-                Toast.makeText(HistoryActivity.this,R.string.ride_deleted,Toast.LENGTH_SHORT).show();
-                refreshMyRides();
-            }
-        });
-        alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-
-            }
-        });
-        alert.show();
-
-    }
-
-    public void fireUploadPrompt() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
-        alert.setTitle(getString(R.string.warning));
-        alert.setMessage(getString(R.string.upload_file_warning));
-        alert.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                writeBooleanToSharedPrefs("uploadWarningShown",true,"simraPrefs",HistoryActivity.this);
-                Intent intent = new Intent(HistoryActivity.this, UploadService.class);
-                startService(intent);
-                Toast.makeText(HistoryActivity.this,getString(R.string.upload_started),Toast.LENGTH_SHORT).show();
-                if (exitWhenDone) {
-                    HistoryActivity.this.moveTaskToBack(true);
-                }
-            }
-        });
-        alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-
-            }
-        });
-        alert.show();
-
     }
 }

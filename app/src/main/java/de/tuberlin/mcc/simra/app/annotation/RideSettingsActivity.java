@@ -4,10 +4,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import java.util.Objects;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import java.util.Objects;
+
 import de.tuberlin.mcc.simra.app.R;
 
 public class RideSettingsActivity extends AppCompatActivity {

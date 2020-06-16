@@ -29,20 +29,40 @@ public class RadmesserService extends Service {
     private static final String TAG = "RadmesserService";
     private static final String sharedPrefsKey = "RadmesserServiceBLE";
     private static final String sharedPrefsKeyRadmesserID = "connectedDevice";
-
+    /**
+     * Bound Service interface
+     */
+    private final IBinder binder = new LocalBinder();
+    public RadmesserDevice connectedDevice;
+    BLEServiceManager serviceManager;
     private volatile HandlerThread mHandlerThread;
     private ServiceHandler mServiceHandler;
     private LocalBroadcastManager mLocalBroadcastManager;
-
-    BLEServiceManager serviceManager;
-
-    private static final class ServiceHandler extends Handler {
-        public ServiceHandler(Looper looper) {
-            super(looper);
-        }
-    }
-
     private ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
+    public BLEScanner scanner = new BLEScanner(new BLEScanner.BLEScannerCallbacks() {
+        @Override
+        public void onNewDeviceFound(BluetoothDevice device) {
+        }
+
+        @Override
+        public void onScanStarted() {
+            setConnectionStatus(ConnectionStatus.SEARCHING);
+        }
+
+        @Override
+        public void onScanStopped() {
+
+        }
+    });
+    private RadmesserDevice.RadmesserDeviceCallbacks radmesserCallbacks = new RadmesserDevice.RadmesserDeviceCallbacks() {
+        @Override
+        public void onConnectionStateChange() {
+        }
+    };
+
+    private static void setPairedRadmesserID(String id, Context ctx) {
+        ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().putString(sharedPrefsKeyRadmesserID, id).apply();
+    }
 
     public ConnectionStatus getCurrentConnectionStatus() {
         return connectionStatus;
@@ -59,7 +79,7 @@ public class RadmesserService extends Service {
     }
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         Log.i(TAG, "created");
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mHandlerThread = new HandlerThread(TAG + ".HandlerThread");
@@ -93,22 +113,10 @@ public class RadmesserService extends Service {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         Log.i(TAG, "stopped");
         // Cleanup service before destruction
         mHandlerThread.quit();
-    }
-
-    /**
-     * Bound Service interface
-     */
-    private final IBinder binder = new LocalBinder();
-    public class LocalBinder extends Binder {
-        public RadmesserService getService() {
-
-            // Return this instance of LocalService so clients can call public methods
-            return RadmesserService.this;
-        }
     }
 
     @Override
@@ -116,45 +124,19 @@ public class RadmesserService extends Service {
         return binder;
     }
 
-    public RadmesserDevice connectedDevice;
-
-    public BLEScanner scanner = new BLEScanner(new BLEScanner.BLEScannerCallbacks() {
-        @Override
-        public void onNewDeviceFound(BluetoothDevice device) {
-        }
-
-        @Override
-        public void onScanStarted() {
-            setConnectionStatus(ConnectionStatus.SEARCHING);
-        }
-
-        @Override
-        public void onScanStopped() {
-
-        }
-    });
-
-    private RadmesserDevice.RadmesserDeviceCallbacks radmesserCallbacks = new RadmesserDevice.RadmesserDeviceCallbacks() {
-        @Override
-        public void onConnectionStateChange() {
-        }
-    };
-
     // Send an Intent with an action named "custom-event-name". The Intent
     // sent should
     // be received by the ReceiverActivity.
     private void sendMessage(String service, @Nullable Map<String, String> data) {
         Intent intent = new Intent(service);
         // You can also include some extra data.
-        if(data != null){
-            for (String key : data.keySet()){
+        if (data != null) {
+            for (String key : data.keySet()) {
                 intent.putExtra(key, data.get(key));
             }
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
-
-
 
     private BLEServiceManager registerBLEServices() {
 
@@ -162,7 +144,7 @@ public class RadmesserService extends Service {
         bleServices.addService(
                 RadmesserDevice.UUID_SERVICE_HEARTRATE,
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_HEARTRATE,
-                val -> sendMessage(RadmesserDevice.UUID_SERVICE_HEARTRATE, (Map)new HashMap<String, String>() {{
+                val -> sendMessage(RadmesserDevice.UUID_SERVICE_HEARTRATE, (Map) new HashMap<String, String>() {{
                     put("heartrate", val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1).toString());
                 }})
         );
@@ -177,7 +159,7 @@ public class RadmesserService extends Service {
         bleServices.addService(
                 RadmesserDevice.UUID_SERVICE_DISTANCE,
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_DISTANCE,
-                val -> sendMessage(RadmesserDevice.UUID_SERVICE_DISTANCE, (Map)new HashMap<String, String>() {{
+                val -> sendMessage(RadmesserDevice.UUID_SERVICE_DISTANCE, (Map) new HashMap<String, String>() {{
                     put("distance", val.getStringValue(0));
                 }})
         );
@@ -194,6 +176,12 @@ public class RadmesserService extends Service {
                 }
         );
         return bleServices;
+    }
+
+    // TODO: Use Utils (or refactor) shared Prefs usage
+    @Nullable
+    private String getPairedRadmesserID() {
+        return getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).getString(sharedPrefsKeyRadmesserID, null);
     }
 
 
@@ -234,30 +222,33 @@ public class RadmesserService extends Service {
 //        return true;
 //    }
 
-
-    // TODO: Use Utils (or refactor) shared Prefs usage
-    @Nullable
-    private String getPairedRadmesserID() {
-        return getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).getString(sharedPrefsKeyRadmesserID, null);
-    }
-
-    private static void setPairedRadmesserID(String id, Context ctx) {
-        ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().putString(sharedPrefsKeyRadmesserID, id).apply();
-    }
-
     public void unPairedRadmesser() {
         getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().remove(sharedPrefsKeyRadmesserID).apply();
     }
 
-    public static class BroadcastMessages{
+    public enum ConnectionStatus {
+        DISCONNECTED,
+        SEARCHING,
+        PAIRING,
+        CONNECTED
+    }
+
+    private static final class ServiceHandler extends Handler {
+        public ServiceHandler(Looper looper) {
+            super(looper);
+        }
+    }
+
+    public static class BroadcastMessages {
         public static final String ConnectionStatusChange = "ConnectionStatusChange";
     }
 
-    public enum ConnectionStatus {
-        DISCONNECTED,
-        SEARCHING ,
-        PAIRING,
-        CONNECTED
+    public class LocalBinder extends Binder {
+        public RadmesserService getService() {
+
+            // Return this instance of LocalService so clients can call public methods
+            return RadmesserService.this;
+        }
     }
 }
 

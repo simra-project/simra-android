@@ -8,9 +8,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
-import java.util.Date;
-
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Date;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.main.StartActivity;
@@ -30,7 +30,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
         this.context = context;
         // we should store the current exception handler -- to invoke it for all not handled exceptions ...
         rootHandler = Thread.getDefaultUncaughtExceptionHandler();
-        if(BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             return;
         }
         // we replace the exception handler now with us -- we will properly dispatch the exceptions ...
@@ -59,16 +59,16 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
 
             String errorReport =
                     "System Timestamp: " + System.currentTimeMillis() + "\n" +
-                    "Build.VERSION.RELEASE: " + Build.VERSION.RELEASE + "\n" +
-                    "Build.DEVICE: " + Build.DEVICE + "\n" +
-                    "Build.MODEL: " + Build.MODEL + "\n" +
-                    "Build.PRODUCT: " + Build.PRODUCT + "\n" +
-                    "App Version: " + getAppVersionNumber(this) + "\n" +
-                    "Exception in: " + context.getClass().getName()
-                    + " " + ex.getClass().getName() + "\n" +
-                    ex.getMessage() + "\n" +
-                    "stackTrace: " + stackTrace + "\n" +
-                    "causeTrace: " + causeTrace + "\n";
+                            "Build.VERSION.RELEASE: " + Build.VERSION.RELEASE + "\n" +
+                            "Build.DEVICE: " + Build.DEVICE + "\n" +
+                            "Build.MODEL: " + Build.MODEL + "\n" +
+                            "Build.PRODUCT: " + Build.PRODUCT + "\n" +
+                            "App Version: " + getAppVersionNumber(this) + "\n" +
+                            "Exception in: " + context.getClass().getName()
+                            + " " + ex.getClass().getName() + "\n" +
+                            ex.getMessage() + "\n" +
+                            "stackTrace: " + stackTrace + "\n" +
+                            "causeTrace: " + causeTrace + "\n";
 
             appendToFile((fileInfoLine + errorReport), "CRASH_REPORT" + new Date().toString() + ".txt", this);
 
