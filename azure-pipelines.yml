@@ -54,6 +54,7 @@ jobs:
         env:
           SIMRA_API_ENDPOINT: $(apiEndpoint)
           SIMRA_API_SECRET: $(apiSecret)
+          SIMRA_SENTRY_DSN: $(sentryDSN)
 
       - task: Gradle@2
         condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
@@ -70,6 +71,7 @@ jobs:
         env:
           SIMRA_API_ENDPOINT: $(apiEndpoint)
           SIMRA_API_SECRET: $(apiSecret)
+          SIMRA_SENTRY_DSN: $(sentryDSN)
 
       - task: CopyFiles@2
         inputs:
@@ -91,16 +93,19 @@ jobs:
           artifactName: "bundle-files-qa"
           artifactType: "container"
 
-      # - task: CopyFiles@2
-      #   inputs:
-      #     SourceFolder: $(Build.SourcesDirectory)
-      #     contents: 'metadata/**'
-      #     targetFolder: '$(build.artifactStagingDirectory)'
-      # - task: PublishBuildArtifacts@1
-      #   inputs:
-      #     pathtoPublish: '$(Build.ArtifactStagingDirectory)/metadata/android'
-      #     artifactName: 'metadata-files'
-      #     artifactType: 'container'
+      - task: CopyFiles@2
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          SourceFolder: $(Build.SourcesDirectory)
+          contents: "metadata/**"
+          targetFolder: "$(build.artifactStagingDirectory)"
+
+      - task: PublishBuildArtifacts@1
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          pathtoPublish: "$(Build.ArtifactStagingDirectory)/metadata/android"
+          artifactName: "metadata-files"
+          artifactType: "container"
 
   - job: apk
     displayName: "Build APK"
@@ -121,6 +126,7 @@ jobs:
         env:
           SIMRA_API_ENDPOINT: $(apiEndpoint)
           SIMRA_API_SECRET: $(apiSecret)
+          SIMRA_SENTRY_DSN: $(sentryDSN)
 
       - task: Gradle@2
         displayName: "build apk"
@@ -136,6 +142,7 @@ jobs:
         env:
           SIMRA_API_ENDPOINT: $(apiEndpoint)
           SIMRA_API_SECRET: $(apiSecret)
+          SIMRA_SENTRY_DSN: $(sentryDSN)
 
       - task: AndroidSigning@2
         displayName: "sign apk"

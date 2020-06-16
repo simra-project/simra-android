@@ -18,6 +18,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -93,6 +94,9 @@ import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 
+import io.sentry.android.core.SentryAndroid;
+import io.sentry.android.core.SentryAndroidOptions;
+import io.sentry.core.Sentry;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
 
@@ -168,6 +172,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Log.d(TAG, "OnCreate called");
         super.onCreate(savedInstanceState);
 
+        if(BuildConfig.BUILD_TYPE != "debug" && BuildConfig.SENTRY_DSN != null){
+            SentryAndroid.init(this, options -> {
+                options.setDsn(BuildConfig.SENTRY_DSN);
+                options.setEnvironment(BuildConfig.IS_PRODUCTION ? "production":"pre-production");
+                options.setRelease(String.valueOf(BuildConfig.VERSION_CODE));
+            });
+        }
 
         myEx = Executors.newFixedThreadPool(4);
 
