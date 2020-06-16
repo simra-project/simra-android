@@ -3,8 +3,10 @@ package de.tuberlin.mcc.simra.app.main;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -19,9 +21,13 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.nio.Buffer;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -31,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 
@@ -73,6 +80,17 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences sharedPrefs;
     SharedPreferences.Editor editor;
     Location startLocation;
+
+    // Radmesser
+    Queue<String> radmesserQueue = new CircularFifoQueue(1);
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra("distance");
+            //Log.d("receiver", "Got message: " + message);
+            radmesserQueue.add(message);
+        }
+    };
 
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
@@ -237,6 +255,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         // Executor service for writing data
         executor = Executors.newSingleThreadExecutor();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter(RadmesserDevice.UUID_SERVICE_DISTANCE));
     }
 
     @Override
@@ -319,6 +340,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         // Stop requesting location updates
         locationManager.removeUpdates(this);
+
+        // Stop Radmesser LocalBroadcast Listener
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(
+                mMessageReceiver);
 
         // Remove the Notification
         ForegroundServiceNotificationManager.cancelNotification(this);
@@ -434,6 +459,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         curTime + "," +
                         accuracy + "," +
                         gyro;
+                if(!radmesserQueue.isEmpty()){
+                    str =  str + "," + radmesserQueue.element();
+                }
+
+
+                Log.i(TAG,str);
 
                 accGpsString.append(str).append(System.getProperty("line.separator"));
                 lineAdded = true;
