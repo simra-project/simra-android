@@ -335,8 +335,9 @@ public class Utils {
     }
 
     /**
-     * returns {NumberOfRides,Duration,NumberOfIncidents,WaitedTime,Distance,Co2,0,...,23,NumberOfScary}
-     * for each region
+     * @param numberOfRegions
+     * @param context
+     * @return {NumberOfRides,Duration,NumberOfIncidents,WaitedTime,Distance,Co2,0,...,23,NumberOfScary} for each region
      */
     public static Object[][] getRegionProfilesArrays(int numberOfRegions, Context context) {
         Object[][] result = new Object[numberOfRegions][31];
