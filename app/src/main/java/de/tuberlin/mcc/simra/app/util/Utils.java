@@ -726,28 +726,4 @@ public class Utils {
         }
         return simRa_regions_config;
     }
-
-    public void resetAppIfVersionIsBelow(Context context, int version) {
-        int appVersion = SharedPref.lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-
-        if (appVersion < version) {
-            File[] dirFiles = context.getFilesDir().listFiles();
-            String path;
-            for (int i = 0; i < dirFiles.length; i++) {
-
-                path = dirFiles[i].getName();
-                Log.d(TAG, "path: " + path);
-                if (!path.equals("profile.csv")) {
-                    dirFiles[i].delete();
-                }
-            }
-
-            String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
-
-            overWriteFile((fileInfoLine + METADATA_HEADER), "metaData.csv", context);
-            SharedPref.writeIntToSharedPrefs("RIDE-KEY", 0, "simraPrefs", context);
-        }
-        SharedPref.writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
-    }
-
 }
