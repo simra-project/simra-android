@@ -44,7 +44,7 @@ import java.util.TimeZone;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
-import de.tuberlin.mcc.simra.app.net.UploadService;
+import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;

@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.net;
+package de.tuberlin.mcc.simra.app.services;
 
 import android.app.Notification;
 import android.app.Service;
@@ -30,6 +30,7 @@ import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
+import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;

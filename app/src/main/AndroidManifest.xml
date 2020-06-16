@@ -118,7 +118,7 @@
             android:name=".services.RecorderService"
             android:parentActivityName=".MainActivity" />
         <service
-            android:name=".net.UploadService"
+            android:name=".services.UploadService"
             android:enabled="true"
             android:parentActivityName=".HistoryActivity" />
         <service

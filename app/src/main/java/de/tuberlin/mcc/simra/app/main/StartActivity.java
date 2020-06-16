@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.net.UploadService;
+import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
