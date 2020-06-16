@@ -144,7 +144,6 @@ public class RadmesserService extends Service {
     // sent should
     // be received by the ReceiverActivity.
     private void sendMessage(String service, @Nullable Map<String, String> data) {
-        Log.d("sender", "Broadcasting message to: " + service);
         Intent intent = new Intent(service);
         // You can also include some extra data.
         if(data != null){
