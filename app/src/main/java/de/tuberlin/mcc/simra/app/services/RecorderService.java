@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.main;
+package de.tuberlin.mcc.simra.app.services;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -488,7 +488,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     }
 
     public class MyBinder extends Binder {
-        RecorderService getService() {
+        public RecorderService getService() {
             return RecorderService.this;
         }
     }
