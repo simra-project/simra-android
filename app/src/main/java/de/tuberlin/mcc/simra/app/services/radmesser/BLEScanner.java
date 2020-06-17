@@ -77,7 +77,7 @@ public class BLEScanner {
     }
 
     private ArrayList<ScanFilter> createFilterListFromBLEServiceManager(BLEServiceManager bleServices) {
-        ArrayList<ScanFilter> filterList = new ArrayList();
+        ArrayList<ScanFilter> filterList = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             for (UUID serviceUUID : bleServices.getAllUUIDs()) {
                 ScanFilter.Builder builder = new ScanFilter.Builder();

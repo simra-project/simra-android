@@ -124,7 +124,7 @@ public class RadmesserDevice {
     }
 
     public interface RadmesserDeviceCallbacks {
-        public void onConnectionStateChange();
+        void onConnectionStateChange();
     }
 
 

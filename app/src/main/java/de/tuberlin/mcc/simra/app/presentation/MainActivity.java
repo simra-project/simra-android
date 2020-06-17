@@ -98,10 +98,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // Map stuff, Overlays
     public static ExecutorService myEx;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // SharedPreferences for storing last location, editor for editing sharedPrefs
-    SharedPreferences sharedPrefs;
-    SharedPreferences.Editor editor;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Service encapsulating accelerometer accGpsFile recording functionality
     Intent recService;
     RecorderService mBoundRecorderService;
@@ -235,12 +231,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         TextView copyrightTxt = (TextView) findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Initialize sharedPreferences
-
-        sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-        editor = sharedPrefs.edit();
-
         // Set compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
         //                       java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
         this.mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
@@ -263,6 +253,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // If app has been used before and therefore a last known location is available in sharedPrefs,
         // animate the map to that location.
         // Move map to last location known by locationManager if app is started for the first time.
+        SharedPreferences sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
         if (sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_longitude")) {
             GeoPoint lastLoc = new GeoPoint(
                     Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")),
@@ -616,6 +607,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         try {
             final Location myLocation = mLocationOverlay.getLastFix();
             if (myLocation != null) {
+                SharedPreferences.Editor editor = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE).edit();
                 editor.putString("lastLoc_latitude", String.valueOf(myLocation.getLatitude()));
                 editor.putString("lastLoc_longitude", String.valueOf(myLocation.getLongitude()));
                 editor.apply();
@@ -907,8 +899,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         private CheckVersionTask() {
         }
-
-        ;
 
         @Override
         protected void onPreExecute() {

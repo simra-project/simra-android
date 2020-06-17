@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import de.tuberlin.mcc.simra.app.R;
 
@@ -111,7 +112,7 @@ public class LicenseActivity extends AppCompatActivity {
                 try {
                     AssetManager am = getApplicationContext().getAssets();
                     InputStream is = am.open(licenceFileName);
-                    InputStreamReader inputStreamReader = new InputStreamReader(is, "UTF-8");
+                    InputStreamReader inputStreamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                     String receiveString = "";
                     StringBuilder stringBuilder = new StringBuilder();

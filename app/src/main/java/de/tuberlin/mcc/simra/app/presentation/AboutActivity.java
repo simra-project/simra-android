@@ -45,7 +45,7 @@ public class AboutActivity extends BaseActivity {
 
         listView = findViewById(R.id.listView);
 
-        String items[] = getResources().getStringArray(R.array.aboutSimraItems);
+        String[] items = getResources().getStringArray(R.array.aboutSimraItems);
         listView.setAdapter(new ArrayAdapter<String>(AboutActivity.this,
                 android.R.layout.simple_list_item_1, items));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

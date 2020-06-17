@@ -24,6 +24,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -627,7 +628,7 @@ public class Utils {
             try {
                 AssetManager am = context.getApplicationContext().getAssets();
                 InputStream is = am.open("simRa_regions.config");
-                InputStreamReader inputStreamReader = new InputStreamReader(is, "UTF-8");
+                InputStreamReader inputStreamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 String receiveString = "";
                 StringBuilder stringBuilder = new StringBuilder();

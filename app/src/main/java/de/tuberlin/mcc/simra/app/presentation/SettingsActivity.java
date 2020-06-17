@@ -290,7 +290,8 @@ public class SettingsActivity extends BaseActivity {
 
     // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)
     private SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener(TextView tV, String unit, String privacyOption) {
-        SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+
+        return new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -340,8 +341,6 @@ public class SettingsActivity extends BaseActivity {
                 }
             }
         };
-
-        return onSeekBarChangeListener;
     }
 
     @Override

@@ -205,7 +205,8 @@ public class ProfileActivity extends AppCompatActivity {
     */
     // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)
     private SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener() {
-        SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+
+        return new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -222,7 +223,5 @@ public class ProfileActivity extends AppCompatActivity {
 
             }
         };
-
-        return onSeekBarChangeListener;
     }
 }

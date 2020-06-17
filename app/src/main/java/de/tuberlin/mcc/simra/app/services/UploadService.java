@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -465,7 +466,7 @@ public class UploadService extends Service {
             urlConnection.setReadTimeout(10000);
             urlConnection.setConnectTimeout(15000);
             urlConnection.setRequestProperty("Content-Type", "text/plain");
-            byte[] outputInBytes = contentToSend.getBytes("UTF-8");
+            byte[] outputInBytes = contentToSend.getBytes(StandardCharsets.UTF_8);
             OutputStream os = urlConnection.getOutputStream();
             os.write(outputInBytes);
             os.close();
@@ -508,7 +509,7 @@ public class UploadService extends Service {
             urlConnection.setConnectTimeout(15000);
             urlConnection.setRequestProperty("Content-Type", "text/plain");
             Log.d(TAG, "contentToSend.length(): " + contentToSend.length());
-            byte[] outputInBytes = contentToSend.getBytes("UTF-8");
+            byte[] outputInBytes = contentToSend.getBytes(StandardCharsets.UTF_8);
             OutputStream os = urlConnection.getOutputStream();
             os.write(outputInBytes);
             os.close();
