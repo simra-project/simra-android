@@ -69,7 +69,7 @@ public class RadmesserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bluetooth_connection);
+        setContentView(R.layout.activity_radmesser);
         initializeToolBar();
 
         connectDevicesLayout = findViewById(R.id.connectDevicesLayout);
