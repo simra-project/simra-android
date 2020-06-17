@@ -76,7 +76,7 @@ android {
         //warningsAsErrors true
         abortOnError true
     }
-    buildToolsVersion = '29.0.2'
+    buildToolsVersion = '29.0.3'
 }
 
 dependencies {
@@ -86,7 +86,7 @@ dependencies {
     // implementation 'com.google.code.gson:gson:2.8.5'
     // implementation 'org.apache.commons:commons-csv:1.6'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.1.0'
     api 'org.osmdroid:osmdroid-android:6.0.3'
     // api 'org.osmdroid:osmdroid-wms:6.0.3'
     // api 'org.osmdroid:osmdroid-mapsforge:6.0.3'
@@ -103,7 +103,7 @@ dependencies {
     implementation 'org.apache.commons:commons-collections4:4.4'
 
     // Tests
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     // androidTestImplementation 'com.android.support.test:runner:1.0.2'
     // androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
