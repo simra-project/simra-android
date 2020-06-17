@@ -390,7 +390,7 @@ public class HistoryActivity extends BaseActivity {
                         File actualFile = dirFiles[i];
                         if (actualFile.getName().startsWith(clicked + "_") || actualFile.getName().startsWith("accEvents" + clicked)) {
 
-                            /** don't delete the following line! */
+                            /* don't delete the following line! */
                             Log.i(TAG, actualFile.getName() + " deleted: " + actualFile.delete());
                         }
                     }

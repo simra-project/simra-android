@@ -394,7 +394,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         @SuppressLint("MissingPermission")
         public void run() {
 
-            /** Every average is computed over 30 data points, so we want the queues for the
+            /* Every average is computed over 30 data points, so we want the queues for the
              three accelerometer values to be of size 30 in order to compute the averages.
 
              Accordingly, when the queues are shorter we're adding data points.
@@ -471,7 +471,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     endTime = curTime;
                 }
 
-                /** Now remove as many elements from the queues as our moving average step/shift
+                /* Now remove as many elements from the queues as our moving average step/shift
                  specifies and therefore enable new data points to come in.
                  */
 

@@ -273,7 +273,7 @@ public class MarkerFunct {
         markerMap.put(accEventKey, incidentMarker);
         GeoPoint currentLocHelper = event.position;
         incidentMarker.setPosition(currentLocHelper);
-        /** Different marker icons for ....
+        /* Different marker icons for ....
          * A) annotated y/n
          * B) default/custom
          */
