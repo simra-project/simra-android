@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 
 import java.util.Map;
 
+/**
+ * Helper for central access to all shared prefs used by the app
+ */
 public class SharedPref {
     public static final String SHARED_PREF_NAME = "simra";
     public static final int DEFAULT_MODE = Context.MODE_PRIVATE;

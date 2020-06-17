@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
+/**
+ * Log Helper Methods for easier debugging
+ */
 public class LogHelper {
 
     private static final String TAG = "LogHelper";
