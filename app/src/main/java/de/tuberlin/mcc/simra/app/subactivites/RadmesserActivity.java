@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -37,12 +38,15 @@ public class RadmesserActivity extends AppCompatActivity {
     boolean deviceConnected = false;
 
     LinearLayout connectDevicesLayout;
-    LinearLayout devicesList;
+//    LinearLayout devicesList;
+    Button deviceButtonTmp;
 
     LinearLayout deviceLayout;
     TextView deviceInfoTextView;
 
     Handler pollDevicesHandler;
+    boolean isShowingToast = false;
+    int nToastShown = 0;
 
     private ServiceConnection mRadmesserServiceConnection = new ServiceConnection() {
         @Override
@@ -61,8 +65,35 @@ public class RadmesserActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("distance");
+            if (message == null) return;
             Log.d("receiver", "Got message: " + message);
-            deviceInfoTextView.setText("Verbunden mit Gerät " + mBoundRadmesserService.connectedDevice.getID() + "\n" + "Letzte Distanz: " + message);
+
+            int distance = -1;
+            String[] splitted = message.split(",");
+            if (splitted.length == 2) distance = Integer.parseInt(splitted[0]);
+
+            deviceInfoTextView.setText("Connected with " + mBoundRadmesserService.connectedDevice.getID() + "\n" + "Last distance: " + distance + " cm");
+
+            // TODO: for the demo only!
+            if (distance <= 5 && !isShowingToast) {
+                if (nToastShown >= 1) Toast.makeText(context, "Detected close pass!", Toast.LENGTH_LONG).show();
+
+                nToastShown++;
+                isShowingToast = true;
+
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(5000);
+                            isShowingToast = false;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                thread.start();
+            }
         }
     };
 
@@ -73,7 +104,8 @@ public class RadmesserActivity extends AppCompatActivity {
         initializeToolBar();
 
         connectDevicesLayout = findViewById(R.id.connectDevicesLayout);
-        devicesList = findViewById(R.id.devicesList);
+//        devicesList = findViewById(R.id.devicesList);
+        deviceButtonTmp = findViewById(R.id.deviceButtonTmp);
 
         deviceLayout = findViewById(R.id.deviceLayout);
         deviceInfoTextView = findViewById(R.id.deviceInfoTextView);
@@ -129,13 +161,24 @@ public class RadmesserActivity extends AppCompatActivity {
         HashMap<String, BluetoothDevice> devices = mBoundRadmesserService.scanner.getFoundDevices();
 
         // TODO: mit einer "richtigen" ListView (o.ä.) implementieren, da hier die Buttons jedes Mal neu erstellt werden
-        devicesList.removeAllViews();
+//        devicesList.removeAllViews();
+//
+//        for (String deviceId : devices.keySet()) {
+//            Button button = new Button(RadmesserActivity.this);
+//            button.setText("Verbinden mit " + deviceId);
+//            button.setOnClickListener(v -> connectToDevice(deviceId));
+//            devicesList.addView(button);
+//        }
 
-        for (String deviceId : devices.keySet()) {
-            Button button = new Button(RadmesserActivity.this);
-            button.setText("Verbinden mit " + deviceId);
-            button.setOnClickListener(v -> connectToDevice(deviceId));
-            devicesList.addView(button);
+        // TODO: this is just temporary!!!
+        if (devices.keySet().size() > 0) {
+            String deviceId = devices.keySet().iterator().next();
+
+            deviceButtonTmp.setVisibility(View.VISIBLE);
+            deviceButtonTmp.setText("Connect with " + deviceId);
+            deviceButtonTmp.setOnClickListener(v -> connectToDevice(deviceId));
+        } else {
+            deviceButtonTmp.setVisibility(View.GONE);
         }
     }
 

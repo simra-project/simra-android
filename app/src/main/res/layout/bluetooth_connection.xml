@@ -50,10 +50,12 @@
             android:paddingRight="16dp">
 
             <Button
+                android:id="@+id/deviceButtonTmp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
-                android:text="Verbinden mit A4:CF:12:9A:15:5A" />
+                android:layout_marginTop="16dp"
+                android:text="Connect with A4:CF:12:9A:15:5A"
+                android:visibility="visible" />
 
         </LinearLayout>
     </LinearLayout>
@@ -71,7 +73,7 @@
             style="@style/TextAppearance.AppCompat.Large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Mit Gerät verbunden" />
+            android:text="Connected to device" />
 
         <TextView
             android:id="@+id/deviceInfoTextView"
@@ -85,7 +87,8 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Verbindung aufheben (TODO)" />
+            android:layout_marginTop="16dp"
+            android:text="Disconnect device" />
     </LinearLayout>
 
 
