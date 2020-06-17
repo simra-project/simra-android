@@ -73,6 +73,19 @@ jobs:
           SIMRA_API_SECRET: $(apiSecret)
           SIMRA_SENTRY_DSN: $(sentryDSN)
 
+      - task: AndroidSigning@2
+        displayName: 'sign bundle'
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          apkFiles: '**/*.aab'
+          jarsign: true
+          jarsignerArguments: '-sigalg SHA256withRSA -digestalg SHA-256'
+          jarsignerKeystoreFile: "simra-dsp2020.jks"
+          jarsignerKeystorePassword: "$(jarsignerKeyPassword)"
+          jarsignerKeystoreAlias: "uploadtest"
+          jarsignerKeyPassword: "$(jarsignerKeyPassword)"
+          zipalign: true
+
       - task: CopyFiles@2
         inputs:
           SourceFolder: $(Build.SourcesDirectory)
