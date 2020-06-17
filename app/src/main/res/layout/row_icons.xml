@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:baselineAligned="false"
     android:orientation="horizontal"
-    tools:context=".presentation.HistoryActivity">
+    tools:context=".activities.HistoryActivity">
 
 
     <LinearLayout

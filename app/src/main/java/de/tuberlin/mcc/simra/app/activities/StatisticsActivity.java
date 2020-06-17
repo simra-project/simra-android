@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.presentation;
+package de.tuberlin.mcc.simra.app.activities;
 
 
 import android.content.res.Resources;

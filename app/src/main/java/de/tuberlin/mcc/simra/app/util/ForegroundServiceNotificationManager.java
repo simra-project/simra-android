@@ -12,7 +12,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.presentation.MainActivity;
+import de.tuberlin.mcc.simra.app.activities.MainActivity;
 
 public class ForegroundServiceNotificationManager {
 
