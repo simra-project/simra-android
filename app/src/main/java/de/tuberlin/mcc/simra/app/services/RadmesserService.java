@@ -65,6 +65,7 @@ public class RadmesserService extends Service {
                     //diconnect from Radmesser
                     disconnectDevice();
                     setConnectionStatus(ConnectionStatus.CONNECTION_REFUSED);
+                    Log.i(TAG, "CONNECTION_REFUSED");
                 }
             }
         }
@@ -186,7 +187,8 @@ public class RadmesserService extends Service {
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CONNECTION,
                 val -> {
                     Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
-                    if (val.getStringValue(0).equals("1")) {
+                    String strVal = val.getStringValue(0);
+                    if (strVal!= null && strVal.equals("1")) {
                         setConnectionStatus(ConnectionStatus.CONNECTED);
                         setPairedRadmesserID(connectedDevice.getID(), this);
                     }
