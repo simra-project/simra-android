@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.main;
+package de.tuberlin.mcc.simra.app.services;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -39,9 +39,9 @@ import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 
 public class RecorderService extends Service implements SensorEventListener, LocationListener {
 
@@ -133,7 +133,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             // since the user pressed Start Recording AND there is enough distance (privacyDistance)
             // between the starting location and the current location.
             if (!recordingAllowed && startLocation != null && lastLocation != null) {
-                if ((startLocation.distanceTo(lastLocation) >= (float) privacyDistance)
+                if ((startLocation.distanceTo(lastLocation) >= privacyDistance)
                         && ((curTime - startTime) > privacyDuration)) {
                     recordingAllowed = true;
                 }
@@ -322,7 +322,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             // Write String data to files
             appendToFile(accGpsString.toString(), pathToAccGpsFile, this);
             appendToFile(key + ","
-                    + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
+                    + startTime + "," + endTime + ","
                     + "0,0," + waitedTime + "," + Math.round(route.getDistance()) + ",0," + region + System.lineSeparator(), "metaData.csv", this);
             editor.putInt("RIDE-KEY", key + 1);
             editor.apply();
@@ -394,7 +394,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         @SuppressLint("MissingPermission")
         public void run() {
 
-            /** Every average is computed over 30 data points, so we want the queues for the
+            /* Every average is computed over 30 data points, so we want the queues for the
              three accelerometer values to be of size 30 in order to compute the averages.
 
              Accordingly, when the queues are shorter we're adding data points.
@@ -433,12 +433,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     if (lastLocation.getSpeed() <= 3.0) {
                         waitedTime += 3;
                     }
-                    gps = String.valueOf(lastLocation.getLatitude()) + "," +
-                            String.valueOf(lastLocation.getLongitude());
+                    gps = lastLocation.getLatitude() + "," + lastLocation.getLongitude();
                     accuracy = String.valueOf(lastAccuracy);
-                    gyro = String.valueOf(gyroscopeMatrix[0]) + "," +
-                            String.valueOf(gyroscopeMatrix[1]) + "," +
-                            String.valueOf(gyroscopeMatrix[2]);
+                    gyro = gyroscopeMatrix[0] + "," +
+                            gyroscopeMatrix[1] + "," +
+                            gyroscopeMatrix[2];
                 }
 
                 // The queues are of sufficient size, let's compute the averages.
@@ -450,9 +449,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 // Put the averages + time data into a string and append to file.
                 String str =
                         gps + "," +
-                                String.valueOf(xAvg) + "," +
-                                String.valueOf(yAvg) + "," +
-                                String.valueOf(zAvg) + "," +
+                                xAvg + "," +
+                                yAvg + "," +
+                                zAvg + "," +
                                 curTime + "," +
                                 accuracy + "," +
                                 gyro;
@@ -471,7 +470,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     endTime = curTime;
                 }
 
-                /** Now remove as many elements from the queues as our moving average step/shift
+                /* Now remove as many elements from the queues as our moving average step/shift
                  specifies and therefore enable new data points to come in.
                  */
 
@@ -488,7 +487,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     }
 
     public class MyBinder extends Binder {
-        RecorderService getService() {
+        public RecorderService getService() {
             return RecorderService.this;
         }
     }

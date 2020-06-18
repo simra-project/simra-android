@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.subactivites;
+package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -28,13 +27,13 @@ import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import pl.droidsonroids.gif.GifImageView;
 
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpLongSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeLongToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpLongSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeLongToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeToSharedPrefs;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -61,7 +60,6 @@ public class SettingsActivity extends BaseActivity {
     Switch dateFormatSwitch;
     Switch radmesserConnectionSwitch;
     Button radmesserButton;
-    private RadmesserService radmesserService;
     private ServiceConnection radmesserServiceConnection = new ServiceConnection() {
 
         @Override
@@ -73,7 +71,7 @@ public class SettingsActivity extends BaseActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(TAG, "Connecting to service");
             RadmesserService.LocalBinder myBinder = (RadmesserService.LocalBinder) service;
-            radmesserService = myBinder.getService();
+            RadmesserService radmesserService = myBinder.getService();
         }
     };
 
@@ -90,13 +88,7 @@ public class SettingsActivity extends BaseActivity {
         toolbarTxt.setText(R.string.title_activity_settings);
 
         backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           finish();
-                                       }
-                                   }
-        );
+        backBtn.setOnClickListener(v -> finish());
 
         // load unit and date format
         unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", this);
@@ -111,33 +103,27 @@ public class SettingsActivity extends BaseActivity {
         if (dateFormat == 1) {
             dateFormatSwitch.setChecked(true);
         }
-        unitSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    unit = "ft";
-                } else {
-                    unit = "m";
-                }
+        unitSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                unit = "ft";
+            } else {
+                unit = "m";
             }
         });
-        dateFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    dateFormat = 1;
-                } else {
-                    dateFormat = 0;
-                }
+        dateFormatSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                dateFormat = 1;
+            } else {
+                dateFormat = 0;
             }
         });
         // Set seekBars
-        SeekBar durationSeekBar = (SeekBar) findViewById(R.id.privacyDurationSeekBar);
-        SeekBar distanceSeekBar = (SeekBar) findViewById(R.id.privacyDistanceSeekBar);
+        SeekBar durationSeekBar = findViewById(R.id.privacyDurationSeekBar);
+        SeekBar distanceSeekBar = findViewById(R.id.privacyDistanceSeekBar);
 
         // Set textViews
-        TextView durationTextView = (TextView) findViewById(R.id.privacyDurationSeekBarProgress);
-        TextView distanceTextView = (TextView) findViewById(R.id.privacyDistanceSeekBarProgress);
+        TextView durationTextView = findViewById(R.id.privacyDurationSeekBarProgress);
+        TextView distanceTextView = findViewById(R.id.privacyDistanceSeekBarProgress);
 
         // Load the privacy option values
         privacyDuration = lookUpLongSharedPrefs("Privacy-Duration", 30, "simraPrefs", this);
@@ -185,28 +171,22 @@ public class SettingsActivity extends BaseActivity {
         if (child == 1) {
             childCheckBox.setChecked(true);
         }
-        childCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    child = 1;
-                } else {
-                    child = 0;
-                }
+        childCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                child = 1;
+            } else {
+                child = 0;
             }
         });
 
         if (trailer == 1) {
             trailerCheckBox.setChecked(true);
         }
-        trailerCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    trailer = 1;
-                } else {
-                    trailer = 0;
-                }
+        trailerCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                trailer = 1;
+            } else {
+                trailer = 0;
             }
         });
 
@@ -241,9 +221,7 @@ public class SettingsActivity extends BaseActivity {
 
         radmesserButton = findViewById(R.id.radmesserButton);
         radmesserButton.setVisibility(radmesserActivated ? View.VISIBLE : View.GONE);
-        radmesserButton.setOnClickListener(view -> {
-            startActivity(new Intent(this, RadmesserActivity.class));
-        });
+        radmesserButton.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
 
     }
 
@@ -290,7 +268,8 @@ public class SettingsActivity extends BaseActivity {
 
     // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)
     private SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener(TextView tV, String unit, String privacyOption) {
-        SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+
+        return new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -340,8 +319,6 @@ public class SettingsActivity extends BaseActivity {
                 }
             }
         };
-
-        return onSeekBarChangeListener;
     }
 
     @Override

@@ -107,7 +107,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         if (previousAnnotation != null && previousAnnotation.length > 7) {
 
             if (previousAnnotation[8].length() > 0) {
-                incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[8]));
+                incidentTypeSpinner.setSelection(Integer.parseInt(previousAnnotation[8]));
             }
             if (previousAnnotation[9].equals("1")) {
                 involvedType1CheckBox.setChecked(true);
@@ -151,36 +151,28 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             doneButton = findViewById(R.id.save_button);
             backButton = findViewById(R.id.back_button);
 
-            doneButton.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        doneButton.setElevation(0.0f);
-                        doneButton.setBackground(getDrawable(R.drawable.button_pressed));
-                    }
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        doneButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
-                        doneButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                    }
-                    return false;
+            doneButton.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    doneButton.setElevation(0.0f);
+                    doneButton.setBackground(getDrawable(R.drawable.button_pressed));
                 }
-
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    doneButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                    doneButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
             });
 
-            backButton.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        backButton.setElevation(0.0f);
-                        backButton.setBackground(getDrawable(R.drawable.button_pressed));
-                    }
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        backButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
-                        backButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                    }
-                    return false;
+            backButton.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    backButton.setElevation(0.0f);
+                    backButton.setBackground(getDrawable(R.drawable.button_pressed));
                 }
-
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    backButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                    backButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
             });
 
             if (getIntent().getExtras() != null) {
@@ -264,31 +256,22 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             }
         } else {
             exitButton = findViewById(R.id.exitButton);
-            exitButton.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        exitButton.setElevation(0.0f);
-                        exitButton.setBackground(getDrawable(R.drawable.button_pressed));
-                    }
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        exitButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
-                        exitButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                    }
-                    return false;
+            exitButton.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    exitButton.setElevation(0.0f);
+                    exitButton.setBackground(getDrawable(R.drawable.button_pressed));
                 }
-
-            });
-            exitButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    incidentSaved = false;
-                    finish();
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    exitButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                    exitButton.setBackground(getDrawable(R.drawable.button_unpressed));
                 }
+                return false;
             });
-
+            exitButton.setOnClickListener(v -> {
+                incidentSaved = false;
+                finish();
+            });
         }
-
     }
 
     @Override
@@ -368,15 +351,15 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             path = "Temp" + path;
         }
 
-        String contentOfNewFile = "";
+        StringBuilder contentOfNewFile = new StringBuilder();
         int appVersion = getAppVersionNumber(IncidentPopUpActivity.this);
         String fileVersion = "";
         try (BufferedReader reader = new BufferedReader(new FileReader(getFileStreamPath(path)))) {
-            contentOfNewFile += reader.readLine();
-            contentOfNewFile += System.lineSeparator();
+            contentOfNewFile.append(reader.readLine());
+            contentOfNewFile.append(System.lineSeparator());
 
-            if (contentOfNewFile.contains("#")) {
-                String[] fileInfoArray = contentOfNewFile.split("#");
+            if (contentOfNewFile.toString().contains("#")) {
+                String[] fileInfoArray = contentOfNewFile.toString().split("#");
                 fileVersion = fileInfoArray[1];
             }
 
@@ -384,12 +367,12 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             while ((line = reader.readLine()) != null) {
                 String[] oldIncident = line.split(",", -1);
                 if (oldIncident[0].equals(incidentKey)) {
-                    contentOfNewFile += newAnnotation;
-                    contentOfNewFile += System.lineSeparator();
+                    contentOfNewFile.append(newAnnotation);
+                    contentOfNewFile.append(System.lineSeparator());
                     Log.d(TAG, "overwriting \"" + line + "\" with \"" + contentOfNewFile);
                 } else {
-                    contentOfNewFile += line;
-                    contentOfNewFile += System.lineSeparator();
+                    contentOfNewFile.append(line);
+                    contentOfNewFile.append(System.lineSeparator());
                 }
 
             }
@@ -399,7 +382,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         }
         String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
         Log.d(TAG, "fileInfoLine: " + fileInfoLine + " contentOfNewFile: " + contentOfNewFile);
-        overWriteFile((contentOfNewFile), path, this);
+        overWriteFile((contentOfNewFile.toString()), path, this);
 
     }
 

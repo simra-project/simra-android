@@ -24,12 +24,13 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.AccEvent;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class MarkerFunct {
@@ -272,7 +273,7 @@ public class MarkerFunct {
         markerMap.put(accEventKey, incidentMarker);
         GeoPoint currentLocHelper = event.position;
         incidentMarker.setPosition(currentLocHelper);
-        /** Different marker icons for ....
+        /* Different marker icons for ....
          * A) annotated y/n
          * B) default/custom
          */

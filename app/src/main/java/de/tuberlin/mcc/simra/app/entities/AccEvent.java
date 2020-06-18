@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.annotation;
+package de.tuberlin.mcc.simra.app.entities;
 
 
 import android.util.Log;

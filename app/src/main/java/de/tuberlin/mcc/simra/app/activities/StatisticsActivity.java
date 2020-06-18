@@ -1,10 +1,9 @@
-package de.tuberlin.mcc.simra.app.subactivites;
+package de.tuberlin.mcc.simra.app.activities;
 
 
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -23,8 +22,8 @@ import java.util.Locale;
 
 import de.tuberlin.mcc.simra.app.R;
 
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getGlobalProfile;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 
 public class StatisticsActivity extends AppCompatActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -49,13 +48,7 @@ public class StatisticsActivity extends AppCompatActivity {
         toolbarTxt.setText(R.string.title_activity_statistics);
 
         backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           finish();
-                                       }
-                                   }
-        );
+        backBtn.setOnClickListener(v -> finish());
         String unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", this);
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
         // String[] profileValues = readContentFromFile("profile.csv", this).split(System.lineSeparator())[2].split(",");
@@ -70,7 +63,7 @@ public class StatisticsActivity extends AppCompatActivity {
         // amount of co2 emissions saved by taking a bicycle instead of a car (138g/km)
         TextView co2Savings = findViewById(R.id.co2SavingsText);
 
-        co2Savings.setText(getText(R.string.co2Savings) + " " + (Math.round((Double.valueOf((long) profileValues[9]) / 1000.0) * 100.0) / 100.0) + " kg");
+        co2Savings.setText(getText(R.string.co2Savings) + " " + (Math.round(((double) (long) profileValues[9] / 1000.0) * 100.0) / 100.0) + " kg");
 
         co2Savings.invalidate();
 
@@ -86,7 +79,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         // total distance of all uploaded rides
         TextView distanceOfRides = findViewById(R.id.distanceOfRidesText);
-        double distance = Double.valueOf((long) profileValues[8]);
+        double distance = (double) (long) profileValues[8];
         if (unit.equals("ft")) {
             distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((distance / 1600) * 100.0)) / 100.0) + " mi");
         } else {
@@ -130,9 +123,9 @@ public class StatisticsActivity extends AppCompatActivity {
         // average speed of per ride of all uploaded rides
         TextView averageSpeed = findViewById(R.id.averageSpeedText);
         if (unit.equals("ft")) {
-            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8])) / 1600.0) / (((((Double.valueOf((long) profileValues[5]) / 1000)) - (Double.valueOf((long) profileValues[7]))) / 3600))) + " mph");
+            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) (((double) ((long) profileValues[8]) / 1600.0) / ((((((double) (long) profileValues[5] / 1000)) - ((double) (long) profileValues[7])) / 3600))) + " mph");
         } else {
-            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8])) / 1000.0) / (((((Double.valueOf((long) profileValues[5]) / 1000)) - (Double.valueOf((long) profileValues[7]))) / 3600))) + " km/h");
+            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) (((double) ((long) profileValues[8]) / 1000.0) / ((((((double) (long) profileValues[5] / 1000)) - ((double) (long) profileValues[7])) / 3600))) + " km/h");
         }
         averageSpeed.invalidate();
 
@@ -163,7 +156,7 @@ public class StatisticsActivity extends AppCompatActivity {
         averageDurationOfWaitedTime.setText(getText(R.string.avgIdle) + " " + avgWaitDurationMinutes + " min");
         averageDurationOfWaitedTime.invalidate();
 
-        chart = (BarChart) findViewById(R.id.timeBucketBarChart);
+        chart = findViewById(R.id.timeBucketBarChart);
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setLabelsToSkip(0);
@@ -179,7 +172,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         BarDataSet bardataset = new BarDataSet(entries, null);
 
-        ArrayList<String> labels = new ArrayList<String>();
+        ArrayList<String> labels = new ArrayList<>();
 
         if (locale.equals(new Locale("en").getLanguage())) {
             labels.add("12am");

@@ -36,8 +36,6 @@ public class RadmesserService extends Service {
     public RadmesserDevice connectedDevice;
     BLEServiceManager serviceManager;
     private volatile HandlerThread mHandlerThread;
-    private ServiceHandler mServiceHandler;
-    private LocalBroadcastManager mLocalBroadcastManager;
     private ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
     public BLEScanner scanner = new BLEScanner(new BLEScanner.BLEScannerCallbacks() {
         @Override
@@ -55,18 +53,15 @@ public class RadmesserService extends Service {
         }
     });
 
-    private RadmesserDevice.RadmesserDeviceCallbacks radmesserCallbacks = new RadmesserDevice.RadmesserDeviceCallbacks() {
-        @Override
-        public void onConnectionStateChange() {
-            // if Device disconnected
-            if (connectedDevice.getConnectionState() == RadmesserDevice.ConnectionStatus.gattDisconnected) {
-                // and Pairing not completed
-                if (connectionStatus != ConnectionStatus.CONNECTED) {
-                    //diconnect from Radmesser
-                    disconnectDevice();
-                    setConnectionStatus(ConnectionStatus.CONNECTION_REFUSED);
-                    Log.i(TAG, "CONNECTION_REFUSED");
-                }
+    private RadmesserDevice.RadmesserDeviceCallbacks radmesserCallbacks =  () -> {
+        // if Device disconnected
+        if (connectedDevice.getConnectionState() == RadmesserDevice.ConnectionStatus.gattDisconnected) {
+            // and Pairing not completed
+            if (connectionStatus != ConnectionStatus.CONNECTED) {
+                //diconnect from Radmesser
+                disconnectDevice();
+                setConnectionStatus(ConnectionStatus.CONNECTION_REFUSED);
+                Log.i(TAG, "CONNECTION_REFUSED");
             }
         }
     };
@@ -99,10 +94,10 @@ public class RadmesserService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "created");
-        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mHandlerThread = new HandlerThread(TAG + ".HandlerThread");
         mHandlerThread.start();
-        mServiceHandler = new ServiceHandler(mHandlerThread.getLooper());
+        ServiceHandler mServiceHandler = new ServiceHandler(mHandlerThread.getLooper());
 
         Notification notification =
                 ForegroundServiceNotificationManager.createOrUpdateNotification(
@@ -162,7 +157,7 @@ public class RadmesserService extends Service {
         bleServices.addService(
                 RadmesserDevice.UUID_SERVICE_HEARTRATE,
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_HEARTRATE,
-                val -> sendMessage(RadmesserDevice.UUID_SERVICE_HEARTRATE, (Map) new HashMap<String, String>() {{
+                val -> sendMessage(RadmesserDevice.UUID_SERVICE_HEARTRATE, new HashMap<String, String>() {{
                     put("heartrate", val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1).toString());
                 }})
         );
@@ -177,7 +172,7 @@ public class RadmesserService extends Service {
         bleServices.addService(
                 RadmesserDevice.UUID_SERVICE_DISTANCE,
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_DISTANCE,
-                val -> sendMessage(RadmesserDevice.UUID_SERVICE_DISTANCE, (Map) new HashMap<String, String>() {{
+                val -> sendMessage(RadmesserDevice.UUID_SERVICE_DISTANCE, new HashMap<String, String>() {{
                     put("distance", val.getStringValue(0));
                 }})
         );

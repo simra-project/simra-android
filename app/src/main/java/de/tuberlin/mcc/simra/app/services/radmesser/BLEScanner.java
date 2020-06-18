@@ -71,13 +71,11 @@ public class BLEScanner {
         startScan(
                 8,
                 createFilterListFromBLEServiceManager(bleServices),
-                (device, callback) -> {
-                    callbacks.onNewDeviceFound(device);
-                });
+                (device, callback) -> callbacks.onNewDeviceFound(device));
     }
 
     private ArrayList<ScanFilter> createFilterListFromBLEServiceManager(BLEServiceManager bleServices) {
-        ArrayList<ScanFilter> filterList = new ArrayList();
+        ArrayList<ScanFilter> filterList = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             for (UUID serviceUUID : bleServices.getAllUUIDs()) {
                 ScanFilter.Builder builder = new ScanFilter.Builder();
