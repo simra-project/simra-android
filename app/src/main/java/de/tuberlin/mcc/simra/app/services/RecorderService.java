@@ -322,7 +322,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             // Write String data to files
             appendToFile(accGpsString.toString(), pathToAccGpsFile, this);
             appendToFile(key + ","
-                    + String.valueOf(startTime) + "," + String.valueOf(endTime) + ","
+                    + startTime + "," + endTime + ","
                     + "0,0," + waitedTime + "," + Math.round(route.getDistance()) + ",0," + region + System.lineSeparator(), "metaData.csv", this);
             editor.putInt("RIDE-KEY", key + 1);
             editor.apply();
@@ -433,12 +433,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     if (lastLocation.getSpeed() <= 3.0) {
                         waitedTime += 3;
                     }
-                    gps = String.valueOf(lastLocation.getLatitude()) + "," +
-                            String.valueOf(lastLocation.getLongitude());
+                    gps = lastLocation.getLatitude() + "," + lastLocation.getLongitude();
                     accuracy = String.valueOf(lastAccuracy);
-                    gyro = String.valueOf(gyroscopeMatrix[0]) + "," +
-                            String.valueOf(gyroscopeMatrix[1]) + "," +
-                            String.valueOf(gyroscopeMatrix[2]);
+                    gyro = gyroscopeMatrix[0] + "," +
+                            gyroscopeMatrix[1] + "," +
+                            gyroscopeMatrix[2];
                 }
 
                 // The queues are of sufficient size, let's compute the averages.
@@ -450,9 +449,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 // Put the averages + time data into a string and append to file.
                 String str =
                         gps + "," +
-                                String.valueOf(xAvg) + "," +
-                                String.valueOf(yAvg) + "," +
-                                String.valueOf(zAvg) + "," +
+                                xAvg + "," +
+                                yAvg + "," +
+                                zAvg + "," +
                                 curTime + "," +
                                 accuracy + "," +
                                 gyro;

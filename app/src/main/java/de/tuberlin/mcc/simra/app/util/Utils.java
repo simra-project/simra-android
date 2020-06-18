@@ -64,7 +64,7 @@ public class Utils {
         try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(fileName)))) {
             String line;
             line = br.readLine();
-            String fileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
+            String fileVersion = "" + ((Integer.parseInt(line.split("#")[1])) + 1);
             fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
             while ((line = br.readLine()) != null) {
                 content.append(line).append(System.lineSeparator());
@@ -102,7 +102,7 @@ public class Utils {
 
         try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accEvents)))) {
             String line = br.readLine();
-            String topFileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
+            String topFileVersion = "" + ((Integer.parseInt(line.split("#")[1])) + 1);
             accEventsFileInfoLine = appVersion + "#" + topFileVersion + System.lineSeparator();
             accEventsContentToUpload.append(accEventsFileInfoLine);
             while ((line = br.readLine()) != null) {
@@ -122,7 +122,7 @@ public class Utils {
         try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accGps)))) {
             String line;
             line = br.readLine();
-            String bottomFileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
+            String bottomFileVersion = "" + ((Integer.parseInt(line.split("#")[1])) + 1);
             bottomFileInfoLine = appVersion + "#" + bottomFileVersion + System.lineSeparator();
             while ((line = br.readLine()) != null) {
                 contentBottom.append(line).append(System.lineSeparator());
@@ -205,10 +205,10 @@ public class Utils {
             SharedPref.writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", context);
             File[] dirFiles = context.getFilesDir().listFiles();
             String path;
-            for (int i = 0; i < dirFiles.length; i++) {
-                path = dirFiles[i].getName();
+            for (File dirFile : dirFiles) {
+                path = dirFile.getName();
                 if (path.startsWith("CRASH")) {
-                    dirFiles[i].delete();
+                    dirFile.delete();
                 }
             }
         }
@@ -412,19 +412,19 @@ public class Utils {
                     // updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
                     if (uploaded) {
                         totalNumberOfRides++;
-                        totalDuration += (Long.valueOf(metaDataLineArray[2]) - Long.valueOf(metaDataLineArray[1]));
-                        totalNumberOfIncidents += Integer.valueOf(metaDataLineArray[4]);
-                        totalWaitedTime += Long.valueOf(metaDataLineArray[4]);
-                        totalDistance += Long.valueOf(metaDataLineArray[5]);
+                        totalDuration += (Long.parseLong(metaDataLineArray[2]) - Long.parseLong(metaDataLineArray[1]));
+                        totalNumberOfIncidents += Integer.parseInt(metaDataLineArray[4]);
+                        totalWaitedTime += Long.parseLong(metaDataLineArray[4]);
+                        totalDistance += Long.parseLong(metaDataLineArray[5]);
                         Locale locale = Resources.getSystem().getConfiguration().locale;
                         SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
-                        int startHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[1]))));
-                        int endHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[2]))));
+                        int startHour = Integer.parseInt(sdf.format(new Date(Long.parseLong(metaDataLineArray[1]))));
+                        int endHour = Integer.parseInt(sdf.format(new Date(Long.parseLong(metaDataLineArray[2]))));
                         float duration = endHour - startHour + 1;
                         for (int i = startHour; i <= endHour; i++) {
                             timeBuckets[i] += (1 / duration);
                         }
-                        totalNumberOfScary += Integer.valueOf(metaDataLineArray[7]);
+                        totalNumberOfScary += Integer.parseInt(metaDataLineArray[7]);
                     }
                     continue;
                 }
@@ -472,13 +472,13 @@ public class Utils {
                     Log.d(TAG, accGpsFile.getName() + " does not exist!");
                     if (uploaded) {
                         totalNumberOfRides++;
-                        totalDuration += (Long.valueOf(metaDataLineArray[2]) - Long.valueOf(metaDataLineArray[1]));
-                        totalWaitedTime += Long.valueOf(metaDataLineArray[4]);
-                        totalDistance += Long.valueOf(metaDataLineArray[5]);
+                        totalDuration += (Long.parseLong(metaDataLineArray[2]) - Long.parseLong(metaDataLineArray[1]));
+                        totalWaitedTime += Long.parseLong(metaDataLineArray[4]);
+                        totalDistance += Long.parseLong(metaDataLineArray[5]);
                         Locale locale = Resources.getSystem().getConfiguration().locale;
                         SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
-                        int startHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[1]))));
-                        int endHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[2]))));
+                        int startHour = Integer.parseInt(sdf.format(new Date(Long.parseLong(metaDataLineArray[1]))));
+                        int endHour = Integer.parseInt(sdf.format(new Date(Long.parseLong(metaDataLineArray[2]))));
                         float duration = endHour - startHour + 1;
                         for (int i = startHour; i <= endHour; i++) {
                             timeBuckets[i] += (1 / duration);
@@ -501,8 +501,8 @@ public class Utils {
                     totalWaitedTime += actualWaitedTime;
                     Locale locale = Resources.getSystem().getConfiguration().locale;
                     SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
-                    int startHour = Integer.valueOf(sdf.format(new Date(startTimeStamp)));
-                    int endHour = Integer.valueOf(sdf.format(new Date(endTimeStamp)));
+                    int startHour = Integer.parseInt(sdf.format(new Date(startTimeStamp)));
+                    int endHour = Integer.parseInt(sdf.format(new Date(endTimeStamp)));
                     float duration = endHour - startHour + 1;
                     for (int i = startHour; i <= endHour; i++) {
                         timeBuckets[i] += (1 / duration);
@@ -565,25 +565,25 @@ public class Utils {
             while ((accGpsLine = accGpsReader.readLine()) != null) {
                 String[] accGpsLineArray = accGpsLine.split(",", -1);
                 if (startTimeStamp == 0) {
-                    startTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                    startTimeStamp = Long.parseLong(accGpsLineArray[5]);
                 } else {
-                    endTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                    endTimeStamp = Long.parseLong(accGpsLineArray[5]);
                 }
                 if (!accGpsLine.startsWith(",,")) {
                     try {
                         // initialize this and previous locations
                         if (thisLocation == null || previousLocation == null) {
                             thisLocation = new Location("thisLocation");
-                            thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                            thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                            thisLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            thisLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
                             previousLocation = new Location("lastLocation");
-                            previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                            previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
-                            previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                            previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                            previousTimeStamp = Long.parseLong(accGpsLineArray[5]);
                         } else {
-                            thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                            thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
-                            thisTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                            thisLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            thisLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                            thisTimeStamp = Long.parseLong(accGpsLineArray[5]);
                             double distanceToLastPoint = thisLocation.distanceTo(previousLocation);
                             long timePassed = (thisTimeStamp - previousTimeStamp) / 1000;
                             // if speed < 2.99km/h: waiting
@@ -596,9 +596,9 @@ public class Utils {
                             } else {
                                 Log.d(TAG, "speed between " + previousLocation.getLatitude() + "," + previousLocation.getLongitude() + " and " + thisLocation.getLatitude() + "," + thisLocation.getLongitude() + " was " + (int) distanceToLastPoint / timePassed + " m/s or " + (int) (distanceToLastPoint / timePassed) * 3.6 + " km/h.");
                             }
-                            previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                            previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
-                            previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                            previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                            previousTimeStamp = Long.parseLong(accGpsLineArray[5]);
                         }
                     } catch (NumberFormatException nfe) {
                         Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(nfe.getStackTrace()));

@@ -4,7 +4,6 @@ package de.tuberlin.mcc.simra.app.activities;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -64,7 +63,7 @@ public class StatisticsActivity extends AppCompatActivity {
         // amount of co2 emissions saved by taking a bicycle instead of a car (138g/km)
         TextView co2Savings = findViewById(R.id.co2SavingsText);
 
-        co2Savings.setText(getText(R.string.co2Savings) + " " + (Math.round((Double.valueOf((long) profileValues[9]) / 1000.0) * 100.0) / 100.0) + " kg");
+        co2Savings.setText(getText(R.string.co2Savings) + " " + (Math.round(((double) (long) profileValues[9] / 1000.0) * 100.0) / 100.0) + " kg");
 
         co2Savings.invalidate();
 
@@ -80,7 +79,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         // total distance of all uploaded rides
         TextView distanceOfRides = findViewById(R.id.distanceOfRidesText);
-        double distance = Double.valueOf((long) profileValues[8]);
+        double distance = (double) (long) profileValues[8];
         if (unit.equals("ft")) {
             distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((distance / 1600) * 100.0)) / 100.0) + " mi");
         } else {
@@ -124,9 +123,9 @@ public class StatisticsActivity extends AppCompatActivity {
         // average speed of per ride of all uploaded rides
         TextView averageSpeed = findViewById(R.id.averageSpeedText);
         if (unit.equals("ft")) {
-            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8])) / 1600.0) / (((((Double.valueOf((long) profileValues[5]) / 1000)) - (Double.valueOf((long) profileValues[7]))) / 3600))) + " mph");
+            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) (((double) ((long) profileValues[8]) / 1600.0) / ((((((double) (long) profileValues[5] / 1000)) - ((double) (long) profileValues[7])) / 3600))) + " mph");
         } else {
-            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) ((Double.valueOf(((long) profileValues[8])) / 1000.0) / (((((Double.valueOf((long) profileValues[5]) / 1000)) - (Double.valueOf((long) profileValues[7]))) / 3600))) + " km/h");
+            averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) (((double) ((long) profileValues[8]) / 1000.0) / ((((((double) (long) profileValues[5] / 1000)) - ((double) (long) profileValues[7])) / 3600))) + " km/h");
         }
         averageSpeed.invalidate();
 

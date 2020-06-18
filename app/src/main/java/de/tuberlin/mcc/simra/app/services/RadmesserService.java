@@ -36,8 +36,6 @@ public class RadmesserService extends Service {
     public RadmesserDevice connectedDevice;
     BLEServiceManager serviceManager;
     private volatile HandlerThread mHandlerThread;
-    private ServiceHandler mServiceHandler;
-    private LocalBroadcastManager mLocalBroadcastManager;
     private ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
     public BLEScanner scanner = new BLEScanner(new BLEScanner.BLEScannerCallbacks() {
         @Override
@@ -78,10 +76,10 @@ public class RadmesserService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "created");
-        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mHandlerThread = new HandlerThread(TAG + ".HandlerThread");
         mHandlerThread.start();
-        mServiceHandler = new ServiceHandler(mHandlerThread.getLooper());
+        ServiceHandler mServiceHandler = new ServiceHandler(mHandlerThread.getLooper());
 
         Notification notification =
                 ForegroundServiceNotificationManager.createOrUpdateNotification(

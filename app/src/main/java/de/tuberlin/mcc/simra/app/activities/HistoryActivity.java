@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -285,9 +284,9 @@ public class HistoryActivity extends BaseActivity {
             todo = getString(R.string.rideUploadedInHistoryActivity);
         }
 
-        long millis = Long.valueOf(item[2]) - Long.valueOf(item[1]);
+        long millis = Long.parseLong(item[2]) - Long.parseLong(item[1]);
         int minutes = Math.round((millis / 1000 / 60));
-        Date dt = new Date(Long.valueOf(item[1]));
+        Date dt = new Date(Long.parseLong(item[1]));
         Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
         localCalendar.setTime(dt);
         String day = String.valueOf(localCalendar.get(Calendar.DATE));
@@ -363,8 +362,7 @@ public class HistoryActivity extends BaseActivity {
             Log.d(TAG, "btnDelete.onClick() clicked: " + clicked);
             clicked = clicked.replace("#", "").split(";")[0];
             if (dirFiles.length != 0) {
-                for (int i = 0; i < dirFiles.length; i++) {
-                    File actualFile = dirFiles[i];
+                for (File actualFile : dirFiles) {
                     if (actualFile.getName().startsWith(clicked + "_") || actualFile.getName().startsWith("accEvents" + clicked)) {
 
                         /* don't delete the following line! */
@@ -486,10 +484,10 @@ public class HistoryActivity extends BaseActivity {
             }
             holder.duration.setText(itemComponents[3]);
             if (unit.equals("ft")) {
-                holder.distance.setText(String.valueOf(Math.round(((Double.valueOf(itemComponents[5]) / 1600) * 100.0)) / 100.0));
+                holder.distance.setText(String.valueOf(Math.round(((Double.parseDouble(itemComponents[5]) / 1600) * 100.0)) / 100.0));
                 holder.distanceUnit.setText("mi");
             } else {
-                holder.distance.setText(String.valueOf(Math.round(((Double.valueOf(itemComponents[5]) / 1000) * 100.0)) / 100.0));
+                holder.distance.setText(String.valueOf(Math.round(((Double.parseDouble(itemComponents[5]) / 1000) * 100.0)) / 100.0));
                 holder.distanceUnit.setText("km");
             }
             if (!itemComponents[4].equals("2")) {
@@ -506,19 +504,19 @@ public class HistoryActivity extends BaseActivity {
                 clicked = clicked.replace("#", "").split(";")[0];
                 if (dirFiles.length != 0) {
                     // loops through the array of files, outputting the name to console
-                    for (int i = 0; i < dirFiles.length; i++) {
+                    for (File dirFile : dirFiles) {
 
-                        String fileOutput = dirFiles[i].getName();
+                        String fileOutput = dirFile.getName();
                         Log.d(TAG, "fileOutput: " + fileOutput + " clicked: " + clicked + "_");
                         if (fileOutput.startsWith(clicked + "_")) {
                             // Start ShowRouteActivity with the selected Ride.
                             Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
-                            intent.putExtra("PathToAccGpsFile", dirFiles[i].getName());
-                            intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
+                            intent.putExtra("PathToAccGpsFile", dirFile.getName());
+                            intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.parseLong(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
                             intent.putExtra("StartTime", metaDataLines.get(metaDataLines.size() - position - 1)[1]);
                             intent.putExtra("State", Integer.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[3]));
-                            Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getName());
-                            Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
+                            Log.d(TAG, "pathToAccGpsFile: " + dirFile.getName());
+                            Log.d(TAG, "Duration: " + (Long.parseLong(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.parseLong(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
                             Log.d(TAG, "StartTime: " + metaDataLines.get(metaDataLines.size() - position - 1)[1]);
                             Log.d(TAG, "State: " + metaDataLines.get(metaDataLines.size() - position - 1)[3]);
 

@@ -44,10 +44,10 @@ public class VersionUpdater {
             File directory = context.getFilesDir();
             File[] fileList = directory.listFiles();
             String name;
-            for (int i = 0; i < fileList.length; i++) {
-                name = fileList[i].getName();
-                if (!(name.equals("metaData.csv") || name.equals("profile.csv") || fileList[i].isDirectory() || name.startsWith("accEvents") || name.startsWith("CRASH") || name.startsWith("simRa_regions.conf"))) {
-                    fileList[i].renameTo(new File(directory.toString() + File.separator + name.split("_")[0] + "_accGps.csv"));
+            for (File file : fileList) {
+                name = file.getName();
+                if (!(name.equals("metaData.csv") || name.equals("profile.csv") || file.isDirectory() || name.startsWith("accEvents") || name.startsWith("CRASH") || name.startsWith("simRa_regions.conf"))) {
+                    file.renameTo(new File(directory.toString() + File.separator + name.split("_")[0] + "_accGps.csv"));
                 }
             }
 
@@ -99,22 +99,22 @@ public class VersionUpdater {
                                 if (!accGpsLine.startsWith(",,")) {
                                     if (thisLocation == null) {
                                         thisLocation = new Location("thisLocation");
-                                        thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                                        thisLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                                        thisLocation.setLatitude(Double.parseDouble(accGpsArray[0]));
+                                        thisLocation.setLongitude(Double.parseDouble(accGpsArray[1]));
                                         lastLocation = new Location("lastLocation");
-                                        lastLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                                        lastLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                                        lastLocation.setLatitude(Double.parseDouble(accGpsArray[0]));
+                                        lastLocation.setLongitude(Double.parseDouble(accGpsArray[1]));
                                     } else {
-                                        thisLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                                        thisLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                                        thisLocation.setLatitude(Double.parseDouble(accGpsArray[0]));
+                                        thisLocation.setLongitude(Double.parseDouble(accGpsArray[1]));
                                         if (thisLocation.distanceTo(lastLocation) < 2.5) {
                                             waitedTime += 3;
                                             if (isUploaded) {
                                                 totalWaitedTime += 3;
                                             }
                                         }
-                                        lastLocation.setLatitude(Double.valueOf(accGpsArray[0]));
-                                        lastLocation.setLongitude(Double.valueOf(accGpsArray[1]));
+                                        lastLocation.setLatitude(Double.parseDouble(accGpsArray[0]));
+                                        lastLocation.setLongitude(Double.parseDouble(accGpsArray[1]));
                                     }
 
                                 }
@@ -149,15 +149,15 @@ public class VersionUpdater {
                     }
                     Object[] waitedTimeRouteAndDistance = Ride.calculateWaitedTimePolylineDistance(gpsFile);
                     if (isUploaded) {
-                        totalDuration += (Long.valueOf(endTime) - Long.valueOf(startTime));
+                        totalDuration += (Long.parseLong(endTime) - Long.parseLong(startTime));
                         totalNumberOfRides++;
                         totalDistance += (long) waitedTimeRouteAndDistance[2];
-                        Date startDate = new Date(Long.valueOf(startTime));
-                        Date endDate = new Date(Long.valueOf(endTime));
+                        Date startDate = new Date(Long.parseLong(startTime));
+                        Date endDate = new Date(Long.parseLong(endTime));
                         Locale locale = Resources.getSystem().getConfiguration().locale;
                         SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
-                        int startHour = Integer.valueOf(sdf.format(startDate));
-                        int endHour = Integer.valueOf(sdf.format(endDate));
+                        int startHour = Integer.parseInt(sdf.format(startDate));
+                        int endHour = Integer.parseInt(sdf.format(endDate));
                         float duration = endHour - startHour + 1;
                         for (int i = startHour; i <= endHour; i++) {
                             timeBuckets[i] += (1 / duration);
@@ -207,11 +207,11 @@ public class VersionUpdater {
             File directory = context.getFilesDir();
             File[] fileList = directory.listFiles();
             String name;
-            for (int i = 0; i < fileList.length; i++) {
-                name = fileList[i].getName();
+            for (File file : fileList) {
+                name = file.getName();
                 if (name.startsWith("accEvents")) {
                     StringBuilder contentOfNewAccEvents = new StringBuilder();
-                    try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(fileList[i])))) {
+                    try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
                         // fileInfoLine (29#2)
                         contentOfNewAccEvents.append(accEventsReader.readLine()).append(System.lineSeparator());
                         // skip old header
@@ -226,7 +226,7 @@ public class VersionUpdater {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    overWriteFile(contentOfNewAccEvents.toString(), fileList[i].getName(), context);
+                    overWriteFile(contentOfNewAccEvents.toString(), file.getName(), context);
                 }
             }
         }

@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -61,7 +60,6 @@ public class SettingsActivity extends BaseActivity {
     Switch dateFormatSwitch;
     Switch radmesserConnectionSwitch;
     Button radmesserButton;
-    private RadmesserService radmesserService;
     private ServiceConnection radmesserServiceConnection = new ServiceConnection() {
 
         @Override
@@ -73,7 +71,7 @@ public class SettingsActivity extends BaseActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(TAG, "Connecting to service");
             RadmesserService.LocalBinder myBinder = (RadmesserService.LocalBinder) service;
-            radmesserService = myBinder.getService();
+            RadmesserService radmesserService = myBinder.getService();
         }
     };
 
@@ -223,9 +221,7 @@ public class SettingsActivity extends BaseActivity {
 
         radmesserButton = findViewById(R.id.radmesserButton);
         radmesserButton.setVisibility(radmesserActivated ? View.VISIBLE : View.GONE);
-        radmesserButton.setOnClickListener(view -> {
-            startActivity(new Intent(this, RadmesserActivity.class));
-        });
+        radmesserButton.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
 
     }
 

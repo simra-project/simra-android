@@ -71,9 +71,7 @@ public class BLEScanner {
         startScan(
                 8,
                 createFilterListFromBLEServiceManager(bleServices),
-                (device, callback) -> {
-                    callbacks.onNewDeviceFound(device);
-                });
+                (device, callback) -> callbacks.onNewDeviceFound(device));
     }
 
     private ArrayList<ScanFilter> createFilterListFromBLEServiceManager(BLEServiceManager bleServices) {

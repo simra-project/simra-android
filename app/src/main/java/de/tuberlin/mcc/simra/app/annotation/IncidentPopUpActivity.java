@@ -107,7 +107,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         if (previousAnnotation != null && previousAnnotation.length > 7) {
 
             if (previousAnnotation[8].length() > 0) {
-                incidentTypeSpinner.setSelection(Integer.valueOf(previousAnnotation[8]));
+                incidentTypeSpinner.setSelection(Integer.parseInt(previousAnnotation[8]));
             }
             if (previousAnnotation[9].equals("1")) {
                 involvedType1CheckBox.setChecked(true);
@@ -351,15 +351,15 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             path = "Temp" + path;
         }
 
-        String contentOfNewFile = "";
+        StringBuilder contentOfNewFile = new StringBuilder();
         int appVersion = getAppVersionNumber(IncidentPopUpActivity.this);
         String fileVersion = "";
         try (BufferedReader reader = new BufferedReader(new FileReader(getFileStreamPath(path)))) {
-            contentOfNewFile += reader.readLine();
-            contentOfNewFile += System.lineSeparator();
+            contentOfNewFile.append(reader.readLine());
+            contentOfNewFile.append(System.lineSeparator());
 
-            if (contentOfNewFile.contains("#")) {
-                String[] fileInfoArray = contentOfNewFile.split("#");
+            if (contentOfNewFile.toString().contains("#")) {
+                String[] fileInfoArray = contentOfNewFile.toString().split("#");
                 fileVersion = fileInfoArray[1];
             }
 
@@ -367,12 +367,12 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             while ((line = reader.readLine()) != null) {
                 String[] oldIncident = line.split(",", -1);
                 if (oldIncident[0].equals(incidentKey)) {
-                    contentOfNewFile += newAnnotation;
-                    contentOfNewFile += System.lineSeparator();
+                    contentOfNewFile.append(newAnnotation);
+                    contentOfNewFile.append(System.lineSeparator());
                     Log.d(TAG, "overwriting \"" + line + "\" with \"" + contentOfNewFile);
                 } else {
-                    contentOfNewFile += line;
-                    contentOfNewFile += System.lineSeparator();
+                    contentOfNewFile.append(line);
+                    contentOfNewFile.append(System.lineSeparator());
                 }
 
             }
@@ -382,7 +382,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         }
         String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
         Log.d(TAG, "fileInfoLine: " + fileInfoLine + " contentOfNewFile: " + contentOfNewFile);
-        overWriteFile((contentOfNewFile), path, this);
+        overWriteFile((contentOfNewFile.toString()), path, this);
 
     }
 

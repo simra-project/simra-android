@@ -80,10 +80,10 @@ public class Ride {
                         String[] accEventLine = line.split(",", -1);
                         Log.d(TAG, "accEventLine: " + line);
                         if (!(accEventLine[0].equals("key") || (accEventLine.length < 20))) {
-                            int key = Integer.valueOf(accEventLine[0]);
-                            double lat = Double.valueOf(accEventLine[1]);
-                            double lon = Double.valueOf(accEventLine[2]);
-                            long timestamp = Long.valueOf(accEventLine[3]);
+                            int key = Integer.parseInt(accEventLine[0]);
+                            double lat = Double.parseDouble(accEventLine[1]);
+                            double lon = Double.parseDouble(accEventLine[2]);
+                            long timestamp = Long.parseLong(accEventLine[3]);
                             boolean annotated = checkForAnnotation(accEventLine);
                             String incidentType = accEventLine[8];
                             String scary = accEventLine[18];
@@ -130,17 +130,17 @@ public class Ride {
                 try {
                     if (thisLocation == null) {
                         thisLocation = new Location("thisLocation");
-                        thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                        thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                        thisLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                        thisLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
                         previousLocation = new Location("previousLocation");
-                        previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                        previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
-                        thisTimeStamp = Long.valueOf(accGpsLineArray[5]);
-                        previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                        previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                        previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                        thisTimeStamp = Long.parseLong(accGpsLineArray[5]);
+                        previousTimeStamp = Long.parseLong(accGpsLineArray[5]);
                     } else {
-                        thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                        thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
-                        thisTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                        thisLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                        thisLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                        thisTimeStamp = Long.parseLong(accGpsLineArray[5]);
                         // distance to last location in meters
                         double distanceToLastPoint = thisLocation.distanceTo(previousLocation);
                         // time passed from last point in seconds
@@ -165,9 +165,9 @@ public class Ride {
                                     + " timePassed: " + timePassed + " speed: " + (distanceToLastPoint/timePassed));
                             */
                         }
-                        previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                        previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
-                        previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                        previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                        previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                        previousTimeStamp = Long.parseLong(accGpsLineArray[5]);
                     }
                 } catch (NumberFormatException nfe) {
                     nfe.printStackTrace();
@@ -250,12 +250,12 @@ public class Ride {
             partOfRide[4] = "0"; // maxZDelta
             partOfRide[5] = timeStamp; // timeStamp
 
-            double maxX = Double.valueOf(currentLine[2]);
-            double minX = Double.valueOf(currentLine[2]);
-            double maxY = Double.valueOf(currentLine[3]);
-            double minY = Double.valueOf(currentLine[3]);
-            double maxZ = Double.valueOf(currentLine[4]);
-            double minZ = Double.valueOf(currentLine[4]);
+            double maxX = Double.parseDouble(currentLine[2]);
+            double minX = Double.parseDouble(currentLine[2]);
+            double maxY = Double.parseDouble(currentLine[3]);
+            double minY = Double.parseDouble(currentLine[3]);
+            double maxZ = Double.parseDouble(currentLine[4]);
+            double minZ = Double.parseDouble(currentLine[4]);
             thisLine = nextLine;
 
             try {
@@ -270,20 +270,20 @@ public class Ride {
             while ((thisLine != null) && newSubPart) {
 
                 currentLine = thisLine.split(",");
-                if (Double.valueOf(currentLine[2]) >= maxX) {
-                    maxX = Double.valueOf(currentLine[2]);
-                } else if (Double.valueOf(currentLine[2]) < minX) {
-                    minX = Double.valueOf(currentLine[2]);
+                if (Double.parseDouble(currentLine[2]) >= maxX) {
+                    maxX = Double.parseDouble(currentLine[2]);
+                } else if (Double.parseDouble(currentLine[2]) < minX) {
+                    minX = Double.parseDouble(currentLine[2]);
                 }
-                if (Double.valueOf(currentLine[3]) >= maxY) {
-                    maxY = Double.valueOf(currentLine[3]);
-                } else if (Double.valueOf(currentLine[3]) < minY) {
-                    minY = Double.valueOf(currentLine[3]);
+                if (Double.parseDouble(currentLine[3]) >= maxY) {
+                    maxY = Double.parseDouble(currentLine[3]);
+                } else if (Double.parseDouble(currentLine[3]) < minY) {
+                    minY = Double.parseDouble(currentLine[3]);
                 }
-                if (Double.valueOf(currentLine[4]) >= maxZ) {
-                    maxZ = Double.valueOf(currentLine[4]);
-                } else if (Double.valueOf(currentLine[4]) < minZ) {
-                    minZ = Double.valueOf(currentLine[4]);
+                if (Double.parseDouble(currentLine[4]) >= maxZ) {
+                    maxZ = Double.parseDouble(currentLine[4]);
+                } else if (Double.parseDouble(currentLine[4]) < minZ) {
+                    minZ = Double.parseDouble(currentLine[4]);
                 }
                 thisLine = nextLine;
                 try {
@@ -311,7 +311,7 @@ public class Ride {
             int threshold = 10000; // 10 seconds
             long minTimeDelta = 999999999;
             for (int i = 0; i < events.size(); i++) {
-                long actualTimeDelta = Long.valueOf(partOfRide[5]) - Long.valueOf(events.get(i)[5]);
+                long actualTimeDelta = Long.parseLong(partOfRide[5]) - Long.parseLong(events.get(i)[5]);
                 if (actualTimeDelta < minTimeDelta) {
                     minTimeDelta = actualTimeDelta;
                 }
@@ -320,47 +320,47 @@ public class Ride {
 
             // Check whether actualX is one of the top 2 events
             boolean eventAdded = false;
-            if (maxXDelta > Double.valueOf(events.get(0)[2]) && !eventAdded && enoughTimePassed) {
+            if (maxXDelta > Double.parseDouble(events.get(0)[2]) && !eventAdded && enoughTimePassed) {
 
                 String[] temp = events.get(0);
                 events.set(0, partOfRide);
-                accEvents.set(0, new AccEvent(0, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
+                accEvents.set(0, new AccEvent(0, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
 
                 events.set(1, temp);
-                accEvents.set(1, new AccEvent(1, Double.valueOf(temp[0]), Double.valueOf(temp[1]), Long.valueOf(temp[5]), false, "0", "0"));
+                accEvents.set(1, new AccEvent(1, Double.parseDouble(temp[0]), Double.parseDouble(temp[1]), Long.parseLong(temp[5]), false, "0", "0"));
                 eventAdded = true;
-            } else if (maxXDelta > Double.valueOf(events.get(1)[2]) && !eventAdded && enoughTimePassed) {
+            } else if (maxXDelta > Double.parseDouble(events.get(1)[2]) && !eventAdded && enoughTimePassed) {
 
                 events.set(1, partOfRide);
-                accEvents.set(1, new AccEvent(1, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
+                accEvents.set(1, new AccEvent(1, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
                 eventAdded = true;
             }
             // Check whether actualY is one of the top 2 events
-            else if (maxYDelta > Double.valueOf(events.get(2)[3]) && !eventAdded && enoughTimePassed) {
+            else if (maxYDelta > Double.parseDouble(events.get(2)[3]) && !eventAdded && enoughTimePassed) {
 
                 String[] temp = events.get(2);
                 events.set(2, partOfRide);
-                accEvents.set(2, new AccEvent(2, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
+                accEvents.set(2, new AccEvent(2, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
                 events.set(3, temp);
-                accEvents.set(3, new AccEvent(3, Double.valueOf(temp[0]), Double.valueOf(temp[1]), Long.valueOf(temp[5]), false, "0", "0"));
+                accEvents.set(3, new AccEvent(3, Double.parseDouble(temp[0]), Double.parseDouble(temp[1]), Long.parseLong(temp[5]), false, "0", "0"));
                 eventAdded = true;
 
-            } else if (maxYDelta > Double.valueOf(events.get(3)[3]) && !eventAdded && enoughTimePassed) {
+            } else if (maxYDelta > Double.parseDouble(events.get(3)[3]) && !eventAdded && enoughTimePassed) {
                 events.set(3, partOfRide);
-                accEvents.set(3, new AccEvent(3, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
+                accEvents.set(3, new AccEvent(3, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
                 eventAdded = true;
             }
             // Check whether actualZ is one of the top 2 events
-            else if (maxZDelta > Double.valueOf(events.get(4)[4]) && !eventAdded && enoughTimePassed) {
+            else if (maxZDelta > Double.parseDouble(events.get(4)[4]) && !eventAdded && enoughTimePassed) {
                 String[] temp = events.get(4);
                 events.set(4, partOfRide);
-                accEvents.set(4, new AccEvent(4, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
+                accEvents.set(4, new AccEvent(4, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
                 events.set(5, temp);
-                accEvents.set(5, new AccEvent(5, Double.valueOf(temp[0]), Double.valueOf(temp[1]), Long.valueOf(temp[5]), false, "0", "0"));
+                accEvents.set(5, new AccEvent(5, Double.parseDouble(temp[0]), Double.parseDouble(temp[1]), Long.parseLong(temp[5]), false, "0", "0"));
 
-            } else if (maxZDelta > Double.valueOf(events.get(5)[4]) && !eventAdded && enoughTimePassed) {
+            } else if (maxZDelta > Double.parseDouble(events.get(5)[4]) && !eventAdded && enoughTimePassed) {
                 events.set(5, partOfRide);
-                accEvents.set(5, new AccEvent(5, Double.valueOf(partOfRide[0]), Double.valueOf(partOfRide[1]), Long.valueOf(partOfRide[5]), false, "0", "0"));
+                accEvents.set(5, new AccEvent(5, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
                 eventAdded = true;
             }
 

@@ -18,7 +18,6 @@ public class ForegroundServiceNotificationManager {
 
     private static final int NOTIFICATION_ID = 1094;
     private static final String CHANNEL_ID = "ForegroundServiceNotificationChannel";
-    private static Notification notification;
 
     public static Notification createOrUpdateNotification(Context ctx, String title, String text) {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(ctx);
@@ -36,7 +35,8 @@ public class ForegroundServiceNotificationManager {
             notificationManager.createNotificationChannel(channel);
         }
 
-        notification = new NotificationCompat.Builder(ctx, CHANNEL_ID)
+        // Set the intent that will fire when the user taps the notification
+        Notification notification = new NotificationCompat.Builder(ctx, CHANNEL_ID)
                 .setSmallIcon(R.drawable.helmet)
                 .setContentTitle(title)
                 .setContentText(text)

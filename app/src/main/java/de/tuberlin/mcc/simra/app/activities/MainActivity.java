@@ -105,20 +105,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private MapView mMapView;
     private MapController mMapController;
     private MyLocationNewOverlay mLocationOverlay;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private CompassOverlay mCompassOverlay;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
     private LocationManager locationManager;
     private Boolean recording = false;
-    private ImageButton helmetButton;
-    private ImageButton centerMap;
     private RelativeLayout startBtn;
     private RelativeLayout stopBtn;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Context of application environment
-    private Context ctx;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Radmesser
     private RelativeLayout radmesserStatus;
@@ -205,7 +198,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // Set some params (context, DisplayMetrics, Config, ContentView)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        ctx = getApplicationContext();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Context of application environment
+        Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
         setContentView(R.layout.activity_main);
@@ -233,7 +228,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Set compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
         //                       java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
-        this.mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        CompassOverlay mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
                 mMapView);
 
         // Sets the icon to device location.
@@ -279,7 +275,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Add overlays
         mMapView.getOverlays().add(this.mLocationOverlay);
-        mMapView.getOverlays().add(this.mCompassOverlay);
+        mMapView.getOverlays().add(mCompassOverlay);
         // mMapView.getOverlays().add(this.mRotationGestureOverlay);
 
         mLocationOverlay.setOptionsMenuEnabled(true);
@@ -303,13 +299,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (2): Helmet
-        helmetButton = findViewById(R.id.helmet_icon);
+        ImageButton helmetButton = findViewById(R.id.helmet_icon);
         helmetButton.setOnClickListener(v -> {
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (3): CenterMap
-        centerMap = findViewById(R.id.center_button);
+        ImageButton centerMap = findViewById(R.id.center_button);
 
         centerMap.setOnClickListener(v -> {
             Log.d(TAG, "centerMap clicked ");
@@ -623,7 +619,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
@@ -912,7 +907,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             String[] responseArray = checkVersionResponse.toString().split("splitter");
             if (responseArray.length > 2) {
                 critical = Boolean.valueOf(responseArray[0]);
-                newestAppVersion = Integer.valueOf(responseArray[1]);
+                newestAppVersion = Integer.parseInt(responseArray[1]);
                 urlToNewestAPK = responseArray[2];
                 return checkVersionResponse.toString();
             } else {

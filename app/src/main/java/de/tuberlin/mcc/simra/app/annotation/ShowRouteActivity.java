@@ -1,7 +1,6 @@
 package de.tuberlin.mcc.simra.app.annotation;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -13,7 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -508,9 +506,7 @@ public class ShowRouteActivity extends BaseActivity {
             return false;
         });
 
-        saveButton.setOnClickListener((View v) -> {
-            saveChanges(temp);
-        });
+        saveButton.setOnClickListener((View v) -> saveChanges(temp));
 
         overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
         runOnUiThread(() -> {
@@ -655,10 +651,10 @@ public class ShowRouteActivity extends BaseActivity {
                     }
                     if ((partOfRideNumber >= left) && (partOfRideNumber <= right)) {
                         // Log.d(TAG, "line: " + line);
-                        if (tempStartTime == null || Long.valueOf(line.split(",", -1)[5]) < tempStartTime) {
+                        if (tempStartTime == null || Long.parseLong(line.split(",", -1)[5]) < tempStartTime) {
                             tempStartTime = Long.valueOf(line.split(",", -1)[5]);
                         }
-                        if (tempEndTime == null || Long.valueOf(line.split(",", -1)[5]) > tempEndTime) {
+                        if (tempEndTime == null || Long.parseLong(line.split(",", -1)[5]) > tempEndTime) {
                             tempEndTime = Long.valueOf(line.split(",", -1)[5]);
                         }
                         content.append(line).append(System.lineSeparator());
@@ -697,7 +693,7 @@ public class ShowRouteActivity extends BaseActivity {
                     for (int i = 0; i < tempRide.events.size(); i++) {
                         Log.d(TAG, "tempRide.events.get(i).key: " + tempRide.events.get(i).key +
                                 " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
-                        if ((tempRide.events.get(i).key) == Integer.valueOf(incidentProps[0])) {
+                        if ((tempRide.events.get(i).key) == Integer.parseInt(incidentProps[0])) {
                             if (annotated) {
                                 tempRide.events.get(i).annotated = true;
                             }
@@ -714,7 +710,7 @@ public class ShowRouteActivity extends BaseActivity {
                     for (int i = 0; i < ride.events.size(); i++) {
                         Log.d(TAG, "ride.events.get(i).key: " + ride.events.get(i).key +
                                 " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
-                        if ((ride.events.get(i).key) == Integer.valueOf(incidentProps[0])) {
+                        if ((ride.events.get(i).key) == Integer.parseInt(incidentProps[0])) {
                             if (annotated) {
                                 ride.events.get(i).annotated = true;
                             }
@@ -727,10 +723,10 @@ public class ShowRouteActivity extends BaseActivity {
                         }
                     }
                 }
-                myMarkerFunct.setMarker(new AccEvent(Integer.valueOf(incidentProps[0]),
+                myMarkerFunct.setMarker(new AccEvent(Integer.parseInt(incidentProps[0]),
                         Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
                         Long.parseLong(incidentProps[3]),
-                        annotated, incidentProps[8], incidentProps[18]), Integer.valueOf(incidentProps[0]));
+                        annotated, incidentProps[8], incidentProps[18]), Integer.parseInt(incidentProps[0]));
 
             }
         }
