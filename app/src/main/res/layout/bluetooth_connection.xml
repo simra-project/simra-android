@@ -47,15 +47,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingLeft="16dp"
+            android:layout_marginTop="16dp"
             android:paddingRight="16dp">
 
             <Button
-                android:id="@+id/deviceButtonTmp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="Connect with A4:CF:12:9A:15:5A"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
         </LinearLayout>
     </LinearLayout>

@@ -38,15 +38,12 @@ public class RadmesserActivity extends AppCompatActivity {
     boolean deviceConnected = false;
 
     LinearLayout connectDevicesLayout;
-//    LinearLayout devicesList;
-    Button deviceButtonTmp;
+    LinearLayout devicesList;
 
     LinearLayout deviceLayout;
     TextView deviceInfoTextView;
 
     Handler pollDevicesHandler;
-    boolean isShowingToast = false;
-    int nToastShown = 0;
 
     private ServiceConnection mRadmesserServiceConnection = new ServiceConnection() {
         @Override
@@ -73,27 +70,6 @@ public class RadmesserActivity extends AppCompatActivity {
             if (splitted.length == 2) distance = Integer.parseInt(splitted[0]);
 
             deviceInfoTextView.setText("Connected with " + mBoundRadmesserService.connectedDevice.getID() + "\n" + "Last distance: " + distance + " cm");
-
-            // TODO: for the demo only!
-            if (distance <= 5 && !isShowingToast) {
-                if (nToastShown >= 1) Toast.makeText(context, "Detected close pass!", Toast.LENGTH_LONG).show();
-
-                nToastShown++;
-                isShowingToast = true;
-
-                Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(5000);
-                            isShowingToast = false;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                thread.start();
-            }
         }
     };
 
@@ -104,8 +80,7 @@ public class RadmesserActivity extends AppCompatActivity {
         initializeToolBar();
 
         connectDevicesLayout = findViewById(R.id.connectDevicesLayout);
-//        devicesList = findViewById(R.id.devicesList);
-        deviceButtonTmp = findViewById(R.id.deviceButtonTmp);
+        devicesList = findViewById(R.id.devicesList);
 
         deviceLayout = findViewById(R.id.deviceLayout);
         deviceInfoTextView = findViewById(R.id.deviceInfoTextView);
@@ -161,24 +136,13 @@ public class RadmesserActivity extends AppCompatActivity {
         HashMap<String, BluetoothDevice> devices = mBoundRadmesserService.scanner.getFoundDevices();
 
         // TODO: mit einer "richtigen" ListView (o.ä.) implementieren, da hier die Buttons jedes Mal neu erstellt werden
-//        devicesList.removeAllViews();
-//
-//        for (String deviceId : devices.keySet()) {
-//            Button button = new Button(RadmesserActivity.this);
-//            button.setText("Verbinden mit " + deviceId);
-//            button.setOnClickListener(v -> connectToDevice(deviceId));
-//            devicesList.addView(button);
-//        }
+        devicesList.removeAllViews();
 
-        // TODO: this is just temporary!!!
-        if (devices.keySet().size() > 0) {
-            String deviceId = devices.keySet().iterator().next();
-
-            deviceButtonTmp.setVisibility(View.VISIBLE);
-            deviceButtonTmp.setText("Connect with " + deviceId);
-            deviceButtonTmp.setOnClickListener(v -> connectToDevice(deviceId));
-        } else {
-            deviceButtonTmp.setVisibility(View.GONE);
+        for (String deviceId : devices.keySet()) {
+            Button button = new Button(RadmesserActivity.this);
+            button.setText("Connect with " + deviceId);
+            button.setOnClickListener(v -> connectToDevice(deviceId));
+            devicesList.addView(button);
         }
     }
 
