@@ -427,7 +427,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
         runOnUiThread(() -> {
             privacySlider.setRange(0, routeSize);
-            ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+            ArrayList<OverlayItem> items = new ArrayList<>();
             Drawable startFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.startblack, null);
             Drawable finishFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.racingflagblack, null);
             GeoPoint startFlagPoint;

@@ -173,7 +173,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         BarDataSet bardataset = new BarDataSet(entries, null);
 
-        ArrayList<String> labels = new ArrayList<String>();
+        ArrayList<String> labels = new ArrayList<>();
 
         if (locale.equals(new Locale("en").getLanguage())) {
             labels.add("12am");

@@ -434,8 +434,8 @@ public class HistoryActivity extends BaseActivity {
 
         Context context;
         int layoutResourceId;
-        ArrayList<String> stringArrayList = new ArrayList<String>();
-        ArrayList<String[]> metaDataLines = new ArrayList<String[]>();
+        ArrayList<String> stringArrayList = new ArrayList<>();
+        ArrayList<String[]> metaDataLines = new ArrayList<>();
 
         public MyArrayAdapter(Context context, int layoutResourceId,
                               ArrayList<String> stringArrayList, ArrayList<String[]> metaDataLines) {

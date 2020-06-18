@@ -486,7 +486,7 @@ public class UploadService extends Service {
             Log.d(TAG, "Server Response: " + response);
             UploadService.this.decreaseNumberOfTasks();
 
-            return new Pair<Integer, String>(status, response);
+            return new Pair<>(status, response);
         }
 
         // fileType = profile | ride
@@ -522,7 +522,7 @@ public class UploadService extends Service {
             Log.d(TAG, "Server Response: " + response);
             UploadService.this.decreaseNumberOfTasks();
 
-            return new Pair<Integer, String>(status, response);
+            return new Pair<>(status, response);
         }
 
         /*

@@ -74,7 +74,7 @@ public class ProfileActivity extends AppCompatActivity {
         activateBehaviourToggleButton = findViewById(R.id.activateBehaviourSeekBar);
 
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
-        List<String> regionContentArray = new ArrayList<String>();
+        List<String> regionContentArray = new ArrayList<>();
         boolean languageIsEnglish = locale.equals(new Locale("en").getLanguage());
         for (String s : simRa_regions_config) {
             if (!(s.startsWith("!") || s.startsWith("Please Choose"))) {
@@ -85,7 +85,7 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             }
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, regionContentArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Collections.sort(regionContentArray);
