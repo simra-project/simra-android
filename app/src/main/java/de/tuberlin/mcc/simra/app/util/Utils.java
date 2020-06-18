@@ -24,11 +24,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
@@ -64,7 +64,7 @@ public class Utils {
         try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(fileName)))) {
             String line;
             line = br.readLine();
-            String fileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
+            String fileVersion = "" + ((Integer.parseInt(line.split("#")[1])) + 1);
             fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
             while ((line = br.readLine()) != null) {
                 content.append(line).append(System.lineSeparator());
@@ -102,7 +102,7 @@ public class Utils {
 
         try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accEvents)))) {
             String line = br.readLine();
-            String topFileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
+            String topFileVersion = "" + ((Integer.parseInt(line.split("#")[1])) + 1);
             accEventsFileInfoLine = appVersion + "#" + topFileVersion + System.lineSeparator();
             accEventsContentToUpload.append(accEventsFileInfoLine);
             while ((line = br.readLine()) != null) {
@@ -122,7 +122,7 @@ public class Utils {
         try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accGps)))) {
             String line;
             line = br.readLine();
-            String bottomFileVersion = "" + ((Integer.valueOf(line.split("#")[1])) + 1);
+            String bottomFileVersion = "" + ((Integer.parseInt(line.split("#")[1])) + 1);
             bottomFileInfoLine = appVersion + "#" + bottomFileVersion + System.lineSeparator();
             while ((line = br.readLine()) != null) {
                 contentBottom.append(line).append(System.lineSeparator());
@@ -164,62 +164,6 @@ public class Utils {
         return ctx.getFilesDir() + "/";
     }
 
-    public static String lookUpSharedPrefs(String key, String defValue, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        return sharedPrefs.getString(key, defValue);
-    }
-
-    public static int lookUpIntSharedPrefs(String key, int defValue, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        return sharedPrefs.getInt(key, defValue);
-    }
-
-    public static long lookUpLongSharedPrefs(String key, long defValue, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        return sharedPrefs.getLong(key, defValue);
-    }
-
-    public static boolean lookUpBooleanSharedPrefs(String key, boolean defValue, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        return sharedPrefs.getBoolean(key, defValue);
-    }
-
-    public static void writeToSharedPrefs(String key, String value, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putString(key, value);
-        editor.apply();
-    }
-
-    public static void writeIntToSharedPrefs(String key, int value, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putInt(key, value);
-        editor.apply();
-    }
-
-    public static void writeLongToSharedPrefs(String key, long value, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putLong(key, value);
-        editor.apply();
-    }
-
-    public static void writeBooleanToSharedPrefs(String key, boolean value, String sharedPrefName, Context context) {
-        SharedPreferences sharedPrefs = context.getApplicationContext()
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean(key, value);
-        editor.apply();
-    }
-
 
     // Check if an accEvent has already been annotated based on one line of the accEvents csv file.
     // Returns true, if accEvent was already annotated.
@@ -256,15 +200,15 @@ public class Utils {
     }
 
     public static void deleteErrorLogsForVersion(Context context, int version) {
-        int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        int appVersion = SharedPref.lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
         if (appVersion < version) {
-            writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", context);
+            SharedPref.writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", context);
             File[] dirFiles = context.getFilesDir().listFiles();
             String path;
-            for (int i = 0; i < dirFiles.length; i++) {
-                path = dirFiles[i].getName();
+            for (File dirFile : dirFiles) {
+                path = dirFile.getName();
                 if (path.startsWith("CRASH")) {
-                    dirFiles[i].delete();
+                    dirFile.delete();
                 }
             }
         }
@@ -272,61 +216,6 @@ public class Utils {
         //writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
 
 
-    }
-
-    public static void showKeyPrefs(Context context) {
-        SharedPreferences keyPrefs = context.getApplicationContext()
-                .getSharedPreferences("keyPrefs", Context.MODE_PRIVATE);
-        Log.d(TAG, "===========================V=keyPrefs=V===========================");
-        Object[] keyPrefsArray = keyPrefs.getAll().entrySet().toArray();
-        for (Object keyPrefsEntry : keyPrefsArray) {
-            Log.d(TAG, keyPrefsEntry + "");
-        }
-        Log.d(TAG, "===========================Λ=keyPrefs=Λ===========================");
-    }
-
-    public static void showDataDirectory(Context context) {
-        Log.d(TAG, "===========================V=Directory=V===========================");
-        String[] fileList = context.fileList();
-        for (String fileName : fileList) {
-            Log.d(TAG, fileName);
-        }
-        Log.d(TAG, "===========================Λ=Directory=Λ===========================");
-    }
-
-    public static void showMetadata(Context context) {
-        Log.d(TAG, "===========================V=metaData=V===========================");
-        File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
-        try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
-            String metaDataLine;
-            // loop through the metaData.csv lines
-            while ((metaDataLine = metaDataReader.readLine()) != null) {
-                Log.d(TAG, metaDataLine);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d(TAG, "Exception in showMetadata(): " + Arrays.toString(e.getStackTrace()));
-        }
-        Log.d(TAG, "===========================Λ=metaData=Λ===========================");
-    }
-
-    public static void showStatistics(Context context) {
-        SharedPreferences profilePrefs = context.getApplicationContext()
-                .getSharedPreferences("Profile", Context.MODE_PRIVATE);
-        Log.d(TAG, "===========================V=Statistics=V===========================");
-        Log.d(TAG, "numberOfRides: " + profilePrefs.getInt("NumberOfRides", -1));
-        Log.d(TAG, "Distance: " + profilePrefs.getLong("Distance", -1) + "m");
-        Log.d(TAG, "Co2: " + profilePrefs.getLong("Co2", -1) + "g");
-        Log.d(TAG, "Duration: " + profilePrefs.getLong("Duration", -1) + "ms");
-        Log.d(TAG, "WaitedTime: " + profilePrefs.getLong("WaitedTime", -1) + "s");
-        Log.d(TAG, "NumberOfIncidents: " + profilePrefs.getInt("NumberOfIncidents", -1));
-        Log.d(TAG, "NumberOfScary: " + profilePrefs.getInt("NumberOfScary", -1));
-        String[] buckets = new String[24];
-        for (int i = 0; i < buckets.length; i++) {
-            buckets[i] = i + ": " + profilePrefs.getFloat(String.valueOf(i), -1.0f);
-        }
-        Log.d(TAG, "timeBuckets: " + Arrays.toString(buckets));
-        Log.d(TAG, "===========================Λ=Statistics=Λ===========================");
     }
 
     public static void updateProfile(boolean global, Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
@@ -447,8 +336,9 @@ public class Utils {
     }
 
     /**
-     * returns {NumberOfRides,Duration,NumberOfIncidents,WaitedTime,Distance,Co2,0,...,23,NumberOfScary}
-     * for each region
+     * @param numberOfRegions
+     * @param context
+     * @return {NumberOfRides,Duration,NumberOfIncidents,WaitedTime,Distance,Co2,0,...,23,NumberOfScary} for each region
      */
     public static Object[][] getRegionProfilesArrays(int numberOfRegions, Context context) {
         Object[][] result = new Object[numberOfRegions][31];
@@ -468,97 +358,10 @@ public class Utils {
             // in an AlertDialog and request access to FINE_LOCATION
 
             // The OK-Button fires a requestPermissions
-            DialogInterface.OnClickListener rationaleOnClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(activity,
-                            requestedPermission, accessCode);
-                }
-            };
+            DialogInterface.OnClickListener rationaleOnClickListener = (dialog, which) -> ActivityCompat.requestPermissions(activity,
+                    requestedPermission, accessCode);
             showMessageOK(rationaleMessage, rationaleOnClickListener, activity);
         }
-    }
-
-    // loops through all uploaded accEvents and updates profile statistics and metaData.csv accordingly
-    public static void fixIncidentStatistics(Context context) {
-        File metaDataFile = new File(getBaseFolderPath(context) + "metaData.csv");
-        int totalNumberOfIncidents = 0;
-        int totalNumberOfScary = 0;
-        StringBuilder contentOfMetaData = new StringBuilder();
-        try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(metaDataFile)))) {
-
-            // fileInfoLine (24#2)
-            String metaDataFileVersion = metaDataReader.readLine().split("#")[1];
-
-            contentOfMetaData.append(getAppVersionNumber(context)).append("#").append(metaDataFileVersion)
-                    .append(System.lineSeparator())
-                    .append(METADATA_HEADER);
-            // header (key,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary)
-            metaDataReader.readLine();
-            String metaDataLine;
-            // loop through the metaData.csv lines
-            // rides (0,1553426842081,1553426843354,2,0,0,0)
-            while ((metaDataLine = metaDataReader.readLine()) != null) {
-                Log.d(TAG, "metaDataLine: " + metaDataLine);
-                String[] metaDataArray = metaDataLine.split(",", -1);
-                boolean isUploaded = metaDataArray[3].equals("2");
-                String key = metaDataArray[0];
-                int numberOfIncidentsCurrentAccEvent = 0;
-                int numberOfScaryCurrentAccEvent = 0;
-                StringBuilder contentOfAccEvents = new StringBuilder();
-                File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
-                if (accEventsFile.exists()) {
-                    // loop through accEvents lines
-                    try (BufferedReader accEventsReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(getBaseFolderPath(context) + "accEvents" + key + ".csv"))))) {
-                        // fileInfoLine (24#2)
-                        String accEventsLine = accEventsReader.readLine().split("#", -1)[1];
-                        contentOfAccEvents.append(getAppVersionNumber(context)).append("#").append(accEventsLine)
-                                .append(System.lineSeparator())
-                                .append(ACCEVENTS_HEADER);
-                        // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10
-                        // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,,
-                        // 21 entries per metaDataLine (index 0-20)
-                        accEventsLine = accEventsReader.readLine();
-                        while ((accEventsLine = accEventsReader.readLine()) != null) {
-                            String[] accEventsArray = accEventsLine.split(",", -1);
-                            if (!accEventsArray[8].equals("") && !accEventsArray[8].equals("0")) {
-                                numberOfIncidentsCurrentAccEvent++;
-                            }
-                            if (!accEventsArray[18].equals("") && !accEventsArray[18].equals("0")) {
-                                numberOfScaryCurrentAccEvent++;
-                            }
-                            if (isUploaded) {
-                                if (checkForAnnotation(accEventsArray)) {
-                                    contentOfAccEvents.append(accEventsLine).append(System.lineSeparator());
-                                }
-                            }
-                        }
-                        if (isUploaded) {
-                            totalNumberOfIncidents += numberOfIncidentsCurrentAccEvent;
-                            totalNumberOfScary += numberOfScaryCurrentAccEvent;
-                            overWriteFile(contentOfAccEvents.toString(), "accEvents" + key + ".csv", context);
-                        }
-                        contentOfMetaData
-                                .append(metaDataArray[0]).append(",")
-                                .append(metaDataArray[1]).append(",")
-                                .append(metaDataArray[2]).append(",")
-                                .append(metaDataArray[3]).append(",")
-                                .append(numberOfIncidentsCurrentAccEvent).append(",")
-                                .append(metaDataArray[5]).append(",")
-                                .append(metaDataArray[6]).append(",")
-                                .append(numberOfScaryCurrentAccEvent)
-                                .append(System.lineSeparator());
-                        overWriteFile(contentOfMetaData.toString(), "metaData.csv", context);
-                    } catch (IOException e) {
-                        Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(e.getStackTrace()));
-                    }
-                }
-            }
-
-        } catch (IOException e) {
-            Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(e.getStackTrace()));
-        }
-        updateProfile(true, context, -1, -1, -1, -1, -1, -1, totalNumberOfIncidents, -1, -1, -1, null, -2, totalNumberOfScary);
     }
 
     // recalculates all statistics, updates metaData.csv, Profile.xml and deletes temp files
@@ -609,19 +412,19 @@ public class Utils {
                     // updateProfile(context,-1,-1,-1,-1,totalNumberOfRides,totalDuration,totalNumberOfIncidents,totalWaitedTime,totalDistance,totalCO2Savings,timeBuckets,-2,totalNumberOfScary);
                     if (uploaded) {
                         totalNumberOfRides++;
-                        totalDuration += (Long.valueOf(metaDataLineArray[2]) - Long.valueOf(metaDataLineArray[1]));
-                        totalNumberOfIncidents += Integer.valueOf(metaDataLineArray[4]);
-                        totalWaitedTime += Long.valueOf(metaDataLineArray[4]);
-                        totalDistance += Long.valueOf(metaDataLineArray[5]);
+                        totalDuration += (Long.parseLong(metaDataLineArray[2]) - Long.parseLong(metaDataLineArray[1]));
+                        totalNumberOfIncidents += Integer.parseInt(metaDataLineArray[4]);
+                        totalWaitedTime += Long.parseLong(metaDataLineArray[4]);
+                        totalDistance += Long.parseLong(metaDataLineArray[5]);
                         Locale locale = Resources.getSystem().getConfiguration().locale;
                         SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
-                        int startHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[1]))));
-                        int endHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[2]))));
+                        int startHour = Integer.parseInt(sdf.format(new Date(Long.parseLong(metaDataLineArray[1]))));
+                        int endHour = Integer.parseInt(sdf.format(new Date(Long.parseLong(metaDataLineArray[2]))));
                         float duration = endHour - startHour + 1;
                         for (int i = startHour; i <= endHour; i++) {
                             timeBuckets[i] += (1 / duration);
                         }
-                        totalNumberOfScary += Integer.valueOf(metaDataLineArray[7]);
+                        totalNumberOfScary += Integer.parseInt(metaDataLineArray[7]);
                     }
                     continue;
                 }
@@ -669,13 +472,13 @@ public class Utils {
                     Log.d(TAG, accGpsFile.getName() + " does not exist!");
                     if (uploaded) {
                         totalNumberOfRides++;
-                        totalDuration += (Long.valueOf(metaDataLineArray[2]) - Long.valueOf(metaDataLineArray[1]));
-                        totalWaitedTime += Long.valueOf(metaDataLineArray[4]);
-                        totalDistance += Long.valueOf(metaDataLineArray[5]);
+                        totalDuration += (Long.parseLong(metaDataLineArray[2]) - Long.parseLong(metaDataLineArray[1]));
+                        totalWaitedTime += Long.parseLong(metaDataLineArray[4]);
+                        totalDistance += Long.parseLong(metaDataLineArray[5]);
                         Locale locale = Resources.getSystem().getConfiguration().locale;
                         SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
-                        int startHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[1]))));
-                        int endHour = Integer.valueOf(sdf.format(new Date(Long.valueOf(metaDataLineArray[2]))));
+                        int startHour = Integer.parseInt(sdf.format(new Date(Long.parseLong(metaDataLineArray[1]))));
+                        int endHour = Integer.parseInt(sdf.format(new Date(Long.parseLong(metaDataLineArray[2]))));
                         float duration = endHour - startHour + 1;
                         for (int i = startHour; i <= endHour; i++) {
                             timeBuckets[i] += (1 / duration);
@@ -698,8 +501,8 @@ public class Utils {
                     totalWaitedTime += actualWaitedTime;
                     Locale locale = Resources.getSystem().getConfiguration().locale;
                     SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
-                    int startHour = Integer.valueOf(sdf.format(new Date(startTimeStamp)));
-                    int endHour = Integer.valueOf(sdf.format(new Date(endTimeStamp)));
+                    int startHour = Integer.parseInt(sdf.format(new Date(startTimeStamp)));
+                    int endHour = Integer.parseInt(sdf.format(new Date(endTimeStamp)));
                     float duration = endHour - startHour + 1;
                     for (int i = startHour; i <= endHour; i++) {
                         timeBuckets[i] += (1 / duration);
@@ -762,25 +565,25 @@ public class Utils {
             while ((accGpsLine = accGpsReader.readLine()) != null) {
                 String[] accGpsLineArray = accGpsLine.split(",", -1);
                 if (startTimeStamp == 0) {
-                    startTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                    startTimeStamp = Long.parseLong(accGpsLineArray[5]);
                 } else {
-                    endTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                    endTimeStamp = Long.parseLong(accGpsLineArray[5]);
                 }
                 if (!accGpsLine.startsWith(",,")) {
                     try {
                         // initialize this and previous locations
                         if (thisLocation == null || previousLocation == null) {
                             thisLocation = new Location("thisLocation");
-                            thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                            thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
+                            thisLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            thisLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
                             previousLocation = new Location("lastLocation");
-                            previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                            previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
-                            previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                            previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                            previousTimeStamp = Long.parseLong(accGpsLineArray[5]);
                         } else {
-                            thisLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                            thisLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
-                            thisTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                            thisLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            thisLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                            thisTimeStamp = Long.parseLong(accGpsLineArray[5]);
                             double distanceToLastPoint = thisLocation.distanceTo(previousLocation);
                             long timePassed = (thisTimeStamp - previousTimeStamp) / 1000;
                             // if speed < 2.99km/h: waiting
@@ -793,9 +596,9 @@ public class Utils {
                             } else {
                                 Log.d(TAG, "speed between " + previousLocation.getLatitude() + "," + previousLocation.getLongitude() + " and " + thisLocation.getLatitude() + "," + thisLocation.getLongitude() + " was " + (int) distanceToLastPoint / timePassed + " m/s or " + (int) (distanceToLastPoint / timePassed) * 3.6 + " km/h.");
                             }
-                            previousLocation.setLatitude(Double.valueOf(accGpsLineArray[0]));
-                            previousLocation.setLongitude(Double.valueOf(accGpsLineArray[1]));
-                            previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
+                            previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                            previousTimeStamp = Long.parseLong(accGpsLineArray[5]);
                         }
                     } catch (NumberFormatException nfe) {
                         Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(nfe.getStackTrace()));
@@ -820,7 +623,7 @@ public class Utils {
             try {
                 AssetManager am = context.getApplicationContext().getAssets();
                 InputStream is = am.open("simRa_regions.config");
-                InputStreamReader inputStreamReader = new InputStreamReader(is, "UTF-8");
+                InputStreamReader inputStreamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 String receiveString = "";
                 StringBuilder stringBuilder = new StringBuilder();
@@ -838,54 +641,4 @@ public class Utils {
         }
         return simRa_regions_config;
     }
-
-    public static void copySharedPreferences(String sourceSharedPref, String newSharedPref, Context context) {
-        SharedPreferences sourceSP = context.getApplicationContext()
-                .getSharedPreferences(sourceSharedPref, Context.MODE_PRIVATE);
-
-        SharedPreferences newSP = context.getApplicationContext()
-                .getSharedPreferences(newSharedPref, Context.MODE_PRIVATE);
-        SharedPreferences.Editor newE = newSP.edit();
-
-        for (Map.Entry<String, ?> kvPair : sourceSP.getAll().entrySet()) {
-            String key = kvPair.getKey();
-            Object value = kvPair.getValue();
-            if (value instanceof Float) {
-                newE.putFloat(key, (Float) value);
-            } else if (value instanceof Integer) {
-                newE.putInt(key, (Integer) value);
-            } else if (value instanceof String) {
-                newE.putString(key, (String) value);
-            } else if (value instanceof Boolean) {
-                newE.putBoolean(key, (Boolean) value);
-            } else if (value instanceof Long) {
-                newE.putLong(key, (Long) value);
-            }
-        }
-        newE.apply();
-    }
-
-    public void resetAppIfVersionIsBelow(Context context, int version) {
-        int appVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
-
-        if (appVersion < version) {
-            File[] dirFiles = context.getFilesDir().listFiles();
-            String path;
-            for (int i = 0; i < dirFiles.length; i++) {
-
-                path = dirFiles[i].getName();
-                Log.d(TAG, "path: " + path);
-                if (!path.equals("profile.csv")) {
-                    dirFiles[i].delete();
-                }
-            }
-
-            String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
-
-            overWriteFile((fileInfoLine + METADATA_HEADER), "metaData.csv", context);
-            writeIntToSharedPrefs("RIDE-KEY", 0, "simraPrefs", context);
-        }
-        writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
-    }
-
 }

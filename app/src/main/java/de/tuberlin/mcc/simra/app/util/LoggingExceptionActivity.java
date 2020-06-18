@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.Date;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
-import de.tuberlin.mcc.simra.app.main.StartActivity;
+import de.tuberlin.mcc.simra.app.activities.StartActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
@@ -22,14 +22,13 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
 
     private final static String TAG = LoggingExceptionActivity.class.getSimpleName() + "_LOG";
     private final Context context;
-    private final Thread.UncaughtExceptionHandler rootHandler;
 
 
     public LoggingExceptionActivity(Context context) {
         this.attachBaseContext(context);
         this.context = context;
         // we should store the current exception handler -- to invoke it for all not handled exceptions ...
-        rootHandler = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.UncaughtExceptionHandler rootHandler = Thread.getDefaultUncaughtExceptionHandler();
         if (BuildConfig.DEBUG) {
             return;
         }
@@ -45,14 +44,14 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
 
             // log this exception ...
 
-            String stackTrace = "";
+            StringBuilder stackTrace = new StringBuilder();
             for (int i = 0; i < ex.getStackTrace().length; i++) {
-                stackTrace += ex.getStackTrace()[i] + "\n";
+                stackTrace.append(ex.getStackTrace()[i]).append("\n");
             }
             String causeTrace = "";
             if (ex.getCause() != null) {
                 for (int i = 0; i < ex.getCause().getStackTrace().length; i++) {
-                    stackTrace += ex.getCause().getStackTrace()[i] + "\n";
+                    stackTrace.append(ex.getCause().getStackTrace()[i]).append("\n");
                 }
             }
             String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();

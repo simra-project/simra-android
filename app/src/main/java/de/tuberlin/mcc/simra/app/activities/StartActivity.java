@@ -1,7 +1,6 @@
-package de.tuberlin.mcc.simra.app.main;
+package de.tuberlin.mcc.simra.app.activities;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,26 +20,26 @@ import java.io.File;
 import java.util.Arrays;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.net.UploadService;
+import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
+import static de.tuberlin.mcc.simra.app.util.LogHelper.showDataDirectory;
+import static de.tuberlin.mcc.simra.app.util.LogHelper.showKeyPrefs;
+import static de.tuberlin.mcc.simra.app.util.LogHelper.showMetadata;
+import static de.tuberlin.mcc.simra.app.util.LogHelper.showStatistics;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeLongToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.deleteErrorLogsForVersion;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.showDataDirectory;
-import static de.tuberlin.mcc.simra.app.util.Utils.showKeyPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.showMetadata;
-import static de.tuberlin.mcc.simra.app.util.Utils.showStatistics;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeLongToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV27;
 import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV30;
 import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV31;
@@ -109,17 +107,14 @@ public class StartActivity extends BaseActivity {
         } else {
             // start MainActivity when Button is clicked
             next = findViewById(R.id.nextBtn);
-            next.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(StartActivity.this, MainActivity.class);
-                    // remove the Callback of the Runnable to the Handler to prevent second start of
-                    // MainActivity
-                    startActivity(intent);
-                    // finish() to prevent going back to StartActivity, when the Back Button is pressed
-                    // in MainActivity
-                    finish();
-                }
+            next.setOnClickListener(v -> {
+                Intent intent = new Intent(StartActivity.this, MainActivity.class);
+                // remove the Callback of the Runnable to the Handler to prevent second start of
+                // MainActivity
+                startActivity(intent);
+                // finish() to prevent going back to StartActivity, when the Back Button is pressed
+                // in MainActivity
+                finish();
             });
         }
     }
@@ -202,35 +197,25 @@ public class StartActivity extends BaseActivity {
     public void fireSendErrorDialog() {
 
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
-        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+        CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
         final boolean[] rememberChoice = {false};
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                rememberChoice[0] = isChecked;
-            }
-        });
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> rememberChoice[0] = isChecked);
         checkBox.setText(getString(R.string.rememberMyChoice));
         AlertDialog.Builder alert = new AlertDialog.Builder(StartActivity.this);
         alert.setTitle(getString(R.string.sendErrorTitle));
         alert.setMessage(getString(R.string.sendErrorMessage));
         alert.setView(checkBoxView);
-        alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                if (rememberChoice[0]) {
-                    writeToSharedPrefs("SEND-CRASH", "ALWAYS-SEND", "simraPrefs", StartActivity.this);
-                }
-                Intent intent = new Intent(StartActivity.this, UploadService.class);
-                intent.putExtra("CRASH_REPORT", true);
-                startService(intent);
+        alert.setPositiveButton(R.string.yes, (dialog, id) -> {
+            if (rememberChoice[0]) {
+                writeToSharedPrefs("SEND-CRASH", "ALWAYS-SEND", "simraPrefs", StartActivity.this);
             }
+            Intent intent = new Intent(StartActivity.this, UploadService.class);
+            intent.putExtra("CRASH_REPORT", true);
+            startService(intent);
         });
-        alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                if (rememberChoice[0]) {
-                    writeToSharedPrefs("SEND-CRASH", "NEVER-SEND", "simraPrefs", StartActivity.this);
-                }
+        alert.setNegativeButton(R.string.no, (dialog, id) -> {
+            if (rememberChoice[0]) {
+                writeToSharedPrefs("SEND-CRASH", "NEVER-SEND", "simraPrefs", StartActivity.this);
             }
         });
         alert.show();
@@ -239,7 +224,7 @@ public class StartActivity extends BaseActivity {
 
     public void firePrivacyDialog() {
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
-        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+        CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
 
         checkBox.setText(getString(R.string.iAccept));
         AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
@@ -248,32 +233,19 @@ public class StartActivity extends BaseActivity {
         builder.setTitle(getString(R.string.privacyAgreementTitle));
         builder.setMessage(getResources().getText(R.string.privacyAgreementMessage));
         builder.setView(checkBoxView);
-        builder.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                writeBooleanToSharedPrefs("Privacy-Policy-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this);
-            }
-        });
-        builder.setNegativeButton(R.string.close_simra, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                writeBooleanToSharedPrefs("firstTime", true, "simraPrefs", StartActivity.this);
-                finish();
-                Toast.makeText(StartActivity.this, getString(R.string.simra_closed), Toast.LENGTH_LONG).show();
-            }
+        builder.setPositiveButton(R.string.next, (dialog, id) -> writeBooleanToSharedPrefs("Privacy-Policy-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this));
+        builder.setNegativeButton(R.string.close_simra, (dialog, id) -> {
+            writeBooleanToSharedPrefs("firstTime", true, "simraPrefs", StartActivity.this);
+            finish();
+            Toast.makeText(StartActivity.this, getString(R.string.simra_closed), Toast.LENGTH_LONG).show();
         });
         final AlertDialog dialog = builder.create();
         dialog.show();
         ((TextView) dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 
         // Initially disable the button
-        ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked);
-
-            }
-        });
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
     }
 
 }

@@ -1,7 +1,6 @@
 package de.tuberlin.mcc.simra.app.annotation;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -13,7 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -54,18 +52,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.AccEvent;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
 
 public class ShowRouteActivity extends BaseActivity {
 
@@ -183,13 +182,7 @@ public class ShowRouteActivity extends BaseActivity {
         toolbarTxt.setText(R.string.title_activity_showRoute);
 
         backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backBtn.setOnClickListener(v -> finish());
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Map configuration
@@ -201,7 +194,7 @@ public class ShowRouteActivity extends BaseActivity {
         mMapView.setFlingEnabled(true);
         MapController mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
-        TextView copyrightTxt = (TextView) findViewById(R.id.copyright_text);
+        TextView copyrightTxt = findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
 
@@ -242,27 +235,18 @@ public class ShowRouteActivity extends BaseActivity {
             privacySliderLinearLayout.setVisibility(View.INVISIBLE);
             privacySliderDescription.setVisibility(View.INVISIBLE);
             saveButton.setVisibility(View.INVISIBLE);
-            exitButton.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        exitButton.setElevation(0.0f);
-                        exitButton.setBackground(getDrawable(R.drawable.button_pressed));
-                    }
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        exitButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
-                        exitButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                    }
-                    return false;
+            exitButton.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    exitButton.setElevation(0.0f);
+                    exitButton.setBackground(getDrawable(R.drawable.button_pressed));
                 }
-
-            });
-            exitButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    exitButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
+                    exitButton.setBackground(getDrawable(R.drawable.button_unpressed));
                 }
+                return false;
             });
+            exitButton.setOnClickListener(v -> finish());
         }
 
         Log.d(TAG, "setting up clickListeners");
@@ -296,12 +280,7 @@ public class ShowRouteActivity extends BaseActivity {
         if (temp) {
             tempAccEventsPath = "TempaccEvents" + ride.getKey() + ".csv";
             tempAccGpsPath = "Temp" + gpsFile.getName();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    progressBarRelativeLayout.setVisibility(View.VISIBLE);
-                }
-            });
+            runOnUiThread(() -> progressBarRelativeLayout.setVisibility(View.VISIBLE));
             tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
             tempRide = new Ride(tempGpsFile, duration, String.valueOf(tempStartTime), state, bike, child, trailer, pLoc, this, calculate, true);
         } else {
@@ -346,15 +325,10 @@ public class ShowRouteActivity extends BaseActivity {
         // set accordingly
 
         if (!temp) {
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    bBox = getBoundingBox(route);
-                    zoomToBBox(bBox);
-                    mMapView.invalidate();
-
-                }
+            runOnUiThread(() -> {
+                bBox = getBoundingBox(route);
+                zoomToBBox(bBox);
+                mMapView.invalidate();
             });
         }
 
@@ -362,12 +336,9 @@ public class ShowRouteActivity extends BaseActivity {
         // (3): CenterMap
         ImageButton centerMap = findViewById(R.id.bounding_box_center_button);
 
-        centerMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "boundingBoxCenterMap clicked ");
-                zoomToBBox(bBox);
-            }
+        centerMap.setOnClickListener(v -> {
+            Log.d(TAG, "boundingBoxCenterMap clicked ");
+            zoomToBBox(bBox);
         });
 
         // Set the icons for event markers
@@ -396,23 +367,19 @@ public class ShowRouteActivity extends BaseActivity {
         // Create an instance of MarkerFunct-class which provides all functionality related to
         // incident markers
         Log.d(TAG, "creating MarkerFunct object");
-        runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                if (temp) {
-                    if (myMarkerFunct != null) {
-                        myMarkerFunct.deleteAllMarkers();
-                    }
-                    myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, true);
-                } else {
-                    myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, false);
+        runOnUiThread(() -> {
+            if (temp) {
+                if (myMarkerFunct != null) {
+                    myMarkerFunct.deleteAllMarkers();
                 }
-
-                // Show all the incidents present in our ride object
-                Log.d(TAG, "showing all incidents");
-                myMarkerFunct.showIncidents();
+                myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, true);
+            } else {
+                myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, false);
             }
+
+            // Show all the incidents present in our ride object
+            Log.d(TAG, "showing all incidents");
+            myMarkerFunct.showIncidents();
         });
 
         addCustomMarkerMode = false;
@@ -456,30 +423,26 @@ public class ShowRouteActivity extends BaseActivity {
         if (routeSize < 2) {
             routeSize = 2;
         }
-        runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                privacySlider.setRange(0, routeSize);
-                ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-                Drawable startFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.startblack, null);
-                Drawable finishFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.racingflagblack, null);
-                GeoPoint startFlagPoint;
-                GeoPoint finishFlagPoint;
-                if (temp) {
-                    startFlagPoint = tempRoute.getPoints().get(0);
-                    finishFlagPoint = tempRoute.getPoints().get(tempRoute.getPoints().size() - 1);
-                } else {
-                    startFlagPoint = route.getPoints().get(0);
-                    finishFlagPoint = route.getPoints().get(route.getPoints().size() - 1);
-                    privacySlider.setValue(0, routeSize);
-                }
-
-                startFlagOverlay = new IconOverlay(startFlagPoint, startFlag);
-                finishFlagOverlay = new IconOverlay(finishFlagPoint, finishFlag);
-                mMapView.getOverlays().add(startFlagOverlay);
-                mMapView.getOverlays().add(finishFlagOverlay);
+        runOnUiThread(() -> {
+            privacySlider.setRange(0, routeSize);
+            ArrayList<OverlayItem> items = new ArrayList<>();
+            Drawable startFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.startblack, null);
+            Drawable finishFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.racingflagblack, null);
+            GeoPoint startFlagPoint;
+            GeoPoint finishFlagPoint;
+            if (temp) {
+                startFlagPoint = tempRoute.getPoints().get(0);
+                finishFlagPoint = tempRoute.getPoints().get(tempRoute.getPoints().size() - 1);
+            } else {
+                startFlagPoint = route.getPoints().get(0);
+                finishFlagPoint = route.getPoints().get(route.getPoints().size() - 1);
+                privacySlider.setValue(0, routeSize);
             }
+
+            startFlagOverlay = new IconOverlay(startFlagPoint, startFlag);
+            finishFlagOverlay = new IconOverlay(finishFlagPoint, finishFlag);
+            mMapView.getOverlays().add(startFlagOverlay);
+            mMapView.getOverlays().add(finishFlagOverlay);
         });
 
         Log.d(TAG, "route.size(): " + routeSize);
@@ -529,43 +492,26 @@ public class ShowRouteActivity extends BaseActivity {
         });
 
 
-        runOnUiThread(new Runnable() {
+        runOnUiThread(() -> privacySlider.setRange(0, routeSize));
 
-            @Override
-            public void run() {
-                privacySlider.setRange(0, routeSize);
-
+        saveButton.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                saveButton.setElevation(0.0f);
+                saveButton.setBackground(getDrawable(R.drawable.button_pressed));
             }
-        });
-
-        saveButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    saveButton.setElevation(0.0f);
-                    saveButton.setBackground(getDrawable(R.drawable.button_pressed));
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    saveButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
-                    saveButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                }
-                return false;
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                saveButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
+                saveButton.setBackground(getDrawable(R.drawable.button_unpressed));
             }
-
+            return false;
         });
 
-        saveButton.setOnClickListener((View v) -> {
-            saveChanges(temp);
-        });
+        saveButton.setOnClickListener((View v) -> saveChanges(temp));
 
         overlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
-        runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                mMapView.getOverlays().add(overlayEvents);
-                mMapView.invalidate();
-            }
+        runOnUiThread(() -> {
+            mMapView.getOverlays().add(overlayEvents);
+            mMapView.invalidate();
         });
 
     }
@@ -705,10 +651,10 @@ public class ShowRouteActivity extends BaseActivity {
                     }
                     if ((partOfRideNumber >= left) && (partOfRideNumber <= right)) {
                         // Log.d(TAG, "line: " + line);
-                        if (tempStartTime == null || Long.valueOf(line.split(",", -1)[5]) < tempStartTime) {
+                        if (tempStartTime == null || Long.parseLong(line.split(",", -1)[5]) < tempStartTime) {
                             tempStartTime = Long.valueOf(line.split(",", -1)[5]);
                         }
-                        if (tempEndTime == null || Long.valueOf(line.split(",", -1)[5]) > tempEndTime) {
+                        if (tempEndTime == null || Long.parseLong(line.split(",", -1)[5]) > tempEndTime) {
                             tempEndTime = Long.valueOf(line.split(",", -1)[5]);
                         }
                         content.append(line).append(System.lineSeparator());
@@ -747,7 +693,7 @@ public class ShowRouteActivity extends BaseActivity {
                     for (int i = 0; i < tempRide.events.size(); i++) {
                         Log.d(TAG, "tempRide.events.get(i).key: " + tempRide.events.get(i).key +
                                 " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
-                        if ((tempRide.events.get(i).key) == Integer.valueOf(incidentProps[0])) {
+                        if ((tempRide.events.get(i).key) == Integer.parseInt(incidentProps[0])) {
                             if (annotated) {
                                 tempRide.events.get(i).annotated = true;
                             }
@@ -764,7 +710,7 @@ public class ShowRouteActivity extends BaseActivity {
                     for (int i = 0; i < ride.events.size(); i++) {
                         Log.d(TAG, "ride.events.get(i).key: " + ride.events.get(i).key +
                                 " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
-                        if ((ride.events.get(i).key) == Integer.valueOf(incidentProps[0])) {
+                        if ((ride.events.get(i).key) == Integer.parseInt(incidentProps[0])) {
                             if (annotated) {
                                 ride.events.get(i).annotated = true;
                             }
@@ -777,10 +723,10 @@ public class ShowRouteActivity extends BaseActivity {
                         }
                     }
                 }
-                myMarkerFunct.setMarker(new AccEvent(Integer.valueOf(incidentProps[0]),
+                myMarkerFunct.setMarker(new AccEvent(Integer.parseInt(incidentProps[0]),
                         Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
                         Long.parseLong(incidentProps[3]),
-                        annotated, incidentProps[8], incidentProps[18]), Integer.valueOf(incidentProps[0]));
+                        annotated, incidentProps[8], incidentProps[18]), Integer.parseInt(incidentProps[0]));
 
             }
         }
@@ -874,42 +820,39 @@ public class ShowRouteActivity extends BaseActivity {
         }
 
         // doneButton click listener.
-        MaterialButton doneButton = (MaterialButton) settingsView.findViewById(R.id.done_button);
+        MaterialButton doneButton = settingsView.findViewById(R.id.done_button);
 
-        doneButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    bike = bikeTypeSpinner.getSelectedItemPosition();
-                    pLoc = phoneLocationSpinner.getSelectedItemPosition();
-                    if (childCheckBoxButton.isChecked()) {
-                        child = 1;
-                    } else {
-                        child = 0;
-                    }
-                    if (trailerCheckBoxButton.isChecked()) {
-                        trailer = 1;
-                    } else {
-                        trailer = 0;
-                    }
-                    if (rememberMyChoiceCheckBox.isChecked()) {
-                        writeIntToSharedPrefs("Settings-BikeType", bike, "simraPrefs", ShowRouteActivity.this);
-                        writeIntToSharedPrefs("Settings-PhoneLocation", pLoc, "simraPrefs", ShowRouteActivity.this);
-                        writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", ShowRouteActivity.this);
-                        writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", ShowRouteActivity.this);
-                    }
-                    // Close Alert Dialog.
-                    alertDialog.cancel();
-                    progressBarRelativeLayout.setVisibility(View.VISIBLE);
-                    if (state == 0) {
-                        new RideUpdateTask(false, true).execute();
-                    } else {
-                        new RideUpdateTask(false, false).execute();
-                    }
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+        doneButton.setOnClickListener(view -> {
+            try {
+                bike = bikeTypeSpinner.getSelectedItemPosition();
+                pLoc = phoneLocationSpinner.getSelectedItemPosition();
+                if (childCheckBoxButton.isChecked()) {
+                    child = 1;
+                } else {
+                    child = 0;
                 }
+                if (trailerCheckBoxButton.isChecked()) {
+                    trailer = 1;
+                } else {
+                    trailer = 0;
+                }
+                if (rememberMyChoiceCheckBox.isChecked()) {
+                    writeIntToSharedPrefs("Settings-BikeType", bike, "simraPrefs", ShowRouteActivity.this);
+                    writeIntToSharedPrefs("Settings-PhoneLocation", pLoc, "simraPrefs", ShowRouteActivity.this);
+                    writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", ShowRouteActivity.this);
+                    writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", ShowRouteActivity.this);
+                }
+                // Close Alert Dialog.
+                alertDialog.cancel();
+                progressBarRelativeLayout.setVisibility(View.VISIBLE);
+                if (state == 0) {
+                    new RideUpdateTask(false, true).execute();
+                } else {
+                    new RideUpdateTask(false, false).execute();
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         });
 
@@ -921,32 +864,22 @@ public class ShowRouteActivity extends BaseActivity {
     public boolean firePrivacySliderWarningDialog(int left, int right) {
 
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
-        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                writeBooleanToSharedPrefs("ShowRoute-Warning", !checkBox.isChecked(), "simraPrefs", ShowRouteActivity.this);
-            }
-        });
+        CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> writeBooleanToSharedPrefs("ShowRoute-Warning", !checkBox.isChecked(), "simraPrefs", ShowRouteActivity.this));
         checkBox.setText(getString(R.string.doNotShowAgain));
         AlertDialog.Builder alert = new AlertDialog.Builder(ShowRouteActivity.this);
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.warningRefreshMessage));
         alert.setView(checkBoxView);
-        alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                continueWithRefresh = true;
-                new RideUpdateTask(true, true).execute();
-                lastLeft = left;
-                lastRight = right;
-            }
+        alert.setPositiveButton(R.string.yes, (dialog, id) -> {
+            continueWithRefresh = true;
+            new RideUpdateTask(true, true).execute();
+            lastLeft = left;
+            lastRight = right;
         });
-        alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                continueWithRefresh = false;
-                privacySlider.setValue(lastLeft, lastRight);
-            }
+        alert.setNegativeButton(R.string.no, (dialog, id) -> {
+            continueWithRefresh = false;
+            privacySlider.setValue(lastLeft, lastRight);
         });
         alert.show();
         return continueWithRefresh;

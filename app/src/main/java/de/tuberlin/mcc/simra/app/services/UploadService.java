@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.net;
+package de.tuberlin.mcc.simra.app.services;
 
 import android.app.Notification;
 import android.app.Service;
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -30,23 +31,24 @@ import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
+import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileWithoutDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegionProfilesArrays;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFileAndIncreaseFileVersion;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeBooleanToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeIntToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.writeToSharedPrefs;
 
 public class UploadService extends Service {
 
@@ -169,8 +171,8 @@ public class UploadService extends Service {
             // If there was a crash and the user permitted to send the crash logs, upload simraPrefs and crash log
             if (crash) {
 
-                for (int i = 0; i < dirFiles.length; i++) {
-                    String path = dirFiles[i].getName();
+                for (File dirFile : dirFiles) {
+                    String path = dirFile.getName();
                     if (!((new File(path)).isDirectory()) && path.startsWith("CRASH")) {
                         String contentToSend = readContentFromFileAndIncreaseFileVersion(path, context);
                         postFile("crash", contentToSend, -1);
@@ -242,10 +244,10 @@ public class UploadService extends Service {
                             String accGpsName = "";
                             String accEventName = "";
                             // find the accGps and accEvents file of that ride
-                            for (int i = 0; i < dirFiles.length; i++) {
-                                if (dirFiles[i].getName().startsWith(rideKey + "_accGps")) {
-                                    Log.d(TAG, "dirFiles[i]: " + dirFiles[i].getName());
-                                    accGpsName = dirFiles[i].getName();
+                            for (File dirFile : dirFiles) {
+                                if (dirFile.getName().startsWith(rideKey + "_accGps")) {
+                                    Log.d(TAG, "dirFiles[i]: " + dirFile.getName());
+                                    accGpsName = dirFile.getName();
                                     accEventName = "accEvents" + rideKey + ".csv";
                                     break;
                                 }
@@ -256,7 +258,7 @@ public class UploadService extends Service {
                             String contentToUpload = contentToUploadAndAccEventsContentToOverwrite.first;
                             String accEventsContentToOverwrite = contentToUploadAndAccEventsContentToOverwrite.second;
                             String password = lookUpSharedPrefs(rideKey, "-1", "keyPrefs", context);
-                            int region = Integer.valueOf(metaDataLine[8]);
+                            int region = Integer.parseInt(metaDataLine[8]);
                             Log.d(TAG, "Saved password: " + password);
                             Pair<Integer, String> response;
                             // send data with POST, if it is being sent the first time
@@ -282,18 +284,18 @@ public class UploadService extends Service {
                             if (response.first.equals(200)) {
                                 metaDataLine[3] = "2";
                                 totalNumberOfRides++;
-                                totalDuration += (Long.valueOf(metaDataLine[2]) - Long.valueOf(metaDataLine[1]));
-                                totalNumberOfIncidents += Integer.valueOf(metaDataLine[4]);
-                                totalWaitedTime += Long.valueOf(metaDataLine[5]);
-                                totalDistance += Long.valueOf(metaDataLine[6]);
-                                totalCO2 += (long) ((Long.valueOf(metaDataLine[6]) / (float) 1000) * 138);
+                                totalDuration += (Long.parseLong(metaDataLine[2]) - Long.parseLong(metaDataLine[1]));
+                                totalNumberOfIncidents += Integer.parseInt(metaDataLine[4]);
+                                totalWaitedTime += Long.parseLong(metaDataLine[5]);
+                                totalDistance += Long.parseLong(metaDataLine[6]);
+                                totalCO2 += (long) ((Long.parseLong(metaDataLine[6]) / (float) 1000) * 138);
                                 // update the timebuckets
-                                Date startDate = new Date(Long.valueOf(metaDataLine[1]));
-                                Date endDate = new Date(Long.valueOf(metaDataLine[2]));
+                                Date startDate = new Date(Long.parseLong(metaDataLine[1]));
+                                Date endDate = new Date(Long.parseLong(metaDataLine[2]));
                                 Locale locale = Resources.getSystem().getConfiguration().locale;
                                 SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
-                                int startHour = Integer.valueOf(sdf.format(startDate));
-                                int endHour = Integer.valueOf(sdf.format(endDate));
+                                int startHour = Integer.parseInt(sdf.format(startDate));
+                                int endHour = Integer.parseInt(sdf.format(endDate));
                                 float durationOfThisRide = endHour - startHour + 1;
                                 Log.d(TAG, region + " buckets before: " + Arrays.toString(regionProfiles[region]));
                                 for (int i = startHour; i <= endHour; i++) {
@@ -304,24 +306,24 @@ public class UploadService extends Service {
                                     regionProfiles[region][i + 6] = thisTimeBucket + (1 / durationOfThisRide);
                                     // regionTimeBuckets[region][i] = (Float)regionProfiles[region][i];
                                 }
-                                totalNumberOfScary += Integer.valueOf(metaDataLine[7]);
+                                totalNumberOfScary += Integer.parseInt(metaDataLine[7]);
 
                                 overWriteFile(accEventsContentToOverwrite, accEventName, context);
                                 Integer thisNumberOfRides = (Integer) regionProfiles[region][0];//numberOfRides
                                 regionProfiles[region][0] = ++thisNumberOfRides;
                                 Long thisDuration = (Long) regionProfiles[region][1];//Duration
-                                regionProfiles[region][1] = thisDuration + (Long.valueOf(metaDataLine[2]) - Long.valueOf(metaDataLine[1]));
+                                regionProfiles[region][1] = thisDuration + (Long.parseLong(metaDataLine[2]) - Long.parseLong(metaDataLine[1]));
                                 Integer thisNumberOfIncidents = (Integer) regionProfiles[region][2];//NumberOfIncidents
-                                regionProfiles[region][2] = thisNumberOfIncidents + Integer.valueOf(metaDataLine[4]);
+                                regionProfiles[region][2] = thisNumberOfIncidents + Integer.parseInt(metaDataLine[4]);
                                 Long thisWaitedTime = (Long) regionProfiles[region][3];//WaitedTime
-                                regionProfiles[region][3] = thisWaitedTime + Long.valueOf(metaDataLine[5]);
+                                regionProfiles[region][3] = thisWaitedTime + Long.parseLong(metaDataLine[5]);
                                 Long thisDistance = (Long) regionProfiles[region][4];//Distance
-                                regionProfiles[region][4] = thisDistance + Long.valueOf(metaDataLine[6]);
+                                regionProfiles[region][4] = thisDistance + Long.parseLong(metaDataLine[6]);
                                 Long thisCo2 = (Long) regionProfiles[region][5];//Co2
-                                regionProfiles[region][5] = thisCo2 + (long) ((Long.valueOf(metaDataLine[6]) / (float) 1000) * 138);
+                                regionProfiles[region][5] = thisCo2 + (long) ((Long.parseLong(metaDataLine[6]) / (float) 1000) * 138);
 
                                 Integer thisNumberOfScary = (Integer) regionProfiles[region][30];//NumberOfScary
-                                regionProfiles[region][30] = thisNumberOfScary + Integer.valueOf(metaDataLine[7]);
+                                regionProfiles[region][30] = thisNumberOfScary + Integer.parseInt(metaDataLine[7]);
                                 regionProfileUpdated[region] = true;
                                 Log.d(TAG, region + " buckets after: " + Arrays.toString(regionProfiles[region]));
 
@@ -387,7 +389,7 @@ public class UploadService extends Service {
                 // update region profiles
                 for (int p = 0; p < regionProfiles.length; p++) {
                     if (regionProfileUpdated[p]) {
-                        updateProfile(false, context, -1, -1, p, -1, Integer.valueOf(String.valueOf(regionProfiles[p][0])), (long) regionProfiles[p][1], Integer.valueOf(String.valueOf(regionProfiles[p][2])), (long) regionProfiles[p][3], (long) regionProfiles[p][4], (long) regionProfiles[p][5], Arrays.copyOfRange(regionProfiles[p], 6, 30), -2, Integer.valueOf(String.valueOf(regionProfiles[p][30])));
+                        updateProfile(false, context, -1, -1, p, -1, Integer.parseInt(String.valueOf(regionProfiles[p][0])), (long) regionProfiles[p][1], Integer.parseInt(String.valueOf(regionProfiles[p][2])), (long) regionProfiles[p][3], (long) regionProfiles[p][4], (long) regionProfiles[p][5], Arrays.copyOfRange(regionProfiles[p], 6, 30), -2, Integer.parseInt(String.valueOf(regionProfiles[p][30])));
                         int profileVersion = lookUpIntSharedPrefs("Version", 1, "Profile_" + p, context);
                         StringBuilder profileContentToSend = new StringBuilder().append(appVersion).append("#").append(profileVersion).append(System.lineSeparator());
                         profileContentToSend.append(Constants.PROFILE_HEADER);
@@ -464,7 +466,7 @@ public class UploadService extends Service {
             urlConnection.setReadTimeout(10000);
             urlConnection.setConnectTimeout(15000);
             urlConnection.setRequestProperty("Content-Type", "text/plain");
-            byte[] outputInBytes = contentToSend.getBytes("UTF-8");
+            byte[] outputInBytes = contentToSend.getBytes(StandardCharsets.UTF_8);
             OutputStream os = urlConnection.getOutputStream();
             os.write(outputInBytes);
             os.close();
@@ -484,7 +486,7 @@ public class UploadService extends Service {
             Log.d(TAG, "Server Response: " + response);
             UploadService.this.decreaseNumberOfTasks();
 
-            return new Pair<Integer, String>(status, response);
+            return new Pair<>(status, response);
         }
 
         // fileType = profile | ride
@@ -507,7 +509,7 @@ public class UploadService extends Service {
             urlConnection.setConnectTimeout(15000);
             urlConnection.setRequestProperty("Content-Type", "text/plain");
             Log.d(TAG, "contentToSend.length(): " + contentToSend.length());
-            byte[] outputInBytes = contentToSend.getBytes("UTF-8");
+            byte[] outputInBytes = contentToSend.getBytes(StandardCharsets.UTF_8);
             OutputStream os = urlConnection.getOutputStream();
             os.write(outputInBytes);
             os.close();
@@ -520,7 +522,7 @@ public class UploadService extends Service {
             Log.d(TAG, "Server Response: " + response);
             UploadService.this.decreaseNumberOfTasks();
 
-            return new Pair<Integer, String>(status, response);
+            return new Pair<>(status, response);
         }
 
         /*

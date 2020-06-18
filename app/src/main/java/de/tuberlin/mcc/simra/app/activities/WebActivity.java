@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.subactivites;
+package de.tuberlin.mcc.simra.app.activities;
 
 import android.os.Bundle;
 import android.webkit.WebView;

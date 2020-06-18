@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:baselineAligned="false"
     android:orientation="horizontal"
-    tools:context=".main.HistoryActivity">
+    tools:context=".activities.HistoryActivity">
 
 
     <LinearLayout
@@ -26,6 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_today_black_24dp" />
+
             <TextView
                 android:id="@+id/row_icons_ride_date"
                 android:layout_width="0dp"
@@ -80,6 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_access_time_black_24dp" />
+
             <TextView
                 android:id="@+id/row_ride_time"
                 android:layout_width="0dp"
@@ -89,6 +91,7 @@
                 android:text="11:40h"
                 android:textAlignment="viewStart"
                 android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+
             <ImageView
                 android:id="@+id/distanceIcon"
                 android:layout_width="24dp"

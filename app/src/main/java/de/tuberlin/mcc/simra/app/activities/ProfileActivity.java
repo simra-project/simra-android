@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.subactivites;
+package de.tuberlin.mcc.simra.app.activities;
 
 
 import android.content.Context;
@@ -6,9 +6,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -61,13 +59,7 @@ public class ProfileActivity extends AppCompatActivity {
         toolbarTxt.setText(R.string.title_activity_profile);
 
         backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           finish();
-                                       }
-                                   }
-        );
+        backBtn.setOnClickListener(v -> finish());
 
         simRa_regions_config = getRegions(this);
 
@@ -76,11 +68,11 @@ public class ProfileActivity extends AppCompatActivity {
         genderSpinner = findViewById(R.id.genderSpinner);
         regionSpinner = findViewById(R.id.regionSpinner);
         experienceSpinner = findViewById(R.id.experienceSpinner);
-        behaviourSeekBar = (SeekBar) findViewById(R.id.behaviourSeekBar);
+        behaviourSeekBar = findViewById(R.id.behaviourSeekBar);
         activateBehaviourToggleButton = findViewById(R.id.activateBehaviourSeekBar);
 
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
-        List<String> regionContentArray = new ArrayList<String>();
+        List<String> regionContentArray = new ArrayList<>();
         boolean languageIsEnglish = locale.equals(new Locale("en").getLanguage());
         for (String s : simRa_regions_config) {
             if (!(s.startsWith("!") || s.startsWith("Please Choose"))) {
@@ -91,7 +83,7 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             }
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, regionContentArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Collections.sort(regionContentArray);
@@ -122,13 +114,7 @@ public class ProfileActivity extends AppCompatActivity {
             activateBehaviourToggleButton.setChecked(true);
         }
 
-        activateBehaviourToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                behaviourSeekBar.setEnabled(isChecked);
-            }
-        });
-
+        activateBehaviourToggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> behaviourSeekBar.setEnabled(isChecked));
     }
 
     @Override
@@ -205,7 +191,8 @@ public class ProfileActivity extends AppCompatActivity {
     */
     // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)
     private SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener() {
-        SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+
+        return new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -222,7 +209,5 @@ public class ProfileActivity extends AppCompatActivity {
 
             }
         };
-
-        return onSeekBarChangeListener;
     }
 }
