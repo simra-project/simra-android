@@ -54,11 +54,29 @@ public class RadmesserService extends Service {
 
         }
     });
+
     private RadmesserDevice.RadmesserDeviceCallbacks radmesserCallbacks = new RadmesserDevice.RadmesserDeviceCallbacks() {
         @Override
         public void onConnectionStateChange() {
+            // if Device disconnected
+            if (connectedDevice.getConnectionState() == RadmesserDevice.ConnectionStatus.gattDisconnected) {
+                // and Pairing not completed
+                if (connectionStatus != ConnectionStatus.CONNECTED) {
+                    //diconnect from Radmesser
+                    disconnectDevice();
+                    setConnectionStatus(ConnectionStatus.CONNECTION_REFUSED);
+                    Log.i(TAG, "CONNECTION_REFUSED");
+                }
+            }
         }
     };
+
+    public void disconnectDevice() {
+        if (connectedDevice != null)
+            connectedDevice.disconnectDevice();
+        setConnectionStatus(ConnectionStatus.DISCONNECTED);
+        connectedDevice = null;
+    }
 
     private static void setPairedRadmesserID(String id, Context ctx) {
         ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().putString(sharedPrefsKeyRadmesserID, id).apply();
@@ -169,7 +187,8 @@ public class RadmesserService extends Service {
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CONNECTION,
                 val -> {
                     Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
-                    if (val.getStringValue(0).equals("1")) {
+                    String strVal = val.getStringValue(0);
+                    if (strVal!= null && strVal.equals("1")) {
                         setConnectionStatus(ConnectionStatus.CONNECTED);
                         setPairedRadmesserID(connectedDevice.getID(), this);
                     }
@@ -230,7 +249,8 @@ public class RadmesserService extends Service {
         DISCONNECTED,
         SEARCHING,
         PAIRING,
-        CONNECTED
+        CONNECTED,
+        CONNECTION_REFUSED
     }
 
     private static final class ServiceHandler extends Handler {
