@@ -228,7 +228,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mMapView.setFlingEnabled(true);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
-        TextView copyrightTxt = (TextView) findViewById(R.id.copyright_text);
+        TextView copyrightTxt = findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
         // Set compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
@@ -782,7 +782,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // get the regions from the asset
         String[] simRa_regions_config;
         View spinnerView = View.inflate(MainActivity.this, R.layout.spinner, null);
-        Spinner spinner = (Spinner) spinnerView.findViewById(R.id.spinner);
+        Spinner spinner = spinnerView.findViewById(R.id.spinner);
         simRa_regions_config = getRegions(MainActivity.this);
         int region = lookUpIntSharedPrefs("Region", 0, "Profile", MainActivity.this);
 

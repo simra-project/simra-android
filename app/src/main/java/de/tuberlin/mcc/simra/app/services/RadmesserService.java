@@ -141,7 +141,7 @@ public class RadmesserService extends Service {
         bleServices.addService(
                 RadmesserDevice.UUID_SERVICE_HEARTRATE,
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_HEARTRATE,
-                val -> sendMessage(RadmesserDevice.UUID_SERVICE_HEARTRATE, (Map) new HashMap<String, String>() {{
+                val -> sendMessage(RadmesserDevice.UUID_SERVICE_HEARTRATE, new HashMap<String, String>() {{
                     put("heartrate", val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1).toString());
                 }})
         );
@@ -156,7 +156,7 @@ public class RadmesserService extends Service {
         bleServices.addService(
                 RadmesserDevice.UUID_SERVICE_DISTANCE,
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_DISTANCE,
-                val -> sendMessage(RadmesserDevice.UUID_SERVICE_DISTANCE, (Map) new HashMap<String, String>() {{
+                val -> sendMessage(RadmesserDevice.UUID_SERVICE_DISTANCE, new HashMap<String, String>() {{
                     put("distance", val.getStringValue(0));
                 }})
         );

@@ -157,7 +157,7 @@ public class StatisticsActivity extends AppCompatActivity {
         averageDurationOfWaitedTime.setText(getText(R.string.avgIdle) + " " + avgWaitDurationMinutes + " min");
         averageDurationOfWaitedTime.invalidate();
 
-        chart = (BarChart) findViewById(R.id.timeBucketBarChart);
+        chart = findViewById(R.id.timeBucketBarChart);
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setLabelsToSkip(0);

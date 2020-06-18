@@ -196,7 +196,7 @@ public class ShowRouteActivity extends BaseActivity {
         mMapView.setFlingEnabled(true);
         MapController mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
-        TextView copyrightTxt = (TextView) findViewById(R.id.copyright_text);
+        TextView copyrightTxt = findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
 
@@ -824,7 +824,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
 
         // doneButton click listener.
-        MaterialButton doneButton = (MaterialButton) settingsView.findViewById(R.id.done_button);
+        MaterialButton doneButton = settingsView.findViewById(R.id.done_button);
 
         doneButton.setOnClickListener(view -> {
             try {
@@ -868,7 +868,7 @@ public class ShowRouteActivity extends BaseActivity {
     public boolean firePrivacySliderWarningDialog(int left, int right) {
 
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
-        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+        CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> writeBooleanToSharedPrefs("ShowRoute-Warning", !checkBox.isChecked(), "simraPrefs", ShowRouteActivity.this));
         checkBox.setText(getString(R.string.doNotShowAgain));
         AlertDialog.Builder alert = new AlertDialog.Builder(ShowRouteActivity.this);

@@ -120,12 +120,12 @@ public class SettingsActivity extends BaseActivity {
             }
         });
         // Set seekBars
-        SeekBar durationSeekBar = (SeekBar) findViewById(R.id.privacyDurationSeekBar);
-        SeekBar distanceSeekBar = (SeekBar) findViewById(R.id.privacyDistanceSeekBar);
+        SeekBar durationSeekBar = findViewById(R.id.privacyDurationSeekBar);
+        SeekBar distanceSeekBar = findViewById(R.id.privacyDistanceSeekBar);
 
         // Set textViews
-        TextView durationTextView = (TextView) findViewById(R.id.privacyDurationSeekBarProgress);
-        TextView distanceTextView = (TextView) findViewById(R.id.privacyDistanceSeekBarProgress);
+        TextView durationTextView = findViewById(R.id.privacyDurationSeekBarProgress);
+        TextView distanceTextView = findViewById(R.id.privacyDistanceSeekBarProgress);
 
         // Load the privacy option values
         privacyDuration = lookUpLongSharedPrefs("Privacy-Duration", 30, "simraPrefs", this);

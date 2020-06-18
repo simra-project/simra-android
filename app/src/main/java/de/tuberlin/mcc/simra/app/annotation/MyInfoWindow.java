@@ -49,11 +49,11 @@ public class MyInfoWindow extends InfoWindow {
     }
 
     public void onOpen(Object arg0) {
-        LinearLayout layout = (LinearLayout) mView.findViewById(R.id.bubble_layout);
-        Button btnMoreInfo = (Button) mView.findViewById(R.id.bubble_moreinfo);
-        TextView txtTitle = (TextView) mView.findViewById(R.id.bubble_title);
-        TextView txtDescription = (TextView) mView.findViewById(R.id.bubble_description);
-        TextView txtSubdescription = (TextView) mView.findViewById(R.id.bubble_subdescription);
+        LinearLayout layout = mView.findViewById(R.id.bubble_layout);
+        Button btnMoreInfo = mView.findViewById(R.id.bubble_moreinfo);
+        TextView txtTitle = mView.findViewById(R.id.bubble_title);
+        TextView txtDescription = mView.findViewById(R.id.bubble_description);
+        TextView txtSubdescription = mView.findViewById(R.id.bubble_subdescription);
 
         txtTitle.setText(motherActivity.getString(R.string.incidentDetected));
         long millis = this.mAccEvent.getTimeStamp();

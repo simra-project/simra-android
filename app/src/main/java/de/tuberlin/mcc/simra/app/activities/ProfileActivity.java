@@ -70,7 +70,7 @@ public class ProfileActivity extends AppCompatActivity {
         genderSpinner = findViewById(R.id.genderSpinner);
         regionSpinner = findViewById(R.id.regionSpinner);
         experienceSpinner = findViewById(R.id.experienceSpinner);
-        behaviourSeekBar = (SeekBar) findViewById(R.id.behaviourSeekBar);
+        behaviourSeekBar = findViewById(R.id.behaviourSeekBar);
         activateBehaviourToggleButton = findViewById(R.id.activateBehaviourSeekBar);
 
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();

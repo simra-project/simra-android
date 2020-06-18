@@ -133,7 +133,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             // since the user pressed Start Recording AND there is enough distance (privacyDistance)
             // between the starting location and the current location.
             if (!recordingAllowed && startLocation != null && lastLocation != null) {
-                if ((startLocation.distanceTo(lastLocation) >= (float) privacyDistance)
+                if ((startLocation.distanceTo(lastLocation) >= privacyDistance)
                         && ((curTime - startTime) > privacyDuration)) {
                     recordingAllowed = true;
                 }

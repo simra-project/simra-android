@@ -456,17 +456,17 @@ public class HistoryActivity extends BaseActivity {
                 LayoutInflater inflater = ((Activity) context).getLayoutInflater();
                 row = inflater.inflate(layoutResourceId, parent, false);
                 holder = new Holder();
-                holder.rideDate = (TextView) row.findViewById(R.id.row_icons_ride_date);
-                holder.rideTime = (TextView) row.findViewById(R.id.row_ride_time);
+                holder.rideDate = row.findViewById(R.id.row_icons_ride_date);
+                holder.rideTime = row.findViewById(R.id.row_ride_time);
                 /*if (dateFormat == 1) {
                     holder.rideDate.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 13));
                     row.findViewById(R.id.duration_relativeLayout).setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 10));
                 }*/
-                holder.duration = (TextView) row.findViewById(R.id.row_duration);
-                holder.distance = (TextView) row.findViewById(R.id.row_distance);
-                holder.distanceUnit = (TextView) row.findViewById(R.id.row_distanceKM);
-                holder.status = (ImageButton) row.findViewById(R.id.statusBtn);
-                holder.btnDelete = (ImageButton) row.findViewById(R.id.deleteBtn);
+                holder.duration = row.findViewById(R.id.row_duration);
+                holder.distance = row.findViewById(R.id.row_distance);
+                holder.distanceUnit = row.findViewById(R.id.row_distanceKM);
+                holder.status = row.findViewById(R.id.statusBtn);
+                holder.btnDelete = row.findViewById(R.id.deleteBtn);
                 row.setTag(holder);
             } else {
                 holder = (Holder) row.getTag();

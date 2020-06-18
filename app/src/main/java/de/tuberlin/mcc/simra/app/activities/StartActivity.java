@@ -199,7 +199,7 @@ public class StartActivity extends BaseActivity {
     public void fireSendErrorDialog() {
 
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
-        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+        CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
         final boolean[] rememberChoice = {false};
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> rememberChoice[0] = isChecked);
         checkBox.setText(getString(R.string.rememberMyChoice));
@@ -226,7 +226,7 @@ public class StartActivity extends BaseActivity {
 
     public void firePrivacyDialog() {
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
-        CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+        CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
 
         checkBox.setText(getString(R.string.iAccept));
         AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
@@ -246,8 +246,8 @@ public class StartActivity extends BaseActivity {
         ((TextView) dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 
         // Initially disable the button
-        ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-        checkBox.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener) (buttonView, isChecked) -> ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
     }
 
 }
