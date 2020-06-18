@@ -151,36 +151,28 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             doneButton = findViewById(R.id.save_button);
             backButton = findViewById(R.id.back_button);
 
-            doneButton.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        doneButton.setElevation(0.0f);
-                        doneButton.setBackground(getDrawable(R.drawable.button_pressed));
-                    }
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        doneButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
-                        doneButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                    }
-                    return false;
+            doneButton.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    doneButton.setElevation(0.0f);
+                    doneButton.setBackground(getDrawable(R.drawable.button_pressed));
                 }
-
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    doneButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                    doneButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
             });
 
-            backButton.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        backButton.setElevation(0.0f);
-                        backButton.setBackground(getDrawable(R.drawable.button_pressed));
-                    }
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        backButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
-                        backButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                    }
-                    return false;
+            backButton.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    backButton.setElevation(0.0f);
+                    backButton.setBackground(getDrawable(R.drawable.button_pressed));
                 }
-
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    backButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                    backButton.setBackground(getDrawable(R.drawable.button_unpressed));
+                }
+                return false;
             });
 
             if (getIntent().getExtras() != null) {
@@ -264,31 +256,22 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             }
         } else {
             exitButton = findViewById(R.id.exitButton);
-            exitButton.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        exitButton.setElevation(0.0f);
-                        exitButton.setBackground(getDrawable(R.drawable.button_pressed));
-                    }
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        exitButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
-                        exitButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                    }
-                    return false;
+            exitButton.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    exitButton.setElevation(0.0f);
+                    exitButton.setBackground(getDrawable(R.drawable.button_pressed));
                 }
-
-            });
-            exitButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    incidentSaved = false;
-                    finish();
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    exitButton.setElevation(2 * IncidentPopUpActivity.this.getResources().getDisplayMetrics().density);
+                    exitButton.setBackground(getDrawable(R.drawable.button_unpressed));
                 }
+                return false;
             });
-
+            exitButton.setOnClickListener(v -> {
+                incidentSaved = false;
+                finish();
+            });
         }
-
     }
 
     @Override

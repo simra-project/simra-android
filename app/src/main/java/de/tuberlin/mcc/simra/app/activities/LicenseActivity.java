@@ -41,13 +41,7 @@ public class LicenseActivity extends AppCompatActivity {
         toolbarTxt.setTextSize(15.0f);
 
         backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           finish();
-                                       }
-                                   }
-        );
+        backBtn.setOnClickListener(v -> finish());
 
         Button androidSupportLibraryButton = findViewById(R.id.android_support_library);
         createDialogWhenButtonIsPressed(androidSupportLibraryButton, "licenseandroidsupportlibrary.txt", "Android Support Library");
@@ -105,41 +99,33 @@ public class LicenseActivity extends AppCompatActivity {
         window.setGravity(Gravity.CENTER);
 
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = "";
-                try {
-                    AssetManager am = getApplicationContext().getAssets();
-                    InputStream is = am.open(licenceFileName);
-                    InputStreamReader inputStreamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
-                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                    String receiveString = "";
-                    StringBuilder stringBuilder = new StringBuilder();
+        button.setOnClickListener(v -> {
+            String message = "";
+            try {
+                AssetManager am = getApplicationContext().getAssets();
+                InputStream is = am.open(licenceFileName);
+                InputStreamReader inputStreamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
 
-                    while ((receiveString = bufferedReader.readLine()) != null) {
+                while ((receiveString = bufferedReader.readLine()) != null) {
 
-                        stringBuilder.append(receiveString.trim() + System.lineSeparator());
+                    stringBuilder.append(receiveString.trim() + System.lineSeparator());
 
-                    }
-                    is.close();
-                    message = stringBuilder.toString();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-                TextView textView = showLicenseDialog.findViewById(R.id.tv);
-                textView.setText(message);
-                TextView titleView = showLicenseDialog.findViewById(R.id.licenseTitle);
-                titleView.setText(title);
-                Button closeButton = showLicenseDialog.findViewById(R.id.closeButton);
-                closeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showLicenseDialog.dismiss();
-                    }
-                });
-                showLicenseDialog.show();
+                is.close();
+                message = stringBuilder.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            TextView textView = showLicenseDialog.findViewById(R.id.tv);
+            textView.setText(message);
+            TextView titleView = showLicenseDialog.findViewById(R.id.licenseTitle);
+            titleView.setText(title);
+            Button closeButton = showLicenseDialog.findViewById(R.id.closeButton);
+            closeButton.setOnClickListener(v1 -> showLicenseDialog.dismiss());
+            showLicenseDialog.show();
         });
     }
 }

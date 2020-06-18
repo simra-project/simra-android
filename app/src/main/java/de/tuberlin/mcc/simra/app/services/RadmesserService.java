@@ -54,10 +54,7 @@ public class RadmesserService extends Service {
 
         }
     });
-    private RadmesserDevice.RadmesserDeviceCallbacks radmesserCallbacks = new RadmesserDevice.RadmesserDeviceCallbacks() {
-        @Override
-        public void onConnectionStateChange() {
-        }
+    private RadmesserDevice.RadmesserDeviceCallbacks radmesserCallbacks = () -> {
     };
 
     private static void setPairedRadmesserID(String id, Context ctx) {

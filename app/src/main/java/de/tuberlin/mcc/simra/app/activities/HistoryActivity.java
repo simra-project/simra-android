@@ -126,13 +126,7 @@ public class HistoryActivity extends BaseActivity {
         toolbarTxt.setText(R.string.title_activity_history);
 
         backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           finish();
-                                       }
-                                   }
-        );
+        backBtn.setOnClickListener(v -> finish());
 
         unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", HistoryActivity.this);
         dateFormat = lookUpIntSharedPrefs("Settings-DateFormat", 0, "simraPrefs", HistoryActivity.this);
@@ -164,63 +158,47 @@ public class HistoryActivity extends BaseActivity {
         });
 
         RelativeLayout justUploadButton = findViewById(R.id.justUpload);
-        justUploadButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    justUploadButton.setElevation(0.0f);
-                    justUploadButton.setBackground(getDrawable(R.drawable.button_pressed));
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    justUploadButton.setElevation(2 * HistoryActivity.this.getResources().getDisplayMetrics().density);
-                    justUploadButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                }
-                return false;
+        justUploadButton.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                justUploadButton.setElevation(0.0f);
+                justUploadButton.setBackground(getDrawable(R.drawable.button_pressed));
             }
-
-
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                justUploadButton.setElevation(2 * HistoryActivity.this.getResources().getDisplayMetrics().density);
+                justUploadButton.setBackground(getDrawable(R.drawable.button_unpressed));
+            }
+            return false;
         });
-        justUploadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", HistoryActivity.this)) {
-                    fireUploadPrompt();
-                } else {
-                    Intent intent = new Intent(HistoryActivity.this, UploadService.class);
-                    startService(intent);
-                    Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
-                }
+        justUploadButton.setOnClickListener(view -> {
+            if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", HistoryActivity.this)) {
+                fireUploadPrompt();
+            } else {
+                Intent intent = new Intent(HistoryActivity.this, UploadService.class);
+                startService(intent);
+                Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
             }
         });
 
 
         RelativeLayout uploadAndExitButton = findViewById(R.id.uploadAndExit);
-        uploadAndExitButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    uploadAndExitButton.setElevation(0.0f);
-                    uploadAndExitButton.setBackground(getDrawable(R.drawable.button_pressed));
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    uploadAndExitButton.setElevation(2 * HistoryActivity.this.getResources().getDisplayMetrics().density);
-                    uploadAndExitButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                }
-                return false;
+        uploadAndExitButton.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                uploadAndExitButton.setElevation(0.0f);
+                uploadAndExitButton.setBackground(getDrawable(R.drawable.button_pressed));
             }
-
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                uploadAndExitButton.setElevation(2 * HistoryActivity.this.getResources().getDisplayMetrics().density);
+                uploadAndExitButton.setBackground(getDrawable(R.drawable.button_unpressed));
+            }
+            return false;
         });
-        uploadAndExitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                exitWhenDone = true;
-                if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", HistoryActivity.this)) {
-                    fireUploadPrompt();
-                } else {
-                    justUploadButton.performClick();
-                    HistoryActivity.this.moveTaskToBack(true);
-                }
-
+        uploadAndExitButton.setOnClickListener(view -> {
+            exitWhenDone = true;
+            if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", HistoryActivity.this)) {
+                fireUploadPrompt();
+            } else {
+                justUploadButton.performClick();
+                HistoryActivity.this.moveTaskToBack(true);
             }
         });
 
@@ -378,44 +356,39 @@ public class HistoryActivity extends BaseActivity {
         AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.delete_file_warning));
-        alert.setPositiveButton(R.string.delete_ride_approve, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                File[] dirFiles = getFilesDir().listFiles();
-                Log.d(TAG, "btnDelete.onClick() dirFiles: " + Arrays.deepToString(dirFiles));
-                String clicked = (String) listView.getItemAtPosition(position);
-                Log.d(TAG, "btnDelete.onClick() clicked: " + clicked);
-                clicked = clicked.replace("#", "").split(";")[0];
-                if (dirFiles.length != 0) {
-                    for (int i = 0; i < dirFiles.length; i++) {
-                        File actualFile = dirFiles[i];
-                        if (actualFile.getName().startsWith(clicked + "_") || actualFile.getName().startsWith("accEvents" + clicked)) {
+        alert.setPositiveButton(R.string.delete_ride_approve, (dialog, id) -> {
+            File[] dirFiles = getFilesDir().listFiles();
+            Log.d(TAG, "btnDelete.onClick() dirFiles: " + Arrays.deepToString(dirFiles));
+            String clicked = (String) listView.getItemAtPosition(position);
+            Log.d(TAG, "btnDelete.onClick() clicked: " + clicked);
+            clicked = clicked.replace("#", "").split(";")[0];
+            if (dirFiles.length != 0) {
+                for (int i = 0; i < dirFiles.length; i++) {
+                    File actualFile = dirFiles[i];
+                    if (actualFile.getName().startsWith(clicked + "_") || actualFile.getName().startsWith("accEvents" + clicked)) {
 
-                            /* don't delete the following line! */
-                            Log.i(TAG, actualFile.getName() + " deleted: " + actualFile.delete());
-                        }
+                        /* don't delete the following line! */
+                        Log.i(TAG, actualFile.getName() + " deleted: " + actualFile.delete());
                     }
                 }
-                String content = "";
-                try (BufferedReader br = new BufferedReader(new FileReader(HistoryActivity.this.getFileStreamPath("metaData.csv")))) {
-                    String line;
-
-                    while ((line = br.readLine()) != null) {
-                        if (!line.split(",")[0].equals(clicked)) {
-                            content += line += System.lineSeparator();
-                        }
-                    }
-                    overWriteFile(content, "metaData.csv", HistoryActivity.this);
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
-                Toast.makeText(HistoryActivity.this, R.string.ride_deleted, Toast.LENGTH_SHORT).show();
-                refreshMyRides();
             }
+            String content = "";
+            try (BufferedReader br = new BufferedReader(new FileReader(HistoryActivity.this.getFileStreamPath("metaData.csv")))) {
+                String line;
+
+                while ((line = br.readLine()) != null) {
+                    if (!line.split(",")[0].equals(clicked)) {
+                        content += line += System.lineSeparator();
+                    }
+                }
+                overWriteFile(content, "metaData.csv", HistoryActivity.this);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+            Toast.makeText(HistoryActivity.this, R.string.ride_deleted, Toast.LENGTH_SHORT).show();
+            refreshMyRides();
         });
-        alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-
-            }
+        alert.setNegativeButton(R.string.cancel, (dialog, id) -> {
         });
         alert.show();
 
@@ -425,24 +398,18 @@ public class HistoryActivity extends BaseActivity {
         AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.upload_file_warning));
-        alert.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                writeBooleanToSharedPrefs("uploadWarningShown", true, "simraPrefs", HistoryActivity.this);
-                Intent intent = new Intent(HistoryActivity.this, UploadService.class);
-                startService(intent);
-                Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
-                if (exitWhenDone) {
-                    HistoryActivity.this.moveTaskToBack(true);
-                }
+        alert.setPositiveButton(R.string.upload, (dialog, id) -> {
+            writeBooleanToSharedPrefs("uploadWarningShown", true, "simraPrefs", HistoryActivity.this);
+            Intent intent = new Intent(HistoryActivity.this, UploadService.class);
+            startService(intent);
+            Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
+            if (exitWhenDone) {
+                HistoryActivity.this.moveTaskToBack(true);
             }
         });
-        alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-
-            }
+        alert.setNegativeButton(R.string.cancel, (dialog, id) -> {
         });
         alert.show();
-
     }
 
     public class MyBroadcastReceiver extends BroadcastReceiver {
@@ -530,47 +497,40 @@ public class HistoryActivity extends BaseActivity {
             } else {
                 holder.btnDelete.setVisibility(View.INVISIBLE);
             }
-            row.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // gets the files in the directory
-                    // lists all the files into an array
-                    File[] dirFiles = getFilesDir().listFiles();
-                    String clicked = (String) listView.getItemAtPosition(position);
-                    Log.d(TAG, "dirFiles.length: " + dirFiles.length + " clicked: " + clicked + " position: " + position);
-                    clicked = clicked.replace("#", "").split(";")[0];
-                    if (dirFiles.length != 0) {
-                        // loops through the array of files, outputting the name to console
-                        for (int i = 0; i < dirFiles.length; i++) {
+            row.setOnClickListener(v -> {
+                // gets the files in the directory
+                // lists all the files into an array
+                File[] dirFiles = getFilesDir().listFiles();
+                String clicked = (String) listView.getItemAtPosition(position);
+                Log.d(TAG, "dirFiles.length: " + dirFiles.length + " clicked: " + clicked + " position: " + position);
+                clicked = clicked.replace("#", "").split(";")[0];
+                if (dirFiles.length != 0) {
+                    // loops through the array of files, outputting the name to console
+                    for (int i = 0; i < dirFiles.length; i++) {
 
-                            String fileOutput = dirFiles[i].getName();
-                            Log.d(TAG, "fileOutput: " + fileOutput + " clicked: " + clicked + "_");
-                            if (fileOutput.startsWith(clicked + "_")) {
-                                // Start ShowRouteActivity with the selected Ride.
-                                Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
-                                intent.putExtra("PathToAccGpsFile", dirFiles[i].getName());
-                                intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
-                                intent.putExtra("StartTime", metaDataLines.get(metaDataLines.size() - position - 1)[1]);
-                                intent.putExtra("State", Integer.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[3]));
-                                Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getName());
-                                Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
-                                Log.d(TAG, "StartTime: " + metaDataLines.get(metaDataLines.size() - position - 1)[1]);
-                                Log.d(TAG, "State: " + metaDataLines.get(metaDataLines.size() - position - 1)[3]);
+                        String fileOutput = dirFiles[i].getName();
+                        Log.d(TAG, "fileOutput: " + fileOutput + " clicked: " + clicked + "_");
+                        if (fileOutput.startsWith(clicked + "_")) {
+                            // Start ShowRouteActivity with the selected Ride.
+                            Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
+                            intent.putExtra("PathToAccGpsFile", dirFiles[i].getName());
+                            intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
+                            intent.putExtra("StartTime", metaDataLines.get(metaDataLines.size() - position - 1)[1]);
+                            intent.putExtra("State", Integer.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[3]));
+                            Log.d(TAG, "pathToAccGpsFile: " + dirFiles[i].getName());
+                            Log.d(TAG, "Duration: " + String.valueOf(Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
+                            Log.d(TAG, "StartTime: " + metaDataLines.get(metaDataLines.size() - position - 1)[1]);
+                            Log.d(TAG, "State: " + metaDataLines.get(metaDataLines.size() - position - 1)[3]);
 
-                                startActivity(intent);
-                            }
+                            startActivity(intent);
                         }
                     }
                 }
             });
 
-            holder.btnDelete.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "Delete Button Clicked");
-                    fireDeletePrompt(position, MyArrayAdapter.this);
-                }
+            holder.btnDelete.setOnClickListener(v -> {
+                Log.d(TAG, "Delete Button Clicked");
+                fireDeletePrompt(position, MyArrayAdapter.this);
             });
             return row;
         }

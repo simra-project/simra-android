@@ -90,13 +90,7 @@ public class SettingsActivity extends BaseActivity {
         toolbarTxt.setText(R.string.title_activity_settings);
 
         backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           finish();
-                                       }
-                                   }
-        );
+        backBtn.setOnClickListener(v -> finish());
 
         // load unit and date format
         unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", this);
@@ -111,24 +105,18 @@ public class SettingsActivity extends BaseActivity {
         if (dateFormat == 1) {
             dateFormatSwitch.setChecked(true);
         }
-        unitSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    unit = "ft";
-                } else {
-                    unit = "m";
-                }
+        unitSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                unit = "ft";
+            } else {
+                unit = "m";
             }
         });
-        dateFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    dateFormat = 1;
-                } else {
-                    dateFormat = 0;
-                }
+        dateFormatSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                dateFormat = 1;
+            } else {
+                dateFormat = 0;
             }
         });
         // Set seekBars
@@ -185,28 +173,22 @@ public class SettingsActivity extends BaseActivity {
         if (child == 1) {
             childCheckBox.setChecked(true);
         }
-        childCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    child = 1;
-                } else {
-                    child = 0;
-                }
+        childCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                child = 1;
+            } else {
+                child = 0;
             }
         });
 
         if (trailer == 1) {
             trailerCheckBox.setChecked(true);
         }
-        trailerCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    trailer = 1;
-                } else {
-                    trailer = 0;
-                }
+        trailerCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                trailer = 1;
+            } else {
+                trailer = 0;
             }
         });
 

@@ -109,17 +109,14 @@ public class StartActivity extends BaseActivity {
         } else {
             // start MainActivity when Button is clicked
             next = findViewById(R.id.nextBtn);
-            next.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(StartActivity.this, MainActivity.class);
-                    // remove the Callback of the Runnable to the Handler to prevent second start of
-                    // MainActivity
-                    startActivity(intent);
-                    // finish() to prevent going back to StartActivity, when the Back Button is pressed
-                    // in MainActivity
-                    finish();
-                }
+            next.setOnClickListener(v -> {
+                Intent intent = new Intent(StartActivity.this, MainActivity.class);
+                // remove the Callback of the Runnable to the Handler to prevent second start of
+                // MainActivity
+                startActivity(intent);
+                // finish() to prevent going back to StartActivity, when the Back Button is pressed
+                // in MainActivity
+                finish();
             });
         }
     }
@@ -204,33 +201,23 @@ public class StartActivity extends BaseActivity {
         View checkBoxView = View.inflate(this, R.layout.checkbox, null);
         CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
         final boolean[] rememberChoice = {false};
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                rememberChoice[0] = isChecked;
-            }
-        });
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> rememberChoice[0] = isChecked);
         checkBox.setText(getString(R.string.rememberMyChoice));
         AlertDialog.Builder alert = new AlertDialog.Builder(StartActivity.this);
         alert.setTitle(getString(R.string.sendErrorTitle));
         alert.setMessage(getString(R.string.sendErrorMessage));
         alert.setView(checkBoxView);
-        alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                if (rememberChoice[0]) {
-                    writeToSharedPrefs("SEND-CRASH", "ALWAYS-SEND", "simraPrefs", StartActivity.this);
-                }
-                Intent intent = new Intent(StartActivity.this, UploadService.class);
-                intent.putExtra("CRASH_REPORT", true);
-                startService(intent);
+        alert.setPositiveButton(R.string.yes, (dialog, id) -> {
+            if (rememberChoice[0]) {
+                writeToSharedPrefs("SEND-CRASH", "ALWAYS-SEND", "simraPrefs", StartActivity.this);
             }
+            Intent intent = new Intent(StartActivity.this, UploadService.class);
+            intent.putExtra("CRASH_REPORT", true);
+            startService(intent);
         });
-        alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                if (rememberChoice[0]) {
-                    writeToSharedPrefs("SEND-CRASH", "NEVER-SEND", "simraPrefs", StartActivity.this);
-                }
+        alert.setNegativeButton(R.string.no, (dialog, id) -> {
+            if (rememberChoice[0]) {
+                writeToSharedPrefs("SEND-CRASH", "NEVER-SEND", "simraPrefs", StartActivity.this);
             }
         });
         alert.show();
@@ -248,17 +235,11 @@ public class StartActivity extends BaseActivity {
         builder.setTitle(getString(R.string.privacyAgreementTitle));
         builder.setMessage(getResources().getText(R.string.privacyAgreementMessage));
         builder.setView(checkBoxView);
-        builder.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                writeBooleanToSharedPrefs("Privacy-Policy-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this);
-            }
-        });
-        builder.setNegativeButton(R.string.close_simra, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                writeBooleanToSharedPrefs("firstTime", true, "simraPrefs", StartActivity.this);
-                finish();
-                Toast.makeText(StartActivity.this, getString(R.string.simra_closed), Toast.LENGTH_LONG).show();
-            }
+        builder.setPositiveButton(R.string.next, (dialog, id) -> writeBooleanToSharedPrefs("Privacy-Policy-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this));
+        builder.setNegativeButton(R.string.close_simra, (dialog, id) -> {
+            writeBooleanToSharedPrefs("firstTime", true, "simraPrefs", StartActivity.this);
+            finish();
+            Toast.makeText(StartActivity.this, getString(R.string.simra_closed), Toast.LENGTH_LONG).show();
         });
         final AlertDialog dialog = builder.create();
         dialog.show();
@@ -266,14 +247,7 @@ public class StartActivity extends BaseActivity {
 
         // Initially disable the button
         ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked);
-
-            }
-        });
+        checkBox.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener) (buttonView, isChecked) -> ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
     }
 
 }

@@ -61,13 +61,7 @@ public class ProfileActivity extends AppCompatActivity {
         toolbarTxt.setText(R.string.title_activity_profile);
 
         backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           finish();
-                                       }
-                                   }
-        );
+        backBtn.setOnClickListener(v -> finish());
 
         simRa_regions_config = getRegions(this);
 
@@ -122,13 +116,7 @@ public class ProfileActivity extends AppCompatActivity {
             activateBehaviourToggleButton.setChecked(true);
         }
 
-        activateBehaviourToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                behaviourSeekBar.setEnabled(isChecked);
-            }
-        });
-
+        activateBehaviourToggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> behaviourSeekBar.setEnabled(isChecked));
     }
 
     @Override

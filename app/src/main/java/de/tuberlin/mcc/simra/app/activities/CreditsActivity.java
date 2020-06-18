@@ -29,13 +29,7 @@ public class CreditsActivity extends AppCompatActivity {
         toolbarTxt.setText(R.string.title_activity_credits);
 
         backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           finish();
-                                       }
-                                   }
-        );
+        backBtn.setOnClickListener(v -> finish());
     }
 
 }

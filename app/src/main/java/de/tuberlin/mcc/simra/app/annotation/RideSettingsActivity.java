@@ -22,13 +22,6 @@ public class RideSettingsActivity extends AppCompatActivity {
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         Button button = findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                RideSettingsActivity.this.finish();
-            }
-        });
+        button.setOnClickListener(v -> RideSettingsActivity.this.finish());
     }
-
 }

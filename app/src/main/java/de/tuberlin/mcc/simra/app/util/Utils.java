@@ -358,13 +358,8 @@ public class Utils {
             // in an AlertDialog and request access to FINE_LOCATION
 
             // The OK-Button fires a requestPermissions
-            DialogInterface.OnClickListener rationaleOnClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(activity,
-                            requestedPermission, accessCode);
-                }
-            };
+            DialogInterface.OnClickListener rationaleOnClickListener = (dialog, which) -> ActivityCompat.requestPermissions(activity,
+                    requestedPermission, accessCode);
             showMessageOK(rationaleMessage, rationaleOnClickListener, activity);
         }
     }

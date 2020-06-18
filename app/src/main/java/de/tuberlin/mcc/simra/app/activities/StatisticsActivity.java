@@ -49,13 +49,7 @@ public class StatisticsActivity extends AppCompatActivity {
         toolbarTxt.setText(R.string.title_activity_statistics);
 
         backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           finish();
-                                       }
-                                   }
-        );
+        backBtn.setOnClickListener(v -> finish());
         String unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", this);
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
         // String[] profileValues = readContentFromFile("profile.csv", this).split(System.lineSeparator())[2].split(",");

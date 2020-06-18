@@ -304,85 +304,65 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (2): Helmet
         helmetButton = findViewById(R.id.helmet_icon);
-        helmetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-
+        helmetButton.setOnClickListener(v -> {
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (3): CenterMap
         centerMap = findViewById(R.id.center_button);
 
-        centerMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "centerMap clicked ");
-                mLocationOverlay.enableFollowLocation();
-                mMapController.setZoom(ZOOM_LEVEL);
-            }
+        centerMap.setOnClickListener(v -> {
+            Log.d(TAG, "centerMap clicked ");
+            mLocationOverlay.enableFollowLocation();
+            mMapController.setZoom(ZOOM_LEVEL);
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (4): NEUE ROUTE / START BUTTON
         startBtn = findViewById(R.id.start_button);
-        startBtn.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    startBtn.setElevation(0.0f);
-                    startBtn.setBackground(getDrawable(R.drawable.button_pressed));
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    startBtn.setElevation(2 * MainActivity.this.getResources().getDisplayMetrics().density);
-                    startBtn.setBackground(getDrawable(R.drawable.button_unpressed));
-                }
-                return false;
+        startBtn.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                startBtn.setElevation(0.0f);
+                startBtn.setBackground(getDrawable(R.drawable.button_pressed));
             }
-
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                startBtn.setElevation(2 * MainActivity.this.getResources().getDisplayMetrics().density);
+                startBtn.setBackground(getDrawable(R.drawable.button_unpressed));
+            }
+            return false;
         });
-        startBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // For permission request
-                int LOCATION_ACCESS_CODE = 1;
-                // Check whether FINE_LOCATION permission is not granted
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    String[] locationPermissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
-                    Utils.permissionRequest(MainActivity.this, locationPermissions, MainActivity.this.getString(R.string.locationPermissionRequestRationale), LOCATION_ACCESS_CODE);
+        startBtn.setOnClickListener(v -> {
+            // For permission request
+            int LOCATION_ACCESS_CODE = 1;
+            // Check whether FINE_LOCATION permission is not granted
+            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                String[] locationPermissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+                Utils.permissionRequest(MainActivity.this, locationPermissions, MainActivity.this.getString(R.string.locationPermissionRequestRationale), LOCATION_ACCESS_CODE);
+                Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
+            } else {
+                if (isLocationServiceOff(MainActivity.this)) {
+                    // notify user
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setMessage(R.string.locationServiceisOff)
+                            .setPositiveButton(android.R.string.ok, (paramDialogInterface, paramInt) -> MainActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
                     Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
+
                 } else {
-                    if (isLocationServiceOff(MainActivity.this)) {
-                        // notify user
-                        new AlertDialog.Builder(MainActivity.this)
-                                .setMessage(R.string.locationServiceisOff)
-                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                                        MainActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                                    }
-                                })
-                                .setNegativeButton(R.string.cancel, null)
-                                .show();
-                        Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
+                    // show stop button, hide start button
+                    showStop();
+                    stopBtn.setVisibility(View.VISIBLE);
+                    startBtn.setVisibility(View.INVISIBLE);
 
-                    } else {
-                        // show stop button, hide start button
-                        showStop();
-                        stopBtn.setVisibility(View.VISIBLE);
-                        startBtn.setVisibility(View.INVISIBLE);
+                    // start RecorderService for accelerometer data recording
+                    Intent intent = new Intent(MainActivity.this, RecorderService.class);
+                    startService(intent);
+                    bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
+                    recording = true;
+                    Toast.makeText(MainActivity.this, R.string.recording_started, Toast.LENGTH_LONG).show();
 
-                        // start RecorderService for accelerometer data recording
-                        Intent intent = new Intent(MainActivity.this, RecorderService.class);
-                        startService(intent);
-                        bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
-                        recording = true;
-                        Toast.makeText(MainActivity.this, R.string.recording_started, Toast.LENGTH_LONG).show();
-
-                    }
                 }
             }
         });
@@ -390,59 +370,47 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (5): AUFZEICHNUNG STOPPEN / STOP-BUTTON
         stopBtn = findViewById(R.id.stop_button);
-        stopBtn.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    stopBtn.setElevation(0.0f);
-                    stopBtn.setBackground(getDrawable(R.drawable.button_pressed));
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    stopBtn.setElevation(2 * MainActivity.this.getResources().getDisplayMetrics().density);
-                    stopBtn.setBackground(getDrawable(R.drawable.button_unpressed));
-                }
-                return false;
+        stopBtn.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                stopBtn.setElevation(0.0f);
+                stopBtn.setBackground(getDrawable(R.drawable.button_pressed));
             }
-
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                stopBtn.setElevation(2 * MainActivity.this.getResources().getDisplayMetrics().density);
+                stopBtn.setBackground(getDrawable(R.drawable.button_unpressed));
+            }
+            return false;
         });
-        stopBtn.setOnClickListener(new View.OnClickListener() {
+        stopBtn.setOnClickListener(v -> {
+            try {
+                showStart();
 
-            @Override
-            public void onClick(View v) {
+                // Stop RecorderService which is recording accelerometer data
+                unbindService(mRecorderServiceConnection);
+                stopService(recService);
+                recording = false;
+                if (mBoundRecorderService.getRecordingAllowed()) {
+                    // Get the recorded files and send them to HistoryActivity for further processing
+                    Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                    // The file under PathToAccGpsFile contains the accelerometer and location data
+                    // as well as time data
+                    intent.putExtra("PathToAccGpsFile", mBoundRecorderService.getPathToAccGpsFile());
 
-                try {
-                    showStart();
+                    // timestamp in ms from 1970
+                    intent.putExtra("Duration", String.valueOf(mBoundRecorderService.getDuration()));
+                    intent.putExtra("StartTime", String.valueOf(mBoundRecorderService.getStartTime()));
 
-                    // Stop RecorderService which is recording accelerometer data
-                    unbindService(mRecorderServiceConnection);
-                    stopService(recService);
-                    recording = false;
-                    if (mBoundRecorderService.getRecordingAllowed()) {
-                        // Get the recorded files and send them to HistoryActivity for further processing
-                        Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                        // The file under PathToAccGpsFile contains the accelerometer and location data
-                        // as well as time data
-                        intent.putExtra("PathToAccGpsFile", mBoundRecorderService.getPathToAccGpsFile());
-
-                        // timestamp in ms from 1970
-                        intent.putExtra("Duration", String.valueOf(mBoundRecorderService.getDuration()));
-                        intent.putExtra("StartTime", String.valueOf(mBoundRecorderService.getStartTime()));
-
-                        // State can be 0 for not annotated, 1 for started but not sent
-                        // and 2 for annotated and sent to the server
-                        intent.putExtra("State", 0); // redundant
-                        startActivity(intent);
-                    } else {
-                        DialogInterface.OnClickListener errorOnClickListener = new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        };
-                        showMessageOK(getString(R.string.errorRideNotRecorded), errorOnClickListener, MainActivity.this);
-                    }
-                } catch (Exception e) {
-                    Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
+                    // State can be 0 for not annotated, 1 for started but not sent
+                    // and 2 for annotated and sent to the server
+                    intent.putExtra("State", 0); // redundant
+                    startActivity(intent);
+                } else {
+                    DialogInterface.OnClickListener errorOnClickListener = (dialog, which) -> {
+                    };
+                    showMessageOK(getString(R.string.errorRideNotRecorded), errorOnClickListener, MainActivity.this);
                 }
+            } catch (Exception e) {
+                Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
             }
         });
         new CheckVersionTask().execute();
@@ -747,48 +715,30 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         Button googlePlayStoreButton = settingsView.findViewById(R.id.google_play_store_button);
 
-        googlePlayStoreButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
-                try {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-                } catch (android.content.ActivityNotFoundException anfe) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                }
+        googlePlayStoreButton.setOnClickListener(v -> {
+            final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
             }
         });
 
         Button apkButton = settingsView.findViewById(R.id.apk_button);
 
-        apkButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(urlToNewestAPK)));
-            }
-        });
+        apkButton.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(urlToNewestAPK))));
 
         alertDialog = builder.create();
 
         if (critical) {
             Button closeSimRaButton = settingsView.findViewById(R.id.close_simra_button);
             closeSimRaButton.setVisibility(View.VISIBLE);
-            closeSimRaButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
+            closeSimRaButton.setOnClickListener(v -> finish());
         } else {
             Button laterButton = settingsView.findViewById(R.id.later_button);
             laterButton.setVisibility(View.VISIBLE);
             AlertDialog finalAlertDialog = alertDialog;
-            laterButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finalAlertDialog.cancel();
-                }
-            });
+            laterButton.setOnClickListener(v -> finalAlertDialog.cancel());
         }
 
         alertDialog.setCanceledOnTouchOutside(false);
@@ -817,12 +767,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         Button okButton = settingsView.findViewById(R.id.ok_button);
         AlertDialog finalAlertDialog = alertDialog;
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                writeBooleanToSharedPrefs("news" + version + "seen", true, "simraPrefs", MainActivity.this);
-                finalAlertDialog.cancel();
-            }
+        okButton.setOnClickListener(v -> {
+            writeBooleanToSharedPrefs("news" + version + "seen", true, "simraPrefs", MainActivity.this);
+            finalAlertDialog.cancel();
         });
 
         alertDialog.setCanceledOnTouchOutside(false);
@@ -871,21 +818,18 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
         alert.setTitle(getString(R.string.chooseRegion));
         alert.setView(spinnerView);
-        alert.setNeutralButton(R.string.done, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int j) {
+        alert.setNeutralButton(R.string.done, (dialogInterface, j) -> {
 
-                int region = -1;
-                String selectedRegion = spinner.getSelectedItem().toString();
-                for (int i = 0; i < simRa_regions_config.length; i++) {
-                    if (selectedRegion.equals(simRa_regions_config[i].split("=")[0]) || selectedRegion.equals(simRa_regions_config[i].split("=")[1])) {
-                        region = i;
-                        break;
-                    }
+            int region1 = -1;
+            String selectedRegion = spinner.getSelectedItem().toString();
+            for (int i = 0; i < simRa_regions_config.length; i++) {
+                if (selectedRegion.equals(simRa_regions_config[i].split("=")[0]) || selectedRegion.equals(simRa_regions_config[i].split("=")[1])) {
+                    region1 = i;
+                    break;
                 }
-                updateProfile(true, MainActivity.this, -1, -1, region, -1, -2);
-
             }
+            updateProfile(true, MainActivity.this, -1, -1, region1, -1, -2);
+
         });
         alert.setCancelable(false);
         alert.show();
@@ -903,12 +847,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.VISIBLE);
-                }
-            });
+            runOnUiThread(() -> MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.VISIBLE));
         }
 
         @Override
@@ -984,12 +923,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.GONE);
-                }
-            });
+            runOnUiThread(() -> MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.GONE));
             if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
                 MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
             } else if (!lookUpBooleanSharedPrefs("news58seen", false, "simraPrefs", MainActivity.this)) {
