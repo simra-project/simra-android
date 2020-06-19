@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -61,8 +62,14 @@ public class RadmesserActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("distance");
+            if (message == null) return;
             Log.d("receiver", "Got message: " + message);
-            deviceInfoTextView.setText("Verbunden mit Gerät " + mBoundRadmesserService.connectedDevice.getID() + "\n" + "Letzte Distanz: " + message);
+
+            int distance = -1;
+            String[] splitted = message.split(",");
+            if (splitted.length == 2) distance = Integer.parseInt(splitted[0]);
+
+            deviceInfoTextView.setText("Connected with " + mBoundRadmesserService.connectedDevice.getID() + "\n" + "Last distance: " + distance + " cm");
         }
     };
 
@@ -133,7 +140,7 @@ public class RadmesserActivity extends AppCompatActivity {
 
         for (String deviceId : devices.keySet()) {
             Button button = new Button(RadmesserActivity.this);
-            button.setText("Verbinden mit " + deviceId);
+            button.setText("Connect with " + deviceId);
             button.setOnClickListener(v -> connectToDevice(deviceId));
             devicesList.addView(button);
         }
