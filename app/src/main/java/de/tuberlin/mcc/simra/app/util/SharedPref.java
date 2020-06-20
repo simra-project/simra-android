@@ -220,7 +220,82 @@ public class SharedPref {
                     return MIN_DURATION;
                 }
             }
-        }
 
+            public static class BikeType {
+                // See top of this class before changing this string
+                public static final String BIKE_TYPE = SETTINGS + "BikeType";
+
+                public static int getBikeType(Context context) {
+                    return readIntegerFromAppSharedPrefs(BIKE_TYPE, 0, SHARED_PREF_NAME, context);
+                }
+
+                public static void setBikeType(int bikeType, Context context) {
+                    writeIntegerToAppSharedPrefsAsync(BIKE_TYPE, bikeType, SHARED_PREF_NAME, context);
+                }
+            }
+
+            public static class PhoneLocation {
+                // See top of this class before changing this string
+                public static final String PHONE_LOCATION = SETTINGS + "PhoneLocation";
+
+                public static int getPhoneLocation(Context context) {
+                    return readIntegerFromAppSharedPrefs(PHONE_LOCATION, 0, SHARED_PREF_NAME, context);
+                }
+
+                public static void setPhoneLocation(int phoneLocation, Context context) {
+                    writeIntegerToAppSharedPrefsAsync(PHONE_LOCATION, phoneLocation, SHARED_PREF_NAME, context);
+                }
+            }
+
+            public static class ChildOnBoard {
+                // See top of this class before changing this string
+                public static final String CHILD_ON_BOARD = SETTINGS + "Child";
+
+                public static boolean isChildOnBoard(Context context) {
+                    return getValue(context) == 1;
+                }
+
+                public static void setChildOnBoard(boolean isChildOnBoard, Context context) {
+                    int value = 0;
+                    if (isChildOnBoard) {
+                        value = 1;
+                    }
+                    setChildOnBoardByValue(value, context);
+                }
+
+                public static void setChildOnBoardByValue(int isChildOnBoard, Context context) {
+                    writeIntegerToAppSharedPrefsAsync(CHILD_ON_BOARD, isChildOnBoard, SHARED_PREF_NAME, context);
+                }
+
+                public static int getValue(Context context) {
+                    return readIntegerFromAppSharedPrefs(CHILD_ON_BOARD, 0, SHARED_PREF_NAME, context);
+                }
+            }
+
+            public static class BikeWithTrailer {
+                // See top of this class before changing this string
+                public static final String BIKE_WITH_TRAILER = SETTINGS + "Trailer";
+
+                public static boolean hasTrailer(Context context) {
+                    return getValue(context) == 1;
+                }
+
+                public static void setTrailer(boolean hasTrailer, Context context) {
+                    int value = 0;
+                    if (hasTrailer) {
+                        value = 1;
+                    }
+                    setTrailerByValue(value, context);
+                }
+
+                public static void setTrailerByValue(int hasTrailer, Context context) {
+                    writeIntegerToAppSharedPrefsAsync(BIKE_WITH_TRAILER, hasTrailer, SHARED_PREF_NAME, context);
+                }
+
+                public static int getValue(Context context) {
+                    return readIntegerFromAppSharedPrefs(BIKE_WITH_TRAILER, 0, SHARED_PREF_NAME, context);
+                }
+            }
+        }
     }
 }

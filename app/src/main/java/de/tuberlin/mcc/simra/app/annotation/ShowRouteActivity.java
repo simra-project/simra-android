@@ -54,13 +54,13 @@ import java.util.concurrent.TimeUnit;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.SharedPref;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
@@ -216,10 +216,10 @@ public class ShowRouteActivity extends BaseActivity {
         gpsFile = getFileStreamPath(pathToAccGpsFile);
 
         Log.d(TAG, "creating ride objects");
-        bike = lookUpIntSharedPrefs("Settings-BikeType", 0, "simraPrefs", this);
-        child = lookUpIntSharedPrefs("Settings-Child", 0, "simraPrefs", this);
-        trailer = lookUpIntSharedPrefs("Settings-Trailer", 0, "simraPrefs", this);
-        pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this);
+        bike = SharedPref.Settings.Ride.BikeType.getBikeType(this);
+        child = SharedPref.Settings.Ride.ChildOnBoard.getValue(this);
+        trailer = SharedPref.Settings.Ride.BikeWithTrailer.getValue(this);
+        pLoc = SharedPref.Settings.Ride.PhoneLocation.getPhoneLocation(this);
 
         privacySlider = findViewById(R.id.privacySlider);
         TextView privacySliderDescription = findViewById(R.id.privacySliderDescription);
@@ -837,10 +837,10 @@ public class ShowRouteActivity extends BaseActivity {
                     trailer = 0;
                 }
                 if (rememberMyChoiceCheckBox.isChecked()) {
-                    writeIntToSharedPrefs("Settings-BikeType", bike, "simraPrefs", ShowRouteActivity.this);
-                    writeIntToSharedPrefs("Settings-PhoneLocation", pLoc, "simraPrefs", ShowRouteActivity.this);
-                    writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", ShowRouteActivity.this);
-                    writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", ShowRouteActivity.this);
+                    SharedPref.Settings.Ride.PhoneLocation.setPhoneLocation(pLoc, ShowRouteActivity.this);
+                    SharedPref.Settings.Ride.ChildOnBoard.setChildOnBoardByValue(child, ShowRouteActivity.this);
+                    SharedPref.Settings.Ride.BikeWithTrailer.setTrailerByValue(trailer, ShowRouteActivity.this);
+                    SharedPref.Settings.Ride.BikeType.setBikeType(bike, ShowRouteActivity.this);
                 }
                 // Close Alert Dialog.
                 alertDialog.cancel();

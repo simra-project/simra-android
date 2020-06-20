@@ -25,9 +25,9 @@ import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
+import de.tuberlin.mcc.simra.app.util.SharedPref;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
@@ -232,10 +232,10 @@ public class MarkerFunct {
 
                     String fileInfoLine = getAppVersionNumber(mother) + "#1" + System.lineSeparator();
 
-                    int bike = lookUpIntSharedPrefs("Settings-BikeType", 0, "simraPrefs", mother);
-                    int child = lookUpIntSharedPrefs("Settings-Child", 0, "simraPrefs", mother);
-                    int trailer = lookUpIntSharedPrefs("Settings-Trailer", 0, "simraPrefs", mother);
-                    int pLoc = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", mother);
+                    int bike = SharedPref.Settings.Ride.BikeType.getBikeType(mother);
+                    int child = SharedPref.Settings.Ride.ChildOnBoard.getValue(mother);
+                    int trailer = SharedPref.Settings.Ride.BikeWithTrailer.getValue(mother);
+                    int pLoc = SharedPref.Settings.Ride.PhoneLocation.getPhoneLocation(mother);
 
                     // eventline = key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,,,,,,,,,,,,
                     String eventLine = newAcc.key + ","
