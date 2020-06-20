@@ -67,8 +67,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     float lastAccuracy;
     Polyline route = new Polyline();
     long waitedTime = 0;
-
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Strings for storing data to enable continued use by other activities
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,9 +76,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences sharedPrefs;
     SharedPreferences.Editor editor;
     Location startLocation;
-
     // Radmesser
     Queue<String> radmesserQueue = new CircularFifoQueue(1);
+    private long lastPictureTaken = 0;
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -89,14 +87,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             radmesserQueue.add(message);
         }
     };
-
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
     private boolean recordingAllowed;
     private float privacyDistance;
     private long privacyDuration;
     private boolean lineAdded;
-
     private long lastAccUpdate = 0;
     private long lastGPSUpdate = 0;
     private SensorManager sensorManager = null;
@@ -457,6 +453,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                                 gyro;
                 if (!radmesserQueue.isEmpty()) {
                     str = str + "," + radmesserQueue.element();
+                    if (Integer.parseInt(radmesserQueue.element().split(",")[0]) <= 150 && lastPictureTaken + 10000 <= curTime) {
+                        lastPictureTaken = curTime;
+                        CameraService.takePicture(RecorderService.this, String.valueOf(curTime));
+                    }
                 }
 
 

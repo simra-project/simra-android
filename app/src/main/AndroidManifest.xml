@@ -125,12 +125,13 @@
             android:name=".services.RadmesserService"
             android:enabled="true"
             android:exported="false" />
-
-        <!-- MetaData -->
+        <service
+            android:name=".services.CameraService"
+            android:exported="false"></service>
+            <!-- MetaData -->
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
         <meta-data
             android:name="io.sentry.auto-init"
             android:value="false" />
