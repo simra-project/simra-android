@@ -62,8 +62,10 @@ public class MarkerFunct {
         } else {
             this.rideID = mother.ride.getKey();
         }
-        pool.execute(new SimpleThreadFactory().newThread(() ->
-                geocoderNominatim = new GeocoderNominatim(userAgent)
+        pool.execute(new SimpleThreadFactory().newThread(() -> {
+                    geocoderNominatim = new GeocoderNominatim(userAgent);
+                    geocoderNominatim.setService("https://nominatim.openstreetmap.org/");
+                }
         ));
 
         this.state = mother.state;
