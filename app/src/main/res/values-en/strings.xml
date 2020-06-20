@@ -169,9 +169,9 @@
     <string name="privacyLink">https://www.mcc.tu-berlin.de/menue/research/projects/simra/privacy_policy_statement/parameter/en?isMobile=1</string>
 
     <!--- Settings -->
-    <string name="privacyDurationDescription">The delay after which the recording starts\n(in seconds)</string>
+    <string name="privacyDurationDescription">The delay after which the recording starts (in seconds)</string>
     <string name="privacy_settings_title">Privacy</string>
-    <string name="privacyDistanceDescription">The delay after which the recording starts\n(in Feet)</string>
+    <string name="privacyDistanceDescription">The delay after which the recording starts</string>
     <string name="settingsSaved">Settings saved</string>
     <string name="general_settings_title">General Settings</string>
     <string name="unitDescription">Unit System</string>
@@ -181,11 +181,18 @@
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Devices</string>
+
     <!--- Radmesser -->
     <string name="radmesserSwitchTitle">Radmesser connection</string>
     <string name="radmesserButton">Open Radmesser settings</string>
+    <string name="availableDevices">Available Devices</string>
 
-
+    <!-- Units -->
+    <string name="meter_short">m</string>
+    <string name="feet_short">ft</string>
+    <string name="seconds_short">s</string>
+    <string name="hour_format">hh:mm aa</string>
+    <string name="datetime_format">MM/dd/yy,hh:mm aa</string>
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Year of Birth</string>
@@ -253,9 +260,6 @@
     <string name="kcalConsumption">Calories consumption:</string>
     <string name="rideDistribution">Ride distribution throughout the day</string>
     <string name="hourOfDay">Hour</string>
-
-    <!-- Radmesser Activity -->
-    <string name="availableDevices">Available Devices</string>
 
     <!--- News -->
     <string name="what_is_new_title">What is new?</string>

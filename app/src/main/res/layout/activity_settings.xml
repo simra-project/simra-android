@@ -57,27 +57,44 @@
 
                 <TextView
                     android:id="@+id/privacyDurationSeekBarTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/privacyDurationDescription"
-                    android:textAlignment="center"
+                    android:textAlignment="textStart"
                     android:textSize="15sp" />
 
-                <SeekBar
-                    android:id="@+id/privacyDurationSeekBar"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:max="50"
-                    android:progress="30" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|left"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/privacyDurationSeekBarProgress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="30/50"
-                    android:textAlignment="center"
-                    android:textSize="15sp" />
+                    <TextView
+                        android:id="@+id/privacyDurationTextLeft"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="0"
+                        android:textAlignment="center"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/privacyDurationSlider"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:stepSize="1" />
+
+                    <TextView
+                        android:id="@+id/privacyDurationTextRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="0"
+                        android:textAlignment="center"
+                        android:textSize="15sp" />
+                </LinearLayout>
 
                 <Space
                     android:id="@+id/settingsSpace3"
@@ -86,27 +103,46 @@
 
                 <TextView
                     android:id="@+id/privacyDistanceSeekBarTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/privacyDistanceDescription"
-                    android:textAlignment="center"
+                    android:textAlignment="textStart"
                     android:textSize="15sp" />
 
-                <SeekBar
-                    android:id="@+id/privacyDistanceSeekBar"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:max="50"
-                    android:progress="30" />
 
-                <TextView
-                    android:id="@+id/privacyDistanceSeekBarProgress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="30/50"
-                    android:textAlignment="center"
-                    android:textSize="15sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|left"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/privacyDistanceTextLeft"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="0"
+                        android:textAlignment="center"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/privacyDistanceSlider"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:stepSize="1" />
+
+                    <TextView
+                        android:id="@+id/privacyDistanceTextRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="0"
+                        android:textAlignment="center"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
             </LinearLayout>
 
             <Space
@@ -318,42 +354,6 @@
 
                 <Space
                     android:id="@+id/generalSettingsSpace3"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
-
-                <TextView
-                    android:id="@+id/dateTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dateFormatDescription"
-                    android:textAlignment="center"
-                    android:textSize="15sp" />
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/GermanDateTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/metric" />
-
-                    <Switch
-                        android:id="@+id/dateFormatSwitch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toEndOf="@id/GermanDateTextView" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toEndOf="@id/dateFormatSwitch"
-                        android:text="@string/imperial" />
-                </RelativeLayout>
-
-                <Space
-                    android:id="@+id/generalSettingsSpace4"
                     android:layout_width="match_parent"
                     android:layout_height="20dp" />
 

@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.location.Location;
 import android.util.Log;
@@ -14,12 +15,12 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 import de.tuberlin.mcc.simra.app.annotation.Ride;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.copySharedPreferences;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
@@ -447,5 +448,31 @@ public class VersionUpdater {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void copySharedPreferences(String sourceSharedPref, String newSharedPref, Context context) {
+        SharedPreferences sourceSP = context.getApplicationContext()
+                .getSharedPreferences(sourceSharedPref, Context.MODE_PRIVATE);
+
+        SharedPreferences newSP = context.getApplicationContext()
+                .getSharedPreferences(newSharedPref, Context.MODE_PRIVATE);
+        SharedPreferences.Editor newE = newSP.edit();
+
+        for (Map.Entry<String, ?> kvPair : sourceSP.getAll().entrySet()) {
+            String key = kvPair.getKey();
+            Object value = kvPair.getValue();
+            if (value instanceof Float) {
+                newE.putFloat(key, (Float) value);
+            } else if (value instanceof Integer) {
+                newE.putInt(key, (Integer) value);
+            } else if (value instanceof String) {
+                newE.putString(key, (String) value);
+            } else if (value instanceof Boolean) {
+                newE.putBoolean(key, (Boolean) value);
+            } else if (value instanceof Long) {
+                newE.putLong(key, (Long) value);
+            }
+        }
+        newE.apply();
     }
 }

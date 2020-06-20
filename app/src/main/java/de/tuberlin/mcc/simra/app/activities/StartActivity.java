@@ -33,7 +33,6 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.writeLongToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.deleteErrorLogsForVersion;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
@@ -154,16 +153,6 @@ public class StartActivity extends BaseActivity {
 
             }
             */
-
-            // Write the default values for privacy duration and distance. These values are
-            // used to determine whether a ride should be saved or not.
-
-            // don't start to record the ride, until user is 30 meters away
-            // from his starting position.
-            writeLongToSharedPrefs("Privacy-Duration", 30, "simraPrefs", this);
-            // don't start to record the ride, until user 30 seconds passed
-            // from recording start time.
-            writeIntToSharedPrefs("Privacy-Distance", 30, "simraPrefs", this);
         }
         return firstTime;
     }

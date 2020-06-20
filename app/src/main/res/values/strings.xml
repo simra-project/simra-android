@@ -79,8 +79,6 @@
     <string name="recording_started">Fahrtaufzeichnung wurde gestartet.</string>
 
 
-
-
     <!--- RecorderService -->
     <string name="foregroundNotificationTitle_record">Aufzeichnung der Fahrt</string>
     <string name="foregroundNotificationBody_record">Ihre Fahrt wird aufgezeichnet.</string>
@@ -173,9 +171,11 @@
     <string name="privacyLink">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1</string>
 
     <!--- Settings -->
-    <string name="privacyDurationDescription">Verzögerung des Aufnahmestarts\n(in Sekunden)</string>
+    <string name="privacyDurationDescription">Verzögerung des Aufnahmestarts (in Sekunden)</string>
     <string name="privacy_settings_title">Privatsphäre</string>
-    <string name="privacyDistanceDescription">Verzögerung des Aufnahmestarts\n(in Metern)</string>
+    <string name="privacyDistanceDescription">Verzögerung des Aufnahmestarts</string>
+
+
     <string name="settingsSaved">Einstellungen gespeichert</string>
     <string name="general_settings_title">Allgemeine Einstellungen</string>
     <string name="unitDescription">Einheitensystem</string>
@@ -188,6 +188,7 @@
     <!--- Radmesser -->
     <string name="radmesserSwitchTitle">Radmesser verbinden</string>
     <string name="radmesserButton">Radmesser Einstellungen öffnen</string>
+    <string name="availableDevices">Verfügbare Geräte</string>
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
@@ -256,8 +257,13 @@
     <string name="rideDistribution">Fahrtverteilung über den Tag</string>
     <string name="hourOfDay">Uhrzeit</string>
 
-    <!-- Radmesser Activity -->
-    <string name="availableDevices">Verfügbare Geräte</string>
+
+    <!-- Units -->
+    <string name="meter_short">m</string>
+    <string name="feet_short">ft</string>
+    <string name="seconds_short">s</string>
+    <string name="hour_format">HH:mm</string>
+    <string name="datetime_format">dd.MM.yy,HH:mm\'h\'</string>
 
     <!--- News -->
     <string name="what_is_new_title">Was ist neu?</string>
