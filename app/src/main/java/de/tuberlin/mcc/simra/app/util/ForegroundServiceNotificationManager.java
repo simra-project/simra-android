@@ -43,7 +43,7 @@ public class ForegroundServiceNotificationManager {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent)
-                .addAction(R.drawable.bluetooth_icon, ctx.getResources().getString(R.string.foregroundNotificationButtonBack),
+                .addAction(R.drawable.ic_bluetooth, ctx.getResources().getString(R.string.foregroundNotificationButtonBack),
                         pendingIntent)
                 .build();
         notificationManager.notify(NOTIFICATION_ID, notification);

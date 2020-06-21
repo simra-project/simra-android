@@ -35,130 +35,54 @@
 
     <include layout="@layout/content_main" />
 
-    <RelativeLayout
-        android:id="@+id/radmesserStatus"
-        android:layout_width="250dp"
-        android:layout_height="54dp"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_ride_settings_general"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/button_start"
+        android:layout_alignRight="@id/toolbar"
+        android:layout_alignBottom="@id/button_start"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:gravity="center_vertical"
+        android:src="@drawable/ic_settings_black_24dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_ride_settings_radmesser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/toolbar"
+        android:layout_alignTop="@id/button_start"
+        android:layout_alignBottom="@id/button_start"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:gravity="center_vertical"
+        android:src="@drawable/ic_bluetooth_disabled"
+        android:visibility="gone" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/button_start"
+        android:layout_width="wrap_content"
+        android:layout_height="86dp"
         android:layout_above="@id/copyright_text"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="99dp"
-        android:background="@drawable/button_unpressed"
-        android:clickable="true"
-        android:elevation="2dp"
-        android:focusable="true">
+        android:layout_marginEnd="63dp"
+        android:gravity="center"
+        android:icon="@drawable/ic_route"
+        android:maxLines="2"
+        android:text="@string/startButtonText"
+        app:icon="@drawable/route" />
 
-
-        <TextView
-            android:id="@+id/radmesserStatusText"
-            android:layout_width="149dp"
-            android:layout_height="34dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="89dp"
-            android:layout_marginBottom="9dp"
-            android:fontFamily="@font/assistant_extralight"
-            android:gravity="center"
-            android:textColor="#FEFEFE"
-            android:textSize="13sp"
-            android:textStyle="normal" />
-
-        <Button
-            android:id="@+id/radmesserStatusButton"
-            android:layout_width="77dp"
-            android:layout_height="43dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="163dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="3dp"
-            android:backgroundTint="#3197FE" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/start_button"
-        android:layout_width="250dp"
-        android:layout_height="85dp"
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/button_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="86dp"
         android:layout_above="@id/copyright_text"
         android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
-        android:background="@drawable/button_unpressed"
-        android:clickable="true"
-        android:elevation="2dp"
-        android:focusable="true">
-
-
-        <ImageView
-            android:id="@+id/route_image"
-            android:layout_width="65dp"
-            android:layout_height="60dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="15dp"
-            android:background="@drawable/route" />
-
-        <TextView
-            android:id="@+id/route_text"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginBottom="10dp"
-            android:fontFamily="@font/assistant_extralight"
-
-            android:gravity="center"
-            android:text="@string/startButtonText"
-            android:textColor="#FEFEFE"
-            android:textSize="21sp"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/stop_button"
-        android:layout_width="250dp"
-        android:layout_height="85dp"
-        android:layout_above="@id/copyright_text"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
-        android:background="@drawable/button_unpressed"
-        android:elevation="2dp"
-        android:visibility="invisible">
-
-        <ImageView
-            android:id="@+id/stop_image"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="15dp"
-            android:background="@drawable/stop" />
-
-        <TextView
-            android:id="@+id/stop_text"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginBottom="5dp"
-            android:fontFamily="@font/assistant_extralight"
-            android:gravity="center"
-            android:text="@string/stopButtonText"
-            android:textColor="#FEFEFE"
-            android:textSize="21sp"
-            android:textStyle="bold" />
-    </RelativeLayout>
+        android:layout_marginEnd="63dp"
+        android:gravity="center"
+        android:icon="@drawable/ic_route"
+        android:maxLines="2"
+        android:text="@string/stopButtonText"
+        app:icon="@drawable/stop" />
 
     <TextView
         android:id="@+id/copyright_text"
