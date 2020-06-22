@@ -38,6 +38,7 @@ import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
+import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
@@ -455,7 +456,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     str = str + "," + radmesserQueue.element();
                     if (Integer.parseInt(radmesserQueue.element().split(",")[0]) <= 150 && lastPictureTaken + 10000 <= curTime) {
                         lastPictureTaken = curTime;
-                        CameraService.takePicture(RecorderService.this, String.valueOf(curTime));
+                        CameraService.takePicture(RecorderService.this, String.valueOf(curTime), Utils.getExternalBaseDirectoryName());
                     }
                 }
 

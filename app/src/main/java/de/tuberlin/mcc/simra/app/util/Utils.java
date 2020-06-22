@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.location.Location;
+import android.os.Environment;
 import android.util.Log;
 import android.util.Pair;
 
@@ -164,15 +165,15 @@ public class Utils {
         return ctx.getFilesDir() + "/";
     }
 
-
-    // Check if an accEvent has already been annotated based on one line of the accEvents csv file.
-    // Returns true, if accEvent was already annotated.
-
     public static boolean checkForAnnotation(String[] incidentProps) {
         // Only checking for empty strings, which means we are retaining
         // events that were labeled as 'nothing happened'
         return (!incidentProps[8].equals("") && !incidentProps[8].equals("0")) || !incidentProps[19].equals("");
     }
+
+
+    // Check if an accEvent has already been annotated based on one line of the accEvents csv file.
+    // Returns true, if accEvent was already annotated.
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Create an AlertDialog with an OK Button displaying a message
@@ -640,5 +641,16 @@ public class Utils {
             }
         }
         return simRa_regions_config;
+    }
+
+    public static String getExternalBaseDirectoryName() {
+        String app_folder_path = "";
+        app_folder_path = Environment.getExternalStorageDirectory().toString() + "/simra/images";
+        File dir = new File(app_folder_path);
+        if (!dir.exists() && !dir.mkdirs()) {
+
+        }
+
+        return app_folder_path;
     }
 }
