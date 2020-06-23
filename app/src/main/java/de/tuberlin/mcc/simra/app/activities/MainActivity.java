@@ -26,12 +26,10 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +42,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import org.osmdroid.config.Configuration;
@@ -110,11 +110,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // CLICKABLES --> INTENTS
     private LocationManager locationManager;
     private Boolean recording = false;
-    private RelativeLayout startBtn;
-    private RelativeLayout stopBtn;
+    private MaterialButton startBtn;
+    private MaterialButton stopBtn;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Radmesser
-    private RelativeLayout radmesserStatus;
+    private FloatingActionButton radmesserButton;
     private RadmesserService radmesserService;
     private ServiceConnection radmesserServiceConnection = new ServiceConnection() {
 
@@ -148,7 +148,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         @Override
         public void onReceive(Context context, Intent intent) {
             updateRadmesserButtonStatus();
-            Log.d("receiver", "Got message: update");
         }
     };
 
@@ -315,18 +314,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (4): NEUE ROUTE / START BUTTON
-        startBtn = findViewById(R.id.start_button);
-        startBtn.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                startBtn.setElevation(0.0f);
-                startBtn.setBackground(getDrawable(R.drawable.button_pressed));
-            }
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                startBtn.setElevation(2 * MainActivity.this.getResources().getDisplayMetrics().density);
-                startBtn.setBackground(getDrawable(R.drawable.button_unpressed));
-            }
-            return false;
-        });
+        startBtn = findViewById(R.id.button_start);
         startBtn.setOnClickListener(v -> {
             // For permission request
             int LOCATION_ACCESS_CODE = 1;
@@ -365,18 +353,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (5): AUFZEICHNUNG STOPPEN / STOP-BUTTON
-        stopBtn = findViewById(R.id.stop_button);
-        stopBtn.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                stopBtn.setElevation(0.0f);
-                stopBtn.setBackground(getDrawable(R.drawable.button_pressed));
-            }
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                stopBtn.setElevation(2 * MainActivity.this.getResources().getDisplayMetrics().density);
-                stopBtn.setBackground(getDrawable(R.drawable.button_unpressed));
-            }
-            return false;
-        });
+        stopBtn = findViewById(R.id.button_stop);
         stopBtn.setOnClickListener(v -> {
             try {
                 showStart();
@@ -418,7 +395,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
         }
 
-        radmesserStatus = findViewById(R.id.radmesserStatus);
+        radmesserButton = findViewById(R.id.button_ride_settings_radmesser);
+        radmesserButton.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
+
+        FloatingActionButton settingsButton = findViewById(R.id.button_ride_settings_general);
+        settingsButton.setOnClickListener(view -> startActivity(new Intent(this, SettingsActivity.class)));
 
         Log.d(TAG, "OnCreate finished");
 
@@ -445,46 +426,38 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void updateRadmesserButtonStatus() {
-        Button statusButton = findViewById(R.id.radmesserStatusButton);
-        statusButton.setTextSize(7);
-        // No Uppercase
-        statusButton.setTransformationMethod(null);
-
-        TextView radmesserText = findViewById(R.id.radmesserStatusText);
         NavigationView navigationView = findViewById(R.id.nav_view);
-
 
         if (radmesserEnabled) {
             // einblenden
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(true);
-            radmesserStatus.setVisibility(View.VISIBLE);
+            radmesserButton.setVisibility(View.VISIBLE);
         } else {
             // ausblenden
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
-            radmesserStatus.setVisibility(View.GONE);
+            radmesserButton.setVisibility(View.GONE);
         }
         RadmesserService.ConnectionStatus status = radmesserService != null ? radmesserService.getCurrentConnectionStatus() : RadmesserService.ConnectionStatus.DISCONNECTED;
         switch (status) {
             case DISCONNECTED:
-                statusButton.setText("Verbinden");
-                radmesserText.setText("Radmesser nicht verbunden");
-                radmesserText.setTextColor(Color.WHITE);
-                radmesserText.setBackgroundColor(Color.RED);
-                // LINUS hier nochmal den Radmesser verbindung versuchen
-
+                radmesserButton.setImageResource(R.drawable.ic_bluetooth_disabled);
+                radmesserButton.setContentDescription("Radmesser nicht verbunden");
+                radmesserButton.setColorFilter(Color.RED);
+                break;
+            case SEARCHING:
+                radmesserButton.setImageResource(R.drawable.ic_bluetooth_searching);
+                radmesserButton.setContentDescription("Radmesser wird gesucht");
+                radmesserButton.setColorFilter(Color.BLACK);
                 break;
             case PAIRING:
-                statusButton.setEnabled(false);
-                statusButton.setText("...");
-                radmesserText.setText("Verbinde");
-                radmesserText.setTextColor(Color.BLACK);
-                radmesserText.setBackgroundColor(Color.LTGRAY);
+                radmesserButton.setImageResource(R.drawable.ic_bluetooth_searching);
+                radmesserButton.setContentDescription("Verbinde");
+                radmesserButton.setColorFilter(Color.BLACK);
                 break;
             case CONNECTED:
-                radmesserText.setText("Radmesser verbunden");
-                statusButton.setText("Siehe");
-                radmesserText.setTextColor(Color.WHITE);
-                radmesserText.setBackgroundColor(Color.GREEN);
+                radmesserButton.setImageResource(R.drawable.ic_bluetooth_connected);
+                radmesserButton.setContentDescription("Radmesser verbunden");
+                radmesserButton.setColorFilter(Color.BLACK);
                 break;
             default:
                 break;

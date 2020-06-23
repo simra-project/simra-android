@@ -44,13 +44,11 @@
         <activity
             android:name=".activities.StatisticsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_statistics"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_statistics"/>
         <activity
             android:name=".activities.AboutActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_about_simra"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_about_simra" />
         <activity
             android:name=".activities.RadmesserActivity"
             android:label="@string/title_activity_bluetooth_connection" />
@@ -58,8 +56,7 @@
             android:name=".annotation.RideSettingsActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_ride_settings"
-            android:parentActivityName=".annotation.ShowRouteActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".annotation.ShowRouteActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity" />
@@ -67,8 +64,7 @@
         <activity
             android:name=".activities.LicenseActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_library_license"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_library_license" />
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|screenSize"
@@ -81,8 +77,7 @@
             android:name=".activities.ProfileActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_profile"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.tuberlin.mcc.simra.app.activities.MainActivity" />
