@@ -72,8 +72,6 @@ public class HistoryActivity extends BaseActivity {
 
     UploadService mBoundUploadService;
 
-    boolean privacyAgreement = false;
-
     String unit;
     int dateFormat;
 
@@ -112,8 +110,6 @@ public class HistoryActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate()");
         setContentView(R.layout.activity_history);
-
-        privacyAgreement = lookUpBooleanSharedPrefs("Privacy-Policy-Accepted", false, "simraPrefs", this);
 
         //  Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);

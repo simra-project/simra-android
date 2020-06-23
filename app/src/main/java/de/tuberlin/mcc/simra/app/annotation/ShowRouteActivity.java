@@ -52,6 +52,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.activities.EvaluateClosePassActivity;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
@@ -230,6 +231,11 @@ public class ShowRouteActivity extends BaseActivity {
         if (state < 2) {
             addIncBttn.setVisibility(View.VISIBLE);
             exitButton.setVisibility(View.INVISIBLE);
+            //if (!IOUtils.isDirectoryEmpty(IOUtils.Directories.getPictureCacheDirectoryPath())) {
+            Intent intent = new Intent(ShowRouteActivity.this, EvaluateClosePassActivity.class);
+            intent.putExtra("PathToAccGpsFile", "22");
+            startActivity(intent);
+            //}
         } else {
             addIncBttn.setVisibility(View.GONE);
             privacySliderLinearLayout.setVisibility(View.INVISIBLE);

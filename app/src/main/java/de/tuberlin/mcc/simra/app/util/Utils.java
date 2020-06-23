@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.location.Location;
-import android.os.Environment;
 import android.util.Log;
 import android.util.Pair;
 
@@ -39,7 +38,7 @@ public class Utils {
     private static final String TAG = "Utils_LOG";
 
     public static String readContentFromFile(String fileName, Context context) {
-        File file = new File(getBaseFolderPath(context) + fileName);
+        File file = new File(IOUtils.Directories.getBaseFolderPath(context) + fileName);
         if (file.isDirectory()) {
             return "FILE IS DIRECTORY";
         }
@@ -81,7 +80,7 @@ public class Utils {
     public static void appendToFile(String content, String fileName, Context context) {
 
         try {
-            File tempFile = new File(getBaseFolderPath(context) + fileName);
+            File tempFile = new File(IOUtils.Directories.getBaseFolderPath(context) + fileName);
             FileOutputStream writer = new FileOutputStream(tempFile, true);
             writer.write(content.getBytes());
             writer.flush();
@@ -151,18 +150,17 @@ public class Utils {
         }
     }
 
+    /**
+     * Use Utils.fileExists(path) instead for clarity
+     *
+     * @deprecated
+     */
     public static boolean fileExists(String fileName, Context context) {
-        return new File(getBaseFolderPath(context) + fileName).exists();
+        return new File(IOUtils.Directories.getBaseFolderPath(context) + fileName).exists();
     }
 
-    /**
-     * Returns the Base Folder (Private App File Directory)
-     *
-     * @param ctx The App Context
-     * @return Path with trailing slash
-     */
-    public static String getBaseFolderPath(Context ctx) {
-        return ctx.getFilesDir() + "/";
+    public static boolean fileExists(String path) {
+        return new File(path).exists();
     }
 
     public static boolean checkForAnnotation(String[] incidentProps) {
@@ -643,14 +641,4 @@ public class Utils {
         return simRa_regions_config;
     }
 
-    public static String getExternalBaseDirectoryName() {
-        String app_folder_path = "";
-        app_folder_path = Environment.getExternalStorageDirectory().toString() + "/simra/images";
-        File dir = new File(app_folder_path);
-        if (!dir.exists() && !dir.mkdirs()) {
-
-        }
-
-        return app_folder_path;
-    }
 }

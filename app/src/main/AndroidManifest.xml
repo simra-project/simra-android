@@ -106,6 +106,9 @@
             android:name=".annotation.ShowRouteActivity"
             android:configChanges="orientation|screenSize" />
         <activity
+            android:name=".activities.EvaluateClosePassActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
             android:name=".annotation.IncidentPopUpActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.PopUpWindow" />
@@ -128,7 +131,7 @@
         <service
             android:name=".services.CameraService"
             android:exported="false"></service>
-            <!-- MetaData -->
+        <!-- MetaData -->
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
