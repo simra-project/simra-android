@@ -453,8 +453,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                                 accuracy + "," +
                                 gyro;
                 if (!radmesserQueue.isEmpty()) {
-                    str = str + "," + radmesserQueue.element();
-                    if (Integer.parseInt(radmesserQueue.element().split(",")[0]) <= 150 && lastPictureTaken + 10000 <= curTime) {
+                    String radmesserValue = radmesserQueue.element();
+                    str = str + "," + radmesserValue;
+                    if (Integer.parseInt(radmesserValue.split(",")[0]) <= 150 && lastPictureTaken + 10000 <= curTime) {
                         lastPictureTaken = curTime;
                         CameraService.takePicture(RecorderService.this, String.valueOf(curTime), IOUtils.Directories.getPictureCacheDirectoryPath());
                     }

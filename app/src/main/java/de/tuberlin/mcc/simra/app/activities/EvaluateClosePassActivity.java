@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.RideImpl;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 
@@ -35,6 +36,7 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
     TextView currentDistanceValue;
 
     List<File> imageQueue;
+    RideImpl ride;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -94,7 +96,8 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         closePassPicture = findViewById(R.id.closePassPicture);
         currentDistanceValue = findViewById(R.id.closePassCurrentValue);
 
-        RideImpl ride = RideImpl.loadRideById(Integer.parseInt(getIntent().getStringExtra("PathToAccGpsFile")), this);
+        String fileName = getIntent().getStringExtra("PathToAccGpsFile").split("_")[0];
+        ride = RideImpl.loadRideById(Integer.parseInt(fileName), this);
         Log.i("TEST", "" + ride.rideID);
 
 
@@ -123,7 +126,11 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         closePassPicture.setImageBitmap(decodeSampledBitmapFromFile(imageQueue.get(0).getAbsolutePath(), displayMetrics.widthPixels, displayMetrics.heightPixels));
-
+        for (DataLogEntry d : ride.dataPoints) {
+            if (d.timestamp == Long.parseLong(imageQueue.get(0).getName().split("\\.")[0])) {
+                currentDistanceValue.setText(String.valueOf(((DataLogEntry) d).RadmesserDistanceLeft1));
+            }
+        }
 
     }
 

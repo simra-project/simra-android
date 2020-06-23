@@ -233,7 +233,7 @@ public class ShowRouteActivity extends BaseActivity {
             exitButton.setVisibility(View.INVISIBLE);
             //if (!IOUtils.isDirectoryEmpty(IOUtils.Directories.getPictureCacheDirectoryPath())) {
             Intent intent = new Intent(ShowRouteActivity.this, EvaluateClosePassActivity.class);
-            intent.putExtra("PathToAccGpsFile", "22");
+            intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
             startActivity(intent);
             //}
         } else {

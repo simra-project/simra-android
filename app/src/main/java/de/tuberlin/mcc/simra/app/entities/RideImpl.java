@@ -17,9 +17,9 @@ import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 
 public class RideImpl implements Serializable {
     public int rideID;
-    public List<BaseDataLogEntry> dataPoints;
+    public List<DataLogEntry> dataPoints;
 
-    public RideImpl(int rideID, List<BaseDataLogEntry> dataPoints) {
+    public RideImpl(int rideID, List<DataLogEntry> dataPoints) {
         this.rideID = rideID;
         this.dataPoints = dataPoints;
     }
@@ -37,7 +37,7 @@ public class RideImpl implements Serializable {
     }
 
     public static RideImpl loadRideById(int rideID, Context context) {
-        List<BaseDataLogEntry> dataPoints = new ArrayList<>();
+        List<DataLogEntry> dataPoints = new ArrayList<>();
         String filePath = IOUtils.Directories.getBaseFolderPath(context) + getFileNameForRide(rideID, false);
         if (fileExists(filePath)) {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(filePath)))) {
@@ -59,6 +59,30 @@ public class RideImpl implements Serializable {
             }
         }
         return new RideImpl(rideID, dataPoints);
+    }
+
+    public static RideImpl loadRideByFilePath(String path, Context context) {
+        List<DataLogEntry> dataPoints = new ArrayList<>();
+        if (fileExists(path)) {
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(path)))) {
+                // Skip first two line as they do only contain the Header, e.g.:
+                // 59#1
+                // lat,lon,X,Y,Z,timeStamp,acc,a,b,c
+                bufferedReader.readLine();
+                bufferedReader.readLine();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    if (!line.trim().isEmpty()) {
+                        dataPoints.add(DataLogEntry.parseDataLogEntryFromLine(line));
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return new RideImpl(22, dataPoints);
     }
 
     public static void writeRideToFile() {
