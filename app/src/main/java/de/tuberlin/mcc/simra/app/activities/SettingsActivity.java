@@ -2,37 +2,30 @@ package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.slider.Slider;
+
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
+import de.tuberlin.mcc.simra.app.util.UnitHelper;
 import pl.droidsonroids.gif.GifImageView;
 
-import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpLongSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.writeLongToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 
 public class SettingsActivity extends BaseActivity {
@@ -40,164 +33,113 @@ public class SettingsActivity extends BaseActivity {
     private static final String TAG = "SettingsActivity_LOG";
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int BLUETOOTH_SUCCESS = -1;
-    private final static int CONNECTED = 2;
-    private final static int NOT_CONNECTED = 0;
-    ImageButton backBtn;
-    TextView toolbarTxt;
-    long privacyDuration;
-    int privacyDistance;
-    int child;
-    int trailer;
-    String unit;
-    int dateFormat;
-    // Bike Type and Phone Location Items
-    Spinner bikeTypeSpinner;
-    Spinner phoneLocationSpinner;
-    // Child and Trailer
-    CheckBox childCheckBox;
-    CheckBox trailerCheckBox;
-    Switch unitSwitch;
-    Switch dateFormatSwitch;
-    Switch radmesserConnectionSwitch;
-    Button radmesserButton;
-    private ServiceConnection radmesserServiceConnection = new ServiceConnection() {
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "Connecting to service");
-            RadmesserService.LocalBinder myBinder = (RadmesserService.LocalBinder) service;
-            RadmesserService radmesserService = myBinder.getService();
-        }
-    };
+    // Sliders
+    Slider distanceSlider;
+    TextView distanceSliderTextLeft;
+    TextView distanceSliderTextRight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Setup
         setContentView(R.layout.activity_settings);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbar.setTitle("");
         toolbar.setSubtitle("");
-        toolbarTxt = findViewById(R.id.toolbar_title);
+        TextView toolbarTxt = findViewById(R.id.toolbar_title);
         toolbarTxt.setText(R.string.title_activity_settings);
 
-        backBtn = findViewById(R.id.back_button);
+        ImageButton backBtn = findViewById(R.id.back_button);
         backBtn.setOnClickListener(v -> finish());
 
-        // load unit and date format
-        unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", this);
-        dateFormat = lookUpIntSharedPrefs("Settings-DateFormat", 0, "simraPrefs", this);
+        // Slider: Duration
+        Slider durationSlider = findViewById(R.id.privacyDurationSlider);
+        TextView durationSliderTextLeft = findViewById(R.id.privacyDurationTextLeft);
+        TextView durationSliderTextRight = findViewById(R.id.privacyDurationTextRight);
+        durationSlider.setValueFrom(SharedPref.Settings.Ride.PrivacyDuration.getMinDuration());
+        durationSlider.setValueTo(SharedPref.Settings.Ride.PrivacyDuration.getMaxDuration());
+        durationSlider.setValue(SharedPref.Settings.Ride.PrivacyDuration.getDuration(this));
+        durationSliderTextLeft.setText(SharedPref.Settings.Ride.PrivacyDuration.getMinDuration() + getString(R.string.seconds_short));
+        durationSliderTextRight.setText(SharedPref.Settings.Ride.PrivacyDuration.getMaxDuration() + getString(R.string.seconds_short));
+        durationSlider.addOnChangeListener((slider, changeListener, touchChangeListener) -> {
+            SharedPref.Settings.Ride.PrivacyDuration.setDuration(Math.round(slider.getValue()), this);
+        });
 
-        // Set switches
-        unitSwitch = findViewById(R.id.unitSwitch);
-        if (unit.equals("ft")) {
+        // Slider: Distance
+        distanceSlider = findViewById(R.id.privacyDistanceSlider);
+        distanceSliderTextLeft = findViewById(R.id.privacyDistanceTextLeft);
+        distanceSliderTextRight = findViewById(R.id.privacyDistanceTextRight);
+        updatePrivacyDistanceSlider(SharedPref.Settings.DisplayUnit.getDisplayUnit(this));
+        distanceSlider.addOnChangeListener((slider, changeListener, touchChangeListener) -> {
+            SharedPref.Settings.Ride.PrivacyDistance.setDistance(Math.round(slider.getValue()), SharedPref.Settings.DisplayUnit.getDisplayUnit(this), this);
+        });
+
+        // Select Menu: Bike Type
+        Spinner bikeTypeSpinner = findViewById(R.id.bikeTypeSpinner);
+        bikeTypeSpinner.setSelection(SharedPref.Settings.Ride.BikeType.getBikeType(this));
+        bikeTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                SharedPref.Settings.Ride.BikeType.setBikeType(position, SettingsActivity.this);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        // Select Menu: Phone Location
+        Spinner phoneLocationSpinner = findViewById(R.id.locationTypeSpinner);
+        phoneLocationSpinner.setSelection(SharedPref.Settings.Ride.PhoneLocation.getPhoneLocation(this));
+        phoneLocationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                SharedPref.Settings.Ride.PhoneLocation.setPhoneLocation(position, SettingsActivity.this);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        // CheckBox: Child on Bicycle
+        CheckBox childOnBikeCheckBox = findViewById(R.id.childCheckBox);
+        childOnBikeCheckBox.setChecked(SharedPref.Settings.Ride.ChildOnBoard.isChildOnBoard(this));
+        childOnBikeCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPref.Settings.Ride.ChildOnBoard.setChildOnBoard(isChecked, this);
+        });
+
+        // CheckBox: Bicycle with Trailer
+        CheckBox trailerCheckBox = findViewById(R.id.trailerCheckBox);
+        trailerCheckBox.setChecked(SharedPref.Settings.Ride.BikeWithTrailer.hasTrailer(this));
+        trailerCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPref.Settings.Ride.BikeWithTrailer.setTrailer(isChecked, this);
+        });
+
+        // Switch: Unit Select
+        Switch unitSwitch = findViewById(R.id.unitSwitch);
+        if (SharedPref.Settings.DisplayUnit.isImperial(this)) {
             unitSwitch.setChecked(true);
         }
-        dateFormatSwitch = findViewById(R.id.dateFormatSwitch);
-        if (dateFormat == 1) {
-            dateFormatSwitch.setChecked(true);
-        }
         unitSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                unit = "ft";
-            } else {
-                unit = "m";
-            }
-        });
-        dateFormatSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                dateFormat = 1;
-            } else {
-                dateFormat = 0;
-            }
-        });
-        // Set seekBars
-        SeekBar durationSeekBar = findViewById(R.id.privacyDurationSeekBar);
-        SeekBar distanceSeekBar = findViewById(R.id.privacyDistanceSeekBar);
-
-        // Set textViews
-        TextView durationTextView = findViewById(R.id.privacyDurationSeekBarProgress);
-        TextView distanceTextView = findViewById(R.id.privacyDistanceSeekBarProgress);
-
-        // Load the privacy option values
-        privacyDuration = lookUpLongSharedPrefs("Privacy-Duration", 30, "simraPrefs", this);
-
-        privacyDistance = lookUpIntSharedPrefs("Privacy-Distance", 30, "simraPrefs", this);
-        if (unit.equals("ft")) {
-            privacyDistance = (int) Math.round((lookUpIntSharedPrefs("Privacy-Distance", 30, "simraPrefs", this) * 3.28));
-        }
-
-        // Set the seekBars according to the privacy option values
-        durationSeekBar.setProgress((int) privacyDuration);
-        distanceSeekBar.setProgress(privacyDistance);
-
-        // Set the textViews according to the values of the corresponding seekBars
-        durationTextView.setText(durationSeekBar.getProgress() + "s/" + (durationSeekBar.getMax()) + "s");
-        if (unit.equals("ft")) {
-            distanceTextView.setText(Math.round(distanceSeekBar.getProgress() * 3.28) + unit + "/" + Math.round(distanceSeekBar.getMax() * 3.28) + unit);
-        } else {
-            distanceTextView.setText(distanceSeekBar.getProgress() + unit + "/" + distanceSeekBar.getMax() + unit);
-
-        }
-
-        // Create onSeekBarChangeListeners to change the corresponding options
-        durationSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(durationTextView, "s", "Privacy-Duration"));
-        distanceSeekBar.setOnSeekBarChangeListener(createOnSeekBarChangeListener(distanceTextView, unit, "Privacy-Distance"));
-
-        // Bike Type and Phone Location Spinners
-        bikeTypeSpinner = findViewById(R.id.bikeTypeSpinner);
-        phoneLocationSpinner = findViewById(R.id.locationTypeSpinner);
-
-        childCheckBox = findViewById(R.id.childCheckBox);
-        trailerCheckBox = findViewById(R.id.trailerCheckBox);
-
-        // Load previous bikeType and phoneLocation settings
-        int bikeType = lookUpIntSharedPrefs("Settings-BikeType", 0, "simraPrefs", this);
-        int phoneLocation = lookUpIntSharedPrefs("Settings-PhoneLocation", 0, "simraPrefs", this);
-
-        bikeTypeSpinner.setSelection(bikeType);
-        phoneLocationSpinner.setSelection(phoneLocation);
-
-        // Load previous child and trailer settings
-        child = lookUpIntSharedPrefs("Settings-Child", 0, "simraPrefs", this);
-        trailer = lookUpIntSharedPrefs("Settings-Trailer", 0, "simraPrefs", this);
-
-        if (child == 1) {
-            childCheckBox.setChecked(true);
-        }
-        childCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                child = 1;
-            } else {
-                child = 0;
-            }
-        });
-
-        if (trailer == 1) {
-            trailerCheckBox.setChecked(true);
-        }
-        trailerCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                trailer = 1;
-            } else {
-                trailer = 0;
-            }
+            UnitHelper.DISTANCE displayUnit = isChecked ? UnitHelper.DISTANCE.IMPERIAL : UnitHelper.DISTANCE.METRIC;
+            SharedPref.Settings.DisplayUnit.setDisplayUnit(displayUnit, this);
+            updatePrivacyDistanceSlider(displayUnit);
         });
 
 
-        TextView appVersionTextView = findViewById(R.id.appVersionTextView);
-        appVersionTextView.setText("Version: " + getAppVersionNumber(this));
-
-        // set radmesser connection
+        // Switch: Radmesser device enabled
         boolean radmesserActivated = SharedPref.Settings.Radmesser.isEnabled(this);
+        Switch radmesserConnectionSwitch = findViewById(R.id.radmesserSwitch);
+        Button radmesserButton = findViewById(R.id.radmesserButton);
+        radmesserButton.setVisibility(radmesserActivated ? View.VISIBLE : View.GONE);
+        radmesserButton.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
 
-        radmesserConnectionSwitch = findViewById(R.id.radmesserSwitch);
         if (BluetoothAdapter.getDefaultAdapter() == null) {
             // Device does not support Bluetooth
             radmesserConnectionSwitch.setEnabled(false);
@@ -212,17 +154,25 @@ public class SettingsActivity extends BaseActivity {
                     enableBluetooth();
                 } else {
                     startRadmesserService();
-//                    showTutorialDialog();
                 }
             } else {
                 stopService(new Intent(this, RadmesserService.class));
             }
         });
 
-        radmesserButton = findViewById(R.id.radmesserButton);
-        radmesserButton.setVisibility(radmesserActivated ? View.VISIBLE : View.GONE);
-        radmesserButton.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
 
+        // Version Text
+        TextView appVersionTextView = findViewById(R.id.appVersionTextView);
+        appVersionTextView.setText("Version: " + getAppVersionNumber(this));
+
+    }
+
+    private void updatePrivacyDistanceSlider(UnitHelper.DISTANCE unit) {
+        distanceSlider.setValueFrom(SharedPref.Settings.Ride.PrivacyDistance.getMinDistance(unit));
+        distanceSlider.setValueTo(SharedPref.Settings.Ride.PrivacyDistance.getMaxDistance(unit));
+        distanceSlider.setValue(SharedPref.Settings.Ride.PrivacyDistance.getDistance(unit, this));
+        distanceSliderTextLeft.setText(SharedPref.Settings.Ride.PrivacyDistance.getMinDistance(unit) + UnitHelper.getShortTranslationForUnit(unit, this));
+        distanceSliderTextRight.setText(SharedPref.Settings.Ride.PrivacyDistance.getMaxDistance(unit) + UnitHelper.getShortTranslationForUnit(unit, this));
     }
 
     private void showTutorialDialog() {
@@ -258,7 +208,6 @@ public class SettingsActivity extends BaseActivity {
     private void startRadmesserService() {
         Intent intent = new Intent(this, RadmesserService.class);
         startService(intent);
-        bindService(intent, radmesserServiceConnection, Context.BIND_IMPORTANT);
     }
 
     private void enableBluetooth() {
@@ -266,78 +215,10 @@ public class SettingsActivity extends BaseActivity {
         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
     }
 
-    // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)
-    private SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener(TextView tV, String unit, String privacyOption) {
-
-        return new SeekBar.OnSeekBarChangeListener() {
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                if (unit.equals("s")) {
-                    if (progress < 3) {
-                        seekBar.setProgress(3);
-                    }
-                }
-                if (unit.equals("ft")) {
-                    tV.setText(Math.round(seekBar.getProgress() * 3.28) + unit + "/" + Math.round(seekBar.getMax() * 3.28) + unit);
-
-                } else {
-                    tV.setText(seekBar.getProgress() + unit + "/" + seekBar.getMax() + unit);
-
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-                if (unit.equals("s")) {
-                    if (seekBar.getProgress() < 3) {
-                        seekBar.setProgress(3);
-                    }
-                }
-                if (unit.equals("ft")) {
-                    tV.setText(Math.round(seekBar.getProgress() * 3.28) + unit + "/" + Math.round(seekBar.getMax() * 3.28) + unit);
-
-                } else {
-                    tV.setText(seekBar.getProgress() + unit + "/" + seekBar.getMax() + unit);
-
-                }
-                if (privacyOption.equals("Privacy-Duration")) {
-                    privacyDuration = seekBar.getProgress();
-                    //writeLongToSharedPrefs(privacyOption, (long) seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
-                } else if (privacyOption.equals("Privacy-Distance")) {
-                    privacyDistance = seekBar.getProgress();
-                    // writeIntToSharedPrefs(privacyOption, seekBar.getProgress(), "simraPrefs", SettingsActivity.this);
-                } else {
-                    Log.e(TAG, "onStopTrackingTouch unknown privacyOption: " + privacyOption);
-                }
-            }
-        };
-    }
-
     @Override
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop called");
-        try {
-            unbindService(radmesserServiceConnection);
-        } catch (Exception e) {
-        }
-
-        writeLongToSharedPrefs("Privacy-Duration", privacyDuration, "simraPrefs", this);
-        writeIntToSharedPrefs("Privacy-Distance", privacyDistance, "simraPrefs", this);
-        writeIntToSharedPrefs("Settings-BikeType", bikeTypeSpinner.getSelectedItemPosition(), "simraPrefs", this);
-        writeIntToSharedPrefs("Settings-PhoneLocation", phoneLocationSpinner.getSelectedItemPosition(), "simraPrefs", this);
-        writeIntToSharedPrefs("Settings-Child", child, "simraPrefs", this);
-        writeIntToSharedPrefs("Settings-Trailer", trailer, "simraPrefs", this);
-        writeToSharedPrefs("Settings-Unit", unit, "simraPrefs", this);
-        writeIntToSharedPrefs("Settings-DateFormat", dateFormat, "simraPrefs", this);
     }
 
 }
