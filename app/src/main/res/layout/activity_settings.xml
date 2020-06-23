@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="40dp"
             android:layout_marginEnd="5dp"
             android:background="@android:color/transparent"
             android:orientation="vertical">
@@ -53,7 +53,7 @@
                 <Space
                     android:id="@+id/settingsSpace2"
                     android:layout_width="match_parent"
-                    android:layout_height="20dp" />
+                    android:layout_height="10dp" />
 
                 <TextView
                     android:id="@+id/privacyDurationSeekBarTitle"
@@ -159,7 +159,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="20dp" />
+                android:layout_height="10dp" />
 
             <TextView
                 android:id="@+id/bikeTypeSpinnerTitle"
@@ -319,7 +319,7 @@
                 <Space
                     android:id="@+id/generalSettingsSpace2"
                     android:layout_width="match_parent"
-                    android:layout_height="20dp" />
+                    android:layout_height="10dp" />
 
                 <TextView
                     android:id="@+id/unitTitle"
@@ -364,6 +364,11 @@
                     android:text="@string/devices"
                     android:textSize="20sp"
                     android:textStyle="bold" />
+
+                <Space
+                    android:id="@+id/generalSettingsSpace4"
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
