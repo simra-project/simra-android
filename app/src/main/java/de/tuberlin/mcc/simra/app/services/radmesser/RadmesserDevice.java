@@ -28,12 +28,12 @@ public class RadmesserDevice {
     public static final String UUID_SERVICE_CHARACTERISTIC_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000001";
     private final String TAG = "RadmesserDevice";
     private final BluetoothDevice bluetoothDevice;
-    private final RadmesserDeviceCallbacks callbacks;
-    private de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices;
+    private final RadmesserDeviceConnectionStateCallback callbacks;
+    private BLEServiceManager bleServices;
     private ConnectionStatus connectionState = ConnectionStatus.gattDisconnected;
     private BluetoothGatt gattConnection;
 
-    public RadmesserDevice(BluetoothDevice bluetoothDevice, RadmesserDeviceCallbacks callbacks, de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager bleServices) {
+    public RadmesserDevice(BluetoothDevice bluetoothDevice, RadmesserDeviceConnectionStateCallback callbacks, BLEServiceManager bleServices) {
         this.bluetoothDevice = bluetoothDevice;
         this.callbacks = callbacks;
         this.bleServices = bleServices;
@@ -75,7 +75,7 @@ public class RadmesserDevice {
                     HashSet<BLEServiceManager.BLEService> requestedServices = bleServices.byService(foundService.getUuid());
                     if (requestedServices == null) continue;
                     Log.i(TAG, "Found " + requestedServices.size() + " Services for UUID:" + foundService.getUuid().toString());
-                    for (de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager.BLEService requestedService : requestedServices) {
+                    for (BLEServiceManager.BLEService requestedService : requestedServices) {
                         if (requestedService.registered) continue;
                         //found new Service on device, which is to be registered
                         BluetoothGattCharacteristic characteristic = gatt
@@ -130,7 +130,7 @@ public class RadmesserDevice {
         gattDisconnected
     }
 
-    public interface RadmesserDeviceCallbacks {
+    public interface RadmesserDeviceConnectionStateCallback {
         void onConnectionStateChange();
     }
 

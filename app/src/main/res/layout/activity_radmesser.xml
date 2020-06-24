@@ -84,6 +84,7 @@
             android:text="Geräte-Info" />
 
         <Button
+            android:id="@+id/btnDisconnect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"

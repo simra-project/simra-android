@@ -23,6 +23,7 @@ public class BLEScanner {
     private final int DEFAULT_SCANNING_DURATION_SECONDS = 8;
     private BluetoothLeScanner bluetoothLeScanner;
     private BLEScannerCallbacks callbacks;
+    private ScanCallback scanCallabck;
 
 
     private HashMap<String, BluetoothDevice> foundDevices;
@@ -36,9 +37,9 @@ public class BLEScanner {
         }
     }
 
-    public boolean tryConnectPairedDevice(String pairedRadmesserID, SingleDeviceScanCB then) {
-        if (pairedRadmesserID == null)
-            return false;
+    public void findDeviceById(String pairedRadmesserID, SingleDeviceScanCB then) {
+        if (scanCallabck != null)
+            bluetoothLeScanner.stopScan(scanCallabck);  //stop any current scan
 
         //create filter matching this device
         ArrayList<ScanFilter> filterList = new ArrayList<>();
@@ -47,14 +48,13 @@ public class BLEScanner {
         filterList.add(builder.build());
 
         startScan(
-                5,
+                3,
                 filterList,
                 (device, callback) -> {
                     then.onSpecificDeviceFound(device);
                     stopScan(callback);
                 }
         );
-        return true;
     }
 
     public void connectAnyNewDevice(BLEServiceManager bleServices, SingleDeviceScanCB then) {
@@ -68,6 +68,7 @@ public class BLEScanner {
     }
 
     public void scanDevices(BLEServiceManager bleServices) {
+
         startScan(
                 8,
                 createFilterListFromBLEServiceManager(bleServices),
@@ -93,7 +94,7 @@ public class BLEScanner {
         ScanSettings scanSettings = new ScanSettings.Builder().build();
 
         foundDevices = new HashMap<>();
-        ScanCallback scanCallabck = new ScanCallback() {
+        scanCallabck = new ScanCallback() {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
                 String deviceID = result.getDevice().getAddress();
@@ -116,15 +117,16 @@ public class BLEScanner {
         }
 
         //stop Scan after duration, if not already stoped
-        Handler stopScanHandler = new Handler(Looper.getMainLooper());
+        Handler stopScanHandler = new Handler(Looper.myLooper());
         stopScanHandler.postDelayed(() -> {
             stopScan(scanCallabck);
-            Log.i(TAG, "scan stopped");
+
         }, duration * 1000);
         return true;
     }
 
     private void stopScan(ScanCallback scanCallback) {
+        Log.i(TAG, "scan stopped");
         bluetoothLeScanner.stopScan(scanCallback);
         callbacks.onScanStopped();
     }
