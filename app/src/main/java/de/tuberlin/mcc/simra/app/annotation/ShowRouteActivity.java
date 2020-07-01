@@ -55,6 +55,7 @@ import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.activities.EvaluateClosePassActivity;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
@@ -231,11 +232,11 @@ public class ShowRouteActivity extends BaseActivity {
         if (state < 2) {
             addIncBttn.setVisibility(View.VISIBLE);
             exitButton.setVisibility(View.INVISIBLE);
-            //if (!IOUtils.isDirectoryEmpty(IOUtils.Directories.getPictureCacheDirectoryPath())) {
-            Intent intent = new Intent(ShowRouteActivity.this, EvaluateClosePassActivity.class);
-            intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
-            startActivity(intent);
-            //}
+            if (!IOUtils.isDirectoryEmpty(IOUtils.Directories.getPictureCacheDirectoryPath())) {
+                Intent intent = new Intent(ShowRouteActivity.this, EvaluateClosePassActivity.class);
+                intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
+                startActivity(intent);
+            }
         } else {
             addIncBttn.setVisibility(View.GONE);
             privacySliderLinearLayout.setVisibility(View.INVISIBLE);

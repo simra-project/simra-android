@@ -1,38 +1,25 @@
 package de.tuberlin.mcc.simra.app.entities;
 
-import android.util.Log;
-
 import androidx.annotation.Nullable;
 
 public class DataLogEntry {
-    @Nullable
-    public final double latitude;
-    @Nullable
-    public final double longitude;
-    public final double accelerometerX;
-    public final double accelerometerY;
-    public final double accelerometerZ;
-    public final long timestamp;
-    @Nullable
-    public final double GPSAccuracy;
-    @Nullable
-    public final double gyroscopeA;
-    @Nullable
-    public final double gyroscopeB;
-    @Nullable
-    public final double gyroscopeC;
-    @Nullable
-    public final long RadmesserTimeStamp;
-    @Nullable
-    public final double RadmesserDistanceLeft1;
-    @Nullable
-    public final double RadmesserDistanceLeft2;
-    @Nullable
-    public final double RadmesserDistanceRight1;
-    @Nullable
-    public final double RadmesserDistanceRight2;
+    public final Double latitude;
+    public final Double longitude;
+    public final Double accelerometerX;
+    public final Double accelerometerY;
+    public final Double accelerometerZ;
+    public final Long timestamp;
+    public final Double GPSAccuracy;
+    public final Double gyroscopeA;
+    public final Double gyroscopeB;
+    public final Double gyroscopeC;
+    public final Long RadmesserTimeStamp;
+    public final Double RadmesserDistanceLeft1;
+    public final Double RadmesserDistanceLeft2;
+    public final Double RadmesserDistanceRight1;
+    public final Double RadmesserDistanceRight2;
 
-    private DataLogEntry(double latitude, double longitude, double accelerometerX, double accelerometerY, double accelerometerZ, long timestamp, double GPSAccuracy, double gyroscopeA, double gyroscopeB, double gyroscopeC, long radmesserTimeStamp, Double radmesserDistanceLeft1, @Nullable Double radmesserDistanceLeft2, @Nullable Double radmesserDistanceRight1, @Nullable Double radmesserDistanceRight2) {
+    private DataLogEntry(Double latitude, Double longitude, Double accelerometerX, Double accelerometerY, Double accelerometerZ, Long timestamp, Double GPSAccuracy, Double gyroscopeA, Double gyroscopeB, Double gyroscopeC, Long radmesserTimeStamp, Double radmesserDistanceLeft1, @Nullable Double radmesserDistanceLeft2, @Nullable Double radmesserDistanceRight1, @Nullable Double radmesserDistanceRight2) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.accelerometerX = accelerometerX;
@@ -100,9 +87,9 @@ public class DataLogEntry {
         dataLogEntry.withRadmesser(
                 dataLogLine.length > 11 ? (!dataLogLine[11].isEmpty() ? Long.parseLong(dataLogLine[11]) : null) : null,
                 dataLogLine.length > 10 ? (!dataLogLine[10].isEmpty() ? Double.parseDouble(dataLogLine[10]) : null) : null,
-                dataLogLine.length > 12 ? (!dataLogLine[12].isEmpty()  ? Double.parseDouble(dataLogLine[12]) : null) : null,
-                dataLogLine.length > 13 ? (!dataLogLine[13].isEmpty()  ? Double.parseDouble(dataLogLine[13]) : null) : null,
-                dataLogLine.length > 14 ? (!dataLogLine[14].isEmpty()  ? Double.parseDouble(dataLogLine[14]) : null) : null
+                dataLogLine.length > 12 ? (!dataLogLine[12].isEmpty() ? Double.parseDouble(dataLogLine[12]) : null) : null,
+                dataLogLine.length > 13 ? (!dataLogLine[13].isEmpty() ? Double.parseDouble(dataLogLine[13]) : null) : null,
+                dataLogLine.length > 14 ? (!dataLogLine[14].isEmpty() ? Double.parseDouble(dataLogLine[14]) : null) : null
         );
 
         return dataLogEntry.build();
@@ -115,26 +102,26 @@ public class DataLogEntry {
 
     static final class Builder {
 
-        private double latitude;
-        private double longitude;
-        private double accelerometerX;
-        private double accelerometerY;
-        private double accelerometerZ;
-        private long timestamp;
-        private double GPSAccuracy;
-        private double gyroscopeA;
-        private double gyroscopeB;
-        private double gyroscopeC;
-        private long radmesserTimeStamp;
-        private double radmesserDistanceLeft1;
-        private double radmesserDistanceLeft2;
-        private double radmesserDistanceRight1;
-        private double radmesserDistanceRight2;
+        private Double latitude;
+        private Double longitude;
+        private Double accelerometerX;
+        private Double accelerometerY;
+        private Double accelerometerZ;
+        private Long timestamp;
+        private Double GPSAccuracy;
+        private Double gyroscopeA;
+        private Double gyroscopeB;
+        private Double gyroscopeC;
+        private Long radmesserTimeStamp;
+        private Double radmesserDistanceLeft1;
+        private Double radmesserDistanceLeft2;
+        private Double radmesserDistanceRight1;
+        private Double radmesserDistanceRight2;
 
         private Builder() {
         }
 
-        public Builder withBaseValues(double vAccelerometerX, double vAccelerometerY, double vAccelerometerZ, long vTimestamp) {
+        public Builder withBaseValues(Double vAccelerometerX, Double vAccelerometerY, Double vAccelerometerZ, Long vTimestamp) {
             accelerometerX = vAccelerometerX;
             accelerometerY = vAccelerometerY;
             accelerometerZ = vAccelerometerZ;
@@ -142,21 +129,21 @@ public class DataLogEntry {
             return this;
         }
 
-        public Builder withGPS(double vLatitude, double vLongitude, double vGPSAccuracy) {
+        public Builder withGPS(Double vLatitude, Double vLongitude, Double vGPSAccuracy) {
             latitude = vLatitude;
             longitude = vLongitude;
             GPSAccuracy = vGPSAccuracy;
             return this;
         }
 
-        public Builder withGyroscope(double vGyroscopeA, double vGyroscopeB, double vGyroscopeC) {
+        public Builder withGyroscope(Double vGyroscopeA, Double vGyroscopeB, Double vGyroscopeC) {
             gyroscopeA = vGyroscopeA;
             gyroscopeB = vGyroscopeB;
             gyroscopeC = vGyroscopeC;
             return this;
         }
 
-        public Builder withRadmesser(long vRadmesserTimeStamp, Double vRadmesserDistanceLeft1, Double vRadmesserDistanceLeft2, Double vRadmesserDistanceRight1, Double vRadmesserDistanceRight2) {
+        public Builder withRadmesser(Long vRadmesserTimeStamp, Double vRadmesserDistanceLeft1, Double vRadmesserDistanceLeft2, Double vRadmesserDistanceRight1, Double vRadmesserDistanceRight2) {
             radmesserTimeStamp = vRadmesserTimeStamp;
             radmesserDistanceLeft1 = vRadmesserDistanceLeft1;
             if (vRadmesserDistanceLeft2 != null) {

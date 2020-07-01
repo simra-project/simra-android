@@ -22,6 +22,7 @@ import de.tuberlin.mcc.simra.app.annotation.Ride;
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.recalculateStatistics;
@@ -30,6 +31,24 @@ import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 public class VersionUpdater {
 
     private static final String TAG = "VersionUpdater_LOG";
+
+    /**
+     * Migrate Shared Prefs Data from previous Versions to the current
+     *
+     * @param context
+     */
+    public static void migrate(Context context) {
+        int lastAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
+        updateToV27(context, lastAppVersion);
+        updateToV30(context, lastAppVersion);
+        updateToV31(context, lastAppVersion);
+        updateToV32(context, lastAppVersion);
+        updateToV39(context, lastAppVersion);
+        updateToV50(context, lastAppVersion);
+        updateToV52(context, lastAppVersion);
+        updateToV58(context, lastAppVersion);
+        writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
+    }
 
 
     /**

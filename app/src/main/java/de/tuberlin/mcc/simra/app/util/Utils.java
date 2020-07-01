@@ -1,6 +1,5 @@
 package de.tuberlin.mcc.simra.app.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -13,8 +12,6 @@ import android.util.Log;
 import android.util.Pair;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -339,22 +336,6 @@ public class Utils {
             result[i] = getProfileWithoutDemographics("Profile_" + i, context);
         }
         return result;
-    }
-
-    public static void permissionRequest(Activity activity, final String[] requestedPermission, String rationaleMessage, final int accessCode) {
-        // Check whether FINE_LOCATION or ACCESS_BACKGROUND_LOCATION permissions are not granted
-        if ((ContextCompat.checkSelfPermission(activity, requestedPermission[0])
-                != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(activity, requestedPermission[1])
-                != PackageManager.PERMISSION_GRANTED)) {
-
-            // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
-            // in an AlertDialog and request access to FINE_LOCATION
-
-            // The OK-Button fires a requestPermissions
-            DialogInterface.OnClickListener rationaleOnClickListener = (dialog, which) -> ActivityCompat.requestPermissions(activity,
-                    requestedPermission, accessCode);
-            showMessageOK(rationaleMessage, rationaleOnClickListener, activity);
-        }
     }
 
     // recalculates all statistics, updates metaData.csv, Profile.xml and deletes temp files

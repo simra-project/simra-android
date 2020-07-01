@@ -64,13 +64,5 @@ public class IOUtils {
             }
             return app_folder_path;
         }
-
-        public static boolean doesPictureCacheDirectoryHasContent() {
-            String app_folder_path = getPictureCacheDirectoryPath();
-            File dir = new File(app_folder_path);
-            return isDirectoryEmpty(getPictureCacheDirectoryPath());
-        }
-
-
     }
 }

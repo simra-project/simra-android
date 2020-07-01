@@ -18,9 +18,7 @@
 
     <!--- Start -->
     <string name="welcome_header">Welcome to SimRa!</string>
-    <string name="welcome_text">Thank you for supporting the SimRa project.</string>
-    <string name="welcome_text2">Have fun, and bon voyage.</string>
-    <string name="welcome_text3">Best, the SimRa team</string>
+    <string name="welcome_text">Thank you for supporting the SimRa project.\nHave fun, and a great ride!</string>
     <string name="sendErrorTitle">Whoops!</string>
     <string name="sendErrorMessage">Seems like an error occurred during your last session. Would you like to send a report to help us improve the app?</string>
     <string name="simra_closed">SimRa closed</string>
@@ -47,9 +45,8 @@
     <string name="link_to_twitter">https://twitter.com/SimRa_Berlin</string>
 
     <!--- Permission -->
-    <string name="permissionFineLocation">In order to continue, please allow SimRa to access your location.</string>
-    <string name="locationPermissionRequestRationale">This app needs permission to access your location data in order to show you your location on the map and to record your rides.</string>
-    <string name="storagePermissionRequestRationale">This app needs permission to access your storage in order to show you the map.</string>
+
+    <string name="base_permission_rationale">In order to continue, please allow SimRa to access your location and storage.\nWe need those to show your location on the map and record your rides.</string>
 
     <!--- WebActivity -->
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>

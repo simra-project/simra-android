@@ -1,6 +1,5 @@
 package de.tuberlin.mcc.simra.app.activities;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -10,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
@@ -37,7 +35,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -74,6 +71,7 @@ import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.Utils;
@@ -316,13 +314,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // (4): NEUE ROUTE / START BUTTON
         startBtn = findViewById(R.id.button_start);
         startBtn.setOnClickListener(v -> {
-            // For permission request
-            int LOCATION_ACCESS_CODE = 1;
-            // Check whether FINE_LOCATION permission is not granted
-            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                String[] locationPermissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
-                Utils.permissionRequest(MainActivity.this, locationPermissions, MainActivity.this.getString(R.string.locationPermissionRequestRationale), LOCATION_ACCESS_CODE);
+            if (PermissionHelper.hasBasePermissions(this)) {
+                PermissionHelper.requestFirstBasePermissionsNotGranted(MainActivity.this);
                 Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
             } else {
                 if (isLocationServiceOff(MainActivity.this)) {
