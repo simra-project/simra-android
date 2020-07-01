@@ -589,33 +589,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
         String fileInfoLine = appVersion + "#" + metaDataFileVersion + System.lineSeparator();
         overWriteFile((fileInfoLine + METADATA_HEADER + metaDataContent), "metaData.csv", this);
-        /*
-        StringBuilder accEventsDataContent = new StringBuilder();
-        String accEventsFileVersion = "";
-        String accEventName = "accEvents" + ride.getKey() + ".csv";
-        if(temp) {
-            accEventName = "Temp" + accEventName;
-        }
 
-        try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(accEventName)))) {
-            // accEventsFileVersion line: 23#7
-            accEventsFileVersion = br.readLine().split("#")[1];
-            // skip header
-            String line = br.readLine();
-
-            while ((line = br.readLine()) != null) {
-                String[] accEventsLine = line.split(",", -1);
-                if (checkForAnnotation(accEventsLine)) {
-                    accEventsDataContent.append(line).append(System.lineSeparator());
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        fileInfoLine = appVersion + "#" + accEventsFileVersion + System.lineSeparator();
-        overWriteFile((fileInfoLine + ACCEVENTS_HEADER + accEventsDataContent), accEventName, this);
-        */
         // tempAccEventsPath
         // tempAccGpsPath
         if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {

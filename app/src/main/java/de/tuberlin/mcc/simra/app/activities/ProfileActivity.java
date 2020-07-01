@@ -134,36 +134,7 @@ public class ProfileActivity extends AppCompatActivity {
         Log.d(TAG, "regionSpinner.getSelectedItem().toString(): " + regionSpinner.getSelectedItem().toString());
         Log.d(TAG, "region index: " + region);
 
-        /*
-        switch (regionSpinner.getSelectedItem().toString()) {
-            case "Berlin/Potsdam":
-                region = 1;
-                break;
-            case "London":
-                region = 2;
-                break;
-            case "Sonstiges":
-            case "Other":
-                region = 3;
-                break;
-            case "Bern":
-                region = 4;
-                break;
-            case "Pforzheim/Enzkreis":
-                region = 5;
-                break;
-            case "Augsburg":
-                region = 6;
-                break;
-            case "Ruhrgebiet":
-                region = 7;
-                break;
-            case "Stuttgart":
-                region = 8;
-                break;
-            default:
-                region = 0;
-        }*/
+
         int experience = experienceSpinner.getSelectedItemPosition();
         int behaviour = behaviourSeekBar.getProgress();
         // Log.d(TAG, "behaviour: " + behaviourSeekBar.getProgress() + " isEnabled: " + behaviourSeekBar.isEnabled());
@@ -177,18 +148,6 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    /*
-    private int[] loadPreviousProfile() {
-        // {ageGroup, gender, region, experience, driving, behaviour}
-        int[] result = new int[5];
-        result[0] = lookUpIntSharedPrefs("Age", 0, "Profile", this);
-        result[1] = lookUpIntSharedPrefs("Gender", 0, "Profile", this);
-        result[2] = lookUpIntSharedPrefs("Region", 0, "Profile", this);
-        result[3] = lookUpIntSharedPrefs("Experience", 0, "Profile", this);
-        result[4] = lookUpIntSharedPrefs("Behaviour", -1, "Profile", this);
-        return result;
-    }
-    */
     // OnSeekBarChangeListener to update the corresponding value (privacy duration or distance)
     private SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener() {
 

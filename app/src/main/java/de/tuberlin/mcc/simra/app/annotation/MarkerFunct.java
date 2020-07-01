@@ -94,55 +94,6 @@ public class MarkerFunct {
                 setMarker(mother.ride.events.get(i), mother.ride.events.get(i).key);
             }
         }
-
-        /*
-        String path = "accEvents" + rideID + ".csv";
-        if (temp) {
-            path = "TempaccEvents" + rideID + ".csv";
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader
-                (mother.getApplicationContext()
-                        .getFileStreamPath(path)))) {
-
-
-
-            String line;
-            line = reader.readLine();
-            line = reader.readLine();
-
-
-            while ((line = reader.readLine()) != null) {
-
-                String[] actualIncident = line.split(",", -1);
-
-                Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident));
-
-                boolean annotated = checkForAnnotation(actualIncident);
-                String incidentType = actualIncident[8];
-
-                Log.d(TAG, "annotated:" + annotated);
-
-                AccEvent accEvent = new AccEvent(Integer.parseInt(actualIncident[0]),
-                        Double.parseDouble(actualIncident[1]),
-                        Double.parseDouble(actualIncident[2]),
-                        Long.parseLong(actualIncident[3]), annotated, incidentType,actualIncident[18]);
-
-                if (temp) {
-                    mother.tempRide.events.add(accEvent);
-                } else {
-                    // mother.ride.events.set(Integer.valueOf(actualIncident[0]),accEvent);
-                    mother.ride.events.add(accEvent);
-                }
-
-                Log.d(TAG, "accEvent key: " + accEvent.key + " accEvent.position" + accEvent.position.toString());
-                setMarker(accEvent, accEvent.key);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
     }
 
     public void addCustMarker(GeoPoint p) {

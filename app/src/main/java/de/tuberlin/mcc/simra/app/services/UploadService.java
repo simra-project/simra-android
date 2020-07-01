@@ -210,16 +210,7 @@ public class UploadService extends Service {
                 // contains one Object[] for each region. The arrays contain the following information:
                 // {NumberOfRides,Duration,NumberOfIncidents,WaitedTime,Distance,Co2,0,...,23,NumberOfScary}
                 Object[][] regionProfiles = getRegionProfilesArrays(numberOfRegions, context);
-                /*
-                // contains on Float[] for each region. The arrays contain the 24 float-values of the time buckets
-                // we need this, because Object[] can't be cast to Float[], but Float[] is expected by
-                Float[][] regionTimeBuckets = new Float[numberOfRegions][24];
-                for (int i = 0; i < numberOfRegions; i++) {
-                    for (int j = 0; j < 24; j++) {
-                        regionTimeBuckets[i][j] = (Float)regionProfiles[i][j+6];
-                    }
-                }
-                */
+               
                 String fileVersion = "";
                 StringBuilder metaDataContent = new StringBuilder();
 
@@ -356,32 +347,7 @@ public class UploadService extends Service {
                     e.printStackTrace();
                 }
 
-                /*
-                String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-                int[] demographics = getProfileDemographics(context);
-                StringBuilder timeBucketsString = new StringBuilder();
-                for (int i = 0; i < timeBuckets.length; i++) {
-                    timeBucketsString.append(timeBuckets[i]).append(",");
-                }
-                overWriteFile(fileInfoLine + PROFILE_HEADER + demographics + "," + totalNumberOfRides + "," + totalDuration + "," + totalNumberOfIncidents + "," + totalWaitedTime + "," + totalDistance + "," + totalCO2 + timeBucketsString.toString() + behaviour, "profile.csv", context);
-                */
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // Sending / Updating profile with each upload
-
-
-                // get profile.csv data to update it when the uploads are successful
-                /*
-                String profileInfoLine;
-                String[] profile;
-                try (BufferedReader profileReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/profile.csv"))))) {
-                    // fileInfo
-                    profileInfoLine = profileReader.readLine();
-                    // header birth,gender,region,experience,numberOfRides,duration,numberOfIncidents,waitedTime,distance,co2,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,behaviour
-                    profileReader.readLine();
-                    // 0,1,1,4,9,6626289,5,3060,46444,6409,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,3.5,1.5,0.0,3.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,3
-                    profile = profileReader.readLine().split(",");
-                }
-                */
+                
                 Log.d(TAG, "uploadFile() totalWaitedTime: " + totalWaitedTime);
                 // Now after the rides have been uploaded, we can update the profile with the new statistics
                 updateProfile(true, context, -1, -1, -1, -1, totalNumberOfRides, totalDuration, totalNumberOfIncidents, totalWaitedTime, totalDistance, totalCO2, timeBuckets, -2, totalNumberOfScary);
@@ -410,13 +376,7 @@ public class UploadService extends Service {
                         }
                         profileContentToSend.append(demographics[4]).append(",");
                         profileContentToSend.append(regionProfiles[p][30]);
-                        /*
-                        for (int i = 0; i < profile.length; i++) {
-                            profileContentToSend.append(profile[i]);
-                            if (!(i == profile.length - 1))
-                                profileContentToSend.append(",");
-                        }
-                        */
+
                         String profilePassword = lookUpSharedPrefs("Profile_" + p, "-1", "keyPrefs", context);
                         Log.d(TAG, "Saved password: " + profilePassword);
                         if (profilePassword.equals("-1")) {
@@ -524,36 +484,5 @@ public class UploadService extends Service {
 
             return new Pair<>(status, response);
         }
-
-        /*
-        private String getDemographics() {
-            int birth = lookUpIntSharedPrefs("Profile-Age", 0, "simraPrefs", context);
-            int gender = lookUpIntSharedPrefs("Profile-Gender", 0, "simraPrefs", context);
-            int region = lookUpIntSharedPrefs("Profile-Region", 0, "simraPrefs", context);
-            int experience = lookUpIntSharedPrefs("Profile-Experience", 0, "simraPrefs", context);
-            return birth + "," + gender + "," + region + "," + experience;
-        }
-        */
-
-        /*private String[] getProfileWithoutDemographics() {
-            String[] result = null;
-            try (BufferedReader metaDataReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(context.getFilesDir() + "/profile.csv"))))) {
-                // fileInfo
-                metaDataReader.readLine();
-                // header
-                metaDataReader.readLine();
-                String[] profileEntries = metaDataReader.readLine().split(",");
-                Log.d(TAG, "profileEntries: " + Arrays.toString(profileEntries));
-                result = new String[profileEntries.length-4];
-                for (int i = 0; i < profileEntries.length-4; i++) {
-                    result[i] = profileEntries[i+4];
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return result;
-        }*/
     }
 }

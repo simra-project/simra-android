@@ -153,17 +153,6 @@ public class Ride {
                         if ((distanceToLastPoint / timePassed) < 22) {
                             distance += (long) distanceToLastPoint;
                             polyLine.addPoint(new GeoPoint(thisLocation));
-                        } else {
-                            /*
-                            Log.d(TAG, "last location: " + previousLocation.getLatitude()
-                                    + "," + previousLocation.getLongitude());
-                            Log.d(TAG, "this location: "  + thisLocation.getLatitude()
-                                    + "," + thisLocation.getLongitude());
-                            Log.d(TAG, "last time: " + previousTimeStamp);
-                            Log.d(TAG, "this time: " + thisTimeStamp);
-                            Log.d(TAG, "distanceToLastPoint: " + distanceToLastPoint + "m"
-                                    + " timePassed: " + timePassed + " speed: " + (distanceToLastPoint/timePassed));
-                            */
                         }
                         previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
                         previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));

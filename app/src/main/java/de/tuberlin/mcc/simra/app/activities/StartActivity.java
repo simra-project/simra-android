@@ -125,15 +125,6 @@ public class StartActivity extends BaseActivity {
                         + System.lineSeparator()), "metaData.csv", this);
 
             }
-            /*
-            Log.d(TAG, "firstTime. Creating profile.csv");
-            if (!fileExists("profile.csv", this)) {
-                String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
-
-                overWriteFile((fileInfoLine + PROFILE_HEADER), "profile.csv", this);
-
-            }
-            */
         }
         return firstTime;
     }
