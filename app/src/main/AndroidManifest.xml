@@ -51,7 +51,7 @@
         <activity
             android:name=".activities.StatisticsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_statistics"/>
+            android:label="@string/title_activity_statistics" />
         <activity
             android:name=".activities.AboutActivity"
             android:configChanges="orientation|screenSize"
@@ -63,10 +63,10 @@
             android:name=".annotation.RideSettingsActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_ride_settings"
-            android:parentActivityName=".annotation.ShowRouteActivity">
+            android:parentActivityName=".activities.ShowRouteActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity" />
+                android:value="de.tuberlin.mcc.simra.app.activities.ShowRouteActivity" />
         </activity>
         <activity
             android:name=".activities.LicenseActivity"
@@ -105,7 +105,7 @@
                 android:value="de.tuberlin.mcc.simra.app.activities.MainActivity" />
         </activity>
         <activity
-            android:name=".annotation.ShowRouteActivity"
+            android:name=".activities.ShowRouteActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.EvaluateClosePassActivity"

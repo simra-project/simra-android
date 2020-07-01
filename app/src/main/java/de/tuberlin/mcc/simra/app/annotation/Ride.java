@@ -32,10 +32,10 @@ public class Ride {
     public int child;
     public int trailer;
     public int pLoc;
+    public int waitedTime;
     String duration;
     String startTime;
     String endTime;
-    int waitedTime;
     Context context;
     Polyline route;
     boolean temp = false;

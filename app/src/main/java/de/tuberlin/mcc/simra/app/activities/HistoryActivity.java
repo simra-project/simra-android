@@ -42,7 +42,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.SharedPref;

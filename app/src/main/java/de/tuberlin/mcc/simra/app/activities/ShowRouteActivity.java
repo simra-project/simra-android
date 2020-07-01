@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.annotation;
+package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -52,7 +52,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.activities.EvaluateClosePassActivity;
+import de.tuberlin.mcc.simra.app.annotation.MarkerFunct;
+import de.tuberlin.mcc.simra.app.annotation.Ride;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
