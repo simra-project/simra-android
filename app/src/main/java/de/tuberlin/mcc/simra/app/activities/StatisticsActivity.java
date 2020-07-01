@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.util.SharedPref;
 
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getGlobalProfile;
@@ -49,7 +50,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         backBtn = findViewById(R.id.back_button);
         backBtn.setOnClickListener(v -> finish());
-        String unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", this);
+        Boolean isImperialUnit = SharedPref.Settings.DisplayUnit.isImperial(this);
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
         // String[] profileValues = readContentFromFile("profile.csv", this).split(System.lineSeparator())[2].split(",");
         Object[] profileValues = getGlobalProfile(this);
@@ -80,7 +81,7 @@ public class StatisticsActivity extends AppCompatActivity {
         // total distance of all uploaded rides
         TextView distanceOfRides = findViewById(R.id.distanceOfRidesText);
         double distance = (double) (long) profileValues[8];
-        if (unit.equals("ft")) {
+        if (isImperialUnit) {
             distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((distance / 1600) * 100.0)) / 100.0) + " mi");
         } else {
             distanceOfRides.setText(getText(R.string.distance) + " " + (Math.round(((distance / 1000) * 100.0)) / 100.0) + " km");
@@ -89,9 +90,9 @@ public class StatisticsActivity extends AppCompatActivity {
 
         // average distance per ride of all uploaded rides
         TextView avgDistanceOfRides = findViewById(R.id.averageDistanceOfRidesText);
-        if (unit.equals("ft") && ridesCount > 0) {
+        if (isImperialUnit && ridesCount > 0) {
             avgDistanceOfRides.setText(getText(R.string.avgDistance) + " " + (Math.round(((distance / 1600 / ridesCount) * 100.0)) / 100.0) + " mi");
-        } else if (unit.equals("m") && ridesCount > 0) {
+        } else if (isImperialUnit && ridesCount > 0) {
             avgDistanceOfRides.setText(getText(R.string.avgDistance) + " " + (Math.round(((distance / 1000 / ridesCount) * 100.0)) / 100.0) + " km");
         } else {
             avgDistanceOfRides.setText(getText(R.string.avgDistance) + " - ");
@@ -122,7 +123,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         // average speed of per ride of all uploaded rides
         TextView averageSpeed = findViewById(R.id.averageSpeedText);
-        if (unit.equals("ft")) {
+        if (isImperialUnit) {
             averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) (((double) ((long) profileValues[8]) / 1600.0) / ((((((double) (long) profileValues[5] / 1000)) - ((double) (long) profileValues[7])) / 3600))) + " mph");
         } else {
             averageSpeed.setText(getText(R.string.average_Speed) + " " + (int) (((double) ((long) profileValues[8]) / 1000.0) / ((((((double) (long) profileValues[5] / 1000)) - ((double) (long) profileValues[7])) / 3600))) + " km/h");

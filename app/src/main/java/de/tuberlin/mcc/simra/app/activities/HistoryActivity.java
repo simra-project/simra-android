@@ -45,10 +45,9 @@ import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.SharedPref;
 
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
@@ -75,6 +74,7 @@ public class HistoryActivity extends BaseActivity {
     String unit;
     int dateFormat;
 
+    boolean privacyAgreement = false;
 
     BroadcastReceiver br;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -122,9 +122,6 @@ public class HistoryActivity extends BaseActivity {
 
         backBtn = findViewById(R.id.back_button);
         backBtn.setOnClickListener(v -> finish());
-
-        unit = lookUpSharedPrefs("Settings-Unit", "m", "simraPrefs", HistoryActivity.this);
-        dateFormat = lookUpIntSharedPrefs("Settings-DateFormat", 0, "simraPrefs", HistoryActivity.this);
 
         listView = findViewById(R.id.listView);
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -285,32 +282,15 @@ public class HistoryActivity extends BaseActivity {
         Date dt = new Date(Long.parseLong(item[1]));
         Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
         localCalendar.setTime(dt);
-        String day = String.valueOf(localCalendar.get(Calendar.DATE));
-        String month = String.valueOf(localCalendar.get(Calendar.MONTH) + 1);
-        String year = String.valueOf(localCalendar.get(Calendar.YEAR)).substring(2, 4);
         Locale locale = Resources.getSystem().getConfiguration().locale;
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", locale);
-        if (dateFormat == 1) {
-            sdf = new SimpleDateFormat("hh:mm aa", locale);
-        }
-        String time = sdf.format(dt);
-        if (month.length() < 2) {
-            month = "0" + month;
-        }
-        if (day.length() < 2) {
-            day = "0" + day;
-        }
 
-
-        String startDateOfRide = day + "." + month + "." + year + ", " + time + "h";
-        if (dateFormat == 1) {
-            startDateOfRide = month + "/" + day + "/" + year + ", " + time;
-        }
+        SimpleDateFormat wholeDateFormat = new SimpleDateFormat(getString(R.string.datetime_format), locale);
+        String datetime = wholeDateFormat.format(dt);
 
         if (item.length > 6) {
-            return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3] + ";" + item[6];
+            return "#" + item[0] + ";" + datetime + ";" + todo + ";" + minutes + ";" + item[3] + ";" + item[6];
         } else {
-            return "#" + item[0] + ";" + startDateOfRide + ";" + todo + ";" + minutes + ";" + item[3] + ";" + 0;
+            return "#" + item[0] + ";" + datetime + ";" + todo + ";" + minutes + ";" + item[3] + ";" + 0;
         }
     }
 
@@ -452,10 +432,6 @@ public class HistoryActivity extends BaseActivity {
                 holder = new Holder();
                 holder.rideDate = row.findViewById(R.id.row_icons_ride_date);
                 holder.rideTime = row.findViewById(R.id.row_ride_time);
-                /*if (dateFormat == 1) {
-                    holder.rideDate.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 13));
-                    row.findViewById(R.id.duration_relativeLayout).setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 10));
-                }*/
                 holder.duration = row.findViewById(R.id.row_duration);
                 holder.distance = row.findViewById(R.id.row_distance);
                 holder.distanceUnit = row.findViewById(R.id.row_distanceKM);
@@ -479,7 +455,7 @@ public class HistoryActivity extends BaseActivity {
                 holder.status.setBackground(null);
             }
             holder.duration.setText(itemComponents[3]);
-            if (unit.equals("ft")) {
+            if (SharedPref.Settings.DisplayUnit.isImperial(HistoryActivity.this)) {
                 holder.distance.setText(String.valueOf(Math.round(((Double.parseDouble(itemComponents[5]) / 1600) * 100.0)) / 100.0));
                 holder.distanceUnit.setText("mi");
             } else {

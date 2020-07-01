@@ -39,6 +39,8 @@ import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
+import de.tuberlin.mcc.simra.app.util.SharedPref;
+import de.tuberlin.mcc.simra.app.util.UnitHelper;
 
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
@@ -238,8 +240,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         }
 
         // Load the privacy settings
-        privacyDistance = (float) sharedPrefs.getInt("Privacy-Distance", 30);
-        privacyDuration = (sharedPrefs.getLong("Privacy-Duration", 30) * 1000);
+        privacyDistance = SharedPref.Settings.Ride.PrivacyDistance.getDistance(UnitHelper.DISTANCE.METRIC, this);
+        privacyDuration = SharedPref.Settings.Ride.PrivacyDuration.getDuration(this) * 1000;
         Log.d(TAG, "privacyDistance: " + privacyDistance + " privacyDuration: " + privacyDuration);
 
 
