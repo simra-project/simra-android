@@ -211,16 +211,10 @@ public class Utils {
                 }
             }
         }
-
-        //writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
-
-
     }
 
     public static void updateProfile(boolean global, Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
-
         updateProfile(global, context, ageGroup, gender, region, experience, -1, -1, -1, -1, -1, -1, null, behaviour, -1);
-
     }
 
     public static void updateProfile(boolean global, Context context, int ageGroup, int gender, int region, int experience, int numberOfRides, long duration, int numberOfIncidents, long waitedTime, long distance, long co2, Object[] timeBuckets, int behaviour, int numberOfScary) {

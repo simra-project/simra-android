@@ -26,6 +26,7 @@ import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showDataDirectory;
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showKeyPrefs;
+import static de.tuberlin.mcc.simra.app.util.LogHelper.showMetaDataFile;
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showMetadata;
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showStatistics;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
@@ -39,7 +40,6 @@ import static de.tuberlin.mcc.simra.app.util.Utils.deleteErrorLogsForVersion;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFile;
 import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV27;
 import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV30;
 import static de.tuberlin.mcc.simra.app.util.VersionUpdater.updateToV31;
@@ -70,9 +70,7 @@ public class StartActivity extends BaseActivity {
         showKeyPrefs(this);
         showDataDirectory(this);
         showMetadata(this);
-        Log.d(TAG, "===========================V=metaData=V===========================");
-        Log.d(TAG, "metaData.csv: " + readContentFromFile("metaData.csv", this));
-        Log.d(TAG, "===========================Λ=metaData=Λ===========================");
+        showMetaDataFile(this);
         showStatistics(this);
         deleteErrorLogsForVersion(this, 26);
         int lastAppVersion = lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", this);
