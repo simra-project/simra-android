@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -30,19 +31,32 @@ public class RadmesserService extends Service {
     public RadmesserDevice connectedDevice;
     BLEServiceManager serviceManager;
     private volatile HandlerThread mHandlerThread;
-    private ConnectionState connectionState = ConnectionState.DISCONNECTED;
 
+    public static ConnectionState getConnectionState() {
+        return connectionState;
+    }
+
+    private static ConnectionState connectionState = ConnectionState.DISCONNECTED;
+
+    private final IBinder binder = new LocalBinder();
+
+    public class LocalBinder extends Binder {
+        public RadmesserService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return RadmesserService.this;
+        }
+
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
 
     private static final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
             super(looper);
         }
-
     }
 
     public enum ConnectionState {
@@ -51,7 +65,6 @@ public class RadmesserService extends Service {
         PAIRING,
         CONNECTED,
         CONNECTION_REFUSED
-
     }
 
     public BLEScanner scanner = new BLEScanner(new BLEScanner.BLEScannerCallbacks() {
@@ -66,21 +79,18 @@ public class RadmesserService extends Service {
         }
 
         @Override
-        public void onScanStopped() {
+        public void onScanFinished() {
             if (connectionState == ConnectionState.SEARCHING)
                 setConnectionState(ConnectionState.DISCONNECTED);
         }
     });
 
-    private RadmesserDevice.RadmesserDeviceConnectionStateCallback radmesserConnectionCallbacks = () -> {   //todo: refactor
+    private RadmesserDevice.RadmesserDeviceConnectionStateCallback radmesserConnectionCallbacks = (RadmesserDevice.ConnectionStatus newState, RadmesserDevice instance) -> {
+        if (instance != connectedDevice) return;
         // if Device disconnected
-        if(connectedDevice == null&&connectionState != ConnectionState.CONNECTED){
-            setConnectionState(ConnectionState.DISCONNECTED);
-            return;
-        }
-        if ( connectedDevice.getConnectionState() == RadmesserDevice.ConnectionStatus.gattDisconnected) {
+        if (newState == RadmesserDevice.ConnectionStatus.gattDisconnected) {
             // and Pairing not completed
-            if (connectionState != ConnectionState.CONNECTED) {
+            if (connectionState != ConnectionState.CONNECTED && connectionState != ConnectionState.DISCONNECTED) {
                 // Uncomplete Pairing -> diconnect from Radmesser
                 disconnectAndUnpairDevice();
                 setConnectionState(ConnectionState.CONNECTION_REFUSED);
@@ -90,6 +100,10 @@ public class RadmesserService extends Service {
                 setConnectionState(ConnectionState.DISCONNECTED);
             }
         }
+
+        if(newState== RadmesserDevice.ConnectionStatus.gattConnected){
+            setConnectionState(instance.connectionSucceded?ConnectionState.CONNECTED:ConnectionState.PAIRING);
+        }
     };
 
 
@@ -98,6 +112,9 @@ public class RadmesserService extends Service {
     }
 
     private void setConnectionState(ConnectionState newStatus) {
+        if (this.connectionState == newStatus)
+            return;
+
         this.connectionState = newStatus;
         boradcastConnectionStateChanged(newStatus);
         ForegroundServiceNotificationManager.createOrUpdateNotification(
@@ -143,6 +160,7 @@ public class RadmesserService extends Service {
     public void onDestroy() {
         Log.i(TAG, "stopped");
         // Cleanup service before destruction
+        ForegroundServiceNotificationManager.cancelNotification(this);
         mHandlerThread.quit();
     }
 
@@ -171,6 +189,7 @@ public class RadmesserService extends Service {
                 RadmesserDevice.UUID_SERVICE_CONNECTION,
                 RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CONNECTION,
                 val -> {
+                    connectedDevice.connectionSucceded = true;
                     Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
                     String strVal = val.getStringValue(0);
                     if (strVal != null && strVal.equals("1")) {
@@ -182,12 +201,12 @@ public class RadmesserService extends Service {
         return bleServices;
     }
 
-
     // ## incoming communication
     // Action-Requests
     final static String ACTION_START_SCANN = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_START_SCANN";
     final static String ACTION_CONNECT_DEVICE = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_CONNECT_DEVICE";
     final static String ACTION_DISCONNECT_AND_UNPAIR = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_DISCONNECT_AND_UNPAIR";
+    final static String ACTION_STOP_SERVICE = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_STOP_SERVICE";
     final static String EXTRA_CONNECT_DEVICE = "de.tuberlin.mcc.simra.app.radmesserservice.EXTRA_CONNECT_DEVICE";
 
     // incoming Action-Requests
@@ -225,6 +244,12 @@ public class RadmesserService extends Service {
         ctx.startService(intent);
     }
 
+    public static void terminateService(Context ctx) {
+        Intent intent = new Intent(ctx, RadmesserService.class);
+        intent.setAction(ACTION_STOP_SERVICE);
+        ctx.startService(intent);
+    }
+
     // internal routing of Action-Requests
     private void handleIntent(Intent intent) {
         if (intent == null || intent.getAction() == null)
@@ -237,6 +262,8 @@ public class RadmesserService extends Service {
             connectDevice(intent.getStringExtra(EXTRA_CONNECT_DEVICE));
         else if (action.equals(ACTION_DISCONNECT_AND_UNPAIR))
             disconnectAndUnpairDevice();
+        else if (action.equals(ACTION_STOP_SERVICE))
+            terminateService();
     }
 
     // internal processing of Action-Requests
@@ -245,11 +272,11 @@ public class RadmesserService extends Service {
     }
 
     private void connectDevice(String deviceId) {
-        disconnectRadmesser();
+        disconnectAnyRadmesser();
+
         // search device
         scanner.findDeviceById(deviceId,
                 device -> {
-                    // try connect
                     setConnectionState(ConnectionState.PAIRING);
                     connectedDevice = new RadmesserDevice(device, radmesserConnectionCallbacks, serviceManager);
                     connectedDevice.connect(this);
@@ -257,17 +284,19 @@ public class RadmesserService extends Service {
     }
 
     private void disconnectAndUnpairDevice() {
-        disconnectRadmesser();
-        setConnectionState(ConnectionState.DISCONNECTED);
+        disconnectAnyRadmesser();
         unPairedRadmesser();
     }
-    // todo: stopService call needed
 
-    private void disconnectRadmesser() {
+    private void terminateService() {
+        disconnectAnyRadmesser();
+        stopSelf();
+    }
+
+    private void disconnectAnyRadmesser() {
+        setConnectionState(ConnectionState.DISCONNECTED);
         if (connectedDevice != null)
             connectedDevice.disconnectDevice();
-        else if (connectionState != ConnectionState.DISCONNECTED)
-            setConnectionState(ConnectionState.DISCONNECTED);
         connectedDevice = null;
     }
 
@@ -311,7 +340,7 @@ public class RadmesserService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    public static class RadmesserServiceCallbacks {
+    public abstract static class RadmesserServiceCallbacks {
         public void onDeviceFound(String deviceName, String deviceId) {
         }
 
@@ -338,7 +367,6 @@ public class RadmesserService extends Service {
         BroadcastReceiver rec = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                // Log.i("Intent send", intent.getAction());
                 switch (intent.getAction()) {
                     case ACTION_DEVICE_FOUND:
                         callbacks.onDeviceFound(
@@ -368,6 +396,11 @@ public class RadmesserService extends Service {
         return rec;
     }
 
+    public static void unRegisterCallbacks(BroadcastReceiver receiver, Context ctx) {
+        if (receiver != null)
+            LocalBroadcastManager.getInstance(ctx).unregisterReceiver(receiver);
+    }
+
 
     // TODO: Use Utils (or refactor) shared Prefs usage
 
@@ -386,4 +419,3 @@ public class RadmesserService extends Service {
 
 
 }
-

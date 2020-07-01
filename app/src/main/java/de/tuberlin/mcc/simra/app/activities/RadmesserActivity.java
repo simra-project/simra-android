@@ -44,8 +44,7 @@ public class RadmesserActivity extends AppCompatActivity {
         Button disconnectBTN = findViewById(R.id.btnDisconnect);
         disconnectBTN.setOnClickListener(view -> RadmesserService.disconnectAndUnpairDevice(this));
 
-        registerReceiver();
-        startScanningDevices();
+
     }
 
     private void registerReceiver(){
@@ -137,13 +136,14 @@ public class RadmesserActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        //receiver.abortBroadcast();  // todo: richtig so?
+        RadmesserService.unRegisterCallbacks(receiver,this);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        //registerReceiver();         // todo: richtig so?
+        registerReceiver();
+        startScanningDevices();
         super.onResume();
     }
 

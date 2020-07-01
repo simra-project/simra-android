@@ -27,6 +27,7 @@ public class RadmesserDevice {
     public static final String UUID_SERVICE_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000000";
     public static final String UUID_SERVICE_CHARACTERISTIC_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000001";
     private final String TAG = "RadmesserDevice";
+    public boolean connectionSucceded;
     private final BluetoothDevice bluetoothDevice;
     private final RadmesserDeviceConnectionStateCallback callbacks;
     private BLEServiceManager bleServices;
@@ -44,8 +45,9 @@ public class RadmesserDevice {
     }
 
     public void setConnectionState(ConnectionStatus newState) {
+        if (connectionState == newState) return;
         connectionState = newState;
-        callbacks.onConnectionStateChange();
+        callbacks.onConnectionStateChange(connectionState,this);
     }
 
     public void connect(Context ctx) {
@@ -113,7 +115,7 @@ public class RadmesserDevice {
         if (gattConnection != null)
             gattConnection.disconnect();
 
-        connectionState = ConnectionStatus.gattDisconnected;
+        setConnectionState(ConnectionStatus.gattDisconnected);
     }
 
     public String getName() {
@@ -131,8 +133,6 @@ public class RadmesserDevice {
     }
 
     public interface RadmesserDeviceConnectionStateCallback {
-        void onConnectionStateChange();
+        void onConnectionStateChange(ConnectionStatus newState,RadmesserDevice instnace);
     }
-
-
 }
