@@ -314,7 +314,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // (4): NEUE ROUTE / START BUTTON
         startBtn = findViewById(R.id.button_start);
         startBtn.setOnClickListener(v -> {
-            if (PermissionHelper.hasBasePermissions(this)) {
+            if (!PermissionHelper.hasBasePermissions(this)) {
                 PermissionHelper.requestFirstBasePermissionsNotGranted(MainActivity.this);
                 Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
             } else {
