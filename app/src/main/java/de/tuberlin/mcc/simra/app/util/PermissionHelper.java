@@ -9,7 +9,20 @@ import android.os.Build;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+
 public class PermissionHelper {
+    public static BasePermission Location = new BasePermission(1001, new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+    });
+    public static BasePermission Storage = new BasePermission(1002, new String[]{
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    });
+    public static BasePermission Camera = new BasePermission(1003, new String[]{
+            Manifest.permission.CAMERA
+    });
+
     /**
      * Checks if the Permission for this App where already granted by the user
      * or if they are given by default (e.g. for a previous SDK version)
@@ -39,7 +52,6 @@ public class PermissionHelper {
         return false;
     }
 
-
     public static void requestFirstBasePermissionsNotGranted(Activity activity) {
         if (!hasPermissions(Location.permissions, activity)) {
             Location.requestPermissions(activity);
@@ -55,28 +67,24 @@ public class PermissionHelper {
         return hasPermissions(Location.permissions, context) && hasPermissions(Storage.permissions, context);
     }
 
-    public static class Location {
-        public static final int PERMISSION_REQQUEST_CODE = 1001;
-        public static final String[] permissions = {
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-        };
 
-        public static void requestPermissions(Activity activity) {
+    public static class BasePermission {
+        public int PERMISSION_REQQUEST_CODE = 0;
+        public String[] permissions = {};
+
+        BasePermission(int permissionRequestCode, String[] ipermissions) {
+            PERMISSION_REQQUEST_CODE = permissionRequestCode;
+            permissions = ipermissions;
+        }
+
+        public void requestPermissions(Activity activity) {
             ActivityCompat.requestPermissions(activity, permissions, PERMISSION_REQQUEST_CODE);
         }
-    }
 
-    public static class Storage {
-        public static final int PERMISSION_REQQUEST_CODE = 1002;
-        public static final String[] permissions = {
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-        };
-
-        public static void requestPermissions(Activity activity) {
-            ActivityCompat.requestPermissions(activity, permissions, PERMISSION_REQQUEST_CODE);
+        public boolean hasPermission(Context context) {
+            return hasPermissions(permissions, context);
         }
+
     }
 }
 

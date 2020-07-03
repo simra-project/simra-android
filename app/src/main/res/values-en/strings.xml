@@ -183,11 +183,17 @@
     <string name="radmesserSwitchTitle">Radmesser connection</string>
     <string name="radmesserButton">Open Radmesser settings</string>
     <string name="availableDevices">Available Devices</string>
+    <string name="radmesserTakePictureDuringRideSetting">Take Pictures during the Ride</string>
+    <string name="radmesserTakePictureDuringRideIntervalText">Interval how often a picture will be taken</string>
+    <string name="radmesserAdvancedSettings">Advanced Settings</string>
+    <string name="radmesserHandlebarWidthText">Distance of the outer point of the Handlebar to the frame</string>
+
 
     <!-- Units -->
     <string name="meter_short">m</string>
     <string name="feet_short">ft</string>
     <string name="seconds_short">s</string>
+    <string name="centimeter_short">cm</string>
     <string name="hour_format">hh:mm aa</string>
     <string name="datetime_format">MM/dd/yy,hh:mm aa</string>
 

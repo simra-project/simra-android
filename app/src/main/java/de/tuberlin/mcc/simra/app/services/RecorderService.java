@@ -23,7 +23,6 @@ import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
@@ -80,19 +79,22 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences.Editor editor;
     Location startLocation;
     // Radmesser
-    Queue<String> radmesserQueue = new CircularFifoQueue(1);
+    String lastRadmesserValue = "";
     private long lastPictureTaken = 0;
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("distance");
             //Log.d("receiver", "Got message: " + message);
-            radmesserQueue.add(message);
+            lastRadmesserValue = message;
         }
     };
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
     private boolean recordingAllowed;
+    private boolean takePictureDuringRideActivated;
+    private int takePictureDuringRideInterval;
+    private int safetyDistanceWithTolerances;
     private float privacyDistance;
     private long privacyDuration;
     private boolean lineAdded;
@@ -213,6 +215,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
 
         editor = sharedPrefs.edit();
+
+        takePictureDuringRideActivated = SharedPref.Settings.Ride.PicturesDuringRide.isActivated(this);
+        takePictureDuringRideInterval = SharedPref.Settings.Ride.PicturesDuringRideInterval.getInterval(this);
+        safetyDistanceWithTolerances = SharedPref.Settings.Ride.OvertakeWidth.getWidth(this);
 
 
         // Prepare the accelerometer accGpsFile
@@ -454,15 +460,15 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                                 curTime + "," +
                                 accuracy + "," +
                                 gyro;
-                if (!radmesserQueue.isEmpty()) {
-                    String radmesserValue = radmesserQueue.element();
-                    str = str + "," + radmesserValue;
-                    if (Integer.parseInt(radmesserValue.split(",")[0]) <= 150 && lastPictureTaken + 10000 <= curTime) {
-                        lastPictureTaken = curTime;
-                        CameraService.takePicture(RecorderService.this, String.valueOf(curTime), IOUtils.Directories.getPictureCacheDirectoryPath());
+                if (!lastRadmesserValue.isEmpty()) {
+                    str = str + "," + lastRadmesserValue;
+                    if (takePictureDuringRideActivated) {
+                        if (Integer.parseInt(lastRadmesserValue.split(",")[0]) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= curTime) {
+                            lastPictureTaken = curTime;
+                            CameraService.takePicture(RecorderService.this, String.valueOf(curTime), IOUtils.Directories.getPictureCacheDirectoryPath());
+                        }
                     }
                 }
-
 
                 Log.i(TAG, str);
 

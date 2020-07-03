@@ -181,10 +181,16 @@
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Geräte</string>
+
     <!--- Radmesser -->
     <string name="radmesserSwitchTitle">Radmesser verbinden</string>
     <string name="radmesserButton">Radmesser Einstellungen öffnen</string>
     <string name="availableDevices">Verfügbare Geräte</string>
+    <string name="radmesserTakePictureDuringRideSetting">Während der Fahrt Bilder aufnehmen</string>
+    <string name="radmesserTakePictureDuringRideIntervalText">Intervall wie oft ein Bild aufgenommen wird</string>
+    <string name="radmesserAdvancedSettings">Weitere Einstellungen</string>
+    <string name="radmesserHandlebarWidthText">Weite des Lenkers von der Außenseite zum Rahmen</string>
+
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
@@ -258,6 +264,7 @@
     <string name="meter_short">m</string>
     <string name="feet_short">ft</string>
     <string name="seconds_short">s</string>
+    <string name="centimeter_short">cm</string>
     <string name="hour_format">HH:mm</string>
     <string name="datetime_format">dd.MM.yy,HH:mm\'h\'</string>
 
