@@ -182,14 +182,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Log.d(TAG, "OnCreate called");
         super.onCreate(savedInstanceState);
 
-        if (BuildConfig.BUILD_TYPE != "debug" && BuildConfig.SENTRY_DSN != null) {
-            SentryAndroid.init(this, options -> {
-                options.setDsn(BuildConfig.SENTRY_DSN);
-                options.setEnvironment(BuildConfig.IS_PRODUCTION ? "production" : "pre-production");
-                options.setRelease(String.valueOf(BuildConfig.VERSION_CODE));
-            });
-        }
-
         myEx = Executors.newFixedThreadPool(4);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
