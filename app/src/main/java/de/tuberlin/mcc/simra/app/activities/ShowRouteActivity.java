@@ -237,7 +237,7 @@ public class ShowRouteActivity extends BaseActivity {
         saveButton = findViewById(R.id.saveIncident);
         exitButton = findViewById(R.id.exitShowRoute);
 
-        if (state < 2) {
+        if (state < MetaData.STATE.SYNCED) {
             addIncBttn.setVisibility(View.VISIBLE);
             exitButton.setVisibility(View.INVISIBLE);
             if (!IOUtils.isDirectoryEmpty(IOUtils.Directories.getPictureCacheDirectoryPath())) {
@@ -280,7 +280,7 @@ public class ShowRouteActivity extends BaseActivity {
             ShowRouteActivity.this.addCustomMarkerMode = false;
         });
 
-        if (state < 2) {
+        if (state < MetaData.STATE.SYNCED) {
             fireRideSettingsDialog();
         } else {
             new RideUpdateTask(false, false).execute();
