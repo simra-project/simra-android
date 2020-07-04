@@ -5,8 +5,7 @@ public class Constants {
     public static final int ZOOM_LEVEL = 19;
 
     // Accelerometer data gets recorded 50 times per second (every 20 millisecs).
-
-    public static final int ACC_FREQUENCY = 20;
+    public static final int ACCELEROMETER_FREQUENCY = 20;
 
     /**
      * Step size for accelerometer moving average

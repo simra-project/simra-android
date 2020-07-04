@@ -1,150 +1,156 @@
 package de.tuberlin.mcc.simra.app.entities;
 
 public class DataLogEntry {
+    public final static String DATA_LOG_HEADER = "lat,lon,X,Y,Z,timeStamp,acc,a,b,c,radmesserDistanceLeft1,radmesserDistanceLeft2,radmesserDistanceRight1,radmesserDistanceRight2";
     public final Double latitude;
     public final Double longitude;
-    public final Double accelerometerX;
-    public final Double accelerometerY;
-    public final Double accelerometerZ;
+    public final Float accelerometerX;
+    public final Float accelerometerY;
+    public final Float accelerometerZ;
     public final Long timestamp;
-    public final Double GPSAccuracy;
-    public final Double gyroscopeA;
-    public final Double gyroscopeB;
-    public final Double gyroscopeC;
+    public final Float GPSAccuracy;
+    public final Float gyroscopeA;
+    public final Float gyroscopeB;
+    public final Float gyroscopeC;
     public final Integer RadmesserDistanceLeft1;
     public final Integer RadmesserDistanceLeft2;
     public final Integer RadmesserDistanceRight1;
     public final Integer RadmesserDistanceRight2;
 
-    private DataLogEntry(Builder builder) {
-        this.latitude = builder.latitude;
-        this.longitude = builder.longitude;
-        this.accelerometerX = builder.accelerometerX;
-        this.accelerometerY = builder.accelerometerY;
-        this.accelerometerZ = builder.accelerometerZ;
-        this.timestamp = builder.timestamp;
-        this.GPSAccuracy = builder.GPSAccuracy;
-        this.gyroscopeA = builder.gyroscopeA;
-        this.gyroscopeB = builder.gyroscopeB;
-        this.gyroscopeC = builder.gyroscopeC;
-        RadmesserDistanceLeft1 = builder.radmesserDistanceLeft1;
-        RadmesserDistanceLeft2 = builder.radmesserDistanceLeft2;
-        RadmesserDistanceRight1 = builder.radmesserDistanceRight1;
-        RadmesserDistanceRight2 = builder.radmesserDistanceRight2;
+    private DataLogEntry(DataLogEntryBuilder dataLogEntryBuilder) {
+        this.latitude = dataLogEntryBuilder.latitude;
+        this.longitude = dataLogEntryBuilder.longitude;
+        this.accelerometerX = dataLogEntryBuilder.accelerometerX;
+        this.accelerometerY = dataLogEntryBuilder.accelerometerY;
+        this.accelerometerZ = dataLogEntryBuilder.accelerometerZ;
+        this.timestamp = dataLogEntryBuilder.timestamp;
+        this.GPSAccuracy = dataLogEntryBuilder.GPSAccuracy;
+        this.gyroscopeA = dataLogEntryBuilder.gyroscopeA;
+        this.gyroscopeB = dataLogEntryBuilder.gyroscopeB;
+        this.gyroscopeC = dataLogEntryBuilder.gyroscopeC;
+        RadmesserDistanceLeft1 = dataLogEntryBuilder.radmesserDistanceLeft1;
+        RadmesserDistanceLeft2 = dataLogEntryBuilder.radmesserDistanceLeft2;
+        RadmesserDistanceRight1 = dataLogEntryBuilder.radmesserDistanceRight1;
+        RadmesserDistanceRight2 = dataLogEntryBuilder.radmesserDistanceRight2;
     }
 
     public static DataLogEntry parseDataLogEntryFromLine(String string) {
         String[] dataLogLine = string.split(",", -1);
-        Builder dataLogEntry = DataLogEntry.newBuilder();
+        DataLogEntryBuilder dataLogEntryBuilder = DataLogEntry.newBuilder();
 
         if (dataLogLine.length >= 6 && !dataLogLine[0].isEmpty() && !dataLogLine[1].isEmpty() && !dataLogLine[6].isEmpty()) {
-            dataLogEntry.withGPS(
+            dataLogEntryBuilder.withGPS(
                     Double.parseDouble(dataLogLine[0]),
                     Double.parseDouble(dataLogLine[1]),
-                    Double.parseDouble(dataLogLine[6])
+                    Float.parseFloat(dataLogLine[6])
             );
         }
 
         if (dataLogLine.length >= 4 && !dataLogLine[2].isEmpty() && !dataLogLine[3].isEmpty() && !dataLogLine[4].isEmpty()) {
-            dataLogEntry.withAccelerometer(
-                    Double.parseDouble(dataLogLine[2]),
-                    Double.parseDouble(dataLogLine[3]),
-                    Double.parseDouble(dataLogLine[4])
+            dataLogEntryBuilder.withAccelerometer(
+                    Float.parseFloat(dataLogLine[2]),
+                    Float.parseFloat(dataLogLine[3]),
+                    Float.parseFloat(dataLogLine[4])
             );
         }
 
         if (dataLogLine.length >= 5 && !dataLogLine[5].isEmpty()) {
-            dataLogEntry.withTimestamp(
+            dataLogEntryBuilder.withTimestamp(
                     Long.parseLong(dataLogLine[5])
             );
         }
 
         if (dataLogLine.length >= 9 && !dataLogLine[7].isEmpty() && !dataLogLine[8].isEmpty() && !dataLogLine[9].isEmpty()) {
-            dataLogEntry.withGyroscope(
-                    Double.parseDouble(dataLogLine[7]),
-                    Double.parseDouble(dataLogLine[8]),
-                    Double.parseDouble(dataLogLine[9])
+            dataLogEntryBuilder.withGyroscope(
+                    Float.parseFloat(dataLogLine[7]),
+                    Float.parseFloat(dataLogLine[8]),
+                    Float.parseFloat(dataLogLine[9])
             );
         }
 
-        dataLogEntry.withRadmesser(
+        dataLogEntryBuilder.withRadmesser(
                 dataLogLine.length > 10 ? (!dataLogLine[10].isEmpty() ? Integer.parseInt(dataLogLine[10]) : null) : null,
                 dataLogLine.length > 11 ? (!dataLogLine[11].isEmpty() ? Integer.parseInt(dataLogLine[11]) : null) : null,
                 dataLogLine.length > 12 ? (!dataLogLine[12].isEmpty() ? Integer.parseInt(dataLogLine[12]) : null) : null,
                 dataLogLine.length > 13 ? (!dataLogLine[13].isEmpty() ? Integer.parseInt(dataLogLine[13]) : null) : null
         );
 
-        return dataLogEntry.build();
+        return dataLogEntryBuilder.build();
     }
 
-    public static String stringifyDataLogEntry(DataLogEntry dataLogEntry) {
-        return (dataLogEntry.latitude != null ? dataLogEntry.latitude : "") + "," +
-                (dataLogEntry.longitude != null ? dataLogEntry.longitude : "") + "," +
-                (dataLogEntry.accelerometerX != null ? dataLogEntry.accelerometerX : "") + "," +
-                (dataLogEntry.accelerometerY != null ? dataLogEntry.accelerometerY : "") + "," +
-                (dataLogEntry.accelerometerZ != null ? dataLogEntry.accelerometerZ : "") + "," +
-                (dataLogEntry.timestamp != null ? dataLogEntry.timestamp : "") + "," +
-                (dataLogEntry.GPSAccuracy != null ? dataLogEntry.GPSAccuracy : "") + "," +
-                (dataLogEntry.gyroscopeA != null ? dataLogEntry.gyroscopeA : "") + "," +
-                (dataLogEntry.gyroscopeB != null ? dataLogEntry.gyroscopeB : "") + "," +
-                (dataLogEntry.gyroscopeC != null ? dataLogEntry.gyroscopeC : "") + "," +
-                (dataLogEntry.RadmesserDistanceLeft1 != null ? dataLogEntry.RadmesserDistanceLeft1 : "") + "," +
-                (dataLogEntry.RadmesserDistanceLeft2 != null ? dataLogEntry.RadmesserDistanceLeft2 : "") + "," +
-                (dataLogEntry.RadmesserDistanceRight1 != null ? dataLogEntry.RadmesserDistanceRight1 : "") + "," +
-                (dataLogEntry.RadmesserDistanceRight2 != null ? dataLogEntry.RadmesserDistanceRight2 : "");
+    public static DataLogEntryBuilder newBuilder() {
+        return new DataLogEntryBuilder();
     }
 
-    public static Builder newBuilder() {
-        return new Builder();
+    /**
+     * Stringifies the DataLogEntry Object to a CSV Log Line
+     *
+     * @return Data Log Line without new line separator
+     */
+    public String stringifyDataLogEntry() {
+        return (latitude != null ? latitude : "") + "," +
+                (longitude != null ? longitude : "") + "," +
+                (accelerometerX != null ? accelerometerX : "") + "," +
+                (accelerometerY != null ? accelerometerY : "") + "," +
+                (accelerometerZ != null ? accelerometerZ : "") + "," +
+                (timestamp != null ? timestamp : "") + "," +
+                (GPSAccuracy != null ? GPSAccuracy : "") + "," +
+                (gyroscopeA != null ? gyroscopeA : "") + "," +
+                (gyroscopeB != null ? gyroscopeB : "") + "," +
+                (gyroscopeC != null ? gyroscopeC : "") + "," +
+                (RadmesserDistanceLeft1 != null ? RadmesserDistanceLeft1 : "") + "," +
+                (RadmesserDistanceLeft2 != null ? RadmesserDistanceLeft2 : "") + "," +
+                (RadmesserDistanceRight1 != null ? RadmesserDistanceRight1 : "") + "," +
+                (RadmesserDistanceRight2 != null ? RadmesserDistanceRight2 : "");
     }
 
-    static final class Builder {
+    public static final class DataLogEntryBuilder {
 
         private Double latitude;
         private Double longitude;
-        private Double accelerometerX;
-        private Double accelerometerY;
-        private Double accelerometerZ;
+        private Float accelerometerX;
+        private Float accelerometerY;
+        private Float accelerometerZ;
         private Long timestamp;
-        private Double GPSAccuracy;
-        private Double gyroscopeA;
-        private Double gyroscopeB;
-        private Double gyroscopeC;
+        private Float GPSAccuracy;
+        private Float gyroscopeA;
+        private Float gyroscopeB;
+        private Float gyroscopeC;
         private Integer radmesserDistanceLeft1;
         private Integer radmesserDistanceLeft2;
         private Integer radmesserDistanceRight1;
         private Integer radmesserDistanceRight2;
 
-        private Builder() {
+        private DataLogEntryBuilder() {
         }
 
-        public Builder withTimestamp(Long vTimestamp) {
+        public DataLogEntryBuilder withTimestamp(Long vTimestamp) {
             timestamp = vTimestamp;
             return this;
         }
 
-        public Builder withAccelerometer(Double vAccelerometerX, Double vAccelerometerY, Double vAccelerometerZ) {
+        public DataLogEntryBuilder withAccelerometer(Float vAccelerometerX, Float vAccelerometerY, Float vAccelerometerZ) {
             accelerometerX = vAccelerometerX;
             accelerometerY = vAccelerometerY;
             accelerometerZ = vAccelerometerZ;
             return this;
         }
 
-        public Builder withGPS(Double vLatitude, Double vLongitude, Double vGPSAccuracy) {
+        public DataLogEntryBuilder withGPS(Double vLatitude, Double vLongitude, Float vGPSAccuracy) {
             latitude = vLatitude;
             longitude = vLongitude;
             GPSAccuracy = vGPSAccuracy;
             return this;
         }
 
-        public Builder withGyroscope(Double vGyroscopeA, Double vGyroscopeB, Double vGyroscopeC) {
+        public DataLogEntryBuilder withGyroscope(Float vGyroscopeA, Float vGyroscopeB, Float vGyroscopeC) {
             gyroscopeA = vGyroscopeA;
             gyroscopeB = vGyroscopeB;
             gyroscopeC = vGyroscopeC;
             return this;
         }
 
-        public Builder withRadmesser(Integer vRadmesserDistanceLeft1, Integer vRadmesserDistanceLeft2, Integer vRadmesserDistanceRight1, Integer vRadmesserDistanceRight2) {
+        public DataLogEntryBuilder withRadmesser(Integer vRadmesserDistanceLeft1, Integer vRadmesserDistanceLeft2, Integer vRadmesserDistanceRight1, Integer vRadmesserDistanceRight2) {
             if (vRadmesserDistanceLeft1 != null) {
                 radmesserDistanceLeft1 = vRadmesserDistanceLeft1;
             }

@@ -83,7 +83,7 @@ public class RadmesserActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == PermissionHelper.Camera.PERMISSION_REQQUEST_CODE) {
+        if (requestCode == PermissionHelper.Camera.PERMISSION_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(true, this);
                 Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
