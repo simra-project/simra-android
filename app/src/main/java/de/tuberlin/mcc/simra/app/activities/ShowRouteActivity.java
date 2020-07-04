@@ -604,7 +604,7 @@ public class ShowRouteActivity extends BaseActivity {
             boolean success = tempGpsFile.renameTo(new File(path + File.separator + pathToAccGpsFile));
             Log.d(TAG, "tempGpsFile successfully renamed: " + success);
         }
-        String pathToAccEventsFile = IOUtils.Files.getEventsFileName(ride.getKey(), false, this);
+        String pathToAccEventsFile = IOUtils.Files.getEventsFileName(ride.getKey(), false);
         if (tempAccEventsPath != null) {
             deleteFile(pathToAccEventsFile);
             String path = ShowRouteActivity.this.getFilesDir().getPath();
