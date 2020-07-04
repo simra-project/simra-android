@@ -11,7 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 import java.util.Arrays;
@@ -19,7 +18,9 @@ import java.util.Arrays;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
+import de.tuberlin.mcc.simra.app.util.Utils;
 import de.tuberlin.mcc.simra.app.util.VersionUpdater;
 
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showDataDirectory;
@@ -32,9 +33,7 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.deleteErrorLogsForVersion;
-import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 /**
  * Shows general info about the app, if the app is run the first time.
@@ -73,7 +72,23 @@ public class StartActivity extends BaseActivity {
             navigateIfAllPermissionsGranted();
         });
 
-        isFirstTime();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // META-FILE (one per user): contains ...
+        // * the information required to display rides in the ride history (See RecorderService)
+        //   (DATE,START TIME, END TIME, ANNOTATED TRUE/FALSE)
+        // * the RIDE KEY which allows to identify the file containing the complete data for
+        //   a ride. => Use case: user wants to view a ride from history - retrieve data
+        // * one meta file per user, so we only want to create it if it doesn't exist yet.
+        //   (fileExists and appendToFile can be found in the Utils.java class)
+
+        File metaDataFile = IOUtils.Files.getMetaDataFile(this);
+        if ((!metaDataFile.exists()) || metaDataFile.length() == 0) {
+            String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
+            Log.d(TAG, "Creating metaData.csv");
+            Utils.overwriteFile((fileInfoLine + "key, startTime, endTime, annotated, distance, waitTime"
+                    + System.lineSeparator()), metaDataFile);
+
+        }
     }
 
     public boolean allPermissionGranted() {
@@ -97,36 +112,6 @@ public class StartActivity extends BaseActivity {
         } else {
             PermissionHelper.requestFirstBasePermissionsNotGranted(StartActivity.this);
         }
-    }
-
-
-    /**
-     * Checks if the user is opening the app for the first time.
-     * Note that this method should be placed inside an activity and it can be called multiple times.
-     *
-     * @return boolean
-     */
-    private boolean isFirstTime() {
-        boolean firstTime = lookUpBooleanSharedPrefs("firstTime", true, "simraPrefs", this);
-        if (firstTime) {
-            writeBooleanToSharedPrefs("firstTime", false, "simraPrefs", this);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // META-FILE (one per user): contains ...
-            // * the information required to display rides in the ride history (See RecorderService)
-            //   (DATE,START TIME, END TIME, ANNOTATED TRUE/FALSE)
-            // * the RIDE KEY which allows to identify the file containing the complete data for
-            //   a ride. => Use case: user wants to view a ride from history - retrieve data
-            // * one meta file per user, so we only want to create it if it doesn't exist yet.
-            //   (fileExists and appendToFile can be found in the Utils.java class)
-            if ((!fileExists("metaData.csv", this)) || (new File(getFilesDir() + "/metaData.csv").length() == 0)) {
-                String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
-                Log.d(TAG, "firstTime. Creating metaData.csv");
-                overWriteFile((fileInfoLine + "key, startTime, endTime, annotated, distance, waitTime"
-                        + System.lineSeparator()), "metaData.csv", this);
-
-            }
-        }
-        return firstTime;
     }
 
     private boolean privacyPolicyAccepted() {
@@ -196,7 +181,6 @@ public class StartActivity extends BaseActivity {
         builder.setView(checkBoxView);
         builder.setPositiveButton(R.string.next, (dialog, id) -> writeBooleanToSharedPrefs("Privacy-Policy-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this));
         builder.setNegativeButton(R.string.close_simra, (dialog, id) -> {
-            writeBooleanToSharedPrefs("firstTime", true, "simraPrefs", StartActivity.this);
             finish();
             Toast.makeText(StartActivity.this, getString(R.string.simra_closed), Toast.LENGTH_LONG).show();
         });

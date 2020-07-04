@@ -58,6 +58,7 @@ import de.tuberlin.mcc.simra.app.entities.AccEvent;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
+import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
@@ -67,7 +68,6 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPref
 import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class ShowRouteActivity extends BaseActivity {
 
@@ -133,9 +133,15 @@ public class ShowRouteActivity extends BaseActivity {
     private RelativeLayout exitAddIncBttn;
     private View progressBarRelativeLayout;
 
-    // Returns the longitudes of the southern- and northernmost points
-    // as well as the latitudes of the western- and easternmost points
-    // in a double Array {South, North, West, East}
+    //
+
+    /**
+     * Returns the longitudes of the southern- and northernmost points
+     * as well as the latitudes of the western- and easternmost points
+     *
+     * @param pl
+     * @return double Array {South, North, West, East}
+     */
     static BoundingBox getBoundingBox(Polyline pl) {
 
         // {North, East, South, West}
@@ -216,7 +222,7 @@ public class ShowRouteActivity extends BaseActivity {
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
 
-        gpsFile = getFileStreamPath(pathToAccGpsFile);
+        gpsFile = new File(IOUtils.Directories.getBaseFolderPath(this) + pathToAccGpsFile);
 
         Log.d(TAG, "creating ride objects");
         bike = SharedPref.Settings.Ride.BikeType.getBikeType(this);
@@ -529,7 +535,7 @@ public class ShowRouteActivity extends BaseActivity {
         StringBuilder metaDataContent = new StringBuilder();
         int appVersion = getAppVersionNumber(ShowRouteActivity.this);
         String metaDataFileVersion = "";
-        try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(IOUtils.Files.getMetaDataFile(this)))) {
             // metaDataFileVersion line: 23#7
             metaDataFileVersion = br.readLine().split("#")[1];
             // skip header
@@ -588,7 +594,7 @@ public class ShowRouteActivity extends BaseActivity {
             ioe.printStackTrace();
         }
         String fileInfoLine = appVersion + "#" + metaDataFileVersion + System.lineSeparator();
-        overWriteFile((fileInfoLine + METADATA_HEADER + metaDataContent), "metaData.csv", this);
+        Utils.overwriteFile((fileInfoLine + METADATA_HEADER + metaDataContent), IOUtils.Files.getMetaDataFile(this));
 
         // tempAccEventsPath
         // tempAccGpsPath

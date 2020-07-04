@@ -65,4 +65,18 @@ public class IOUtils {
             return app_folder_path;
         }
     }
+
+    /**
+     * Well known Files
+     * Those we need access to from all over the app, because the access was never centralized...
+     */
+    public static class Files {
+        public static String getMetaDataPath(Context context) {
+            return IOUtils.Directories.getBaseFolderPath(context) + "metaData.csv";
+        }
+
+        public static File getMetaDataFile(Context context) {
+            return new File(getMetaDataPath(context));
+        }
+    }
 }

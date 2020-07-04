@@ -34,8 +34,32 @@ public class Utils {
 
     private static final String TAG = "Utils_LOG";
 
+    /**
+     * Use Utils.overwriteFile(file) instead.
+     * Why? For Clarity filename does not say where the file is...
+     *
+     * @deprecated
+     */
     public static String readContentFromFile(String fileName, Context context) {
         File file = new File(IOUtils.Directories.getBaseFolderPath(context) + fileName);
+        if (file.isDirectory()) {
+            return "FILE IS DIRECTORY";
+        }
+        StringBuilder content = new StringBuilder();
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                content.append(line).append(System.lineSeparator());
+            }
+        } catch (IOException ioe) {
+            Log.d(TAG, "readContentFromFile() Exception: " + Arrays.toString(ioe.getStackTrace()));
+        }
+        return content.toString();
+    }
+
+    public static String readContentFromFile(File file) {
         if (file.isDirectory()) {
             return "FILE IS DIRECTORY";
         }
@@ -73,12 +97,29 @@ public class Utils {
         return (fileInfoLine + content.toString());
     }
 
-
+    /**
+     * Use Utils.overwriteFile(file) instead.
+     * Why? For Clarity filename does not say where the file is...
+     *
+     * @deprecated
+     */
     public static void appendToFile(String content, String fileName, Context context) {
 
         try {
             File tempFile = new File(IOUtils.Directories.getBaseFolderPath(context) + fileName);
             FileOutputStream writer = new FileOutputStream(tempFile, true);
+            writer.write(content.getBytes());
+            writer.flush();
+            writer.close();
+        } catch (IOException ioe) {
+            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
+        }
+    }
+
+    public static void appendToFile(String content, File file) {
+
+        try {
+            FileOutputStream writer = new FileOutputStream(file, true);
             writer.write(content.getBytes());
             writer.flush();
             writer.close();
@@ -136,6 +177,12 @@ public class Utils {
         return new Pair<>(content.toString(), accEventsContentToUpload.toString());
     }
 
+    /**
+     * Use Utils.overwriteFile(file) instead.
+     * Why? For Clarity filename does not say where the file is...
+     *
+     * @deprecated
+     */
     public static void overWriteFile(String content, String fileName, Context context) {
         try {
             FileOutputStream writer = context.openFileOutput(fileName, Context.MODE_PRIVATE);
@@ -147,8 +194,20 @@ public class Utils {
         }
     }
 
+    public static void overwriteFile(String content, File file) {
+        try {
+            FileOutputStream writer = new FileOutputStream(file);
+            writer.write(content.getBytes());
+            writer.flush();
+            writer.close();
+        } catch (IOException ioe) {
+            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
+        }
+    }
+
     /**
      * Use Utils.fileExists(path) instead for clarity
+     * Why? For Clarity filename does not say where the file is...
      *
      * @deprecated
      */
@@ -341,7 +400,7 @@ public class Utils {
     // recalculates all statistics, updates metaData.csv, Profile.xml and deletes temp files
     public static void recalculateStatistics(Context context) {
         Log.d(TAG, "===========================V=recalculateStatistics=V===========================");
-        File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+        File metaDataFile = IOUtils.Files.getMetaDataFile(context);
         StringBuilder contentOfMetaData = new StringBuilder();
         // total number of (scary) incidents read from each accEvents csv.
         int totalNumberOfIncidents = 0;
@@ -505,7 +564,7 @@ public class Utils {
             Log.d(TAG, "totalNumberOfScary: " + totalNumberOfScary);
             Log.d(TAG, "recalculateStatistics() overwriting metaData.csv with: ");
             Log.d(TAG, contentOfMetaData.toString());
-            overWriteFile(contentOfMetaData.toString(), "metaData.csv", context);
+            overwriteFile(contentOfMetaData.toString(), metaDataFile);
             updateProfile(true, context, -1, -1, -1, -1, totalNumberOfRides, totalDuration, totalNumberOfIncidents, totalWaitedTime, totalDistance, totalCO2Savings, timeBuckets, -2, totalNumberOfScary);
         } catch (IOException e) {
             Log.d(TAG, "Exception in recalculateStatistics(): " + Arrays.toString(e.getStackTrace()));

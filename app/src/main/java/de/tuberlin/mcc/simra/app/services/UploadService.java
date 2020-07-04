@@ -31,6 +31,7 @@ import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
@@ -210,12 +211,12 @@ public class UploadService extends Service {
                 // contains one Object[] for each region. The arrays contain the following information:
                 // {NumberOfRides,Duration,NumberOfIncidents,WaitedTime,Distance,Co2,0,...,23,NumberOfScary}
                 Object[][] regionProfiles = getRegionProfilesArrays(numberOfRegions, context);
-               
+
                 String fileVersion = "";
                 StringBuilder metaDataContent = new StringBuilder();
 
                 try {
-                    BufferedReader metaDataReader = new BufferedReader(new FileReader(context.getFileStreamPath("metaData.csv")));
+                    BufferedReader metaDataReader = new BufferedReader(new FileReader(IOUtils.Files.getMetaDataFile(context)));
                     String line;
                     fileVersion = metaDataReader.readLine().split("#")[1];
 
@@ -342,12 +343,12 @@ public class UploadService extends Service {
                         return;
                     }
                     String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-                    overWriteFile((fileInfoLine + METADATA_HEADER + metaDataContent.toString()), "metaData.csv", context);
+                    Utils.overwriteFile((fileInfoLine + METADATA_HEADER + metaDataContent.toString()), IOUtils.Files.getMetaDataFile(context));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                
+
                 Log.d(TAG, "uploadFile() totalWaitedTime: " + totalWaitedTime);
                 // Now after the rides have been uploaded, we can update the profile with the new statistics
                 updateProfile(true, context, -1, -1, -1, -1, totalNumberOfRides, totalDuration, totalNumberOfIncidents, totalWaitedTime, totalDistance, totalCO2, timeBuckets, -2, totalNumberOfScary);
