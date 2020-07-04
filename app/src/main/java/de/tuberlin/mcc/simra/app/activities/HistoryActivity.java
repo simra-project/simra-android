@@ -39,6 +39,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -279,7 +280,7 @@ public class HistoryActivity extends BaseActivity {
             startTime = getIntent().getStringExtra("StartTime");
             // State can be 0 for server processing not started, 1 for started and pending
             // and 2 for processed by server so the incidents can be annotated by the user
-            state = getIntent().getIntExtra("State", 0);
+            state = getIntent().getIntExtra("State", MetaData.STATE.JUST_RECORDED);
         }
 
         // Checks whether a ride was selected or not. Maybe it will be possible to select

@@ -29,6 +29,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -230,7 +231,7 @@ public class UploadService extends Service {
                         String[] metaDataLine = line.split(",", -1);
                         Log.d(TAG, "metaDataLine: " + Arrays.toString(metaDataLine));
                         // found a ride which is ready to upload in metaData.csv
-                        if (metaDataLine.length > 1 && metaDataLine[3].equals("1")) {
+                        if (metaDataLine.length > 1 && metaDataLine[3].equals(MetaData.STATE.ANNOTATED)) {
                             foundARideToUpload = true;
                             String rideKey = metaDataLine[0];
                             String accGpsName = "";
@@ -274,7 +275,7 @@ public class UploadService extends Service {
 
                             // if the respond is ok, mark ride as uploaded in metaData.csv and delete "nothing" incidents from accEvents.csv
                             if (response.first.equals(200)) {
-                                metaDataLine[3] = "2";
+                                metaDataLine[3] = String.valueOf(MetaData.STATE.SYNCED);
                                 totalNumberOfRides++;
                                 totalDuration += (Long.parseLong(metaDataLine[2]) - Long.parseLong(metaDataLine[1]));
                                 totalNumberOfIncidents += Integer.parseInt(metaDataLine[4]);

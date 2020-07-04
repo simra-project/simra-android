@@ -55,6 +55,7 @@ import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.annotation.MarkerFunct;
 import de.tuberlin.mcc.simra.app.annotation.Ride;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
+import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
@@ -209,7 +210,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
-        state = getIntent().getIntExtra("State", 0);
+        state = getIntent().getIntExtra("State", MetaData.STATE.JUST_RECORDED);
         Log.d(TAG, "state: " + state);
         duration = getIntent().getStringExtra("Duration");
 

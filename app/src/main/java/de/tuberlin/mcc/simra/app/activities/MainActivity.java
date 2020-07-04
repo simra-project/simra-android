@@ -68,6 +68,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
@@ -368,7 +369,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                     // State can be 0 for not annotated, 1 for started but not sent
                     // and 2 for annotated and sent to the server
-                    intent.putExtra("State", 0); // redundant
+                    intent.putExtra("State", MetaData.STATE.JUST_RECORDED); // redundant
                     startActivity(intent);
                 } else {
                     DialogInterface.OnClickListener errorOnClickListener = (dialog, which) -> {
