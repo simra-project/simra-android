@@ -296,7 +296,7 @@ public class ShowRouteActivity extends BaseActivity {
             tempAccEventsPath = "TempaccEvents" + ride.getKey() + ".csv";
             tempAccGpsPath = "Temp" + gpsFile.getName();
             runOnUiThread(() -> progressBarRelativeLayout.setVisibility(View.VISIBLE));
-            tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
+            tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath, gpsFile);
             tempRide = new Ride(tempGpsFile, duration, String.valueOf(tempStartTime), state, bike, child, trailer, pLoc, this, calculate, true);
         } else {
             ride = new Ride(gpsFile, duration, startTime, state, bike, child, trailer, pLoc, this, calculate, false);
@@ -325,20 +325,15 @@ public class ShowRouteActivity extends BaseActivity {
                 editableRoute = new Polyline();
                 editableRoute.setPoints(route.getPoints());
                 editableRoute.setWidth(40.0f);
-
                 editableRoute.getPaint().setColor(getColor(R.color.colorAccent));
                 editableRoute.getPaint().setStrokeCap(Paint.Cap.ROUND);
-
                 mMapView.getOverlayManager().add(editableRoute);
             }
             mMapView.getOverlayManager().add(route);
-
         }
-
 
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
         // set accordingly
-
         if (!temp) {
             runOnUiThread(() -> {
                 bBox = getBoundingBox(route);
@@ -619,15 +614,25 @@ public class ShowRouteActivity extends BaseActivity {
 
     }
 
-    private File updateRoute(int left, int right, String pathToAccGpsFile) {
+    /**
+     * This function cuts of the dataLogEntries from left and right
+     * <p>
+     * pathToAccGpsFile is the newly created temp file
+     *
+     * @param left
+     * @param right
+     * @param pathToAccGpsTempFile
+     * @return
+     */
+    private File updateRoute(int left, int right, String pathToAccGpsTempFile, File copyFromAccGpsFile) {
         tempStartTime = null;
         tempEndTime = null;
-        File inputFile = getFileStreamPath(pathToAccGpsFile);
+        File inputFile = getFileStreamPath(pathToAccGpsTempFile);
         StringBuilder content = new StringBuilder();
         //String content = "";
         try (BufferedWriter writer = new BufferedWriter((new FileWriter(inputFile, false)))) {
 
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(ride.accGpsFile)))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(copyFromAccGpsFile)))) {
                 String line;
                 content.append(br.readLine()).append(System.lineSeparator()); // fileInfo
                 content.append(br.readLine()).append(System.lineSeparator()); // csv header
@@ -654,7 +659,7 @@ public class ShowRouteActivity extends BaseActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return getFileStreamPath(pathToAccGpsFile);
+        return getFileStreamPath(pathToAccGpsTempFile);
     }
 
     // If the user clicks on an InfoWindow and IncidentPopUpActivity for that

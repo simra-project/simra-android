@@ -441,7 +441,7 @@ public class HistoryActivity extends BaseActivity {
             row.setOnClickListener(v -> {
                 // gets the files in the directory
                 // lists all the files into an array
-                File[] dirFiles = getFilesDir().listFiles();
+                File[] dirFiles = new File(IOUtils.Directories.getBaseFolderPath(context)).listFiles();
                 String clicked = (String) listView.getItemAtPosition(position);
                 Log.d(TAG, "dirFiles.length: " + dirFiles.length + " clicked: " + clicked + " position: " + position);
                 clicked = clicked.replace("#", "").split(";")[0];

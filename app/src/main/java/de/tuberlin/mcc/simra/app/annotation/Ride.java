@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
@@ -25,7 +26,6 @@ import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 public class Ride {
 
     static String TAG = "Ride_LOG";
-    public File accGpsFile;
     public ArrayList<AccEvent> events;
     public long distance;
     public int bike;
@@ -42,9 +42,7 @@ public class Ride {
     int state;
     private String key = "";
 
-    // Non-temp ride.
     public Ride(File accGpsFile, String duration, String startTime, int state, int bike, int child, int trailer, int pLoc, Context context, boolean calculateEvents, boolean temp) throws IOException {
-        this.accGpsFile = accGpsFile;
         this.duration = duration;
         this.startTime = startTime;
         Object[] waitedTimeRouteAndDistance = calculateWaitedTimePolylineDistance(accGpsFile);
@@ -69,12 +67,13 @@ public class Ride {
         String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
 
         if (calculateEvents || temp) {
-            this.events = findAccEvents();
+            this.events = findAccEvents(accGpsFile);
         } else {
             this.events = new ArrayList<>();
-            if (fileExists(pathToAccEventsOfRide, context)) {
+            File accEventsFile = IOUtils.Files.getEventsFile(key, false, context);
+            if (accEventsFile.exists()) {
                 Log.d(TAG, "reading " + pathToAccEventsOfRide + " to get accEvents");
-                try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(pathToAccEventsOfRide)))) {
+                try (BufferedReader br = new BufferedReader(new FileReader(accEventsFile))) {
                     String line;
                     while ((line = br.readLine()) != null) {
                         String[] accEventLine = line.split(",", -1);
@@ -94,11 +93,9 @@ public class Ride {
             }
         }
 
-
         for (int i = 0; i < events.size(); i++) {
-
             AccEvent actualAccEvent = events.get(i);
-
+            // TODO: Use IncidentLogEntry
             content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + ",,,,,,,,,,,," + System.lineSeparator();
         }
         if (!fileExists(pathToAccEventsOfRide, context) && !temp) {
@@ -114,6 +111,7 @@ public class Ride {
     public static Object[] calculateWaitedTimePolylineDistance(File gpsFile) throws IOException {
         Polyline polyLine = new Polyline();
 
+        // TODO: Use IOUtils for File Location
         BufferedReader br = new BufferedReader(new FileReader(gpsFile));
         // br.readLine() to skip the first two lines which contain the file version info and headers
         String line = br.readLine();
@@ -169,23 +167,7 @@ public class Ride {
         return new Object[]{waitedTime, polyLine, distance};
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public ArrayList<AccEvent> getEvents() {
-        return events;
-    }
-
-    public String getDuration() {
-        return duration;
-    }
-
-    public Polyline getRoute() {
-        return this.route;
-    }
-
-    public ArrayList<AccEvent> findAccEvents() {
+    public static ArrayList<AccEvent> findAccEvents(File accGpsFile) {
         ArrayList<AccEvent> accEvents = new ArrayList<>(6);
 
         BufferedReader br = null;
@@ -365,6 +347,22 @@ public class Ride {
 
         return accEvents;
 
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public ArrayList<AccEvent> getEvents() {
+        return events;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public Polyline getRoute() {
+        return this.route;
     }
 
 }

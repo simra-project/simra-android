@@ -37,8 +37,6 @@ import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class MarkerFunct {
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Log tag
     private static final String TAG = "MarkerFunct_LOG";
     private final String userAgent = "SimRa/alpha";
     private ShowRouteActivity mother;
