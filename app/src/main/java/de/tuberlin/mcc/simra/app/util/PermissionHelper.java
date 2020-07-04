@@ -36,7 +36,7 @@ public class PermissionHelper {
                 // Before version N the Storage permissions were granted on app install, so we should not check
                 // https://developer.android.com/reference/android/Manifest.permission#READ_EXTERNAL_STORAGE
                 return true;
-            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && permission == Manifest.permission.ACCESS_BACKGROUND_LOCATION) {
+            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N && permission == Manifest.permission.ACCESS_BACKGROUND_LOCATION) {
                 // Before SDK29 the Background Location Permission was automatically granted with a location request:
                 // https://developer.android.com/reference/android/Manifest.permission#ACCESS_BACKGROUND_LOCATION
                 return true;
@@ -69,16 +69,16 @@ public class PermissionHelper {
 
 
     public static class BasePermission {
-        public int PERMISSION_REQQUEST_CODE = 0;
+        public int PERMISSION_REQUEST_CODE = 0;
         public String[] permissions = {};
 
         BasePermission(int permissionRequestCode, String[] ipermissions) {
-            PERMISSION_REQQUEST_CODE = permissionRequestCode;
+            PERMISSION_REQUEST_CODE = permissionRequestCode;
             permissions = ipermissions;
         }
 
         public void requestPermissions(Activity activity) {
-            ActivityCompat.requestPermissions(activity, permissions, PERMISSION_REQQUEST_CODE);
+            ActivityCompat.requestPermissions(activity, permissions, PERMISSION_REQUEST_CODE);
         }
 
         public boolean hasPermission(Context context) {
