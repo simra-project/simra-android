@@ -597,8 +597,6 @@ public class ShowRouteActivity extends BaseActivity {
         String fileInfoLine = appVersion + "#" + metaDataFileVersion + System.lineSeparator();
         Utils.overwriteFile((fileInfoLine + METADATA_HEADER + metaDataContent), IOUtils.Files.getMetaDataFile(this));
 
-        // tempAccEventsPath
-        // tempAccGpsPath
         if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {
             Log.d(TAG, "path of tempGpsFile: " + tempGpsFile.getPath());
             deleteFile(pathToAccGpsFile);
@@ -606,7 +604,7 @@ public class ShowRouteActivity extends BaseActivity {
             boolean success = tempGpsFile.renameTo(new File(path + File.separator + pathToAccGpsFile));
             Log.d(TAG, "tempGpsFile successfully renamed: " + success);
         }
-        String pathToAccEventsFile = "accEvents" + ride.getKey() + ".csv";
+        String pathToAccEventsFile = IOUtils.Files.getEventsFileName(ride.getKey(), false, this);
         if (tempAccEventsPath != null) {
             deleteFile(pathToAccEventsFile);
             String path = ShowRouteActivity.this.getFilesDir().getPath();

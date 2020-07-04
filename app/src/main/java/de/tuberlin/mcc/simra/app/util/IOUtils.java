@@ -71,12 +71,25 @@ public class IOUtils {
      * Those we need access to from all over the app, because the access was never centralized...
      */
     public static class Files {
-        public static String getMetaDataPath(Context context) {
+        public static String getMetaDataFilePath(Context context) {
             return IOUtils.Directories.getBaseFolderPath(context) + "metaData.csv";
         }
 
         public static File getMetaDataFile(Context context) {
-            return new File(getMetaDataPath(context));
+            return new File(getMetaDataFilePath(context));
+        }
+
+        // TODO: ID should be an Integer
+        public static String getEventsFileName(String rideId, boolean isTempFile) {
+            return (isTempFile ? "Temp" : "") + "accEvents" + rideId + ".csv";
+        }
+
+        public static String getEventsFilePath(String rideId, boolean isTempFile, Context context) {
+            return IOUtils.Directories.getBaseFolderPath(context) + getEventsFileName(rideId, isTempFile);
+        }
+
+        public static File getEventsFile(String rideId, boolean isTempFile, Context context) {
+            return new File(IOUtils.Directories.getBaseFolderPath(context) + (isTempFile ? "Temp" : "") + "accEvents" + rideId + ".csv");
         }
     }
 }

@@ -241,7 +241,7 @@ public class UploadService extends Service {
                                 if (dirFile.getName().startsWith(rideKey + "_accGps")) {
                                     Log.d(TAG, "dirFiles[i]: " + dirFile.getName());
                                     accGpsName = dirFile.getName();
-                                    accEventName = "accEvents" + rideKey + ".csv";
+                                    accEventName = IOUtils.Files.getEventsFileName(rideKey, false);
                                     break;
                                 }
                             }

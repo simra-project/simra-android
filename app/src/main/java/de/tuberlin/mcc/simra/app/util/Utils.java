@@ -438,7 +438,7 @@ public class Utils {
                     uploaded = false;
                 }
                 // First part: read accEvents and calculate number of (scary) incidents.
-                File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
+                File accEventsFile = IOUtils.Files.getEventsFile(key, false, context);
                 StringBuilder contentOfAccEvents = new StringBuilder();
                 if (!accEventsFile.exists()) {
                     contentOfMetaData.append(metaDataLine).append(System.lineSeparator());
@@ -497,7 +497,7 @@ public class Utils {
                 if (uploaded) {
                     totalNumberOfIncidents += actualNumberOfIncidents;
                     totalNumberOfScary += actualNumberOfScary;
-                    overWriteFile(contentOfAccEvents.toString(), "accEvents" + key + ".csv", context);
+                    overwriteFile(contentOfAccEvents.toString(), accEventsFile);
                 }
                 // Second part: read accGps and calculate number of rides, distance, duration, CO2-savings and waited time.
                 File accGpsFile = context.getFileStreamPath(key + "_accGps.csv");

@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.activities.ShowRouteActivity;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
@@ -179,10 +180,7 @@ public class MarkerFunct {
 
                     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // Append new acc event to accEvents[rideID].csv
-                    String pathToAccEventsOfRide = "accEvents" + rideID + ".csv";
-                    if (temp) {
-                        pathToAccEventsOfRide = "TempaccEvents" + rideID + ".csv";
-                    }
+                    String pathToAccEventsOfRide = IOUtils.Files.getEventsFileName(rideID, temp);
 
                     String fileInfoLine = getAppVersionNumber(mother) + "#1" + System.lineSeparator();
 
