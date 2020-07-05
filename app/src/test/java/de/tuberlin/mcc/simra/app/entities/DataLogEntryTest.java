@@ -43,30 +43,30 @@ public class DataLogEntryTest {
 
     @Test
     public void parseDataLogEntryFromLine_Radmesser_One_Value() {
-        assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2"))
+        assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(2, 1, null, null).build());
+                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(1, null, null, null).build());
     }
 
     @Test
     public void parseDataLogEntryFromLine_Radmesser_Two_Value() {
-        assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2,3"))
+        assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(2, 1, 3, null).build());
+                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(1, 2, null, null).build());
     }
 
     @Test
     public void parseDataLogEntryFromLine_Radmesser_Three_Value() {
-        assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2,3,4"))
+        assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2,3"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(2, 1, 3, 4).build());
+                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(1, 2, 3, null).build());
     }
 
     @Test
     public void parseDataLogEntryFromLine_Radmesser_Four_Value() {
         assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2,3,4"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(2, 1, 3, 4).build());
+                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(1, 2, 3, 4).build());
     }
 
     @Test
