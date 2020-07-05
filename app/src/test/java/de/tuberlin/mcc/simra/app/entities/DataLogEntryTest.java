@@ -83,32 +83,29 @@ public class DataLogEntryTest {
 
     @Test
     public void stringifyLogEntry_Full() {
-        assertThat(DataLogEntry.stringifyDataLogEntry(
-                DataLogEntry.newBuilder()
-                        .withTimestamp(6L)
-                        .withGPS(1D, 2D, 7F)
-                        .withAccelerometer(3F, 4F, 5F)
-                        .withGyroscope(8F, 9F, 10F)
-                        .withRadmesser(11, 12, 13, 14).build()))
+        assertThat(DataLogEntry.newBuilder()
+                .withTimestamp(6L)
+                .withGPS(1D, 2D, 7F)
+                .withAccelerometer(3F, 4F, 5F)
+                .withGyroscope(8F, 9F, 10F)
+                .withRadmesser(11, 12, 13, 14).build().stringifyDataLogEntry())
                 .isEqualTo("1.0,2.0,3.0,4.0,5.0,6,7.0,8.0,9.0,10.0,11,12,13,14");
     }
 
     @Test
     public void stringifyLogEntry_Full_ExampleValues() {
-        assertThat(DataLogEntry.stringifyDataLogEntry(
-                DataLogEntry.newBuilder()
-                        .withTimestamp(1592319028261L)
-                        .withGPS(52.53949384561807D, 13.371213365189773, 6.0F)
-                        .withAccelerometer(-0.8885537F, -9.369222F, -2.433742F)
-                        .withGyroscope(0.008709193F, 0.21959732F, -0.057107173F)
-                        .withRadmesser(255, null, null, null).build()))
+        assertThat(DataLogEntry.newBuilder()
+                .withTimestamp(1592319028261L)
+                .withGPS(52.53949384561807D, 13.371213365189773, 6.0F)
+                .withAccelerometer(-0.8885537F, -9.369222F, -2.433742F)
+                .withGyroscope(0.008709193F, 0.21959732F, -0.057107173F)
+                .withRadmesser(255, null, null, null).build().stringifyDataLogEntry())
                 .isEqualTo("52.53949384561807,13.371213365189773,-0.8885537,-9.369222,-2.433742,1592319028261,6.0,0.008709193,0.21959732,-0.057107173,255,,,");
     }
 
     @Test
     public void stringifyLogEntry_EmptyLine() {
-        assertThat(DataLogEntry.stringifyDataLogEntry(
-                DataLogEntry.newBuilder().build()))
+        assertThat(DataLogEntry.newBuilder().build().stringifyDataLogEntry())
                 .isEqualTo(",,,,,,,,,,,,,");
     }
 }
