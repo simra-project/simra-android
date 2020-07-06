@@ -83,7 +83,6 @@ public class BLEScanner {
                 ScanFilter.Builder builder = new ScanFilter.Builder();
                 builder.setServiceUuid(new ParcelUuid(serviceUUID));
                 filterList.add(builder.build());
-            
         }
 
         startScan(8, filterList, deviceFoundCallback);
