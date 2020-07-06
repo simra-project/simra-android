@@ -1,17 +1,8 @@
 package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,92 +11,35 @@ import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import java.util.HashMap;
-
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
-import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import pl.droidsonroids.gif.GifImageView;
 
-import static de.tuberlin.mcc.simra.app.services.RadmesserService.ConnectionStatus;
 
 public class RadmesserActivity extends AppCompatActivity {
-
-    RadmesserService mBoundRadmesserService;
     boolean deviceConnected = false;
-
     LinearLayout connectDevicesLayout;
     LinearLayout devicesList;
-
     LinearLayout deviceLayout;
     TextView deviceInfoTextView;
-
-    Handler pollDevicesHandler;
+    BroadcastReceiver receiver;
     Switch takePicturesButton;
-
-    private ServiceConnection mRadmesserServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            RadmesserService.LocalBinder myBinder = (RadmesserService.LocalBinder) service;
-            mBoundRadmesserService = myBinder.getService();
-            updateViewMode();
-        }
-    };
-
-    private BroadcastReceiver distanceReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra("distance");
-            if (message == null) return;
-            Log.d("receiver", "Got message: " + message);
-
-            int distance = -1;
-            String[] splitted = message.split(",");
-            if (splitted.length == 2) distance = Integer.parseInt(splitted[0]);
-
-            deviceInfoTextView.setText("Connected with " + mBoundRadmesserService.connectedDevice.getID() + "\n" + "Last distance: " + distance + " cm");
-        }
-    };
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == PermissionHelper.Camera.PERMISSION_REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(true, this);
-                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
-            } else {
-                takePicturesButton.setChecked(false);
-                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_radmesser);
         initializeToolBar();
-
+        Log.i("start", "RadmesserActivity");
         connectDevicesLayout = findViewById(R.id.connectDevicesLayout);
         devicesList = findViewById(R.id.devicesList);
-
         deviceLayout = findViewById(R.id.deviceLayout);
         deviceInfoTextView = findViewById(R.id.deviceInfoTextView);
-
         NumberPicker handleBarWidth = findViewById(R.id.handleBarWidth);
         handleBarWidth.setMaxValue(40);
         handleBarWidth.setMinValue(0);
@@ -139,9 +73,58 @@ public class RadmesserActivity extends AppCompatActivity {
             }
         });
 
-        Intent intent = new Intent(RadmesserActivity.this, RadmesserService.class);
-        startService(intent);
-        bindService(intent, mRadmesserServiceConnection, Context.BIND_IMPORTANT);
+        Button disconnectBTN = findViewById(R.id.btnDisconnect);
+        disconnectBTN.setOnClickListener(view -> RadmesserService.disconnectAndUnpairDevice(this));
+
+
+    }
+
+    private void registerReceiver() {
+        receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks() {
+            @Override
+            public void onDeviceFound(String deviceName, String deviceId) {
+                Button button = new Button(RadmesserActivity.this);
+                button.setText("Connect with " + deviceName);
+                button.setOnClickListener(v -> connectToDevice(deviceId));
+                devicesList.addView(button);
+            }
+
+            @Override
+            public void onConnectionStateChanged(RadmesserService.ConnectionState newState) {
+                Log.i("connState", newState.toString());
+                switch (newState) {
+                    case PAIRING:
+                        showTutorialDialog();
+                        break;
+                    case CONNECTED:
+                        deviceConnected = true;
+                        closeTutorialDialog();
+                        break;
+                    case CONNECTION_REFUSED:
+                    case DISCONNECTED:
+                        deviceConnected = false;
+                        break;
+                }
+                // ?????
+                connectDevicesLayout.setVisibility(deviceConnected ? View.GONE : View.VISIBLE);
+                deviceLayout.setVisibility(deviceConnected ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void onDistanceValue(String value) {
+                int distance = -1;
+                String[] splitted = value.split(",");
+                if (splitted.length == 2) distance = Integer.parseInt(splitted[0]);
+
+                deviceInfoTextView.setText("Connected with " + "\n" + "Last distance: " + distance + " cm");
+            }
+        });
+
+    }
+
+    private void startScanningDevices() {
+        devicesList.removeAllViews();
+        RadmesserService.startScanning(this);
     }
 
     private void initializeToolBar() {
@@ -157,54 +140,8 @@ public class RadmesserActivity extends AppCompatActivity {
         backBtn.setOnClickListener(v -> finish());
     }
 
-    private void updateViewMode() {
-        // TODO: implement all connection statuses
-        deviceConnected = mBoundRadmesserService != null && (mBoundRadmesserService.getCurrentConnectionStatus() == ConnectionStatus.CONNECTED || mBoundRadmesserService.getCurrentConnectionStatus() == ConnectionStatus.PAIRING);
-
-        connectDevicesLayout.setVisibility(deviceConnected ? View.GONE : View.VISIBLE);
-        deviceLayout.setVisibility(deviceConnected ? View.VISIBLE : View.GONE);
-
-        if (deviceConnected) {
-            if (pollDevicesHandler != null) {
-                pollDevicesHandler.removeCallbacksAndMessages(null);
-                pollDevicesHandler = null;
-            }
-
-            deviceInfoTextView.setText("Verbunden mit Gerät " + mBoundRadmesserService.connectedDevice.getID());
-        } else {
-            if (pollDevicesHandler == null) {
-                pollDevicesHandler = new Handler();
-                int delayMs = 1000;
-
-                pollDevicesHandler.postDelayed(new Runnable() {
-                    public void run() {
-                        pollAvailableDevices();
-                        pollDevicesHandler.postDelayed(this, delayMs);
-                    }
-                }, delayMs);
-            }
-        }
-    }
-
-    private void pollAvailableDevices() {
-        HashMap<String, BluetoothDevice> devices = mBoundRadmesserService.scanner.getFoundDevices();
-
-        // TODO: mit einer "richtigen" ListView (o.ä.) implementieren, da hier die Buttons jedes Mal neu erstellt werden
-        devicesList.removeAllViews();
-
-        for (String deviceId : devices.keySet()) {
-            Button button = new Button(RadmesserActivity.this);
-            button.setText("Connect with " + deviceId);
-            button.setOnClickListener(v -> connectToDevice(deviceId));
-            devicesList.addView(button);
-        }
-    }
-
     private void connectToDevice(String deviceId) {
-        mBoundRadmesserService.connectToDevice(deviceId, device -> {
-            updateViewMode();
-            showTutorialDialog();
-        });
+        RadmesserService.connectDevice(this, deviceId);
     }
 
     private void showTutorialDialog() {
@@ -223,19 +160,25 @@ public class RadmesserActivity extends AppCompatActivity {
         alert.setView(gifLayout);
         alert.setPositiveButton("Ok", (dialog, whichButton) -> {
         });
-        alert.show();
+        alertDialog = alert.show();
+
+    }
+
+    private void closeTutorialDialog() {
+        if (alertDialog != null)
+            alertDialog.dismiss();
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(distanceReceiver);
+        RadmesserService.unRegisterCallbacks(receiver, this);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(distanceReceiver, new IntentFilter(RadmesserDevice.UUID_SERVICE_DISTANCE));
+        registerReceiver();
+        startScanningDevices();
         super.onResume();
     }
 
@@ -243,6 +186,5 @@ public class RadmesserActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
     }
-
 }
 

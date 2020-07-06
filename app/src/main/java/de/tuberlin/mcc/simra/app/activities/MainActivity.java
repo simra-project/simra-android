@@ -6,7 +6,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -37,7 +36,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -76,7 +74,6 @@ import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.Utils;
-import io.sentry.android.core.SentryAndroid;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
@@ -115,19 +112,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // Radmesser
     private FloatingActionButton radmesserButton;
     private RadmesserService radmesserService;
-    private ServiceConnection radmesserServiceConnection = new ServiceConnection() {
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            RadmesserService.LocalBinder myBinder = (RadmesserService.LocalBinder) service;
-            radmesserService = myBinder.getService();
-            updateRadmesserButtonStatus();
-        }
-    };
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -169,11 +154,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return (!gps_enabled);
     }
 
-    private void connectToRadmesserService() {
-        Intent intent = new Intent(this, RadmesserService.class);
-        startService(intent);
-        bindService(intent, radmesserServiceConnection, Context.BIND_IMPORTANT);
-    }
 
     @SuppressLint("MissingPermission")
     @Override
@@ -423,7 +403,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
             radmesserButton.setVisibility(View.GONE);
         }
-        RadmesserService.ConnectionStatus status = radmesserService != null ? radmesserService.getCurrentConnectionStatus() : RadmesserService.ConnectionStatus.DISCONNECTED;
+        RadmesserService.ConnectionState status = radmesserService != null ? radmesserService.getConnectionState() : RadmesserService.ConnectionState.DISCONNECTED;
         switch (status) {
             case DISCONNECTED:
                 radmesserButton.setImageResource(R.drawable.ic_bluetooth_disabled);
@@ -461,16 +441,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     public void onResume() {
 
-        Log.d(TAG, "OnResume called");
+        // Log.d(TAG, "OnResume called");
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
-        if (radmesserEnabled) {
-            connectToRadmesserService();
-        }
+        boolean isConnecting;
+
+        if(radmesserEnabled)
+            isConnecting = RadmesserService.tryConnectPairedDevice(this);
+
+
         // show or hide the radmesser status according to the shared settings
         updateRadmesserButtonStatus();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter(RadmesserService.BroadcastMessages.ConnectionStatusChange));
 
         super.onResume();
 
@@ -521,12 +502,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void onStop() {
         super.onStop();
         Log.d(TAG, "OnStop called");
-
-        try {
-            unbindService(radmesserServiceConnection);
-        } catch (Exception e) {
-        }
-
         try {
             final Location myLocation = mLocationOverlay.getLastFix();
             if (myLocation != null) {

@@ -16,98 +16,99 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
-
-
 public class BLEScanner {
     private final String TAG = "BLEScanner";
-    private final int DEFAULT_SCANNING_DURATION_SECONDS = 8;
     private BluetoothLeScanner bluetoothLeScanner;
-    private BLEScannerCallbacks callbacks;
-
-
     private HashMap<String, BluetoothDevice> foundDevices;
+    private ScanCallback currentScan;
+    private final BLEScanCallbacks scanCallbacks;
 
-    public BLEScanner(BLEScannerCallbacks callbacks) {
-        this.callbacks = callbacks;
-
+    public BLEScanner(BLEScanCallbacks scanCallbacks) {
+        this.scanCallbacks = scanCallbacks;
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        } else
+            throw new RuntimeException("Blutooth not enabled or granted");
+    }
+
+    public synchronized void abortAnyCurrentScan() {
+        if(finishScan()){
+            scanCallbacks.onScanAborted();
         }
     }
 
-    public boolean tryConnectPairedDevice(String pairedRadmesserID, SingleDeviceScanCB then) {
-        if (pairedRadmesserID == null)
-            return false;
+    private synchronized boolean finishScan() {
+        if (currentScan != null && bluetoothLeScanner != null) {
+            bluetoothLeScanner.stopScan(currentScan);
+            currentScan = null;
+            return true;
+        }
+        return false;
+    }
 
-        //create filter matching this device
+    public interface BLEScanCallbacks {
+        void onScanStarted();
+
+        void onScanSelfFinished();
+
+        void onScanAborted();
+    }
+
+    public interface DeviceFoundCallback {
+        void onDeviceFound(BluetoothDevice device);
+    }
+
+    public boolean isScanning(){
+        return currentScan!=null;
+    }
+
+    public void findDeviceById(String radmesserID, DeviceFoundCallback deviceFoundCallback) {
         ArrayList<ScanFilter> filterList = new ArrayList<>();
         ScanFilter.Builder builder = new ScanFilter.Builder();
-        builder.setDeviceAddress(pairedRadmesserID);
+        builder.setDeviceAddress(radmesserID);
         filterList.add(builder.build());
 
         startScan(
                 5,
                 filterList,
-                (device, callback) -> {
-                    then.onSpecificDeviceFound(device);
-                    stopScan(callback);
-                }
+                deviceFoundCallback     //todo: maybe tops scan after, but may not be needed?
         );
-        return true;
+
     }
 
-    public void connectAnyNewDevice(BLEServiceManager bleServices, SingleDeviceScanCB then) {
-        startScan(
-                8,
-                createFilterListFromBLEServiceManager(bleServices),
-                (device, callback) -> {
-                    then.onSpecificDeviceFound(device);
-                    stopScan(callback);
-                });
-    }
-
-    public void scanDevices(BLEServiceManager bleServices) {
-        startScan(
-                8,
-                createFilterListFromBLEServiceManager(bleServices),
-                (device, callback) -> callbacks.onNewDeviceFound(device));
-    }
-
-    private ArrayList<ScanFilter> createFilterListFromBLEServiceManager(BLEServiceManager bleServices) {
+    public void findDevicesByServices(BLEServiceManager bleServices, DeviceFoundCallback deviceFoundCallback) {
         ArrayList<ScanFilter> filterList = new ArrayList<>();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             for (UUID serviceUUID : bleServices.getAllUUIDs()) {
                 ScanFilter.Builder builder = new ScanFilter.Builder();
                 builder.setServiceUuid(new ParcelUuid(serviceUUID));
                 filterList.add(builder.build());
-            }
         }
-        return filterList;
+
+        startScan(8, filterList, deviceFoundCallback);
+
     }
 
-    private boolean startScan(int duration, ArrayList<ScanFilter> fitlerList, ScanResultCallback then) {
-        if (duration <= 0 || duration > 10)
-            duration = DEFAULT_SCANNING_DURATION_SECONDS;
-
+    private synchronized boolean startScan(int duration, ArrayList<ScanFilter> fitlerList, DeviceFoundCallback deviceFoundCallback) {
+        abortAnyCurrentScan();
         ScanSettings scanSettings = new ScanSettings.Builder().build();
 
         foundDevices = new HashMap<>();
-        ScanCallback scanCallabck = new ScanCallback() {
+        ScanCallback thisScanCallback = new ScanCallback() {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
                 String deviceID = result.getDevice().getAddress();
                 if (!foundDevices.containsKey(deviceID)) {
                     foundDevices.put(deviceID, result.getDevice());
-                    then.onNewDeviceFound(result.getDevice(), this);
+                    deviceFoundCallback.onDeviceFound(result.getDevice());
                 }
                 super.onScanResult(callbackType, result);
             }
         };
-
+        currentScan = thisScanCallback;
         try {
-            bluetoothLeScanner.startScan(fitlerList, scanSettings, scanCallabck);
-            callbacks.onScanStarted();
+            bluetoothLeScanner.startScan(fitlerList, scanSettings, thisScanCallback);
+            scanCallbacks.onScanStarted();
             Log.i(TAG, "scan started");
         } catch (NullPointerException nex) {
             //errorStatus = ErrorStatus.bluetooth_not_ready;
@@ -116,36 +117,12 @@ public class BLEScanner {
         }
 
         //stop Scan after duration, if not already stoped
-        Handler stopScanHandler = new Handler(Looper.getMainLooper());
+        Handler stopScanHandler = new Handler(Looper.myLooper());
         stopScanHandler.postDelayed(() -> {
-            stopScan(scanCallabck);
-            Log.i(TAG, "scan stopped");
+            if (finishScan()) {
+                scanCallbacks.onScanSelfFinished();
+            }
         }, duration * 1000);
         return true;
-    }
-
-    private void stopScan(ScanCallback scanCallback) {
-        bluetoothLeScanner.stopScan(scanCallback);
-        callbacks.onScanStopped();
-    }
-
-    public HashMap<String, BluetoothDevice> getFoundDevices() {
-        return foundDevices;
-    }
-
-    private interface ScanResultCallback {
-        void onNewDeviceFound(BluetoothDevice device, ScanCallback callback);
-    }
-
-    public interface SingleDeviceScanCB {
-        void onSpecificDeviceFound(BluetoothDevice device);
-    }
-
-    public interface BLEScannerCallbacks {
-        void onNewDeviceFound(BluetoothDevice device);
-
-        void onScanStarted();
-
-        void onScanStopped();
     }
 }
