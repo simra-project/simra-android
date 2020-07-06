@@ -6,7 +6,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -37,7 +36,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -76,7 +74,6 @@ import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.Utils;
-import io.sentry.android.core.SentryAndroid;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
@@ -444,8 +441,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     public void onResume() {
 
-        Log.d(TAG, "OnResume called");
+        // Log.d(TAG, "OnResume called");
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
+        boolean isConnecting;
+
+        if(radmesserEnabled)
+            isConnecting = RadmesserService.tryConnectPairedDevice(this);
+
+
         // show or hide the radmesser status according to the shared settings
         updateRadmesserButtonStatus();
 
