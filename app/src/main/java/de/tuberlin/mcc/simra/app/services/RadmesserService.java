@@ -165,10 +165,10 @@ public class RadmesserService extends Service {
                     RadmesserDevice.UUID_SERVICE_CONNECTION,
                     RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CONNECTION,
                     val -> {
-                        connectedDevice.devicePaired = true;
                         Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
                         String strVal = val.getStringValue(0);
                         if (strVal != null && strVal.equals("1")) {
+                            connectedDevice.devicePaired = true;
                             setConnectionState(ConnectionState.CONNECTED);
                             setPairedRadmesserID(connectedDevice.getID(), this);
                         }
