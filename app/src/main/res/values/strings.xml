@@ -18,9 +18,7 @@
 
     <!--- Start -->
     <string name="welcome_header">Willkommen bei SimRa!</string>
-    <string name="welcome_text">Vielen Dank, dass Sie das SimRa-Projekt unterstützen.</string>
-    <string name="welcome_text2">Viel Spaß und Gute Fahrt!</string>
-    <string name="welcome_text3">Mit freundlichen Grüßen,\ndas SimRa-Team.</string>
+    <string name="welcome_text">Vielen Dank, dass du das SimRa-Projekt unterstützt.\nViel Spaß und Gute Fahrt!</string>
     <string name="sendErrorTitle">Ups!</string>
     <string name="sendErrorMessage">Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?</string>
     <string name="simra_closed">SimRa beendet</string>
@@ -47,9 +45,7 @@
     <string name="link_to_twitter">https://twitter.com/SimRa_Berlin</string>
 
     <!--- Permission -->
-    <string name="locationPermissionRequestRationale">Diese App benötigt den Zugriff auf deine Standortdaten, um dich auf der Karte anzuzeigen und deine Fahrt zu speichern.</string>
-    <string name="permissionFineLocation">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten.</string>
-    <string name="storagePermissionRequestRationale">Diese App benötigt den Zugriff auf den Speicher deines Smartphones, um die Karte richtig anzeigen zu können.</string>
+    <string name="base_permission_rationale">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten und Speicher.\nWir benötigen diese um deinen Standort auf der Karte anzuzeigen und deine Fahrt aufzuzeichnen</string>
 
 
     <!--- WebActivity -->
@@ -185,10 +181,16 @@
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Geräte</string>
+
     <!--- Radmesser -->
     <string name="radmesserSwitchTitle">Radmesser verbinden</string>
     <string name="radmesserButton">Radmesser Einstellungen öffnen</string>
     <string name="availableDevices">Verfügbare Geräte</string>
+    <string name="radmesserTakePictureDuringRideSetting">Während der Fahrt Bilder aufnehmen</string>
+    <string name="radmesserTakePictureDuringRideIntervalText">Intervall wie oft ein Bild aufgenommen wird</string>
+    <string name="radmesserAdvancedSettings">Weitere Einstellungen</string>
+    <string name="radmesserHandlebarWidthText">Weite des Lenkers von der Außenseite zum Rahmen</string>
+
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
@@ -262,6 +264,7 @@
     <string name="meter_short">m</string>
     <string name="feet_short">ft</string>
     <string name="seconds_short">s</string>
+    <string name="centimeter_short">cm</string>
     <string name="hour_format">HH:mm</string>
     <string name="datetime_format">dd.MM.yy,HH:mm\'h\'</string>
 

@@ -29,22 +29,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/nextBtn"
-            android:layout_alignEnd="@+id/textView4"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="20dp"
-
             app:srcCompat="@drawable/helmet" />
 
         <TextView
             android:id="@+id/textView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginHorizontal="25dp"
             android:background="@drawable/button_unpressed"
             android:padding="5dp"
             android:text="@string/welcome_header"
-            android:textAlignment="textEnd"
             android:textColor="#FEFEFE"
             android:textSize="20dp"
             android:textStyle="bold" />
@@ -58,35 +54,20 @@
             android:layout_marginHorizontal="25dp"
             android:fontFamily="@font/assistant_extralight"
             android:text="@string/welcome_text"
-            android:textAlignment="textEnd"
             android:textColor="#FEFEFE"
             android:textSize="20dp"
             android:textStyle="bold" />
 
+
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/textView5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/textView2"
-            android:layout_centerHorizontal="true"
             android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="20dp"
             android:fontFamily="@font/assistant_extralight"
-            android:text="@string/welcome_text2"
-            android:textAlignment="textEnd"
-            android:textColor="#FEFEFE"
-            android:textSize="20dp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView3"
-            android:layout_centerHorizontal="true"
-            android:layout_marginHorizontal="25dp"
-            android:fontFamily="@font/assistant_extralight"
-            android:text="@string/welcome_text3"
-            android:textAlignment="textEnd"
+            android:text="@string/base_permission_rationale"
             android:textColor="#FEFEFE"
             android:textSize="20dp"
             android:textStyle="bold" />

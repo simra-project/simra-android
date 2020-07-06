@@ -2,14 +2,11 @@ package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -42,15 +39,15 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.annotation.ShowRouteActivity;
+import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
+import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class HistoryActivity extends BaseActivity {
 
@@ -69,29 +66,7 @@ public class HistoryActivity extends BaseActivity {
     ListView listView;
     String[] ridesArr;
 
-    UploadService mBoundUploadService;
-
-    boolean privacyAgreement = false;
-
     BroadcastReceiver br;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // ServiceConnection for communicating with RecorderService
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private ServiceConnection mUploadServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "onServiceDisconnected");
-            refreshMyRides();
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "onServiceConnected() called");
-            UploadService.MyBinder myBinder = (UploadService.MyBinder) service;
-            mBoundUploadService = myBinder.getService();
-        }
-    };
 
     /**
      * When this Activity gets started automatically after the route recording is finished,
@@ -107,8 +82,6 @@ public class HistoryActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate()");
         setContentView(R.layout.activity_history);
-
-        privacyAgreement = lookUpBooleanSharedPrefs("Privacy-Policy-Accepted", false, "simraPrefs", this);
 
         //  Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -206,9 +179,8 @@ public class HistoryActivity extends BaseActivity {
         ArrayList<String[]> metaDataLines = new ArrayList<>();
 
 
-        if (fileExists("metaData.csv", this)) {
-
-            File metaDataFile = getFileStreamPath("metaData.csv");
+        File metaDataFile = IOUtils.Files.getMetaDataFile(this);
+        if (metaDataFile.exists()) {
             try {
                 BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
                 // br.readLine() to skip the first line which contains the headers
@@ -308,7 +280,7 @@ public class HistoryActivity extends BaseActivity {
             startTime = getIntent().getStringExtra("StartTime");
             // State can be 0 for server processing not started, 1 for started and pending
             // and 2 for processed by server so the incidents can be annotated by the user
-            state = getIntent().getIntExtra("State", 0);
+            state = getIntent().getIntExtra("State", MetaData.STATE.JUST_RECORDED);
         }
 
         // Checks whether a ride was selected or not. Maybe it will be possible to select
@@ -346,7 +318,7 @@ public class HistoryActivity extends BaseActivity {
                 }
             }
             String content = "";
-            try (BufferedReader br = new BufferedReader(new FileReader(HistoryActivity.this.getFileStreamPath("metaData.csv")))) {
+            try (BufferedReader br = new BufferedReader(new FileReader(IOUtils.Files.getMetaDataFile(this)))) {
                 String line;
 
                 while ((line = br.readLine()) != null) {
@@ -354,7 +326,7 @@ public class HistoryActivity extends BaseActivity {
                         content += line += System.lineSeparator();
                     }
                 }
-                overWriteFile(content, "metaData.csv", HistoryActivity.this);
+                Utils.overwriteFile(content, IOUtils.Files.getMetaDataFile(this));
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
@@ -469,7 +441,7 @@ public class HistoryActivity extends BaseActivity {
             row.setOnClickListener(v -> {
                 // gets the files in the directory
                 // lists all the files into an array
-                File[] dirFiles = getFilesDir().listFiles();
+                File[] dirFiles = new File(IOUtils.Directories.getBaseFolderPath(context)).listFiles();
                 String clicked = (String) listView.getItemAtPosition(position);
                 Log.d(TAG, "dirFiles.length: " + dirFiles.length + " clicked: " + clicked + " position: " + position);
                 clicked = clicked.replace("#", "").split(";")[0];
