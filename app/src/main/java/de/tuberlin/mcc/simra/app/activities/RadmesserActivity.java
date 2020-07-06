@@ -28,7 +28,7 @@ public class RadmesserActivity extends AppCompatActivity {
     TextView deviceInfoTextView;
     BroadcastReceiver receiver;
     Switch takePicturesButton;
-    private AlertDialog alertDL;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,13 +160,13 @@ public class RadmesserActivity extends AppCompatActivity {
         alert.setView(gifLayout);
         alert.setPositiveButton("Ok", (dialog, whichButton) -> {
         });
-        alertDL = alert.show();
+        alertDialog = alert.show();
 
     }
 
     private void closeTutorialDialog() {
-        if (alertDL != null)
-            alertDL.dismiss();
+        if (alertDialog != null)
+            alertDialog.dismiss();
     }
 
     @Override

@@ -2,24 +2,19 @@ package de.tuberlin.mcc.simra.app.services;
 
 import android.app.Notification;
 import android.app.Service;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import java.util.ArrayList;
-
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
@@ -40,18 +35,18 @@ public class RadmesserService extends Service {
 
     private static ConnectionState connectionState = ConnectionState.DISCONNECTED;
 
-    private final IBinder binder = new LocalBinder();
+  /*  private final IBinder binder = new LocalBinder();
 
     public class LocalBinder extends Binder {
         public RadmesserService getService() {
             // Return this instance of LocalService so clients can call public methods
             return RadmesserService.this;
         }
-    }
+    }*/
 
     @Override
     public IBinder onBind(Intent intent) {
-        return binder;
+        return null;
     }
 
     private static final class ServiceHandler extends Handler {
