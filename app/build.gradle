@@ -26,7 +26,7 @@ android {
             properties.load(project.rootProject.file('local.properties').newDataInputStream())
         }
 
-        buildConfigField "String", SENTRY_DSN, properties.getProperty(SENTRY_DSN) ?: "null"
+        buildConfigField "String", SENTRY_DSN, properties.getProperty(SENTRY_DSN) ?: ""
         def VAR_SENTRY_DSN = System.getenv(ENV_VARIABLE_PREFIX + SENTRY_DSN)
         if (VAR_SENTRY_DSN != null) {
             buildConfigField "String", SENTRY_DSN, "\"" + VAR_SENTRY_DSN + "\""
