@@ -420,7 +420,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
             radmesserButton.setVisibility(View.GONE);
         }
-        RadmesserService.ConnectionState status = radmesserService != null ? radmesserService.getCurrentConnectionStatus() : RadmesserService.ConnectionState.DISCONNECTED;
+        RadmesserService.ConnectionState status = radmesserService != null ? radmesserService.getConnectionState() : RadmesserService.ConnectionState.DISCONNECTED;
         switch (status) {
             case DISCONNECTED:
                 radmesserButton.setImageResource(R.drawable.ic_bluetooth_disabled);

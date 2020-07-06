@@ -18,6 +18,8 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.util.ArrayList;
+
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
@@ -28,9 +30,9 @@ public class RadmesserService extends Service {
     private static final String sharedPrefsKey = "RadmesserServiceBLE";
     private static final String sharedPrefsKeyRadmesserID = "connectedDevice";
 
-    public RadmesserDevice connectedDevice;
-    BLEServiceManager serviceManager;
+    private RadmesserDevice connectedDevice;
     private volatile HandlerThread mHandlerThread;
+    private BLEScanner bluetoothScanner;
 
     public static ConnectionState getConnectionState() {
         return connectionState;
@@ -45,7 +47,6 @@ public class RadmesserService extends Service {
             // Return this instance of LocalService so clients can call public methods
             return RadmesserService.this;
         }
-
     }
 
     @Override
@@ -59,6 +60,7 @@ public class RadmesserService extends Service {
         }
     }
 
+    //todo: refactor
     public enum ConnectionState {
         DISCONNECTED,
         SEARCHING,
@@ -67,60 +69,16 @@ public class RadmesserService extends Service {
         CONNECTION_REFUSED
     }
 
-    public BLEScanner scanner = new BLEScanner(new BLEScanner.BLEScannerCallbacks() {
-        @Override
-        public void onNewDeviceFound(BluetoothDevice device) {
-            boradcastDeviceFound(device.getName(), device.getAddress());
-        }
-
-        @Override
-        public void onScanStarted() {
-            setConnectionState(ConnectionState.SEARCHING);
-        }
-
-        @Override
-        public void onScanFinished() {
-            if (connectionState == ConnectionState.SEARCHING)
-                setConnectionState(ConnectionState.DISCONNECTED);
-        }
-    });
-
-    private RadmesserDevice.RadmesserDeviceConnectionStateCallback radmesserConnectionCallbacks = (RadmesserDevice.ConnectionStatus newState, RadmesserDevice instance) -> {
-        if (instance != connectedDevice) return;
-        // if Device disconnected
-        if (newState == RadmesserDevice.ConnectionStatus.gattDisconnected) {
-            // and Pairing not completed
-            if (connectionState != ConnectionState.CONNECTED && connectionState != ConnectionState.DISCONNECTED) {
-                // Uncomplete Pairing -> diconnect from Radmesser
-                disconnectAndUnpairDevice();
-                setConnectionState(ConnectionState.CONNECTION_REFUSED);
-                Log.i(TAG, "CONNECTION_REFUSED");
-            } else {
-                // connection lost
-                setConnectionState(ConnectionState.DISCONNECTED);
-            }
-        }
-
-        if(newState== RadmesserDevice.ConnectionStatus.gattConnected){
-            setConnectionState(instance.connectionSucceded?ConnectionState.CONNECTED:ConnectionState.PAIRING);
-        }
-    };
-
-
-    public ConnectionState getCurrentConnectionStatus() {
-        return connectionState;
-    }
-
-    private void setConnectionState(ConnectionState newStatus) {
-        if (this.connectionState == newStatus)
+    private synchronized void setConnectionState(ConnectionState newState) {
+        if (this.connectionState == newState)
             return;
 
-        this.connectionState = newStatus;
-        boradcastConnectionStateChanged(newStatus);
+        this.connectionState = newState;
+        boradcastConnectionStateChanged(newState);
         ForegroundServiceNotificationManager.createOrUpdateNotification(
                 this,
                 "SimRa RadmesseR connection",
-                newStatus.toString()
+                newState.toString()
         );
     }
 
@@ -133,7 +91,7 @@ public class RadmesserService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "created");
-        serviceManager = registerBLEServices();
+        bluetoothScanner = new BLEScanner(scannerStatusCallbacks);
 
         LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mHandlerThread = new HandlerThread(TAG + ".HandlerThread");
@@ -146,13 +104,6 @@ public class RadmesserService extends Service {
                         "SimRa RadmesseR connection",
                         "Disconnected"
                 );
-
-       /* mServiceHandler.post(() -> {
-            serviceManager = registerBLEServices();
-            scanner.scanDevices(serviceManager);
-            // stopSelf();
-        });*/
-
         startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
     }
 
@@ -164,42 +115,85 @@ public class RadmesserService extends Service {
         mHandlerThread.quit();
     }
 
-    private BLEServiceManager registerBLEServices() {
+    //todo: refactor
+    public BLEScanner.BLEScanCallbacks scannerStatusCallbacks = new BLEScanner.BLEScanCallbacks() {
 
-        BLEServiceManager bleServices = new BLEServiceManager();
-        bleServices.addService(
-                RadmesserDevice.UUID_SERVICE_HEARTRATE,
-                RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_HEARTRATE,
-                val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
-        );
+        @Override
+        public void onScanStarted() {
+            setConnectionState(ConnectionState.SEARCHING);
+        }
 
-        bleServices.addService(
-                RadmesserDevice.UUID_SERVICE_CLOSEPASS,
-                RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CLOSEPASS,
-                val -> boradcasClosePassIncedent(val.getStringValue(0))
-        );
+        @Override
+        public void onScanSelfFinished() {
+            if (connectionState == ConnectionState.SEARCHING && connectedDevice == null)
+                setConnectionState(ConnectionState.DISCONNECTED);
+            else if (connectedDevice != null)   //restore connection state of the current device, after scan
+                radmesserConnectionCallbacks.onConnectionStateChange(connectedDevice.getConnectionState(), connectedDevice);
+        }
 
-        bleServices.addService(
-                RadmesserDevice.UUID_SERVICE_DISTANCE,
-                RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_DISTANCE,
-                val -> boradcastDistanceValue(val.getStringValue(0))
-        );
+        @Override
+        public void onScanAborted() {
+            if (connectionState == ConnectionState.SEARCHING && connectedDevice == null)
+                setConnectionState(ConnectionState.DISCONNECTED);
+            else if (connectedDevice != null) //restore connection state of the current device, after scan
+                radmesserConnectionCallbacks.onConnectionStateChange(connectedDevice.getConnectionState(), connectedDevice);
+        }
+    };
 
-        bleServices.addService(
-                RadmesserDevice.UUID_SERVICE_CONNECTION,
-                RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CONNECTION,
-                val -> {
-                    connectedDevice.connectionSucceded = true;
-                    Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
-                    String strVal = val.getStringValue(0);
-                    if (strVal != null && strVal.equals("1")) {
-                        setConnectionState(ConnectionState.CONNECTED);
-                        setPairedRadmesserID(connectedDevice.getID(), this);
+    private RadmesserDevice.ConnectionStateCallbacks radmesserConnectionCallbacks = (RadmesserDevice.ConnectionStatus newState, RadmesserDevice instance) -> {
+        if (instance != connectedDevice) return;    // only interested in current device
+
+        switch (newState) {
+            case GATT_CONNECTED:
+                if (!instance.devicePaired)
+                    setConnectionState(ConnectionState.PAIRING);
+                else
+                    setConnectionState(ConnectionState.CONNECTED);
+                break;
+
+            case GATT_DISCONNECTED:
+                if (!instance.devicePaired)
+                    setConnectionState(ConnectionState.CONNECTION_REFUSED);
+                else
+                    setConnectionState(ConnectionState.DISCONNECTED);
+        }
+    };
+
+
+    private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
+            BLEServiceManager.createService(
+                    RadmesserDevice.UUID_SERVICE_HEARTRATE,
+                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_HEARTRATE,
+                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
+            ),
+
+            BLEServiceManager.createService(
+                    RadmesserDevice.UUID_SERVICE_CLOSEPASS,
+                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CLOSEPASS,
+                    val -> boradcasClosePassIncedent(val.getStringValue(0))
+            ),
+
+            BLEServiceManager.createService(
+                    RadmesserDevice.UUID_SERVICE_DISTANCE,
+                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_DISTANCE,
+                    val -> boradcastDistanceValue(val.getStringValue(0))
+            ),
+
+            BLEServiceManager.createService(
+                    RadmesserDevice.UUID_SERVICE_CONNECTION,
+                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CONNECTION,
+                    val -> {
+                        connectedDevice.devicePaired = true;
+                        Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
+                        String strVal = val.getStringValue(0);
+                        if (strVal != null && strVal.equals("1")) {
+                            setConnectionState(ConnectionState.CONNECTED);
+                            setPairedRadmesserID(connectedDevice.getID(), this);
+                        }
                     }
-                }
-        );
-        return bleServices;
-    }
+            )
+    );
+
 
     // ## incoming communication
     // Action-Requests
@@ -268,19 +262,16 @@ public class RadmesserService extends Service {
 
     // internal processing of Action-Requests
     private void startScanning() {
-        scanner.scanDevices(serviceManager);
+        bluetoothScanner.findDevicesByServices(radmesserServicesDefinition,
+                device -> boradcastDeviceFound(device.getName(), device.getAddress())
+        );
     }
 
     private void connectDevice(String deviceId) {
-        disconnectAnyRadmesser();
-
-        // search device
-        scanner.findDeviceById(deviceId,
-                device -> {
-                    setConnectionState(ConnectionState.PAIRING);
-                    connectedDevice = new RadmesserDevice(device, radmesserConnectionCallbacks, serviceManager);
-                    connectedDevice.connect(this);
-                });
+        disconnectAndUnpairDevice();
+        bluetoothScanner.findDeviceById(deviceId,
+                device -> connectedDevice = new RadmesserDevice(device, radmesserConnectionCallbacks, radmesserServicesDefinition, this)
+        );
     }
 
     private void disconnectAndUnpairDevice() {
@@ -288,16 +279,16 @@ public class RadmesserService extends Service {
         unPairedRadmesser();
     }
 
-    private void terminateService() {
-        disconnectAnyRadmesser();
-        stopSelf();
-    }
-
     private void disconnectAnyRadmesser() {
         setConnectionState(ConnectionState.DISCONNECTED);
         if (connectedDevice != null)
             connectedDevice.disconnectDevice();
         connectedDevice = null;
+    }
+
+    private void terminateService() {
+        disconnectAnyRadmesser();
+        stopSelf();
     }
 
 
@@ -347,10 +338,10 @@ public class RadmesserService extends Service {
         public void onConnectionStateChanged(ConnectionState newState) {
         }
 
-        public void onClosePassIncedent(String value) {
+        public void onClosePassIncedent(String raw) {     //todo: change type to Measurement
         }
 
-        public void onDistanceValue(String value) {
+        public void onDistanceValue(String raw) {         //todo: change type to Measurement
         }
     }
 
@@ -358,6 +349,8 @@ public class RadmesserService extends Service {
      * the caller ist responible for unregistering thr receiver, when he does not need him anymore
      * */
     public static BroadcastReceiver registerCallbacks(Context ctx, RadmesserServiceCallbacks callbacks) {
+
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_DEVICE_FOUND);
         filter.addAction(ACTION_CONNECTION_STATE_CHANGED);
@@ -379,12 +372,12 @@ public class RadmesserService extends Service {
                                 ConnectionState.valueOf(intent.getStringExtra(EXTRA_CONNECTION_STATE))
                         );
                         break;
-                    case ACTION_VALE_RECEIVED_CLOSEPASS:
+                    case ACTION_VALE_RECEIVED_CLOSEPASS:    //todo:  call parseMesuarementLine() and return result
                         callbacks.onClosePassIncedent(
                                 intent.getStringExtra(EXTRA_VALUE)
                         );
                         break;
-                    case ACTION_VALE_RECEIVED_DISTANCE:
+                    case ACTION_VALE_RECEIVED_DISTANCE:     //todo:  call parseMesuarementLine() and return result
                         callbacks.onDistanceValue(
                                 intent.getStringExtra(EXTRA_VALUE)
                         );
@@ -395,6 +388,45 @@ public class RadmesserService extends Service {
         LocalBroadcastManager.getInstance(ctx).registerReceiver(rec, filter);
         return rec;
     }
+
+    private Measurement parseMesuarementLine(String line) {
+        if (line.equals(""))
+            return null;
+
+        try {
+            String[] sections = line.split(";");
+
+            long timestamp = Long.parseLong(sections[0]);
+            return new Measurement(timestamp, parseValues(sections[1].split(",")), parseValues(sections[2].split(",")));
+
+        } catch (ArrayIndexOutOfBoundsException iex) {
+            return null;
+        } catch (NumberFormatException fex) {
+            return null;
+        }
+    }
+
+    private ArrayList<Integer> parseValues(String[] vals) {
+        ArrayList<Integer> valsList = new ArrayList<>();
+
+        for (String val : vals) {
+            valsList.add((int) Float.parseFloat(val));
+        }
+        return valsList;
+    }
+
+    public class Measurement {
+        long timestamp;
+        ArrayList<Integer> leftSensorValues;
+        ArrayList<Integer> rightSensorValues;
+
+        public Measurement(long timestamp, ArrayList<Integer> leftSensorValues, ArrayList<Integer> rightSensorValues) {
+            this.timestamp = timestamp;
+            this.leftSensorValues = leftSensorValues;
+            this.rightSensorValues = rightSensorValues;
+        }
+    }
+
 
     public static void unRegisterCallbacks(BroadcastReceiver receiver, Context ctx) {
         if (receiver != null)
@@ -419,3 +451,4 @@ public class RadmesserService extends Service {
 
 
 }
+

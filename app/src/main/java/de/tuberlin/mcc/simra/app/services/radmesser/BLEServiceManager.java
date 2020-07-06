@@ -12,14 +12,21 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class BLEServiceManager {
-    //todo: place somewhere else, to avoid static state
     private HashMap<String, HashSet<BLEService>> byService = new HashMap<>();
     private HashMap<String, BLEService> byCharakteristic = new HashMap<>();
 
+    public BLEServiceManager(BLEService... services) {
+        for (BLEService service : services) {
+            byCharakteristic.put(service.charackteristicUUIDs, service);
+            if (byService.get(service.serviceUUID) == null)
+                byService.put(service.serviceUUID, new HashSet<>());
+            byService.get(service.serviceUUID).add(service);
+        }
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public Set<UUID> getAllUUIDs() {
-        return byService.keySet().stream().map(UUID::fromString).collect(Collectors.toSet());
+        return byService.keySet().stream().map(UUID::fromString).collect(Collectors.toSet());   //todo: make backward compartible
     }
 
     public HashSet<BLEService> byService(UUID uuid) {
@@ -30,7 +37,7 @@ public class BLEServiceManager {
         return byCharakteristic.get(uuid.toString());
     }
 
-    public BLEService addService(String serviceUUID, String charackteristicUUIDs, ValueCallback callback) {
+    public static BLEService createService(String serviceUUID, String charackteristicUUIDs, ValueCallback callback) {
 
         // sanity-check and format correctly
         serviceUUID = UUID.fromString(serviceUUID).toString();
@@ -48,21 +55,14 @@ public class BLEServiceManager {
         void onValue(BluetoothGattCharacteristic characteristic);
     }
 
-    public abstract class BLEService {
+    public static abstract class BLEService {
         public final String serviceUUID;
         public final String charackteristicUUIDs;
         public boolean registered;
 
-
         public BLEService(String serviceUUID, String charackteristicUUIDs) {
             this.serviceUUID = serviceUUID;
             this.charackteristicUUIDs = charackteristicUUIDs;
-
-            byCharakteristic.put(charackteristicUUIDs, this);
-
-            if (byService.get(serviceUUID) == null)
-                byService.put(serviceUUID, new HashSet<>());
-            byService.get(serviceUUID).add(this);
         }
 
         public abstract void onValue(BluetoothGattCharacteristic characteristic);

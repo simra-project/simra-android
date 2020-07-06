@@ -26,47 +26,42 @@ public class RadmesserDevice {
     public static final String UUID_SERVICE_CHARACTERISTIC_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000001";
     public static final String UUID_SERVICE_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000000";
     public static final String UUID_SERVICE_CHARACTERISTIC_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000001";
+
     private final String TAG = "RadmesserDevice";
-    public boolean connectionSucceded;
-    private final BluetoothDevice bluetoothDevice;
-    private final RadmesserDeviceConnectionStateCallback callbacks;
-    private BLEServiceManager bleServices;
-    private ConnectionStatus connectionState = ConnectionStatus.gattDisconnected;
+    public boolean devicePaired;        //needen From the outside
+    private final BluetoothDevice bleDevice;
+    private final ConnectionStateCallbacks callbacks;
+    private BLEServiceManager servicesDefinitions;
     private BluetoothGatt gattConnection;
+    private Context ctx;
+    private ConnectionStatus connectionState = ConnectionStatus.GATT_DISCONNECTED;
 
-    public RadmesserDevice(BluetoothDevice bluetoothDevice, RadmesserDeviceConnectionStateCallback callbacks, BLEServiceManager bleServices) {
-        this.bluetoothDevice = bluetoothDevice;
-        this.callbacks = callbacks;
-        this.bleServices = bleServices;
+    public RadmesserDevice(BluetoothDevice bleDevice, ConnectionStateCallbacks stateCallbacks, BLEServiceManager servicesDefinitions, Context parentContext) {
+        this.bleDevice = bleDevice;
+        this.callbacks = stateCallbacks;
+        this.servicesDefinitions = servicesDefinitions;
+        this.ctx = parentContext;
+        connect();
     }
 
-    public ConnectionStatus getConnectionState() {
-        return connectionState;
-    }
-
-    public void setConnectionState(ConnectionStatus newState) {
-        if (connectionState == newState) return;
-        connectionState = newState;
-        callbacks.onConnectionStateChange(connectionState,this);
-    }
-
-    public void connect(Context ctx) {
-        setConnectionState(ConnectionStatus.startConnecting);
-        bluetoothDevice.createBond();   //start connect to device
-        bluetoothDevice.fetchUuidsWithSdp();   //start discover services on that device
-        gattConnection = bluetoothDevice.connectGatt(ctx, true, new BluetoothGattCallback() {
+    private void connect() {
+        setConnectionState(ConnectionStatus.INIT_CONNECTION);
+        bleDevice.createBond();   //start connect to device
+        bleDevice.fetchUuidsWithSdp();   //start discover services on that device
+        gattConnection = bleDevice.connectGatt(ctx, true, new BluetoothGattCallback() {
             @Override
             public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                 Log.i(TAG, "onConnectionStateChange: " + gatt.getServices().size());
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    setConnectionState(ConnectionStatus.gattConnected);
+                    setConnectionState(ConnectionStatus.GATT_CONNECTED);
                     gatt.discoverServices();
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     // try to reconnect, ony update status (stop connection in Service, if not Paired)
-                    setConnectionState(ConnectionStatus.gattDisconnected);
-                } else {
-                    return;
+                    setConnectionState(ConnectionStatus.GATT_DISCONNECTED);
+                    if(!devicePaired)
+                        disconnectDevice();
                 }
+                // ignore others
             }
 
             @Override
@@ -74,7 +69,7 @@ public class RadmesserDevice {
                 Log.i(TAG, "onServicesDiscovered: " + gatt.getServices().size());
                 super.onServicesDiscovered(gatt, status);
                 for (BluetoothGattService foundService : gatt.getServices()) {
-                    HashSet<BLEServiceManager.BLEService> requestedServices = bleServices.byService(foundService.getUuid());
+                    HashSet<BLEServiceManager.BLEService> requestedServices = servicesDefinitions.byService(foundService.getUuid());
                     if (requestedServices == null) continue;
                     Log.i(TAG, "Found " + requestedServices.size() + " Services for UUID:" + foundService.getUuid().toString());
                     for (BLEServiceManager.BLEService requestedService : requestedServices) {
@@ -101,38 +96,48 @@ public class RadmesserDevice {
 
             @Override
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                bleServices.byCharakteristic(characteristic.getUuid()).onValue(characteristic);
+                servicesDefinitions.byCharakteristic(characteristic.getUuid()).onValue(characteristic);
             }
 
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-                bleServices.byCharakteristic(characteristic.getUuid()).onValue(characteristic);
+                servicesDefinitions.byCharakteristic(characteristic.getUuid()).onValue(characteristic);
             }
         });
+    }
+
+    public ConnectionStatus getConnectionState() {
+        return connectionState;
+    }
+
+    public void setConnectionState(ConnectionStatus newState) {
+        if (connectionState == newState) return;
+        connectionState = newState;
+        callbacks.onConnectionStateChange(connectionState, this);
     }
 
     public void disconnectDevice() {
         if (gattConnection != null)
             gattConnection.disconnect();
 
-        setConnectionState(ConnectionStatus.gattDisconnected);
+        setConnectionState(ConnectionStatus.GATT_DISCONNECTED);
     }
 
     public String getName() {
-        return bluetoothDevice.getName();
+        return bleDevice.getName();
     }
 
     public String getID() {
-        return bluetoothDevice.getAddress();
+        return bleDevice.getAddress();
     }
 
     public enum ConnectionStatus {
-        startConnecting,
-        gattConnected,
-        gattDisconnected
+        INIT_CONNECTION,
+        GATT_CONNECTED,
+        GATT_DISCONNECTED
     }
 
-    public interface RadmesserDeviceConnectionStateCallback {
-        void onConnectionStateChange(ConnectionStatus newState,RadmesserDevice instnace);
+    public interface ConnectionStateCallbacks {
+        void onConnectionStateChange(ConnectionStatus newState, RadmesserDevice instnace);
     }
 }
