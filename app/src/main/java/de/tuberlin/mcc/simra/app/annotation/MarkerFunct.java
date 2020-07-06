@@ -24,7 +24,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.activities.ShowRouteActivity;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
@@ -35,8 +37,6 @@ import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class MarkerFunct {
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Log tag
     private static final String TAG = "MarkerFunct_LOG";
     private final String userAgent = "SimRa/alpha";
     private ShowRouteActivity mother;
@@ -93,55 +93,6 @@ public class MarkerFunct {
                 setMarker(mother.ride.events.get(i), mother.ride.events.get(i).key);
             }
         }
-
-        /*
-        String path = "accEvents" + rideID + ".csv";
-        if (temp) {
-            path = "TempaccEvents" + rideID + ".csv";
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader
-                (mother.getApplicationContext()
-                        .getFileStreamPath(path)))) {
-
-
-
-            String line;
-            line = reader.readLine();
-            line = reader.readLine();
-
-
-            while ((line = reader.readLine()) != null) {
-
-                String[] actualIncident = line.split(",", -1);
-
-                Log.d(TAG, "actualIncident: " + Arrays.toString(actualIncident));
-
-                boolean annotated = checkForAnnotation(actualIncident);
-                String incidentType = actualIncident[8];
-
-                Log.d(TAG, "annotated:" + annotated);
-
-                AccEvent accEvent = new AccEvent(Integer.parseInt(actualIncident[0]),
-                        Double.parseDouble(actualIncident[1]),
-                        Double.parseDouble(actualIncident[2]),
-                        Long.parseLong(actualIncident[3]), annotated, incidentType,actualIncident[18]);
-
-                if (temp) {
-                    mother.tempRide.events.add(accEvent);
-                } else {
-                    // mother.ride.events.set(Integer.valueOf(actualIncident[0]),accEvent);
-                    mother.ride.events.add(accEvent);
-                }
-
-                Log.d(TAG, "accEvent key: " + accEvent.key + " accEvent.position" + accEvent.position.toString());
-                setMarker(accEvent, accEvent.key);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
     }
 
     public void addCustMarker(GeoPoint p) {
@@ -227,10 +178,7 @@ public class MarkerFunct {
 
                     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // Append new acc event to accEvents[rideID].csv
-                    String pathToAccEventsOfRide = "accEvents" + rideID + ".csv";
-                    if (temp) {
-                        pathToAccEventsOfRide = "TempaccEvents" + rideID + ".csv";
-                    }
+                    String pathToAccEventsOfRide = IOUtils.Files.getEventsFileName(rideID, temp);
 
                     String fileInfoLine = getAppVersionNumber(mother) + "#1" + System.lineSeparator();
 

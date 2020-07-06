@@ -1,6 +1,5 @@
 package de.tuberlin.mcc.simra.app.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -13,8 +12,6 @@ import android.util.Log;
 import android.util.Pair;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,8 +34,32 @@ public class Utils {
 
     private static final String TAG = "Utils_LOG";
 
+    /**
+     * Use Utils.overwriteFile(file) instead.
+     * Why? For Clarity filename does not say where the file is...
+     *
+     * @deprecated
+     */
     public static String readContentFromFile(String fileName, Context context) {
-        File file = new File(getBaseFolderPath(context) + fileName);
+        File file = new File(IOUtils.Directories.getBaseFolderPath(context) + fileName);
+        if (file.isDirectory()) {
+            return "FILE IS DIRECTORY";
+        }
+        StringBuilder content = new StringBuilder();
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                content.append(line).append(System.lineSeparator());
+            }
+        } catch (IOException ioe) {
+            Log.d(TAG, "readContentFromFile() Exception: " + Arrays.toString(ioe.getStackTrace()));
+        }
+        return content.toString();
+    }
+
+    public static String readContentFromFile(File file) {
         if (file.isDirectory()) {
             return "FILE IS DIRECTORY";
         }
@@ -76,12 +97,29 @@ public class Utils {
         return (fileInfoLine + content.toString());
     }
 
-
+    /**
+     * Use Utils.overwriteFile(file) instead.
+     * Why? For Clarity filename does not say where the file is...
+     *
+     * @deprecated
+     */
     public static void appendToFile(String content, String fileName, Context context) {
 
         try {
-            File tempFile = new File(getBaseFolderPath(context) + fileName);
+            File tempFile = new File(IOUtils.Directories.getBaseFolderPath(context) + fileName);
             FileOutputStream writer = new FileOutputStream(tempFile, true);
+            writer.write(content.getBytes());
+            writer.flush();
+            writer.close();
+        } catch (IOException ioe) {
+            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
+        }
+    }
+
+    public static void appendToFile(String content, File file) {
+
+        try {
+            FileOutputStream writer = new FileOutputStream(file, true);
             writer.write(content.getBytes());
             writer.flush();
             writer.close();
@@ -139,6 +177,12 @@ public class Utils {
         return new Pair<>(content.toString(), accEventsContentToUpload.toString());
     }
 
+    /**
+     * Use Utils.overwriteFile(file) instead.
+     * Why? For Clarity filename does not say where the file is...
+     *
+     * @deprecated
+     */
     public static void overWriteFile(String content, String fileName, Context context) {
         try {
             FileOutputStream writer = context.openFileOutput(fileName, Context.MODE_PRIVATE);
@@ -150,29 +194,40 @@ public class Utils {
         }
     }
 
-    public static boolean fileExists(String fileName, Context context) {
-        return new File(getBaseFolderPath(context) + fileName).exists();
+    public static void overwriteFile(String content, File file) {
+        try {
+            FileOutputStream writer = new FileOutputStream(file);
+            writer.write(content.getBytes());
+            writer.flush();
+            writer.close();
+        } catch (IOException ioe) {
+            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
+        }
     }
 
     /**
-     * Returns the Base Folder (Private App File Directory)
+     * Use Utils.fileExists(path) instead for clarity
+     * Why? For Clarity filename does not say where the file is...
      *
-     * @param ctx The App Context
-     * @return Path with trailing slash
+     * @deprecated
      */
-    public static String getBaseFolderPath(Context ctx) {
-        return ctx.getFilesDir() + "/";
+    public static boolean fileExists(String fileName, Context context) {
+        return new File(IOUtils.Directories.getBaseFolderPath(context) + fileName).exists();
     }
 
-
-    // Check if an accEvent has already been annotated based on one line of the accEvents csv file.
-    // Returns true, if accEvent was already annotated.
+    public static boolean fileExists(String path) {
+        return new File(path).exists();
+    }
 
     public static boolean checkForAnnotation(String[] incidentProps) {
         // Only checking for empty strings, which means we are retaining
         // events that were labeled as 'nothing happened'
         return (!incidentProps[8].equals("") && !incidentProps[8].equals("0")) || !incidentProps[19].equals("");
     }
+
+
+    // Check if an accEvent has already been annotated based on one line of the accEvents csv file.
+    // Returns true, if accEvent was already annotated.
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Create an AlertDialog with an OK Button displaying a message
@@ -212,16 +267,10 @@ public class Utils {
                 }
             }
         }
-
-        //writeIntToSharedPrefs("App-Version", getAppVersionNumber(context), "simraPrefs", context);
-
-
     }
 
     public static void updateProfile(boolean global, Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
-
         updateProfile(global, context, ageGroup, gender, region, experience, -1, -1, -1, -1, -1, -1, null, behaviour, -1);
-
     }
 
     public static void updateProfile(boolean global, Context context, int ageGroup, int gender, int region, int experience, int numberOfRides, long duration, int numberOfIncidents, long waitedTime, long distance, long co2, Object[] timeBuckets, int behaviour, int numberOfScary) {
@@ -348,26 +397,10 @@ public class Utils {
         return result;
     }
 
-    public static void permissionRequest(Activity activity, final String[] requestedPermission, String rationaleMessage, final int accessCode) {
-        // Check whether FINE_LOCATION or ACCESS_BACKGROUND_LOCATION permissions are not granted
-        if ((ContextCompat.checkSelfPermission(activity, requestedPermission[0])
-                != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(activity, requestedPermission[1])
-                != PackageManager.PERMISSION_GRANTED)) {
-
-            // Permission for FINE_LOCATION is not granted. Show rationale why location permission is needed
-            // in an AlertDialog and request access to FINE_LOCATION
-
-            // The OK-Button fires a requestPermissions
-            DialogInterface.OnClickListener rationaleOnClickListener = (dialog, which) -> ActivityCompat.requestPermissions(activity,
-                    requestedPermission, accessCode);
-            showMessageOK(rationaleMessage, rationaleOnClickListener, activity);
-        }
-    }
-
     // recalculates all statistics, updates metaData.csv, Profile.xml and deletes temp files
     public static void recalculateStatistics(Context context) {
         Log.d(TAG, "===========================V=recalculateStatistics=V===========================");
-        File metaDataFile = new File(context.getFilesDir() + "/metaData.csv");
+        File metaDataFile = IOUtils.Files.getMetaDataFile(context);
         StringBuilder contentOfMetaData = new StringBuilder();
         // total number of (scary) incidents read from each accEvents csv.
         int totalNumberOfIncidents = 0;
@@ -405,7 +438,7 @@ public class Utils {
                     uploaded = false;
                 }
                 // First part: read accEvents and calculate number of (scary) incidents.
-                File accEventsFile = context.getFileStreamPath("accEvents" + key + ".csv");
+                File accEventsFile = IOUtils.Files.getEventsFile(key, false, context);
                 StringBuilder contentOfAccEvents = new StringBuilder();
                 if (!accEventsFile.exists()) {
                     contentOfMetaData.append(metaDataLine).append(System.lineSeparator());
@@ -464,7 +497,7 @@ public class Utils {
                 if (uploaded) {
                     totalNumberOfIncidents += actualNumberOfIncidents;
                     totalNumberOfScary += actualNumberOfScary;
-                    overWriteFile(contentOfAccEvents.toString(), "accEvents" + key + ".csv", context);
+                    overwriteFile(contentOfAccEvents.toString(), accEventsFile);
                 }
                 // Second part: read accGps and calculate number of rides, distance, duration, CO2-savings and waited time.
                 File accGpsFile = context.getFileStreamPath(key + "_accGps.csv");
@@ -531,7 +564,7 @@ public class Utils {
             Log.d(TAG, "totalNumberOfScary: " + totalNumberOfScary);
             Log.d(TAG, "recalculateStatistics() overwriting metaData.csv with: ");
             Log.d(TAG, contentOfMetaData.toString());
-            overWriteFile(contentOfMetaData.toString(), "metaData.csv", context);
+            overwriteFile(contentOfMetaData.toString(), metaDataFile);
             updateProfile(true, context, -1, -1, -1, -1, totalNumberOfRides, totalDuration, totalNumberOfIncidents, totalWaitedTime, totalDistance, totalCO2Savings, timeBuckets, -2, totalNumberOfScary);
         } catch (IOException e) {
             Log.d(TAG, "Exception in recalculateStatistics(): " + Arrays.toString(e.getStackTrace()));
@@ -641,4 +674,5 @@ public class Utils {
         }
         return simRa_regions_config;
     }
+
 }

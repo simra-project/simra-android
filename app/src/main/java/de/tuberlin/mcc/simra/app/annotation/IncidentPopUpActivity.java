@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.MetaData;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
@@ -55,8 +57,8 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
         temp = getIntent().getBooleanExtra("Incident_temp", false);
 
-        state = getIntent().getIntExtra("State", 0);
-        if (state < 2) {
+        state = getIntent().getIntExtra("State", MetaData.STATE.JUST_RECORDED);
+        if (state < MetaData.STATE.SYNCED) {
             setContentView(R.layout.incident_popup_layout);
         } else {
             setContentView(R.layout.incident_popup_layout_uneditable_incident);
@@ -292,10 +294,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         String[] result = null;
         Log.d(TAG, "loadPreviousAnnotation rideID: " + rideID + " incidentKey: " + incidentKey);
 
-        String pathToIncidents = "accEvents" + rideID + ".csv";
-        if (temp) {
-            pathToIncidents = "Temp" + pathToIncidents;
-        }
+        String pathToIncidents = IOUtils.Files.getEventsFileName(rideID, temp);
 
         if (fileExists(pathToIncidents, this)) {
 
@@ -346,10 +345,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
     public void overwriteIncidentFile(String rideID, String incidentKey, String newAnnotation) {
 
-        String path = "accEvents" + rideID + ".csv";
-        if (temp) {
-            path = "Temp" + path;
-        }
+        String path = IOUtils.Files.getEventsFileName(rideID, temp);
 
         StringBuilder contentOfNewFile = new StringBuilder();
         int appVersion = getAppVersionNumber(IncidentPopUpActivity.this);

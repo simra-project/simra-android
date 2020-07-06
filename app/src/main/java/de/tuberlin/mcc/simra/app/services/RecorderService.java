@@ -23,7 +23,6 @@ import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
@@ -35,9 +34,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 
@@ -52,8 +53,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public static final String TAG = "RecorderService_LOG:";
-    final int ACC_POLL_FREQUENCY = Constants.ACC_FREQUENCY;
-    final int GPS_POLL_FREQUENCY = Constants.GPS_FREQUENCY;
     long curTime;
     long startTime = 0;
     long endTime;
@@ -66,39 +65,38 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     int key;
     LocationManager locationManager;
     Location lastLocation;
-    float lastAccuracy;
     Polyline route = new Polyline();
     long waitedTime = 0;
-
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Strings for storing data to enable continued use by other activities
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Queue<Float> accXQueue;
-    Queue<Float> accYQueue;
-    Queue<Float> accZQueue;
+    // TODO: Can Use CircularQueue instead of removing elements by hand?
+    Queue<Float> accelerometerQueueX = new LinkedList<>();
+    Queue<Float> accelerometerQueueY = new LinkedList<>();
+    Queue<Float> accelerometerQueueZ = new LinkedList<>();
     SharedPreferences sharedPrefs;
     SharedPreferences.Editor editor;
     Location startLocation;
-
     // Radmesser
-    Queue<String> radmesserQueue = new CircularFifoQueue(1);
+    String lastRadmesserValue = "";
+    private long lastPictureTaken = 0;
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("distance");
             //Log.d("receiver", "Got message: " + message);
-            radmesserQueue.add(message);
+            lastRadmesserValue = message;
         }
     };
-
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
     private boolean recordingAllowed;
+    private boolean takePictureDuringRideActivated;
+    private int takePictureDuringRideInterval;
+    private int safetyDistanceWithTolerances;
     private float privacyDistance;
     private long privacyDuration;
     private boolean lineAdded;
-
     private long lastAccUpdate = 0;
     private long lastGPSUpdate = 0;
     private SensorManager sensorManager = null;
@@ -143,7 +141,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             accelerometerMatrix = event.values;
 
 
-            if (((curTime - lastAccUpdate) >= ACC_POLL_FREQUENCY) && recordingAllowed) {
+            if (((curTime - lastAccUpdate) >= Constants.ACCELEROMETER_FREQUENCY) && recordingAllowed) {
 
                 lastAccUpdate = curTime;
                 // Write data to file in background thread
@@ -183,7 +181,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 startLocation = location;
             }
             lastLocation = location;
-            lastAccuracy = location.getAccuracy();
         }
     }
 
@@ -217,6 +214,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         editor = sharedPrefs.edit();
 
+        takePictureDuringRideActivated = SharedPref.Settings.Ride.PicturesDuringRide.isActivated(this);
+        takePictureDuringRideInterval = SharedPref.Settings.Ride.PicturesDuringRideInterval.getInterval(this);
+        safetyDistanceWithTolerances = SharedPref.Settings.Ride.OvertakeWidth.getWidth(this);
+
 
         // Prepare the accelerometer accGpsFile
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -228,10 +229,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         locationManager.requestLocationUpdates(LocationManager
                 .GPS_PROVIDER, 3000, 1.0f, this);
 
-        // Queues for storing acc data
-        accXQueue = new LinkedList<>();
-        accYQueue = new LinkedList<>();
-        accZQueue = new LinkedList<>();
 
         // When the user records a route for the first time, the ride key is 0.
         // For all subsequent rides, the key value increases by one at a time.
@@ -320,12 +317,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             Log.d(TAG, "fileInfoLine: " + fileInfoLine);
             int region = lookUpIntSharedPrefs("Region", 0, "Profile", this);
             // Create head of the csv-file
-            appendToFile((fileInfoLine + "lat,lon,X,Y,Z,timeStamp,acc,a,b,c" + System.lineSeparator()), pathToAccGpsFile, this);
+            appendToFile((fileInfoLine + DataLogEntry.DATA_LOG_HEADER + System.lineSeparator()), pathToAccGpsFile, this);
             // Write String data to files
             appendToFile(accGpsString.toString(), pathToAccGpsFile, this);
             appendToFile(key + ","
                     + startTime + "," + endTime + ","
-                    + "0,0," + waitedTime + "," + Math.round(route.getDistance()) + ",0," + region + System.lineSeparator(), "metaData.csv", this);
+                    + "0,0," + waitedTime + "," + Math.round(route.getDistance()) + ",0," + region + System.lineSeparator(), IOUtils.Files.getMetaDataFile(this));
             editor.putInt("RIDE-KEY", key + 1);
             editor.apply();
         }
@@ -379,9 +376,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         return sum / myVals.size();
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Runnables
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     class InsertHandler implements Runnable {
 
         final float[] accelerometerMatrix;
@@ -395,31 +390,38 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         @SuppressLint("MissingPermission")
         public void run() {
-
-            /* Every average is computed over 30 data points, so we want the queues for the
-             three accelerometer values to be of size 30 in order to compute the averages.
-
-             Accordingly, when the queues are shorter we're adding data points.
+            /**
+             * How is this Working?
+             * We are collecting GPS, Accelerometer, Gyroscope (and Radmesser) Data, those are updated as following;
+             * - GPS (lat, lon, accuracy) roughly every 3 seconds
+             * - accelerometer data (x,y,z) roughly 50 times a second
+             * - gyroscope data (a,b,c) roughly every 3 seconds
+             * <p>
+             * Every Data Type is given asynchronously via its Callback function.
+             * In order to synchronize the accelerometer interval ist used as baseline.
+             * 1. We wait till there are 30 values generated
+             * 2. We write a Log Entry every {@link Constants.MVG_AVG_STEP}
+             *    as this number of values is removed at the end of this function
+             *    and we wait again till there are 30
              */
 
-            if (accXQueue.size() < 30) {
-
-                accXQueue.add(accelerometerMatrix[0]);
-                accYQueue.add(accelerometerMatrix[1]);
-                accZQueue.add(accelerometerMatrix[2]);
+            if (accelerometerQueueX.size() < 30) {
+                accelerometerQueueX.add(accelerometerMatrix[0]);
+                accelerometerQueueY.add(accelerometerMatrix[1]);
+                accelerometerQueueZ.add(accelerometerMatrix[2]);
 
             } else {
+                DataLogEntry.DataLogEntryBuilder dataLogEntryBuilder = DataLogEntry.newBuilder();
+                dataLogEntryBuilder.withTimestamp(curTime);
+                dataLogEntryBuilder.withAccelerometer(
+                        // Every average is computed over 30 data points
+                        // TODO: Why?
+                        computeAverage(accelerometerQueueX),
+                        computeAverage(accelerometerQueueY),
+                        computeAverage(accelerometerQueueZ)
+                );
 
-                // The gps (lat, lon, accuracy) information are recorded (around) every 3 seconds.
-                // The accelerometer data (x,y,z) information are recorded 50 times a second.
-                // The gyroscope data (a,b,c) information are recorded (around) every 3 seconds.
-                // So the gps and gyroscope data changes (around) every 150 lines. We store the gps
-                // data only after the 3 seconds are over.
-                String gps = ",";
-                String accuracy = "";
-                String gyro = ",,";
-
-                if ((lastAccUpdate - lastGPSUpdate) >= GPS_POLL_FREQUENCY) {
+                if ((lastAccUpdate - lastGPSUpdate) >= Constants.GPS_FREQUENCY) {
                     lastGPSUpdate = lastAccUpdate;
 
                     if (lastLocation == null) {
@@ -435,33 +437,29 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     if (lastLocation.getSpeed() <= 3.0) {
                         waitedTime += 3;
                     }
-                    gps = lastLocation.getLatitude() + "," + lastLocation.getLongitude();
-                    accuracy = String.valueOf(lastAccuracy);
-                    gyro = gyroscopeMatrix[0] + "," +
-                            gyroscopeMatrix[1] + "," +
-                            gyroscopeMatrix[2];
+                    dataLogEntryBuilder.withGPS(
+                            lastLocation.getLatitude(),
+                            lastLocation.getLongitude(),
+                            lastLocation.getAccuracy()
+                    );
+                }
+                dataLogEntryBuilder.withGyroscope(
+                        gyroscopeMatrix[0],
+                        gyroscopeMatrix[1],
+                        gyroscopeMatrix[2]
+                );
+
+                if (!lastRadmesserValue.isEmpty()) {
+                    dataLogEntryBuilder.withRadmesser(Integer.parseInt(lastRadmesserValue.split(",")[0]), null, null, null);
+                    if (takePictureDuringRideActivated) {
+                        if (Integer.parseInt(lastRadmesserValue.split(",")[0]) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= curTime) {
+                            lastPictureTaken = curTime;
+                            CameraService.takePicture(RecorderService.this, String.valueOf(curTime), IOUtils.Directories.getPictureCacheDirectoryPath());
+                        }
+                    }
                 }
 
-                // The queues are of sufficient size, let's compute the averages.
-
-                float xAvg = computeAverage(accXQueue);
-                float yAvg = computeAverage(accYQueue);
-                float zAvg = computeAverage(accZQueue);
-
-                // Put the averages + time data into a string and append to file.
-                String str =
-                        gps + "," +
-                                xAvg + "," +
-                                yAvg + "," +
-                                zAvg + "," +
-                                curTime + "," +
-                                accuracy + "," +
-                                gyro;
-                if (!radmesserQueue.isEmpty()) {
-                    str = str + "," + radmesserQueue.element();
-                }
-
-
+                String str = dataLogEntryBuilder.build().stringifyDataLogEntry();
                 Log.i(TAG, str);
 
                 accGpsString.append(str).append(System.getProperty("line.separator"));
@@ -472,19 +470,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     endTime = curTime;
                 }
 
-                /* Now remove as many elements from the queues as our moving average step/shift
-                 specifies and therefore enable new data points to come in.
-                 */
-
                 for (int i = 0; i < Constants.MVG_AVG_STEP; i++) {
 
-                    accXQueue.remove();
-                    accYQueue.remove();
-                    accZQueue.remove();
+                    accelerometerQueueX.remove();
+                    accelerometerQueueY.remove();
+                    accelerometerQueueZ.remove();
                 }
 
             }
-
         }
     }
 

@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.annotation;
+package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -52,9 +52,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.annotation.MarkerFunct;
+import de.tuberlin.mcc.simra.app.annotation.Ride;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
+import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
+import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
@@ -64,7 +69,6 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPref
 import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class ShowRouteActivity extends BaseActivity {
 
@@ -130,9 +134,15 @@ public class ShowRouteActivity extends BaseActivity {
     private RelativeLayout exitAddIncBttn;
     private View progressBarRelativeLayout;
 
-    // Returns the longitudes of the southern- and northernmost points
-    // as well as the latitudes of the western- and easternmost points
-    // in a double Array {South, North, West, East}
+    //
+
+    /**
+     * Returns the longitudes of the southern- and northernmost points
+     * as well as the latitudes of the western- and easternmost points
+     *
+     * @param pl
+     * @return double Array {South, North, West, East}
+     */
     static BoundingBox getBoundingBox(Polyline pl) {
 
         // {North, East, South, West}
@@ -200,7 +210,7 @@ public class ShowRouteActivity extends BaseActivity {
 
         pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
-        state = getIntent().getIntExtra("State", 0);
+        state = getIntent().getIntExtra("State", MetaData.STATE.JUST_RECORDED);
         Log.d(TAG, "state: " + state);
         duration = getIntent().getStringExtra("Duration");
 
@@ -213,7 +223,7 @@ public class ShowRouteActivity extends BaseActivity {
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
 
-        gpsFile = getFileStreamPath(pathToAccGpsFile);
+        gpsFile = new File(IOUtils.Directories.getBaseFolderPath(this) + pathToAccGpsFile);
 
         Log.d(TAG, "creating ride objects");
         bike = SharedPref.Settings.Ride.BikeType.getBikeType(this);
@@ -227,9 +237,14 @@ public class ShowRouteActivity extends BaseActivity {
         saveButton = findViewById(R.id.saveIncident);
         exitButton = findViewById(R.id.exitShowRoute);
 
-        if (state < 2) {
+        if (state < MetaData.STATE.SYNCED) {
             addIncBttn.setVisibility(View.VISIBLE);
             exitButton.setVisibility(View.INVISIBLE);
+            if (!IOUtils.isDirectoryEmpty(IOUtils.Directories.getPictureCacheDirectoryPath())) {
+                Intent intent = new Intent(ShowRouteActivity.this, EvaluateClosePassActivity.class);
+                intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
+                startActivity(intent);
+            }
         } else {
             addIncBttn.setVisibility(View.GONE);
             privacySliderLinearLayout.setVisibility(View.INVISIBLE);
@@ -265,7 +280,7 @@ public class ShowRouteActivity extends BaseActivity {
             ShowRouteActivity.this.addCustomMarkerMode = false;
         });
 
-        if (state < 2) {
+        if (state < MetaData.STATE.SYNCED) {
             fireRideSettingsDialog();
         } else {
             new RideUpdateTask(false, false).execute();
@@ -281,7 +296,7 @@ public class ShowRouteActivity extends BaseActivity {
             tempAccEventsPath = "TempaccEvents" + ride.getKey() + ".csv";
             tempAccGpsPath = "Temp" + gpsFile.getName();
             runOnUiThread(() -> progressBarRelativeLayout.setVisibility(View.VISIBLE));
-            tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath);
+            tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath, gpsFile);
             tempRide = new Ride(tempGpsFile, duration, String.valueOf(tempStartTime), state, bike, child, trailer, pLoc, this, calculate, true);
         } else {
             ride = new Ride(gpsFile, duration, startTime, state, bike, child, trailer, pLoc, this, calculate, false);
@@ -310,20 +325,15 @@ public class ShowRouteActivity extends BaseActivity {
                 editableRoute = new Polyline();
                 editableRoute.setPoints(route.getPoints());
                 editableRoute.setWidth(40.0f);
-
                 editableRoute.getPaint().setColor(getColor(R.color.colorAccent));
                 editableRoute.getPaint().setStrokeCap(Paint.Cap.ROUND);
-
                 mMapView.getOverlayManager().add(editableRoute);
             }
             mMapView.getOverlayManager().add(route);
-
         }
-
 
         // Get a bounding box of the route so the view can be moved to it and the zoom can be
         // set accordingly
-
         if (!temp) {
             runOnUiThread(() -> {
                 bBox = getBoundingBox(route);
@@ -521,7 +531,7 @@ public class ShowRouteActivity extends BaseActivity {
         StringBuilder metaDataContent = new StringBuilder();
         int appVersion = getAppVersionNumber(ShowRouteActivity.this);
         String metaDataFileVersion = "";
-        try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath("metaData.csv")))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(IOUtils.Files.getMetaDataFile(this)))) {
             // metaDataFileVersion line: 23#7
             metaDataFileVersion = br.readLine().split("#")[1];
             // skip header
@@ -580,36 +590,8 @@ public class ShowRouteActivity extends BaseActivity {
             ioe.printStackTrace();
         }
         String fileInfoLine = appVersion + "#" + metaDataFileVersion + System.lineSeparator();
-        overWriteFile((fileInfoLine + METADATA_HEADER + metaDataContent), "metaData.csv", this);
-        /*
-        StringBuilder accEventsDataContent = new StringBuilder();
-        String accEventsFileVersion = "";
-        String accEventName = "accEvents" + ride.getKey() + ".csv";
-        if(temp) {
-            accEventName = "Temp" + accEventName;
-        }
+        Utils.overwriteFile((fileInfoLine + METADATA_HEADER + metaDataContent), IOUtils.Files.getMetaDataFile(this));
 
-        try (BufferedReader br = new BufferedReader(new FileReader(getFileStreamPath(accEventName)))) {
-            // accEventsFileVersion line: 23#7
-            accEventsFileVersion = br.readLine().split("#")[1];
-            // skip header
-            String line = br.readLine();
-
-            while ((line = br.readLine()) != null) {
-                String[] accEventsLine = line.split(",", -1);
-                if (checkForAnnotation(accEventsLine)) {
-                    accEventsDataContent.append(line).append(System.lineSeparator());
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        fileInfoLine = appVersion + "#" + accEventsFileVersion + System.lineSeparator();
-        overWriteFile((fileInfoLine + ACCEVENTS_HEADER + accEventsDataContent), accEventName, this);
-        */
-        // tempAccEventsPath
-        // tempAccGpsPath
         if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {
             Log.d(TAG, "path of tempGpsFile: " + tempGpsFile.getPath());
             deleteFile(pathToAccGpsFile);
@@ -617,7 +599,7 @@ public class ShowRouteActivity extends BaseActivity {
             boolean success = tempGpsFile.renameTo(new File(path + File.separator + pathToAccGpsFile));
             Log.d(TAG, "tempGpsFile successfully renamed: " + success);
         }
-        String pathToAccEventsFile = "accEvents" + ride.getKey() + ".csv";
+        String pathToAccEventsFile = IOUtils.Files.getEventsFileName(ride.getKey(), false);
         if (tempAccEventsPath != null) {
             deleteFile(pathToAccEventsFile);
             String path = ShowRouteActivity.this.getFilesDir().getPath();
@@ -632,15 +614,25 @@ public class ShowRouteActivity extends BaseActivity {
 
     }
 
-    private File updateRoute(int left, int right, String pathToAccGpsFile) {
+    /**
+     * This function cuts of the dataLogEntries from left and right
+     * <p>
+     * pathToAccGpsFile is the newly created temp file
+     *
+     * @param left
+     * @param right
+     * @param pathToAccGpsTempFile
+     * @return
+     */
+    private File updateRoute(int left, int right, String pathToAccGpsTempFile, File copyFromAccGpsFile) {
         tempStartTime = null;
         tempEndTime = null;
-        File inputFile = getFileStreamPath(pathToAccGpsFile);
+        File inputFile = getFileStreamPath(pathToAccGpsTempFile);
         StringBuilder content = new StringBuilder();
         //String content = "";
         try (BufferedWriter writer = new BufferedWriter((new FileWriter(inputFile, false)))) {
 
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(ride.accGpsFile)))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(copyFromAccGpsFile)))) {
                 String line;
                 content.append(br.readLine()).append(System.lineSeparator()); // fileInfo
                 content.append(br.readLine()).append(System.lineSeparator()); // csv header
@@ -667,7 +659,7 @@ public class ShowRouteActivity extends BaseActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return getFileStreamPath(pathToAccGpsFile);
+        return getFileStreamPath(pathToAccGpsTempFile);
     }
 
     // If the user clicks on an InfoWindow and IncidentPopUpActivity for that

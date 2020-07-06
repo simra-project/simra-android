@@ -2,6 +2,12 @@ package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -9,6 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +24,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
+import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
+import de.tuberlin.mcc.simra.app.util.PermissionHelper;
+import de.tuberlin.mcc.simra.app.util.SharedPref;
 import pl.droidsonroids.gif.GifImageView;
 
 
@@ -28,6 +39,21 @@ public class RadmesserActivity extends AppCompatActivity {
     BroadcastReceiver receiver;
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PermissionHelper.Camera.PERMISSION_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(true, this);
+                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
+            } else {
+                takePicturesButton.setChecked(false);
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_radmesser);
@@ -37,7 +63,42 @@ public class RadmesserActivity extends AppCompatActivity {
         devicesList = findViewById(R.id.devicesList);
         deviceLayout = findViewById(R.id.deviceLayout);
         deviceInfoTextView = findViewById(R.id.deviceInfoTextView);
+        NumberPicker handleBarWidth = findViewById(R.id.handleBarWidth);
+        handleBarWidth.setMaxValue(40);
+        handleBarWidth.setMinValue(0);
+        handleBarWidth.setValue(SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(this));
+        handleBarWidth.setOnValueChangedListener((numberPicker, oldVal, newVal) -> {
+            SharedPref.Settings.Ride.OvertakeWidth.setTotalWidthThroughHandlebarWidth(newVal, this);
+        });
 
+        NumberPicker takePictureInterval = findViewById(R.id.takePictureDuringRideInterval);
+        takePictureInterval.setMaxValue(20);
+        takePictureInterval.setMinValue(0);
+        takePictureInterval.setValue(SharedPref.Settings.Ride.PicturesDuringRideInterval.getInterval(this));
+        takePictureInterval.setOnValueChangedListener((numberPicker, oldVal, newVal) -> {
+            SharedPref.Settings.Ride.PicturesDuringRideInterval.setInterval(newVal, this);
+        });
+
+        takePicturesButton = findViewById(R.id.takePictureDuringRideButton);
+        takePicturesButton.setChecked(SharedPref.Settings.Ride.PicturesDuringRide.isActivated(this));
+        takePicturesButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                if (PermissionHelper.Camera.hasPermission(this)) {
+                    // Wants to activate this Functionality and already has Camera Permission
+                    SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(true, this);
+                } else {
+                    // Wants to activate this Functionality and already has does not have Camera Permission
+                    PermissionHelper.Camera.requestPermissions(RadmesserActivity.this);
+                }
+            } else {
+                // Deactivate Functionality
+                SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(false, this);
+            }
+        });
+
+        Intent intent = new Intent(RadmesserActivity.this, RadmesserService.class);
+        startService(intent);
+        bindService(intent, mRadmesserServiceConnection, Context.BIND_IMPORTANT);
         /*Intent intent = new Intent(RadmesserActivity.this, RadmesserService.class);
         startService(intent);*/
 

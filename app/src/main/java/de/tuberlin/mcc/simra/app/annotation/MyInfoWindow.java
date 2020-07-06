@@ -11,6 +11,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.activities.ShowRouteActivity;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
 
 public class MyInfoWindow extends InfoWindow {
@@ -91,6 +92,7 @@ public class MyInfoWindow extends InfoWindow {
             popUpIntent.putExtra("Incident_pLoc",
                     String.valueOf(motherActivity.ride.pLoc));
 
+            // TODO: What is this?
             popUpIntent.putExtra("Incident_accDat",
                     "mockSensorDatForIncident.csv");
 

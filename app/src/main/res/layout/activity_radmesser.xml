@@ -12,83 +12,185 @@
         layout="@layout/toolbar" />
 
     <LinearLayout
-        android:id="@+id/connectDevicesLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
 
-
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/connectDevicesLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/connectDevicesText"
-                style="@style/TextAppearance.AppCompat.Large"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/availableDevices" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <ProgressBar
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/connectDevicesText"
+                    style="@style/TextAppearance.AppCompat.Large"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/availableDevices" />
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/connectDevicesText"
+                    android:layout_alignBottom="@id/connectDevicesText"
+                    android:layout_marginLeft="4dp"
+                    android:layout_toRightOf="@id/connectDevicesText"
+                    android:indeterminate="true" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/devicesList"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignTop="@id/connectDevicesText"
-                android:layout_alignBottom="@id/connectDevicesText"
-                android:layout_marginLeft="4dp"
-                android:layout_toRightOf="@id/connectDevicesText"
-                android:indeterminate="true" />
-        </RelativeLayout>
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Connect with A4:CF:12:9A:15:5A"
+                    android:visibility="invisible" />
+
+            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/devicesList"
+            android:id="@+id/deviceLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="16dp"
-            android:layout_marginTop="16dp"
-            android:paddingRight="16dp">
+            android:visibility="visible">
 
-            <Button
+            <TextView
+                style="@style/TextAppearance.AppCompat.Large"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Connect with A4:CF:12:9A:15:5A"
-                android:visibility="invisible" />
+                android:text="Connected to device" />
 
+            <TextView
+                android:id="@+id/deviceInfoTextView"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:text="Geräte-Info" />
+
+             <Button
+                android:id="@+id/btnDisconnect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Disconnect device" />
         </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/deviceLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:visibility="visible">
 
         <TextView
-            style="@style/TextAppearance.AppCompat.Large"
-            android:layout_width="match_parent"
+            android:id="@+id/devicesTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Connected to device" />
+            android:text="@string/radmesserAdvancedSettings"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/deviceInfoTextView"
-            style="@style/TextAppearance.AppCompat.Medium"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:text="Geräte-Info" />
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnDisconnect"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/radmesserHandlebarWidthText" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <NumberPicker
+                        android:id="@+id/handleBarWidth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center"
+                        android:text="@string/centimeter_short" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Disconnect device" />
+            android:layout_marginTop="20dp">
+
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/radmesserTakePictureDuringRideSetting" />
+
+            <Switch
+                android:id="@+id/takePictureDuringRideButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/radmesserTakePictureDuringRideIntervalText" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <NumberPicker
+                        android:id="@+id/takePictureDuringRideInterval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center"
+                        android:text="@string/seconds_short" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
     </LinearLayout>
 
 

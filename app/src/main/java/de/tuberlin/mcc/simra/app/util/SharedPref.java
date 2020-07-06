@@ -296,6 +296,65 @@ public class SharedPref {
                     return readIntegerFromAppSharedPrefs(BIKE_WITH_TRAILER, 0, SHARED_PREF_NAME, context);
                 }
             }
+
+            public static class OvertakeWidth {
+                // See top of this class before changing this string
+                public static final String OVERTAKE_WIDTH = SETTINGS + "OVERTAKE_WIDTH";
+                /**
+                 * Safety Clearance + Side Mirror Length in cm
+                 */
+                private static int SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH = 150 + 13;
+
+                public static int getWidth(Context context) {
+                    return readIntegerFromAppSharedPrefs(OVERTAKE_WIDTH, SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH, SHARED_PREF_NAME, context);
+                }
+
+                public static void setWidth(int width, Context context) {
+                    writeIntegerToAppSharedPrefsAsync(OVERTAKE_WIDTH, width, SHARED_PREF_NAME, context);
+                }
+
+                public static int getHandlebarWidth(Context context) {
+                    return calculateHandleBarWidthFromTotal(getWidth(context));
+                }
+
+                public static void setTotalWidthThroughHandlebarWidth(int width, Context context) {
+                    setWidth(calculateTotalWidth(width), context);
+                }
+
+                private static int calculateTotalWidth(int handlebarWidth) {
+                    return handlebarWidth + SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH;
+                }
+
+                private static int calculateHandleBarWidthFromTotal(int totalWidth) {
+                    return totalWidth - SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH;
+                }
+            }
+
+            public static class PicturesDuringRide {
+                // See top of this class before changing this string
+                public static final String PICTURES_DURING_RIDE = SETTINGS + "PICTURES_DURING_RIDE";
+
+                public static boolean isActivated(Context context) {
+                    return readBooleanFromAppSharedPrefs(PICTURES_DURING_RIDE, false, SHARED_PREF_NAME, context);
+                }
+
+                public static void setMakePictureDuringRide(boolean activated, Context context) {
+                    writeBooleanToAppSharedPrefsAsync(PICTURES_DURING_RIDE, activated, SHARED_PREF_NAME, context);
+                }
+            }
+
+            public static class PicturesDuringRideInterval {
+                // See top of this class before changing this string
+                public static final String PICTURES_DURING_RIDE_INTERVAL = SETTINGS + "PICTURES_DURING_RIDE_INTERVAL";
+
+                public static int getInterval(Context context) {
+                    return readIntegerFromAppSharedPrefs(PICTURES_DURING_RIDE_INTERVAL, 1, SHARED_PREF_NAME, context);
+                }
+
+                public static void setInterval(int interval, Context context) {
+                    writeIntegerToAppSharedPrefsAsync(PICTURES_DURING_RIDE_INTERVAL, interval, SHARED_PREF_NAME, context);
+                }
+            }
         }
     }
 }
