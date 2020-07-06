@@ -19,7 +19,6 @@ import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
-
 public class RadmesserService extends Service {
     private static final String TAG = "RadmesserService";
     private static final String sharedPrefsKey = "RadmesserServiceBLE";
@@ -28,9 +27,11 @@ public class RadmesserService extends Service {
     private volatile HandlerThread mHandlerThread;
     private BLEScanner bluetoothScanner;
     private LocalBroadcastManager broadcastManager;
+
     public static ConnectionState getConnectionState() {
         return connectionState;
     }
+
     private static ConnectionState connectionState = ConnectionState.DISCONNECTED;
 
 
@@ -325,10 +326,12 @@ public class RadmesserService extends Service {
         public void onConnectionStateChanged(ConnectionState newState) {
         }
 
-        public void onClosePassIncedent(String raw) {     //todo: change type to Measurement
+
+        public void onClosePassIncedent(@Nullable Measurement measurement) {
         }
 
-        public void onDistanceValue(String raw) {         //todo: change type to Measurement
+
+        public void onDistanceValue(@Nullable Measurement measurement) {
         }
     }
 
@@ -357,14 +360,18 @@ public class RadmesserService extends Service {
                                 ConnectionState.valueOf(intent.getStringExtra(EXTRA_CONNECTION_STATE))
                         );
                         break;
-                    case ACTION_VALUE_RECEIVED_CLOSEPASS:    //todo:  call parseMesuarementLine() and return result
+                    case ACTION_VALUE_RECEIVED_CLOSEPASS:
                         callbacks.onClosePassIncedent(
-                                intent.getStringExtra(EXTRA_VALUE)
+                                parseMesuarementLine(
+                                        intent.getStringExtra(EXTRA_VALUE)
+                                )
                         );
                         break;
-                    case ACTION_VALUE_RECEIVED_DISTANCE:     //todo:  call parseMesuarementLine() and return result
+                    case ACTION_VALUE_RECEIVED_DISTANCE:
                         callbacks.onDistanceValue(
-                                intent.getStringExtra(EXTRA_VALUE)
+                                parseMesuarementLine(
+                                        intent.getStringExtra(EXTRA_VALUE)
+                                )
                         );
                         break;
                 }
@@ -374,7 +381,7 @@ public class RadmesserService extends Service {
         return rec;
     }
 
-    private Measurement parseMesuarementLine(String line) {
+    private static Measurement parseMesuarementLine(String line) {
         if (line.equals(""))
             return null;
 
@@ -382,7 +389,15 @@ public class RadmesserService extends Service {
             String[] sections = line.split(";");
 
             long timestamp = Long.parseLong(sections[0]);
-            return new Measurement(timestamp, parseValues(sections[1].split(",")), parseValues(sections[2].split(",")));
+
+            ArrayList<Integer> left = parseValues(sections[1].split(","));
+            ArrayList<Integer> right;
+            if (sections.length > 2)
+                right = parseValues(sections[1].split(","));
+            else
+                right= new ArrayList<>();
+
+            return new Measurement(timestamp,left, right);
 
         } catch (ArrayIndexOutOfBoundsException iex) {
             return null;
@@ -391,7 +406,7 @@ public class RadmesserService extends Service {
         }
     }
 
-    private ArrayList<Integer> parseValues(String[] values) {
+    private static ArrayList<Integer> parseValues(String[] values) {
         ArrayList<Integer> vaalueList = new ArrayList<>();
 
         for (String value : values) {
@@ -400,7 +415,7 @@ public class RadmesserService extends Service {
         return vaalueList;
     }
 
-    public class Measurement {
+    public static class Measurement {
         long timestamp;
         ArrayList<Integer> leftSensorValues;
         ArrayList<Integer> rightSensorValues;
@@ -409,6 +424,11 @@ public class RadmesserService extends Service {
             this.timestamp = timestamp;
             this.leftSensorValues = leftSensorValues;
             this.rightSensorValues = rightSensorValues;
+        }
+
+        @Override
+        public String toString() {
+            return timestamp + " " + leftSensorValues + " " + rightSensorValues;
         }
     }
 
@@ -434,3 +454,4 @@ public class RadmesserService extends Service {
         ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().putString(sharedPrefsKeyRadmesserID, id).apply();
     }
 }
+
