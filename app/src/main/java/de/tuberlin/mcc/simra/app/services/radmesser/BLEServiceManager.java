@@ -24,9 +24,13 @@ public class BLEServiceManager {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public Set<UUID> getAllUUIDs() {
-        return byService.keySet().stream().map(UUID::fromString).collect(Collectors.toSet());   //todo: make backward compartible
+        HashSet<UUID> allUUIDs = new HashSet<>();
+        for (String id : byService.keySet()) {
+            allUUIDs.add(UUID.fromString(id));
+        }
+        return allUUIDs;
+
     }
 
     public HashSet<BLEService> byService(UUID uuid) {

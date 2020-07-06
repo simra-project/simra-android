@@ -79,12 +79,11 @@ public class BLEScanner {
 
     public void findDevicesByServices(BLEServiceManager bleServices, DeviceFoundCallback deviceFoundCallback) {
         ArrayList<ScanFilter> filterList = new ArrayList<>();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {       //todo: refactor
             for (UUID serviceUUID : bleServices.getAllUUIDs()) {
                 ScanFilter.Builder builder = new ScanFilter.Builder();
                 builder.setServiceUuid(new ParcelUuid(serviceUUID));
                 filterList.add(builder.build());
-            }
+            
         }
 
         startScan(8, filterList, deviceFoundCallback);
