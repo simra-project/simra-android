@@ -231,7 +231,7 @@ public class UploadService extends Service {
                         String[] metaDataLine = line.split(",", -1);
                         Log.d(TAG, "metaDataLine: " + Arrays.toString(metaDataLine));
                         // found a ride which is ready to upload in metaData.csv
-                        if (metaDataLine.length > 1 && metaDataLine[3].equals(MetaData.STATE.ANNOTATED)) {
+                        if (metaDataLine.length > 1 && metaDataLine[3].equals(String.valueOf(MetaData.STATE.ANNOTATED))) {
                             foundARideToUpload = true;
                             String rideKey = metaDataLine[0];
                             String accGpsName = "";
