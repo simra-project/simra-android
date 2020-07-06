@@ -1,7 +1,6 @@
 package de.tuberlin.mcc.simra.app.entities;
 
 public class DataLogEntry {
-    public final static String DATA_LOG_HEADER = "lat,lon,X,Y,Z,timeStamp,acc,a,b,c,radmesserDistanceLeft1,radmesserDistanceLeft2,radmesserDistanceRight1,radmesserDistanceRight2";
     public final Double latitude;
     public final Double longitude;
     public final Float accelerometerX;
@@ -85,7 +84,7 @@ public class DataLogEntry {
     /**
      * Stringifies the DataLogEntry Object to a CSV Log Line
      *
-     * @return Data Log Line without new line separator
+     * @return Log Line without new line separator
      */
     public String stringifyDataLogEntry() {
         return (latitude != null ? latitude : "") + "," +

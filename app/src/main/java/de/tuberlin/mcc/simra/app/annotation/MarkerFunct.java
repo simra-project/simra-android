@@ -41,7 +41,7 @@ public class MarkerFunct {
     private final String userAgent = "SimRa/alpha";
     private ShowRouteActivity mother;
     private ExecutorService pool;
-    private String rideID;
+    private Integer rideID;
     private ArrayList<Marker> markers = new ArrayList<>();
     private GeocoderNominatim geocoderNominatim;
     private boolean temp;
@@ -58,9 +58,9 @@ public class MarkerFunct {
         this.pool = mother.pool;
 
         if (temp) {
-            this.rideID = mother.tempRide.getKey();
+            this.rideID = mother.tempLegacyRide.getKey();
         } else {
-            this.rideID = mother.ride.getKey();
+            this.rideID = mother.legacyRide.getKey();
         }
         pool.execute(new SimpleThreadFactory().newThread(() -> {
                     geocoderNominatim = new GeocoderNominatim(userAgent);
@@ -70,9 +70,9 @@ public class MarkerFunct {
 
         this.state = mother.state;
         if (temp) {
-            this.numEvents = (mother.tempRide.events.size() - 1);
+            this.numEvents = (mother.tempLegacyRide.events.size() - 1);
         } else {
-            this.numEvents = (mother.ride.events.size() - 1);
+            this.numEvents = (mother.legacyRide.events.size() - 1);
         }
 
     }
@@ -83,14 +83,14 @@ public class MarkerFunct {
     public void showIncidents() {
 
         if (temp) {
-            for (int i = 0; i < mother.tempRide.events.size(); i++) {
+            for (int i = 0; i < mother.tempLegacyRide.events.size(); i++) {
                 // Log.d(TAG,"showIncidents() mother.tempRide.events.get(i).key: " + mother.tempRide.events.get(i).key);
-                setMarker(mother.tempRide.events.get(i), mother.tempRide.events.get(i).key);
+                setMarker(mother.tempLegacyRide.events.get(i), mother.tempLegacyRide.events.get(i).key);
             }
         } else {
-            for (int i = 0; i < mother.ride.events.size(); i++) {
+            for (int i = 0; i < mother.legacyRide.events.size(); i++) {
                 // Log.d(TAG,"showIncidents() mother.ride.events.get(i).key: " + mother.ride.events.get(i).key);
-                setMarker(mother.ride.events.get(i), mother.ride.events.get(i).key);
+                setMarker(mother.legacyRide.events.get(i), mother.legacyRide.events.get(i).key);
             }
         }
     }
@@ -107,11 +107,11 @@ public class MarkerFunct {
         List<GeoPointWrapper> wrappedGPS = new ArrayList<>();
 
         if (temp) {
-            for (GeoPoint thisGP : mother.tempRide.getRoute().getPoints()) {
+            for (GeoPoint thisGP : mother.tempLegacyRide.getRoute().getPoints()) {
                 wrappedGPS.add(new GeoPointWrapper(thisGP, p));
             }
         } else {
-            for (GeoPoint thisGP : mother.ride.getRoute().getPoints()) {
+            for (GeoPoint thisGP : mother.legacyRide.getRoute().getPoints()) {
                 wrappedGPS.add(new GeoPointWrapper(thisGP, p));
             }
         }
@@ -200,9 +200,9 @@ public class MarkerFunct {
                     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // Add new AccEvent to ride's AccEvents list
                     if (temp) {
-                        mother.tempRide.getEvents().add(newAcc);
+                        mother.tempLegacyRide.getEvents().add(newAcc);
                     } else {
-                        mother.ride.getEvents().add(newAcc);
+                        mother.legacyRide.getEvents().add(newAcc);
                     }
                 });
 

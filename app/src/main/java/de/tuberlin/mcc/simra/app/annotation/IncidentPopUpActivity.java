@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,7 +28,6 @@ import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 
-import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
@@ -42,7 +42,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     LinearLayout backButton;
     RelativeLayout exitButton;
     Boolean incidentSaved = false;
-    String rideID;
+    int rideID;
     String incidentKey;
     String[] previousAnnotation;
     boolean temp;
@@ -51,7 +51,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        rideID = getIntent().getStringExtra("Ride_ID");
+        rideID = getIntent().getIntExtra("Ride_ID", 0);
 
         incidentKey = getIntent().getStringExtra("Incident_Key");
 
@@ -107,7 +107,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             involvedType10CheckBox.setEnabled(false);
         }
         if (previousAnnotation != null && previousAnnotation.length > 7) {
-
+            // TODO: Use https://stackoverflow.com/questions/38417984/android-spinner-dropdown-checkbox
             if (previousAnnotation[8].length() > 0) {
                 incidentTypeSpinner.setSelection(Integer.parseInt(previousAnnotation[8]));
             }
@@ -238,8 +238,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                     String incidentString = incidentKey + "," + lat + "," + lon + "," + ts + ","
                             + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValuesWithouti10).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description + "," + i10Value;
 
-                    overwriteIncidentFile(rideID, incidentKey, incidentKey + "," + lat + "," + lon + "," + ts + ","
-                            + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValuesWithouti10).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description + "," + i10Value);
+                    overwriteIncidentFile(rideID, incidentKey, incidentString);
 
                     incidentSaved = true;
                     Intent returnIntent = new Intent();
@@ -294,15 +293,15 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         String[] result = null;
         Log.d(TAG, "loadPreviousAnnotation rideID: " + rideID + " incidentKey: " + incidentKey);
 
-        String pathToIncidents = IOUtils.Files.getEventsFileName(rideID, temp);
+        File incidentFile = IOUtils.Files.getEventsFile(rideID, temp, this);
 
-        if (fileExists(pathToIncidents, this)) {
+        if (incidentFile.exists()) {
 
             BufferedReader reader = null;
 
             try {
 
-                reader = new BufferedReader(new FileReader(getFileStreamPath(pathToIncidents)));
+                reader = new BufferedReader(new FileReader(incidentFile));
 
             } catch (FileNotFoundException fnfe) {
                 fnfe.printStackTrace();
@@ -335,7 +334,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             }
 
         } else {
-            Log.d(TAG, pathToIncidents + " doesn't exist");
+            Log.d(TAG, incidentFile.getAbsolutePath() + " doesn't exist");
         }
 
         Log.d(TAG, "loadPreviousAnnotation() result: " + Arrays.toString(result));
@@ -343,7 +342,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
 
     }
 
-    public void overwriteIncidentFile(String rideID, String incidentKey, String newAnnotation) {
+    public void overwriteIncidentFile(int rideID, String incidentKey, String newAnnotation) {
 
         String path = IOUtils.Files.getEventsFileName(rideID, temp);
 

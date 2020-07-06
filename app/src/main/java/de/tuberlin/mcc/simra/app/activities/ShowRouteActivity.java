@@ -52,8 +52,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.annotation.LegacyRide;
 import de.tuberlin.mcc.simra.app.annotation.MarkerFunct;
-import de.tuberlin.mcc.simra.app.annotation.Ride;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
@@ -79,14 +79,14 @@ public class ShowRouteActivity extends BaseActivity {
     final int[] right = {0};
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Our ride
-    public Ride ride;
+    public LegacyRide legacyRide;
     public ExecutorService pool;
     public Drawable editMarkerDefault;
     public Drawable editCustMarker;
     public Drawable editDoneDefault;
     public Drawable editDoneCust;
     public int state;
-    public Ride tempRide;
+    public LegacyRide tempLegacyRide;
     ImageButton backBtn;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -103,7 +103,6 @@ public class ShowRouteActivity extends BaseActivity {
     MapEventsOverlay overlayEvents;
     boolean addCustomMarkerMode;
     MarkerFunct myMarkerFunct;
-    AlertDialog alertDialog;
 
     int bike;
     int child;
@@ -211,7 +210,6 @@ public class ShowRouteActivity extends BaseActivity {
         pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
         startTime = getIntent().getStringExtra("StartTime");
         state = getIntent().getIntExtra("State", MetaData.STATE.JUST_RECORDED);
-        Log.d(TAG, "state: " + state);
         duration = getIntent().getStringExtra("Duration");
 
         addIncBttn = findViewById(R.id.addIncident);
@@ -241,9 +239,7 @@ public class ShowRouteActivity extends BaseActivity {
             addIncBttn.setVisibility(View.VISIBLE);
             exitButton.setVisibility(View.INVISIBLE);
             if (!IOUtils.isDirectoryEmpty(IOUtils.Directories.getPictureCacheDirectoryPath())) {
-                Intent intent = new Intent(ShowRouteActivity.this, EvaluateClosePassActivity.class);
-                intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
-                startActivity(intent);
+                EvaluateClosePassActivity.startEvaluateClosePassActivity(Integer.parseInt(pathToAccGpsFile.split("_")[0]), this);
             }
         } else {
             addIncBttn.setVisibility(View.GONE);
@@ -293,13 +289,13 @@ public class ShowRouteActivity extends BaseActivity {
 
         // Create a ride object with the accelerometer, gps and time data
         if (temp) {
-            tempAccEventsPath = "TempaccEvents" + ride.getKey() + ".csv";
+            tempAccEventsPath = "TempaccEvents" + legacyRide.getKey() + ".csv";
             tempAccGpsPath = "Temp" + gpsFile.getName();
             runOnUiThread(() -> progressBarRelativeLayout.setVisibility(View.VISIBLE));
             tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath, gpsFile);
-            tempRide = new Ride(tempGpsFile, duration, String.valueOf(tempStartTime), state, bike, child, trailer, pLoc, this, calculate, true);
+            tempLegacyRide = new LegacyRide(tempGpsFile, duration, String.valueOf(tempStartTime), state, bike, child, trailer, pLoc, this, calculate, true);
         } else {
-            ride = new Ride(gpsFile, duration, startTime, state, bike, child, trailer, pLoc, this, calculate, false);
+            legacyRide = new LegacyRide(gpsFile, duration, startTime, state, bike, child, trailer, pLoc, this, calculate, false);
         }
 
         // Get the Route as a Polyline to be displayed on the map
@@ -308,7 +304,7 @@ public class ShowRouteActivity extends BaseActivity {
             if (tempRoute != null) {
                 mMapView.getOverlayManager().remove(tempRoute);
             }
-            tempRoute = tempRide.getRoute();
+            tempRoute = tempLegacyRide.getRoute();
             tempRoute.setWidth(8.0f);
             // tempRoute.getPaint().setStrokeJoin(Paint.Join.ROUND);
             tempRoute.getPaint().setStrokeCap(Paint.Cap.ROUND);
@@ -318,7 +314,7 @@ public class ShowRouteActivity extends BaseActivity {
 
 
         } else {
-            route = ride.getRoute();
+            route = legacyRide.getRoute();
             Log.d(TAG, "route size: " + route.getPoints().size());
             if (editableRoute == null) {
                 Log.d(TAG, "adding editableRoute");
@@ -527,7 +523,7 @@ public class ShowRouteActivity extends BaseActivity {
     }
 
     private void saveChanges(boolean temp) {
-        Log.d(TAG, "saveChanges(): ride.events.size(): " + ride.events.size());
+        Log.d(TAG, "saveChanges(): ride.events.size(): " + legacyRide.events.size());
         StringBuilder metaDataContent = new StringBuilder();
         int appVersion = getAppVersionNumber(ShowRouteActivity.this);
         String metaDataFileVersion = "";
@@ -539,9 +535,9 @@ public class ShowRouteActivity extends BaseActivity {
             while ((line = br.readLine()) != null) {
                 String[] metaDataLine = line.split(",", -1);
                 String metaDataRide = line;
-                Log.d(TAG, "metaDataLine[0]: " + metaDataLine[0] + " ride.getKey(): " + ride.getKey());
+                Log.d(TAG, "metaDataLine[0]: " + metaDataLine[0] + " ride.getKey(): " + legacyRide.getKey());
                 // loop through metaData.csv to find the right ride
-                if (metaDataLine[0].equals(ride.getKey())) {
+                if (metaDataLine[0].equals(legacyRide.getKey())) {
                     long distance = 0;
                     long waitedTime = 0;
                     int numberOfIncidents = 0;
@@ -549,12 +545,12 @@ public class ShowRouteActivity extends BaseActivity {
                     if (temp) {
                         metaDataLine[1] = String.valueOf(tempStartTime);
                         metaDataLine[2] = String.valueOf(tempEndTime);
-                        distance = tempRide.distance;
-                        waitedTime = tempRide.waitedTime;
-                        ArrayList<AccEvent> accEventArrayList = tempRide.events;
+                        distance = tempLegacyRide.distance;
+                        waitedTime = tempLegacyRide.waitedTime;
+                        ArrayList<AccEvent> accEventArrayList = tempLegacyRide.events;
                         Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
                         for (int i = 0; i < accEventArrayList.size(); i++) {
-                            Log.d(TAG, "accEvent " + tempRide.events.get(i).key + ": " + tempRide.events.get(i).annotated + " scary: " + tempRide.events.get(i).scary);
+                            Log.d(TAG, "accEvent " + tempLegacyRide.events.get(i).key + ": " + tempLegacyRide.events.get(i).annotated + " scary: " + tempLegacyRide.events.get(i).scary);
                             if (accEventArrayList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
@@ -563,12 +559,12 @@ public class ShowRouteActivity extends BaseActivity {
                             }
                         }
                     } else {
-                        distance = ride.distance;
-                        waitedTime = ride.waitedTime;
-                        ArrayList<AccEvent> accEventArrayList = ride.events;
+                        distance = legacyRide.distance;
+                        waitedTime = legacyRide.waitedTime;
+                        ArrayList<AccEvent> accEventArrayList = legacyRide.events;
                         Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
                         for (int i = 0; i < accEventArrayList.size(); i++) {
-                            Log.d(TAG, "accEvent " + ride.events.get(i).key + ": " + ride.events.get(i).annotated + " scary: " + ride.events.get(i).scary);
+                            Log.d(TAG, "accEvent " + legacyRide.events.get(i).key + ": " + legacyRide.events.get(i).annotated + " scary: " + legacyRide.events.get(i).scary);
                             if (accEventArrayList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
@@ -599,7 +595,7 @@ public class ShowRouteActivity extends BaseActivity {
             boolean success = tempGpsFile.renameTo(new File(path + File.separator + pathToAccGpsFile));
             Log.d(TAG, "tempGpsFile successfully renamed: " + success);
         }
-        String pathToAccEventsFile = IOUtils.Files.getEventsFileName(ride.getKey(), false);
+        String pathToAccEventsFile = IOUtils.Files.getEventsFileName(legacyRide.getKey(), false);
         if (tempAccEventsPath != null) {
             deleteFile(pathToAccEventsFile);
             String path = ShowRouteActivity.this.getFilesDir().getPath();
@@ -681,36 +677,36 @@ public class ShowRouteActivity extends BaseActivity {
                 Log.d(TAG, "onActivityResult() temp: " + temp);
                 boolean annotated = checkForAnnotation(incidentProps);
                 if (temp) {
-                    Log.d(TAG, "tempRide.events.size(): " + tempRide.events.size());
-                    for (int i = 0; i < tempRide.events.size(); i++) {
-                        Log.d(TAG, "tempRide.events.get(i).key: " + tempRide.events.get(i).key +
+                    Log.d(TAG, "tempRide.events.size(): " + tempLegacyRide.events.size());
+                    for (int i = 0; i < tempLegacyRide.events.size(); i++) {
+                        Log.d(TAG, "tempRide.events.get(i).key: " + tempLegacyRide.events.get(i).key +
                                 " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
-                        if ((tempRide.events.get(i).key) == Integer.parseInt(incidentProps[0])) {
+                        if ((tempLegacyRide.events.get(i).key) == Integer.parseInt(incidentProps[0])) {
                             if (annotated) {
-                                tempRide.events.get(i).annotated = true;
+                                tempLegacyRide.events.get(i).annotated = true;
                             }
                             if (incidentProps[8] != null) {
-                                tempRide.events.get(i).incidentType = incidentProps[8];
+                                tempLegacyRide.events.get(i).incidentType = incidentProps[8];
                             }
                             if (incidentProps[18] != null) {
-                                tempRide.events.get(i).scary = incidentProps[18];
+                                tempLegacyRide.events.get(i).scary = incidentProps[18];
                             }
                         }
                     }
                 } else {
-                    Log.d(TAG, "ride.events.size(): " + ride.events.size());
-                    for (int i = 0; i < ride.events.size(); i++) {
-                        Log.d(TAG, "ride.events.get(i).key: " + ride.events.get(i).key +
+                    Log.d(TAG, "ride.events.size(): " + legacyRide.events.size());
+                    for (int i = 0; i < legacyRide.events.size(); i++) {
+                        Log.d(TAG, "ride.events.get(i).key: " + legacyRide.events.get(i).key +
                                 " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
-                        if ((ride.events.get(i).key) == Integer.parseInt(incidentProps[0])) {
+                        if ((legacyRide.events.get(i).key) == Integer.parseInt(incidentProps[0])) {
                             if (annotated) {
-                                ride.events.get(i).annotated = true;
+                                legacyRide.events.get(i).annotated = true;
                             }
                             if (incidentProps[8] != null) {
-                                ride.events.get(i).incidentType = incidentProps[8];
+                                legacyRide.events.get(i).incidentType = incidentProps[8];
                             }
                             if (incidentProps[18] != null) {
-                                ride.events.get(i).scary = incidentProps[18];
+                                legacyRide.events.get(i).scary = incidentProps[18];
                             }
                         }
                     }
@@ -776,9 +772,7 @@ public class ShowRouteActivity extends BaseActivity {
 
     public void fireRideSettingsDialog() {
         Log.d(TAG, "fireRideSettingsDialog()");
-        // Store the created AlertDialog instance.
-        // Because only AlertDialog has cancel method.
-        alertDialog = null;
+
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(ShowRouteActivity.this);
 
@@ -810,7 +804,7 @@ public class ShowRouteActivity extends BaseActivity {
         if (trailer == 1) {
             trailerCheckBoxButton.setChecked(true);
         }
-
+        AlertDialog alertDialog = builder.create();
         // doneButton click listener.
         MaterialButton doneButton = settingsView.findViewById(R.id.done_button);
 
@@ -849,7 +843,6 @@ public class ShowRouteActivity extends BaseActivity {
         });
 
         builder.setCancelable(false);
-        alertDialog = builder.create();
         alertDialog.show();
     }
 

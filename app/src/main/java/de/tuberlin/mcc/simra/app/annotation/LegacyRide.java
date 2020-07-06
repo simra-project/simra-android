@@ -20,10 +20,9 @@ import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
-public class Ride {
+public class LegacyRide {
 
     static String TAG = "Ride_LOG";
     public ArrayList<AccEvent> events;
@@ -42,7 +41,19 @@ public class Ride {
     int state;
     private String key = "";
 
-    public Ride(File accGpsFile, String duration, String startTime, int state, int bike, int child, int trailer, int pLoc, Context context, boolean calculateEvents, boolean temp) throws IOException {
+    public LegacyRide(
+            File accGpsFile,
+            String duration,
+            String startTime,
+            int state,
+            int bike,
+            int child,
+            int trailer,
+            int pLoc,
+            Context context,
+            boolean calculateEvents,
+            boolean temp
+    ) throws IOException {
         this.duration = duration;
         this.startTime = startTime;
         Object[] waitedTimeRouteAndDistance = calculateWaitedTimePolylineDistance(accGpsFile);
@@ -58,19 +69,18 @@ public class Ride {
         this.context = context;
         this.temp = temp;
         this.key = accGpsFile.getName().split("_")[0];
-        String pathToAccEventsOfRide = "accEvents" + key + ".csv";
+        String pathToAccEventsOfRide = IOUtils.Files.getEventsFileName(Integer.parseInt(key), false);
         if (temp) {
             this.key = accGpsFile.getName().split("_")[0].replace("Temp", "");
             pathToAccEventsOfRide = "TempaccEvents" + key + ".csv";
         }
         String content = ACCEVENTS_HEADER;
-        String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
 
         if (calculateEvents || temp) {
             this.events = findAccEvents(accGpsFile);
         } else {
             this.events = new ArrayList<>();
-            File accEventsFile = IOUtils.Files.getEventsFile(key, false, context);
+            File accEventsFile = IOUtils.Files.getEventsFile(Integer.parseInt(key), false, context);
             if (accEventsFile.exists()) {
                 Log.d(TAG, "reading " + pathToAccEventsOfRide + " to get accEvents");
                 try (BufferedReader br = new BufferedReader(new FileReader(accEventsFile))) {
@@ -98,6 +108,7 @@ public class Ride {
             // TODO: Use IncidentLogEntry
             content += i + "," + actualAccEvent.position.getLatitude() + "," + actualAccEvent.position.getLongitude() + "," + actualAccEvent.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + ",,,,,,,,,,,," + System.lineSeparator();
         }
+        String fileInfoLine = IOUtils.Files.getFileInfoLine();
         if (!fileExists(pathToAccEventsOfRide, context) && !temp) {
             appendToFile((fileInfoLine + content), pathToAccEventsOfRide, context);
         } else if (temp) {
@@ -349,8 +360,8 @@ public class Ride {
 
     }
 
-    public String getKey() {
-        return key;
+    public Integer getKey() {
+        return Integer.parseInt(key);
     }
 
     public ArrayList<AccEvent> getEvents() {

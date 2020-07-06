@@ -1,9 +1,10 @@
 package de.tuberlin.mcc.simra.app.activities;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -23,20 +24,27 @@ import java.util.List;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
-import de.tuberlin.mcc.simra.app.entities.RideImpl;
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
+import de.tuberlin.mcc.simra.app.entities.Ride;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
+import de.tuberlin.mcc.simra.app.util.Utils;
 
 public class EvaluateClosePassActivity extends AppCompatActivity {
     private static final String TAG = "EvaluateClosePass";
-
+    private static final String EXTRA_RIDE_ID = "EXTRA_RIDE_ID";
     ImageButton backBtn;
     TextView toolbarTxt;
-
     ImageView closePassPicture;
     TextView currentDistanceValue;
-
     List<File> imageQueue;
-    RideImpl ride;
+    DataLogEntry currentDataLogEntry;
+    Ride ride;
+
+    public static void startEvaluateClosePassActivity(int rideId, Context context) {
+        Intent intent = new Intent(context, EvaluateClosePassActivity.class);
+        intent.putExtra(EXTRA_RIDE_ID, rideId);
+        context.startActivity(intent);
+    }
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -80,6 +88,9 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!getIntent().hasExtra(EXTRA_RIDE_ID)) {
+            throw new RuntimeException("Extra: " + EXTRA_RIDE_ID + " not defined.");
+        }
         setContentView(R.layout.activity_evaluate_closepass);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -96,21 +107,19 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         closePassPicture = findViewById(R.id.closePassPicture);
         currentDistanceValue = findViewById(R.id.closePassCurrentValue);
 
-        String fileName = getIntent().getStringExtra("PathToAccGpsFile").split("_")[0];
-        ride = RideImpl.loadRideById(Integer.parseInt(fileName), this);
-        Log.i("TEST", "" + ride.rideID);
 
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            ride.dataPoints.forEach(a -> {
-                Log.i("Test", a.timestamp + "");
-            });
-        }
+        Integer rideId = getIntent().getIntExtra(EXTRA_RIDE_ID, 0);
+        ride = Ride.loadRideById(rideId, this);
 
 
         MaterialButton closePassConfirmButton = findViewById(R.id.closePassConfirmButton);
         closePassConfirmButton.setOnClickListener(view -> {
-            // TODO: Add incident
+            ride.incidentLog.incidents.add(IncidentLogEntry.newBuilder()
+                    .withKey(ride.incidentLog.incidents.size())
+                    .withTimestamp(currentDataLogEntry.timestamp)
+                    .withGPS(currentDataLogEntry.latitude, currentDataLogEntry.longitude)
+                    .withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS)
+                    .build());
             removePicture();
         });
         MaterialButton closePassDisapproveButton = findViewById(R.id.closePassDisapproveButton);
@@ -126,10 +135,21 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         closePassPicture.setImageBitmap(decodeSampledBitmapFromFile(imageQueue.get(0).getAbsolutePath(), displayMetrics.widthPixels, displayMetrics.heightPixels));
-        for (DataLogEntry d : ride.dataPoints) {
+        boolean foundPicture = false;
+        for (DataLogEntry d : ride.dataLog.dataLogEntries) {
             if (d.timestamp == Long.parseLong(imageQueue.get(0).getName().split("\\.")[0])) {
                 currentDistanceValue.setText(String.valueOf(((DataLogEntry) d).RadmesserDistanceLeft1));
+                foundPicture = true;
             }
+            // Find next DataLogEntry with GPS Location attached
+            if (d.longitude != null) {
+                currentDataLogEntry = d;
+                break;
+            }
+        }
+        // If Picture Timestamp does not match with ride timestamps it is not part of the ride.
+        if (!foundPicture) {
+            removePicture();
         }
 
     }
@@ -137,6 +157,9 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
     public void removePicture() {
         imageQueue.remove(0);
         if (imageQueue.isEmpty()) {
+            File newFile = IOUtils.Files.getEventsFile(ride.rideID, false, this);
+            Utils.overwriteFile(ride.incidentLog.toFileString(), newFile);
+
             IOUtils.deleteDirectoryContent(IOUtils.Directories.getPictureCacheDirectoryPath());
             finish();
         } else {

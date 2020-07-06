@@ -438,7 +438,7 @@ public class Utils {
                     uploaded = false;
                 }
                 // First part: read accEvents and calculate number of (scary) incidents.
-                File accEventsFile = IOUtils.Files.getEventsFile(key, false, context);
+                File accEventsFile = IOUtils.Files.getEventsFile(Integer.parseInt(key), false, context);
                 StringBuilder contentOfAccEvents = new StringBuilder();
                 if (!accEventsFile.exists()) {
                     contentOfMetaData.append(metaDataLine).append(System.lineSeparator());

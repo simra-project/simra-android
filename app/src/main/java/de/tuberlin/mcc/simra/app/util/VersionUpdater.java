@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-import de.tuberlin.mcc.simra.app.annotation.Ride;
+import de.tuberlin.mcc.simra.app.annotation.LegacyRide;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
@@ -167,7 +167,7 @@ public class VersionUpdater {
                     } else {
                         continue;
                     }
-                    Object[] waitedTimeRouteAndDistance = Ride.calculateWaitedTimePolylineDistance(gpsFile);
+                    Object[] waitedTimeRouteAndDistance = LegacyRide.calculateWaitedTimePolylineDistance(gpsFile);
                     if (isUploaded) {
                         totalDuration += (Long.parseLong(endTime) - Long.parseLong(startTime));
                         totalNumberOfRides++;

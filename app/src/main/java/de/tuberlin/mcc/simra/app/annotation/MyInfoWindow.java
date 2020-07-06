@@ -23,7 +23,7 @@ public class MyInfoWindow extends InfoWindow {
     private AccEvent mAccEvent;
     private ShowRouteActivity motherActivity;
     private String addressForLoc;
-    private String rideID;
+    private Integer rideID;
     private String accEventKey;
     private boolean temp;
     private int state;
@@ -37,9 +37,9 @@ public class MyInfoWindow extends InfoWindow {
         this.addressForLoc = addressForLoc;
         this.motherActivity = motherActivity;
         if (temp) {
-            this.rideID = motherActivity.tempRide.getKey();
+            this.rideID = motherActivity.tempLegacyRide.getKey();
         } else {
-            this.rideID = motherActivity.ride.getKey();
+            this.rideID = motherActivity.legacyRide.getKey();
         }
         this.accEventKey = String.valueOf(accEventKey);
         this.temp = temp;
@@ -81,16 +81,16 @@ public class MyInfoWindow extends InfoWindow {
                     String.valueOf(this.mAccEvent.getTimeStamp()));
 
             popUpIntent.putExtra("Incident_bike",
-                    String.valueOf(motherActivity.ride.bike));
+                    String.valueOf(motherActivity.legacyRide.bike));
 
             popUpIntent.putExtra("Incident_child",
-                    String.valueOf(motherActivity.ride.child));
+                    String.valueOf(motherActivity.legacyRide.child));
 
             popUpIntent.putExtra("Incident_trailer",
-                    String.valueOf(motherActivity.ride.trailer));
+                    String.valueOf(motherActivity.legacyRide.trailer));
 
             popUpIntent.putExtra("Incident_pLoc",
-                    String.valueOf(motherActivity.ride.pLoc));
+                    String.valueOf(motherActivity.legacyRide.pLoc));
 
             // TODO: What is this?
             popUpIntent.putExtra("Incident_accDat",

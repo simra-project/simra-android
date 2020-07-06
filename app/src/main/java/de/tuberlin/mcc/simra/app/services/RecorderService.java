@@ -34,6 +34,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.Constants;
@@ -317,7 +318,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             Log.d(TAG, "fileInfoLine: " + fileInfoLine);
             int region = lookUpIntSharedPrefs("Region", 0, "Profile", this);
             // Create head of the csv-file
-            appendToFile((fileInfoLine + DataLogEntry.DATA_LOG_HEADER + System.lineSeparator()), pathToAccGpsFile, this);
+            appendToFile((fileInfoLine + DataLog.DATA_LOG_HEADER + System.lineSeparator()), pathToAccGpsFile, this);
             // Write String data to files
             appendToFile(accGpsString.toString(), pathToAccGpsFile, this);
             appendToFile(key + ","
