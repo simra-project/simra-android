@@ -90,7 +90,6 @@ public class RadmesserService extends Service {
 
     @Override
     public void onCreate() {
-        Log.i(TAG, "created");
         bluetoothScanner = new BLEScanner(scannerStatusCallbacks);
 
         LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
@@ -109,7 +108,6 @@ public class RadmesserService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.i(TAG, "stopped");
         // Cleanup service before destruction
         ForegroundServiceNotificationManager.cancelNotification(this);
         mHandlerThread.quit();
@@ -249,7 +247,7 @@ public class RadmesserService extends Service {
         if (intent == null || intent.getAction() == null)
             return;
         String action = intent.getAction();
-        Log.i("Intent", action);
+        Log.i(TAG, "Intent received " + action);
         if (action.equals(ACTION_START_SCANN))
             startScanning();
         else if (action.equals(ACTION_CONNECT_DEVICE))
@@ -406,13 +404,13 @@ public class RadmesserService extends Service {
         }
     }
 
-    private ArrayList<Integer> parseValues(String[] vals) {
-        ArrayList<Integer> valsList = new ArrayList<>();
+    private ArrayList<Integer> parseValues(String[] values) {
+        ArrayList<Integer> vaalueList = new ArrayList<>();
 
-        for (String val : vals) {
-            valsList.add((int) Float.parseFloat(val));
+        for (String value : values) {
+            vaalueList.add((int) Float.parseFloat(value));
         }
-        return valsList;
+        return vaalueList;
     }
 
     public class Measurement {
@@ -448,7 +446,5 @@ public class RadmesserService extends Service {
     private static void setPairedRadmesserID(String id, Context ctx) {
         ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().putString(sharedPrefsKeyRadmesserID, id).apply();
     }
-
-
 }
 
