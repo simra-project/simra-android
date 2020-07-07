@@ -28,7 +28,7 @@ public class RadmesserDevice {
     public static final String UUID_SERVICE_CHARACTERISTIC_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000001";
 
     private final String TAG = "RadmesserDevice";
-    public boolean devicePaired;        //needen From the outside
+    public boolean devicePaired = true;        //needen From the outside, workaround to prevent pairing required
     private final BluetoothDevice bleDevice;
     private final ConnectionStateCallbacks callbacks;
     private BLEServiceManager servicesDefinitions;
