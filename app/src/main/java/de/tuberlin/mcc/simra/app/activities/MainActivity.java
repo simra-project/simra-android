@@ -148,6 +148,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return (!gps_enabled);
     }
 
+    private void showRadmesserNotConnectedWarning(){
+        android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
+        alert.setTitle("Warnung: Radmesser nicht verbunden");
+        alert.setMessage("\nUm das Radmesser zu verbinden, clicken Sie auf dem Bluetooth button");
+        alert.setPositiveButton("Ok", (dialog, whichButton) -> {
+        });
+        alert.show();
+    }
+
 
     @SuppressLint("MissingPermission")
     @Override
@@ -282,6 +291,16 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // (4): NEUE ROUTE / START BUTTON
         startBtn = findViewById(R.id.button_start);
         startBtn.setOnClickListener(v -> {
+            if(radmesserEnabled){
+                RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
+                if(!currentState.equals(RadmesserService.ConnectionState.CONNECTED)){
+                    boolean reconected = RadmesserService.tryConnectPairedDevice(this);
+                    if(!reconected){
+                        showRadmesserNotConnectedWarning();
+                    }
+                }
+            }
+
             if (!PermissionHelper.hasBasePermissions(this)) {
                 PermissionHelper.requestFirstBasePermissionsNotGranted(MainActivity.this);
                 Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
@@ -318,7 +337,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         stopBtn.setOnClickListener(v -> {
             try {
                 showStart();
-
+                RadmesserService.terminateService(this);
                 // Stop RecorderService which is recording accelerometer data
                 unbindService(mRecorderServiceConnection);
                 stopService(recService);
@@ -405,6 +424,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        RadmesserService.terminateService(this);
+        super.onDestroy();
     }
 
     private void unregisterRadmesserService(){
