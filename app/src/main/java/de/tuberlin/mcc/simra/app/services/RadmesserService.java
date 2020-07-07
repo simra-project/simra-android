@@ -17,7 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
@@ -188,11 +188,12 @@ public class RadmesserService extends Service {
 
     // ## incoming communication
     // Action-Requests
-    final static String ACTION_START_SCANN = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_START_SCANN";
-    final static String ACTION_CONNECT_DEVICE = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_CONNECT_DEVICE";
-    final static String ACTION_DISCONNECT_AND_UNPAIR = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_DISCONNECT_AND_UNPAIR";
-    final static String ACTION_STOP_SERVICE = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_STOP_SERVICE";
-    final static String EXTRA_CONNECT_DEVICE = "de.tuberlin.mcc.simra.app.radmesserservice.EXTRA_CONNECT_DEVICE";
+    final static String ACTION_PREFIX = "de.tuberlin.mcc.simra.app.radmesserservice.";
+    final static String ACTION_START_SCANN = ACTION_PREFIX + ".ACTION_START_SCANN";
+    final static String ACTION_CONNECT_DEVICE = ACTION_PREFIX + ".ACTION_CONNECT_DEVICE";
+    final static String ACTION_DISCONNECT_AND_UNPAIR = ACTION_PREFIX + ".ACTION_DISCONNECT_AND_UNPAIR";
+    final static String ACTION_STOP_SERVICE = ACTION_PREFIX + ".ACTION_STOP_SERVICE";
+    final static String EXTRA_CONNECT_DEVICE = ACTION_PREFIX + ".EXTRA_CONNECT_DEVICE";
 
     // incoming Action-Requests
     public static void startScanning(Context ctx) {
@@ -417,22 +418,17 @@ public class RadmesserService extends Service {
         return rec;
     }
 
-    //todo: refactor into  Measurement constructor
+    // todo: refactor into  Measurement constructor
     private static Measurement parseMeasurementLine(String line) {
         if (line.equals(""))
             return null;
 
         try {
-            String[] sections = line.split(";");
+            String[] sections = line.split(";", -1);
 
             long timestamp = Long.parseLong(sections[0]);
-
-            ArrayList<Integer> left = parseMeasurementValues(sections[1].split(","));
-            ArrayList<Integer> right;
-            if (sections.length > 2)
-                right = parseMeasurementValues(sections[1].split(","));
-            else
-                right = new ArrayList<>();
+            List<Integer> left = parseValues(sections[1].split(","));
+            List<Integer> right = parseValues(sections[2].split(","));
 
             return new Measurement(timestamp, left, right);
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException iex) {
@@ -440,14 +436,14 @@ public class RadmesserService extends Service {
         }
     }
 
-    //todo: refactor into  Measurement class
-    private static ArrayList<Integer> parseMeasurementValues(String[] values) {
-        ArrayList<Integer> vaalueList = new ArrayList<>();
+    // todo: refactor into  Measurement class
+    private static List<Integer> parseValues(String[] values) {
+        List<Integer> valueList = new ArrayList<>();
 
         for (String value : values) {
-            vaalueList.add((int) Float.parseFloat(value));
+            valueList.add((int) Float.parseFloat(value));
         }
-        return vaalueList;
+        return valueList;
     }
 
 
@@ -476,13 +472,11 @@ public class RadmesserService extends Service {
 
         public ClosePassEvent(String rawData) {
             Log.i("ClosePassEvent", rawData);
-            String[] sections = rawData.split(";");
+
+            String[] sections = rawData.split(";", -1);
             timestamp = Long.parseLong(sections[0]);
-            eventType = sections[1].toUpperCase();  //EventType.valueOf(sections[1].toUpperCase());
-            if (sections.length > 2)
-                payload = Arrays.asList(sections[2]);
-            else
-                payload = new ArrayList<>();
+            eventType = sections[1].toUpperCase();
+            payload = Collections.singletonList(sections[2]);
         }
 
         @Override

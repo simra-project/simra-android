@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothGattCharacteristic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,12 +24,7 @@ public class BLEServiceManager {
     }
 
     public Set<UUID> getAllUUIDs() {
-        Set<UUID> allUUIDs = new HashSet<>();
-        for (UUID id : serviceMap.keySet()) {
-            allUUIDs.add(id);
-        }
-        return allUUIDs;
-
+        return serviceMap.keySet();
     }
 
     public BLEService getServiceByUUID(UUID uuid) {
@@ -58,8 +52,8 @@ public class BLEServiceManager {
         public BLEService addCharacteristic(String uuidString, ValueCallback callback) {
             this.characteristics.add(new BLEServiceCharacteristic(uuidString) {
                 @Override
-                public void onValue(BluetoothGattCharacteristic characteristic1) {
-                    callback.onValue(characteristic1);
+                public void onValue(BluetoothGattCharacteristic characteristic) {
+                    callback.onValue(characteristic);
                 }
             });
 
