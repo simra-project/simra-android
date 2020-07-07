@@ -426,8 +426,13 @@ public class RadmesserService extends Service {
             String[] sections = line.split(";");
 
             long timestamp = Long.parseLong(sections[0]);
-            List<Integer> left = parseValues(sections[1].split(","));
-            List<Integer> right = parseValues(sections[2].split(","));
+
+            ArrayList<Integer> left = parseMeasurementValues(sections[1].split(","));
+            ArrayList<Integer> right;
+            if (sections.length > 2)
+                right = parseMeasurementValues(sections[1].split(","));
+            else
+                right = new ArrayList<>();
 
             return new Measurement(timestamp, left, right);
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException iex) {
@@ -436,13 +441,13 @@ public class RadmesserService extends Service {
     }
 
     //todo: refactor into  Measurement class
-    private static List<Integer> parseValues(String[] values) {
-        List<Integer> valueList = new ArrayList<>();
+    private static ArrayList<Integer> parseMeasurementValues(String[] values) {
+        ArrayList<Integer> vaalueList = new ArrayList<>();
 
         for (String value : values) {
-            valueList.add((int) Float.parseFloat(value));
+            vaalueList.add((int) Float.parseFloat(value));
         }
-        return valueList;
+        return vaalueList;
     }
 
 

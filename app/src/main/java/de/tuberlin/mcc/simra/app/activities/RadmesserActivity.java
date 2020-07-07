@@ -169,7 +169,7 @@ public class RadmesserActivity extends AppCompatActivity {
             public void onDistanceValue(RadmesserService.Measurement value) {
                 Log.i("RadmesserService", "Value found : " + value);
                 int distance = -1;
-                if (value.leftSensorValues.size() > 0){
+                if (value!= null && value.leftSensorValues.size() > 0){
                     distance = value.leftSensorValues.get(0);
                     deviceInfoTextView.setText("Connected with " + "\n" + "Last distance: " + distance + " cm");
                     setClosePassBarColor(distance);
