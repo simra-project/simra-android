@@ -147,26 +147,24 @@ public class RadmesserService extends Service {
 
     private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
             BLEServiceManager.createService(
+                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1))),
                     RadmesserDevice.UUID_SERVICE_HEARTRATE,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_HEARTRATE,
-                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
+                    RadmesserDevice.UUID_SERVICE_HEARTRATE_CHAR
             ),
 
             BLEServiceManager.createService(
+                    val -> boradcasClosePassIncedent(val.getStringValue(0)),
                     RadmesserDevice.UUID_SERVICE_CLOSEPASS,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CLOSEPASS,
-                    val -> boradcasClosePassIncedent(val.getStringValue(0))
+                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE
             ),
 
             BLEServiceManager.createService(
+                    val -> boradcastDistanceValue(val.getStringValue(0)),
                     RadmesserDevice.UUID_SERVICE_DISTANCE,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_DISTANCE,
-                    val -> boradcastDistanceValue(val.getStringValue(0))
+                    RadmesserDevice.UUID_SERVICE_DISTANCE_CHAR_50MS
             ),
 
             BLEServiceManager.createService(
-                    RadmesserDevice.UUID_SERVICE_CONNECTION,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CONNECTION,
                     val -> {
                         Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
                         String strVal = val.getStringValue(0);
@@ -175,7 +173,9 @@ public class RadmesserService extends Service {
                             setConnectionState(ConnectionState.CONNECTED);
                             setPairedRadmesserID(connectedDevice.getID(), this);
                         }
-                    }
+                    },
+                    RadmesserDevice.UUID_SERVICE_CONNECTION,
+                    RadmesserDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED
             )
     );
 

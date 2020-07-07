@@ -1,26 +1,26 @@
 package de.tuberlin.mcc.simra.app.services.radmesser;
 
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.os.Build;
 
-import androidx.annotation.RequiresApi;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class BLEServiceManager {
     private HashMap<String, HashSet<BLEService>> byService = new HashMap<>();
-    private HashMap<String, BLEService> byCharakteristic = new HashMap<>();
+    private HashMap<String, BLEService> byCharacteristic = new HashMap<>();
 
     public BLEServiceManager(BLEService... services) {
         for (BLEService service : services) {
-            byCharakteristic.put(service.charackteristicUUIDs, service);
-            if (byService.get(service.serviceUUID) == null)
-                byService.put(service.serviceUUID, new HashSet<>());
-            byService.get(service.serviceUUID).add(service);
+            byCharacteristic.put(service.characteristicUUIDs.toString(), service);
+            if (byService.get(service.serviceUUID.toString()) == null) {
+                byService.put(service.serviceUUID.toString(), new HashSet<>());
+            }
+
+            byService.get(service.serviceUUID.toString()).add(service);
         }
     }
 
@@ -37,17 +37,19 @@ public class BLEServiceManager {
         return byService.get(uuid.toString());
     }
 
-    public BLEService byCharakteristic(UUID uuid) {
-        return byCharakteristic.get(uuid.toString());
+    public BLEService byCharacteristic(UUID uuid) {
+        return byCharacteristic.get(uuid.toString());
     }
 
-    public static BLEService createService(String serviceUUID, String charackteristicUUIDs, ValueCallback callback) {
+    public static BLEService createService(ValueCallback callback, String serviceUUIDString, String... characteristicUUIDStrings) {
+        UUID serviceUUID = UUID.fromString(serviceUUIDString);
 
-        // sanity-check and format correctly
-        serviceUUID = UUID.fromString(serviceUUID).toString();
-        charackteristicUUIDs = UUID.fromString(charackteristicUUIDs).toString();
+        List<UUID> characteristicUUIDs = new ArrayList<>();
+        for (String s : characteristicUUIDStrings) {
+            characteristicUUIDs.add(UUID.fromString(s));
+        }
 
-        return new BLEService(serviceUUID, charackteristicUUIDs) {
+        return new BLEService(serviceUUID, characteristicUUIDs) {
             @Override
             public void onValue(BluetoothGattCharacteristic characteristic) {
                 callback.onValue(characteristic);
@@ -60,13 +62,13 @@ public class BLEServiceManager {
     }
 
     public static abstract class BLEService {
-        public final String serviceUUID;
-        public final String charackteristicUUIDs;
+        public final UUID serviceUUID;
+        public final List<UUID> characteristicUUIDs;
         public boolean registered;
 
-        public BLEService(String serviceUUID, String charackteristicUUIDs) {
+        public BLEService(UUID serviceUUID, List<UUID> characteristicUUIDs) {
             this.serviceUUID = serviceUUID;
-            this.charackteristicUUIDs = charackteristicUUIDs;
+            this.characteristicUUIDs = characteristicUUIDs;
         }
 
         public abstract void onValue(BluetoothGattCharacteristic characteristic);

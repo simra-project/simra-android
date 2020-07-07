@@ -19,13 +19,13 @@ public class RadmesserDevice {
      * Bluetooth Service UUIDs
      */
     public static final String UUID_SERVICE_HEARTRATE = "0000180D-0000-1000-8000-00805F9B34FB";
-    public static final String UUID_SERVICE_CHARACTERISTIC_HEARTRATE = "00002a37-0000-1000-8000-00805f9b34fb";
+    public static final String UUID_SERVICE_HEARTRATE_CHAR = "00002a37-0000-1000-8000-00805f9b34fb";
     public static final String UUID_SERVICE_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000000";
-    public static final String UUID_SERVICE_CHARACTERISTIC_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000001";
+    public static final String UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE = "1FE7FAF9-CE63-4236-0003-000000000001";
     public static final String UUID_SERVICE_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000000";
-    public static final String UUID_SERVICE_CHARACTERISTIC_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000001";
+    public static final String UUID_SERVICE_DISTANCE_CHAR_50MS = "1FE7FAF9-CE63-4236-0001-000000000001";
     public static final String UUID_SERVICE_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000000";
-    public static final String UUID_SERVICE_CHARACTERISTIC_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000001";
+    public static final String UUID_SERVICE_CONNECTION_CHAR_CONNECTED = "1FE7FAF9-CE63-4236-0002-000000000001";
 
     private final String TAG = "RadmesserDevice";
     public boolean devicePaired = true;        //needen From the outside, workaround to prevent pairing required
@@ -74,34 +74,40 @@ public class RadmesserDevice {
                     Log.i(TAG, "Found " + requestedServices.size() + " Services for UUID:" + foundService.getUuid().toString());
                     for (BLEServiceManager.BLEService requestedService : requestedServices) {
                         if (requestedService.registered) continue;
-                        //found new Service on device, which is to be registered
-                        BluetoothGattCharacteristic characteristic = gatt
-                                .getService(UUID.fromString(requestedService.serviceUUID))
-                                .getCharacteristic(UUID.fromString(requestedService.charackteristicUUIDs));
-                        if (characteristic == null) {
-                            Log.i(TAG, "Error connecting to Characteristic: " + requestedService.charackteristicUUIDs);
-                            continue;
+
+                        // found new Service on device, which is to be registered
+                        int nRegisteredCharacteristics = 0;
+                        for (UUID characteristicUUID : requestedService.characteristicUUIDs) {
+                            BluetoothGattCharacteristic characteristic = gatt
+                                    .getService(requestedService.serviceUUID)
+                                    .getCharacteristic(characteristicUUID);
+                            if (characteristic == null) {
+                                Log.i(TAG, "Error connecting to Characteristic: " + requestedService.characteristicUUIDs);
+                                continue;
+                            }
+
+                            BluetoothGattDescriptor desc = new BluetoothGattDescriptor(UUID.randomUUID(), BluetoothGattDescriptor.PERMISSION_READ); // create generic descriptor
+                            desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                            gatt.writeDescriptor(desc);
+
+                            gatt.setCharacteristicNotification(characteristic, true);
+                            gatt.readCharacteristic(characteristic);
+                            nRegisteredCharacteristics++;
                         }
 
-                        BluetoothGattDescriptor desc = new BluetoothGattDescriptor(UUID.randomUUID(), BluetoothGattDescriptor.PERMISSION_READ);   //create generic descriptor
-                        desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                        gatt.writeDescriptor(desc);
-
-                        gatt.setCharacteristicNotification(characteristic, true);
-                        gatt.readCharacteristic(characteristic);
-                        requestedService.registered = true;
+                        requestedService.registered = (nRegisteredCharacteristics == requestedService.characteristicUUIDs.size());
                     }
                 }
             }
 
             @Override
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                servicesDefinitions.byCharakteristic(characteristic.getUuid()).onValue(characteristic);
+                servicesDefinitions.byCharacteristic(characteristic.getUuid()).onValue(characteristic);
             }
 
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-                servicesDefinitions.byCharakteristic(characteristic.getUuid()).onValue(characteristic);
+                servicesDefinitions.byCharacteristic(characteristic.getUuid()).onValue(characteristic);
             }
         });
     }
