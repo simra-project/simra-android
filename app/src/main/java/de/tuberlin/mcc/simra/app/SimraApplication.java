@@ -14,12 +14,13 @@ public class SimraApplication extends Application {
          * The call back function is provided with the options loaded from the manifest.
          *
          */
-        if (BuildConfig.BUILD_TYPE != "debug" && BuildConfig.SENTRY_DSN != null) {
-            SentryAndroid.init(this, options -> {
-                options.setDsn(BuildConfig.SENTRY_DSN);
-                options.setEnvironment(BuildConfig.IS_PRODUCTION ? "production" : "pre-production");
-                options.setRelease(String.valueOf(BuildConfig.VERSION_CODE));
-            });
-        }
+        // TODO: Uncomment for go live
+        //if (BuildConfig.BUILD_TYPE != "debug" && BuildConfig.SENTRY_DSN != null) {
+        SentryAndroid.init(this, options -> {
+            options.setDsn(BuildConfig.SENTRY_DSN);
+            options.setEnvironment(BuildConfig.IS_PRODUCTION ? "production" : "pre-production");
+            options.setRelease(String.valueOf(BuildConfig.VERSION_CODE));
+        });
+        //}
     }
 }

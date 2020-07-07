@@ -149,34 +149,32 @@ public class RadmesserService extends Service {
 
 
     private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
-           /* BLEServiceManager.createService(
+            BLEServiceManager.createService(
+                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1))),
                     RadmesserDevice.UUID_SERVICE_HEARTRATE,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_HEARTRATE,
-                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
-            ),*/
-
-            BLEServiceManager.createService(
-                    RadmesserDevice.UUID_SERVICE_CLOSEPASS,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CLOSEPASS_DISTANCE,
-                    val -> boradcasClosePassDistance(val.getStringValue(0))
+                    RadmesserDevice.UUID_SERVICE_HEARTRATE_CHAR
             ),
 
             BLEServiceManager.createService(
+                    val -> boradcasClosePassDistance(val.getStringValue(0)),
                     RadmesserDevice.UUID_SERVICE_CLOSEPASS,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CLOSEPASS_EVENT,
-                    val -> boradcasClosePassEvent(val.getStringValue(0))
+                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE
             ),
 
             BLEServiceManager.createService(
+                    val -> boradcasClosePassDistance(val.getStringValue(0)),
+                    RadmesserDevice.UUID_SERVICE_CLOSEPASS,
+                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_EVENT
+            ),
+
+            BLEServiceManager.createService(
+                    val -> boradcastDistanceValue(val.getStringValue(0)),
                     RadmesserDevice.UUID_SERVICE_DISTANCE,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_DISTANCE,
-                    val -> boradcastDistanceValue(val.getStringValue(0))
+                    RadmesserDevice.UUID_SERVICE_DISTANCE_CHAR_50MS
             ),
 
             //legacy Service from Radmesser
             BLEServiceManager.createService(
-                    RadmesserDevice.UUID_SERVICE_CONNECTION,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CONNECTION,
                     val -> {
                         Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
                         String strVal = val.getStringValue(0);
@@ -185,7 +183,9 @@ public class RadmesserService extends Service {
                             setConnectionState(ConnectionState.CONNECTED);
                             setPairedRadmesserID(connectedDevice.getID(), this);
                         }
-                    }
+                    },
+                    RadmesserDevice.UUID_SERVICE_CONNECTION,
+                    RadmesserDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED
             )
     );
 
@@ -395,14 +395,14 @@ public class RadmesserService extends Service {
                         break;
                     case ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE:
                         callbacks.onClosePassIncedentDistance(
-                                parseMesuarementLine(
+                                parseMeasurementLine(
                                         intent.getStringExtra(EXTRA_VALUE)
                                 )
                         );
                         break;
                     case ACTION_VALUE_RECEIVED_DISTANCE:
                         callbacks.onDistanceValue(
-                                parseMesuarementLine(
+                                parseMeasurementLine(
                                         intent.getStringExtra(EXTRA_VALUE)
                                 )
                         );
@@ -422,7 +422,7 @@ public class RadmesserService extends Service {
     }
 
     //todo: refactor into  Measurement constructor
-    private static Measurement parseMesuarementLine(String line) {
+    private static Measurement parseMeasurementLine(String line) {
         if (line.equals(""))
             return null;
 
@@ -430,40 +430,32 @@ public class RadmesserService extends Service {
             String[] sections = line.split(";");
 
             long timestamp = Long.parseLong(sections[0]);
-
-            ArrayList<Integer> left = parseMeasurementValues(sections[1].split(","));
-            ArrayList<Integer> right;
-            if (sections.length > 2)
-                right = parseMeasurementValues(sections[1].split(","));
-            else
-                right = new ArrayList<>();
+            List<Integer> left = parseValues(sections[1].split(","));
+            List<Integer> right = parseValues(sections[2].split(","));
 
             return new Measurement(timestamp, left, right);
-
-        } catch (ArrayIndexOutOfBoundsException iex) {
-            return null;
-        } catch (NumberFormatException fex) {
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException iex) {
             return null;
         }
     }
 
     //todo: refactor into  Measurement class
-    private static ArrayList<Integer> parseMeasurementValues(String[] values) {
-        ArrayList<Integer> vaalueList = new ArrayList<>();
+    private static List<Integer> parseValues(String[] values) {
+        List<Integer> valueList = new ArrayList<>();
 
         for (String value : values) {
-            vaalueList.add((int) Float.parseFloat(value));
+            valueList.add((int) Float.parseFloat(value));
         }
-        return vaalueList;
+        return valueList;
     }
 
 
     public static class Measurement {
         public long timestamp;
-        public ArrayList<Integer> leftSensorValues;
-        public ArrayList<Integer> rightSensorValues;
+        public List<Integer> leftSensorValues;
+        public List<Integer> rightSensorValues;
 
-        public Measurement(long timestamp, ArrayList<Integer> leftSensorValues, ArrayList<Integer> rightSensorValues) {
+        public Measurement(long timestamp, List<Integer> leftSensorValues, List<Integer> rightSensorValues) {
             this.timestamp = timestamp;
             this.leftSensorValues = leftSensorValues;
             this.rightSensorValues = rightSensorValues;
