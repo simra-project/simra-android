@@ -30,7 +30,7 @@ public class RadmesserDevice {
     public static final String UUID_SERVICE_CONNECTION_CHAR_CONNECTED = "1FE7FAF9-CE63-4236-0002-000000000001";
 
     private final String TAG = "RadmesserDevice";
-    public boolean devicePaired = true;        //needen From the outside
+    public boolean devicePaired = true; // needed from the outside
     private final BluetoothDevice bleDevice;
     private final ConnectionStateCallbacks callbacks;
     private BLEServiceManager servicesDefinitions;
@@ -48,8 +48,8 @@ public class RadmesserDevice {
 
     private void connect() {
         setConnectionState(ConnectionStatus.INIT_CONNECTION);
-        bleDevice.createBond();   //start connect to device
-        bleDevice.fetchUuidsWithSdp();   //start discover services on that device
+        bleDevice.createBond(); // start connecting to device
+        bleDevice.fetchUuidsWithSdp(); // start discovering services on that device
         gattConnection = bleDevice.connectGatt(ctx, true, new BluetoothGattCallback() {
             @Override
             public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {

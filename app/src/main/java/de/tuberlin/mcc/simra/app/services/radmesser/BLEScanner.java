@@ -29,14 +29,16 @@ public class BLEScanner {
     public BLEScanner(BLEScanCallbacks scanCallbacks) {
         this.scanCallbacks = scanCallbacks;
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
         if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-        } else
+        } else {
             throw new RuntimeException("Blutooth not enabled or granted");
+        }
     }
 
     public synchronized void abortAnyCurrentScan() {
-        if(finishScan()){
+        if (finishScan()) {
             scanCallbacks.onScanAborted();
         }
     }
@@ -62,8 +64,8 @@ public class BLEScanner {
         void onDeviceFound(BluetoothDevice device);
     }
 
-    public boolean isScanning(){
-        return currentScan!=null;
+    public boolean isScanning() {
+        return currentScan != null;
     }
 
     public void findDeviceById(String radmesserID, DeviceFoundCallback deviceFoundCallback) {
@@ -75,9 +77,8 @@ public class BLEScanner {
         startScan(
                 5,
                 filterList,
-                deviceFoundCallback     //todo: maybe tops scan after, but may not be needed?
+                deviceFoundCallback // todo: maybe tops scan after, but may not be needed?
         );
-
     }
 
     public void findDevicesByServices(BLEServiceManager bleServices, DeviceFoundCallback deviceFoundCallback) {
@@ -92,7 +93,7 @@ public class BLEScanner {
 
     }
 
-    private synchronized boolean startScan(int duration, List<ScanFilter> fitlerList, DeviceFoundCallback deviceFoundCallback) {
+    private synchronized boolean startScan(int duration, List<ScanFilter> filters, DeviceFoundCallback deviceFoundCallback) {
         abortAnyCurrentScan();
         ScanSettings scanSettings = new ScanSettings.Builder().build();
 
@@ -110,7 +111,7 @@ public class BLEScanner {
         };
         currentScan = thisScanCallback;
         try {
-            bluetoothLeScanner.startScan(fitlerList, scanSettings, thisScanCallback);
+            bluetoothLeScanner.startScan(filters, scanSettings, thisScanCallback);
             scanCallbacks.onScanStarted();
             Log.i(TAG, "scan started");
         } catch (NullPointerException nex) {
@@ -119,7 +120,7 @@ public class BLEScanner {
             return false;
         }
 
-        //stop Scan after duration, if not already stoped
+        // stop scanning after duration, if not already stoped
         Handler stopScanHandler = new Handler(Looper.myLooper());
         stopScanHandler.postDelayed(() -> {
             if (finishScan()) {
