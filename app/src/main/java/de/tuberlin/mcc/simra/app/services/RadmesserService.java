@@ -196,6 +196,11 @@ public class RadmesserService extends Service {
     final static String EXTRA_CONNECT_DEVICE = ACTION_PREFIX + ".EXTRA_CONNECT_DEVICE";
 
     // incoming Action-Requests
+
+    /*
+     * Request Service to scan for Radmesser devices
+     * Scan results can be subscribed with registerCallbacks()
+     * */
     public static void startScanning(Context ctx) {
         Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_START_SCANN);
@@ -204,6 +209,11 @@ public class RadmesserService extends Service {
 
     private static String lastConnectionRequest;
 
+    /*
+     * Request Service to connect to a specific device by providing its Hardware Adress
+     *
+     * returns false if already connecting to this device
+     * */
     public static boolean connectDevice(Context ctx, String deviceId) {
         if (deviceId.equals(lastConnectionRequest) &&
                 connectionState != ConnectionState.CONNECTION_REFUSED &&
@@ -220,7 +230,9 @@ public class RadmesserService extends Service {
     }
 
     /*
-     * returns false if no Radmesser is Paired
+     * Request Service to connect to a the last paired device
+     *
+     * returns false if there is no device paired yet
      */
     public static boolean tryConnectPairedDevice(Context ctx) {
         String connectedDevice = getPairedRadmesserID(ctx);
@@ -233,6 +245,11 @@ public class RadmesserService extends Service {
         ctx.startService(intent);
         return true;
     }
+    /*
+     * Request Service to connect to a the last paired device
+     *
+     * returns false if there is no device paired yet
+     */
 
     public static void disconnectAndUnpairDevice(Context ctx) {
         Intent intent = new Intent(ctx, RadmesserService.class);
@@ -240,6 +257,10 @@ public class RadmesserService extends Service {
         ctx.startService(intent);
     }
 
+    /*
+     * Request Service to terminate
+     *
+     * */
     public static void terminateService(Context ctx) {
         Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_STOP_SERVICE);
