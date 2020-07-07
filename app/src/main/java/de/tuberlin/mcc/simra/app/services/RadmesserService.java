@@ -19,6 +19,8 @@ import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
+
+
 public class RadmesserService extends Service {
     private static final String TAG = "RadmesserService";
     private static final String sharedPrefsKey = "RadmesserServiceBLE";
@@ -193,11 +195,21 @@ public class RadmesserService extends Service {
         ctx.startService(intent);
     }
 
-    public static void connectDevice(Context ctx, String deviceId) {
+    private static String lastConnectionRequest;
+
+    public static boolean connectDevice(Context ctx, String deviceId) {
+        if (deviceId.equals(lastConnectionRequest) &&
+                connectionState != ConnectionState.CONNECTION_REFUSED &&
+                connectionState != ConnectionState.DISCONNECTED)
+            return false;
+
+        lastConnectionRequest = deviceId;
+
         Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_CONNECT_DEVICE);
         intent.putExtra(EXTRA_CONNECT_DEVICE, deviceId);
         ctx.startService(intent);
+        return true;
     }
 
     /*
@@ -395,9 +407,9 @@ public class RadmesserService extends Service {
             if (sections.length > 2)
                 right = parseValues(sections[1].split(","));
             else
-                right= new ArrayList<>();
+                right = new ArrayList<>();
 
-            return new Measurement(timestamp,left, right);
+            return new Measurement(timestamp, left, right);
 
         } catch (ArrayIndexOutOfBoundsException iex) {
             return null;
