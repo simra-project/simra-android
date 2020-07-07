@@ -11,8 +11,10 @@ import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
@@ -111,10 +113,10 @@ public class RadmesserActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onDistanceValue(String value) {
+            public void onDistanceValue(RadmesserService.Measurement value) {
                 int distance = -1;
-                String[] splitted = value.split(",");
-                if (splitted.length == 2) distance = Integer.parseInt(splitted[0]);
+                if (value.leftSensorValues.size() > 0)
+                    distance = value.leftSensorValues.get(0);
 
                 deviceInfoTextView.setText("Connected with " + "\n" + "Last distance: " + distance + " cm");
             }

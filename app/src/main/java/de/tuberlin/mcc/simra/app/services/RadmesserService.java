@@ -428,9 +428,9 @@ public class RadmesserService extends Service {
     }
 
     public static class Measurement {
-        long timestamp;
-        ArrayList<Integer> leftSensorValues;
-        ArrayList<Integer> rightSensorValues;
+        public long timestamp;
+        public ArrayList<Integer> leftSensorValues;
+        public ArrayList<Integer> rightSensorValues;
 
         public Measurement(long timestamp, ArrayList<Integer> leftSensorValues, ArrayList<Integer> rightSensorValues) {
             this.timestamp = timestamp;
