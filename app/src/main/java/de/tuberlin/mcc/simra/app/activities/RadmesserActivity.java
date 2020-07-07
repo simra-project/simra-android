@@ -2,6 +2,8 @@ package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +31,7 @@ public class RadmesserActivity extends AppCompatActivity {
     LinearLayout deviceLayout; // Connected Device
     LinearLayout pairingLayout; // Connected Device
     LinearLayout devicesList; // Button list (Innerhalb ConnectDevicesLayout)
+    ProgressBar progressBar;
     TextView deviceInfoTextView; // (Innerhalb deviceLayout)
     BroadcastReceiver receiver;
     Switch takePicturesButton;
@@ -43,6 +47,7 @@ public class RadmesserActivity extends AppCompatActivity {
         devicesList = findViewById(R.id.devicesList);
         deviceLayout = findViewById(R.id.deviceLayout);
         pairingLayout = findViewById(R.id.pairing);
+        progressBar = findViewById(R.id.progressBarClosePass);
         deviceInfoTextView = findViewById(R.id.deviceInfoTextView);
         NumberPicker handleBarWidth = findViewById(R.id.handleBarWidth);
         handleBarWidth.setMaxValue(40);
@@ -84,6 +89,19 @@ public class RadmesserActivity extends AppCompatActivity {
         if(!currentState.equals(RadmesserService.ConnectionState.CONNECTED)){
             startScanningDevices();
         }
+    }
+
+    private void setClosePassBarColor(int distanceInCm){
+        int maxColorValue = Math.min(distanceInCm, 200); // 200 cm ist maximum, das grün
+        // Algoritmus found https://stackoverflow.com/questions/340209/generate-colors-between-red-and-green-for-a-power-meter
+        // Da n zwischen 0 -100 liegen soll und das maximum 200 ist, dann halbieren immer den Wert.
+        int normalizedValue = distanceInCm / 2;
+        int red = (255 * normalizedValue) / 100;
+        int green = (255 * (100 - normalizedValue)) / 100;
+        int blue = 0;
+        // Color und Progress sind abhängig
+        progressBar.setProgressTintList(ColorStateList.valueOf(Color.rgb(red, green, blue)));
+        progressBar.setProgress(normalizedValue);
     }
 
     private void updateUI(RadmesserService.ConnectionState state){
@@ -154,6 +172,7 @@ public class RadmesserActivity extends AppCompatActivity {
                 if (value.leftSensorValues.size() > 0){
                     distance = value.leftSensorValues.get(0);
                     deviceInfoTextView.setText("Connected with " + "\n" + "Last distance: " + distance + " cm");
+                    setClosePassBarColor(distance);
                     Log.i("RadmesserService", "Distance found : " + distance);
                 }
             }

@@ -99,6 +99,16 @@
                 android:paddingBottom="16dp"
                 android:text="Geräte-Info" />
 
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBarClosePass"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:max="100"
+                android:progress="45"/>
+
              <Button
                 android:id="@+id/btnDisconnect"
                 android:layout_width="match_parent"
