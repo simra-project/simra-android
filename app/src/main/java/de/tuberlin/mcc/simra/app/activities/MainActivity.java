@@ -111,7 +111,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Radmesser
     private FloatingActionButton radmesserButton;
-    BroadcastReceiver receiver;
+    private RadmesserService radmesserService;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
@@ -126,6 +126,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         public void onServiceConnected(ComponentName name, IBinder service) {
             RecorderService.MyBinder myBinder = (RecorderService.MyBinder) service;
             mBoundRecorderService = myBinder.getService();
+        }
+    };
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateRadmesserButtonStatus();
         }
     };
 
@@ -148,15 +154,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return (!gps_enabled);
     }
 
-    private void showRadmesserNotConnectedWarning(){
-        android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
-        alert.setTitle("Warnung: Radmesser nicht verbunden");
-        alert.setMessage("\nUm das Radmesser zu verbinden, clicken Sie auf dem Bluetooth button");
-        alert.setPositiveButton("Ok", (dialog, whichButton) -> {
-        });
-        alert.show();
-    }
-
 
     @SuppressLint("MissingPermission")
     @Override
@@ -166,7 +163,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onCreate(savedInstanceState);
 
         myEx = Executors.newFixedThreadPool(4);
-
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Set some params (context, DisplayMetrics, Config, ContentView)
@@ -291,16 +287,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // (4): NEUE ROUTE / START BUTTON
         startBtn = findViewById(R.id.button_start);
         startBtn.setOnClickListener(v -> {
-            if(radmesserEnabled){
-                RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
-                if(!currentState.equals(RadmesserService.ConnectionState.CONNECTED)){
-                    boolean reconected = RadmesserService.tryConnectPairedDevice(this);
-                    if(!reconected){
-                        showRadmesserNotConnectedWarning();
-                    }
-                }
-            }
-
             if (!PermissionHelper.hasBasePermissions(this)) {
                 PermissionHelper.requestFirstBasePermissionsNotGranted(MainActivity.this);
                 Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
@@ -337,7 +323,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         stopBtn.setOnClickListener(v -> {
             try {
                 showStart();
-                RadmesserService.terminateService(this);
+
                 // Stop RecorderService which is recording accelerometer data
                 unbindService(mRecorderServiceConnection);
                 stopService(recService);
@@ -381,15 +367,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         FloatingActionButton settingsButton = findViewById(R.id.button_ride_settings_general);
         settingsButton.setOnClickListener(view -> startActivity(new Intent(this, SettingsActivity.class)));
 
-        // Radmesser
-        radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
-        RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
-        if(radmesserEnabled && currentState.equals(RadmesserService.ConnectionState.DISCONNECTED)){
-            RadmesserService.startScanning(this);
-        }
-        updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
-        registerRadmesserService();
         Log.d(TAG, "OnCreate finished");
+
     }
 
 
@@ -410,38 +389,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
-    private void registerRadmesserService(){
-        receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks(){
-            public void onConnectionStateChanged(RadmesserService.ConnectionState newState) {
-                Log.d(TAG, "Staus changed in main " + newState.toString());
-                updateRadmesserButtonStatus(newState);
-            }
-
-            public void onDeviceFound(String deviceName, String deviceId) {
-                Log.d(TAG, "Device found from main");
-                if(!RadmesserService.getConnectionState().equals(RadmesserService.ConnectionState.CONNECTED)){
-                    Toast.makeText(MainActivity.this, "Gerät gefunden, clicke auf dem Bluetooth Knopf um dich damit zu verbinden", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void onDestroy() {
-        RadmesserService.terminateService(this);
-        super.onDestroy();
-    }
-
-    private void unregisterRadmesserService(){
-        RadmesserService.unRegisterCallbacks(receiver, this);
-        receiver = null;
-    }
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private void updateRadmesserButtonStatus(RadmesserService.ConnectionState status) {
-        Log.d(TAG, "updateRadmesserButtonStatus called with status " + status.toString());
+    private void updateRadmesserButtonStatus() {
         NavigationView navigationView = findViewById(R.id.nav_view);
+
         if (radmesserEnabled) {
             // einblenden
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(true);
@@ -451,6 +403,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
             radmesserButton.setVisibility(View.GONE);
         }
+        RadmesserService.ConnectionState status = radmesserService != null ? radmesserService.getConnectionState() : RadmesserService.ConnectionState.DISCONNECTED;
         switch (status) {
             case DISCONNECTED:
                 radmesserButton.setImageResource(R.drawable.ic_bluetooth_disabled);
@@ -495,9 +448,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if(radmesserEnabled)
             isConnecting = RadmesserService.tryConnectPairedDevice(this);
 
-        if(receiver == null && radmesserEnabled){
-            registerRadmesserService();
-        }
+
+        // show or hide the radmesser status according to the shared settings
+        updateRadmesserButtonStatus();
+
+
         super.onResume();
 
         // Ensure the button that matches current state is presented.
@@ -523,8 +478,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mMapView.onResume(); // needed for compass and icons
         mLocationOverlay.onResume();
         mLocationOverlay.enableMyLocation();
-        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
-
     }
 
     public void onPause() {
@@ -543,7 +496,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mLocationOverlay.onPause();
         mLocationOverlay.disableMyLocation();
         Log.d(TAG, "OnPause finished");
-        unregisterRadmesserService();
     }
 
     @SuppressLint("MissingPermission")
@@ -562,7 +514,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } catch (Exception se) {
             se.printStackTrace();
         }
-       unregisterRadmesserService();
+
         Log.d(TAG, "OnStop finished");
     }
 

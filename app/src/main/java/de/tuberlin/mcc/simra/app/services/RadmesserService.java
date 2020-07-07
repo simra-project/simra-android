@@ -12,18 +12,13 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import java.util.ArrayList;
-import java.util.List;
-
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
-
 
 public class RadmesserService extends Service {
     private static final String TAG = "RadmesserService";
@@ -33,11 +28,9 @@ public class RadmesserService extends Service {
     private volatile HandlerThread mHandlerThread;
     private BLEScanner bluetoothScanner;
     private LocalBroadcastManager broadcastManager;
-
     public static ConnectionState getConnectionState() {
         return connectionState;
     }
-
     private static ConnectionState connectionState = ConnectionState.DISCONNECTED;
 
 
@@ -151,35 +144,35 @@ public class RadmesserService extends Service {
 
     private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
             BLEServiceManager.createService(
-                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1))),
                     RadmesserDevice.UUID_SERVICE_HEARTRATE,
-                    RadmesserDevice.UUID_SERVICE_HEARTRATE_CHAR
+                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_HEARTRATE,
+                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
             ),
 
             BLEServiceManager.createService(
-                    val -> boradcasClosePassIncedent(val.getStringValue(0)),
                     RadmesserDevice.UUID_SERVICE_CLOSEPASS,
-                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE
+                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CLOSEPASS,
+                    val -> boradcasClosePassIncedent(val.getStringValue(0))
             ),
 
             BLEServiceManager.createService(
-                    val -> boradcastDistanceValue(val.getStringValue(0)),
                     RadmesserDevice.UUID_SERVICE_DISTANCE,
-                    RadmesserDevice.UUID_SERVICE_DISTANCE_CHAR_50MS
+                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_DISTANCE,
+                    val -> boradcastDistanceValue(val.getStringValue(0))
             ),
 
             BLEServiceManager.createService(
+                    RadmesserDevice.UUID_SERVICE_CONNECTION,
+                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CONNECTION,
                     val -> {
+                        connectedDevice.devicePaired = true;
                         Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
                         String strVal = val.getStringValue(0);
                         if (strVal != null && strVal.equals("1")) {
-                            connectedDevice.devicePaired = true;
                             setConnectionState(ConnectionState.CONNECTED);
                             setPairedRadmesserID(connectedDevice.getID(), this);
                         }
-                    },
-                    RadmesserDevice.UUID_SERVICE_CONNECTION,
-                    RadmesserDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED
+                    }
             )
     );
 
@@ -199,21 +192,11 @@ public class RadmesserService extends Service {
         ctx.startService(intent);
     }
 
-    private static String lastConnectionRequest;
-
-    public static boolean connectDevice(Context ctx, String deviceId) {
-        if (deviceId.equals(lastConnectionRequest) &&
-                connectionState != ConnectionState.CONNECTION_REFUSED &&
-                connectionState != ConnectionState.DISCONNECTED)
-            return false;
-
-        lastConnectionRequest = deviceId;
-
+    public static void connectDevice(Context ctx, String deviceId) {
         Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_CONNECT_DEVICE);
         intent.putExtra(EXTRA_CONNECT_DEVICE, deviceId);
         ctx.startService(intent);
-        return true;
     }
 
     /*
@@ -342,12 +325,10 @@ public class RadmesserService extends Service {
         public void onConnectionStateChanged(ConnectionState newState) {
         }
 
-
-        public void onClosePassIncedent(@Nullable Measurement measurement) {
+        public void onClosePassIncedent(String raw) {     //todo: change type to Measurement
         }
 
-
-        public void onDistanceValue(@Nullable Measurement measurement) {
+        public void onDistanceValue(String raw) {         //todo: change type to Measurement
         }
     }
 
@@ -376,18 +357,14 @@ public class RadmesserService extends Service {
                                 ConnectionState.valueOf(intent.getStringExtra(EXTRA_CONNECTION_STATE))
                         );
                         break;
-                    case ACTION_VALUE_RECEIVED_CLOSEPASS:
+                    case ACTION_VALUE_RECEIVED_CLOSEPASS:    //todo:  call parseMesuarementLine() and return result
                         callbacks.onClosePassIncedent(
-                                parseMeasurementLine(
-                                        intent.getStringExtra(EXTRA_VALUE)
-                                )
+                                intent.getStringExtra(EXTRA_VALUE)
                         );
                         break;
-                    case ACTION_VALUE_RECEIVED_DISTANCE:
+                    case ACTION_VALUE_RECEIVED_DISTANCE:     //todo:  call parseMesuarementLine() and return result
                         callbacks.onDistanceValue(
-                                parseMeasurementLine(
-                                        intent.getStringExtra(EXTRA_VALUE)
-                                )
+                                intent.getStringExtra(EXTRA_VALUE)
                         );
                         break;
                 }
@@ -397,7 +374,7 @@ public class RadmesserService extends Service {
         return rec;
     }
 
-    private static Measurement parseMeasurementLine(String line) {
+    private Measurement parseMesuarementLine(String line) {
         if (line.equals(""))
             return null;
 
@@ -405,38 +382,33 @@ public class RadmesserService extends Service {
             String[] sections = line.split(";");
 
             long timestamp = Long.parseLong(sections[0]);
-            List<Integer> left = parseValues(sections[1].split(","));
-            List<Integer> right = parseValues(sections[2].split(","));
+            return new Measurement(timestamp, parseValues(sections[1].split(",")), parseValues(sections[2].split(",")));
 
-            return new Measurement(timestamp, left, right);
-        } catch (ArrayIndexOutOfBoundsException | NumberFormatException iex) {
+        } catch (ArrayIndexOutOfBoundsException iex) {
+            return null;
+        } catch (NumberFormatException fex) {
             return null;
         }
     }
 
-    private static List<Integer> parseValues(String[] values) {
-        List<Integer> valueList = new ArrayList<>();
+    private ArrayList<Integer> parseValues(String[] values) {
+        ArrayList<Integer> vaalueList = new ArrayList<>();
 
         for (String value : values) {
-            valueList.add((int) Float.parseFloat(value));
+            vaalueList.add((int) Float.parseFloat(value));
         }
-        return valueList;
+        return vaalueList;
     }
 
-    public static class Measurement {
-        public long timestamp;
-        public List<Integer> leftSensorValues;
-        public List<Integer> rightSensorValues;
+    public class Measurement {
+        long timestamp;
+        ArrayList<Integer> leftSensorValues;
+        ArrayList<Integer> rightSensorValues;
 
-        public Measurement(long timestamp, List<Integer> leftSensorValues, List<Integer> rightSensorValues) {
+        public Measurement(long timestamp, ArrayList<Integer> leftSensorValues, ArrayList<Integer> rightSensorValues) {
             this.timestamp = timestamp;
             this.leftSensorValues = leftSensorValues;
             this.rightSensorValues = rightSensorValues;
-        }
-
-        @Override
-        public String toString() {
-            return timestamp + " " + leftSensorValues + " " + rightSensorValues;
         }
     }
 
@@ -462,4 +434,3 @@ public class RadmesserService extends Service {
         ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().putString(sharedPrefsKeyRadmesserID, id).apply();
     }
 }
-

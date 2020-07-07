@@ -42,7 +42,7 @@ public class MarkerFunct {
     private ShowRouteActivity mother;
     private ExecutorService pool;
     private String rideID;
-    private List<Marker> markers = new ArrayList<>();
+    private ArrayList<Marker> markers = new ArrayList<>();
     private GeocoderNominatim geocoderNominatim;
     private boolean temp;
     private int state;
@@ -265,7 +265,7 @@ public class MarkerFunct {
     // Generate a new GeoPoint from address String via Geocoding
 
     public String getAddressFromLocation(GeoPoint incidentLoc) {
-        List<Address> address;
+        List<Address> address = new ArrayList<>();
         String addressForLocation = "";
         try {
             // This is the actual geocoding

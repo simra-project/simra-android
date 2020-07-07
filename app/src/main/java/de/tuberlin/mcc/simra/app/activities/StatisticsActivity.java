@@ -18,12 +18,12 @@ import com.github.mikephil.charting.data.BarEntry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 
+import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getGlobalProfile;
 
 public class StatisticsActivity extends AppCompatActivity {
@@ -161,7 +161,7 @@ public class StatisticsActivity extends AppCompatActivity {
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setLabelsToSkip(0);
-        List<BarEntry> entries = new ArrayList<>();
+        ArrayList<BarEntry> entries = new ArrayList<>();
         for (int i = 11; i < 34; i++) {
             entries.add(new BarEntry((float) profileValues[i], i - 10));
             if (entries.get(i - 11).getVal() == 0.0) {
@@ -173,7 +173,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         BarDataSet bardataset = new BarDataSet(entries, null);
 
-        List<String> labels = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
 
         if (locale.equals(new Locale("en").getLanguage())) {
             labels.add("12am");
