@@ -73,6 +73,7 @@ public class RadmesserDevice {
                 Log.i(TAG, "onServicesDiscovered: " + gatt.getServices().size());
                 super.onServicesDiscovered(gatt, status);
 
+                logCharacteristics(gatt);
                 for (BluetoothGattService foundService : gatt.getServices()) {
                     BLEService service = servicesDefinitions.getServiceByUUID(foundService.getUuid());
                     if (service == null) continue;
@@ -150,5 +151,15 @@ public class RadmesserDevice {
 
     public interface ConnectionStateCallbacks {
         void onConnectionStateChange(ConnectionStatus newState, RadmesserDevice instnace);
+    }
+    private void logCharacteristics(BluetoothGatt gatt) {
+        for (BluetoothGattService service : gatt.getServices()) {
+            StringBuilder b = new StringBuilder().append(service.getUuid());
+            for(BluetoothGattCharacteristic characteristic: service.getCharacteristics()){
+                b.append( "\t #").append(characteristic.getUuid());
+            }
+            Log.i("Found LE-Service",  b.toString());
+        }
+
     }
 }
