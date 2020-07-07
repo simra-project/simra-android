@@ -11,8 +11,11 @@ import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
@@ -21,11 +24,11 @@ import pl.droidsonroids.gif.GifImageView;
 
 
 public class RadmesserActivity extends AppCompatActivity {
-    boolean deviceConnected = false;
-    LinearLayout connectDevicesLayout;
-    LinearLayout devicesList;
-    LinearLayout deviceLayout;
-    TextView deviceInfoTextView;
+    LinearLayout connectDevicesLayout; // Verfügbare Geräte
+    LinearLayout deviceLayout; // Connected Device
+    LinearLayout pairingLayout; // Connected Device
+    LinearLayout devicesList; // Button list (Innerhalb ConnectDevicesLayout)
+    TextView deviceInfoTextView; // (Innerhalb deviceLayout)
     BroadcastReceiver receiver;
     Switch takePicturesButton;
     private AlertDialog alertDialog;
@@ -39,6 +42,7 @@ public class RadmesserActivity extends AppCompatActivity {
         connectDevicesLayout = findViewById(R.id.connectDevicesLayout);
         devicesList = findViewById(R.id.devicesList);
         deviceLayout = findViewById(R.id.deviceLayout);
+        pairingLayout = findViewById(R.id.pairing);
         deviceInfoTextView = findViewById(R.id.deviceInfoTextView);
         NumberPicker handleBarWidth = findViewById(R.id.handleBarWidth);
         handleBarWidth.setMaxValue(40);
@@ -75,7 +79,54 @@ public class RadmesserActivity extends AppCompatActivity {
 
         Button disconnectBTN = findViewById(R.id.btnDisconnect);
         disconnectBTN.setOnClickListener(view -> RadmesserService.disconnectAndUnpairDevice(this));
+        RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
+        updateUI(currentState);
+        if(!currentState.equals(RadmesserService.ConnectionState.CONNECTED)){
+            startScanningDevices();
+        }
+    }
 
+    private void updateUI(RadmesserService.ConnectionState state){
+        switch (state) {
+            case PAIRING:
+                if(deviceLayout != null){
+                    deviceLayout.setVisibility(View.GONE);
+                }
+                if(connectDevicesLayout != null){
+                    connectDevicesLayout.setVisibility(View.GONE);
+                }
+                if(pairingLayout != null){
+                    pairingLayout.setVisibility(View.VISIBLE);
+                }
+                showTutorialDialog();
+                break;
+            case CONNECTED:
+                if(deviceLayout != null){
+                    deviceLayout.setVisibility(View.VISIBLE);
+                }
+                if(connectDevicesLayout != null){
+                    connectDevicesLayout.setVisibility(View.GONE);
+                }
+                if(pairingLayout != null){
+                    pairingLayout.setVisibility(View.GONE);
+                }
+                closeTutorialDialog();
+                break;
+            case CONNECTION_REFUSED:
+            case DISCONNECTED:
+            default:
+                if(deviceLayout != null){
+                    deviceLayout.setVisibility(View.GONE);
+                }
+                if(connectDevicesLayout != null){
+                    connectDevicesLayout.setVisibility(View.VISIBLE);
+                }
+                if(pairingLayout != null){
+                    pairingLayout.setVisibility(View.GONE);
+                }
+                closeTutorialDialog();
+                break;
+        }
 
     }
 
@@ -87,36 +138,24 @@ public class RadmesserActivity extends AppCompatActivity {
                 button.setText("Connect with " + deviceName);
                 button.setOnClickListener(v -> connectToDevice(deviceId));
                 devicesList.addView(button);
+                Log.i("RadmesserService", "DeviceFound in radmesser activity");
             }
 
             @Override
             public void onConnectionStateChanged(RadmesserService.ConnectionState newState) {
                 Log.i("connState", newState.toString());
-                switch (newState) {
-                    case PAIRING:
-                        showTutorialDialog();
-                        break;
-                    case CONNECTED:
-                        deviceConnected = true;
-                        closeTutorialDialog();
-                        break;
-                    case CONNECTION_REFUSED:
-                    case DISCONNECTED:
-                        deviceConnected = false;
-                        break;
-                }
-                // ?????
-                connectDevicesLayout.setVisibility(deviceConnected ? View.GONE : View.VISIBLE);
-                deviceLayout.setVisibility(deviceConnected ? View.VISIBLE : View.GONE);
+                updateUI(newState);
             }
 
             @Override
-            public void onDistanceValue(String value) {
+            public void onDistanceValue(RadmesserService.Measurement value) {
+                Log.i("RadmesserService", "Value found : " + value);
                 int distance = -1;
-                String[] splitted = value.split(",");
-                if (splitted.length == 2) distance = Integer.parseInt(splitted[0]);
-
-                deviceInfoTextView.setText("Connected with " + "\n" + "Last distance: " + distance + " cm");
+                if (value.leftSensorValues.size() > 0){
+                    distance = value.leftSensorValues.get(0);
+                    deviceInfoTextView.setText("Connected with " + "\n" + "Last distance: " + distance + " cm");
+                    Log.i("RadmesserService", "Distance found : " + distance);
+                }
             }
         });
 
@@ -178,7 +217,11 @@ public class RadmesserActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         registerReceiver();
-        startScanningDevices();
+        RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
+        if(!currentState.equals(RadmesserService.ConnectionState.CONNECTED)){
+            startScanningDevices();
+        }
+        Toast.makeText(this, currentState.toString(), Toast.LENGTH_SHORT).show();
         super.onResume();
     }
 
