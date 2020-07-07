@@ -47,7 +47,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -147,7 +146,7 @@ public class ShowRouteActivity extends BaseActivity {
     static BoundingBox getBoundingBox(Polyline pl) {
 
         // {North, East, South, West}
-        List<GeoPoint> geoPoints = pl.getPoints();
+        ArrayList<GeoPoint> geoPoints = pl.getPoints();
 
         double[] border = {geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude(), geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude()};
 
@@ -436,7 +435,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
         runOnUiThread(() -> {
             privacySlider.setRange(0, routeSize);
-            List<OverlayItem> items = new ArrayList<>();
+            ArrayList<OverlayItem> items = new ArrayList<>();
             Drawable startFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.startblack, null);
             Drawable finishFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.racingflagblack, null);
             GeoPoint startFlagPoint;
@@ -552,28 +551,28 @@ public class ShowRouteActivity extends BaseActivity {
                         metaDataLine[2] = String.valueOf(tempEndTime);
                         distance = tempRide.distance;
                         waitedTime = tempRide.waitedTime;
-                        List<AccEvent> accEventList = tempRide.events;
-                        Log.d(TAG, "accEventList.size(): " + accEventList.size());
-                        for (int i = 0; i < accEventList.size(); i++) {
+                        ArrayList<AccEvent> accEventArrayList = tempRide.events;
+                        Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
+                        for (int i = 0; i < accEventArrayList.size(); i++) {
                             Log.d(TAG, "accEvent " + tempRide.events.get(i).key + ": " + tempRide.events.get(i).annotated + " scary: " + tempRide.events.get(i).scary);
-                            if (accEventList.get(i).annotated) {
+                            if (accEventArrayList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
-                            if (accEventList.get(i).scary.equals("1")) {
+                            if (accEventArrayList.get(i).scary.equals("1")) {
                                 numberOfScary++;
                             }
                         }
                     } else {
                         distance = ride.distance;
                         waitedTime = ride.waitedTime;
-                        List<AccEvent> accEventList = ride.events;
-                        Log.d(TAG, "accEventList.size(): " + accEventList.size());
-                        for (int i = 0; i < accEventList.size(); i++) {
+                        ArrayList<AccEvent> accEventArrayList = ride.events;
+                        Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
+                        for (int i = 0; i < accEventArrayList.size(); i++) {
                             Log.d(TAG, "accEvent " + ride.events.get(i).key + ": " + ride.events.get(i).annotated + " scary: " + ride.events.get(i).scary);
-                            if (accEventList.get(i).annotated) {
+                            if (accEventArrayList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
-                            if (accEventList.get(i).scary.equals("1")) {
+                            if (accEventArrayList.get(i).scary.equals("1")) {
                                 numberOfScary++;
                             }
                         }

@@ -7,6 +7,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ParcelUuid;
@@ -14,15 +15,11 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
-
 public class BLEScanner {
     private final String TAG = "BLEScanner";
     private BluetoothLeScanner bluetoothLeScanner;
-    private Map<String, BluetoothDevice> foundDevices;
+    private HashMap<String, BluetoothDevice> foundDevices;
     private ScanCallback currentScan;
     private final BLEScanCallbacks scanCallbacks;
 
@@ -67,7 +64,7 @@ public class BLEScanner {
     }
 
     public void findDeviceById(String radmesserID, DeviceFoundCallback deviceFoundCallback) {
-        List<ScanFilter> filterList = new ArrayList<>();
+        ArrayList<ScanFilter> filterList = new ArrayList<>();
         ScanFilter.Builder builder = new ScanFilter.Builder();
         builder.setDeviceAddress(radmesserID);
         filterList.add(builder.build());
@@ -81,7 +78,7 @@ public class BLEScanner {
     }
 
     public void findDevicesByServices(BLEServiceManager bleServices, DeviceFoundCallback deviceFoundCallback) {
-        List<ScanFilter> filterList = new ArrayList<>();
+        ArrayList<ScanFilter> filterList = new ArrayList<>();
             for (UUID serviceUUID : bleServices.getAllUUIDs()) {
                 ScanFilter.Builder builder = new ScanFilter.Builder();
                 builder.setServiceUuid(new ParcelUuid(serviceUUID));
@@ -92,7 +89,7 @@ public class BLEScanner {
 
     }
 
-    private synchronized boolean startScan(int duration, List<ScanFilter> fitlerList, DeviceFoundCallback deviceFoundCallback) {
+    private synchronized boolean startScan(int duration, ArrayList<ScanFilter> fitlerList, DeviceFoundCallback deviceFoundCallback) {
         abortAnyCurrentScan();
         ScanSettings scanSettings = new ScanSettings.Builder().build();
 

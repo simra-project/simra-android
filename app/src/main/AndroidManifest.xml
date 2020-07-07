@@ -130,8 +130,7 @@
         <service
             android:name=".services.RadmesserService"
             android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="connectedDevice"/>
+            android:exported="false" />
         <service
             android:name=".services.CameraService"
             android:exported="false"></service>
