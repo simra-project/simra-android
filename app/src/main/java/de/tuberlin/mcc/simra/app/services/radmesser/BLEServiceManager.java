@@ -6,39 +6,47 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 public class BLEServiceManager {
-    private HashMap<String, HashSet<BLEService>> byService = new HashMap<>();
-    private HashMap<String, BLEService> byCharacteristic = new HashMap<>();
+    // TODO: Why is this a set? Why should one UUID map to a set of services?
+    // TODO: Each service is only detectable through its unique Id (-> UUID ;-) ) so there should never be more than one service for a given UUID
+    // TODO: Refactor!
+    private Map<UUID, Set<BLEService>> byService        = new HashMap<>();
+    private Map<UUID, BLEService>      byCharacteristic = new HashMap<>();
 
     public BLEServiceManager(BLEService... services) {
         for (BLEService service : services) {
-            byCharacteristic.put(service.characteristicUUIDs.toString(), service);
-            if (byService.get(service.serviceUUID.toString()) == null) {
-                byService.put(service.serviceUUID.toString(), new HashSet<>());
+            for (UUID characteristicUUID : service.characteristicUUIDs) {
+                byCharacteristic.put(characteristicUUID, service);
             }
 
-            byService.get(service.serviceUUID.toString()).add(service);
+            // TODO: This will *always* occur because for a given UUID, there will never be a service with the same UUID already in the list.
+            if (byService.get(service.serviceUUID) == null) {
+                byService.put(service.serviceUUID, new HashSet<>());
+            }
+
+            byService.get(service.serviceUUID).add(service);
         }
     }
 
     public Set<UUID> getAllUUIDs() {
-        HashSet<UUID> allUUIDs = new HashSet<>();
-        for (String id : byService.keySet()) {
-            allUUIDs.add(UUID.fromString(id));
+        Set<UUID> allUUIDs = new HashSet<>();
+        for (UUID id : byService.keySet()) {
+            allUUIDs.add(id);
         }
         return allUUIDs;
 
     }
 
-    public HashSet<BLEService> byService(UUID uuid) {
-        return byService.get(uuid.toString());
+    public Set<BLEService> byService(UUID uuid) {
+        return byService.get(uuid);
     }
 
     public BLEService byCharacteristic(UUID uuid) {
-        return byCharacteristic.get(uuid.toString());
+        return byCharacteristic.get(uuid);
     }
 
     public static BLEService createService(ValueCallback callback, String serviceUUIDString, String... characteristicUUIDStrings) {

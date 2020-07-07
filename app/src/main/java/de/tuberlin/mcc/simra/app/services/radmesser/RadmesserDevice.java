@@ -10,7 +10,7 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
 
-import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -58,8 +58,10 @@ public class RadmesserDevice {
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     // try to reconnect, ony update status (stop connection in Service, if not Paired)
                     setConnectionState(ConnectionStatus.GATT_DISCONNECTED);
-                    if(!devicePaired)
+
+                    if (!devicePaired) {
                         disconnectDevice();
+                    }
                 }
                 // ignore others
             }
@@ -68,10 +70,12 @@ public class RadmesserDevice {
             public void onServicesDiscovered(BluetoothGatt gatt, int status) {
                 Log.i(TAG, "onServicesDiscovered: " + gatt.getServices().size());
                 super.onServicesDiscovered(gatt, status);
+
                 for (BluetoothGattService foundService : gatt.getServices()) {
-                    HashSet<BLEServiceManager.BLEService> requestedServices = servicesDefinitions.byService(foundService.getUuid());
+                    Set<BLEServiceManager.BLEService> requestedServices = servicesDefinitions.byService(foundService.getUuid());
                     if (requestedServices == null) continue;
                     Log.i(TAG, "Found " + requestedServices.size() + " Services for UUID:" + foundService.getUuid().toString());
+
                     for (BLEServiceManager.BLEService requestedService : requestedServices) {
                         if (requestedService.registered) continue;
 
@@ -123,8 +127,9 @@ public class RadmesserDevice {
     }
 
     public void disconnectDevice() {
-        if (gattConnection != null)
+        if (gattConnection != null) {
             gattConnection.disconnect();
+        }
 
         setConnectionState(ConnectionStatus.GATT_DISCONNECTED);
     }

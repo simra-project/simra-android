@@ -12,9 +12,13 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import java.util.ArrayList;
+import java.util.List;
+
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
@@ -374,14 +378,14 @@ public class RadmesserService extends Service {
                         break;
                     case ACTION_VALUE_RECEIVED_CLOSEPASS:
                         callbacks.onClosePassIncedent(
-                                parseMesuarementLine(
+                                parseMeasurementLine(
                                         intent.getStringExtra(EXTRA_VALUE)
                                 )
                         );
                         break;
                     case ACTION_VALUE_RECEIVED_DISTANCE:
                         callbacks.onDistanceValue(
-                                parseMesuarementLine(
+                                parseMeasurementLine(
                                         intent.getStringExtra(EXTRA_VALUE)
                                 )
                         );
@@ -393,7 +397,7 @@ public class RadmesserService extends Service {
         return rec;
     }
 
-    private static Measurement parseMesuarementLine(String line) {
+    private static Measurement parseMeasurementLine(String line) {
         if (line.equals(""))
             return null;
 
@@ -401,38 +405,30 @@ public class RadmesserService extends Service {
             String[] sections = line.split(";");
 
             long timestamp = Long.parseLong(sections[0]);
-
-            ArrayList<Integer> left = parseValues(sections[1].split(","));
-            ArrayList<Integer> right;
-            if (sections.length > 2)
-                right = parseValues(sections[1].split(","));
-            else
-                right = new ArrayList<>();
+            List<Integer> left = parseValues(sections[1].split(","));
+            List<Integer> right = parseValues(sections[2].split(","));
 
             return new Measurement(timestamp, left, right);
-
-        } catch (ArrayIndexOutOfBoundsException iex) {
-            return null;
-        } catch (NumberFormatException fex) {
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException iex) {
             return null;
         }
     }
 
-    private static ArrayList<Integer> parseValues(String[] values) {
-        ArrayList<Integer> vaalueList = new ArrayList<>();
+    private static List<Integer> parseValues(String[] values) {
+        List<Integer> valueList = new ArrayList<>();
 
         for (String value : values) {
-            vaalueList.add((int) Float.parseFloat(value));
+            valueList.add((int) Float.parseFloat(value));
         }
-        return vaalueList;
+        return valueList;
     }
 
     public static class Measurement {
         public long timestamp;
-        public ArrayList<Integer> leftSensorValues;
-        public ArrayList<Integer> rightSensorValues;
+        public List<Integer> leftSensorValues;
+        public List<Integer> rightSensorValues;
 
-        public Measurement(long timestamp, ArrayList<Integer> leftSensorValues, ArrayList<Integer> rightSensorValues) {
+        public Measurement(long timestamp, List<Integer> leftSensorValues, List<Integer> rightSensorValues) {
             this.timestamp = timestamp;
             this.leftSensorValues = leftSensorValues;
             this.rightSensorValues = rightSensorValues;
