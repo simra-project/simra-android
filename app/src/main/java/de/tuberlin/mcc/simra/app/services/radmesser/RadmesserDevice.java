@@ -21,14 +21,15 @@ public class RadmesserDevice {
     public static final String UUID_SERVICE_HEARTRATE = "0000180D-0000-1000-8000-00805F9B34FB";
     public static final String UUID_SERVICE_CHARACTERISTIC_HEARTRATE = "00002a37-0000-1000-8000-00805f9b34fb";
     public static final String UUID_SERVICE_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000000";
-    public static final String UUID_SERVICE_CHARACTERISTIC_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000001";
+    public static final String UUID_SERVICE_CHARACTERISTIC_CLOSEPASS_DISTANCE = "1FE7FAF9-CE63-4236-0003-000000000001";
+    public static final String UUID_SERVICE_CHARACTERISTIC_CLOSEPASS_EVENT = "1FE7FAF9-CE63-4236-0003-000000000002";
     public static final String UUID_SERVICE_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000000";
     public static final String UUID_SERVICE_CHARACTERISTIC_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000001";
     public static final String UUID_SERVICE_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000000";
     public static final String UUID_SERVICE_CHARACTERISTIC_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000001";
 
     private final String TAG = "RadmesserDevice";
-    public boolean devicePaired = true;        //needen From the outside, workaround to prevent pairing required
+    public boolean devicePaired = true;        //needen From the outside
     private final BluetoothDevice bleDevice;
     private final ConnectionStateCallbacks callbacks;
     private BLEServiceManager servicesDefinitions;
