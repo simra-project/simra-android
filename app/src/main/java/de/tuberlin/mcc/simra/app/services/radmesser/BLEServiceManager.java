@@ -11,72 +11,75 @@ import java.util.Set;
 import java.util.UUID;
 
 public class BLEServiceManager {
-    // TODO: Why is this a set? Why should one UUID map to a set of services?
-    // TODO: Each service is only detectable through its unique Id (-> UUID ;-) ) so there should never be more than one service for a given UUID
-    // TODO: Refactor!
-    private Map<UUID, Set<BLEService>> byService        = new HashMap<>();
-    private Map<UUID, BLEService>      byCharacteristic = new HashMap<>();
+    private Map<UUID, BLEService> serviceMap                     = new HashMap<>();
+    private Map<UUID, BLEService> characteristicUuidToServiceMap = new HashMap<>();
 
     public BLEServiceManager(BLEService... services) {
         for (BLEService service : services) {
-            for (UUID characteristicUUID : service.characteristicUUIDs) {
-                byCharacteristic.put(characteristicUUID, service);
-            }
+            serviceMap.put(service.uuid, service);
 
-            // TODO: This will *always* occur because for a given UUID, there will never be a service with the same UUID already in the list.
-            if (byService.get(service.serviceUUID) == null) {
-                byService.put(service.serviceUUID, new HashSet<>());
+            for (BLEServiceCharacteristic characteristic : service.characteristics) {
+                characteristicUuidToServiceMap.put(characteristic.uuid, service);
             }
-
-            byService.get(service.serviceUUID).add(service);
         }
     }
 
     public Set<UUID> getAllUUIDs() {
         Set<UUID> allUUIDs = new HashSet<>();
-        for (UUID id : byService.keySet()) {
+        for (UUID id : serviceMap.keySet()) {
             allUUIDs.add(id);
         }
         return allUUIDs;
 
     }
 
-    public Set<BLEService> byService(UUID uuid) {
-        return byService.get(uuid);
+    public BLEService getServiceByUUID(UUID uuid) {
+        return serviceMap.get(uuid);
     }
 
-    public BLEService byCharacteristic(UUID uuid) {
-        return byCharacteristic.get(uuid);
-    }
-
-    public static BLEService createService(ValueCallback callback, String serviceUUIDString, String... characteristicUUIDStrings) {
-        UUID serviceUUID = UUID.fromString(serviceUUIDString);
-
-        List<UUID> characteristicUUIDs = new ArrayList<>();
-        for (String s : characteristicUUIDStrings) {
-            characteristicUUIDs.add(UUID.fromString(s));
-        }
-
-        return new BLEService(serviceUUID, characteristicUUIDs) {
-            @Override
-            public void onValue(BluetoothGattCharacteristic characteristic) {
-                callback.onValue(characteristic);
-            }
-        };
+    public BLEService getServiceByCharacteristicUUID(UUID uuid) {
+        return characteristicUuidToServiceMap.get(uuid);
     }
 
     public interface ValueCallback {
         void onValue(BluetoothGattCharacteristic characteristic);
     }
 
-    public static abstract class BLEService {
-        public final UUID serviceUUID;
-        public final List<UUID> characteristicUUIDs;
+    public static class BLEService {
+        public final UUID uuid;
+        public final List<BLEServiceCharacteristic> characteristics;
         public boolean registered;
 
-        public BLEService(UUID serviceUUID, List<UUID> characteristicUUIDs) {
-            this.serviceUUID = serviceUUID;
-            this.characteristicUUIDs = characteristicUUIDs;
+        public BLEService(String uuidString) {
+            this.uuid = UUID.fromString(uuidString);
+            this.characteristics = new ArrayList<>();
+        }
+
+        public BLEService addCharacteristic(String uuidString, ValueCallback callback) {
+            this.characteristics.add(new BLEServiceCharacteristic(uuidString) {
+                @Override
+                public void onValue(BluetoothGattCharacteristic characteristic1) {
+                    callback.onValue(characteristic1);
+                }
+            });
+
+            return this;
+        }
+
+        public void onValue(BluetoothGattCharacteristic gattCharacteristic) {
+            for (BLEServiceCharacteristic characteristic : characteristics) {
+                if (characteristic.uuid.equals(gattCharacteristic.getUuid())) {
+                    characteristic.onValue(gattCharacteristic);
+                }
+            }
+        }
+    }
+
+    public static abstract class BLEServiceCharacteristic {
+        public final UUID uuid;
+
+        public BLEServiceCharacteristic(String uuidString) {
+            this.uuid = UUID.fromString(uuidString);
         }
 
         public abstract void onValue(BluetoothGattCharacteristic characteristic);

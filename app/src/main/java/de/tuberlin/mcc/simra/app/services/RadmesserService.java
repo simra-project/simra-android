@@ -12,8 +12,10 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +25,7 @@ import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 
+import static de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager.BLEService;
 
 public class RadmesserService extends Service {
     private static final String TAG = "RadmesserService";
@@ -149,32 +152,27 @@ public class RadmesserService extends Service {
 
 
     private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
-            BLEServiceManager.createService(
-                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1))),
-                    RadmesserDevice.UUID_SERVICE_HEARTRATE,
-                    RadmesserDevice.UUID_SERVICE_HEARTRATE_CHAR
+            new BLEService(RadmesserDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
+                    RadmesserDevice.UUID_SERVICE_HEARTRATE_CHAR,
+                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
             ),
 
-            BLEServiceManager.createService(
-                    val -> boradcasClosePassDistance(val.getStringValue(0)),
-                    RadmesserDevice.UUID_SERVICE_CLOSEPASS,
-                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE
+            new BLEService(RadmesserDevice.UUID_SERVICE_CLOSEPASS).addCharacteristic(
+                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE,
+                    val -> broadcastClosePassDistance(val.getStringValue(0))
+            ).addCharacteristic(
+                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_EVENT,
+                    val -> broadcastClosePassEvent(val.getStringValue(0))
             ),
 
-            BLEServiceManager.createService(
-                    val -> boradcasClosePassDistance(val.getStringValue(0)),
-                    RadmesserDevice.UUID_SERVICE_CLOSEPASS,
-                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_EVENT
-            ),
-
-            BLEServiceManager.createService(
-                    val -> boradcastDistanceValue(val.getStringValue(0)),
-                    RadmesserDevice.UUID_SERVICE_DISTANCE,
-                    RadmesserDevice.UUID_SERVICE_DISTANCE_CHAR_50MS
+            new BLEService(RadmesserDevice.UUID_SERVICE_DISTANCE).addCharacteristic(
+                    RadmesserDevice.UUID_SERVICE_DISTANCE_CHAR_50MS,
+                    val -> broadcastDistanceValue(val.getStringValue(0))
             ),
 
             //legacy Service from Radmesser
-            BLEServiceManager.createService(
+            new BLEService(RadmesserDevice.UUID_SERVICE_CONNECTION).addCharacteristic(
+                    RadmesserDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED,
                     val -> {
                         Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
                         String strVal = val.getStringValue(0);
@@ -183,9 +181,7 @@ public class RadmesserService extends Service {
                             setConnectionState(ConnectionState.CONNECTED);
                             setPairedRadmesserID(connectedDevice.getID(), this);
                         }
-                    },
-                    RadmesserDevice.UUID_SERVICE_CONNECTION,
-                    RadmesserDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED
+                    }
             )
     );
 
@@ -330,19 +326,19 @@ public class RadmesserService extends Service {
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void boradcasClosePassDistance(String value) {
+    private void broadcastClosePassDistance(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);
         intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void boradcasClosePassEvent(String value) {
+    private void broadcastClosePassEvent(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
         intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void boradcastDistanceValue(String value) {
+    private void broadcastDistanceValue(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_DISTANCE);
         intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);

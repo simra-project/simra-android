@@ -10,8 +10,10 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
 
-import java.util.Set;
 import java.util.UUID;
+
+import static de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager.BLEService;
+import static de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager.BLEServiceCharacteristic;
 
 public class RadmesserDevice {
     /**
@@ -72,46 +74,44 @@ public class RadmesserDevice {
                 super.onServicesDiscovered(gatt, status);
 
                 for (BluetoothGattService foundService : gatt.getServices()) {
-                    Set<BLEServiceManager.BLEService> requestedServices = servicesDefinitions.byService(foundService.getUuid());
-                    if (requestedServices == null) continue;
-                    Log.i(TAG, "Found " + requestedServices.size() + " Services for UUID:" + foundService.getUuid().toString());
+                    BLEService service = servicesDefinitions.getServiceByUUID(foundService.getUuid());
+                    if (service == null) continue;
+                    Log.i(TAG, "Found 1 Service for UUID:" + foundService.getUuid().toString());
 
-                    for (BLEServiceManager.BLEService requestedService : requestedServices) {
-                        if (requestedService.registered) continue;
+                    if (service.registered) continue;
 
-                        // found new Service on device, which is to be registered
-                        int nRegisteredCharacteristics = 0;
-                        for (UUID characteristicUUID : requestedService.characteristicUUIDs) {
-                            BluetoothGattCharacteristic characteristic = gatt
-                                    .getService(requestedService.serviceUUID)
-                                    .getCharacteristic(characteristicUUID);
-                            if (characteristic == null) {
-                                Log.i(TAG, "Error connecting to Characteristic: " + requestedService.characteristicUUIDs);
-                                continue;
-                            }
-
-                            BluetoothGattDescriptor desc = new BluetoothGattDescriptor(UUID.randomUUID(), BluetoothGattDescriptor.PERMISSION_READ); // create generic descriptor
-                            desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                            gatt.writeDescriptor(desc);
-
-                            gatt.setCharacteristicNotification(characteristic, true);
-                            gatt.readCharacteristic(characteristic);
-                            nRegisteredCharacteristics++;
+                    // found new Service on device, which is to be registered
+                    int nRegisteredCharacteristics = 0;
+                    for (BLEServiceCharacteristic characteristic : service.characteristics) {
+                        BluetoothGattCharacteristic gattCharacteristic = gatt
+                                .getService(service.uuid)
+                                .getCharacteristic(characteristic.uuid);
+                        if (gattCharacteristic == null) {
+                            Log.i(TAG, "Error connecting to Characteristic: " + characteristic.uuid);
+                            continue;
                         }
 
-                        requestedService.registered = (nRegisteredCharacteristics == requestedService.characteristicUUIDs.size());
+                        BluetoothGattDescriptor desc = new BluetoothGattDescriptor(UUID.randomUUID(), BluetoothGattDescriptor.PERMISSION_READ); // create generic descriptor
+                        desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                        gatt.writeDescriptor(desc);
+
+                        gatt.setCharacteristicNotification(gattCharacteristic, true);
+                        gatt.readCharacteristic(gattCharacteristic);
+                        nRegisteredCharacteristics++;
                     }
+
+                    service.registered = (nRegisteredCharacteristics == service.characteristics.size());
                 }
             }
 
             @Override
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                servicesDefinitions.byCharacteristic(characteristic.getUuid()).onValue(characteristic);
+                servicesDefinitions.getServiceByCharacteristicUUID(characteristic.getUuid()).onValue(characteristic);
             }
 
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-                servicesDefinitions.byCharacteristic(characteristic.getUuid()).onValue(characteristic);
+                servicesDefinitions.getServiceByCharacteristicUUID(characteristic.getUuid()).onValue(characteristic);
             }
         });
     }
