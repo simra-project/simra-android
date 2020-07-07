@@ -498,6 +498,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mMapView.onResume(); // needed for compass and icons
         mLocationOverlay.onResume();
         mLocationOverlay.enableMyLocation();
+        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
+
     }
 
     public void onPause() {
