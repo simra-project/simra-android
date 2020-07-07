@@ -77,7 +77,7 @@ public class RadmesserDevice {
                 for (BluetoothGattService foundService : gatt.getServices()) {
                     BLEService service = servicesDefinitions.getServiceByUUID(foundService.getUuid());
                     if (service == null) continue;
-                    Log.i(TAG, "Found 1 Service for UUID:" + foundService.getUuid().toString());
+                    Log.i(TAG, "subscribing to Service:" + foundService.getUuid().toString());
 
                     if (service.registered) continue;
 
@@ -88,7 +88,7 @@ public class RadmesserDevice {
                                 .getService(service.uuid)
                                 .getCharacteristic(characteristic.uuid);
                         if (gattCharacteristic == null) {
-                            Log.i(TAG, "Error connecting to Characteristic: " + characteristic.uuid);
+                            Log.e(TAG, "Error connecting to Characteristic: " + characteristic.uuid);
                             continue;
                         }
 
@@ -154,11 +154,11 @@ public class RadmesserDevice {
     }
     private void logCharacteristics(BluetoothGatt gatt) {
         for (BluetoothGattService service : gatt.getServices()) {
-            StringBuilder b = new StringBuilder().append(service.getUuid());
+            StringBuilder b = new StringBuilder("Found LE-Service: ").append(service.getUuid());
             for(BluetoothGattCharacteristic characteristic: service.getCharacteristics()){
                 b.append( "\t #").append(characteristic.getUuid());
             }
-            Log.i("Found LE-Service",  b.toString());
+            Log.i(TAG,  b.toString());
         }
 
     }
