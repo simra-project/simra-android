@@ -441,6 +441,7 @@ public class RadmesserService extends Service {
         List<Integer> valueList = new ArrayList<>();
 
         for (String value : values) {
+            if (value.equals("")) continue;
             valueList.add((int) Float.parseFloat(value));
         }
         return valueList;
