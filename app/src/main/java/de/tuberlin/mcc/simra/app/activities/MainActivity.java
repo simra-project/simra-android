@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.activities;
 
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -89,6 +90,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     // Log tag
     private static final String TAG = "MainActivity_LOG";
+    private final static int REQUEST_ENABLE_BT=1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
@@ -152,14 +154,41 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
         alert.setTitle(R.string.not_connected_warnung_title);
         alert.setMessage(R.string.not_connected_warnung_message);
-        alert.setPositiveButton(R.string.okay_button, (dialog, whichButton) -> {
+        alert.setPositiveButton(R.string.yes, (dialog, whichButton) -> {
             startRecording();
         });
         alert.setNegativeButton(R.string.cancel_button, (dialog, whichButton) -> {
             startActivity(new Intent(this, RadmesserActivity.class));
         });
-
         alert.show();
+    }
+
+    private void showBluetoothNotEnableWarning(){
+        android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
+        alert.setTitle(R.string.bluetooth_not_enable_title);
+        alert.setMessage(R.string.bluetooth_not_enable_message);
+        alert.setPositiveButton(R.string.yes, (dialog, whichButton) -> {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        });
+        alert.setNegativeButton(R.string.no, (dialog, whichButton) -> {
+            deactivateRadmesser();
+        });
+        alert.show();
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode == RESULT_OK) {
+                // Bluetooth was enabled
+                startRadmesserService();
+            } else if (resultCode == RESULT_CANCELED) {
+                // Bluetooth was not enabled
+                deactivateRadmesser();
+            }
+        }
     }
 
 
@@ -360,13 +389,37 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Radmesser
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
+        updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
+        if(radmesserEnabled){
+            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (mBluetoothAdapter == null) {
+                // Device does not support Bluetooth
+                deactivateRadmesser();
+                Toast.makeText(MainActivity.this, "Your device does not support bluetooth, radmesser feature cannot be activated", Toast.LENGTH_LONG).show();
+            } else if (!mBluetoothAdapter.isEnabled() && radmesserEnabled) {
+                // Bluetooth is not enabled :)
+                showBluetoothNotEnableWarning();
+            } else {
+                // Bluetooth is enabled
+                startRadmesserService();
+            }
+        }
+
+        Log.d(TAG, "OnCreate finished");
+    }
+
+    private void deactivateRadmesser(){
+        radmesserEnabled = false;
+        updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
+        SharedPref.Settings.Radmesser.setEnabled(false, this);
+    }
+
+    private void startRadmesserService(){
         RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
         if(radmesserEnabled && currentState.equals(RadmesserService.ConnectionState.DISCONNECTED)){
             RadmesserService.startScanning(this);
         }
-        updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
         registerRadmesserService();
-        Log.d(TAG, "OnCreate finished");
     }
 
 
