@@ -446,9 +446,8 @@ public class RadmesserService extends Service {
 
         private Measurement(String line) throws MeasurementFormatException {
             try {
-                if (line.equals(""))
+                if (line.equals(""))    //explicit end of a closepass event
                     throw new MeasurementFormatException();
-
 
                 String[] sections = line.split(";", -1);
 
