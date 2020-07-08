@@ -189,8 +189,11 @@
     <string name="radmesserHandlebarWidthText">Distance of the outer point of the Handlebar to the frame</string>
     <string name="not_connected_warnung_title">Warning : Radmesser is not connected</string>
     <string name="not_connected_warnung_message">Do you still want to record the ride ?</string>
-    <string name="okay_button">Yes</string>
     <string name="cancel_button">No, connect with the Radmesser</string>
+    <string name="bluetooth_not_enable_title">Warning: Bluetooth is off</string>
+    <string name="bluetooth_not_enable_message">Do you want to enable Bluetooth ? Otherwise the radmesser feature cannot be activated</string>
+
+
 
 
     <!-- Units -->

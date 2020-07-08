@@ -38,6 +38,8 @@ public class SettingsActivity extends BaseActivity {
     Slider distanceSlider;
     TextView distanceSliderTextLeft;
     TextView distanceSliderTextRight;
+    Button radmesserButton;
+    Switch radmesserConnectionSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,8 +137,8 @@ public class SettingsActivity extends BaseActivity {
 
         // Switch: Radmesser device enabled
         boolean radmesserActivated = SharedPref.Settings.Radmesser.isEnabled(this);
-        Switch radmesserConnectionSwitch = findViewById(R.id.radmesserSwitch);
-        Button radmesserButton = findViewById(R.id.radmesserButton);
+        radmesserConnectionSwitch = findViewById(R.id.radmesserSwitch);
+        radmesserButton = findViewById(R.id.radmesserButton);
         radmesserButton.setVisibility(radmesserActivated ? View.VISIBLE : View.GONE);
         radmesserButton.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
 
@@ -200,8 +202,9 @@ public class SettingsActivity extends BaseActivity {
             startRadmesserService();
             showTutorialDialog();
         } else {
-            // Try to start again?
-            enableBluetooth();
+            SharedPref.Settings.Radmesser.setEnabled(false, this);
+            radmesserConnectionSwitch.setChecked(false);
+            radmesserButton.setVisibility(View.GONE);
         }
     }
 
