@@ -187,6 +187,10 @@
     <string name="radmesserTakePictureDuringRideIntervalText">Interval how often a picture will be taken</string>
     <string name="radmesserAdvancedSettings">Advanced Settings</string>
     <string name="radmesserHandlebarWidthText">Distance of the outer point of the Handlebar to the frame</string>
+    <string name="not_connected_warnung_title">Warning : Radmesser is not connected</string>
+    <string name="not_connected_warnung_message">Do you still want to record the ride ?</string>
+    <string name="okay_button">Yes</string>
+    <string name="cancel_button">No, connect with the Radmesser</string>
 
 
     <!-- Units -->

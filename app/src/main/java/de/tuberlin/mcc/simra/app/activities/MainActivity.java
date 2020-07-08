@@ -150,10 +150,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void showRadmesserNotConnectedWarning(){
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
-        alert.setTitle("Warnung: Radmesser nicht verbunden");
-        alert.setMessage("\nUm das Radmesser zu verbinden, clicken Sie auf dem Bluetooth button");
-        alert.setPositiveButton("Ok", (dialog, whichButton) -> {
+        alert.setTitle(R.string.not_connected_warnung_title);
+        alert.setMessage(R.string.not_connected_warnung_message);
+        alert.setPositiveButton(R.string.okay_button, (dialog, whichButton) -> {
+            startRecording();
         });
+        alert.setNegativeButton(R.string.cancel_button, (dialog, whichButton) -> {
+            startActivity(new Intent(this, RadmesserActivity.class));
+        });
+
         alert.show();
     }
 
@@ -297,38 +302,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     boolean reconected = RadmesserService.tryConnectPairedDevice(this);
                     if(!reconected){
                         showRadmesserNotConnectedWarning();
+                        return;
                     }
                 }
             }
-
-            if (!PermissionHelper.hasBasePermissions(this)) {
-                PermissionHelper.requestFirstBasePermissionsNotGranted(MainActivity.this);
-                Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
-            } else {
-                if (isLocationServiceOff(MainActivity.this)) {
-                    // notify user
-                    new AlertDialog.Builder(MainActivity.this)
-                            .setMessage(R.string.locationServiceisOff)
-                            .setPositiveButton(android.R.string.ok, (paramDialogInterface, paramInt) -> MainActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
-                            .setNegativeButton(R.string.cancel, null)
-                            .show();
-                    Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
-
-                } else {
-                    // show stop button, hide start button
-                    showStop();
-                    stopBtn.setVisibility(View.VISIBLE);
-                    startBtn.setVisibility(View.INVISIBLE);
-
-                    // start RecorderService for accelerometer data recording
-                    Intent intent = new Intent(MainActivity.this, RecorderService.class);
-                    startService(intent);
-                    bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
-                    recording = true;
-                    Toast.makeText(MainActivity.this, R.string.recording_started, Toast.LENGTH_LONG).show();
-
-                }
-            }
+            startRecording();
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -337,7 +315,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         stopBtn.setOnClickListener(v -> {
             try {
                 showStart();
-                RadmesserService.terminateService(this);
                 // Stop RecorderService which is recording accelerometer data
                 unbindService(mRecorderServiceConnection);
                 stopService(recService);
@@ -437,10 +414,39 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         receiver = null;
     }
 
+    private void startRecording(){
+        if (!PermissionHelper.hasBasePermissions(this)) {
+            PermissionHelper.requestFirstBasePermissionsNotGranted(MainActivity.this);
+            Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
+        } else {
+            if (isLocationServiceOff(MainActivity.this)) {
+                // notify user
+                new AlertDialog.Builder(MainActivity.this)
+                        .setMessage(R.string.locationServiceisOff)
+                        .setPositiveButton(android.R.string.ok, (paramDialogInterface, paramInt) -> MainActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+                Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
+
+            } else {
+                // show stop button, hide start button
+                showStop();
+                stopBtn.setVisibility(View.VISIBLE);
+                startBtn.setVisibility(View.INVISIBLE);
+
+                // start RecorderService for accelerometer data recording
+                Intent intent = new Intent(MainActivity.this, RecorderService.class);
+                startService(intent);
+                bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
+                recording = true;
+                Toast.makeText(MainActivity.this, R.string.recording_started, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void updateRadmesserButtonStatus(RadmesserService.ConnectionState status) {
-        Log.d(TAG, "updateRadmesserButtonStatus called with status " + status.toString());
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (radmesserEnabled) {
             // einblenden
@@ -562,7 +568,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } catch (Exception se) {
             se.printStackTrace();
         }
-       unregisterRadmesserService();
         Log.d(TAG, "OnStop finished");
     }
 
