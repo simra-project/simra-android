@@ -548,11 +548,11 @@ public class ShowRouteActivity extends BaseActivity {
                         metaDataLine[2] = String.valueOf(tempEndTime);
                         distance = tempLegacyRide.distance;
                         waitedTime = tempLegacyRide.waitedTime;
-                        ArrayList<AccEvent> accEventArrayList = tempLegacyRide.events;
-                        Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
-                        for (int i = 0; i < accEventArrayList.size(); i++) {
+                        List<AccEvent> accEventList = tempLegacyRide.events;
+                        Log.d(TAG, "accEventArrayList.size(): " + accEventList.size());
+                        for (int i = 0; i < accEventList.size(); i++) {
                             Log.d(TAG, "accEvent " + tempLegacyRide.events.get(i).key + ": " + tempLegacyRide.events.get(i).annotated + " scary: " + tempLegacyRide.events.get(i).scary);
-                            if (accEventArrayList.get(i).annotated) {
+                            if (accEventList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
                             if (accEventList.get(i).scary.equals("1")) {
@@ -562,11 +562,11 @@ public class ShowRouteActivity extends BaseActivity {
                     } else {
                         distance = legacyRide.distance;
                         waitedTime = legacyRide.waitedTime;
-                        ArrayList<AccEvent> accEventArrayList = legacyRide.events;
-                        Log.d(TAG, "accEventArrayList.size(): " + accEventArrayList.size());
-                        for (int i = 0; i < accEventArrayList.size(); i++) {
+                        List<AccEvent> accEventList = legacyRide.events;
+                        Log.d(TAG, "accEventArrayList.size(): " + accEventList.size());
+                        for (int i = 0; i < accEventList.size(); i++) {
                             Log.d(TAG, "accEvent " + legacyRide.events.get(i).key + ": " + legacyRide.events.get(i).annotated + " scary: " + legacyRide.events.get(i).scary);
-                            if (accEventArrayList.get(i).annotated) {
+                            if (accEventList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
                             if (accEventList.get(i).scary.equals("1")) {
