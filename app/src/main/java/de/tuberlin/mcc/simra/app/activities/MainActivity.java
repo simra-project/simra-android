@@ -71,6 +71,7 @@ import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
@@ -341,7 +342,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         reportIncidentBtn = findViewById(R.id.report_incident);
         reportIncidentBtn.setOnClickListener(v -> {
-            System.out.println("Incident reported");
+            IncidentBroadcaster.broadcastIncident(this);
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
