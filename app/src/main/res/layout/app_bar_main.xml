@@ -82,6 +82,24 @@
         android:text="@string/stopButtonText"
         app:icon="@drawable/stop" />
 
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/report_incident"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/copyright_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="@dimen/activity_vertical_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="128dp"
+        android:gravity="center"
+        android:icon="@drawable/ic_route"
+        android:maxLines="2"
+        android:text="@string/reportIncident"
+        android:visibility="gone"
+        app:icon="@android:drawable/stat_sys_warning" />
+
     <TextView
         android:id="@+id/copyright_text"
         android:layout_width="wrap_content"

@@ -110,6 +110,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private Boolean recording = false;
     private MaterialButton startBtn;
     private MaterialButton stopBtn;
+    private MaterialButton reportIncidentBtn;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Radmesser
     private FloatingActionButton radmesserButton;
@@ -338,6 +339,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             startRecording();
         });
 
+        reportIncidentBtn = findViewById(R.id.report_incident);
+        reportIncidentBtn.setOnClickListener(v -> {
+            System.out.println("Incident reported");
+        });
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (5): AUFZEICHNUNG STOPPEN / STOP-BUTTON
         stopBtn = findViewById(R.id.button_stop);
@@ -429,6 +435,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         startBtn.setVisibility(View.VISIBLE);
         stopBtn.setVisibility(View.INVISIBLE);
+        reportIncidentBtn.setVisibility(View.INVISIBLE);
 
     }
 
@@ -541,7 +548,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void showStop() {
 
         stopBtn.setVisibility(View.VISIBLE);
+        reportIncidentBtn.setVisibility(View.VISIBLE);
         startBtn.setVisibility(View.INVISIBLE);
+
 
     }
 
