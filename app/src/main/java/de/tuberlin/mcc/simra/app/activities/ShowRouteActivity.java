@@ -47,6 +47,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -145,7 +146,7 @@ public class ShowRouteActivity extends BaseActivity {
     static BoundingBox getBoundingBox(Polyline pl) {
 
         // {North, East, South, West}
-        ArrayList<GeoPoint> geoPoints = pl.getPoints();
+        List<GeoPoint> geoPoints = pl.getPoints();
 
         double[] border = {geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude(), geoPoints.get(0).getLatitude(), geoPoints.get(0).getLongitude()};
 
@@ -431,7 +432,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
         runOnUiThread(() -> {
             privacySlider.setRange(0, routeSize);
-            ArrayList<OverlayItem> items = new ArrayList<>();
+            List<OverlayItem> items = new ArrayList<>();
             Drawable startFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.startblack, null);
             Drawable finishFlag = ShowRouteActivity.this.getResources().getDrawable(R.drawable.racingflagblack, null);
             GeoPoint startFlagPoint;
@@ -554,7 +555,7 @@ public class ShowRouteActivity extends BaseActivity {
                             if (accEventArrayList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
-                            if (accEventArrayList.get(i).scary.equals("1")) {
+                            if (accEventList.get(i).scary.equals("1")) {
                                 numberOfScary++;
                             }
                         }
@@ -568,7 +569,7 @@ public class ShowRouteActivity extends BaseActivity {
                             if (accEventArrayList.get(i).annotated) {
                                 numberOfIncidents++;
                             }
-                            if (accEventArrayList.get(i).scary.equals("1")) {
+                            if (accEventList.get(i).scary.equals("1")) {
                                 numberOfScary++;
                             }
                         }

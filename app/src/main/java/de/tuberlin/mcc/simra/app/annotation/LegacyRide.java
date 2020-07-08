@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -25,7 +26,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 public class LegacyRide {
 
     static String TAG = "Ride_LOG";
-    public ArrayList<AccEvent> events;
+    public List<AccEvent> events;
     public long distance;
     public int bike;
     public int child;
@@ -178,8 +179,8 @@ public class LegacyRide {
         return new Object[]{waitedTime, polyLine, distance};
     }
 
-    public static ArrayList<AccEvent> findAccEvents(File accGpsFile) {
-        ArrayList<AccEvent> accEvents = new ArrayList<>(6);
+    public static List<AccEvent> findAccEvents(File accGpsFile) {
+        List<AccEvent> accEvents = new ArrayList<>(6);
 
         BufferedReader br = null;
         String thisLine = null;
@@ -196,8 +197,8 @@ public class LegacyRide {
 
         String[] partOfRide;
         // Each String[] in ride is a part of the ride which is ca. 3 seconds long.
-        ArrayList<String[]> ride = new ArrayList<>();
-        ArrayList<String[]> events = new ArrayList<>(6);
+        List<String[]> ride = new ArrayList<>();
+        List<String[]> events = new ArrayList<>(6);
         accEvents.add(new AccEvent(0, 999.0, 999.0, 0, false, "0", "0"));
         accEvents.add(new AccEvent(1, 999.0, 999.0, 0, false, "0", "0"));
         accEvents.add(new AccEvent(2, 999.0, 999.0, 0, false, "0", "0"));
@@ -364,7 +365,7 @@ public class LegacyRide {
         return Integer.parseInt(key);
     }
 
-    public ArrayList<AccEvent> getEvents() {
+    public List<AccEvent> getEvents() {
         return events;
     }
 

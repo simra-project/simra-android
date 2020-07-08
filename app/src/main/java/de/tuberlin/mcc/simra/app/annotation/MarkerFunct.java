@@ -265,7 +265,7 @@ public class MarkerFunct {
     // Generate a new GeoPoint from address String via Geocoding
 
     public String getAddressFromLocation(GeoPoint incidentLoc) {
-        List<Address> address = new ArrayList<>();
+        List<Address> address;
         String addressForLocation = "";
         try {
             // This is the actual geocoding

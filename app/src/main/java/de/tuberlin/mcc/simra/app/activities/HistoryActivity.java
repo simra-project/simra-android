@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -176,8 +177,7 @@ public class HistoryActivity extends BaseActivity {
     }
 
     private void refreshMyRides() {
-        ArrayList<String[]> metaDataLines = new ArrayList<>();
-
+        List<String[]> metaDataLines = new ArrayList<>();
 
         File metaDataFile = IOUtils.Files.getMetaDataFile(this);
         if (metaDataFile.exists()) {
@@ -207,7 +207,7 @@ public class HistoryActivity extends BaseActivity {
             }
 
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
-            ArrayList<String> stringArrayList = new ArrayList<>(Arrays.asList(ridesArr));
+            List<String> stringArrayList = new ArrayList<>(Arrays.asList(ridesArr));
             MyArrayAdapter myAdapter = new MyArrayAdapter(this, R.layout.row_icons, stringArrayList, metaDataLines);
             listView.setAdapter(myAdapter);
 
@@ -378,17 +378,16 @@ public class HistoryActivity extends BaseActivity {
         String TAG = "MyArrayAdapter_LOG";
 
         Context context;
-        int layoutResourceId;
-        ArrayList<String> stringArrayList = new ArrayList<>();
-        ArrayList<String[]> metaDataLines = new ArrayList<>();
+        int            layoutResourceId;
+        List<String>   stringList;
+        List<String[]> metaDataLines;
 
-        public MyArrayAdapter(Context context, int layoutResourceId,
-                              ArrayList<String> stringArrayList, ArrayList<String[]> metaDataLines) {
+        public MyArrayAdapter(Context context, int layoutResourceId, List<String> stringList, List<String[]> metaDataLines) {
 
-            super(context, layoutResourceId, stringArrayList);
+            super(context, layoutResourceId, stringList);
             this.layoutResourceId = layoutResourceId;
             this.context = context;
-            this.stringArrayList = stringArrayList;
+            this.stringList = stringList;
             this.metaDataLines = metaDataLines;
         }
 
@@ -412,7 +411,7 @@ public class HistoryActivity extends BaseActivity {
             } else {
                 holder = (Holder) row.getTag();
             }
-            String[] itemComponents = stringArrayList.get(position).split(";");
+            String[] itemComponents = stringList.get(position).split(";");
             holder.rideDate.setText(itemComponents[1].split(",")[0]);
             holder.rideTime.setText(itemComponents[1].split(",")[1]);
             // holder.message.setText(itemComponents[2]);

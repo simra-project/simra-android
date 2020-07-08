@@ -12,13 +12,20 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
+
+import static de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager.BLEService;
 
 public class RadmesserService extends Service {
     private static final String TAG = "RadmesserService";
@@ -28,9 +35,11 @@ public class RadmesserService extends Service {
     private volatile HandlerThread mHandlerThread;
     private BLEScanner bluetoothScanner;
     private LocalBroadcastManager broadcastManager;
+
     public static ConnectionState getConnectionState() {
         return connectionState;
     }
+
     private static ConnectionState connectionState = ConnectionState.DISCONNECTED;
 
 
@@ -123,7 +132,7 @@ public class RadmesserService extends Service {
     };
 
     private RadmesserDevice.ConnectionStateCallbacks radmesserConnectionCallbacks = (RadmesserDevice.ConnectionStatus newState, RadmesserDevice instance) -> {
-        if (instance != connectedDevice) return;    // only interested in current device
+        if (instance != connectedDevice) return;    // only interested in currently connected device
 
         switch (newState) {
             case GATT_CONNECTED:
@@ -143,32 +152,32 @@ public class RadmesserService extends Service {
 
 
     private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
-            BLEServiceManager.createService(
-                    RadmesserDevice.UUID_SERVICE_HEARTRATE,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_HEARTRATE,
+            new BLEService(RadmesserDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
+                    RadmesserDevice.UUID_SERVICE_HEARTRATE_CHAR,
                     val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
             ),
 
-            BLEServiceManager.createService(
-                    RadmesserDevice.UUID_SERVICE_CLOSEPASS,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CLOSEPASS,
-                    val -> boradcasClosePassIncedent(val.getStringValue(0))
+            new BLEService(RadmesserDevice.UUID_SERVICE_CLOSEPASS).addCharacteristic(
+                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE,
+                    val -> broadcastClosePassDistance(val.getStringValue(0))
+            ).addCharacteristic(
+                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_EVENT,
+                    val -> broadcastClosePassEvent(val.getStringValue(0))
             ),
 
-            BLEServiceManager.createService(
-                    RadmesserDevice.UUID_SERVICE_DISTANCE,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_DISTANCE,
-                    val -> boradcastDistanceValue(val.getStringValue(0))
+            new BLEService(RadmesserDevice.UUID_SERVICE_DISTANCE).addCharacteristic(
+                    RadmesserDevice.UUID_SERVICE_DISTANCE_CHAR_50MS,
+                    val -> broadcastDistanceValue(val.getStringValue(0))
             ),
 
-            BLEServiceManager.createService(
-                    RadmesserDevice.UUID_SERVICE_CONNECTION,
-                    RadmesserDevice.UUID_SERVICE_CHARACTERISTIC_CONNECTION,
+            //legacy Service from Radmesser
+            new BLEService(RadmesserDevice.UUID_SERVICE_CONNECTION).addCharacteristic(
+                    RadmesserDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED,
                     val -> {
-                        connectedDevice.devicePaired = true;
                         Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
                         String strVal = val.getStringValue(0);
                         if (strVal != null && strVal.equals("1")) {
+                            connectedDevice.devicePaired = true;
                             setConnectionState(ConnectionState.CONNECTED);
                             setPairedRadmesserID(connectedDevice.getID(), this);
                         }
@@ -179,28 +188,51 @@ public class RadmesserService extends Service {
 
     // ## incoming communication
     // Action-Requests
-    final static String ACTION_START_SCANN = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_START_SCANN";
-    final static String ACTION_CONNECT_DEVICE = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_CONNECT_DEVICE";
-    final static String ACTION_DISCONNECT_AND_UNPAIR = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_DISCONNECT_AND_UNPAIR";
-    final static String ACTION_STOP_SERVICE = "de.tuberlin.mcc.simra.app.radmesserservice.ACTION_STOP_SERVICE";
-    final static String EXTRA_CONNECT_DEVICE = "de.tuberlin.mcc.simra.app.radmesserservice.EXTRA_CONNECT_DEVICE";
+    final static String ACTION_PREFIX = "de.tuberlin.mcc.simra.app.radmesserservice.";
+    final static String ACTION_START_SCANN = ACTION_PREFIX + ".ACTION_START_SCANN";
+    final static String ACTION_CONNECT_DEVICE = ACTION_PREFIX + ".ACTION_CONNECT_DEVICE";
+    final static String ACTION_DISCONNECT_AND_UNPAIR = ACTION_PREFIX + ".ACTION_DISCONNECT_AND_UNPAIR";
+    final static String ACTION_STOP_SERVICE = ACTION_PREFIX + ".ACTION_STOP_SERVICE";
+    final static String EXTRA_CONNECT_DEVICE = ACTION_PREFIX + ".EXTRA_CONNECT_DEVICE";
 
     // incoming Action-Requests
+
+    /*
+     * Request Service to scan for Radmesser devices
+     * Scan results can be subscribed with registerCallbacks()
+     * */
     public static void startScanning(Context ctx) {
         Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_START_SCANN);
         ctx.startService(intent);
     }
 
-    public static void connectDevice(Context ctx, String deviceId) {
+    private static String lastConnectionRequest;
+
+    /*
+     * Request Service to connect to a specific device by providing its Hardware Adress
+     *
+     * returns false if already connecting to this device
+     * */
+    public static boolean connectDevice(Context ctx, String deviceId) {
+        if (deviceId.equals(lastConnectionRequest) &&
+                connectionState != ConnectionState.CONNECTION_REFUSED &&
+                connectionState != ConnectionState.DISCONNECTED)
+            return false;
+
+        lastConnectionRequest = deviceId;
+
         Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_CONNECT_DEVICE);
         intent.putExtra(EXTRA_CONNECT_DEVICE, deviceId);
         ctx.startService(intent);
+        return true;
     }
 
     /*
-     * returns false if no Radmesser is Paired
+     * Request Service to connect to a the last paired device
+     *
+     * returns false if there is no device paired yet
      */
     public static boolean tryConnectPairedDevice(Context ctx) {
         String connectedDevice = getPairedRadmesserID(ctx);
@@ -213,6 +245,11 @@ public class RadmesserService extends Service {
         ctx.startService(intent);
         return true;
     }
+    /*
+     * Request Service to connect to a the last paired device
+     *
+     * returns false if there is no device paired yet
+     */
 
     public static void disconnectAndUnpairDevice(Context ctx) {
         Intent intent = new Intent(ctx, RadmesserService.class);
@@ -220,6 +257,10 @@ public class RadmesserService extends Service {
         ctx.startService(intent);
     }
 
+    /*
+     * Request Service to terminate
+     *
+     * */
     public static void terminateService(Context ctx) {
         Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_STOP_SERVICE);
@@ -284,7 +325,8 @@ public class RadmesserService extends Service {
     // Broadcasts
     final static String ACTION_DEVICE_FOUND = "de.tuberlin.mcc.simra.app.radmesserservice.actiondevicefound";
     final static String ACTION_CONNECTION_STATE_CHANGED = "de.tuberlin.mcc.simra.app.radmesserservice.actiondconnectionstatechanged";
-    final static String ACTION_VALUE_RECEIVED_CLOSEPASS = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedclosepass";
+    final static String ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedclosepass.distance";
+    final static String ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedclosepass.event";
     final static String ACTION_VALUE_RECEIVED_DISTANCE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceiveddistance";
 
     final static String EXTRA_DEVICE_ID = "de.tuberlin.mcc.simra.app.radmesserservice.extraid";
@@ -306,13 +348,19 @@ public class RadmesserService extends Service {
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void boradcasClosePassIncedent(String value) {
-        Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS);
+    private void broadcastClosePassDistance(String value) {
+        Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);
         intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void boradcastDistanceValue(String value) {
+    private void broadcastClosePassEvent(String value) {
+        Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
+        intent.putExtra(EXTRA_VALUE, value);
+        broadcastManager.sendBroadcast(intent);
+    }
+
+    private void broadcastDistanceValue(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_DISTANCE);
         intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);
@@ -325,22 +373,28 @@ public class RadmesserService extends Service {
         public void onConnectionStateChanged(ConnectionState newState) {
         }
 
-        public void onClosePassIncedent(String raw) {     //todo: change type to Measurement
+        public void onClosePassIncedentDistance(@Nullable Measurement measurement) {
         }
 
-        public void onDistanceValue(String raw) {         //todo: change type to Measurement
+        public void onClosePassIncedentEvent(@Nullable ClosePassEvent measurement) {
+        }
+
+        public void onDistanceValue(@Nullable Measurement measurement) {
         }
     }
 
     /*
      * the caller ist responible for unregistering thr receiver, when he does not need him anymore
-     * */
+     */
+    //todo: how to handle exceptions due to "wrong formmat" of the received data?
+
     public static BroadcastReceiver registerCallbacks(Context ctx, RadmesserServiceCallbacks callbacks) {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_DEVICE_FOUND);
         filter.addAction(ACTION_CONNECTION_STATE_CHANGED);
-        filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS);
         filter.addAction(ACTION_VALUE_RECEIVED_DISTANCE);
+        filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);
+        filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
 
         BroadcastReceiver rec = new BroadcastReceiver() {
             @Override
@@ -357,14 +411,25 @@ public class RadmesserService extends Service {
                                 ConnectionState.valueOf(intent.getStringExtra(EXTRA_CONNECTION_STATE))
                         );
                         break;
-                    case ACTION_VALUE_RECEIVED_CLOSEPASS:    //todo:  call parseMesuarementLine() and return result
-                        callbacks.onClosePassIncedent(
-                                intent.getStringExtra(EXTRA_VALUE)
+                    case ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE:
+                        callbacks.onClosePassIncedentDistance(
+                                Measurement.fromString(
+                                        intent.getStringExtra(EXTRA_VALUE)
+                                )
                         );
                         break;
-                    case ACTION_VALUE_RECEIVED_DISTANCE:     //todo:  call parseMesuarementLine() and return result
+                    case ACTION_VALUE_RECEIVED_DISTANCE:
                         callbacks.onDistanceValue(
-                                intent.getStringExtra(EXTRA_VALUE)
+                                Measurement.fromString(
+                                        intent.getStringExtra(EXTRA_VALUE)
+                                )
+                        );
+                        break;
+                    case ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT:
+                        callbacks.onClosePassIncedentEvent(
+                                ClosePassEvent.fromString(
+                                        intent.getStringExtra(EXTRA_VALUE)
+                                )
                         );
                         break;
                 }
@@ -374,50 +439,83 @@ public class RadmesserService extends Service {
         return rec;
     }
 
-    private Measurement parseMesuarementLine(String line) {
-        if (line.equals(""))
-            return null;
+    public static class Measurement {
+        public long timestamp;
+        public List<Integer> leftSensorValues;
+        public List<Integer> rightSensorValues;
 
-        try {
-            String[] sections = line.split(";");
+        private Measurement(String line) throws MeasurementFormatException {
+            try {
+                if (line.equals(""))
+                    throw new MeasurementFormatException();
 
-            long timestamp = Long.parseLong(sections[0]);
-            return new Measurement(timestamp, parseValues(sections[1].split(",")), parseValues(sections[2].split(",")));
 
-        } catch (ArrayIndexOutOfBoundsException iex) {
-            return null;
-        } catch (NumberFormatException fex) {
-            return null;
+                String[] sections = line.split(";", -1);
+
+                timestamp = Long.parseLong(sections[0]);
+                leftSensorValues = parseValues(sections[1].split(","));
+                rightSensorValues = parseValues(sections[2].split(","));
+            } catch (ArrayIndexOutOfBoundsException | NumberFormatException | NullPointerException nex) {
+                throw new MeasurementFormatException();
+            }
+        }
+
+        @Override
+        public String toString() {
+            return timestamp + " " + leftSensorValues + " " + rightSensorValues;
+        }
+
+        private static List<Integer> parseValues(String[] values) {
+            List<Integer> valueList = new ArrayList<>();
+
+            for (String value : values) {
+                if (value.equals("")) continue;
+                valueList.add((int) Float.parseFloat(value));
+            }
+            return valueList;
+        }
+
+        public static Measurement fromString(String line) {
+            try {
+                return new Measurement(line);
+            } catch (MeasurementFormatException e) {
+                return null;
+            }
+        }
+
+        private class MeasurementFormatException extends Exception {
         }
     }
 
-    private ArrayList<Integer> parseValues(String[] values) {
-        ArrayList<Integer> vaalueList = new ArrayList<>();
+    public static class ClosePassEvent {
+        //enum EventType {BUTTON, AVG2S}
+        public String eventType;     //todo: consider this to be an enum, but also have in mind,that the format could change in future
+        public long timestamp;
+        public List<String> payload;
 
-        for (String value : values) {
-            vaalueList.add((int) Float.parseFloat(value));
+        private ClosePassEvent(String rawData) {
+            Log.i("ClosePassEvent", rawData);
+
+            String[] sections = rawData.split(";", -1);
+            timestamp = Long.parseLong(sections[0]);
+            eventType = sections[1].toUpperCase();
+            payload = Collections.singletonList(sections[2]);
         }
-        return vaalueList;
-    }
 
-    public class Measurement {
-        long timestamp;
-        ArrayList<Integer> leftSensorValues;
-        ArrayList<Integer> rightSensorValues;
+        public static ClosePassEvent fromString(String line) {
+            return new ClosePassEvent(line);
+        }
 
-        public Measurement(long timestamp, ArrayList<Integer> leftSensorValues, ArrayList<Integer> rightSensorValues) {
-            this.timestamp = timestamp;
-            this.leftSensorValues = leftSensorValues;
-            this.rightSensorValues = rightSensorValues;
+        @Override
+        public String toString() {
+            return timestamp + " " + eventType + " " + payload;
         }
     }
-
 
     public static void unRegisterCallbacks(BroadcastReceiver receiver, Context ctx) {
         if (receiver != null)
             LocalBroadcastManager.getInstance(ctx).unregisterReceiver(receiver);
     }
-
 
     // TODO: Use Utils (or refactor) shared Prefs usage
 
