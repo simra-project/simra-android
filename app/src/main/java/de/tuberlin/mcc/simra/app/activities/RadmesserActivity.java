@@ -107,41 +107,23 @@ public class RadmesserActivity extends AppCompatActivity {
     private void updateUI(RadmesserService.ConnectionState state){
         switch (state) {
             case PAIRING:
-                if(deviceLayout != null){
-                    deviceLayout.setVisibility(View.GONE);
-                }
-                if(connectDevicesLayout != null){
-                    connectDevicesLayout.setVisibility(View.GONE);
-                }
-                if(pairingLayout != null){
-                    pairingLayout.setVisibility(View.VISIBLE);
-                }
+                deviceLayout.setVisibility(View.GONE);
+                connectDevicesLayout.setVisibility(View.GONE);
+                pairingLayout.setVisibility(View.VISIBLE);
                 showTutorialDialog();
                 break;
             case CONNECTED:
-                if(deviceLayout != null){
-                    deviceLayout.setVisibility(View.VISIBLE);
-                }
-                if(connectDevicesLayout != null){
-                    connectDevicesLayout.setVisibility(View.GONE);
-                }
-                if(pairingLayout != null){
-                    pairingLayout.setVisibility(View.GONE);
-                }
+                deviceLayout.setVisibility(View.VISIBLE);
+                connectDevicesLayout.setVisibility(View.GONE);
+                pairingLayout.setVisibility(View.GONE);
                 closeTutorialDialog();
                 break;
             case CONNECTION_REFUSED:
             case DISCONNECTED:
             default:
-                if(deviceLayout != null){
-                    deviceLayout.setVisibility(View.GONE);
-                }
-                if(connectDevicesLayout != null){
-                    connectDevicesLayout.setVisibility(View.VISIBLE);
-                }
-                if(pairingLayout != null){
-                    pairingLayout.setVisibility(View.GONE);
-                }
+                deviceLayout.setVisibility(View.GONE);
+                connectDevicesLayout.setVisibility(View.VISIBLE);
+                pairingLayout.setVisibility(View.GONE);
                 closeTutorialDialog();
                 break;
         }

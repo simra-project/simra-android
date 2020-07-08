@@ -73,6 +73,10 @@
     <string name="later">Später</string>
     <string name="recording_not_started">Fahrtaufzeichnung wurde NICHT gestartet.</string>
     <string name="recording_started">Fahrtaufzeichnung wurde gestartet.</string>
+    <string name="not_connected_warnung_title">Warnung : Radmesser ist nicht verbunden</string>
+    <string name="not_connected_warnung_message">Wollen Sie trotzdem den Fahrt aufzeichnen ?</string>
+    <string name="okay_button">Ja</string>
+    <string name="cancel_button">Nein, mit dem Radmesser verbinden</string>
 
 
     <!--- RecorderService -->
