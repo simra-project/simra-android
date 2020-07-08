@@ -62,6 +62,22 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/pairing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/pairingText"
+                style="@style/TextAppearance.AppCompat.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pairing" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/deviceLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,6 +98,16 @@
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp"
                 android:text="Geräte-Info" />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBarClosePass"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:max="100"
+                android:progress="45"/>
 
              <Button
                 android:id="@+id/btnDisconnect"
