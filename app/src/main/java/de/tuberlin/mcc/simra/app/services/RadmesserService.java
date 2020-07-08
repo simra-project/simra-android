@@ -413,21 +413,21 @@ public class RadmesserService extends Service {
                         break;
                     case ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE:
                         callbacks.onClosePassIncedentDistance(
-                                parseMeasurementLine(
+                                Measurement.fromString(
                                         intent.getStringExtra(EXTRA_VALUE)
                                 )
                         );
                         break;
                     case ACTION_VALUE_RECEIVED_DISTANCE:
                         callbacks.onDistanceValue(
-                                parseMeasurementLine(
+                                Measurement.fromString(
                                         intent.getStringExtra(EXTRA_VALUE)
                                 )
                         );
                         break;
                     case ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT:
                         callbacks.onClosePassIncedentEvent(
-                                new ClosePassEvent(
+                                ClosePassEvent.fromString(
                                         intent.getStringExtra(EXTRA_VALUE)
                                 )
                         );
@@ -439,50 +439,50 @@ public class RadmesserService extends Service {
         return rec;
     }
 
-    // todo: refactor into  Measurement constructor
-    private static Measurement parseMeasurementLine(String line) {
-        if (line.equals(""))
-            return null;
-
-        try {
-            String[] sections = line.split(";", -1);
-
-            long timestamp = Long.parseLong(sections[0]);
-            List<Integer> left = parseValues(sections[1].split(","));
-            List<Integer> right = parseValues(sections[2].split(","));
-
-            return new Measurement(timestamp, left, right);
-        } catch (ArrayIndexOutOfBoundsException | NumberFormatException iex) {
-            return null;
-        }
-    }
-
-    // todo: refactor into  Measurement class
-    private static List<Integer> parseValues(String[] values) {
-        List<Integer> valueList = new ArrayList<>();
-
-        for (String value : values) {
-            if (value.equals("")) continue;
-            valueList.add((int) Float.parseFloat(value));
-        }
-        return valueList;
-    }
-
-
     public static class Measurement {
         public long timestamp;
         public List<Integer> leftSensorValues;
         public List<Integer> rightSensorValues;
 
-        public Measurement(long timestamp, List<Integer> leftSensorValues, List<Integer> rightSensorValues) {
-            this.timestamp = timestamp;
-            this.leftSensorValues = leftSensorValues;
-            this.rightSensorValues = rightSensorValues;
+        private Measurement(String line) throws MeasurementFormatException {
+            if (line.equals(""))
+                throw new MeasurementFormatException();
+
+            try {
+                String[] sections = line.split(";", -1);
+
+                timestamp = Long.parseLong(sections[0]);
+                leftSensorValues = parseValues(sections[1].split(","));
+                rightSensorValues = parseValues(sections[2].split(","));
+            } catch (ArrayIndexOutOfBoundsException | NumberFormatException iex) {
+                throw new MeasurementFormatException();
+            }
         }
 
         @Override
         public String toString() {
             return timestamp + " " + leftSensorValues + " " + rightSensorValues;
+        }
+
+        private static List<Integer> parseValues(String[] values) {
+            List<Integer> valueList = new ArrayList<>();
+
+            for (String value : values) {
+                if (value.equals("")) continue;
+                valueList.add((int) Float.parseFloat(value));
+            }
+            return valueList;
+        }
+
+        public static Measurement fromString(String line) {
+            try {
+                return new Measurement(line);
+            } catch (MeasurementFormatException e) {
+                return null;
+            }
+        }
+
+        private class MeasurementFormatException extends Exception {
         }
     }
 
@@ -492,13 +492,16 @@ public class RadmesserService extends Service {
         public long timestamp;
         public List<String> payload;
 
-        public ClosePassEvent(String rawData) {
+        private ClosePassEvent(String rawData) {
             Log.i("ClosePassEvent", rawData);
 
             String[] sections = rawData.split(";", -1);
             timestamp = Long.parseLong(sections[0]);
             eventType = sections[1].toUpperCase();
             payload = Collections.singletonList(sections[2]);
+        }
+        public static ClosePassEvent fromString(String line) {
+            return new ClosePassEvent(line);
         }
 
         @Override
