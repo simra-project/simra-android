@@ -445,16 +445,17 @@ public class RadmesserService extends Service {
         public List<Integer> rightSensorValues;
 
         private Measurement(String line) throws MeasurementFormatException {
-            if (line.equals(""))
-                throw new MeasurementFormatException();
-
             try {
+                if (line.equals(""))
+                    throw new MeasurementFormatException();
+
+
                 String[] sections = line.split(";", -1);
 
                 timestamp = Long.parseLong(sections[0]);
                 leftSensorValues = parseValues(sections[1].split(","));
                 rightSensorValues = parseValues(sections[2].split(","));
-            } catch (ArrayIndexOutOfBoundsException | NumberFormatException iex) {
+            } catch (ArrayIndexOutOfBoundsException | NumberFormatException | NullPointerException nex) {
                 throw new MeasurementFormatException();
             }
         }
@@ -500,6 +501,7 @@ public class RadmesserService extends Service {
             eventType = sections[1].toUpperCase();
             payload = Collections.singletonList(sections[2]);
         }
+
         public static ClosePassEvent fromString(String line) {
             return new ClosePassEvent(line);
         }
