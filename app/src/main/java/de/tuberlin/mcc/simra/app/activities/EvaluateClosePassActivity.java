@@ -116,7 +116,7 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
 
         MaterialButton closePassConfirmButton = findViewById(R.id.closePassConfirmButton);
         closePassConfirmButton.setOnClickListener(view -> {
-            incidentLog.addIncident(IncidentLogEntry.newBuilder()
+            incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder()
                     .withBaseInformation(
                             currentDataLogEntry.timestamp,
                             currentDataLogEntry.latitude, currentDataLogEntry.longitude

@@ -19,9 +19,9 @@ public class Ride {
 
     }
 
-    public int getState() {
-
-    }
+    //public int getState() {
+//
+//    }
 
 
 }

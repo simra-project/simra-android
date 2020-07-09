@@ -54,9 +54,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.annotation.IncidentPopUpActivity;
 import de.tuberlin.mcc.simra.app.annotation.LegacyRide;
 import de.tuberlin.mcc.simra.app.annotation.MarkerFunct;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
+import de.tuberlin.mcc.simra.app.entities.IncidentLog;
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -68,7 +71,6 @@ import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.checkForAnnotation;
 import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 
@@ -134,6 +136,9 @@ public class ShowRouteActivity extends BaseActivity {
     private RelativeLayout addIncBttn;
     private RelativeLayout exitAddIncBttn;
     private View progressBarRelativeLayout;
+
+    // New inicident Logic
+    private IncidentLog incidentLog;
 
     /**
      * Returns the longitudes of the southern- and northernmost points
@@ -216,6 +221,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
         rideId = getIntent().getIntExtra(EXTRA_RIDE_ID, 0);
         state = getIntent().getIntExtra(EXTRA_STATE, MetaData.STATE.JUST_RECORDED);
+        incidentLog = IncidentLog.loadIncidentLog(rideId, this);
 
         addIncBttn = findViewById(R.id.addIncident);
 
@@ -264,20 +270,19 @@ public class ShowRouteActivity extends BaseActivity {
             exitButton.setOnClickListener(v -> finish());
         }
 
-        Log.d(TAG, "setting up clickListeners");
 
         // Functionality for 'edit mode', i.e. the mode in which users can put their own incidents
         // onto the map
         addIncBttn.setOnClickListener((View v) -> {
             addIncBttn.setVisibility(View.INVISIBLE);
             exitAddIncBttn.setVisibility(View.VISIBLE);
-            ShowRouteActivity.this.addCustomMarkerMode = true;
+            addCustomMarkerMode = true;
         });
 
         exitAddIncBttn.setOnClickListener((View v) -> {
             addIncBttn.setVisibility(View.VISIBLE);
             exitAddIncBttn.setVisibility(View.INVISIBLE);
-            ShowRouteActivity.this.addCustomMarkerMode = false;
+            addCustomMarkerMode = false;
         });
 
         if (state < MetaData.STATE.SYNCED) {
@@ -382,9 +387,9 @@ public class ShowRouteActivity extends BaseActivity {
                 if (myMarkerFunct != null) {
                     myMarkerFunct.deleteAllMarkers();
                 }
-                myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, true);
+                myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, rideId, tempLegacyRide, incidentLog);
             } else {
-                myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, false);
+                myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, rideId, legacyRide, incidentLog);
             }
 
             // Show all the incidents present in our ride object
@@ -614,10 +619,6 @@ public class ShowRouteActivity extends BaseActivity {
         HistoryActivity.startHistoryActivity(this);
     }
 
-    // If the user clicks on an InfoWindow and IncidentPopUpActivity for that
-    // event opens, upon closing it again onActivityResult is called and the
-    // displaying of markers is updated if necessary.
-
     /**
      * This function cuts of the dataLogEntries from left and right
      * <p>
@@ -667,58 +668,18 @@ public class ShowRouteActivity extends BaseActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == IncidentPopUpActivity.REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
+                // TODO: Update Incident
+                incidentLog.updateOrAddIncident((IncidentLogEntry) intent.getSerializableExtra(IncidentPopUpActivity.EXTRA_INCIDENT));
 
-                String result = data.getStringExtra("result");
-                String[] incidentProps = result.split(",", -1);
-                Log.d(TAG, "onActivityResult() result: " + result);
-                boolean temp = data.getBooleanExtra("temp", false);
-                Log.d(TAG, "onActivityResult() temp: " + temp);
-                boolean annotated = checkForAnnotation(incidentProps);
-                if (temp) {
-                    Log.d(TAG, "tempRide.events.size(): " + tempLegacyRide.events.size());
-                    for (int i = 0; i < tempLegacyRide.events.size(); i++) {
-                        Log.d(TAG, "tempRide.events.get(i).key: " + tempLegacyRide.events.get(i).key +
-                                " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
-                        if ((tempLegacyRide.events.get(i).key) == Integer.parseInt(incidentProps[0])) {
-                            if (annotated) {
-                                tempLegacyRide.events.get(i).annotated = true;
-                            }
-                            if (incidentProps[8] != null) {
-                                tempLegacyRide.events.get(i).incidentType = incidentProps[8];
-                            }
-                            if (incidentProps[18] != null) {
-                                tempLegacyRide.events.get(i).scary = incidentProps[18];
-                            }
-                        }
-                    }
-                } else {
-                    Log.d(TAG, "ride.events.size(): " + legacyRide.events.size());
-                    for (int i = 0; i < legacyRide.events.size(); i++) {
-                        Log.d(TAG, "ride.events.get(i).key: " + legacyRide.events.get(i).key +
-                                " Integer.valueOf(incidentProps[0]): " + Integer.valueOf(incidentProps[0]));
-                        if ((legacyRide.events.get(i).key) == Integer.parseInt(incidentProps[0])) {
-                            if (annotated) {
-                                legacyRide.events.get(i).annotated = true;
-                            }
-                            if (incidentProps[8] != null) {
-                                legacyRide.events.get(i).incidentType = incidentProps[8];
-                            }
-                            if (incidentProps[18] != null) {
-                                legacyRide.events.get(i).scary = incidentProps[18];
-                            }
-                        }
-                    }
-                }
-                myMarkerFunct.setMarker(new AccEvent(Integer.parseInt(incidentProps[0]),
-                        Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
-                        Long.parseLong(incidentProps[3]),
-                        annotated, incidentProps[8], incidentProps[18]), Integer.parseInt(incidentProps[0]));
+                //myMarkerFunct.setMarker(new AccEvent(Integer.parseInt(incidentProps[0]),
+                //        Double.parseDouble(incidentProps[1]), Double.parseDouble(incidentProps[2]),
+                //        Long.parseLong(incidentProps[3]),
+                //        annotated, incidentProps[8], incidentProps[18]));
 
             }
         }
@@ -726,6 +687,7 @@ public class ShowRouteActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        // TODO: Save Events and Route
         Log.d(TAG, "onDestroy()");
         super.onDestroy();
         Log.d(TAG, "tempAccEventsPath: " + tempAccEventsPath);

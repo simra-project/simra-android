@@ -1,6 +1,8 @@
 package de.tuberlin.mcc.simra.app.entities;
 
-public class IncidentLogEntry {
+import java.io.Serializable;
+
+public class IncidentLogEntry implements Serializable {
     public Integer key;
     public Double latitude;
     public Double longitude;
@@ -23,7 +25,7 @@ public class IncidentLogEntry {
         this.bikeWithTrailer = builder.bikeWithTrailer != null ? builder.bikeWithTrailer : false;
         this.phoneLocation = builder.phoneLocation != null ? builder.phoneLocation : 0;
         this.incidentType = builder.incidentType != null ? builder.incidentType : 0;
-        this.involvedRoadUser = builder.involvedRoadUser != null ? builder.involvedRoadUser : new InvolvedRoadUser(false, false, false, false, false, false, false, false, false, false);
+        this.involvedRoadUser = builder.involvedRoadUser != null ? builder.involvedRoadUser : InvolvedRoadUser.getDefaultInvolvedRoadUser();
         this.scarySituation = builder.scarySituation != null ? builder.scarySituation : false;
         this.description = builder.description != null ? builder.description : "";
         this.timestamp = builder.timestamp;
@@ -66,7 +68,7 @@ public class IncidentLogEntry {
                         dataLogLine.length > 20 ? (!dataLogLine[20].isEmpty() ? dataLogLine[20].equals("1") : false) : false
                 ),
                 dataLogLine.length > 18 ? (!dataLogLine[18].isEmpty() ? dataLogLine[18].equals("1") : false) : false,
-                dataLogLine.length > 19 ? (!dataLogLine[19].isEmpty() ? dataLogLine[19] : "") : ""
+                dataLogLine.length > 19 ? (!dataLogLine[19].isEmpty() ? dataLogLine[19].replaceAll(";linebreak;", System.lineSeparator()).replaceAll(";komma;", ",") : "") : ""
         );
 
         return dataLogEntry.build();
@@ -110,7 +112,7 @@ public class IncidentLogEntry {
                 booleanToInt(involvedRoadUser.other) + "," +
                 booleanToInt(scarySituation) + "," +
                 booleanToInt(involvedRoadUser.electricScooter) + "," +
-                description;
+                description.replace(System.lineSeparator(), ";linebreak;").replace(",", ";komma;");
     }
 
     public static final class Builder {
@@ -162,17 +164,17 @@ public class IncidentLogEntry {
 
     }
 
-    public static class InvolvedRoadUser {
-        Boolean bus;
-        Boolean cyclist;
-        Boolean pedestrian;
-        Boolean deliveryVan;
-        Boolean truck;
-        Boolean motorcyclist;
-        Boolean car;
-        Boolean taxi;
-        Boolean other;
-        Boolean electricScooter;
+    public static class InvolvedRoadUser implements Serializable {
+        public Boolean bus;
+        public Boolean cyclist;
+        public Boolean pedestrian;
+        public Boolean deliveryVan;
+        public Boolean truck;
+        public Boolean motorcyclist;
+        public Boolean car;
+        public Boolean taxi;
+        public Boolean other;
+        public Boolean electricScooter;
 
         public InvolvedRoadUser(boolean bus, boolean cyclist, boolean pedestrian, boolean deliveryVan, boolean truck, boolean motorcyclist, boolean car, boolean taxi, boolean other, boolean electricScooter) {
             this.bus = bus;
@@ -186,9 +188,14 @@ public class IncidentLogEntry {
             this.other = other;
             this.electricScooter = electricScooter;
         }
+
+        public static InvolvedRoadUser getDefaultInvolvedRoadUser() {
+            return new InvolvedRoadUser(false, false, false, false, false, false, false, false, false, false);
+        }
     }
 
     public static class INCIDENT_TYPE {
+        public static final int AUTO_GENERATED = -1;
         public static final int NOTHING = 0;
         public static final int CLOSE_PASS = 1;
         public static final int PULL_OUT = 2;

@@ -27,8 +27,8 @@ public class IncidentLog {
         return primaryIncidentLog;
     }
 
-    public static IncidentLog loadIncidentLog(int id, Context context) {
-        File incidentFile = IOUtils.Files.getEventsFile(id, false, context);
+    public static IncidentLog loadIncidentLog(int rideId, Context context) {
+        File incidentFile = IOUtils.Files.getEventsFile(rideId, false, context);
         List<IncidentLogEntry> incidents = new ArrayList<>();
         if (incidentFile.exists()) {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(incidentFile))) {
@@ -45,7 +45,7 @@ public class IncidentLog {
                 e.printStackTrace();
             }
         }
-        return new IncidentLog(id, incidents);
+        return new IncidentLog(rideId, incidents);
     }
 
     public static void saveIncidentLog(IncidentLog incidentLog, Context context) {
@@ -62,12 +62,13 @@ public class IncidentLog {
         return incidents;
     }
 
-    public List<IncidentLogEntry> addIncident(IncidentLogEntry incidentLogEntry) {
+    public IncidentLogEntry updateOrAddIncident(IncidentLogEntry incidentLogEntry) {
+        // TODO: really update or add using a Map
         incidentLogEntry.key = incidents.size();
         incidents.add(
                 incidentLogEntry
         );
-        return incidents;
+        return incidentLogEntry;
     }
 
     public List<IncidentLogEntry> removeIncident(IncidentLogEntry incidentLogEntry) {

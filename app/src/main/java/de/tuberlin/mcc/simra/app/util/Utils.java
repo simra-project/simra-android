@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
+
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 
@@ -219,10 +221,24 @@ public class Utils {
         return new File(path).exists();
     }
 
+    /**
+     * @param incidentProps
+     * @deprecated
+     */
     public static boolean checkForAnnotation(String[] incidentProps) {
         // Only checking for empty strings, which means we are retaining
         // events that were labeled as 'nothing happened'
         return (!incidentProps[8].equals("") && !incidentProps[8].equals("0")) || !incidentProps[19].equals("");
+    }
+
+    /**
+     * Legacy function I am not sure what it does
+     *
+     * @param incidentLogEntry
+     * @return
+     */
+    public static boolean checkForAnnotation(IncidentLogEntry incidentLogEntry) {
+        return !(incidentLogEntry.incidentType == null) && !(incidentLogEntry.incidentType == 0) || !(incidentLogEntry.scarySituation == false);
     }
 
 

@@ -1,10 +1,11 @@
 package de.tuberlin.mcc.simra.app.entities;
 
 
-import android.util.Log;
-
 import org.osmdroid.util.GeoPoint;
 
+/**
+ * @deprecated Use IncidentLogEntry instead
+ */
 public class AccEvent {
 
     public long timeStamp;
@@ -23,7 +24,6 @@ public class AccEvent {
         this.annotated = annotated;
         this.incidentType = incidentType;
         this.scary = scary;
-        Log.d(TAG, "AccEvent " + this.key + " constructor incidentType: " + this.incidentType + " scary: " + this.scary);
     }
 
 

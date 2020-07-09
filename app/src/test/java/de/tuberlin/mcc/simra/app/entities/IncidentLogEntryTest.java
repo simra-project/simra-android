@@ -16,9 +16,16 @@ public class IncidentLogEntryTest {
 
     @Test
     public void parseEntryFromLine_Empty() {
-        assertThat(IncidentLogEntry.parseEntryFromLine(",,,,,,,,,,,,,,,,,"))
+        assertThat(IncidentLogEntry.parseEntryFromLine(",,,,,,,,,,,,,,,,,,,"))
                 .usingRecursiveComparison()
                 .isEqualTo(IncidentLogEntry.newBuilder().build());
+    }
+
+    @Test
+    public void parseEntryFromLine_Special_Chars() {
+        assertThat(IncidentLogEntry.parseEntryFromLine(",,,,,,,,,,,,,,,,,,,string;komma;;linebreak;"))
+                .usingRecursiveComparison()
+                .isEqualTo(IncidentLogEntry.newBuilder().withRideInformation(0, false, false, 0, 0, null, false, "string," + System.lineSeparator()).build());
     }
 
     @Test
@@ -60,18 +67,7 @@ public class IncidentLogEntryTest {
                         false,
                         2,
                         0,
-                        new IncidentLogEntry.InvolvedRoadUser(
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false
-                        ),
+                        null,
                         false,
                         ""
 
@@ -109,5 +105,23 @@ public class IncidentLogEntryTest {
                 )
                 .build().stringifyDataLogEntry())
                 .isEqualTo("0,52.48022987,13.35637859,1561224261445,1,1,1,2,3,1,1,1,1,1,1,1,1,1,1,1,string");
+    }
+
+    @Test
+    public void stringifyDataLogEntry_Special_Chars() {
+        assertThat(IncidentLogEntry.newBuilder()
+                .withRideInformation(
+                        0,
+                        false,
+                        false,
+                        0,
+                        0,
+                        null,
+                        false,
+                        "string," + System.lineSeparator()
+
+                )
+                .build().stringifyDataLogEntry())
+                .isEqualTo(",,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,string;komma;;linebreak;");
     }
 }

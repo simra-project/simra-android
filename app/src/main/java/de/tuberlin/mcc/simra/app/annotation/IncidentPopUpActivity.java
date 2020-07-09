@@ -17,47 +17,37 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Arrays;
-
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
-import de.tuberlin.mcc.simra.app.util.IOUtils;
-
-import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 
 public class IncidentPopUpActivity extends AppCompatActivity {
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Log tag
+    public static final String EXTRA_INCIDENT = "EXTRA_INCIDENT";
+    public static final int REQUEST_CODE = 6034; // This is a random request code, you can safely edit it.
+    private static final String EXTRA_RIDE_STATE = "EXTRA_RIDE_STATE";
     private static final String TAG = "IncidentPopUpAct_LOG";
-    String[] incidentTypes = new String[9];
-    String[] locations = new String[7];
     LinearLayout doneButton;
     LinearLayout backButton;
     RelativeLayout exitButton;
     Boolean incidentSaved = false;
-    int rideID;
-    String incidentKey;
-    String[] previousAnnotation;
-    boolean temp;
     int state = 0;
+
+    private IncidentLogEntry incidentLogEntry;
+
+    public static Integer startIncidentPopUpActivity(IncidentLogEntry incidentLogEntry, int state, Activity activity) {
+        Intent intent = new Intent(activity, IncidentPopUpActivity.class);
+        intent.putExtra(EXTRA_INCIDENT, incidentLogEntry);
+        intent.putExtra(EXTRA_RIDE_STATE, state);
+        activity.startActivityForResult(intent, REQUEST_CODE);
+        return REQUEST_CODE;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        rideID = getIntent().getIntExtra("Ride_ID", 0);
 
-        incidentKey = getIntent().getStringExtra("Incident_Key");
-
-        temp = getIntent().getBooleanExtra("Incident_temp", false);
-
-        state = getIntent().getIntExtra("State", MetaData.STATE.JUST_RECORDED);
+        incidentLogEntry = (IncidentLogEntry) getIntent().getSerializableExtra(EXTRA_INCIDENT);
+        state = getIntent().getIntExtra(EXTRA_RIDE_STATE, MetaData.STATE.JUST_RECORDED);
         if (state < MetaData.STATE.SYNCED) {
             setContentView(R.layout.incident_popup_layout);
         } else {
@@ -72,83 +62,51 @@ public class IncidentPopUpActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         getWindow().getDecorView().setBackgroundColor(Color.TRANSPARENT);
 
-        incidentTypes = getResources().getStringArray(R.array.incidenttypelist);
-        locations = getResources().getStringArray(R.array.phoneLocations);
-
-        previousAnnotation = loadPreviousAnnotation();
-
         Spinner incidentTypeSpinner = findViewById(R.id.incidentTypeSpinner);
         EditText incidentDescription = findViewById(R.id.EditTextDescriptionBody);
         CheckBox scarinessCheckBox = findViewById(R.id.scarinessCheckBox);
-        CheckBox involvedType1CheckBox = findViewById(R.id.involvedType1);
-        CheckBox involvedType2CheckBox = findViewById(R.id.involvedType2);
-        CheckBox involvedType3CheckBox = findViewById(R.id.involvedType3);
-        CheckBox involvedType4CheckBox = findViewById(R.id.involvedType4);
-        CheckBox involvedType5CheckBox = findViewById(R.id.involvedType5);
-        CheckBox involvedType6CheckBox = findViewById(R.id.involvedType6);
-        CheckBox involvedType7CheckBox = findViewById(R.id.involvedType7);
-        CheckBox involvedType8CheckBox = findViewById(R.id.involvedType8);
-        CheckBox involvedType9CheckBox = findViewById(R.id.involvedType9);
-        CheckBox involvedType10CheckBox = findViewById(R.id.involvedType10);
+        CheckBox involvedTypeCheckBoxBus = findViewById(R.id.involvedType1);
+        CheckBox involvedTypeCheckBoxCyclist = findViewById(R.id.involvedType2);
+        CheckBox involvedTypeCheckBoxPedestrian = findViewById(R.id.involvedType3);
+        CheckBox involvedTypeCheckBoxDeliveryVan = findViewById(R.id.involvedType4);
+        CheckBox involvedTypeCheckBoxTruck = findViewById(R.id.involvedType5);
+        CheckBox involvedTypeCheckBoxMotorcyclist = findViewById(R.id.involvedType6);
+        CheckBox involvedTypeCheckBoxCar = findViewById(R.id.involvedType7);
+        CheckBox involvedTypeCheckBoxTaxi = findViewById(R.id.involvedType8);
+        CheckBox involvedTypeCheckBoxOther = findViewById(R.id.involvedType9);
+        CheckBox involvedTypeCheckBoxElectricScooter = findViewById(R.id.involvedType10);
+
+        // TODO: Use https://stackoverflow.com/questions/38417984/android-spinner-dropdown-checkbox
+        incidentTypeSpinner.setSelection(incidentLogEntry.incidentType);
+        involvedTypeCheckBoxBus.setChecked(incidentLogEntry.involvedRoadUser.bus);
+        involvedTypeCheckBoxCyclist.setChecked(incidentLogEntry.involvedRoadUser.cyclist);
+        involvedTypeCheckBoxPedestrian.setChecked(incidentLogEntry.involvedRoadUser.pedestrian);
+        involvedTypeCheckBoxDeliveryVan.setChecked(incidentLogEntry.involvedRoadUser.deliveryVan);
+        involvedTypeCheckBoxTruck.setChecked(incidentLogEntry.involvedRoadUser.truck);
+        involvedTypeCheckBoxMotorcyclist.setChecked(incidentLogEntry.involvedRoadUser.motorcyclist);
+        involvedTypeCheckBoxCar.setChecked(incidentLogEntry.involvedRoadUser.car);
+        involvedTypeCheckBoxTaxi.setChecked(incidentLogEntry.involvedRoadUser.taxi);
+        involvedTypeCheckBoxOther.setChecked(incidentLogEntry.involvedRoadUser.other);
+        involvedTypeCheckBoxElectricScooter.setChecked(incidentLogEntry.involvedRoadUser.electricScooter);
+        scarinessCheckBox.setChecked(incidentLogEntry.scarySituation);
+        incidentDescription.setText(incidentLogEntry.description);
 
         if (state == 2) {
             incidentTypeSpinner.setEnabled(false);
             incidentDescription.setEnabled(false);
             scarinessCheckBox.setEnabled(false);
-            involvedType1CheckBox.setEnabled(false);
-            involvedType2CheckBox.setEnabled(false);
-            involvedType3CheckBox.setEnabled(false);
-            involvedType4CheckBox.setEnabled(false);
-            involvedType5CheckBox.setEnabled(false);
-            involvedType6CheckBox.setEnabled(false);
-            involvedType7CheckBox.setEnabled(false);
-            involvedType8CheckBox.setEnabled(false);
-            involvedType9CheckBox.setEnabled(false);
-            involvedType10CheckBox.setEnabled(false);
+            involvedTypeCheckBoxBus.setEnabled(false);
+            involvedTypeCheckBoxCyclist.setEnabled(false);
+            involvedTypeCheckBoxPedestrian.setEnabled(false);
+            involvedTypeCheckBoxDeliveryVan.setEnabled(false);
+            involvedTypeCheckBoxTruck.setEnabled(false);
+            involvedTypeCheckBoxMotorcyclist.setEnabled(false);
+            involvedTypeCheckBoxCar.setEnabled(false);
+            involvedTypeCheckBoxTaxi.setEnabled(false);
+            involvedTypeCheckBoxOther.setEnabled(false);
+            involvedTypeCheckBoxElectricScooter.setEnabled(false);
         }
-        if (previousAnnotation != null && previousAnnotation.length > 7) {
-            // TODO: Use https://stackoverflow.com/questions/38417984/android-spinner-dropdown-checkbox
-            if (previousAnnotation[8].length() > 0) {
-                incidentTypeSpinner.setSelection(Integer.parseInt(previousAnnotation[8]));
-            }
-            if (previousAnnotation[9].equals("1")) {
-                involvedType1CheckBox.setChecked(true);
-            }
-            if (previousAnnotation[10].equals("1")) {
-                involvedType2CheckBox.setChecked(true);
-            }
-            if (previousAnnotation[11].equals("1")) {
-                involvedType3CheckBox.setChecked(true);
-            }
-            if (previousAnnotation[12].equals("1")) {
-                involvedType4CheckBox.setChecked(true);
-            }
-            if (previousAnnotation[13].equals("1")) {
-                involvedType5CheckBox.setChecked(true);
-            }
-            if (previousAnnotation[14].equals("1")) {
-                involvedType6CheckBox.setChecked(true);
-            }
-            if (previousAnnotation[15].equals("1")) {
-                involvedType7CheckBox.setChecked(true);
-            }
-            if (previousAnnotation[16].equals("1")) {
-                involvedType8CheckBox.setChecked(true);
-            }
-            if (previousAnnotation[17].equals("1")) {
-                involvedType9CheckBox.setChecked(true);
-            }
 
-            if (previousAnnotation[18].length() > 0) {
-                if (previousAnnotation[18].equals("1")) {
-                    scarinessCheckBox.setChecked(true);
-                }
-            }
-            incidentDescription.setText(previousAnnotation[19].replaceAll(";linebreak;", System.lineSeparator()).replaceAll(";komma;", ","));
-            if (previousAnnotation.length > 20 && previousAnnotation[20].equals("1")) {
-                involvedType10CheckBox.setChecked(true);
-            }
-        }
         if (state < 2) {
             doneButton = findViewById(R.id.save_button);
             backButton = findViewById(R.id.back_button);
@@ -191,59 +149,24 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 // data to file.
 
                 doneButton.setOnClickListener((View v) -> {
-
-                    // Instead of writing the String selected items in the spinner,
-                    // we use an int to save disk space and bandwidth
-                    int incidentType = incidentTypeSpinner.getSelectedItemPosition();
-                    String description = incidentDescription.getText().toString().replace(System.lineSeparator(), ";linebreak;").replace(",", ";komma;");
-                    int scariness = 0;
-                    if (scarinessCheckBox.isChecked()) {
-                        scariness = 1;
-                    }
-                    String[] checkBoxValuesWithouti10 = {"0", "0", "0", "0", "0", "0", "0", "0", "0"};
-
-                    if (involvedType1CheckBox.isChecked()) {
-                        checkBoxValuesWithouti10[0] = "1";
-                    }
-                    if (involvedType2CheckBox.isChecked()) {
-                        checkBoxValuesWithouti10[1] = "1";
-                    }
-                    if (involvedType3CheckBox.isChecked()) {
-                        checkBoxValuesWithouti10[2] = "1";
-                    }
-                    if (involvedType4CheckBox.isChecked()) {
-                        checkBoxValuesWithouti10[3] = "1";
-                    }
-                    if (involvedType5CheckBox.isChecked()) {
-                        checkBoxValuesWithouti10[4] = "1";
-                    }
-                    if (involvedType6CheckBox.isChecked()) {
-                        checkBoxValuesWithouti10[5] = "1";
-                    }
-                    if (involvedType7CheckBox.isChecked()) {
-                        checkBoxValuesWithouti10[6] = "1";
-                    }
-                    if (involvedType8CheckBox.isChecked()) {
-                        checkBoxValuesWithouti10[7] = "1";
-                    }
-                    if (involvedType9CheckBox.isChecked()) {
-                        checkBoxValuesWithouti10[8] = "1";
-                    }
-                    String i10Value = "0";
-                    if (involvedType10CheckBox.isChecked()) {
-                        i10Value = "1";
-                    }
-
-
-                    String incidentString = incidentKey + "," + lat + "," + lon + "," + ts + ","
-                            + bike + "," + child + "," + trailer + "," + pLoc + "," + incidentType + "," + Arrays.toString(checkBoxValuesWithouti10).replace(" ", "").replace("[", "").replace("]", "") + "," + scariness + "," + description + "," + i10Value;
-
-                    overwriteIncidentFile(rideID, incidentKey, incidentString);
+                    // Update the incidentLogEntry with the values from the UI before closing
+                    incidentLogEntry.incidentType = incidentTypeSpinner.getSelectedItemPosition();
+                    incidentLogEntry.description = incidentDescription.getText().toString();
+                    incidentLogEntry.scarySituation = scarinessCheckBox.isChecked();
+                    incidentLogEntry.involvedRoadUser.bus = involvedTypeCheckBoxBus.isChecked();
+                    incidentLogEntry.involvedRoadUser.cyclist = involvedTypeCheckBoxCyclist.isChecked();
+                    incidentLogEntry.involvedRoadUser.pedestrian = involvedTypeCheckBoxPedestrian.isChecked();
+                    incidentLogEntry.involvedRoadUser.deliveryVan = involvedTypeCheckBoxDeliveryVan.isChecked();
+                    incidentLogEntry.involvedRoadUser.truck = involvedTypeCheckBoxTruck.isChecked();
+                    incidentLogEntry.involvedRoadUser.motorcyclist = involvedTypeCheckBoxMotorcyclist.isChecked();
+                    incidentLogEntry.involvedRoadUser.car = involvedTypeCheckBoxCar.isChecked();
+                    incidentLogEntry.involvedRoadUser.taxi = involvedTypeCheckBoxTaxi.isChecked();
+                    incidentLogEntry.involvedRoadUser.other = involvedTypeCheckBoxOther.isChecked();
+                    incidentLogEntry.involvedRoadUser.electricScooter = involvedTypeCheckBoxElectricScooter.isChecked();
 
                     incidentSaved = true;
                     Intent returnIntent = new Intent();
-                    returnIntent.putExtra("result", incidentString);
-                    returnIntent.putExtra("temp", temp);
+                    returnIntent.putExtra(EXTRA_INCIDENT, incidentLogEntry);
                     setResult(Activity.RESULT_OK, returnIntent);
                     finish();
                 });
@@ -287,98 +210,4 @@ public class IncidentPopUpActivity extends AppCompatActivity {
             }
         }
     }
-
-    public String[] loadPreviousAnnotation() {
-
-        String[] result = null;
-        Log.d(TAG, "loadPreviousAnnotation rideID: " + rideID + " incidentKey: " + incidentKey);
-
-        File incidentFile = IOUtils.Files.getEventsFile(rideID, temp, this);
-
-        if (incidentFile.exists()) {
-
-            BufferedReader reader = null;
-
-            try {
-
-                reader = new BufferedReader(new FileReader(incidentFile));
-
-            } catch (FileNotFoundException fnfe) {
-                fnfe.printStackTrace();
-                Log.d(TAG, "Incident file not found");
-            }
-            try {
-
-                reader.readLine(); // this will read the first line
-                reader.readLine();
-
-                String line = null;
-
-                while ((line = reader.readLine()) != null) { //loop will run from 2nd line
-
-                    String[] incidentProps = line.split(",", -1);
-
-                    if (incidentProps[0].equals(incidentKey)) {
-
-                        result = incidentProps;
-
-                    }
-
-                }
-
-
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-                Log.d(TAG, "Problems reading AccEvents file");
-
-            }
-
-        } else {
-            Log.d(TAG, incidentFile.getAbsolutePath() + " doesn't exist");
-        }
-
-        Log.d(TAG, "loadPreviousAnnotation() result: " + Arrays.toString(result));
-        return result;
-
-    }
-
-    public void overwriteIncidentFile(int rideID, String incidentKey, String newAnnotation) {
-
-        String path = IOUtils.Files.getEventsFileName(rideID, temp);
-
-        StringBuilder contentOfNewFile = new StringBuilder();
-        int appVersion = getAppVersionNumber(IncidentPopUpActivity.this);
-        String fileVersion = "";
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFileStreamPath(path)))) {
-            contentOfNewFile.append(reader.readLine());
-            contentOfNewFile.append(System.lineSeparator());
-
-            if (contentOfNewFile.toString().contains("#")) {
-                String[] fileInfoArray = contentOfNewFile.toString().split("#");
-                fileVersion = fileInfoArray[1];
-            }
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] oldIncident = line.split(",", -1);
-                if (oldIncident[0].equals(incidentKey)) {
-                    contentOfNewFile.append(newAnnotation);
-                    contentOfNewFile.append(System.lineSeparator());
-                    Log.d(TAG, "overwriting \"" + line + "\" with \"" + contentOfNewFile);
-                } else {
-                    contentOfNewFile.append(line);
-                    contentOfNewFile.append(System.lineSeparator());
-                }
-
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-        Log.d(TAG, "fileInfoLine: " + fileInfoLine + " contentOfNewFile: " + contentOfNewFile);
-        overWriteFile((contentOfNewFile.toString()), path, this);
-
-    }
-
 }

@@ -26,15 +26,12 @@ import java.util.concurrent.TimeUnit;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.activities.ShowRouteActivity;
 import de.tuberlin.mcc.simra.app.entities.AccEvent;
-import de.tuberlin.mcc.simra.app.util.IOUtils;
-import de.tuberlin.mcc.simra.app.util.SharedPref;
+import de.tuberlin.mcc.simra.app.entities.IncidentLog;
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 
-import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
-import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.fileExists;
-import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
-
+/**
+ * What does it do?
+ */
 public class MarkerFunct {
 
     private static final String TAG = "MarkerFunct_LOG";
@@ -44,24 +41,19 @@ public class MarkerFunct {
     private Integer rideID;
     private ArrayList<Marker> markers = new ArrayList<>();
     private GeocoderNominatim geocoderNominatim;
-    private boolean temp;
     private int state;
     private int numEvents;
     private Map<Integer, Marker> markerMap = new HashMap<>();
+    private IncidentLog incidentLog;
+    private LegacyRide legacyRide;
 
-    public MarkerFunct(ShowRouteActivity mother, boolean temp) {
-
+    public MarkerFunct(ShowRouteActivity mother, int rideId, LegacyRide legacyRide, IncidentLog incidentLog) {
         this.mother = mother;
-
-        this.temp = temp;
-
+        this.rideID = rideId;
+        this.legacyRide = legacyRide;
         this.pool = mother.pool;
+        this.incidentLog = incidentLog;
 
-        if (temp) {
-            this.rideID = mother.tempLegacyRide.getKey();
-        } else {
-            this.rideID = mother.legacyRide.getKey();
-        }
         pool.execute(new SimpleThreadFactory().newThread(() -> {
                     geocoderNominatim = new GeocoderNominatim(userAgent);
                     geocoderNominatim.setService("https://nominatim.openstreetmap.org/");
@@ -69,31 +61,29 @@ public class MarkerFunct {
         ));
 
         this.state = mother.state;
-        if (temp) {
-            this.numEvents = (mother.tempLegacyRide.events.size() - 1);
-        } else {
-            this.numEvents = (mother.legacyRide.events.size() - 1);
-        }
-
+        this.numEvents = incidentLog.getIncidents().size() - 1;
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Event determination and representation happens here
 
     public void showIncidents() {
-
-        if (temp) {
-            for (int i = 0; i < mother.tempLegacyRide.events.size(); i++) {
-                // Log.d(TAG,"showIncidents() mother.tempRide.events.get(i).key: " + mother.tempRide.events.get(i).key);
-                setMarker(mother.tempLegacyRide.events.get(i), mother.tempLegacyRide.events.get(i).key);
-            }
-        } else {
-            for (int i = 0; i < mother.legacyRide.events.size(); i++) {
-                // Log.d(TAG,"showIncidents() mother.ride.events.get(i).key: " + mother.ride.events.get(i).key);
-                setMarker(mother.legacyRide.events.get(i), mother.legacyRide.events.get(i).key);
-            }
+        for (IncidentLogEntry incident : incidentLog.getIncidents()) {
+            setMarker(
+                    new AccEvent(
+                            incident.key,
+                            incident.latitude,
+                            incident.longitude,
+                            incident.timestamp,
+                            false,
+                            String.valueOf(incident.incidentType),
+                            String.valueOf(incident.scarySituation)
+                    ),
+                    incident
+            );
         }
     }
+
 
     public void addCustMarker(GeoPoint p) {
 
@@ -105,17 +95,9 @@ public class MarkerFunct {
         GeoPoint closestOnRoute;
 
         List<GeoPointWrapper> wrappedGPS = new ArrayList<>();
-
-        if (temp) {
-            for (GeoPoint thisGP : mother.tempLegacyRide.getRoute().getPoints()) {
-                wrappedGPS.add(new GeoPointWrapper(thisGP, p));
-            }
-        } else {
-            for (GeoPoint thisGP : mother.legacyRide.getRoute().getPoints()) {
-                wrappedGPS.add(new GeoPointWrapper(thisGP, p));
-            }
+        for (GeoPoint thisGP : legacyRide.getRoute().getPoints()) {
+            wrappedGPS.add(new GeoPointWrapper(thisGP, p));
         }
-
 
         Log.d(TAG, "wrappedGPS.size(): " + wrappedGPS.size());
 
@@ -142,7 +124,8 @@ public class MarkerFunct {
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // set Marker for new AccEvent, refresh map
-        setMarker(newAcc, eventCount);
+        IncidentLogEntry newIncidentLogEnty = incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(1337L, closestOnRoute.getLatitude(), closestOnRoute.getLongitude()).build());
+        setMarker(newAcc, newIncidentLogEnty);
         mother.getmMapView().invalidate();
 
         // Now we display a dialog box to allow the user to decide if she/he is happy
@@ -176,34 +159,7 @@ public class MarkerFunct {
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mother.getResources().getString(R.string.yes),
                 (DialogInterface dialog, int which) -> {
 
-                    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // Append new acc event to accEvents[rideID].csv
-                    String pathToAccEventsOfRide = IOUtils.Files.getEventsFileName(rideID, temp);
-
-                    String fileInfoLine = getAppVersionNumber(mother) + "#1" + System.lineSeparator();
-
-                    int bike = SharedPref.Settings.Ride.BikeType.getBikeType(mother);
-                    int child = SharedPref.Settings.Ride.ChildOnBoard.getValue(mother);
-                    int trailer = SharedPref.Settings.Ride.BikeWithTrailer.getValue(mother);
-                    int pLoc = SharedPref.Settings.Ride.PhoneLocation.getPhoneLocation(mother);
-
-                    // eventline = key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,,,,,,,,,,,,
-                    String eventLine = newAcc.key + ","
-                            + newAcc.position.getLatitude() + "," + newAcc.position.getLongitude()
-                            + "," + newAcc.timeStamp + "," + bike + "," + child + "," + trailer + "," + pLoc + "," + /*incident*/"," + /*i1*/"," + /*i2*/"," + /*i3*/"," + /*i4*/"," + /*i5*/"," + /*i6*/"," + /*i7*/"," + /*i8*/"," + /*i9*/"," + /*scary*/"," + /*desc*/"," + /*i10*/"," + System.lineSeparator();
-
-                    if (!fileExists(pathToAccEventsOfRide, mother.getApplicationContext())) {
-                        overWriteFile((fileInfoLine + ACCEVENTS_HEADER + eventLine), pathToAccEventsOfRide, mother.getApplicationContext());
-                    } else {
-                        appendToFile(eventLine, pathToAccEventsOfRide, mother.getApplicationContext());
-                    }
-                    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // Add new AccEvent to ride's AccEvents list
-                    if (temp) {
-                        mother.tempLegacyRide.getEvents().add(newAcc);
-                    } else {
-                        mother.legacyRide.getEvents().add(newAcc);
-                    }
+                    legacyRide.getEvents().add(newAcc);
                 });
 
         Window window = alertDialog.getWindow();
@@ -215,12 +171,12 @@ public class MarkerFunct {
         alertDialog.show();
     }
 
-    public void setMarker(AccEvent event, int accEventKey) {
+    public void setMarker(AccEvent event, IncidentLogEntry incidentLogEntry) {
         Marker incidentMarker = new Marker(mother.getmMapView());
 
         // Add the marker + corresponding key to map so we can manage markers if
         // necessary (e.g., remove them)
-        markerMap.put(accEventKey, incidentMarker);
+        markerMap.put(event.key, incidentMarker);
         GeoPoint currentLocHelper = event.position;
         incidentMarker.setPosition(currentLocHelper);
         /* Different marker icons for ....
@@ -254,7 +210,7 @@ public class MarkerFunct {
 
         InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble,
                 mother.getmMapView(),
-                event, addressForLoc, mother, event.key, temp, state);
+                addressForLoc, mother, state, incidentLogEntry);
         incidentMarker.setInfoWindow(infoWindow);
 
         markers.add(incidentMarker);
