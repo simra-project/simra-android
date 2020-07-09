@@ -7,7 +7,7 @@ public class Ride {
     public int rideID;
 
 
-    public Ride(int rideID) {
+    private Ride(int rideID) {
         this.rideID = rideID;
     }
 
@@ -16,6 +16,10 @@ public class Ride {
     }
 
     public static void saveRide() {
+
+    }
+
+    public int getState() {
 
     }
 

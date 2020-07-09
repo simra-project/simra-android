@@ -25,21 +25,21 @@ public class IncidentLogEntryTest {
     public void parseEntryFromLine_Full_Negative() {
         assertThat(IncidentLogEntry.parseEntryFromLine("0,52.4949566,13.3658506,1593886060502,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,string,0"))
                 .usingRecursiveComparison()
-                .isEqualTo(IncidentLogEntry.newBuilder().withKey(0).withGPS(52.4949566, 13.3658506).withTimestamp(1593886060502L).withRideInformation(0, false, false, 0, 0, new IncidentLogEntry.InvolvedRoadUser(false, false, false, false, false, false, false, false, false, false), false, "string").build());
+                .isEqualTo(IncidentLogEntry.newBuilder().withKey(0).withBaseInformation(1593886060502L, 52.4949566, 13.3658506).withRideInformation(0, false, false, 0, 0, new IncidentLogEntry.InvolvedRoadUser(false, false, false, false, false, false, false, false, false, false), false, "string").build());
     }
 
     @Test
     public void parseEntryFromLine_Full_Positive() {
         assertThat(IncidentLogEntry.parseEntryFromLine("0,52.4949566,13.3658506,1593886060502,2,1,1,3,4,1,1,1,1,1,1,1,1,1,1,string,1"))
                 .usingRecursiveComparison()
-                .isEqualTo(IncidentLogEntry.newBuilder().withKey(0).withGPS(52.4949566, 13.3658506).withTimestamp(1593886060502L).withRideInformation(2, true, true, 3, 4, new IncidentLogEntry.InvolvedRoadUser(true, true, true, true, true, true, true, true, true, true), true, "string").build());
+                .isEqualTo(IncidentLogEntry.newBuilder().withKey(0).withBaseInformation(1593886060502L, 52.4949566, 13.3658506).withRideInformation(2, true, true, 3, 4, new IncidentLogEntry.InvolvedRoadUser(true, true, true, true, true, true, true, true, true, true), true, "string").build());
     }
 
     @Test
     public void parseEntryFromLine_Test() {
         assertThat(IncidentLogEntry.parseEntryFromLine("0,52.4949566,13.3658506,1593886060502,0,0,0,0,,,,,,,,,,,,,"))
                 .usingRecursiveComparison()
-                .isEqualTo(IncidentLogEntry.newBuilder().withKey(0).withGPS(52.4949566, 13.3658506).withTimestamp(1593886060502L).withRideInformation(0, false, false, 0, 0, new IncidentLogEntry.InvolvedRoadUser(false, false, false, false, false, false, false, false, false, false), false, "").build());
+                .isEqualTo(IncidentLogEntry.newBuilder().withKey(0).withBaseInformation(1593886060502L, 52.4949566, 13.3658506).withRideInformation(0, false, false, 0, 0, new IncidentLogEntry.InvolvedRoadUser(false, false, false, false, false, false, false, false, false, false), false, "").build());
     }
 
     @Test
@@ -53,8 +53,7 @@ public class IncidentLogEntryTest {
     public void stringifyDataLogEntry_Example() {
         assertThat(IncidentLogEntry.newBuilder()
                 .withKey(0)
-                .withGPS(52.48022987, 13.35637859)
-                .withTimestamp(1561224261445L)
+                .withBaseInformation(1561224261445L, 52.48022987, 13.35637859)
                 .withRideInformation(
                         3,
                         false,
@@ -85,8 +84,7 @@ public class IncidentLogEntryTest {
     public void stringifyDataLogEntry_Full_Positive() {
         assertThat(IncidentLogEntry.newBuilder()
                 .withKey(0)
-                .withGPS(52.48022987, 13.35637859)
-                .withTimestamp(1561224261445L)
+                .withBaseInformation(1561224261445L, 52.48022987, 13.35637859)
                 .withRideInformation(
                         1,
                         true,

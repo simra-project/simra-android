@@ -142,7 +142,7 @@ public class ShowRouteActivity extends BaseActivity {
      * @param pl
      * @return double Array {South, North, West, East}
      */
-    static BoundingBox getBoundingBox(Polyline pl) {
+    private static BoundingBox getBoundingBox(Polyline pl) {
 
         // {North, East, South, West}
         List<GeoPoint> geoPoints = pl.getPoints();
@@ -164,9 +164,7 @@ public class ShowRouteActivity extends BaseActivity {
             if (geoPoints.get(i).getLongitude() > border[1]) {
                 border[1] = geoPoints.get(i).getLongitude();
             }
-
         }
-
         return new BoundingBox(border[0] + 0.001, border[1] + 0.001, border[2] - 0.001, border[3] - 0.001);
     }
 
@@ -197,7 +195,6 @@ public class ShowRouteActivity extends BaseActivity {
         toolbar.setSubtitle("");
         toolbarTxt = findViewById(R.id.toolbar_title);
         toolbarTxt.setText(R.string.title_activity_showRoute);
-
         backBtn = findViewById(R.id.back_button);
         backBtn.setOnClickListener(v -> finish());
 
@@ -231,7 +228,6 @@ public class ShowRouteActivity extends BaseActivity {
 
         gpsFile = IOUtils.Files.getGPSLogFile(rideId, false, this);
 
-        Log.d(TAG, "creating ride objects");
         bike = SharedPref.Settings.Ride.BikeType.getBikeType(this);
         child = SharedPref.Settings.Ride.ChildOnBoard.getValue(this);
         trailer = SharedPref.Settings.Ride.BikeWithTrailer.getValue(this);

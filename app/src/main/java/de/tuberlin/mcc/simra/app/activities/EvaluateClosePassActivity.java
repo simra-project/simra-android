@@ -116,17 +116,18 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
 
         MaterialButton closePassConfirmButton = findViewById(R.id.closePassConfirmButton);
         closePassConfirmButton.setOnClickListener(view -> {
-            incidentLog.incidents.add(IncidentLogEntry.newBuilder()
-                    .withKey(incidentLog.incidents.size())
-                    .withTimestamp(currentDataLogEntry.timestamp)
-                    .withGPS(currentDataLogEntry.latitude, currentDataLogEntry.longitude)
+            incidentLog.addIncident(IncidentLogEntry.newBuilder()
+                    .withBaseInformation(
+                            currentDataLogEntry.timestamp,
+                            currentDataLogEntry.latitude, currentDataLogEntry.longitude
+                    )
                     .withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS)
                     .build());
-            removePicture();
+            removePicture(true);
         });
         MaterialButton closePassDisapproveButton = findViewById(R.id.closePassDisapproveButton);
         closePassDisapproveButton.setOnClickListener(view -> {
-            removePicture();
+            removePicture(true);
         });
 
         imageQueue = new LinkedList<>(Arrays.asList(new File(IOUtils.Directories.getPictureCacheDirectoryPath()).listFiles()));
@@ -151,16 +152,18 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         }
         // If Picture Timestamp does not match with ride timestamps it is not part of the ride.
         if (!foundPicture) {
-            removePicture();
+            removePicture(false);
         }
 
     }
 
-    public void removePicture() {
+    public void removePicture(boolean delete) {
+        if (delete) {
+            imageQueue.get(0).delete();
+        }
         imageQueue.remove(0);
         if (imageQueue.isEmpty()) {
             IncidentLog.saveIncidentLog(incidentLog, this);
-            IOUtils.deleteDirectoryContent(IOUtils.Directories.getPictureCacheDirectoryPath());
             finish();
         } else {
             updateView();

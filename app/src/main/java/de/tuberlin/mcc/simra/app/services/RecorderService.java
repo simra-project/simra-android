@@ -49,21 +49,12 @@ import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 
 public class RecorderService extends Service implements SensorEventListener, LocationListener {
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Properties
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     public static final String TAG = "RecorderService_LOG:";
     long curTime;
     long startTime = 0;
     long endTime;
-    ExecutorService executor;
-    Sensor accelerometer;
-    Sensor gyroscope;
     float[] accelerometerMatrix = new float[3];
     float[] gyroscopeMatrix = new float[3];
-    LocationManager locationManager;
     Location lastLocation;
     Polyline route = new Polyline();
     long waitedTime = 0;
@@ -79,6 +70,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     Location startLocation;
     // Radmesser
     String lastRadmesserValue = "";
+    private LocationManager locationManager;
+    private ExecutorService executor;
+    private Sensor accelerometer;
+    private Sensor gyroscope;
     private int key;
     private long lastPictureTaken = 0;
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {

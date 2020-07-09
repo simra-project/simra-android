@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.entities;
 
 public class DataLogEntry {
+    public final Integer rideId;
     public final Double latitude;
     public final Double longitude;
     public final Float accelerometerX;
@@ -17,6 +18,7 @@ public class DataLogEntry {
     public final Integer RadmesserDistanceRight2;
 
     private DataLogEntry(DataLogEntryBuilder dataLogEntryBuilder) {
+        this.rideId = dataLogEntryBuilder.rideId;
         this.latitude = dataLogEntryBuilder.latitude;
         this.longitude = dataLogEntryBuilder.longitude;
         this.accelerometerX = dataLogEntryBuilder.accelerometerX;
@@ -104,7 +106,7 @@ public class DataLogEntry {
     }
 
     public static final class DataLogEntryBuilder {
-
+        private Integer rideId;
         private Double latitude;
         private Double longitude;
         private Float accelerometerX;
@@ -121,6 +123,11 @@ public class DataLogEntry {
         private Integer radmesserDistanceRight2;
 
         private DataLogEntryBuilder() {
+        }
+
+        public DataLogEntryBuilder withRideId(Integer rideId) {
+            this.rideId = rideId;
+            return this;
         }
 
         public DataLogEntryBuilder withTimestamp(Long vTimestamp) {

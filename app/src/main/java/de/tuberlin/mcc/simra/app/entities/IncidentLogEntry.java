@@ -1,18 +1,18 @@
 package de.tuberlin.mcc.simra.app.entities;
 
 public class IncidentLogEntry {
-    public final Integer key;
-    public final Double latitude;
-    public final Double longitude;
-    public final Long timestamp;
-    public final Integer bikeType;
-    public final Boolean childOnBoard;
-    public final Boolean bikeWithTrailer;
-    public final Integer phoneLocation;
-    public final Integer incidentType;
-    public final InvolvedRoadUser involvedRoadUser;
-    public final Boolean scarySituation;
-    public final String description;
+    public Integer key;
+    public Double latitude;
+    public Double longitude;
+    public Long timestamp;
+    public Integer bikeType;
+    public Boolean childOnBoard;
+    public Boolean bikeWithTrailer;
+    public Integer phoneLocation;
+    public Integer incidentType;
+    public InvolvedRoadUser involvedRoadUser;
+    public Boolean scarySituation;
+    public String description;
 
     private IncidentLogEntry(Builder builder) {
         this.key = builder.key;
@@ -39,16 +39,11 @@ public class IncidentLogEntry {
             );
         }
 
-        if (dataLogLine.length >= 2 && !dataLogLine[0].isEmpty() && !dataLogLine[1].isEmpty()) {
-            dataLogEntry.withGPS(
+        if (dataLogLine.length >= 3 && !dataLogLine[0].isEmpty() && !dataLogLine[1].isEmpty() && !dataLogLine[3].isEmpty()) {
+            dataLogEntry.withBaseInformation(
+                    Long.parseLong(dataLogLine[3]),
                     Double.parseDouble(dataLogLine[1]),
                     Double.parseDouble(dataLogLine[2])
-            );
-        }
-
-        if (dataLogLine.length >= 3 && !dataLogLine[3].isEmpty()) {
-            dataLogEntry.withTimestamp(
-                    Long.parseLong(dataLogLine[3])
             );
         }
 
@@ -144,17 +139,8 @@ public class IncidentLogEntry {
             return this;
         }
 
-        public Builder withTimestamp(Long timestamp) {
+        public Builder withBaseInformation(Long timestamp, Double latitude, Double longitude) {
             this.timestamp = timestamp;
-            return this;
-        }
-
-        public Builder withKey(Integer key) {
-            this.key = key;
-            return this;
-        }
-
-        public Builder withGPS(Double latitude, Double longitude) {
             this.latitude = latitude;
             this.longitude = longitude;
             return this;
@@ -165,6 +151,10 @@ public class IncidentLogEntry {
             return this;
         }
 
+        public Builder withKey(Integer key) {
+            this.key = key;
+            return this;
+        }
 
         public IncidentLogEntry build() {
             return new IncidentLogEntry(this);
@@ -184,7 +174,7 @@ public class IncidentLogEntry {
         Boolean other;
         Boolean electricScooter;
 
-        public InvolvedRoadUser(Boolean bus, Boolean cyclist, Boolean pedestrian, Boolean deliveryVan, Boolean truck, Boolean motorcyclist, Boolean car, Boolean taxi, Boolean other, Boolean electricScooter) {
+        public InvolvedRoadUser(boolean bus, boolean cyclist, boolean pedestrian, boolean deliveryVan, boolean truck, boolean motorcyclist, boolean car, boolean taxi, boolean other, boolean electricScooter) {
             this.bus = bus;
             this.cyclist = cyclist;
             this.pedestrian = pedestrian;

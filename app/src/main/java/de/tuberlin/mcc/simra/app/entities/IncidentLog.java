@@ -14,12 +14,17 @@ import de.tuberlin.mcc.simra.app.util.Utils;
 
 public class IncidentLog {
     public final static String INCIDENT_LOG_HEADER = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10";
-    public final List<IncidentLogEntry> incidents;
     public final int rideId;
+    private List<IncidentLogEntry> incidents;
 
     private IncidentLog(int rideId, List<IncidentLogEntry> incidents) {
         this.rideId = rideId;
         this.incidents = incidents;
+    }
+
+    public static IncidentLog mergeIncidentLogs(IncidentLog primaryIncidentLog, IncidentLog secondaryIncidentLog) {
+        // TODO: Merge Logic
+        return primaryIncidentLog;
     }
 
     public static IncidentLog loadIncidentLog(int id, Context context) {
@@ -49,7 +54,38 @@ public class IncidentLog {
             incidentString += incident.stringifyDataLogEntry() + System.lineSeparator();
         }
         File newFile = IOUtils.Files.getEventsFile(incidentLog.rideId, false, context);
-        // TODO: Merge Logic
+        // TODO: Merge Logic?
         Utils.overwriteFile(IOUtils.Files.getFileInfoLine() + INCIDENT_LOG_HEADER + System.lineSeparator() + incidentString, newFile);
+    }
+
+    public List<IncidentLogEntry> getIncidents() {
+        return incidents;
+    }
+
+    public List<IncidentLogEntry> addIncident(IncidentLogEntry incidentLogEntry) {
+        incidentLogEntry.key = incidents.size();
+        incidents.add(
+                incidentLogEntry
+        );
+        return incidents;
+    }
+
+    public List<IncidentLogEntry> removeIncident(IncidentLogEntry incidentLogEntry) {
+        incidentLogEntry.key = incidents.size();
+        incidents.add(
+                incidentLogEntry
+        );
+        return incidents;
+    }
+
+    public List<IncidentLogEntry> removeIncidentsOutsideTimeFrame(int timeFrameStart, int timeFrameEnd) {
+        List<IncidentLogEntry> newIncidentList = new ArrayList<>();
+        for (IncidentLogEntry incident : incidents) {
+            if (incident.timestamp > timeFrameStart && incident.timestamp < timeFrameEnd) {
+                newIncidentList.add(incident);
+            }
+        }
+        incidents = newIncidentList;
+        return newIncidentList;
     }
 }

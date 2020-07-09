@@ -418,7 +418,6 @@ public class HistoryActivity extends BaseActivity {
             TextView duration;
             TextView distance;
             TextView distanceUnit;
-            TextView message;
             ImageButton status;
             ImageButton btnDelete;
         }
