@@ -60,6 +60,7 @@
     <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um ihre Privatsphäre zu schützen.\nSie können dies im Menü "Einstellungen" anpassen.</string>
     <string name="startButtonText">Aufzeichnung\nstarten</string>
     <string name="stopButtonText">Aufzeichnung\nbeenden</string>
+    <string name="reportIncident">Incident melden</string>
     <string name="cancel">Abbrechen</string>
     <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalten Sie es aus, damit die Fahrt aufgezeichnet werden kann.</string>
     <string name="locationServiceisOff">Der Ortungsdienst Ihres Geräts ist aus. Bitte schalten Sie den Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
