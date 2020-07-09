@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -76,6 +77,8 @@ public class ShowRouteActivity extends BaseActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Log tag
     private static final String TAG = "ShowRouteActivity_LOG";
+    private static final String EXTRA_RIDE_ID = "EXTRA_RIDE_ID";
+    private static final String EXTRA_STATE = "EXTRA_STATE";
     final int[] left = {0};
     final int[] right = {0};
     ////~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,7 +96,6 @@ public class ShowRouteActivity extends BaseActivity {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // GEOCODER --> obtain GeoPoint from address
     TextView toolbarTxt;
-    String startTime = "";
     RelativeLayout saveButton;
 
     // Marker-icons for different types/states of events:
@@ -109,8 +111,7 @@ public class ShowRouteActivity extends BaseActivity {
     int child;
     int trailer;
     int pLoc;
-    String duration;
-    String pathToAccGpsFile;
+    int rideId;
     File gpsFile;
     Polyline route;
     Polyline editableRoute;
@@ -133,8 +134,6 @@ public class ShowRouteActivity extends BaseActivity {
     private RelativeLayout addIncBttn;
     private RelativeLayout exitAddIncBttn;
     private View progressBarRelativeLayout;
-
-    //
 
     /**
      * Returns the longitudes of the southern- and northernmost points
@@ -169,6 +168,14 @@ public class ShowRouteActivity extends BaseActivity {
         }
 
         return new BoundingBox(border[0] + 0.001, border[1] + 0.001, border[2] - 0.001, border[3] - 0.001);
+    }
+
+    public static void startShowRouteActivity(int rideId, Integer state, Context context) {
+        Intent intent = new Intent(context, ShowRouteActivity.class);
+        intent.putExtra(EXTRA_RIDE_ID, rideId);
+        intent.putExtra(EXTRA_STATE, state);
+        context.startActivity(intent);
+
     }
 
     public MapView getmMapView() {
@@ -207,11 +214,11 @@ public class ShowRouteActivity extends BaseActivity {
         TextView copyrightTxt = findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
-
-        pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
-        startTime = getIntent().getStringExtra("StartTime");
-        state = getIntent().getIntExtra("State", MetaData.STATE.JUST_RECORDED);
-        duration = getIntent().getStringExtra("Duration");
+        if (!getIntent().hasExtra(EXTRA_RIDE_ID)) {
+            throw new RuntimeException("Extra: " + EXTRA_RIDE_ID + " not defined.");
+        }
+        rideId = getIntent().getIntExtra(EXTRA_RIDE_ID, 0);
+        state = getIntent().getIntExtra(EXTRA_STATE, MetaData.STATE.JUST_RECORDED);
 
         addIncBttn = findViewById(R.id.addIncident);
 
@@ -222,7 +229,7 @@ public class ShowRouteActivity extends BaseActivity {
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
 
-        gpsFile = new File(IOUtils.Directories.getBaseFolderPath(this) + pathToAccGpsFile);
+        gpsFile = IOUtils.Files.getGPSLogFile(rideId, false, this);
 
         Log.d(TAG, "creating ride objects");
         bike = SharedPref.Settings.Ride.BikeType.getBikeType(this);
@@ -240,7 +247,7 @@ public class ShowRouteActivity extends BaseActivity {
             addIncBttn.setVisibility(View.VISIBLE);
             exitButton.setVisibility(View.INVISIBLE);
             if (!IOUtils.isDirectoryEmpty(IOUtils.Directories.getPictureCacheDirectoryPath())) {
-                EvaluateClosePassActivity.startEvaluateClosePassActivity(Integer.parseInt(pathToAccGpsFile.split("_")[0]), this);
+                EvaluateClosePassActivity.startEvaluateClosePassActivity(rideId, this);
             }
         } else {
             addIncBttn.setVisibility(View.GONE);
@@ -294,9 +301,9 @@ public class ShowRouteActivity extends BaseActivity {
             tempAccGpsPath = "Temp" + gpsFile.getName();
             runOnUiThread(() -> progressBarRelativeLayout.setVisibility(View.VISIBLE));
             tempGpsFile = updateRoute(left[0], right[0], tempAccGpsPath, gpsFile);
-            tempLegacyRide = new LegacyRide(tempGpsFile, duration, String.valueOf(tempStartTime), state, bike, child, trailer, pLoc, this, calculate, true);
+            tempLegacyRide = new LegacyRide(tempGpsFile, state, bike, child, trailer, pLoc, this, calculate, true);
         } else {
-            legacyRide = new LegacyRide(gpsFile, duration, startTime, state, bike, child, trailer, pLoc, this, calculate, false);
+            legacyRide = new LegacyRide(gpsFile, state, bike, child, trailer, pLoc, this, calculate, false);
         }
 
         // Get the Route as a Polyline to be displayed on the map
@@ -591,9 +598,9 @@ public class ShowRouteActivity extends BaseActivity {
 
         if (tempGpsFile != null && fileExists(tempGpsFile.getName(), this)) {
             Log.d(TAG, "path of tempGpsFile: " + tempGpsFile.getPath());
-            deleteFile(pathToAccGpsFile);
+            IOUtils.Files.getGPSLogFile(rideId, false, this).delete();
             String path = ShowRouteActivity.this.getFilesDir().getPath();
-            boolean success = tempGpsFile.renameTo(new File(path + File.separator + pathToAccGpsFile));
+            boolean success = tempGpsFile.renameTo(IOUtils.Files.getGPSLogFile(rideId, false, this));
             Log.d(TAG, "tempGpsFile successfully renamed: " + success);
         }
         String pathToAccEventsFile = IOUtils.Files.getEventsFileName(legacyRide.getKey(), false);
@@ -608,8 +615,12 @@ public class ShowRouteActivity extends BaseActivity {
 
         Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
         finish();
-
+        HistoryActivity.startHistoryActivity(this);
     }
+
+    // If the user clicks on an InfoWindow and IncidentPopUpActivity for that
+    // event opens, upon closing it again onActivityResult is called and the
+    // displaying of markers is updated if necessary.
 
     /**
      * This function cuts of the dataLogEntries from left and right
@@ -658,10 +669,6 @@ public class ShowRouteActivity extends BaseActivity {
         }
         return getFileStreamPath(pathToAccGpsTempFile);
     }
-
-    // If the user clicks on an InfoWindow and IncidentPopUpActivity for that
-    // event opens, upon closing it again onActivityResult is called and the
-    // displaying of markers is updated if necessary.
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -26,6 +26,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -62,8 +63,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     Sensor gyroscope;
     float[] accelerometerMatrix = new float[3];
     float[] gyroscopeMatrix = new float[3];
-    String pathToAccGpsFile = "";
-    int key;
     LocationManager locationManager;
     Location lastLocation;
     Polyline route = new Polyline();
@@ -80,6 +79,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     Location startLocation;
     // Radmesser
     String lastRadmesserValue = "";
+    private int key;
     private long lastPictureTaken = 0;
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -105,8 +105,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private IBinder mBinder = new MyBinder();
     private StringBuilder accGpsString = new StringBuilder();
 
-    public String getPathToAccGpsFile() {
-        return pathToAccGpsFile;
+    public int getCurrentRideKey() {
+        return key;
     }
 
     public double getDuration() {
@@ -285,7 +285,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // For all subsequent rides, the key value increases by one at a time.
 
         key = sharedPrefs.getInt("RIDE-KEY", 0);
-        pathToAccGpsFile = key + "_accGps.csv";
 
         // Fire the notification while recording
         Notification notification =
@@ -314,13 +313,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // data.
         if (recordingAllowed && lineAdded) {
 
+            File gpsLogFile = IOUtils.Files.getGPSLogFile(key, false, this);
             String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
             Log.d(TAG, "fileInfoLine: " + fileInfoLine);
             int region = lookUpIntSharedPrefs("Region", 0, "Profile", this);
             // Create head of the csv-file
-            appendToFile((fileInfoLine + DataLog.DATA_LOG_HEADER + System.lineSeparator()), pathToAccGpsFile, this);
-            // Write String data to files
-            appendToFile(accGpsString.toString(), pathToAccGpsFile, this);
+            appendToFile((fileInfoLine + DataLog.DATA_LOG_HEADER + System.lineSeparator() + accGpsString.toString()), gpsLogFile);
             appendToFile(key + ","
                     + startTime + "," + endTime + ","
                     + "0,0," + waitedTime + "," + Math.round(route.getDistance()) + ",0," + region + System.lineSeparator(), IOUtils.Files.getMetaDataFile(this));

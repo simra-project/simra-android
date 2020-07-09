@@ -90,7 +90,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     // Log tag
     private static final String TAG = "MainActivity_LOG";
-    private final static int REQUEST_ENABLE_BT=1;
+    private final static int REQUEST_ENABLE_BT = 1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
@@ -100,10 +100,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     Intent recService;
     RecorderService mBoundRecorderService;
     boolean radmesserEnabled = false;
+    BroadcastReceiver receiver;
     private MapView mMapView;
     private MapController mMapController;
     private MyLocationNewOverlay mLocationOverlay;
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
     private LocationManager locationManager;
@@ -113,8 +113,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Radmesser
     private FloatingActionButton radmesserButton;
-    BroadcastReceiver receiver;
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,7 +148,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return (!gps_enabled);
     }
 
-    private void showRadmesserNotConnectedWarning(){
+    private void showRadmesserNotConnectedWarning() {
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
         alert.setTitle(R.string.not_connected_warnung_title);
         alert.setMessage(R.string.not_connected_warnung_message);
@@ -163,7 +161,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         alert.show();
     }
 
-    private void showBluetoothNotEnableWarning(){
+    private void showBluetoothNotEnableWarning() {
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
         alert.setTitle(R.string.bluetooth_not_enable_title);
         alert.setMessage(R.string.bluetooth_not_enable_message);
@@ -325,11 +323,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // (4): NEUE ROUTE / START BUTTON
         startBtn = findViewById(R.id.button_start);
         startBtn.setOnClickListener(v -> {
-            if(radmesserEnabled){
+            if (radmesserEnabled) {
                 RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
-                if(!currentState.equals(RadmesserService.ConnectionState.CONNECTED)){
+                if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
                     boolean reconected = RadmesserService.tryConnectPairedDevice(this);
-                    if(!reconected){
+                    if (!reconected) {
                         showRadmesserNotConnectedWarning();
                         return;
                     }
@@ -349,20 +347,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 stopService(recService);
                 recording = false;
                 if (mBoundRecorderService.getRecordingAllowed()) {
-                    // Get the recorded files and send them to HistoryActivity for further processing
-                    Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                    // The file under PathToAccGpsFile contains the accelerometer and location data
-                    // as well as time data
-                    intent.putExtra("PathToAccGpsFile", mBoundRecorderService.getPathToAccGpsFile());
-
-                    // timestamp in ms from 1970
-                    intent.putExtra("Duration", String.valueOf(mBoundRecorderService.getDuration()));
-                    intent.putExtra("StartTime", String.valueOf(mBoundRecorderService.getStartTime()));
-
-                    // State can be 0 for not annotated, 1 for started but not sent
-                    // and 2 for annotated and sent to the server
-                    intent.putExtra("State", MetaData.STATE.JUST_RECORDED); // redundant
-                    startActivity(intent);
+                    ShowRouteActivity.startShowRouteActivity(
+                            mBoundRecorderService.getCurrentRideKey(),
+                            MetaData.STATE.JUST_RECORDED,
+                            this
+                    );
                 } else {
                     DialogInterface.OnClickListener errorOnClickListener = (dialog, which) -> {
                     };
@@ -390,7 +379,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // Radmesser
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
         updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
-        if(radmesserEnabled){
+        if (radmesserEnabled) {
             BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (mBluetoothAdapter == null) {
                 // Device does not support Bluetooth
@@ -408,15 +397,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Log.d(TAG, "OnCreate finished");
     }
 
-    private void deactivateRadmesser(){
+    private void deactivateRadmesser() {
         radmesserEnabled = false;
         updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
         SharedPref.Settings.Radmesser.setEnabled(false, this);
     }
 
-    private void startRadmesserService(){
+    private void startRadmesserService() {
         RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
-        if(radmesserEnabled && currentState.equals(RadmesserService.ConnectionState.DISCONNECTED)){
+        if (radmesserEnabled && currentState.equals(RadmesserService.ConnectionState.DISCONNECTED)) {
             RadmesserService.startScanning(this);
         }
         registerRadmesserService();
@@ -440,8 +429,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
-    private void registerRadmesserService(){
-        receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks(){
+    private void registerRadmesserService() {
+        receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks() {
             public void onConnectionStateChanged(RadmesserService.ConnectionState newState) {
                 Log.d(TAG, "Staus changed in main " + newState.toString());
                 updateRadmesserButtonStatus(newState);
@@ -449,7 +438,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             public void onDeviceFound(String deviceName, String deviceId) {
                 Log.d(TAG, "Device found from main");
-                if(!RadmesserService.getConnectionState().equals(RadmesserService.ConnectionState.CONNECTED)){
+                if (!RadmesserService.getConnectionState().equals(RadmesserService.ConnectionState.CONNECTED)) {
                     Toast.makeText(MainActivity.this, "Gerät gefunden, clicke auf dem Bluetooth Knopf um dich damit zu verbinden", Toast.LENGTH_LONG).show();
                 }
             }
@@ -462,12 +451,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onDestroy();
     }
 
-    private void unregisterRadmesserService(){
+    private void unregisterRadmesserService() {
         RadmesserService.unRegisterCallbacks(receiver, this);
         receiver = null;
     }
 
-    private void startRecording(){
+    private void startRecording() {
         if (!PermissionHelper.hasBasePermissions(this)) {
             PermissionHelper.requestFirstBasePermissionsNotGranted(MainActivity.this);
             Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
@@ -551,10 +540,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
         boolean isConnecting;
 
-        if(radmesserEnabled)
+        if (radmesserEnabled)
             isConnecting = RadmesserService.tryConnectPairedDevice(this);
 
-        if(receiver == null && radmesserEnabled){
+        if (receiver == null && radmesserEnabled) {
             registerRadmesserService();
         }
         super.onResume();

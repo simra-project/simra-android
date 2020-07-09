@@ -23,11 +23,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
+import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
-import de.tuberlin.mcc.simra.app.entities.Ride;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
-import de.tuberlin.mcc.simra.app.util.Utils;
 
 public class EvaluateClosePassActivity extends AppCompatActivity {
     private static final String TAG = "EvaluateClosePass";
@@ -38,7 +38,8 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
     TextView currentDistanceValue;
     List<File> imageQueue;
     DataLogEntry currentDataLogEntry;
-    Ride ride;
+    IncidentLog incidentLog;
+    DataLog dataLog;
 
     public static void startEvaluateClosePassActivity(int rideId, Context context) {
         Intent intent = new Intent(context, EvaluateClosePassActivity.class);
@@ -108,14 +109,15 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         currentDistanceValue = findViewById(R.id.closePassCurrentValue);
 
 
-        Integer rideId = getIntent().getIntExtra(EXTRA_RIDE_ID, 0);
-        ride = Ride.loadRideById(rideId, this);
+        int rideId = getIntent().getIntExtra(EXTRA_RIDE_ID, 0);
+        incidentLog = IncidentLog.loadIncidentLog(rideId, this);
+        dataLog = DataLog.loadDataLog(rideId, this);
 
 
         MaterialButton closePassConfirmButton = findViewById(R.id.closePassConfirmButton);
         closePassConfirmButton.setOnClickListener(view -> {
-            ride.incidentLog.incidents.add(IncidentLogEntry.newBuilder()
-                    .withKey(ride.incidentLog.incidents.size())
+            incidentLog.incidents.add(IncidentLogEntry.newBuilder()
+                    .withKey(incidentLog.incidents.size())
                     .withTimestamp(currentDataLogEntry.timestamp)
                     .withGPS(currentDataLogEntry.latitude, currentDataLogEntry.longitude)
                     .withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS)
@@ -136,7 +138,7 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         closePassPicture.setImageBitmap(decodeSampledBitmapFromFile(imageQueue.get(0).getAbsolutePath(), displayMetrics.widthPixels, displayMetrics.heightPixels));
         boolean foundPicture = false;
-        for (DataLogEntry d : ride.dataLog.dataLogEntries) {
+        for (DataLogEntry d : dataLog.dataLogEntries) {
             if (d.timestamp == Long.parseLong(imageQueue.get(0).getName().split("\\.")[0])) {
                 currentDistanceValue.setText(String.valueOf(((DataLogEntry) d).RadmesserDistanceLeft1));
                 foundPicture = true;
@@ -157,9 +159,7 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
     public void removePicture() {
         imageQueue.remove(0);
         if (imageQueue.isEmpty()) {
-            File newFile = IOUtils.Files.getEventsFile(ride.rideID, false, this);
-            Utils.overwriteFile(ride.incidentLog.toFileString(), newFile);
-
+            IncidentLog.saveIncidentLog(incidentLog, this);
             IOUtils.deleteDirectoryContent(IOUtils.Directories.getPictureCacheDirectoryPath());
             finish();
         } else {

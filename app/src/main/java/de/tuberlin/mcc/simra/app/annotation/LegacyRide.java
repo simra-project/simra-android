@@ -33,9 +33,6 @@ public class LegacyRide {
     public int trailer;
     public int pLoc;
     public int waitedTime;
-    String duration;
-    String startTime;
-    String endTime;
     Context context;
     Polyline route;
     boolean temp = false;
@@ -44,8 +41,6 @@ public class LegacyRide {
 
     public LegacyRide(
             File accGpsFile,
-            String duration,
-            String startTime,
             int state,
             int bike,
             int child,
@@ -55,8 +50,6 @@ public class LegacyRide {
             boolean calculateEvents,
             boolean temp
     ) throws IOException {
-        this.duration = duration;
-        this.startTime = startTime;
         Object[] waitedTimeRouteAndDistance = calculateWaitedTimePolylineDistance(accGpsFile);
         this.waitedTime = (int) waitedTimeRouteAndDistance[0];
         this.route = (Polyline) waitedTimeRouteAndDistance[1];
@@ -367,10 +360,6 @@ public class LegacyRide {
 
     public List<AccEvent> getEvents() {
         return events;
-    }
-
-    public String getDuration() {
-        return duration;
     }
 
     public Polyline getRoute() {
