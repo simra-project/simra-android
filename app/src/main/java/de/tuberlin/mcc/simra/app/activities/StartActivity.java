@@ -18,9 +18,7 @@ import java.util.Arrays;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
-import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
-import de.tuberlin.mcc.simra.app.util.Utils;
 import de.tuberlin.mcc.simra.app.util.VersionUpdater;
 
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showDataDirectory;
@@ -32,7 +30,6 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.deleteErrorLogsForVersion;
-import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 
 /**
  * Shows general info about the app, if the app is run the first time.
@@ -69,24 +66,6 @@ public class StartActivity extends BaseActivity {
         next.setOnClickListener(v -> {
             navigateIfAllPermissionsGranted();
         });
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // META-FILE (one per user): contains ...
-        // * the information required to display rides in the ride history (See RecorderService)
-        //   (DATE,START TIME, END TIME, ANNOTATED TRUE/FALSE)
-        // * the RIDE KEY which allows to identify the file containing the complete data for
-        //   a ride. => Use case: user wants to view a ride from history - retrieve data
-        // * one meta file per user, so we only want to create it if it doesn't exist yet.
-        //   (fileExists and appendToFile can be found in the Utils.java class)
-
-        File metaDataFile = IOUtils.Files.getMetaDataFile(this);
-        if ((!metaDataFile.exists()) || metaDataFile.length() == 0) {
-            String fileInfoLine = getAppVersionNumber(this) + "#1" + System.lineSeparator();
-            Log.d(TAG, "Creating metaData.csv");
-            Utils.overwriteFile((fileInfoLine + "key, startTime, endTime, annotated, distance, waitTime"
-                    + System.lineSeparator()), metaDataFile);
-
-        }
     }
 
     public boolean allPermissionGranted() {

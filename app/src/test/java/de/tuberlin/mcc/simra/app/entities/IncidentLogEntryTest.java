@@ -23,7 +23,7 @@ public class IncidentLogEntryTest {
 
     @Test
     public void parseEntryFromLine_Special_Chars() {
-        assertThat(IncidentLogEntry.parseEntryFromLine(",,,,,,,,,,,,,,,,,,,string;komma;;linebreak;"))
+        assertThat(IncidentLogEntry.parseEntryFromLine(",,,,,,,,,,,,,,,,,,,string;komma;;linebreak;,"))
                 .usingRecursiveComparison()
                 .isEqualTo(IncidentLogEntry.newBuilder().withRideInformation(0, false, false, 0, 0, null, false, "string," + System.lineSeparator()).build());
     }
@@ -53,7 +53,7 @@ public class IncidentLogEntryTest {
     public void stringifyDataLogEntry_Empty() {
         assertThat(IncidentLogEntry.newBuilder()
                 .build().stringifyDataLogEntry())
-                .isEqualTo(",,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,");
+                .isEqualTo(",,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,0");
     }
 
     @Test
@@ -73,7 +73,7 @@ public class IncidentLogEntryTest {
 
                 )
                 .build().stringifyDataLogEntry())
-                .isEqualTo("0,52.48022987,13.35637859,1561224261445,3,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,");
+                .isEqualTo("0,52.48022987,13.35637859,1561224261445,3,0,0,2,0,0,0,0,0,0,0,0,0,0,0,,0");
     }
 
     @Test
@@ -104,7 +104,7 @@ public class IncidentLogEntryTest {
 
                 )
                 .build().stringifyDataLogEntry())
-                .isEqualTo("0,52.48022987,13.35637859,1561224261445,1,1,1,2,3,1,1,1,1,1,1,1,1,1,1,1,string");
+                .isEqualTo("0,52.48022987,13.35637859,1561224261445,1,1,1,2,3,1,1,1,1,1,1,1,1,1,1,string,1");
     }
 
     @Test
@@ -122,6 +122,6 @@ public class IncidentLogEntryTest {
 
                 )
                 .build().stringifyDataLogEntry())
-                .isEqualTo(",,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,string;komma;;linebreak;");
+                .isEqualTo(",,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,string;komma;;linebreak;,0");
     }
 }

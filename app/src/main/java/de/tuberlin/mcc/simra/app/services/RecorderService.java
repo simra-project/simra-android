@@ -325,6 +325,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             int region = lookUpIntSharedPrefs("Region", 0, "Profile", this);
             overwriteFile((IOUtils.Files.getFileInfoLine() + DataLog.DATA_LOG_HEADER + System.lineSeparator() + accGpsString.toString()), IOUtils.Files.getGPSLogFile(key, false, this));
             MetaData.updateOrAddMetaDataEntryForRide(new MetaDataEntry(key, startTime, endTime, MetaData.STATE.JUST_RECORDED, 0, waitedTime, Math.round(route.getDistance()), 0, region), this);
+            IncidentLog.saveIncidentLog(incidentLog, this);
             editor.putInt("RIDE-KEY", key + 1);
             editor.apply();
         }

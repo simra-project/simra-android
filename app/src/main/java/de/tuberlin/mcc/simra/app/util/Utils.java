@@ -814,7 +814,7 @@ public class Utils {
 
         List<IncidentLogEntry> incidents = new ArrayList<>();
         for (AccEvent accEvent : accEvents) {
-            if (!(accEvent.position.getLatitude() == 999)) {
+            if (!(accEvent.position.getLatitude() == 999 || accEvent.position.getLatitude() == 0f)) {
                 incidents.add(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.AUTO_GENERATED).withBaseInformation(accEvent.timeStamp, accEvent.position.getLatitude(), accEvent.position.getLongitude()).build());
             }
         }

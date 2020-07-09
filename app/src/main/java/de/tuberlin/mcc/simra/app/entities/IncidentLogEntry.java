@@ -111,8 +111,8 @@ public class IncidentLogEntry implements Serializable {
                 booleanToInt(involvedRoadUser.taxi) + "," +
                 booleanToInt(involvedRoadUser.other) + "," +
                 booleanToInt(scarySituation) + "," +
-                booleanToInt(involvedRoadUser.electricScooter) + "," +
-                description.replace(System.lineSeparator(), ";linebreak;").replace(",", ";komma;");
+                description.replace(System.lineSeparator(), ";linebreak;").replace(",", ";komma;") + "," +
+                booleanToInt(involvedRoadUser.electricScooter);
     }
 
     public static final class Builder {
