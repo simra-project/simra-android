@@ -74,6 +74,8 @@ public class RadmesserService extends Service {
                 "SimRa RadmesseR connection",
                 newState.toString()
         );
+        if (newState == ConnectionState.CONNECTED)
+            setPairedRadmesserID(connectedDevice.getID(), this);
     }
 
     @Override
@@ -154,7 +156,7 @@ public class RadmesserService extends Service {
     private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
             new BLEService(RadmesserDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
                     RadmesserDevice.UUID_SERVICE_HEARTRATE_CHAR,
-                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
+                    val -> broadcastHeatRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
             ),
 
             new BLEService(RadmesserDevice.UUID_SERVICE_CLOSEPASS).addCharacteristic(
@@ -179,7 +181,7 @@ public class RadmesserService extends Service {
                         if (strVal != null && strVal.equals("1")) {
                             connectedDevice.devicePaired = true;
                             setConnectionState(ConnectionState.CONNECTED);
-                            setPairedRadmesserID(connectedDevice.getID(), this);
+
                         }
                     }
             )
@@ -235,13 +237,13 @@ public class RadmesserService extends Service {
      * returns false if there is no device paired yet
      */
     public static boolean tryConnectPairedDevice(Context ctx) {
-        String connectedDevice = getPairedRadmesserID(ctx);
-        if (connectedDevice == null)
+        String deviceId = getPairedRadmesserID(ctx);
+        if (deviceId == null)
             return false;
 
         Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_CONNECT_DEVICE);
-        intent.putExtra(EXTRA_CONNECT_DEVICE, connectedDevice);
+        intent.putExtra(EXTRA_CONNECT_DEVICE, deviceId);
         ctx.startService(intent);
         return true;
     }
@@ -298,6 +300,9 @@ public class RadmesserService extends Service {
     }
 
     private void connectDevice(String deviceId) {
+        if (connectedDevice != null && connectedDevice.getID().equals(deviceId) && connectionState == ConnectionState.CONNECTED)
+            return;
+
         disconnectAndUnpairDevice();
         bluetoothScanner.findDeviceById(deviceId,
                 device -> connectedDevice = new RadmesserDevice(device, radmesserConnectionCallbacks, radmesserServicesDefinition, this)
@@ -326,6 +331,7 @@ public class RadmesserService extends Service {
     final static String ACTION_DEVICE_FOUND = "de.tuberlin.mcc.simra.app.radmesserservice.actiondevicefound";
     final static String ACTION_CONNECTION_STATE_CHANGED = "de.tuberlin.mcc.simra.app.radmesserservice.actiondconnectionstatechanged";
     final static String ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedclosepass.distance";
+    final static String ACTION_VALUE_RECEIVED_HEARTRATE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedheartrate";
     final static String ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedclosepass.event";
     final static String ACTION_VALUE_RECEIVED_DISTANCE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceiveddistance";
 
@@ -350,6 +356,12 @@ public class RadmesserService extends Service {
 
     private void broadcastClosePassDistance(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);
+        intent.putExtra(EXTRA_VALUE, value);
+        broadcastManager.sendBroadcast(intent);
+    }
+
+    private void broadcastHeatRate(String value) {
+        Intent intent = new Intent(ACTION_VALUE_RECEIVED_HEARTRATE);
         intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);
     }
@@ -380,6 +392,9 @@ public class RadmesserService extends Service {
         }
 
         public void onDistanceValue(@Nullable Measurement measurement) {
+        }
+
+        public void onHeartRate(Short value) {
         }
     }
 
@@ -432,11 +447,25 @@ public class RadmesserService extends Service {
                                 )
                         );
                         break;
+                    case ACTION_VALUE_RECEIVED_HEARTRATE:
+                        callbacks.onHeartRate(
+                                parseShort(intent.getStringExtra(EXTRA_VALUE))
+                        );
+                        break;
                 }
             }
         };
         LocalBroadcastManager.getInstance(ctx).registerReceiver(rec, filter);
         return rec;
+    }
+
+    private static Short parseShort(String value) {
+        try {
+            return new Short(value);
+        } catch (NumberFormatException nex) {
+            return null;
+        }
+
     }
 
     public static class Measurement {
@@ -519,7 +548,7 @@ public class RadmesserService extends Service {
     // TODO: Use Utils (or refactor) shared Prefs usage
 
     public void unPairedRadmesser() {
-        getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().remove(sharedPrefsKeyRadmesserID).apply();
+        //getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().remove(sharedPrefsKeyRadmesserID).apply();
     }
 
     @Nullable
