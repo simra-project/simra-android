@@ -20,7 +20,7 @@ public class IncidentLog {
     public final int rideId;
     private Map<Integer, IncidentLogEntry> incidents;
 
-    private IncidentLog(int rideId, Map<Integer, IncidentLogEntry> incidents) {
+    public IncidentLog(int rideId, Map<Integer, IncidentLogEntry> incidents) {
         this.rideId = rideId;
         this.incidents = incidents;
     }

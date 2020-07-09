@@ -78,7 +78,7 @@ public class MetaData {
         return null;
     }
 
-    public static void updateMetaDataEntryForRide(MetaDataEntry metaDataEntry, Context context) {
+    public static void updateOrAddMetaDataEntryForRide(MetaDataEntry metaDataEntry, Context context) {
         MetaData metaData = loadMetaData(context);
         metaData.metaDataEntries.put(metaDataEntry.rideId, metaDataEntry);
         saveMetaData(metaData, context);

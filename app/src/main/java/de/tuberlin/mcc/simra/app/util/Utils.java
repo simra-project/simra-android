@@ -65,24 +65,6 @@ public class Utils {
         return content.toString();
     }
 
-    public static String readContentFromFile(File file) {
-        if (file.isDirectory()) {
-            return "FILE IS DIRECTORY";
-        }
-        StringBuilder content = new StringBuilder();
-
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                content.append(line).append(System.lineSeparator());
-            }
-        } catch (IOException ioe) {
-            Log.d(TAG, "readContentFromFile() Exception: " + Arrays.toString(ioe.getStackTrace()));
-        }
-        return content.toString();
-    }
-
     public static String readContentFromFileAndIncreaseFileVersion(String fileName, Context context) {
         StringBuilder content = new StringBuilder();
         int appVersion = getAppVersionNumber(context);
@@ -101,37 +83,6 @@ public class Utils {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
         }
         return (fileInfoLine + content.toString());
-    }
-
-    /**
-     * Use Utils.overwriteFile(file) instead.
-     * Why? For Clarity filename does not say where the file is...
-     *
-     * @deprecated
-     */
-    public static void appendToFile(String content, String fileName, Context context) {
-
-        try {
-            File tempFile = new File(IOUtils.Directories.getBaseFolderPath(context) + fileName);
-            FileOutputStream writer = new FileOutputStream(tempFile, true);
-            writer.write(content.getBytes());
-            writer.flush();
-            writer.close();
-        } catch (IOException ioe) {
-            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
-        }
-    }
-
-    public static void appendToFile(String content, File file) {
-
-        try {
-            FileOutputStream writer = new FileOutputStream(file, true);
-            writer.write(content.getBytes());
-            writer.flush();
-            writer.close();
-        } catch (IOException ioe) {
-            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
-        }
     }
 
     // appends content from file <accGps> to the content of file <accEvents>

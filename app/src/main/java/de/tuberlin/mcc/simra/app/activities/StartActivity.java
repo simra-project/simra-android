@@ -25,7 +25,6 @@ import de.tuberlin.mcc.simra.app.util.VersionUpdater;
 
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showDataDirectory;
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showKeyPrefs;
-import static de.tuberlin.mcc.simra.app.util.LogHelper.showMetaDataFile;
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showMetadata;
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showStatistics;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
@@ -56,7 +55,6 @@ public class StartActivity extends BaseActivity {
         showKeyPrefs(this);
         showDataDirectory(this);
         showMetadata(this);
-        showMetaDataFile(this);
         showStatistics(this);
         deleteErrorLogsForVersion(this, 26);
 

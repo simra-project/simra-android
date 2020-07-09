@@ -455,7 +455,7 @@ public class ShowRouteActivity extends BaseActivity {
         metaDataEntry.numberOfIncidents = incidentLog.getIncidents().size();
         metaDataEntry.numberOfScaryIncidents = IncidentLog.getScaryIncidents(incidentLog).size();
         metaDataEntry.region = lookUpIntSharedPrefs("Region", 0, "Profile", this);
-        MetaData.updateMetaDataEntryForRide(metaDataEntry, this);
+        MetaData.updateOrAddMetaDataEntryForRide(metaDataEntry, this);
 
         Toast.makeText(this, getString(R.string.savedRide), Toast.LENGTH_SHORT).show();
         HistoryActivity.startHistoryActivity(this);

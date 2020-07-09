@@ -67,6 +67,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
@@ -340,7 +341,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         reportIncidentBtn = findViewById(R.id.report_incident);
         reportIncidentBtn.setOnClickListener(v -> {
-            IncidentBroadcaster.broadcastIncident(this);
+            IncidentBroadcaster.broadcastIncident(this, IncidentLogEntry.INCIDENT_TYPE.NOTHING);
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
