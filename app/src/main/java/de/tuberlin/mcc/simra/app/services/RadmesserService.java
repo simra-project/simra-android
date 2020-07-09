@@ -176,12 +176,10 @@ public class RadmesserService extends Service {
             new BLEService(RadmesserDevice.UUID_SERVICE_CONNECTION).addCharacteristic(
                     RadmesserDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED,
                     val -> {
-                        Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
+                        //Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
                         String strVal = val.getStringValue(0);
                         if (strVal != null && strVal.equals("1")) {
                             connectedDevice.devicePaired = true;
-                            setConnectionState(ConnectionState.CONNECTED);
-
                         }
                     }
             )
