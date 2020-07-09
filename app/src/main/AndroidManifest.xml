@@ -62,15 +62,6 @@
             android:name=".activities.RadmesserActivity"
             android:label="@string/title_activity_bluetooth_connection" />
         <activity
-            android:name=".annotation.RideSettingsActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_ride_settings"
-            android:parentActivityName=".activities.ShowRouteActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.tuberlin.mcc.simra.app.activities.ShowRouteActivity" />
-        </activity>
-        <activity
             android:name=".activities.LicenseActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_library_license" />
