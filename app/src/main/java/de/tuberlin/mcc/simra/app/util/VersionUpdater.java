@@ -6,9 +6,13 @@ import android.content.res.Resources;
 import android.location.Location;
 import android.util.Log;
 
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.Polyline;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
@@ -16,8 +20,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
-
-import de.tuberlin.mcc.simra.app.annotation.LegacyRide;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
@@ -167,7 +169,7 @@ public class VersionUpdater {
                     } else {
                         continue;
                     }
-                    Object[] waitedTimeRouteAndDistance = LegacyRide.calculateWaitedTimePolylineDistance(gpsFile);
+                    Object[] waitedTimeRouteAndDistance = Legacy.calculateWaitedTimePolylineDistance(gpsFile);
                     if (isUploaded) {
                         totalDuration += (Long.parseLong(endTime) - Long.parseLong(startTime));
                         totalNumberOfRides++;
@@ -493,5 +495,66 @@ public class VersionUpdater {
             }
         }
         newE.apply();
+    }
+
+    public static class Legacy {
+        // Takes a File which contains all the data and creates a
+        // PolyLine to be displayed on the map as a route.
+        public static Object[] calculateWaitedTimePolylineDistance(File gpsFile) throws IOException {
+            Polyline polyLine = new Polyline();
+            BufferedReader br = new BufferedReader(new FileReader(gpsFile));
+            // br.readLine() to skip the first two lines which contain the file version info and headers
+            String line = br.readLine();
+            line = br.readLine();
+            int waitedTime = 0; // seconds
+            Location previousLocation = null;
+            Location thisLocation = null;
+            long previousTimeStamp = 0; // milliseconds
+            long thisTimeStamp = 0; // milliseconds
+            long distance = 0; // meters
+            while ((line = br.readLine()) != null) {
+                String[] accGpsLineArray = line.split(",");
+                if (!line.startsWith(",,")) {
+                    try {
+                        if (thisLocation == null) {
+                            thisLocation = new Location("thisLocation");
+                            thisLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            thisLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                            previousLocation = new Location("previousLocation");
+                            previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                            thisTimeStamp = Long.parseLong(accGpsLineArray[5]);
+                            previousTimeStamp = Long.parseLong(accGpsLineArray[5]);
+                        } else {
+                            thisLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            thisLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                            thisTimeStamp = Long.parseLong(accGpsLineArray[5]);
+                            // distance to last location in meters
+                            double distanceToLastPoint = thisLocation.distanceTo(previousLocation);
+                            // time passed from last point in seconds
+                            long timePassed = (thisTimeStamp - previousTimeStamp) / 1000;
+                            // if speed < 2.99km/h: waiting
+                            if (distanceToLastPoint < 2.5) {
+                                waitedTime += timePassed;
+                            }
+                            // if speed > 80km/h: too fast, do not consider for distance
+                            if ((distanceToLastPoint / timePassed) < 22) {
+                                distance += (long) distanceToLastPoint;
+                                polyLine.addPoint(new GeoPoint(thisLocation));
+                            }
+                            previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
+                            previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
+                            previousTimeStamp = Long.parseLong(accGpsLineArray[5]);
+                        }
+                    } catch (NumberFormatException nfe) {
+                        nfe.printStackTrace();
+                    }
+                }
+
+            }
+
+            br.close();
+            return new Object[]{waitedTime, polyLine, distance};
+        }
     }
 }

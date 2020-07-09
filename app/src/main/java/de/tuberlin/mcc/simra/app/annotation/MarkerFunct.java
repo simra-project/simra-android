@@ -25,33 +25,31 @@ import java.util.concurrent.TimeUnit;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.activities.ShowRouteActivity;
-import de.tuberlin.mcc.simra.app.entities.AccEvent;
+import de.tuberlin.mcc.simra.app.entities.DataLog;
+import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
+import de.tuberlin.mcc.simra.app.util.Utils;
 
 /**
- * What does it do?
+ * Convenience functions for working with the Map and setting or deleting markers
  */
 public class MarkerFunct {
 
     private static final String TAG = "MarkerFunct_LOG";
     private final String userAgent = "SimRa/alpha";
-    private ShowRouteActivity mother;
+    private ShowRouteActivity activity;
     private ExecutorService pool;
-    private Integer rideID;
-    private ArrayList<Marker> markers = new ArrayList<>();
     private GeocoderNominatim geocoderNominatim;
     private int state;
-    private int numEvents;
     private Map<Integer, Marker> markerMap = new HashMap<>();
     private IncidentLog incidentLog;
-    private LegacyRide legacyRide;
+    private DataLog gpsDataLog;
 
-    public MarkerFunct(ShowRouteActivity mother, int rideId, LegacyRide legacyRide, IncidentLog incidentLog) {
-        this.mother = mother;
-        this.rideID = rideId;
-        this.legacyRide = legacyRide;
-        this.pool = mother.pool;
+    public MarkerFunct(ShowRouteActivity activity, DataLog gpsDataLog, IncidentLog incidentLog) {
+        this.activity = activity;
+        this.gpsDataLog = gpsDataLog;
+        this.pool = activity.pool;
         this.incidentLog = incidentLog;
 
         pool.execute(new SimpleThreadFactory().newThread(() -> {
@@ -60,106 +58,73 @@ public class MarkerFunct {
                 }
         ));
 
-        this.state = mother.state;
-        this.numEvents = incidentLog.getIncidents().size() - 1;
+        this.state = activity.state;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Event determination and representation happens here
-
-    public void showIncidents() {
-        for (IncidentLogEntry incident : incidentLog.getIncidents()) {
-            setMarker(
-                    new AccEvent(
-                            incident.key,
-                            incident.latitude,
-                            incident.longitude,
-                            incident.timestamp,
-                            false,
-                            String.valueOf(incident.incidentType),
-                            String.valueOf(incident.scarySituation)
-                    ),
-                    incident
-            );
+    public void updateMarkers(IncidentLog incidentLog) {
+        for (Map.Entry<Integer, IncidentLogEntry> entry : incidentLog.getIncidents().entrySet()) {
+            IncidentLogEntry incident = entry.getValue();
+            setMarker(incident);
         }
     }
 
-
-    public void addCustMarker(GeoPoint p) {
-
-        // Because custom markers should only be placed on the actual route, after the
-        // user taps onto the map we're determining the GeoPoint on the route that
-        // is clostest to the location the user has actually tapped.
-        // => this is done via the GeoPointWrapper class.
-
-        GeoPoint closestOnRoute;
-
+    /**
+     * Because custom markers should only be placed on the actual route, after the
+     * user taps onto the map we're determining the GeoPoint on the route that
+     * is clostest to the location the user has actually tapped.
+     * => this is done via the GeoPointWrapper class.
+     *
+     * @param geoPoint
+     * @param gpsDataLog
+     * @return
+     */
+    public DataLogEntry getClosesDataLogEntryToGeoPoint(GeoPoint geoPoint, DataLog gpsDataLog) {
         List<GeoPointWrapper> wrappedGPS = new ArrayList<>();
-        for (GeoPoint thisGP : legacyRide.getRoute().getPoints()) {
-            wrappedGPS.add(new GeoPointWrapper(thisGP, p));
+        List<GeoPoint> gpsDataLogGeoPoints = gpsDataLog.rideAnalysisData.route.getPoints();
+        for (int i = 0; i < gpsDataLogGeoPoints.size(); i++) {
+            wrappedGPS.add(new GeoPointWrapper(gpsDataLogGeoPoints.get(i), geoPoint, gpsDataLog.onlyGPSDataLogEntries.get(i)));
         }
-
-        Log.d(TAG, "wrappedGPS.size(): " + wrappedGPS.size());
-
         Collections.sort(wrappedGPS, (GeoPointWrapper o1, GeoPointWrapper o2) -> {
-
             if (o1.distToReference < o2.distToReference) return -1;
-
             if (o1.distToReference > o2.distToReference) return 1;
-
             else return 0;
-
         });
+        return wrappedGPS.get(0).dataLogEntry;
+    }
 
-        closestOnRoute = wrappedGPS.get(0).wrappedGeoPoint;
 
-        Log.d(TAG, "closestOnRoute: " + closestOnRoute.toString());
-
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Create a new AccEvent
-        int eventCount = ++this.numEvents;
-        AccEvent newAcc = new AccEvent(eventCount, closestOnRoute.getLatitude(),
-                closestOnRoute.getLongitude(), 1337, false, "", "0");
-        Log.d(TAG, "newAcc: " + newAcc.toString());
-
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    public void addCustomMarker(GeoPoint geoPoint) {
+        DataLogEntry closestDataLogEntry = getClosesDataLogEntryToGeoPoint(geoPoint, gpsDataLog);
         // set Marker for new AccEvent, refresh map
-        IncidentLogEntry newIncidentLogEnty = incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(1337L, closestOnRoute.getLatitude(), closestOnRoute.getLongitude()).build());
-        setMarker(newAcc, newIncidentLogEnty);
-        mother.getmMapView().invalidate();
+        IncidentLogEntry newIncidentLogEnty = incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(closestDataLogEntry.timestamp, closestDataLogEntry.latitude, closestDataLogEntry.longitude).withIncidentType(IncidentLogEntry.INCIDENT_TYPE.NOTHING).build());
+        setMarker(newIncidentLogEnty);
+        activity.getmMapView().invalidate();
 
         // Now we display a dialog box to allow the user to decide if she/he is happy
         // with the location of the custom marker.
-        approveCustMarker(newAcc);
 
-    }
-
-    public void approveCustMarker(AccEvent newAcc) {
-
-        AlertDialog alertDialog = new AlertDialog.Builder(mother).create();
-        alertDialog.setTitle(mother.getResources().getString(R.string.customIncidentAddedTitle));
-        alertDialog.setMessage(mother.getResources().getString(R.string.customIncidentAddedMessage));
+        AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+        alertDialog.setTitle(activity.getResources().getString(R.string.customIncidentAddedTitle));
+        alertDialog.setMessage(activity.getResources().getString(R.string.customIncidentAddedMessage));
         alertDialog.setCancelable(false);
         alertDialog.setCanceledOnTouchOutside(false);
         // NEGATIVE BUTTON: marker wasn't placed in the right location, remove from
         // map & markerMap.
         // Removal from ride.events and file not necessary as the new event hasn't been
         // added to those structures yet.
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, mother.getResources().getString(R.string.no),
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, activity.getResources().getString(R.string.no),
                 (DialogInterface dialog, int which) -> {
-                    Marker custMarker = markerMap.get(this.numEvents);
-                    mother.getmMapView().getOverlays().remove(custMarker);
+                    Marker custMarker = markerMap.get(newIncidentLogEnty.key);
+                    activity.getmMapView().getOverlays().remove(custMarker);
                     //mother.getmMapView().getOverlayManager().remove(custMarker);
-                    mother.getmMapView().invalidate();
+                    activity.getmMapView().invalidate();
                     markerMap.remove(custMarker);
-                    this.numEvents--;
+                    incidentLog.removeIncident(newIncidentLogEnty);
                 });
 
         // POSITIVE BUTTON: user approves of button. Add to ride.events & file.
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mother.getResources().getString(R.string.yes),
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getResources().getString(R.string.yes),
                 (DialogInterface dialog, int which) -> {
-
-                    legacyRide.getEvents().add(newAcc);
                 });
 
         Window window = alertDialog.getWindow();
@@ -171,32 +136,35 @@ public class MarkerFunct {
         alertDialog.show();
     }
 
-    public void setMarker(AccEvent event, IncidentLogEntry incidentLogEntry) {
-        Marker incidentMarker = new Marker(mother.getmMapView());
-
+    public void setMarker(IncidentLogEntry incidentLogEntry) {
+        Marker incidentMarker = new Marker(activity.getmMapView());
+        Marker previousMarker = markerMap.get(incidentLogEntry.key);
+        if (previousMarker != null) {
+            activity.getmMapView().getOverlays().remove(previousMarker);
+        }
         // Add the marker + corresponding key to map so we can manage markers if
         // necessary (e.g., remove them)
-        markerMap.put(event.key, incidentMarker);
-        GeoPoint currentLocHelper = event.position;
+        markerMap.put(incidentLogEntry.key, incidentMarker);
+        GeoPoint currentLocHelper = new GeoPoint(incidentLogEntry.latitude, incidentLogEntry.longitude);
         incidentMarker.setPosition(currentLocHelper);
         /* Different marker icons for ....
          * A) annotated y/n
          * B) default/custom
          */
 
-        if (!event.annotated) {
+        if (Utils.checkForAnnotation(incidentLogEntry)) {
             // custom events can be detected via their timeStamp
-            if (!(event.timeStamp == 1337)) {
-                incidentMarker.setIcon(mother.editMarkerDefault);
+            if (!(incidentLogEntry.timestamp == 1337)) {
+                incidentMarker.setIcon(activity.markerDefault);
             } else {
-                incidentMarker.setIcon(mother.editCustMarker);
+                incidentMarker.setIcon(activity.markerNotYetAnnotated);
             }
         } else {
             // custom events can be detected via their timeStamp
-            if (!(event.timeStamp == 1337)) {
-                incidentMarker.setIcon(mother.editDoneDefault);
+            if (!(incidentLogEntry.timestamp == 1337)) {
+                incidentMarker.setIcon(activity.markerAutoGenerated);
             } else {
-                incidentMarker.setIcon(mother.editDoneCust);
+                incidentMarker.setIcon(activity.editDoneCust);
             }
         }
 
@@ -209,13 +177,12 @@ public class MarkerFunct {
         }
 
         InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble,
-                mother.getmMapView(),
-                addressForLoc, mother, state, incidentLogEntry);
+                activity.getmMapView(),
+                addressForLoc, activity, state, incidentLogEntry);
         incidentMarker.setInfoWindow(infoWindow);
 
-        markers.add(incidentMarker);
-        mother.getmMapView().getOverlays().add(incidentMarker);
-        mother.getmMapView().invalidate();
+        activity.getmMapView().getOverlays().add(incidentMarker);
+        activity.getmMapView().invalidate();
     }
 
     // Generate a new GeoPoint from address String via Geocoding
@@ -243,22 +210,13 @@ public class MarkerFunct {
 
     }
 
-    // Closes all InfoWindows.
-    public void closeAllInfoWindows() {
-        for (int i = 0; i < markers.size(); i++) {
-            markers.get(i).closeInfoWindow();
-        }
-    }
-
     public void deleteAllMarkers() {
-        for (int i = 0; i < markers.size(); i++) {
-            mother.getmMapView().getOverlays().remove(markers.get(i));
-
+        for (Map.Entry<Integer, Marker> markerEntry : markerMap.entrySet()) {
+            activity.getmMapView().getOverlays().remove(markerEntry.getValue());
         }
-        mother.getmMapView().invalidate();
+        activity.getmMapView().invalidate();
     }
 
-    // Thread factory implementation: to enable setting priority before new thread is returned
     class SimpleThreadFactory implements ThreadFactory {
         public Thread newThread(Runnable r) {
             Thread myThread = new Thread(r);

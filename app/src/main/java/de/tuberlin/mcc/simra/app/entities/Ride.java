@@ -5,23 +5,20 @@ package de.tuberlin.mcc.simra.app.entities;
  */
 public class Ride {
     public int rideID;
+    public int bike;
+    public int child;
+    public int trailer;
+    public int pLoc;
 
-
-    private Ride(int rideID) {
+    public Ride(int rideID, int bike, int child, int trailer, int pLoc) {
         this.rideID = rideID;
-    }
-
-    public static Ride loadRideById(int rideID) {
-        return new Ride(rideID);
+        this.bike = bike;
+        this.child = child;
+        this.trailer = trailer;
+        this.pLoc = pLoc;
     }
 
     public static void saveRide() {
 
     }
-
-    //public int getState() {
-//
-//    }
-
-
 }

@@ -120,6 +120,8 @@
     <string name="returnAsText">Return</string>
     <string name="savedRide">Ride saved</string>
     <string name="doNotShowAgain">Don\'t show this again</string>
+    <string name="ride_undo">Reset</string>
+
 
     <!--- IncidentPopUp -->
     <string name="description">Optional Comment</string>
@@ -192,8 +194,6 @@
     <string name="cancel_button">No, connect with the Radmesser</string>
     <string name="bluetooth_not_enable_title">Warning: Bluetooth is off</string>
     <string name="bluetooth_not_enable_message">Do you want to enable Bluetooth ? Otherwise the radmesser feature cannot be activated</string>
-
-
 
 
     <!-- Units -->

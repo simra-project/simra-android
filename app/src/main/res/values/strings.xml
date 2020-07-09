@@ -80,7 +80,6 @@
     <string name="bluetooth_not_enable_message">Möchten Sie die Bluetooth einschalten ? Ansonsten kann der Radmesser nicht verwendet werden</string>
 
 
-
     <!--- RecorderService -->
     <string name="foregroundNotificationTitle_record">Aufzeichnung der Fahrt</string>
     <string name="foregroundNotificationBody_record">Ihre Fahrt wird aufgezeichnet.</string>
@@ -127,6 +126,7 @@
     <string name="returnAsText">Zurück</string>
     <string name="savedRide">Die Fahrt wurde gespeichert</string>
     <string name="doNotShowAgain">Diesen Dialog nicht mehr zeigen</string>
+    <string name="ride_undo">Zurücksetzen</string>
 
     <!--- IncidentPopUp -->
     <string name="description">Optionaler Kommentar</string>

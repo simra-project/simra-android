@@ -55,6 +55,7 @@ public class MyInfoWindow extends InfoWindow {
 
         layout.setOnClickListener((View v) -> {
             IncidentPopUpActivity.startIncidentPopUpActivity(incidentLogEntry, state, motherActivity);
+            close();
         });
     }
 }

@@ -6,7 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -34,7 +34,8 @@ public class MetaData {
 
     public static MetaData loadMetaData(Context context) {
         File metaDataFile = IOUtils.Files.getMetaDataFile(context);
-        Map<Integer, MetaDataEntry> metaDataEntries = Collections.emptyMap();
+        Map<Integer, MetaDataEntry> metaDataEntries = new HashMap() {
+        };
         if (metaDataFile.exists()) {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(metaDataFile))) {
                 // Skip first two line as they do only contain the Header

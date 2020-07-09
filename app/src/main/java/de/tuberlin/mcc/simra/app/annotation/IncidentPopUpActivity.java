@@ -135,49 +135,34 @@ public class IncidentPopUpActivity extends AppCompatActivity {
                 return false;
             });
 
-            if (getIntent().getExtras() != null) {
+            doneButton.setOnClickListener((View v) -> {
+                // Update the incidentLogEntry with the values from the UI before closing
+                incidentLogEntry.incidentType = incidentTypeSpinner.getSelectedItemPosition();
+                incidentLogEntry.description = incidentDescription.getText().toString();
+                incidentLogEntry.scarySituation = scarinessCheckBox.isChecked();
+                incidentLogEntry.involvedRoadUser.bus = involvedTypeCheckBoxBus.isChecked();
+                incidentLogEntry.involvedRoadUser.cyclist = involvedTypeCheckBoxCyclist.isChecked();
+                incidentLogEntry.involvedRoadUser.pedestrian = involvedTypeCheckBoxPedestrian.isChecked();
+                incidentLogEntry.involvedRoadUser.deliveryVan = involvedTypeCheckBoxDeliveryVan.isChecked();
+                incidentLogEntry.involvedRoadUser.truck = involvedTypeCheckBoxTruck.isChecked();
+                incidentLogEntry.involvedRoadUser.motorcyclist = involvedTypeCheckBoxMotorcyclist.isChecked();
+                incidentLogEntry.involvedRoadUser.car = involvedTypeCheckBoxCar.isChecked();
+                incidentLogEntry.involvedRoadUser.taxi = involvedTypeCheckBoxTaxi.isChecked();
+                incidentLogEntry.involvedRoadUser.other = involvedTypeCheckBoxOther.isChecked();
+                incidentLogEntry.involvedRoadUser.electricScooter = involvedTypeCheckBoxElectricScooter.isChecked();
 
-                String lat = getIntent().getStringExtra("Incident_latitude");
-                String lon = getIntent().getStringExtra("Incident_longitude");
-                String ts = getIntent().getStringExtra("Incident_timeStamp");
-                String bike = getIntent().getStringExtra("Incident_bike");
-                String child = getIntent().getStringExtra("Incident_child");
-                String trailer = getIntent().getStringExtra("Incident_trailer");
-                String pLoc = getIntent().getStringExtra("Incident_pLoc");
+                incidentSaved = true;
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra(EXTRA_INCIDENT, incidentLogEntry);
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            });
 
-                // onClick-behavior for 'Done inserting description'-button: save incident
-                // data to file.
-
-                doneButton.setOnClickListener((View v) -> {
-                    // Update the incidentLogEntry with the values from the UI before closing
-                    incidentLogEntry.incidentType = incidentTypeSpinner.getSelectedItemPosition();
-                    incidentLogEntry.description = incidentDescription.getText().toString();
-                    incidentLogEntry.scarySituation = scarinessCheckBox.isChecked();
-                    incidentLogEntry.involvedRoadUser.bus = involvedTypeCheckBoxBus.isChecked();
-                    incidentLogEntry.involvedRoadUser.cyclist = involvedTypeCheckBoxCyclist.isChecked();
-                    incidentLogEntry.involvedRoadUser.pedestrian = involvedTypeCheckBoxPedestrian.isChecked();
-                    incidentLogEntry.involvedRoadUser.deliveryVan = involvedTypeCheckBoxDeliveryVan.isChecked();
-                    incidentLogEntry.involvedRoadUser.truck = involvedTypeCheckBoxTruck.isChecked();
-                    incidentLogEntry.involvedRoadUser.motorcyclist = involvedTypeCheckBoxMotorcyclist.isChecked();
-                    incidentLogEntry.involvedRoadUser.car = involvedTypeCheckBoxCar.isChecked();
-                    incidentLogEntry.involvedRoadUser.taxi = involvedTypeCheckBoxTaxi.isChecked();
-                    incidentLogEntry.involvedRoadUser.other = involvedTypeCheckBoxOther.isChecked();
-                    incidentLogEntry.involvedRoadUser.electricScooter = involvedTypeCheckBoxElectricScooter.isChecked();
-
-                    incidentSaved = true;
-                    Intent returnIntent = new Intent();
-                    returnIntent.putExtra(EXTRA_INCIDENT, incidentLogEntry);
-                    setResult(Activity.RESULT_OK, returnIntent);
-                    finish();
-                });
-
-                // Return to ShowRouteActivity without saving the annotated incidents
-                backButton.setOnClickListener((View v) -> {
-                    incidentSaved = false;
-                    finish();
-                });
-
-            }
+            // Return to ShowRouteActivity without saving the annotated incidents
+            backButton.setOnClickListener((View v) -> {
+                incidentSaved = false;
+                finish();
+            });
         } else {
             exitButton = findViewById(R.id.exitButton);
             exitButton.setOnTouchListener((v, event) -> {

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,7 +15,7 @@
         android:layout_height="fill_parent" />
 
     <RelativeLayout
-        android:id="@+id/addIncident"
+        android:id="@+id/addIncidentModeButton"
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:layout_below="@id/toolbar"
@@ -49,7 +48,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/exitAddIncident"
+        android:id="@+id/exitAddIncidentModeButton"
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:layout_below="@id/toolbar"
@@ -84,7 +83,7 @@
         android:id="@+id/bounding_box_center_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_below="@id/addIncident"
+        android:layout_below="@id/addIncidentModeButton"
         android:layout_alignEnd="@id/toolbar"
         android:layout_marginTop="10dp"
         android:background="@drawable/my_center"
@@ -92,36 +91,13 @@
         android:elevation="2dp"
         android:focusable="true" />
 
-    <!--
     <RelativeLayout
-        android:id="@+id/doneButton"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:background="@drawable/button_unpressed"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="DONE"
-            android:layout_centerInParent="true"
-            android:fontFamily="@font/assistant_extralight"
-            android:textColor="#FEFEFE"
-            android:textStyle="bold"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
-            />
-
-    </RelativeLayout>
-    -->
-    <RelativeLayout
-        android:id="@+id/progressBarRelativeLayout"
+        android:id="@+id/loadingAnimationLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/transparent"
-        android:elevation="9dp">
+        android:elevation="9dp"
+        android:visibility="gone">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -155,7 +131,7 @@
         android:id="@+id/exitShowRoute"
         android:layout_width="140dp"
         android:layout_height="50dp"
-        android:layout_alignEnd="@id/exitAddIncident"
+        android:layout_alignEnd="@id/exitAddIncidentModeButton"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp"
         android:background="@drawable/button_unpressed"
@@ -194,12 +170,23 @@
 
     </RelativeLayout>
 
+    <!-- <Button
+        android:id="@+id/saveRide"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/privacySliderDescription"
+        android:layout_alignEnd="@id/exitAddIncident"
+        android:layout_marginBottom="20dp"
+        android:text="@string/ride_reset"
+        app:icon="@drawable/ic_undo" /> -->
+
     <RelativeLayout
         android:id="@+id/saveIncident"
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:layout_above="@id/privacySliderDescription"
-        android:layout_alignEnd="@id/exitAddIncident"
+        android:layout_alignEnd="@id/exitAddIncidentModeButton"
         android:layout_marginBottom="20dp"
         android:background="@drawable/button_unpressed"
         android:clickable="true"
@@ -263,18 +250,16 @@
             android:adjustViewBounds="true"
             android:src="@drawable/startwhite" />
 
-        <com.jaygoo.widget.RangeSeekBar
-            android:id="@+id/privacySlider"
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/routePrivacySlider"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="8"
             android:paddingStart="5dp"
             android:paddingEnd="5dp"
-            app:rsb_mode="range"
-            app:rsb_progress_color="@color/colorAccent"
-            app:rsb_progress_default_color="@color/colorPrimary"
-            app:rsb_range_interval="1"
-            app:rsb_tick_mark_number="1" />
+            android:stepSize="1" />
+
 
         <ImageView
             android:layout_width="0dp"
