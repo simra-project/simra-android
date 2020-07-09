@@ -41,6 +41,7 @@ public class SettingsActivity extends BaseActivity {
     Button radmesserButton;
     Switch radmesserConnectionSwitch;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,6 +146,7 @@ public class SettingsActivity extends BaseActivity {
         if (BluetoothAdapter.getDefaultAdapter() == null) {
             // Device does not support Bluetooth
             radmesserConnectionSwitch.setEnabled(false);
+            RadmesserService.terminateService(this);
         }
         radmesserConnectionSwitch.setChecked(radmesserActivated);
         radmesserConnectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -204,6 +206,7 @@ public class SettingsActivity extends BaseActivity {
         } else {
             SharedPref.Settings.Radmesser.setEnabled(false, this);
             radmesserConnectionSwitch.setChecked(false);
+            RadmesserService.terminateService(this);
             radmesserButton.setVisibility(View.GONE);
         }
     }
@@ -223,5 +226,7 @@ public class SettingsActivity extends BaseActivity {
         super.onStop();
         Log.d(TAG, "onStop called");
     }
+
+
 
 }
