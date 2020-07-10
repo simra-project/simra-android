@@ -11,8 +11,8 @@ android {
         applicationId "dsp2020.simra.app"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 60
-        versionName "60.0"
+        versionCode 61
+        versionName "61.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
