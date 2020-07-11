@@ -141,7 +141,7 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         boolean foundPicture = false;
         for (DataLogEntry d : dataLog.dataLogEntries) {
             if (d.timestamp == Long.parseLong(imageQueue.get(0).getName().split("\\.")[0])) {
-                currentDistanceValue.setText(String.valueOf(((DataLogEntry) d).RadmesserDistanceLeft1));
+                currentDistanceValue.setText(String.valueOf(((DataLogEntry) d).radmesserDistanceLeft1));
                 foundPicture = true;
             }
             // Find next DataLogEntry with GPS Location attached

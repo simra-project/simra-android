@@ -26,6 +26,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,7 +42,6 @@ import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.MetaDataEntry;
-import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -49,6 +49,10 @@ import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 
+import static de.tuberlin.mcc.simra.app.services.RadmesserService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
+import static de.tuberlin.mcc.simra.app.services.RadmesserService.ACTION_VALUE_RECEIVED_DISTANCE;
+import static de.tuberlin.mcc.simra.app.services.RadmesserService.EXTRA_VALUE;
+import static de.tuberlin.mcc.simra.app.services.RadmesserService.EXTRA_VALUE_SERIALIZED;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
@@ -73,7 +77,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences.Editor editor;
     Location startLocation;
     // Radmesser
-    private String lastRadmesserValue = "";
+    private String lastRadmesserValue          = "";
+    private RadmesserService.ClosePassEvent lastRadmesserClosePassEvent = null;
     private LocationManager locationManager;
     private ExecutorService executor;
     private Sensor accelerometer;
@@ -81,12 +86,21 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private int key;
     private long lastPictureTaken = 0;
     private Integer thereWasAnIncident = null;
+    // TODO: refactor names!
     private BroadcastReceiver openBikeSensorMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra("distance");
-            //Log.d("receiver", "Got message: " + message);
-            lastRadmesserValue = message;
+            lastRadmesserValue = intent.getStringExtra(EXTRA_VALUE);
+        }
+    };
+    private BroadcastReceiver openBikeSensorMessageReceiverClosePassEvent = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
+
+            if (serializable instanceof RadmesserService.ClosePassEvent) {
+                lastRadmesserClosePassEvent = (RadmesserService.ClosePassEvent) serializable;
+            }
         }
     };
     private BroadcastReceiver incidentBroadcastReceiver = IncidentBroadcaster.recieveIncidents(this, new IncidentBroadcaster.IncidentCallbacks() {
@@ -261,8 +275,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Executor service for writing data
         executor = Executors.newSingleThreadExecutor();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                openBikeSensorMessageReceiver, new IntentFilter(RadmesserDevice.UUID_SERVICE_DISTANCE));
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(openBikeSensorMessageReceiver, new IntentFilter(ACTION_VALUE_RECEIVED_DISTANCE));
+        localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverClosePassEvent, new IntentFilter(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT));
     }
 
     @Override
@@ -288,13 +303,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-
         // When the user records a route for the first time, the ride key is 0.
         // For all subsequent rides, the key value increases by one at a time.
 
         key = sharedPrefs.getInt("RIDE-KEY", 0);
         incidentLog = new IncidentLog(key, new HashMap<>());
-
 
         // Fire the notification while recording
         Notification notification =
@@ -330,7 +343,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             editor.apply();
         }
 
-
         // Prevent new tasks from being added to thread
         executor.shutdown();
 
@@ -341,8 +353,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         locationManager.removeUpdates(this);
 
         // Stop Radmesser LocalBroadcast Listener
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(
-                openBikeSensorMessageReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverClosePassEvent);
 
         // Stop Manual Incident Broadcast Listener
         LocalBroadcastManager.getInstance(this).unregisterReceiver(incidentBroadcastReceiver);
@@ -381,7 +393,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         }
         return sum / myVals.size();
     }
-
 
     class InsertHandler implements Runnable {
 
@@ -468,8 +479,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                             CameraService.takePicture(RecorderService.this, String.valueOf(curTime), IOUtils.Directories.getPictureCacheDirectoryPath());
                         }
                     }
+                    lastRadmesserValue = "";
                 }
 
+                if (lastRadmesserClosePassEvent != null) {
+                    dataLogEntryBuilder.withRadmesserClosePassEvent(lastRadmesserClosePassEvent);
+                    lastRadmesserClosePassEvent = null;
+                }
 
                 String str = dataLogEntryBuilder.build().stringifyDataLogEntry();
                 Log.i(TAG, str);
@@ -498,6 +514,4 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             return RecorderService.this;
         }
     }
-
-
 }
