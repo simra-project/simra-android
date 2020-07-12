@@ -160,7 +160,6 @@ public class SettingsActivity extends BaseActivity {
                     startRadmesserService();
                 }
             } else {
-                stopService(new Intent(this, RadmesserService.class));
                 RadmesserService.terminateService(this);
             }
         });
