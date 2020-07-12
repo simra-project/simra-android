@@ -44,13 +44,14 @@ public class RadmesserActivity extends AppCompatActivity {
     Button retryButton;
     Button connectButton;
     private AlertDialog alertDialog;
-    Set<BluetoothDevice> foundDevices = new HashSet<>();
+    Set<BluetoothDevice> foundDevices;
     BluetoothDevice selectedDevice;
     RadioGroup devices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        foundDevices = new HashSet<>();
         setContentView(R.layout.activity_radmesser);
         initializeToolBar();
         Log.i("start", "RadmesserActivity");
@@ -62,6 +63,7 @@ public class RadmesserActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startScanningDevices();
+                foundDevices = new HashSet<>();
             }
         });
         devices  = new RadioGroup(this);
@@ -157,14 +159,17 @@ public class RadmesserActivity extends AppCompatActivity {
         devices.addView(radioButton);
     }
 
+    private void showRetryButton(){
+        searchingCircle.setVisibility(View.GONE);
+        retryButton.setVisibility(View.VISIBLE);
+    }
+
+    private void hideRetryButton(){
+        searchingCircle.setVisibility(View.VISIBLE);
+        retryButton.setVisibility(View.GONE);
+    }
+
     private void updateUI(RadmesserService.ConnectionState state){
-        if(state.equals(RadmesserService.ConnectionState.SEARCHING)){
-            searchingCircle.setVisibility(View.VISIBLE);
-            retryButton.setVisibility(View.GONE);
-        }else {
-            searchingCircle.setVisibility(View.GONE);
-            retryButton.setVisibility(View.VISIBLE);
-        }
         switch (state) {
             case PAIRING:
                 deviceLayout.setVisibility(View.GONE);
@@ -179,15 +184,17 @@ public class RadmesserActivity extends AppCompatActivity {
                 closeTutorialDialog();
                 break;
             case CONNECTION_REFUSED:
+                showRetryButton();
             case DISCONNECTED:
-            default:
+                showRetryButton();
+            case SEARCHING:
                 deviceLayout.setVisibility(View.GONE);
                 connectDevicesLayout.setVisibility(View.VISIBLE);
                 pairingLayout.setVisibility(View.GONE);
-                closeTutorialDialog();
+                hideRetryButton();
+            default:
                 break;
         }
-
     }
 
     private void registerReceiver() {

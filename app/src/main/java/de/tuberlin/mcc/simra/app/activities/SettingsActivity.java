@@ -161,6 +161,7 @@ public class SettingsActivity extends BaseActivity {
                 }
             } else {
                 stopService(new Intent(this, RadmesserService.class));
+                RadmesserService.terminateService(this);
             }
         });
 
