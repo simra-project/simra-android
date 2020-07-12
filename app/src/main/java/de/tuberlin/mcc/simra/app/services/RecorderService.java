@@ -51,7 +51,6 @@ import de.tuberlin.mcc.simra.app.util.UnitHelper;
 
 import static de.tuberlin.mcc.simra.app.services.RadmesserService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
 import static de.tuberlin.mcc.simra.app.services.RadmesserService.ACTION_VALUE_RECEIVED_DISTANCE;
-import static de.tuberlin.mcc.simra.app.services.RadmesserService.EXTRA_VALUE;
 import static de.tuberlin.mcc.simra.app.services.RadmesserService.EXTRA_VALUE_SERIALIZED;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
@@ -77,8 +76,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences.Editor editor;
     Location startLocation;
     // Radmesser
-    private String lastRadmesserValue          = "";
-    private RadmesserService.ClosePassEvent lastRadmesserClosePassEvent = null;
+    private RadmesserService.Measurement    lastRadmesserDistanceValue    = null;
+    private RadmesserService.ClosePassEvent lastRadmesserClosePassEvent   = null;
     private LocationManager locationManager;
     private ExecutorService executor;
     private Sensor accelerometer;
@@ -86,11 +85,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private int key;
     private long lastPictureTaken = 0;
     private Integer thereWasAnIncident = null;
-    // TODO: refactor names!
-    private BroadcastReceiver openBikeSensorMessageReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver openBikeSensorMessageReceiverDistanceValue  = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            lastRadmesserValue = intent.getStringExtra(EXTRA_VALUE);
+            Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
+
+            if (serializable instanceof RadmesserService.Measurement) {
+                lastRadmesserDistanceValue = (RadmesserService.Measurement) serializable;
+            }
         }
     };
     private BroadcastReceiver openBikeSensorMessageReceiverClosePassEvent = new BroadcastReceiver() {
@@ -276,7 +278,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         executor = Executors.newSingleThreadExecutor();
 
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localBroadcastManager.registerReceiver(openBikeSensorMessageReceiver, new IntentFilter(ACTION_VALUE_RECEIVED_DISTANCE));
+        localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverDistanceValue, new IntentFilter(ACTION_VALUE_RECEIVED_DISTANCE));
         localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverClosePassEvent, new IntentFilter(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT));
     }
 
@@ -353,7 +355,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         locationManager.removeUpdates(this);
 
         // Stop Radmesser LocalBroadcast Listener
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverDistanceValue);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverClosePassEvent);
 
         // Stop Manual Incident Broadcast Listener
@@ -471,15 +473,15 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         gyroscopeMatrix[2]
                 );
 
-                if (!lastRadmesserValue.isEmpty()) {
-                    dataLogEntryBuilder.withRadmesser(Integer.parseInt(lastRadmesserValue.split(",")[0]), null, null, null);
+                if (lastRadmesserDistanceValue != null) {
+                    dataLogEntryBuilder.withRadmesser(lastRadmesserDistanceValue.leftSensorValues.get(0), null, null, null);
                     if (takePictureDuringRideActivated) {
-                        if (Integer.parseInt(lastRadmesserValue.split(",")[0]) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= curTime) {
+                        if (lastRadmesserDistanceValue.leftSensorValues.get(0) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= curTime) {
                             lastPictureTaken = curTime;
                             CameraService.takePicture(RecorderService.this, String.valueOf(curTime), IOUtils.Directories.getPictureCacheDirectoryPath());
                         }
                     }
-                    lastRadmesserValue = "";
+                    lastRadmesserDistanceValue = null;
                 }
 
                 if (lastRadmesserClosePassEvent != null) {
