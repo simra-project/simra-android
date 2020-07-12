@@ -1,5 +1,7 @@
 package de.tuberlin.mcc.simra.app.entities;
 
+import java.util.ArrayList;
+
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 
 public class DataLogEntry {
@@ -87,6 +89,9 @@ public class DataLogEntry {
          // TODO load radmesser close pass event correctly from string
         RadmesserService.ClosePassEvent event = new RadmesserService.ClosePassEvent("0;none;");
         event.eventType = dataLogLine.length > 14 && !dataLogLine[14].isEmpty() ? dataLogLine[14] : null;
+        event.payload = new ArrayList<>();
+        if (dataLogLine.length > 15 && !dataLogLine[15].isEmpty()) event.payload.add(dataLogLine[15]);
+        if (dataLogLine.length > 16 && !dataLogLine[16].isEmpty()) event.payload.add(dataLogLine[16]);
         dataLogEntryBuilder.withRadmesserClosePassEvent(event);
 
         return dataLogEntryBuilder.build();
