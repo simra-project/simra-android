@@ -87,7 +87,7 @@ public class Utils {
 
     // appends content from file <accGps> to the content of file <accEvents>
     // and increases both their file version number
-    public static Pair<String, String> appendAccGpsToAccEvents(String accEvents, String accGps, Context context) {
+    public static Pair<String, String> appendAccGpsToAccEvents(File accEvents, File accGps, Context context) {
 
         StringBuilder content = new StringBuilder();
         StringBuilder accEventsContentToOverwrite = new StringBuilder();
@@ -95,7 +95,7 @@ public class Utils {
         int appVersion = getAppVersionNumber(context);
         String accEventsFileInfoLine = appVersion + "#-1" + System.lineSeparator();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accEvents)))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(accEvents))) {
             String line = br.readLine();
             String topFileVersion = "" + ((Integer.parseInt(line.split("#")[1])) + 1);
             accEventsFileInfoLine = appVersion + "#" + topFileVersion + System.lineSeparator();
@@ -106,7 +106,7 @@ public class Utils {
                     accEventsContentToUpload.append(line).append(System.lineSeparator());
                 }
             }
-            overWriteFile((accEventsFileInfoLine + accEventsContentToOverwrite.toString()), accEvents, context);
+            Utils.overwriteFile((accEventsFileInfoLine + accEventsContentToOverwrite.toString()), accEvents);
 
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
@@ -114,7 +114,7 @@ public class Utils {
 
         StringBuilder contentBottom = new StringBuilder();
         String bottomFileInfoLine = appVersion + "#-1";
-        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accGps)))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(accGps))) {
             String line;
             line = br.readLine();
             String bottomFileVersion = "" + ((Integer.parseInt(line.split("#")[1])) + 1);
@@ -122,7 +122,7 @@ public class Utils {
             while ((line = br.readLine()) != null) {
                 contentBottom.append(line).append(System.lineSeparator());
             }
-            overWriteFile((bottomFileInfoLine + contentBottom.toString()), accGps, context);
+            Utils.overwriteFile((bottomFileInfoLine + contentBottom.toString()), accGps);
 
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));

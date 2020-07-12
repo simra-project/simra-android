@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -76,8 +77,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences.Editor editor;
     Location startLocation;
     // Radmesser
-    private RadmesserService.Measurement    lastRadmesserDistanceValue    = null;
-    private RadmesserService.ClosePassEvent lastRadmesserClosePassEvent   = null;
+    private LinkedList<RadmesserService.Measurement> lastRadmesserDistanceValues = new LinkedList<>();
+    private List<RadmesserService.ClosePassEvent> lastRadmesserClosePassEvents = new LinkedList<>();
     private LocationManager locationManager;
     private ExecutorService executor;
     private Sensor accelerometer;
@@ -91,7 +92,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
             if (serializable instanceof RadmesserService.Measurement) {
-                lastRadmesserDistanceValue = (RadmesserService.Measurement) serializable;
+                lastRadmesserDistanceValues.add((RadmesserService.Measurement) serializable);
             }
         }
     };
@@ -101,7 +102,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
             if (serializable instanceof RadmesserService.ClosePassEvent) {
-                lastRadmesserClosePassEvent = (RadmesserService.ClosePassEvent) serializable;
+                lastRadmesserClosePassEvents.add((RadmesserService.ClosePassEvent) serializable);
             }
         }
     };
@@ -473,7 +474,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         gyroscopeMatrix[2]
                 );
 
-                if (lastRadmesserDistanceValue != null) {
+                if (lastRadmesserDistanceValues.size() > 0) {
+                    RadmesserService.Measurement lastRadmesserDistanceValue = lastRadmesserDistanceValues.remove(0);
+
                     dataLogEntryBuilder.withRadmesser(lastRadmesserDistanceValue.leftSensorValues.get(0), null, null, null);
                     if (takePictureDuringRideActivated) {
                         if (lastRadmesserDistanceValue.leftSensorValues.get(0) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= curTime) {
@@ -481,12 +484,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                             CameraService.takePicture(RecorderService.this, String.valueOf(curTime), IOUtils.Directories.getPictureCacheDirectoryPath());
                         }
                     }
-                    lastRadmesserDistanceValue = null;
                 }
 
-                if (lastRadmesserClosePassEvent != null) {
+                if (lastRadmesserClosePassEvents.size() > 0) {
+                    RadmesserService.ClosePassEvent lastRadmesserClosePassEvent = lastRadmesserClosePassEvents.remove(0);
+
                     dataLogEntryBuilder.withRadmesserClosePassEvent(lastRadmesserClosePassEvent);
-                    lastRadmesserClosePassEvent = null;
                 }
 
                 String str = dataLogEntryBuilder.build().stringifyDataLogEntry();
