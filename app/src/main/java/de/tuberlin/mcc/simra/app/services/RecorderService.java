@@ -105,12 +105,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             }
         }
     };
-    private BroadcastReceiver incidentBroadcastReceiver = IncidentBroadcaster.receiveIncidents(this, new IncidentBroadcaster.IncidentCallbacks() {
-        @Override
-        public void onManualIncident(int incidentType) {
-            incidentDuringRide = incidentType;
-        }
-    });
+    private BroadcastReceiver incidentBroadcastReceiver;
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
     private boolean recordingAllowed;
@@ -268,6 +263,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverDistanceValue, new IntentFilter(ACTION_VALUE_RECEIVED_DISTANCE));
         localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverClosePassEvent, new IntentFilter(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT));
+        incidentBroadcastReceiver = IncidentBroadcaster.receiveIncidents(this, new IncidentBroadcaster.IncidentCallbacks() {
+            @Override
+            public void onManualIncident(int incidentType) {
+                incidentDuringRide = incidentType;
+            }
+        });
     }
 
     @Override
