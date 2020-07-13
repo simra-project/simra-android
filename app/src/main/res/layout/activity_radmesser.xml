@@ -36,6 +36,7 @@
                     android:text="@string/availableDevices" />
 
                 <ProgressBar
+                    android:id="@+id/searching"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@id/connectDevicesText"
@@ -43,6 +44,22 @@
                     android:layout_marginLeft="4dp"
                     android:layout_toRightOf="@id/connectDevicesText"
                     android:indeterminate="true" />
+
+                <Button
+                    android:id="@+id/retry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="212dp"
+                    android:layout_marginEnd="73dp"
+                    android:height="38dip"
+                    android:minHeight="38dip"
+                    android:text="Retry"
+                    android:visibility="visible"
+                    />
+
+
             </RelativeLayout>
 
             <LinearLayout
