@@ -155,7 +155,7 @@ public class RadmesserService extends Service {
     private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
             new BLEService(RadmesserDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
                     RadmesserDevice.UUID_SERVICE_HEARTRATE_CHAR,
-                    val -> broadcastHeatRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
+                    val -> broadcastHeartRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
             ),
 
             new BLEService(RadmesserDevice.UUID_SERVICE_CLOSEPASS).addCharacteristic(
@@ -359,7 +359,7 @@ public class RadmesserService extends Service {
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void broadcastHeatRate(String value) {
+    private void broadcastHeartRate(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_HEARTRATE);
         intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);
@@ -477,9 +477,6 @@ public class RadmesserService extends Service {
 
         private Measurement(String line) throws MeasurementFormatException {
             try {
-                if (line.equals(""))    //explicit end of a closepass event
-                    throw new MeasurementFormatException();
-
                 String[] sections = line.split(";", -1);
 
                 timestamp = Long.parseLong(sections[0]);
