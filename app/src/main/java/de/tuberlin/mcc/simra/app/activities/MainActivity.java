@@ -118,6 +118,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // Radmesser
     private FloatingActionButton radmesserButton;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // other UI Elements
+    private Toolbar toolbar;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private ServiceConnection mRecorderServiceConnection = new ServiceConnection() {
@@ -297,7 +301,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (1): Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -355,7 +359,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         stopBtn = findViewById(R.id.button_stop);
         stopBtn.setOnClickListener(v -> {
             try {
-                showStart();
+                displayButtonsForMenue();
                 // Stop RecorderService which is recording accelerometer data
                 unbindService(mRecorderServiceConnection);
                 stopService(recService);
@@ -428,13 +432,33 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     // (2) stop button visible, start button invisible
 
-    public void showStart() {
-
+    public void displayButtonsForMenue() {
         startBtn.setVisibility(View.VISIBLE);
         stopBtn.setVisibility(View.INVISIBLE);
         reportObstacleIncidentBtn.setVisibility(View.INVISIBLE);
         reportClosepassIncidentBtn.setVisibility(View.INVISIBLE);
 
+        toolbar.setVisibility(View.VISIBLE);
+
+        findViewById(R.id.button_ride_settings_general).setVisibility(View.VISIBLE);
+        findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.VISIBLE);
+    }
+
+    public void displayButtonsForDrive() {
+        stopBtn.setVisibility(View.VISIBLE);
+        reportObstacleIncidentBtn.setVisibility(View.VISIBLE);
+        reportClosepassIncidentBtn.setVisibility(View.VISIBLE);
+        startBtn.setVisibility(View.INVISIBLE);
+
+        toolbar.setVisibility(View.INVISIBLE);
+
+         findViewById(R.id.button_ride_settings_general).setVisibility(View.INVISIBLE);
+        findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.INVISIBLE);
+
+    }
+
+    private void hideViewById(int id, int visibility) {
+        findViewById(id).setVisibility(visibility);
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -488,7 +512,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             } else {
                 // show stop button, hide start button
-                showStop();
+                displayButtonsForDrive();
 
                 // start RecorderService for accelerometer data recording
                 Intent intent = new Intent(MainActivity.this, RecorderService.class);
@@ -541,15 +565,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public void showStop() {
-
-        stopBtn.setVisibility(View.VISIBLE);
-        reportObstacleIncidentBtn.setVisibility(View.VISIBLE);
-        reportClosepassIncidentBtn.setVisibility(View.VISIBLE);
-        startBtn.setVisibility(View.INVISIBLE);
-
-
-    }
 
     public void onResume() {
 
@@ -567,9 +582,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Ensure the button that matches current state is presented.
         if (recording) {
-            showStop();
+            displayButtonsForDrive();
         } else {
-            showStart();
+            displayButtonsForMenue();
         }
 
         // Load Configuration with changes from onCreate
