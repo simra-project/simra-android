@@ -2,6 +2,8 @@ package de.tuberlin.mcc.simra.app.annotation;
 
 import org.osmdroid.util.GeoPoint;
 
+import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
+
 // This class wraps two GeoPoints and their distance (difference between their summed
 // lats & lons).
 // => PURPOSE: ensure that when users add incidents manually, they cannot include locations
@@ -9,32 +11,20 @@ import org.osmdroid.util.GeoPoint;
 //             So every manually added location gets replaced by the closest location included
 //             in the route.
 
-public class GeoPointWrapper implements Comparable<GeoPointWrapper> {
+public class GeoPointWrapper {
 
     public GeoPoint wrappedGeoPoint;
 
     public GeoPoint referencePoint;
 
     public double distToReference;
+    public DataLogEntry dataLogEntry;
 
-    public GeoPointWrapper(GeoPoint wrappedGeoPoint, GeoPoint referenceGeoPoint) {
-
+    public GeoPointWrapper(GeoPoint wrappedGeoPoint, GeoPoint referenceGeoPoint, DataLogEntry dataLogEntry) {
         this.wrappedGeoPoint = wrappedGeoPoint;
-
         this.referencePoint = referenceGeoPoint;
-
+        this.dataLogEntry = dataLogEntry;
         this.distToReference = calcDistToReference();
-
-    }
-
-    public int compareTo(GeoPointWrapper other) {
-
-        if (this.distToReference < other.distToReference) return -1;
-
-        if (this.distToReference > other.distToReference) return 1;
-
-        else return 0;
-
     }
 
     public double calcDistToReference() {

@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
-import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFile;
-
 /**
  * Log Helper Methods for easier debugging
  */
@@ -71,11 +69,5 @@ public class LogHelper {
         }
         Log.d(TAG, "timeBuckets: " + Arrays.toString(buckets));
         Log.d(TAG, "===========================Λ=Statistics=Λ===========================");
-    }
-
-    public static void showMetaDataFile(Context context) {
-        Log.d(TAG, "===========================V=metaData=V===========================");
-        Log.d(TAG, "metaData.csv: " + readContentFromFile(IOUtils.Files.getMetaDataFile(context)));
-        Log.d(TAG, "===========================Λ=metaData=Λ===========================");
     }
 }

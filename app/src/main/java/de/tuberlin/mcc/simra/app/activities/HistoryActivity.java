@@ -40,7 +40,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -58,25 +57,16 @@ public class HistoryActivity extends BaseActivity {
     TextView toolbarTxt;
 
     boolean exitWhenDone = false;
-    String accGpsString = "";
-    String pathToAccGpsFile = "";
-    int state = 0;
-    String duration = "";
-    String startTime = "";
 
     ListView listView;
     String[] ridesArr;
 
     BroadcastReceiver br;
 
-    /**
-     * When this Activity gets started automatically after the route recording is finished,
-     * the route gets shown immediately by calling ShowRouteActivity.
-     * Otherwise, this activity has to scan for saved rides (maybe as files in the internal storage
-     * or as entries in sharedPreference) and display them in a list.
-     * <p>
-     * The user must be able to select a ride which should start the ShowRouteActivity with that ride.
-     */
+    public static void startHistoryActivity(Context context) {
+        Intent intent = new Intent(context, HistoryActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,14 +156,6 @@ public class HistoryActivity extends BaseActivity {
                 HistoryActivity.this.moveTaskToBack(true);
             }
         });
-
-
-        // Press immediately the button, if HistoryActivity was created automatically after the
-        // recording of a route has finished
-        if (getIntent().hasExtra("PathToAccGpsFile")) {
-            startShowRouteWithSelectedRide();
-        }
-
     }
 
     private void refreshMyRides() {
@@ -265,39 +247,6 @@ public class HistoryActivity extends BaseActivity {
         }
     }
 
-    public void startShowRouteWithSelectedRide() {
-
-        Log.d(TAG, "onClick()");
-
-        // Checks if HistoryActivity was started by the user or by the app after a route
-        // recording was finished
-        if (getIntent().hasExtra("PathToAccGpsFile")) {
-            // AccGpsString contains the accelerometer and location data as well as time data
-            pathToAccGpsFile = getIntent().getStringExtra("PathToAccGpsFile");
-            // TimeStamp is the duration of the ride in MS
-            duration = getIntent().getStringExtra("Duration");
-            // The time in which the ride started in ms from 1970
-            startTime = getIntent().getStringExtra("StartTime");
-            // State can be 0 for server processing not started, 1 for started and pending
-            // and 2 for processed by server so the incidents can be annotated by the user
-            state = getIntent().getIntExtra("State", MetaData.STATE.JUST_RECORDED);
-        }
-
-        // Checks whether a ride was selected or not. Maybe it will be possible to select
-        // multiple rides and push a button to send them all to the server to be analyzed
-        if (accGpsString != null && !startTime.equals("")) {
-            // Start ShowRouteActivity with the selected Ride.
-            Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
-            intent.putExtra("PathToAccGpsFile", pathToAccGpsFile);
-            intent.putExtra("Duration", duration);
-            intent.putExtra("StartTime", startTime);
-            intent.putExtra("State", state);
-            startActivity(intent);
-        }
-
-
-    }
-
     public void fireDeletePrompt(int position, MyArrayAdapter arrayAdapter) {
         AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
         alert.setTitle(getString(R.string.warning));
@@ -378,8 +327,8 @@ public class HistoryActivity extends BaseActivity {
         String TAG = "MyArrayAdapter_LOG";
 
         Context context;
-        int            layoutResourceId;
-        List<String>   stringList;
+        int layoutResourceId;
+        List<String> stringList;
         List<String[]> metaDataLines;
 
         public MyArrayAdapter(Context context, int layoutResourceId, List<String> stringList, List<String[]> metaDataLines) {
@@ -447,22 +396,10 @@ public class HistoryActivity extends BaseActivity {
                 if (dirFiles.length != 0) {
                     // loops through the array of files, outputting the name to console
                     for (File dirFile : dirFiles) {
-
                         String fileOutput = dirFile.getName();
                         Log.d(TAG, "fileOutput: " + fileOutput + " clicked: " + clicked + "_");
                         if (fileOutput.startsWith(clicked + "_")) {
-                            // Start ShowRouteActivity with the selected Ride.
-                            Intent intent = new Intent(HistoryActivity.this, ShowRouteActivity.class);
-                            intent.putExtra("PathToAccGpsFile", dirFile.getName());
-                            intent.putExtra("Duration", String.valueOf(Long.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.parseLong(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
-                            intent.putExtra("StartTime", metaDataLines.get(metaDataLines.size() - position - 1)[1]);
-                            intent.putExtra("State", Integer.valueOf(metaDataLines.get(metaDataLines.size() - position - 1)[3]));
-                            Log.d(TAG, "pathToAccGpsFile: " + dirFile.getName());
-                            Log.d(TAG, "Duration: " + (Long.parseLong(metaDataLines.get(metaDataLines.size() - position - 1)[2]) - Long.parseLong(metaDataLines.get(metaDataLines.size() - position - 1)[1])));
-                            Log.d(TAG, "StartTime: " + metaDataLines.get(metaDataLines.size() - position - 1)[1]);
-                            Log.d(TAG, "State: " + metaDataLines.get(metaDataLines.size() - position - 1)[3]);
-
-                            startActivity(intent);
+                            ShowRouteActivity.startShowRouteActivity(Integer.parseInt(fileOutput.split("_", -1)[0]), Integer.parseInt(metaDataLines.get(metaDataLines.size() - position - 1)[3]), HistoryActivity.this);
                         }
                     }
                 }
@@ -481,7 +418,6 @@ public class HistoryActivity extends BaseActivity {
             TextView duration;
             TextView distance;
             TextView distanceUnit;
-            TextView message;
             ImageButton status;
             ImageButton btnDelete;
         }

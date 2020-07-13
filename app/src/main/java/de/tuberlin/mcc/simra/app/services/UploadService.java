@@ -167,7 +167,7 @@ public class UploadService extends Service {
         }
 
         private void uploadFile(Context context) throws IOException {
-            File[] dirFiles = getFilesDir().listFiles();
+            File[] dirFiles = new File(IOUtils.Directories.getBaseFolderPath(context)).listFiles();
 
             boolean crash = intent.getBooleanExtra("CRASH_REPORT", false);
             // If there was a crash and the user permitted to send the crash logs, upload simraPrefs and crash log
@@ -234,20 +234,25 @@ public class UploadService extends Service {
                         if (metaDataLine.length > 1 && metaDataLine[3].equals(String.valueOf(MetaData.STATE.ANNOTATED))) {
                             foundARideToUpload = true;
                             String rideKey = metaDataLine[0];
-                            String accGpsName = "";
-                            String accEventName = "";
+                            File accGpsFile = null, accEventFile = null;
+
                             // find the accGps and accEvents file of that ride
                             for (File dirFile : dirFiles) {
                                 if (dirFile.getName().startsWith(rideKey + "_accGps")) {
                                     Log.d(TAG, "dirFiles[i]: " + dirFile.getName());
-                                    accGpsName = dirFile.getName();
-                                    accEventName = IOUtils.Files.getEventsFileName(rideKey, false);
+                                    accGpsFile = dirFile.getAbsoluteFile();
+                                    accEventFile = IOUtils.Files.getEventsFile(Integer.parseInt(rideKey), false, context);
                                     break;
                                 }
                             }
-                            Log.d(TAG, "accEventName: " + accEventName + " accGpsName: " + accGpsName);
+                            if (accGpsFile == null || accEventFile == null) {
+                                Log.e(TAG, "Couldn't find the required files! (acccGps, accEvent)");
+                                continue;
+                            }
+
+                            Log.d(TAG, "accEventName: " + accEventFile.getName() + " accGpsName: " + accGpsFile.getName());
                             // concatenate fileInfoVersion, accEvents and accGps content
-                            Pair<String, String> contentToUploadAndAccEventsContentToOverwrite = Utils.appendAccGpsToAccEvents(accEventName, accGpsName, context);
+                            Pair<String, String> contentToUploadAndAccEventsContentToOverwrite = Utils.appendAccGpsToAccEvents(accEventFile, accGpsFile, context);
                             String contentToUpload = contentToUploadAndAccEventsContentToOverwrite.first;
                             String accEventsContentToOverwrite = contentToUploadAndAccEventsContentToOverwrite.second;
                             String password = lookUpSharedPrefs(rideKey, "-1", "keyPrefs", context);
@@ -301,7 +306,7 @@ public class UploadService extends Service {
                                 }
                                 totalNumberOfScary += Integer.parseInt(metaDataLine[7]);
 
-                                overWriteFile(accEventsContentToOverwrite, accEventName, context);
+                                Utils.overwriteFile(accEventsContentToOverwrite, accEventFile);
                                 Integer thisNumberOfRides = (Integer) regionProfiles[region][0];//numberOfRides
                                 regionProfiles[region][0] = ++thisNumberOfRides;
                                 Long thisDuration = (Long) regionProfiles[region][1];//Duration

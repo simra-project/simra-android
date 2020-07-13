@@ -12,12 +12,17 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
@@ -31,23 +36,54 @@ public class RadmesserActivity extends AppCompatActivity {
     LinearLayout deviceLayout; // Connected Device
     LinearLayout pairingLayout; // Connected Device
     LinearLayout devicesList; // Button list (Innerhalb ConnectDevicesLayout)
-    ProgressBar progressBar;
+    ProgressBar closePassBar;
+    ProgressBar searchingCircle;
     TextView deviceInfoTextView; // (Innerhalb deviceLayout)
     BroadcastReceiver receiver;
     Switch takePicturesButton;
+    Button retryButton;
+    Button connectButton;
     private AlertDialog alertDialog;
+    Set<BluetoothDevice> foundDevices;
+    BluetoothDevice selectedDevice;
+    RadioGroup devices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        foundDevices = new HashSet<>();
         setContentView(R.layout.activity_radmesser);
         initializeToolBar();
         Log.i("start", "RadmesserActivity");
         connectDevicesLayout = findViewById(R.id.connectDevicesLayout);
         devicesList = findViewById(R.id.devicesList);
+        searchingCircle = findViewById(R.id.searching);
+        retryButton = findViewById(R.id.retry);
+        retryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startScanningDevices();
+                foundDevices = new HashSet<>();
+            }
+        });
+        devices  = new RadioGroup(this);
+        devices.setOrientation(RadioGroup.VERTICAL);
+        devices.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int id) {
+                for(BluetoothDevice device : foundDevices){
+                    if(device.hashCode() == id){
+                        selectedDevice = device;
+                        connectButton.setText("Connect to " + selectedDevice.deviceName);
+                        connectButton.setVisibility(View.VISIBLE);
+                    }
+                }
+
+            }
+        });
         deviceLayout = findViewById(R.id.deviceLayout);
         pairingLayout = findViewById(R.id.pairing);
-        progressBar = findViewById(R.id.progressBarClosePass);
+        closePassBar = findViewById(R.id.progressBarClosePass);
         deviceInfoTextView = findViewById(R.id.deviceInfoTextView);
         NumberPicker handleBarWidth = findViewById(R.id.handleBarWidth);
         handleBarWidth.setMaxValue(40);
@@ -86,25 +122,54 @@ public class RadmesserActivity extends AppCompatActivity {
         disconnectBTN.setOnClickListener(view -> RadmesserService.disconnectAndUnpairDevice(this));
         RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
         updateUI(currentState);
-        if(!currentState.equals(RadmesserService.ConnectionState.CONNECTED)){
+        if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
             startScanningDevices();
         }
+        connectButton = new Button(this);
+        connectButton.setVisibility(View.GONE);
+        connectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(selectedDevice != null){
+                    RadmesserService.connectDevice(RadmesserActivity.this, selectedDevice.deviceId);
+                }
+            }
+        });
+        connectDevicesLayout.addView(devices);
+        connectDevicesLayout.addView(connectButton);
     }
 
-    private void setClosePassBarColor(int distanceInCm){
+    private void setClosePassBarColor(int distanceInCm) {
         int maxColorValue = Math.min(distanceInCm, 200); // 200 cm ist maximum, das grün
         // Algoritmus found https://stackoverflow.com/questions/340209/generate-colors-between-red-and-green-for-a-power-meter
         // Da n zwischen 0 -100 liegen soll und das maximum 200 ist, dann halbieren immer den Wert.
-        int normalizedValue = distanceInCm / 2;
+        int normalizedValue = maxColorValue / 2;
         int red = (255 * normalizedValue) / 100;
         int green = (255 * (100 - normalizedValue)) / 100;
         int blue = 0;
         // Color und Progress sind abhängig
-        progressBar.setProgressTintList(ColorStateList.valueOf(Color.rgb(red, green, blue)));
-        progressBar.setProgress(normalizedValue);
+        closePassBar.setProgressTintList(ColorStateList.valueOf(Color.rgb(red, green, blue)));
+        closePassBar.setProgress(normalizedValue);
     }
 
-    private void updateUI(RadmesserService.ConnectionState state){
+    private void createRadioButton(BluetoothDevice device) {
+        RadioButton radioButton =  new RadioButton(this);
+        radioButton.setText(device.deviceName);
+        radioButton.setId(device.hashCode());
+        devices.addView(radioButton);
+    }
+
+    private void showRetryButton(){
+        searchingCircle.setVisibility(View.GONE);
+        retryButton.setVisibility(View.VISIBLE);
+    }
+
+    private void hideRetryButton(){
+        searchingCircle.setVisibility(View.VISIBLE);
+        retryButton.setVisibility(View.GONE);
+    }
+
+    private void updateUI(RadmesserService.ConnectionState state) {
         switch (state) {
             case PAIRING:
                 deviceLayout.setVisibility(View.GONE);
@@ -119,43 +184,43 @@ public class RadmesserActivity extends AppCompatActivity {
                 closeTutorialDialog();
                 break;
             case CONNECTION_REFUSED:
+                showRetryButton();
             case DISCONNECTED:
-            default:
+                showRetryButton();
+            case SEARCHING:
                 deviceLayout.setVisibility(View.GONE);
                 connectDevicesLayout.setVisibility(View.VISIBLE);
                 pairingLayout.setVisibility(View.GONE);
-                closeTutorialDialog();
+                hideRetryButton();
+            default:
                 break;
         }
-
     }
 
     private void registerReceiver() {
         receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks() {
             @Override
             public void onDeviceFound(String deviceName, String deviceId) {
-                Button button = new Button(RadmesserActivity.this);
-                button.setText("Connect with " + deviceName);
-                button.setOnClickListener(v -> connectToDevice(deviceId));
-                devicesList.addView(button);
-                Log.i("RadmesserService", "DeviceFound in radmesser activity");
+                BluetoothDevice foundDevice = new BluetoothDevice(deviceName, deviceId);
+                if(!foundDevices.contains(foundDevice)){
+                    foundDevices.add(foundDevice);
+                    createRadioButton(foundDevice);
+
+                }
             }
 
             @Override
             public void onConnectionStateChanged(RadmesserService.ConnectionState newState) {
-                Log.i("connState", newState.toString());
                 updateUI(newState);
             }
 
             @Override
             public void onDistanceValue(RadmesserService.Measurement value) {
-                Log.i("RadmesserService", "Value found : " + value);
                 int distance = -1;
-                if (value!= null && value.leftSensorValues.size() > 0){
+                if (value != null && value.leftSensorValues.size() > 0) {
                     distance = value.leftSensorValues.get(0);
                     deviceInfoTextView.setText("Connected with " + "\n" + "Last distance: " + distance + " cm");
                     setClosePassBarColor(distance);
-                    Log.i("RadmesserService", "Distance found : " + distance);
                 }
             }
         });
@@ -219,7 +284,7 @@ public class RadmesserActivity extends AppCompatActivity {
     protected void onResume() {
         registerReceiver();
         RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
-        if(!currentState.equals(RadmesserService.ConnectionState.CONNECTED)){
+        if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
             startScanningDevices();
         }
         Toast.makeText(this, currentState.toString(), Toast.LENGTH_SHORT).show();
@@ -229,6 +294,37 @@ public class RadmesserActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    private class BluetoothDevice{
+        private String deviceName;
+        private String deviceId;
+
+        public BluetoothDevice(String deviceName, String deviceId){
+            this.deviceName = deviceName;
+            this.deviceId = deviceId;
+        }
+
+        @Override
+        public int hashCode() {
+            return deviceName.hashCode() * deviceId.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            BluetoothDevice other = (BluetoothDevice) obj;
+            if (!deviceName.equals(other.deviceName))
+                return false;
+            if (!deviceId.equals(other.deviceId))
+                return false;
+            return true;
+        }
     }
 }
 
