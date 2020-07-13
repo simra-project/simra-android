@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -360,6 +361,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         stopBtn.setOnClickListener(v -> {
             try {
                 displayButtonsForMenue();
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 // Stop RecorderService which is recording accelerometer data
                 unbindService(mRecorderServiceConnection);
                 stopService(recService);
@@ -513,6 +515,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             } else {
                 // show stop button, hide start button
                 displayButtonsForDrive();
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
                 // start RecorderService for accelerometer data recording
                 Intent intent = new Intent(MainActivity.this, RecorderService.class);
