@@ -12,10 +12,8 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;

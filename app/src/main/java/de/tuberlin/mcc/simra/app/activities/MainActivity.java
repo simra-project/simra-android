@@ -112,7 +112,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private Boolean recording = false;
     private MaterialButton startBtn;
     private MaterialButton stopBtn;
-    private MaterialButton reportIncidentBtn;
+    private MaterialButton reportClosepassIncidentBtn;
+    private MaterialButton reportObstacleIncidentBtn;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Radmesser
     private FloatingActionButton radmesserButton;
@@ -339,9 +340,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             startRecording();
         });
 
-        reportIncidentBtn = findViewById(R.id.report_incident);
-        reportIncidentBtn.setOnClickListener(v -> {
-            IncidentBroadcaster.broadcastIncident(this, IncidentLogEntry.INCIDENT_TYPE.NOTHING);
+        reportClosepassIncidentBtn = findViewById(R.id.report_closepass_incident);
+        reportClosepassIncidentBtn.setOnClickListener(v -> {
+            IncidentBroadcaster.broadcastIncident(this, IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS);
+        });
+
+        reportObstacleIncidentBtn = findViewById(R.id.report_obstacle_incident);
+        reportObstacleIncidentBtn.setOnClickListener(v -> {
+            IncidentBroadcaster.broadcastIncident(this, IncidentLogEntry.INCIDENT_TYPE.OBSTACLE);
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -426,7 +432,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         startBtn.setVisibility(View.VISIBLE);
         stopBtn.setVisibility(View.INVISIBLE);
-        reportIncidentBtn.setVisibility(View.INVISIBLE);
+        reportObstacleIncidentBtn.setVisibility(View.INVISIBLE);
+        reportClosepassIncidentBtn.setVisibility(View.INVISIBLE);
 
     }
 
@@ -482,8 +489,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             } else {
                 // show stop button, hide start button
                 showStop();
-                stopBtn.setVisibility(View.VISIBLE);
-                startBtn.setVisibility(View.INVISIBLE);
 
                 // start RecorderService for accelerometer data recording
                 Intent intent = new Intent(MainActivity.this, RecorderService.class);
@@ -539,7 +544,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void showStop() {
 
         stopBtn.setVisibility(View.VISIBLE);
-        reportIncidentBtn.setVisibility(View.VISIBLE);
+        reportObstacleIncidentBtn.setVisibility(View.VISIBLE);
+        reportClosepassIncidentBtn.setVisibility(View.VISIBLE);
         startBtn.setVisibility(View.INVISIBLE);
 
 

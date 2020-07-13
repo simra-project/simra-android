@@ -84,20 +84,36 @@
 
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/report_incident"
+        android:id="@+id/report_closepass_incident"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/copyright_text"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="@dimen/activity_vertical_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginEnd="@dimen/activity_vertical_margin"
-        android:layout_marginBottom="128dp"
+        android:layout_marginBottom="171dp"
         android:gravity="center"
         android:icon="@drawable/ic_route"
         android:maxLines="2"
-        android:text="@string/reportIncident"
-        android:visibility="gone"
+        android:text="@string/reportIncidentClosepass"
+        android:visibility="visible"
+        app:icon="@android:drawable/stat_sys_warning" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/report_obstacle_incident"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/report_closepass_incident"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="@dimen/activity_vertical_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="18dp"
+        android:gravity="center"
+        android:icon="@drawable/ic_route"
+        android:maxLines="2"
+        android:text="@string/reportIncidentObstacle"
+        android:visibility="visible"
         app:icon="@android:drawable/stat_sys_warning" />
 
     <TextView
