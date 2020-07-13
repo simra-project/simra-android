@@ -2,6 +2,8 @@ package de.tuberlin.mcc.simra.app.entities;
 
 import java.io.Serializable;
 
+import de.tuberlin.mcc.simra.app.services.RadmesserService;
+
 public class IncidentLogEntry implements Serializable {
     public Integer key;
     public Double latitude;
@@ -153,6 +155,12 @@ public class IncidentLogEntry implements Serializable {
             return this;
         }
 
+        public Builder withClosePassEvent(RadmesserService.ClosePassEvent closePassEvent) {
+            this.incidentType = closePassEvent.getIncidentType();
+            this.description = closePassEvent.getIncidentDescription();
+            return this;
+        }
+
         public Builder withKey(Integer key) {
             this.key = key;
             return this;
@@ -161,7 +169,6 @@ public class IncidentLogEntry implements Serializable {
         public IncidentLogEntry build() {
             return new IncidentLogEntry(this);
         }
-
     }
 
     public static class InvolvedRoadUser implements Serializable {
@@ -205,5 +212,11 @@ public class IncidentLogEntry implements Serializable {
         public static final int NEAR_DOORING = 6;
         public static final int OBSTACLE = 7;
         public static final int OTHER = 8;
+    }
+
+    public static class INCIDENT_TYPE_RADMESSER {
+        public static final int UNKOWN = -2;
+        public static final int AVG2S = -3;
+        public static final int MIN_KALMAN = -4;
     }
 }
