@@ -552,7 +552,7 @@ public class RadmesserService extends Service {
     // TODO: Use Utils (or refactor) shared Prefs usage
 
     public void unPairedRadmesser() {
-        //getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().remove(sharedPrefsKeyRadmesserID).apply();
+        getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().remove(sharedPrefsKeyRadmesserID).apply();
     }
 
     @Nullable
