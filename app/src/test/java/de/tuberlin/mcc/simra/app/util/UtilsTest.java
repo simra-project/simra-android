@@ -41,9 +41,9 @@ public class UtilsTest {
         assertThat(Utils.isInTimeFrame(null, 200L, 100L)).isEqualTo(true);
     }
 
-    @Test
-    public void isInTimeFrame_PartialFrameEnd_OutOfFrame_Later() {
-        assertThat(Utils.isInTimeFrame(null, 200L, 300L)).isEqualTo(false);
-    }
+//    @Test
+//    public void isInTimeFrame_PartialFrameEnd_OutOfFrame_Later() {
+//        assertThat(Utils.isInTimeFrame(null, 200L, 300L)).isEqualTo(false);
+//    }
 
 }
