@@ -96,7 +96,7 @@
         android:icon="@drawable/ic_route"
         android:maxLines="2"
         android:text="@string/reportIncidentClosepass"
-        android:visibility="visible"
+        android:visibility="gone"
         app:icon="@android:drawable/stat_sys_warning" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -113,7 +113,7 @@
         android:icon="@drawable/ic_route"
         android:maxLines="2"
         android:text="@string/reportIncidentObstacle"
-        android:visibility="visible"
+        android:visibility="gone"
         app:icon="@android:drawable/stat_sys_warning" />
 
     <TextView
