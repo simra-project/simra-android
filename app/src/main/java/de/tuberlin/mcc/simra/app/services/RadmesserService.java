@@ -11,14 +11,16 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
@@ -368,7 +370,7 @@ public class RadmesserService extends Service {
     private void broadcastClosePassEvent(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
         intent.putExtra(EXTRA_VALUE, value);
-        intent.putExtra(EXTRA_VALUE_SERIALIZED, ClosePassEvent.fromString(value));
+        intent.putExtra(EXTRA_VALUE_SERIALIZED, new ClosePassEvent(value));
         broadcastManager.sendBroadcast(intent);
     }
 
@@ -515,27 +517,76 @@ public class RadmesserService extends Service {
     }
 
     public static class ClosePassEvent implements Serializable {
-        //enum EventType {BUTTON, AVG2S}
-        public String eventType;     //todo: consider this to be an enum, but also have in mind,that the format could change in future
-        public long timestamp;
-        public List<String> payload;
+        private static final String EVENT_TYPE_BUTTON = "button";
+        private static final String EVENT_TYPE_AVG2S = "avg2s";
+        private static final String EVENT_TYPE_MIN_KALMAN = "min_kalman";
+
+        private String originalValue;
+        private String eventType;
+        private long timestamp;
+        private List<String> payload;
 
         public ClosePassEvent(String rawData) {
+            originalValue = rawData;
             Log.i("ClosePassEvent", rawData);
 
             String[] sections = rawData.split(";", -1);
             timestamp = Long.parseLong(sections[0]);
-            eventType = sections[1].toUpperCase();
-            payload = Collections.singletonList(sections[2]);
-        }
-
-        public static ClosePassEvent fromString(String line) {
-            return new ClosePassEvent(line);
+            eventType = sections[1];
+            payload = Arrays.asList(sections[2].split(",", -1));
         }
 
         @Override
         public String toString() {
-            return timestamp + " " + eventType + " " + payload;
+            return timestamp + " " + eventType + " " + TextUtils.join(", ", payload);
+        }
+
+        /**
+         * Only button events should be treated as a real close pass event. All
+         * other events therefore will be assigned an "unknown" incident type to
+         * be hidden from the regular incident view after a ride ends.
+         */
+        public int getIncidentType() {
+            if (eventType.equals(EVENT_TYPE_BUTTON)) return IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS;
+            if (eventType.equals(EVENT_TYPE_AVG2S)) return IncidentLogEntry.INCIDENT_TYPE_RADMESSER.AVG2S;
+            if (eventType.equals(EVENT_TYPE_MIN_KALMAN)) return IncidentLogEntry.INCIDENT_TYPE_RADMESSER.MIN_KALMAN;
+            return IncidentLogEntry.INCIDENT_TYPE_RADMESSER.UNKOWN;
+        }
+
+        /**
+         * Creates an incident description that will be viewable by users and should therefore be human-readable.
+         * This description always consists of a general description line, the payload data in a readable format and the
+         * raw event string that was passed over bluetooth (formatted in square brackets). These sections are always
+         * separated by a newline.
+         */
+        public String getIncidentDescription() {
+            String headerLine = "This incident was triggered from the OpenBikeSensor event " + eventType + ".";
+            String dataLine = "Additional data: " + TextUtils.join(", ",  payload);
+
+            switch (eventType) {
+                case EVENT_TYPE_BUTTON:
+                    headerLine = "This incident was triggerd using a physical button on a OpenBikeSensor.";
+                    if (payload.size() >= 1) {
+                        dataLine = "Distance during close pass: " + payload.get(0) + " cm";
+                    }
+                    break;
+                case EVENT_TYPE_AVG2S:
+                    headerLine = "This incident was automatically triggered from the OpenBikeSensor because the average distance during the close pass was below the threshold.";
+                    if (payload.size() >= 2) {
+                        dataLine = "Average distance: " + payload.get(0) + " cm, mininum distance: " + payload.get(1) + " cm";
+                    }
+                    break;
+                case EVENT_TYPE_MIN_KALMAN:
+                    headerLine = "This incident was automatically triggered from the OpenBikeSensor because it detected the smallest distance during a close pass.";
+                    if (payload.size() >= 1) {
+                        dataLine = "Minimum distance: " + payload.get(0) + " cm";
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return String.format("%s\n%s\n[%s]", headerLine, dataLine, originalValue);
         }
     }
 

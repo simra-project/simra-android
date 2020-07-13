@@ -23,7 +23,7 @@ public class IncidentBroadcaster {
         LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
     }
 
-    public static BroadcastReceiver recieveIncidents(Context ctx, IncidentCallbacks callbacks) {
+    public static BroadcastReceiver receiveIncidents(Context ctx, IncidentCallbacks callbacks) {
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -37,7 +37,5 @@ public class IncidentBroadcaster {
     public abstract static class IncidentCallbacks {
         public void onManualIncident(int incidentType) {
         }
-
     }
-
 }
