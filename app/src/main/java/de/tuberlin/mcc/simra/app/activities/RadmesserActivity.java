@@ -86,12 +86,12 @@ public class RadmesserActivity extends AppCompatActivity {
         disconnectBTN.setOnClickListener(view -> RadmesserService.disconnectAndUnpairDevice(this));
         RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
         updateUI(currentState);
-        if(!currentState.equals(RadmesserService.ConnectionState.CONNECTED)){
+        if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
             startScanningDevices();
         }
     }
 
-    private void setClosePassBarColor(int distanceInCm){
+    private void setClosePassBarColor(int distanceInCm) {
         int maxColorValue = Math.min(distanceInCm, 200); // 200 cm ist maximum, das grün
         // Algoritmus found https://stackoverflow.com/questions/340209/generate-colors-between-red-and-green-for-a-power-meter
         // Da n zwischen 0 -100 liegen soll und das maximum 200 ist, dann halbieren immer den Wert.
@@ -104,7 +104,7 @@ public class RadmesserActivity extends AppCompatActivity {
         progressBar.setProgress(normalizedValue);
     }
 
-    private void updateUI(RadmesserService.ConnectionState state){
+    private void updateUI(RadmesserService.ConnectionState state) {
         switch (state) {
             case PAIRING:
                 deviceLayout.setVisibility(View.GONE);
@@ -149,13 +149,11 @@ public class RadmesserActivity extends AppCompatActivity {
 
             @Override
             public void onDistanceValue(RadmesserService.Measurement value) {
-                Log.i("RadmesserService", "Value found : " + value);
                 int distance = -1;
-                if (value!= null && value.leftSensorValues.size() > 0){
+                if (value != null && value.leftSensorValues.size() > 0) {
                     distance = value.leftSensorValues.get(0);
                     deviceInfoTextView.setText("Connected with " + "\n" + "Last distance: " + distance + " cm");
                     setClosePassBarColor(distance);
-                    Log.i("RadmesserService", "Distance found : " + distance);
                 }
             }
         });
@@ -219,7 +217,7 @@ public class RadmesserActivity extends AppCompatActivity {
     protected void onResume() {
         registerReceiver();
         RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
-        if(!currentState.equals(RadmesserService.ConnectionState.CONNECTED)){
+        if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
             startScanningDevices();
         }
         Toast.makeText(this, currentState.toString(), Toast.LENGTH_SHORT).show();

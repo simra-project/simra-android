@@ -10,12 +10,13 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.File;
 import java.util.Date;
 
 import de.tuberlin.mcc.simra.app.activities.StartActivity;
 
-import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
 
@@ -65,7 +66,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
                             "stackTrace: " + stackTrace + "\n" +
                             "causeTrace: " + causeTrace + "\n";
 
-            appendToFile((fileInfoLine + errorReport), "CRASH_REPORT" + new Date().toString() + ".txt", this);
+            overwriteFile((fileInfoLine + errorReport), new File(IOUtils.Directories.getBaseFolderPath(this) + "CRASH_REPORT" + new Date().toString() + ".txt"));
 
             SharedPreferences sharedPrefs = getApplicationContext()
                     .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);

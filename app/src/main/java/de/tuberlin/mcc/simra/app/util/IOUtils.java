@@ -5,6 +5,8 @@ import android.os.Environment;
 
 import java.io.File;
 
+import de.tuberlin.mcc.simra.app.BuildConfig;
+
 public class IOUtils {
     public static boolean isDirectoryEmpty(String path) {
         File dir = new File(path);
@@ -32,7 +34,8 @@ public class IOUtils {
          * @return Path with trailing slash
          */
         public static String getBaseFolderPath(Context ctx) {
-            return ctx.getFilesDir() + "/";
+            return getExternalBaseDirectoryPath();
+            //return ctx.getFilesDir() + "/";
         }
 
         /**
@@ -68,9 +71,14 @@ public class IOUtils {
 
     /**
      * Well known Files
+     * Using this should be only temporary
      * Those we need access to from all over the app, because the access was never centralized...
      */
     public static class Files {
+        public static String getFileInfoLine() {
+            return BuildConfig.VERSION_CODE + "#1" + System.lineSeparator();
+        }
+
         public static String getMetaDataFilePath(Context context) {
             return IOUtils.Directories.getBaseFolderPath(context) + "metaData.csv";
         }
@@ -80,16 +88,29 @@ public class IOUtils {
         }
 
         // TODO: ID should be an Integer
-        public static String getEventsFileName(String rideId, boolean isTempFile) {
+        public static String getEventsFileName(Integer rideId, boolean isTempFile) {
             return (isTempFile ? "Temp" : "") + "accEvents" + rideId + ".csv";
         }
 
-        public static String getEventsFilePath(String rideId, boolean isTempFile, Context context) {
+        public static String getEventsFilePath(Integer rideId, boolean isTempFile, Context context) {
             return IOUtils.Directories.getBaseFolderPath(context) + getEventsFileName(rideId, isTempFile);
         }
 
-        public static File getEventsFile(String rideId, boolean isTempFile, Context context) {
-            return new File(IOUtils.Directories.getBaseFolderPath(context) + (isTempFile ? "Temp" : "") + "accEvents" + rideId + ".csv");
+        public static File getEventsFile(Integer rideId, boolean isTempFile, Context context) {
+            return new File(getEventsFilePath(rideId, isTempFile, context));
         }
+
+        public static String getGPSLogFileName(int rideId, boolean isTempFile) {
+            return (isTempFile ? "Temp" : "") + rideId + "_accGps.csv";
+        }
+
+        public static String getGPSLogFilePath(int rideId, boolean isTempFile, Context context) {
+            return IOUtils.Directories.getBaseFolderPath(context) + getGPSLogFileName(rideId, isTempFile);
+        }
+
+        public static File getGPSLogFile(int rideId, boolean isTempFile, Context context) {
+            return new File(getGPSLogFilePath(rideId, isTempFile, context));
+        }
+
     }
 }

@@ -1,7 +1,11 @@
 package de.tuberlin.mcc.simra.app.entities;
 
+import java.util.ArrayList;
+
+import de.tuberlin.mcc.simra.app.services.RadmesserService;
+
 public class DataLogEntry {
-    public final static String DATA_LOG_HEADER = "lat,lon,X,Y,Z,timeStamp,acc,a,b,c,radmesserDistanceLeft1,radmesserDistanceLeft2,radmesserDistanceRight1,radmesserDistanceRight2";
+    public final Integer rideId;
     public final Double latitude;
     public final Double longitude;
     public final Float accelerometerX;
@@ -12,12 +16,16 @@ public class DataLogEntry {
     public final Float gyroscopeA;
     public final Float gyroscopeB;
     public final Float gyroscopeC;
-    public final Integer RadmesserDistanceLeft1;
-    public final Integer RadmesserDistanceLeft2;
-    public final Integer RadmesserDistanceRight1;
-    public final Integer RadmesserDistanceRight2;
+    public final Integer radmesserDistanceLeft1;
+    public final Integer radmesserDistanceLeft2;
+    public final Integer radmesserDistanceRight1;
+    public final Integer radmesserDistanceRight2;
+    public final String  radmesserClosePassEventType;
+    public final String radmesserClosePassEventPayload1;
+    public final String radmesserClosePassEventPayload2;
 
     private DataLogEntry(DataLogEntryBuilder dataLogEntryBuilder) {
+        this.rideId = dataLogEntryBuilder.rideId;
         this.latitude = dataLogEntryBuilder.latitude;
         this.longitude = dataLogEntryBuilder.longitude;
         this.accelerometerX = dataLogEntryBuilder.accelerometerX;
@@ -28,10 +36,13 @@ public class DataLogEntry {
         this.gyroscopeA = dataLogEntryBuilder.gyroscopeA;
         this.gyroscopeB = dataLogEntryBuilder.gyroscopeB;
         this.gyroscopeC = dataLogEntryBuilder.gyroscopeC;
-        RadmesserDistanceLeft1 = dataLogEntryBuilder.radmesserDistanceLeft1;
-        RadmesserDistanceLeft2 = dataLogEntryBuilder.radmesserDistanceLeft2;
-        RadmesserDistanceRight1 = dataLogEntryBuilder.radmesserDistanceRight1;
-        RadmesserDistanceRight2 = dataLogEntryBuilder.radmesserDistanceRight2;
+        this.radmesserDistanceLeft1 = dataLogEntryBuilder.radmesserDistanceLeft1;
+        this.radmesserDistanceLeft2 = dataLogEntryBuilder.radmesserDistanceLeft2;
+        this.radmesserDistanceRight1 = dataLogEntryBuilder.radmesserDistanceRight1;
+        this.radmesserDistanceRight2 = dataLogEntryBuilder.radmesserDistanceRight2;
+        this.radmesserClosePassEventType = dataLogEntryBuilder.radmesserClosePassEventType;
+        this.radmesserClosePassEventPayload1 = dataLogEntryBuilder.radmesserClosePassEventPayload1;
+        this.radmesserClosePassEventPayload2 = dataLogEntryBuilder.radmesserClosePassEventPayload2;
     }
 
     public static DataLogEntry parseDataLogEntryFromLine(String string) {
@@ -75,6 +86,14 @@ public class DataLogEntry {
                 dataLogLine.length > 13 ? (!dataLogLine[13].isEmpty() ? Integer.parseInt(dataLogLine[13]) : null) : null
         );
 
+         // TODO load radmesser close pass event correctly from string
+        RadmesserService.ClosePassEvent event = new RadmesserService.ClosePassEvent("0;none;");
+        event.eventType = dataLogLine.length > 14 && !dataLogLine[14].isEmpty() ? dataLogLine[14] : null;
+        event.payload = new ArrayList<>();
+        if (dataLogLine.length > 15 && !dataLogLine[15].isEmpty()) event.payload.add(dataLogLine[15]);
+        if (dataLogLine.length > 16 && !dataLogLine[16].isEmpty()) event.payload.add(dataLogLine[16]);
+        dataLogEntryBuilder.withRadmesserClosePassEvent(event);
+
         return dataLogEntryBuilder.build();
     }
 
@@ -85,7 +104,7 @@ public class DataLogEntry {
     /**
      * Stringifies the DataLogEntry Object to a CSV Log Line
      *
-     * @return Data Log Line without new line separator
+     * @return Log Line without new line separator
      */
     public String stringifyDataLogEntry() {
         return (latitude != null ? latitude : "") + "," +
@@ -98,14 +117,17 @@ public class DataLogEntry {
                 (gyroscopeA != null ? gyroscopeA : "") + "," +
                 (gyroscopeB != null ? gyroscopeB : "") + "," +
                 (gyroscopeC != null ? gyroscopeC : "") + "," +
-                (RadmesserDistanceLeft1 != null ? RadmesserDistanceLeft1 : "") + "," +
-                (RadmesserDistanceLeft2 != null ? RadmesserDistanceLeft2 : "") + "," +
-                (RadmesserDistanceRight1 != null ? RadmesserDistanceRight1 : "") + "," +
-                (RadmesserDistanceRight2 != null ? RadmesserDistanceRight2 : "");
+                (radmesserDistanceLeft1 != null ? radmesserDistanceLeft1 : "") + "," +
+                (radmesserDistanceLeft2 != null ? radmesserDistanceLeft2 : "") + "," +
+                (radmesserDistanceRight1 != null ? radmesserDistanceRight1 : "") + "," +
+                (radmesserDistanceRight2 != null ? radmesserDistanceRight2 : "") + "," +
+                (radmesserClosePassEventType != null ? radmesserClosePassEventType : "") + "," +
+                (radmesserClosePassEventPayload1 != null ? radmesserClosePassEventPayload1 : "") + "," +
+                (radmesserClosePassEventPayload2 != null ? radmesserClosePassEventPayload2 : "");
     }
 
     public static final class DataLogEntryBuilder {
-
+        private Integer rideId;
         private Double latitude;
         private Double longitude;
         private Float accelerometerX;
@@ -116,12 +138,20 @@ public class DataLogEntry {
         private Float gyroscopeA;
         private Float gyroscopeB;
         private Float gyroscopeC;
-        private Integer radmesserDistanceLeft1;
+        private Integer radmesserDistanceLeft1; // TODO: rename!
         private Integer radmesserDistanceLeft2;
         private Integer radmesserDistanceRight1;
         private Integer radmesserDistanceRight2;
+        private String  radmesserClosePassEventType;
+        private String radmesserClosePassEventPayload1;
+        private String radmesserClosePassEventPayload2;
 
         private DataLogEntryBuilder() {
+        }
+
+        public DataLogEntryBuilder withRideId(Integer rideId) {
+            this.rideId = rideId;
+            return this;
         }
 
         public DataLogEntryBuilder withTimestamp(Long vTimestamp) {
@@ -164,6 +194,12 @@ public class DataLogEntry {
                 radmesserDistanceRight2 = vRadmesserDistanceRight2;
             }
             return this;
+        }
+
+        public void withRadmesserClosePassEvent(RadmesserService.ClosePassEvent event) {
+            radmesserClosePassEventType = event.eventType;
+            radmesserClosePassEventPayload1 = event.payload.size() >= 1 ? event.payload.get(0) : "";
+            radmesserClosePassEventPayload2 = event.payload.size() >= 2 ? event.payload.get(1) : "";
         }
 
         public DataLogEntry build() {

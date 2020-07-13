@@ -16,6 +16,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -333,6 +334,7 @@ public class RadmesserService extends Service {
     final static String EXTRA_DEVICE_NAME = "de.tuberlin.mcc.simra.app.radmesserservice.extraname";
     final static String EXTRA_CONNECTION_STATE = "de.tuberlin.mcc.simra.app.radmesserservice.extraconnectionstate";
     final static String EXTRA_VALUE = "de.tuberlin.mcc.simra.app.radmesserservice.extravalue";
+    final static String EXTRA_VALUE_SERIALIZED = "de.tuberlin.mcc.simra.app.radmesserservice.extravalueserialized";
 
 
     private void boradcastDeviceFound(String deviceName, String deviceId) {
@@ -351,18 +353,21 @@ public class RadmesserService extends Service {
     private void broadcastClosePassDistance(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);
         intent.putExtra(EXTRA_VALUE, value);
+        intent.putExtra(EXTRA_VALUE_SERIALIZED, Measurement.fromString(value));
         broadcastManager.sendBroadcast(intent);
     }
 
     private void broadcastClosePassEvent(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
         intent.putExtra(EXTRA_VALUE, value);
+        intent.putExtra(EXTRA_VALUE_SERIALIZED, ClosePassEvent.fromString(value));
         broadcastManager.sendBroadcast(intent);
     }
 
     private void broadcastDistanceValue(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_DISTANCE);
         intent.putExtra(EXTRA_VALUE, value);
+        intent.putExtra(EXTRA_VALUE_SERIALIZED, Measurement.fromString(value));
         broadcastManager.sendBroadcast(intent);
     }
 
@@ -373,10 +378,10 @@ public class RadmesserService extends Service {
         public void onConnectionStateChanged(ConnectionState newState) {
         }
 
-        public void onClosePassIncedentDistance(@Nullable Measurement measurement) {
+        public void onClosePassIncidentDistance(@Nullable Measurement measurement) {
         }
 
-        public void onClosePassIncedentEvent(@Nullable ClosePassEvent measurement) {
+        public void onClosePassIncidentEvent(@Nullable ClosePassEvent measurement) {
         }
 
         public void onDistanceValue(@Nullable Measurement measurement) {
@@ -399,6 +404,7 @@ public class RadmesserService extends Service {
         BroadcastReceiver rec = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Serializable serializable;
                 switch (intent.getAction()) {
                     case ACTION_DEVICE_FOUND:
                         callbacks.onDeviceFound(
@@ -412,25 +418,25 @@ public class RadmesserService extends Service {
                         );
                         break;
                     case ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE:
-                        callbacks.onClosePassIncedentDistance(
-                                Measurement.fromString(
-                                        intent.getStringExtra(EXTRA_VALUE)
-                                )
-                        );
+                        serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
+
+                        if (serializable instanceof Measurement) {
+                            callbacks.onClosePassIncidentDistance((Measurement) serializable);
+                        }
                         break;
                     case ACTION_VALUE_RECEIVED_DISTANCE:
-                        callbacks.onDistanceValue(
-                                Measurement.fromString(
-                                        intent.getStringExtra(EXTRA_VALUE)
-                                )
-                        );
+                        serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
+
+                        if (serializable instanceof Measurement) {
+                            callbacks.onDistanceValue((Measurement) serializable);
+                        }
                         break;
                     case ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT:
-                        callbacks.onClosePassIncedentEvent(
-                                ClosePassEvent.fromString(
-                                        intent.getStringExtra(EXTRA_VALUE)
-                                )
-                        );
+                        serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
+
+                        if (serializable instanceof ClosePassEvent) {
+                            callbacks.onClosePassIncidentEvent((ClosePassEvent) serializable);
+                        }
                         break;
                 }
             }
@@ -439,7 +445,7 @@ public class RadmesserService extends Service {
         return rec;
     }
 
-    public static class Measurement {
+    public static class Measurement implements Serializable {
         public long timestamp;
         public List<Integer> leftSensorValues;
         public List<Integer> rightSensorValues;
@@ -487,13 +493,13 @@ public class RadmesserService extends Service {
         }
     }
 
-    public static class ClosePassEvent {
+    public static class ClosePassEvent implements Serializable {
         //enum EventType {BUTTON, AVG2S}
         public String eventType;     //todo: consider this to be an enum, but also have in mind,that the format could change in future
         public long timestamp;
         public List<String> payload;
 
-        private ClosePassEvent(String rawData) {
+        public ClosePassEvent(String rawData) {
             Log.i("ClosePassEvent", rawData);
 
             String[] sections = rawData.split(";", -1);

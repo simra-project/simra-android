@@ -13,6 +13,8 @@ import android.util.Pair;
 
 import androidx.appcompat.app.AlertDialog;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,9 +25,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
@@ -42,24 +48,6 @@ public class Utils {
      */
     public static String readContentFromFile(String fileName, Context context) {
         File file = new File(IOUtils.Directories.getBaseFolderPath(context) + fileName);
-        if (file.isDirectory()) {
-            return "FILE IS DIRECTORY";
-        }
-        StringBuilder content = new StringBuilder();
-
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                content.append(line).append(System.lineSeparator());
-            }
-        } catch (IOException ioe) {
-            Log.d(TAG, "readContentFromFile() Exception: " + Arrays.toString(ioe.getStackTrace()));
-        }
-        return content.toString();
-    }
-
-    public static String readContentFromFile(File file) {
         if (file.isDirectory()) {
             return "FILE IS DIRECTORY";
         }
@@ -97,40 +85,9 @@ public class Utils {
         return (fileInfoLine + content.toString());
     }
 
-    /**
-     * Use Utils.overwriteFile(file) instead.
-     * Why? For Clarity filename does not say where the file is...
-     *
-     * @deprecated
-     */
-    public static void appendToFile(String content, String fileName, Context context) {
-
-        try {
-            File tempFile = new File(IOUtils.Directories.getBaseFolderPath(context) + fileName);
-            FileOutputStream writer = new FileOutputStream(tempFile, true);
-            writer.write(content.getBytes());
-            writer.flush();
-            writer.close();
-        } catch (IOException ioe) {
-            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
-        }
-    }
-
-    public static void appendToFile(String content, File file) {
-
-        try {
-            FileOutputStream writer = new FileOutputStream(file, true);
-            writer.write(content.getBytes());
-            writer.flush();
-            writer.close();
-        } catch (IOException ioe) {
-            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
-        }
-    }
-
     // appends content from file <accGps> to the content of file <accEvents>
     // and increases both their file version number
-    public static Pair<String, String> appendAccGpsToAccEvents(String accEvents, String accGps, Context context) {
+    public static Pair<String, String> appendAccGpsToAccEvents(File accEvents, File accGps, Context context) {
 
         StringBuilder content = new StringBuilder();
         StringBuilder accEventsContentToOverwrite = new StringBuilder();
@@ -138,7 +95,7 @@ public class Utils {
         int appVersion = getAppVersionNumber(context);
         String accEventsFileInfoLine = appVersion + "#-1" + System.lineSeparator();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accEvents)))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(accEvents))) {
             String line = br.readLine();
             String topFileVersion = "" + ((Integer.parseInt(line.split("#")[1])) + 1);
             accEventsFileInfoLine = appVersion + "#" + topFileVersion + System.lineSeparator();
@@ -149,7 +106,7 @@ public class Utils {
                     accEventsContentToUpload.append(line).append(System.lineSeparator());
                 }
             }
-            overWriteFile((accEventsFileInfoLine + accEventsContentToOverwrite.toString()), accEvents, context);
+            Utils.overwriteFile((accEventsFileInfoLine + accEventsContentToOverwrite.toString()), accEvents);
 
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
@@ -157,7 +114,7 @@ public class Utils {
 
         StringBuilder contentBottom = new StringBuilder();
         String bottomFileInfoLine = appVersion + "#-1";
-        try (BufferedReader br = new BufferedReader(new FileReader(context.getFileStreamPath(accGps)))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(accGps))) {
             String line;
             line = br.readLine();
             String bottomFileVersion = "" + ((Integer.parseInt(line.split("#")[1])) + 1);
@@ -165,7 +122,7 @@ public class Utils {
             while ((line = br.readLine()) != null) {
                 contentBottom.append(line).append(System.lineSeparator());
             }
-            overWriteFile((bottomFileInfoLine + contentBottom.toString()), accGps, context);
+            Utils.overwriteFile((bottomFileInfoLine + contentBottom.toString()), accGps);
 
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
@@ -219,10 +176,24 @@ public class Utils {
         return new File(path).exists();
     }
 
+    /**
+     * @param incidentProps
+     * @deprecated
+     */
     public static boolean checkForAnnotation(String[] incidentProps) {
         // Only checking for empty strings, which means we are retaining
         // events that were labeled as 'nothing happened'
         return (!incidentProps[8].equals("") && !incidentProps[8].equals("0")) || !incidentProps[19].equals("");
+    }
+
+    /**
+     * Legacy function I am not sure what it does
+     *
+     * @param incidentLogEntry
+     * @return
+     */
+    public static boolean checkForAnnotation(IncidentLogEntry incidentLogEntry) {
+        return !(incidentLogEntry.incidentType == null) && !(incidentLogEntry.incidentType == 0) || !(incidentLogEntry.scarySituation == false);
     }
 
 
@@ -438,7 +409,7 @@ public class Utils {
                     uploaded = false;
                 }
                 // First part: read accEvents and calculate number of (scary) incidents.
-                File accEventsFile = IOUtils.Files.getEventsFile(key, false, context);
+                File accEventsFile = IOUtils.Files.getEventsFile(Integer.parseInt(key), false, context);
                 StringBuilder contentOfAccEvents = new StringBuilder();
                 if (!accEventsFile.exists()) {
                     contentOfMetaData.append(metaDataLine).append(System.lineSeparator());
@@ -675,4 +646,208 @@ public class Utils {
         return simRa_regions_config;
     }
 
+    public static boolean isInTimeFrame(Long startTimeBoundary, Long endTimeBoundary, long timestamp) {
+        return (startTimeBoundary == null && endTimeBoundary == null) || (endTimeBoundary == null && timestamp >= startTimeBoundary) || (startTimeBoundary == null && timestamp <= endTimeBoundary) || (timestamp >= startTimeBoundary && timestamp <= endTimeBoundary);
+    }
+
+    public static List<IncidentLogEntry> findAccEvents(int rideId, Context context) {
+        List<AccEvent> accEvents = new ArrayList<>(6);
+
+        // Each String[] in ride is a part of the ride which is approx. 3 seconds long.
+        List<String[]> ride = new ArrayList<>();
+        List<String[]> events = new ArrayList<>(6);
+        accEvents.add(new AccEvent(0, 999.0, 999.0, 0, false, "0", "0"));
+        accEvents.add(new AccEvent(1, 999.0, 999.0, 0, false, "0", "0"));
+        accEvents.add(new AccEvent(2, 999.0, 999.0, 0, false, "0", "0"));
+        accEvents.add(new AccEvent(3, 999.0, 999.0, 0, false, "0", "0"));
+        accEvents.add(new AccEvent(4, 999.0, 999.0, 0, false, "0", "0"));
+        accEvents.add(new AccEvent(5, 999.0, 999.0, 0, false, "0", "0"));
+
+        String[] template = {"0.0", "0.0", "0.0", "0.0", "0.0", "0"};
+        events.add(template);
+        events.add(template);
+        events.add(template);
+        events.add(template);
+        events.add(template);
+        events.add(template);
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(IOUtils.Files.getGPSLogFile(rideId, false, context)));
+            br.readLine();
+            br.readLine();
+            String thisLine = br.readLine();
+            String nextLine = br.readLine();
+
+            String[] partOfRide;
+            boolean newSubPart = false;
+            // Loops through all lines. If the line starts with lat and lon, it is consolidated into
+            // a part of a ride together with the subsequent lines that don't have lat and lon.
+            // Then, it takes the top two X-, Y- and Z-deltas and creates AccEvents from them.
+            while ((thisLine != null) && (!newSubPart)) {
+                String[] currentLine = thisLine.split(",");
+                // currentLine: {lat, lon, maxXDelta, maxYDelta, maxZDelta, timeStamp}
+                partOfRide = new String[6];
+                String lat = currentLine[0];
+                String lon = currentLine[1];
+                String timeStamp = currentLine[5];
+
+                partOfRide[0] = lat; // lat
+                partOfRide[1] = lon; // lon
+                partOfRide[2] = "0"; // maxXDelta
+                partOfRide[3] = "0"; // maxYDelta
+                partOfRide[4] = "0"; // maxZDelta
+                partOfRide[5] = timeStamp; // timeStamp
+
+                double maxX = Double.parseDouble(currentLine[2]);
+                double minX = Double.parseDouble(currentLine[2]);
+                double maxY = Double.parseDouble(currentLine[3]);
+                double minY = Double.parseDouble(currentLine[3]);
+                double maxZ = Double.parseDouble(currentLine[4]);
+                double minZ = Double.parseDouble(currentLine[4]);
+                thisLine = nextLine;
+
+                nextLine = br.readLine();
+                if (thisLine != null && thisLine.startsWith(",,")) {
+                    newSubPart = true;
+                }
+
+                while ((thisLine != null) && newSubPart) {
+
+                    currentLine = thisLine.split(",");
+                    if (Double.parseDouble(currentLine[2]) >= maxX) {
+                        maxX = Double.parseDouble(currentLine[2]);
+                    } else if (Double.parseDouble(currentLine[2]) < minX) {
+                        minX = Double.parseDouble(currentLine[2]);
+                    }
+                    if (Double.parseDouble(currentLine[3]) >= maxY) {
+                        maxY = Double.parseDouble(currentLine[3]);
+                    } else if (Double.parseDouble(currentLine[3]) < minY) {
+                        minY = Double.parseDouble(currentLine[3]);
+                    }
+                    if (Double.parseDouble(currentLine[4]) >= maxZ) {
+                        maxZ = Double.parseDouble(currentLine[4]);
+                    } else if (Double.parseDouble(currentLine[4]) < minZ) {
+                        minZ = Double.parseDouble(currentLine[4]);
+                    }
+                    thisLine = nextLine;
+                    nextLine = br.readLine();
+
+                    if (thisLine != null && !thisLine.startsWith(",,")) {
+                        newSubPart = false;
+                    }
+                }
+
+                double maxXDelta = Math.abs(maxX - minX);
+                double maxYDelta = Math.abs(maxY - minY);
+                double maxZDelta = Math.abs(maxZ - minZ);
+
+                partOfRide[2] = String.valueOf(maxXDelta);
+                partOfRide[3] = String.valueOf(maxYDelta);
+                partOfRide[4] = String.valueOf(maxZDelta);
+
+                ride.add(partOfRide);
+
+                // Checks whether there is a minimum of <threshold> milliseconds
+                // between the actual event and the top 6 events so far.
+                int threshold = 10000; // 10 seconds
+                long minTimeDelta = 999999999;
+                for (int i = 0; i < events.size(); i++) {
+                    long actualTimeDelta = Long.parseLong(partOfRide[5]) - Long.parseLong(events.get(i)[5]);
+                    if (actualTimeDelta < minTimeDelta) {
+                        minTimeDelta = actualTimeDelta;
+                    }
+                }
+                boolean enoughTimePassed = minTimeDelta > threshold;
+
+                // Check whether actualX is one of the top 2 events
+                boolean eventAdded = false;
+                if (maxXDelta > Double.parseDouble(events.get(0)[2]) && !eventAdded && enoughTimePassed) {
+
+                    String[] temp = events.get(0);
+                    events.set(0, partOfRide);
+                    accEvents.set(0, new AccEvent(0, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
+
+                    events.set(1, temp);
+                    accEvents.set(1, new AccEvent(1, Double.parseDouble(temp[0]), Double.parseDouble(temp[1]), Long.parseLong(temp[5]), false, "0", "0"));
+                    eventAdded = true;
+                } else if (maxXDelta > Double.parseDouble(events.get(1)[2]) && !eventAdded && enoughTimePassed) {
+
+                    events.set(1, partOfRide);
+                    accEvents.set(1, new AccEvent(1, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
+                    eventAdded = true;
+                }
+                // Check whether actualY is one of the top 2 events
+                else if (maxYDelta > Double.parseDouble(events.get(2)[3]) && !eventAdded && enoughTimePassed) {
+
+                    String[] temp = events.get(2);
+                    events.set(2, partOfRide);
+                    accEvents.set(2, new AccEvent(2, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
+                    events.set(3, temp);
+                    accEvents.set(3, new AccEvent(3, Double.parseDouble(temp[0]), Double.parseDouble(temp[1]), Long.parseLong(temp[5]), false, "0", "0"));
+                    eventAdded = true;
+
+                } else if (maxYDelta > Double.parseDouble(events.get(3)[3]) && !eventAdded && enoughTimePassed) {
+                    events.set(3, partOfRide);
+                    accEvents.set(3, new AccEvent(3, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
+                    eventAdded = true;
+                }
+                // Check whether actualZ is one of the top 2 events
+                else if (maxZDelta > Double.parseDouble(events.get(4)[4]) && !eventAdded && enoughTimePassed) {
+                    String[] temp = events.get(4);
+                    events.set(4, partOfRide);
+                    accEvents.set(4, new AccEvent(4, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
+                    events.set(5, temp);
+                    accEvents.set(5, new AccEvent(5, Double.parseDouble(temp[0]), Double.parseDouble(temp[1]), Long.parseLong(temp[5]), false, "0", "0"));
+
+                } else if (maxZDelta > Double.parseDouble(events.get(5)[4]) && !eventAdded && enoughTimePassed) {
+                    events.set(5, partOfRide);
+                    accEvents.set(5, new AccEvent(5, Double.parseDouble(partOfRide[0]), Double.parseDouble(partOfRide[1]), Long.parseLong(partOfRide[5]), false, "0", "0"));
+                    eventAdded = true;
+                }
+
+                if (nextLine == null) {
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<IncidentLogEntry> incidents = new ArrayList<>();
+        for (AccEvent accEvent : accEvents) {
+            if (!(accEvent.position.getLatitude() == 999 || accEvent.position.getLatitude() == 0f)) {
+                incidents.add(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.AUTO_GENERATED).withBaseInformation(accEvent.timeStamp, accEvent.position.getLatitude(), accEvent.position.getLongitude()).build());
+            }
+        }
+
+        return incidents;
+    }
+
+    /**
+     * @deprecated Use IncidentLogEntry instead
+     */
+    private static class AccEvent {
+
+        public long timeStamp;
+        public GeoPoint position;
+        public int key = 999;              // when an event doesn't have a key yet, the key is 999
+        // (can't use 0 because that's an actual valid key)
+        public String incidentType = "-1";
+        public String scary = "0"; // default is non-scary
+        public boolean annotated = false;  // events are labeled as not annotated when first created.
+        String TAG = "AccEvent_LOG";
+
+        public AccEvent(int key, double lat, double lon, long timeStamp, boolean annotated, String incidentType, String scary) {
+            this.key = key;
+            this.position = new GeoPoint(lat, lon);
+            this.timeStamp = timeStamp;
+            this.annotated = annotated;
+            this.incidentType = incidentType;
+            this.scary = scary;
+        }
+
+
+        public long getTimeStamp() {
+            return this.timeStamp;
+        }
+    }
 }
