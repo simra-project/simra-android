@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.entities;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 
@@ -212,11 +213,20 @@ public class IncidentLogEntry implements Serializable {
         public static final int NEAR_DOORING = 6;
         public static final int OBSTACLE = 7;
         public static final int OTHER = 8;
+
+        public static boolean contains(Integer test) {
+            return Arrays.asList(AUTO_GENERATED, NOTHING, CLOSE_PASS, PULL_OUT, HOOK, HEAD_ON, TAILGATING, NEAR_DOORING, OBSTACLE, OTHER)
+                    .contains(test);
+        }
     }
 
     public static class INCIDENT_TYPE_RADMESSER {
         public static final int UNKOWN = -2;
         public static final int AVG2S = -3;
         public static final int MIN_KALMAN = -4;
+
+        public static boolean contains(Integer test) {
+            return Arrays.asList(UNKOWN, AVG2S, MIN_KALMAN).contains(test);
+        }
     }
 }

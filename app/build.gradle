@@ -119,4 +119,7 @@ dependencies {
     implementation "androidx.camera:camera-camera2:${camerax_version}"
     // If you want to additionally use the CameraX Lifecycle library
     implementation "androidx.camera:camera-lifecycle:${camerax_version}"
+
+    // "Backporting" Java 8 streams for Android < 24
+    compile 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
 }

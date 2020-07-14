@@ -524,7 +524,7 @@ public class RadmesserService extends Service {
         private String originalValue;
         private String eventType;
         private long timestamp;
-        private List<String> payload;
+        public List<String> payload;
 
         public ClosePassEvent(String rawData) {
             originalValue = rawData;
@@ -565,7 +565,7 @@ public class RadmesserService extends Service {
 
             switch (eventType) {
                 case EVENT_TYPE_BUTTON:
-                    headerLine = "This incident was triggerd using a physical button on a OpenBikeSensor.";
+                    headerLine = "This incident was triggered using a physical button on a OpenBikeSensor.";
                     if (payload.size() >= 1) {
                         dataLine = "Distance during close pass: " + payload.get(0) + " cm";
                     }

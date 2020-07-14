@@ -3,21 +3,32 @@ package de.tuberlin.mcc.simra.app.annotation;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Address;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.annotation.ColorInt;
+
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
+import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
+import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlay;
+import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlayOptions;
+import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -29,7 +40,14 @@ import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry.INCIDENT_TYPE;
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry.INCIDENT_TYPE_RADMESSER;
+import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.util.Utils;
+import java9.util.function.Function;
+import java9.util.function.Predicate;
+import java9.util.stream.Collectors;
+import java9.util.stream.StreamSupport;
 
 /**
  * Convenience functions for working with the Map and setting or deleting markers
@@ -62,10 +80,53 @@ public class MarkerFunct {
     }
 
     public void updateMarkers(IncidentLog incidentLog) {
-        for (Map.Entry<Integer, IncidentLogEntry> entry : incidentLog.getIncidents().entrySet()) {
-            IncidentLogEntry incident = entry.getValue();
+        Collection<IncidentLogEntry> incidents = incidentLog.getIncidents().values();
+
+        List<IncidentLogEntry> radmesserIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE_RADMESSER.contains(x.incidentType));
+        List<IncidentLogEntry> radmesserAvg2sIncidents = simpleFilter(radmesserIncidents, x -> x.incidentType == INCIDENT_TYPE_RADMESSER.AVG2S);
+        List<IncidentLogEntry> radmesserMinKalmanIncidents = simpleFilter(radmesserIncidents, x -> {
+            if (x.incidentType != INCIDENT_TYPE_RADMESSER.MIN_KALMAN) return false;
+
+            try {
+                RadmesserService.ClosePassEvent event = new RadmesserService.ClosePassEvent(x.description.split("\n", -1)[2].replace("[", "").replace("]", ""));
+                return Integer.parseInt(event.payload.get(0)) < 50;
+            } catch (Exception e) {
+                return false;
+            }
+        });
+
+        // TODO: temporary!
+        ListIterator<IncidentLogEntry> it = radmesserMinKalmanIncidents.listIterator();
+        int i = 0;
+        while (it.hasNext()) {
+            it.next();
+            if (i++ % 6 > 0) it.remove();
+        }
+
+        radmesserAvg2sIncidents = simpleFilter(radmesserAvg2sIncidents, x -> {
+            Double latitude = x.latitude, longitude = x.longitude;
+
+            return simpleFilter(radmesserMinKalmanIncidents, y -> latitude.equals(y.latitude) && longitude.equals(y.longitude)).size() == 0;
+        });
+
+        setRadmesserMarkers(radmesserAvg2sIncidents, Color.parseColor("#ffbf00"));
+        setRadmesserMarkers(radmesserMinKalmanIncidents, Color.parseColor("#ff3300"));
+
+        List<IncidentLogEntry> regularIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.contains(x.incidentType));
+        // TODO: temporary!
+        regularIncidents = simpleFilter(regularIncidents, x -> !x.description.startsWith("This incident was trigg"));
+
+        for (IncidentLogEntry incident : regularIncidents) {
             setMarker(incident);
         }
+    }
+
+    private <T> List<T> simpleFilter(Collection<T> c, Predicate<? super T> filter) {
+        return StreamSupport.stream(c).filter(filter).collect(Collectors.toList());
+    }
+
+    private <S, T> List<T> simpleMap(Collection<S> c, Function<? super S, ? extends T> mapper) {
+        return StreamSupport.stream(c).map(mapper).collect(Collectors.toList());
     }
 
     /**
@@ -96,7 +157,7 @@ public class MarkerFunct {
     public void addCustomMarker(GeoPoint geoPoint) {
         DataLogEntry closestDataLogEntry = getClosesDataLogEntryToGeoPoint(geoPoint, gpsDataLog);
         // set Marker for new AccEvent, refresh map
-        IncidentLogEntry newIncidentLogEnty = incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(closestDataLogEntry.timestamp, closestDataLogEntry.latitude, closestDataLogEntry.longitude).withIncidentType(IncidentLogEntry.INCIDENT_TYPE.NOTHING).build());
+        IncidentLogEntry newIncidentLogEnty = incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(closestDataLogEntry.timestamp, closestDataLogEntry.latitude, closestDataLogEntry.longitude).withIncidentType(INCIDENT_TYPE.NOTHING).build());
         setMarker(newIncidentLogEnty);
         activity.getmMapView().invalidate();
 
@@ -185,6 +246,24 @@ public class MarkerFunct {
         activity.getmMapView().invalidate();
     }
 
+    private void setRadmesserMarkers(List<IncidentLogEntry> incidents, @ColorInt Integer color) {
+        List<IGeoPoint> points = simpleMap(incidents, x -> (IGeoPoint) new LabelledGeoPoint(x.latitude, x.longitude, ""));
+        SimplePointTheme adapter = new SimplePointTheme(points, true);
+
+        Paint pointStyle = new Paint();
+        pointStyle.setStyle(Paint.Style.FILL);
+        pointStyle.setColor(color);
+
+        SimpleFastPointOverlayOptions opt = SimpleFastPointOverlayOptions.getDefaultStyle()
+                .setAlgorithm(points.size() > 10000 ? SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION : SimpleFastPointOverlayOptions.RenderingAlgorithm.MEDIUM_OPTIMIZATION)
+                .setRadius(10).setIsClickable(false).setCellSize(15).setPointStyle(pointStyle)
+                .setSymbol(SimpleFastPointOverlayOptions.Shape.CIRCLE);
+
+        SimpleFastPointOverlay pointOverlay = new SimpleFastPointOverlay(adapter, opt);
+        activity.getmMapView().getOverlays().add(pointOverlay);
+//        activity.getmMapView().invalidate();
+    }
+
     // Generate a new GeoPoint from address String via Geocoding
 
     public String getAddressFromLocation(GeoPoint incidentLoc) {
@@ -224,5 +303,4 @@ public class MarkerFunct {
             return myThread;
         }
     }
-
 }
