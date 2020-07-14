@@ -22,6 +22,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +30,7 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +38,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.util.Consumer;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -113,14 +116,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private Boolean recording = false;
     private MaterialButton startBtn;
     private MaterialButton stopBtn;
-    private MaterialButton reportClosepassIncidentBtn;
-    private MaterialButton reportObstacleIncidentBtn;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Radmesser
     private FloatingActionButton radmesserButton;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // other UI Elements
     private Toolbar toolbar;
+    private LinearLayout reportIncidentLayout;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
@@ -345,14 +347,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             startRecording();
         });
 
-        reportClosepassIncidentBtn = findViewById(R.id.report_closepass_incident);
-        reportClosepassIncidentBtn.setOnClickListener(v -> {
-            IncidentBroadcaster.broadcastIncident(this, IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS);
+        Consumer<Integer> recordIncident = (incidentType) -> {
+            Toast t = Toast.makeText(MainActivity.this, R.string.recorded_incident, Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 230);
+            t.show();
+
+            IncidentBroadcaster.broadcastIncident(MainActivity.this, incidentType);
+        };
+
+        reportIncidentLayout = findViewById(R.id.reportIncidentContainer);
+        this.<MaterialButton>findViewById(R.id.report_closepass_incident).setOnClickListener(v -> {
+            recordIncident.accept(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS);
         });
 
-        reportObstacleIncidentBtn = findViewById(R.id.report_obstacle_incident);
-        reportObstacleIncidentBtn.setOnClickListener(v -> {
-            IncidentBroadcaster.broadcastIncident(this, IncidentLogEntry.INCIDENT_TYPE.OBSTACLE);
+        this.<MaterialButton>findViewById(R.id.report_obstacle_incident).setOnClickListener(v -> {
+            recordIncident.accept(IncidentLogEntry.INCIDENT_TYPE.OBSTACLE);
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -437,10 +446,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void displayButtonsForMenue() {
         startBtn.setVisibility(View.VISIBLE);
         stopBtn.setVisibility(View.INVISIBLE);
-        reportObstacleIncidentBtn.setVisibility(View.INVISIBLE);
-        reportClosepassIncidentBtn.setVisibility(View.INVISIBLE);
 
         toolbar.setVisibility(View.VISIBLE);
+        reportIncidentLayout.setVisibility(View.GONE);
 
         findViewById(R.id.button_ride_settings_general).setVisibility(View.VISIBLE);
         findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.VISIBLE);
@@ -448,11 +456,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     public void displayButtonsForDrive() {
         stopBtn.setVisibility(View.VISIBLE);
-        reportObstacleIncidentBtn.setVisibility(View.VISIBLE);
-        reportClosepassIncidentBtn.setVisibility(View.VISIBLE);
         startBtn.setVisibility(View.INVISIBLE);
 
         toolbar.setVisibility(View.INVISIBLE);
+        reportIncidentLayout.setVisibility(View.VISIBLE);
 
          findViewById(R.id.button_ride_settings_general).setVisibility(View.INVISIBLE);
         findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.INVISIBLE);
@@ -545,17 +552,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             case SEARCHING:
                 radmesserButton.setImageResource(R.drawable.ic_bluetooth_searching);
                 radmesserButton.setContentDescription("Radmesser wird gesucht");
-                radmesserButton.setColorFilter(Color.BLACK);
+                radmesserButton.setColorFilter(Color.WHITE);
                 break;
             case PAIRING:
                 radmesserButton.setImageResource(R.drawable.ic_bluetooth_searching);
                 radmesserButton.setContentDescription("Verbinde");
-                radmesserButton.setColorFilter(Color.BLACK);
+                radmesserButton.setColorFilter(Color.WHITE);
                 break;
             case CONNECTED:
                 radmesserButton.setImageResource(R.drawable.ic_bluetooth_connected);
                 radmesserButton.setContentDescription("Radmesser verbunden");
-                radmesserButton.setColorFilter(Color.BLACK);
+                radmesserButton.setColorFilter(Color.GREEN);
                 break;
             default:
                 break;

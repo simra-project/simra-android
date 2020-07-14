@@ -70,8 +70,8 @@
     <string name="newest_version">newest version:</string>
     <string name="new_app_version_title">New update available</string>
     <string name="later">Later</string>
-    <string name="reportIncidentClosepass">Closepass</string>
-    <string name="reportIncidentObstacle">Obstacle</string>
+    <string name="reportIncidentClosepass">Close Pass</string>
+    <string name="reportIncidentObstacle">Dodging Obstacle</string>
     <string name="recording_not_started">Recording did NOT start.</string>
     <string name="recording_started">Recording started.</string>
 
@@ -318,5 +318,7 @@
 
     <!-- 55 -->
     <string name="added_new_regions_news_58">Following regions are now available: Leipzig, Wuppertal/Solingen/Remscheid und Düsseldorf</string>
+    <string name="reportIncidentText">Report Incident</string>
+	<string name="recorded_incident">Saved Incident</string>
 
 </resources>

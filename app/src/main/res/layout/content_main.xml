@@ -13,6 +13,9 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
+    <!-- Temporarily removed this button because its static offset from the top
+         doesn't guarantee that it'll be shown correctly at the right location.
+         This button should probably moved to its parent layout file. -->
     <ImageButton
         android:id="@+id/center_button"
         android:layout_width="40dp"
@@ -24,7 +27,8 @@
         android:background="@drawable/my_center"
         android:clickable="true"
         android:elevation="2dp"
-        android:focusable="true" />
+        android:focusable="true"
+        android:visibility="gone"/>
 
     <RelativeLayout
         android:id="@+id/checkingAppVersionProgressBarRelativeLayout"

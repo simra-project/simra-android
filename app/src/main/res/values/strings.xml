@@ -60,8 +60,9 @@
     <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um ihre Privatsphäre zu schützen.\nSie können dies im Menü "Einstellungen" anpassen.</string>
     <string name="startButtonText">Aufzeichnung\nstarten</string>
     <string name="stopButtonText">Aufzeichnung\nbeenden</string>
-    <string name="reportIncidentClosepass">Abstand</string>
-    <string name="reportIncidentObstacle">Hinderniss</string>
+    <string name="reportIncidentText">Ereignis melden</string>
+    <string name="reportIncidentClosepass">Knappe Überholung</string>
+    <string name="reportIncidentObstacle">Hindernis ausweichen</string>
     <string name="cancel">Abbrechen</string>
     <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalten Sie es aus, damit die Fahrt aufgezeichnet werden kann.</string>
     <string name="locationServiceisOff">Der Ortungsdienst Ihres Geräts ist aus. Bitte schalten Sie den Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
@@ -80,6 +81,7 @@
     <string name="cancel_button">Nein, mit dem Radmesser verbinden</string>
     <string name="bluetooth_not_enable_title">Warnung: Bluetooth is ausgeschaltet</string>
     <string name="bluetooth_not_enable_message">Möchten Sie die Bluetooth einschalten ? Ansonsten kann der Radmesser nicht verwendet werden</string>
+    <string name="recorded_incident">Ereignis gespeichert</string>
 
 
     <!--- RecorderService -->
