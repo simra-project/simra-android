@@ -135,17 +135,17 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
     }
 
     public void updateView() {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        closePassPicture.setImageBitmap(decodeSampledBitmapFromFile(imageQueue.get(0).getAbsolutePath(), displayMetrics.widthPixels, displayMetrics.heightPixels));
         boolean foundPicture = false;
         for (DataLogEntry d : dataLog.dataLogEntries) {
             if (d.timestamp == Long.parseLong(imageQueue.get(0).getName().split("\\.")[0])) {
                 currentDistanceValue.setText(String.valueOf(((DataLogEntry) d).radmesserDistanceLeft1));
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                closePassPicture.setImageBitmap(decodeSampledBitmapFromFile(imageQueue.get(0).getAbsolutePath(), displayMetrics.widthPixels, displayMetrics.heightPixels));
                 foundPicture = true;
             }
             // Find next DataLogEntry with GPS Location attached
-            if (d.longitude != null) {
+            if (foundPicture == true && d.longitude != null) {
                 currentDataLogEntry = d;
                 break;
             }
