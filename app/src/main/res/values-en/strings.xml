@@ -294,4 +294,9 @@
     <!-- 55 -->
     <string name="added_new_regions_news_58">Following regions are now available: Leipzig, Wuppertal/Solingen/Remscheid und Düsseldorf</string>
 
+    <!-- 59 -->
+    <string name="workshop_ad_title_news_59">SimRa-Workshop August 2020 Registration</string>
+    <string name="workshop_ad_text_news_59">Seid ihr schon gespannt darauf, was bei SimRa rauskommt? Wir auch. Darum veranstalten wir am 3. oder 4.8. einen virtuellen Workshop zur Auswertung der Berliner Daten.\nAlle Detailinformationen gibt es <a href="https://forms.gle/7iUMHxy8rfEKLBAi6">hier</a>. </string>
+
+
 </resources>

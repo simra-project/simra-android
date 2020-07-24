@@ -731,8 +731,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             });
             if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
                 MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
-            } else if (!lookUpBooleanSharedPrefs("news58seen",false,"simraPrefs",MainActivity.this)) {
-                fireWhatIsNewPrompt(58);
+            } else if (!lookUpBooleanSharedPrefs("news59seen",false,"simraPrefs",MainActivity.this)) {
+                fireWhatIsNewPromptWithClickableURL(59);
             }
         }
     }
@@ -816,7 +816,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         // Get custom login form view.
-        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_58, null);
+        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_59, null);
 
         // Set above view in alert dialog.
         builder.setView(settingsView);
@@ -839,7 +839,25 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setCancelable(false);
         alertDialog.show();
+        ((TextView)alertDialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
+    }
 
+    private void fireWhatIsNewPromptWithClickableURL(int version) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(getString(R.string.workshop_ad_title_news_59));
+        builder.setMessage(getResources().getText(R.string.workshop_ad_text_news_59));
+        builder.setNeutralButton("ok",null);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        Button okButton = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                writeBooleanToSharedPrefs("news" + version + "seen",true,"simraPrefs",MainActivity.this);
+                dialog.cancel();
+            }
+        });
+        ((TextView)dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     public void fireRegionPrompt() {

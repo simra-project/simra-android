@@ -410,7 +410,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
              Accordingly, when the queues are shorter we're adding data points.
              */
-
             if (accXQueue.size() < 30) {
 
                 accXQueue.add(accelerometerMatrix[0]);
