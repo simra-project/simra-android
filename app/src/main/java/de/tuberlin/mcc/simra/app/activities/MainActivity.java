@@ -589,6 +589,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // Ensure the button that matches current state is presented.
         if (recording) {
             displayButtonsForDrive();
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         } else {
             displayButtonsForMenue();
         }
@@ -618,6 +619,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Log.d(TAG, "OnPause called");
 
         super.onPause();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Load Configuration with changes from onCreate
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
