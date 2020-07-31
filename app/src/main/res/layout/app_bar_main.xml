@@ -146,6 +146,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/reportHelperSpace"
+                    android:layout_alignParentRight="true"
                     android:backgroundTint="@color/colorAccent"
                     android:maxLines="2"
                     android:text="@string/reportIncidentObstacle"
