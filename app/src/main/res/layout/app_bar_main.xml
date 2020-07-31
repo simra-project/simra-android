@@ -28,72 +28,11 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-
-
-    <include layout="@layout/content_main" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_ride_settings_general"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@id/toolbar"
-        android:layout_alignBottom="@id/button_start"
-        android:gravity="center_vertical"
-        android:src="@drawable/ic_settings_black_24dp" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_ride_settings_radmesser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@id/toolbar"
-        android:layout_alignBottom="@id/button_start"
-        android:gravity="center_vertical"
-        android:src="@drawable/ic_bluetooth_disabled"
-        android:visibility="gone" />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/button_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/copyright_text"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="@dimen/activity_vertical_margin"
-        android:layout_marginEnd="63dp"
-        android:gravity="center"
-        android:icon="@drawable/ic_route"
-        android:maxLines="2"
-        android:text="@string/startButtonText"
-        app:icon="@drawable/route" />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/button_stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/copyright_text"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="@dimen/activity_vertical_margin"
-        android:layout_marginEnd="63dp"
-        android:gravity="center"
-        android:icon="@drawable/ic_route"
-        android:maxLines="2"
-        android:text="@string/stopButtonText"
-        android:backgroundTint="@color/design_default_color_error"
-        app:icon="@drawable/stop" />
-
-    <TextView
-        android:id="@+id/copyright_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="5dp"
-        android:text="@string/osmCopyright"
-        android:textSize="10sp" />
-
     <LinearLayout
         android:id="@+id/reportIncidentContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -162,5 +101,78 @@
             android:layout_height="10dp"
             android:background="@drawable/shadow_gradient"/>
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/center_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/reportIncidentContainer"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="15dp"
+        android:background="@drawable/my_center"
+        android:clickable="true"
+        android:elevation="2dp"
+        android:focusable="true" />
+
+    <include layout="@layout/content_main" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_ride_settings_general"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/toolbar"
+        android:layout_alignBottom="@id/button_start"
+        android:gravity="center_vertical"
+        android:src="@drawable/ic_settings_black_24dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_ride_settings_radmesser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/toolbar"
+        android:layout_alignBottom="@id/button_start"
+        android:gravity="center_vertical"
+        android:src="@drawable/ic_bluetooth_disabled"
+        android:visibility="gone" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/button_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/copyright_text"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="63dp"
+        android:gravity="center"
+        android:icon="@drawable/ic_route"
+        android:maxLines="2"
+        android:text="@string/startButtonText"
+        app:icon="@drawable/route" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/button_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/copyright_text"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="63dp"
+        android:gravity="center"
+        android:icon="@drawable/ic_route"
+        android:maxLines="2"
+        android:text="@string/stopButtonText"
+        android:backgroundTint="@color/design_default_color_error"
+        app:icon="@drawable/stop" />
+
+    <TextView
+        android:id="@+id/copyright_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="5dp"
+        android:text="@string/osmCopyright"
+        android:textSize="10sp" />
 
 </RelativeLayout>
