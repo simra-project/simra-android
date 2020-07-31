@@ -361,7 +361,7 @@ public class ShowRouteActivity extends BaseActivity {
                 myMarkerFunct.deleteAllMarkers();
             }
             myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, dataLog, incidentLog);
-            myMarkerFunct.updateMarkers(this.incidentLog);
+            myMarkerFunct.updateMarkers(this.incidentLog, ShowRouteActivity.this);
         });
 
         addCustomMarkerMode = false;

@@ -2,8 +2,8 @@ package de.tuberlin.mcc.simra.app.annotation;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.Address;
 import android.util.Log;
@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -78,7 +77,7 @@ public class MarkerFunct {
         this.state = activity.state;
     }
 
-    public void updateMarkers(IncidentLog incidentLog) {
+    public void updateMarkers(IncidentLog incidentLog, Context context) {
         Collection<IncidentLogEntry> incidents = incidentLog.getIncidents().values();
 
         List<IncidentLogEntry> radmesserIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.isOBS(x.incidentType));
@@ -94,27 +93,17 @@ public class MarkerFunct {
             }
         });
 
-        // TODO: temporary!
-        ListIterator<IncidentLogEntry> it = radmesserMinKalmanIncidents.listIterator();
-        int i = 0;
-        while (it.hasNext()) {
-            it.next();
-            if (i++ % 6 > 0) it.remove();
-        }
-
+        // Removing Avg2s markers if MinKalman markers are already placed at the same position
         radmesserAvg2sIncidents = simpleFilter(radmesserAvg2sIncidents, x -> {
             Double latitude = x.latitude, longitude = x.longitude;
 
             return simpleFilter(radmesserMinKalmanIncidents, y -> latitude.equals(y.latitude) && longitude.equals(y.longitude)).size() == 0;
         });
 
-        setRadmesserMarkers(radmesserAvg2sIncidents, Color.parseColor("#ffbf00"));
-        setRadmesserMarkers(radmesserMinKalmanIncidents, Color.parseColor("#ff3300"));
+        setDistanceMarkers(radmesserAvg2sIncidents, context.getColor(R.color.distanceMarkerWarning));
+        setDistanceMarkers(radmesserMinKalmanIncidents, context.getColor(R.color.distanceMarkerDanger));
 
         List<IncidentLogEntry> regularIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.isRegular(x.incidentType));
-        // TODO: temporary!
-        regularIncidents = simpleFilter(regularIncidents, x -> !x.description.startsWith("This incident was trigg"));
-
         for (IncidentLogEntry incident : regularIncidents) {
             setMarker(incident);
         }
@@ -245,7 +234,7 @@ public class MarkerFunct {
         activity.getmMapView().invalidate();
     }
 
-    private void setRadmesserMarkers(List<IncidentLogEntry> incidents, @ColorInt Integer color) {
+    private void setDistanceMarkers(List<IncidentLogEntry> incidents, @ColorInt Integer color) {
         List<IGeoPoint> points = simpleMap(incidents, x -> (IGeoPoint) new LabelledGeoPoint(x.latitude, x.longitude, ""));
         SimplePointTheme adapter = new SimplePointTheme(points, true);
 
