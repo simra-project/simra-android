@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
@@ -543,8 +544,9 @@ public class RadmesserService extends Service {
 
         /**
          * Only button events should be treated as a real close pass event. All
-         * other events therefore will be assigned an "unknown" incident type to
-         * be hidden from the regular incident view after a ride ends.
+         * other events therefore will be assigned an "unknown" incident type
+         * (prefixed with 'OBS_') to be hidden from the regular incident view
+         * after a ride ends.
          */
         public int getIncidentType() {
             if (eventType.equals(EVENT_TYPE_BUTTON)) return IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS;
@@ -559,27 +561,27 @@ public class RadmesserService extends Service {
          * raw event string that was passed over bluetooth (formatted in square brackets). These sections are always
          * separated by a newline.
          */
-        public String getIncidentDescription() {
-            String headerLine = "This incident was triggered from the OpenBikeSensor event " + eventType + ".";
-            String dataLine = "Additional data: " + TextUtils.join(", ",  payload);
+        public String getIncidentDescription(Context context) {
+            String headerLine = context.getString(R.string.radmesserIncidentDescriptionHeaderLine, eventType);
+            String dataLine = context.getString(R.string.radmesserIncidentDescriptionDataLine, TextUtils.join(", ",  payload));
 
             switch (eventType) {
                 case EVENT_TYPE_BUTTON:
-                    headerLine = "This incident was triggered using a physical button on a OpenBikeSensor.";
+                    headerLine = context.getString(R.string.radmesserIncidentDescriptionButtonHeaderLine);
                     if (payload.size() >= 1) {
-                        dataLine = "Distance during close pass: " + payload.get(0) + " cm";
+                        dataLine = context.getString(R.string.radmesserIncidentDescriptionButtonDataLine, payload.get(0));
                     }
                     break;
                 case EVENT_TYPE_AVG2S:
-                    headerLine = "This incident was automatically triggered from the OpenBikeSensor because the average distance during the close pass was below the threshold.";
+                    headerLine = context.getString(R.string.radmesserIncidentDescriptionAvg2sHeaderLine);
                     if (payload.size() >= 2) {
-                        dataLine = "Average distance: " + payload.get(0) + " cm, mininum distance: " + payload.get(1) + " cm";
+                        dataLine = context.getString(R.string.radmesserIncidentDescriptionAvg2sDataLine, payload.get(0), payload.get(1));
                     }
                     break;
                 case EVENT_TYPE_MIN_KALMAN:
-                    headerLine = "This incident was automatically triggered from the OpenBikeSensor because it detected the smallest distance during a close pass.";
+                    headerLine = context.getString(R.string.radmesserIncidentDescriptionMinKalmanHeaderLine);
                     if (payload.size() >= 1) {
-                        dataLine = "Minimum distance: " + payload.get(0) + " cm";
+                        dataLine = context.getString(R.string.radmesserIncidentDescriptionMinKalmanDataLine, payload.get(0));
                     }
                     break;
                 default:
