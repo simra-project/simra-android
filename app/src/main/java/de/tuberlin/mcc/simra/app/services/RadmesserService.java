@@ -548,9 +548,9 @@ public class RadmesserService extends Service {
          */
         public int getIncidentType() {
             if (eventType.equals(EVENT_TYPE_BUTTON)) return IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS;
-            if (eventType.equals(EVENT_TYPE_AVG2S)) return IncidentLogEntry.INCIDENT_TYPE_RADMESSER.AVG2S;
-            if (eventType.equals(EVENT_TYPE_MIN_KALMAN)) return IncidentLogEntry.INCIDENT_TYPE_RADMESSER.MIN_KALMAN;
-            return IncidentLogEntry.INCIDENT_TYPE_RADMESSER.UNKOWN;
+            if (eventType.equals(EVENT_TYPE_AVG2S)) return IncidentLogEntry.INCIDENT_TYPE.OBS_AVG2S;
+            if (eventType.equals(EVENT_TYPE_MIN_KALMAN)) return IncidentLogEntry.INCIDENT_TYPE.OBS_MIN_KALMAN;
+            return IncidentLogEntry.INCIDENT_TYPE.OBS_UNKNOWN;
         }
 
         /**

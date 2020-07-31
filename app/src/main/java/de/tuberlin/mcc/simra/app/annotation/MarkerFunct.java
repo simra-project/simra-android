@@ -41,7 +41,6 @@ import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry.INCIDENT_TYPE;
-import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry.INCIDENT_TYPE_RADMESSER;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.util.Utils;
 import java9.util.function.Function;
@@ -82,10 +81,10 @@ public class MarkerFunct {
     public void updateMarkers(IncidentLog incidentLog) {
         Collection<IncidentLogEntry> incidents = incidentLog.getIncidents().values();
 
-        List<IncidentLogEntry> radmesserIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE_RADMESSER.contains(x.incidentType));
-        List<IncidentLogEntry> radmesserAvg2sIncidents = simpleFilter(radmesserIncidents, x -> x.incidentType == INCIDENT_TYPE_RADMESSER.AVG2S);
+        List<IncidentLogEntry> radmesserIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.isOBS(x.incidentType));
+        List<IncidentLogEntry> radmesserAvg2sIncidents = simpleFilter(radmesserIncidents, x -> x.incidentType == INCIDENT_TYPE.OBS_AVG2S);
         List<IncidentLogEntry> radmesserMinKalmanIncidents = simpleFilter(radmesserIncidents, x -> {
-            if (x.incidentType != INCIDENT_TYPE_RADMESSER.MIN_KALMAN) return false;
+            if (x.incidentType != INCIDENT_TYPE.OBS_MIN_KALMAN) return false;
 
             try {
                 RadmesserService.ClosePassEvent event = new RadmesserService.ClosePassEvent(x.description.split("\n", -1)[2].replace("[", "").replace("]", ""));
@@ -112,7 +111,7 @@ public class MarkerFunct {
         setRadmesserMarkers(radmesserAvg2sIncidents, Color.parseColor("#ffbf00"));
         setRadmesserMarkers(radmesserMinKalmanIncidents, Color.parseColor("#ff3300"));
 
-        List<IncidentLogEntry> regularIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.contains(x.incidentType));
+        List<IncidentLogEntry> regularIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.isRegular(x.incidentType));
         // TODO: temporary!
         regularIncidents = simpleFilter(regularIncidents, x -> !x.description.startsWith("This incident was trigg"));
 

@@ -203,6 +203,9 @@ public class IncidentLogEntry implements Serializable {
     }
 
     public static class INCIDENT_TYPE {
+        public static final int OBS_MIN_KALMAN = -4;
+        public static final int OBS_AVG2S = -3;
+        public static final int OBS_UNKNOWN = -2;
         public static final int AUTO_GENERATED = -1;
         public static final int NOTHING = 0;
         public static final int CLOSE_PASS = 1;
@@ -214,19 +217,13 @@ public class IncidentLogEntry implements Serializable {
         public static final int OBSTACLE = 7;
         public static final int OTHER = 8;
 
-        public static boolean contains(Integer test) {
+        public static boolean isRegular(Integer test) {
             return Arrays.asList(AUTO_GENERATED, NOTHING, CLOSE_PASS, PULL_OUT, HOOK, HEAD_ON, TAILGATING, NEAR_DOORING, OBSTACLE, OTHER)
                     .contains(test);
         }
-    }
 
-    public static class INCIDENT_TYPE_RADMESSER {
-        public static final int UNKOWN = -2;
-        public static final int AVG2S = -3;
-        public static final int MIN_KALMAN = -4;
-
-        public static boolean contains(Integer test) {
-            return Arrays.asList(UNKOWN, AVG2S, MIN_KALMAN).contains(test);
+        public static boolean isOBS(Integer test) {
+            return Arrays.asList(OBS_UNKNOWN, OBS_AVG2S, OBS_MIN_KALMAN).contains(test);
         }
     }
 }
