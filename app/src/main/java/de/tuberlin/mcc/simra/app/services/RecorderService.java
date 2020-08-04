@@ -456,8 +456,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     }
 
                     while (lastRadmesserClosePassEvents.size() > 0) {
+                        RadmesserService.ClosePassEvent closePassEvent = lastRadmesserClosePassEvents.removeFirst();
                         incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder()
-                                .withClosePassEvent(lastRadmesserClosePassEvents.removeFirst(), getApplicationContext())
+                                .withIncidentType(closePassEvent.getIncidentType())
+                                .withDescription(closePassEvent.getIncidentDescription(getApplicationContext()))
                                 .withBaseInformation(curTime, lastLocation.getLatitude(), lastLocation.getLongitude())
                                 .build());
                     }

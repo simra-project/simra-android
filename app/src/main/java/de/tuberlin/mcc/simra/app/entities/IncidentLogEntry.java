@@ -1,11 +1,7 @@
 package de.tuberlin.mcc.simra.app.entities;
 
-import android.content.Context;
-
 import java.io.Serializable;
 import java.util.Arrays;
-
-import de.tuberlin.mcc.simra.app.services.RadmesserService;
 
 public class IncidentLogEntry implements Serializable {
     public Integer key;
@@ -158,9 +154,8 @@ public class IncidentLogEntry implements Serializable {
             return this;
         }
 
-        public Builder withClosePassEvent(RadmesserService.ClosePassEvent closePassEvent, Context context) {
-            this.incidentType = closePassEvent.getIncidentType();
-            this.description = closePassEvent.getIncidentDescription(context);
+        public Builder withDescription(String description) {
+            this.description = description;
             return this;
         }
 
