@@ -1,6 +1,5 @@
 package de.tuberlin.mcc.simra.app.services;
 
-import android.Manifest;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -82,9 +81,6 @@ public class CameraService extends IntentService implements CameraXConfig.Provid
      * Then in Background thread to do File IO
      */
     public void handleTakePicture(String name, String path) {
-
-        // TODO: Check Permissions here and at app start
-        String[] requiredPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
         final ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
 

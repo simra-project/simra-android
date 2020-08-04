@@ -146,20 +146,6 @@ public class Utils {
     }
 
     /**
-     * Use Utils.fileExists(path) instead for clarity
-     * Why? For Clarity filename does not say where the file is...
-     *
-     * @deprecated
-     */
-    public static boolean fileExists(String fileName, Context context) {
-        return new File(IOUtils.Directories.getBaseFolderPath(context) + fileName).exists();
-    }
-
-    public static boolean fileExists(String path) {
-        return new File(path).exists();
-    }
-
-    /**
      * @param incidentProps
      * @deprecated
      */

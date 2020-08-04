@@ -117,7 +117,7 @@ public class DataLogEntry {
         private Float gyroscopeA;
         private Float gyroscopeB;
         private Float gyroscopeC;
-        private Integer radmesserDistanceLeft1; // TODO: rename!
+        private Integer radmesserDistanceLeft1;
         private Integer radmesserDistanceLeft2;
         private Integer radmesserDistanceRight1;
         private Integer radmesserDistanceRight2;
