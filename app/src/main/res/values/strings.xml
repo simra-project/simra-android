@@ -333,5 +333,6 @@
 
     <!-- 58 -->
     <string name="added_new_regions_news_58">Folgende Regionen wurden freigeschaltet: Leipzig, Wuppertal/Solingen/Remscheid und Düsseldorf</string>
-
+    <string name="openbikesensor_toast_devicefound">Gerät gefunden, klicke auf dem Bluetooth Knopf um dich damit zu verbinden</string>
+    <string name="openbikesensor_bluetooth_incompatible">Dein Gerät unterstützt kein Bluetooth.</string>
 </resources>

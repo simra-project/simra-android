@@ -122,7 +122,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // other UI Elements
     private Toolbar toolbar;
-    private LinearLayout reportIncidentLayout;
+    private LinearLayout reportIncidentContainer;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
@@ -355,7 +355,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             IncidentBroadcaster.broadcastIncident(MainActivity.this, incidentType);
         };
 
-        reportIncidentLayout = findViewById(R.id.reportIncidentContainer);
+        reportIncidentContainer = findViewById(R.id.reportIncidentContainer);
         this.<MaterialButton>findViewById(R.id.report_closepass_incident).setOnClickListener(v -> {
             recordIncident.accept(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS);
         });
@@ -413,9 +413,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             if (mBluetoothAdapter == null) {
                 // Device does not support Bluetooth
                 deactivateRadmesser();
-                Toast.makeText(MainActivity.this, "Your device does not support bluetooth, radmesser feature cannot be activated", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, R.string.openbikesensor_bluetooth_incompatible, Toast.LENGTH_LONG).show();
             } else if (!mBluetoothAdapter.isEnabled() && radmesserEnabled) {
-                // Bluetooth is not enabled :)
+                // Bluetooth is disabled
                 showBluetoothNotEnableWarning();
             } else {
                 // Bluetooth is enabled
@@ -448,7 +448,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         stopBtn.setVisibility(View.INVISIBLE);
 
         toolbar.setVisibility(View.VISIBLE);
-        reportIncidentLayout.setVisibility(View.GONE);
+        reportIncidentContainer.setVisibility(View.GONE);
 
         findViewById(R.id.button_ride_settings_general).setVisibility(View.VISIBLE);
         findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.VISIBLE);
@@ -459,9 +459,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         startBtn.setVisibility(View.INVISIBLE);
 
         toolbar.setVisibility(View.INVISIBLE);
-        reportIncidentLayout.setVisibility(View.VISIBLE);
+        reportIncidentContainer.setVisibility(View.VISIBLE);
 
-         findViewById(R.id.button_ride_settings_general).setVisibility(View.INVISIBLE);
+        findViewById(R.id.button_ride_settings_general).setVisibility(View.INVISIBLE);
         findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.INVISIBLE);
 
     }
@@ -470,21 +470,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // Lifecycle (onResume onPause onStop):
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private void setRadmesserButtonVisibility() {
-
-    }
-
     private void registerRadmesserService() {
         receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks() {
             public void onConnectionStateChanged(RadmesserService.ConnectionState newState) {
-                Log.d(TAG, "Staus changed in main " + newState.toString());
                 updateRadmesserButtonStatus(newState);
             }
 
             public void onDeviceFound(String deviceName, String deviceId) {
-                Log.d(TAG, "Device found from main");
                 if (!RadmesserService.getConnectionState().equals(RadmesserService.ConnectionState.CONNECTED)) {
-                    Toast.makeText(MainActivity.this, "Gerät gefunden, clicke auf dem Bluetooth Knopf um dich damit zu verbinden", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, R.string.openbikesensor_toast_devicefound, Toast.LENGTH_LONG).show();
                 }
             }
         });

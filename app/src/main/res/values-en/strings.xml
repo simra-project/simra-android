@@ -326,6 +326,7 @@
     <!-- 55 -->
     <string name="added_new_regions_news_58">Following regions are now available: Leipzig, Wuppertal/Solingen/Remscheid und Düsseldorf</string>
     <string name="reportIncidentText">Report Incident</string>
-	<string name="recorded_incident">Saved Incident</string>
-
+    <string name="recorded_incident">Saved Incident</string>
+    <string name="openbikesensor_toast_devicefound">Device found. Push the Bluetooth Button to connect to it.</string>
+    <string name="openbikesensor_bluetooth_incompatible">Your device does not support bluetooth.</string>
 </resources>
