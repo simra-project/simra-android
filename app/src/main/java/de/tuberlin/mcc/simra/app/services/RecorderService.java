@@ -123,10 +123,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private StringBuilder accGpsString = new StringBuilder();
     private IncidentLog incidentLog = null;
 
-    {
-
-    }
-
     public int getCurrentRideKey() {
         return key;
     }

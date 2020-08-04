@@ -69,6 +69,7 @@ public class MarkerFunct {
         this.incidentLog = incidentLog;
 
         pool.execute(new SimpleThreadFactory().newThread(() -> {
+                    // TODO: Only do it when Internet is available
                     geocoderNominatim = new GeocoderNominatim(userAgent);
                     geocoderNominatim.setService("https://nominatim.openstreetmap.org/");
                 }
@@ -77,12 +78,20 @@ public class MarkerFunct {
         this.state = activity.state;
     }
 
-    public void updateMarkers(IncidentLog incidentLog, Context context) {
+    public void updateIncidentMarkers(IncidentLog incidentLog) {
+        Collection<IncidentLogEntry> incidents = incidentLog.getIncidents().values();
+        List<IncidentLogEntry> regularIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.isRegular(x.incidentType));
+        for (IncidentLogEntry incident : regularIncidents) {
+            setMarker(incident);
+        }
+    }
+
+    public void updateOBSMarkers(IncidentLog incidentLog, Context context) {
         Collection<IncidentLogEntry> incidents = incidentLog.getIncidents().values();
 
-        List<IncidentLogEntry> radmesserIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.isOBS(x.incidentType));
-        List<IncidentLogEntry> radmesserAvg2sIncidents = simpleFilter(radmesserIncidents, x -> x.incidentType == INCIDENT_TYPE.OBS_AVG2S);
-        List<IncidentLogEntry> radmesserMinKalmanIncidents = simpleFilter(radmesserIncidents, x -> {
+        List<IncidentLogEntry> obsIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.isOBS(x.incidentType));
+        List<IncidentLogEntry> obsAvg2sIncidents = simpleFilter(obsIncidents, x -> x.incidentType == INCIDENT_TYPE.OBS_AVG2S);
+        List<IncidentLogEntry> obsMinKalmanIncidents = simpleFilter(obsIncidents, x -> {
             if (x.incidentType != INCIDENT_TYPE.OBS_MIN_KALMAN) return false;
 
             try {
@@ -94,19 +103,14 @@ public class MarkerFunct {
         });
 
         // Removing Avg2s markers if MinKalman markers are already placed at the same position
-        radmesserAvg2sIncidents = simpleFilter(radmesserAvg2sIncidents, x -> {
+        obsAvg2sIncidents = simpleFilter(obsAvg2sIncidents, x -> {
             Double latitude = x.latitude, longitude = x.longitude;
 
-            return simpleFilter(radmesserMinKalmanIncidents, y -> latitude.equals(y.latitude) && longitude.equals(y.longitude)).size() == 0;
+            return simpleFilter(obsMinKalmanIncidents, y -> latitude.equals(y.latitude) && longitude.equals(y.longitude)).size() == 0;
         });
 
-        setDistanceMarkers(radmesserAvg2sIncidents, context.getColor(R.color.distanceMarkerWarning));
-        setDistanceMarkers(radmesserMinKalmanIncidents, context.getColor(R.color.distanceMarkerDanger));
-
-        List<IncidentLogEntry> regularIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.isRegular(x.incidentType));
-        for (IncidentLogEntry incident : regularIncidents) {
-            setMarker(incident);
-        }
+        setDistanceMarkers(obsAvg2sIncidents, context.getColor(R.color.distanceMarkerWarning));
+        setDistanceMarkers(obsMinKalmanIncidents, context.getColor(R.color.distanceMarkerDanger));
     }
 
     private <T> List<T> simpleFilter(Collection<T> c, Predicate<? super T> filter) {

@@ -369,7 +369,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         stopBtn = findViewById(R.id.button_stop);
         stopBtn.setOnClickListener(v -> {
             try {
-                displayButtonsForMenue();
+                displayButtonsForMenu();
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 // Stop RecorderService which is recording accelerometer data
                 unbindService(mRecorderServiceConnection);
@@ -443,7 +443,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     // (2) stop button visible, start button invisible
 
-    public void displayButtonsForMenue() {
+    public void displayButtonsForMenu() {
         startBtn.setVisibility(View.VISIBLE);
         stopBtn.setVisibility(View.INVISIBLE);
 
@@ -585,7 +585,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             displayButtonsForDrive();
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         } else {
-            displayButtonsForMenue();
+            displayButtonsForMenu();
         }
 
         // Load Configuration with changes from onCreate
