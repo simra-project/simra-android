@@ -16,15 +16,6 @@ public class IOUtils {
         return false;
     }
 
-    public static void deleteDirectoryContent(String path) {
-        File dir = new File(path);
-        if (dir.isDirectory()) {
-            for (File file : dir.listFiles())
-                if (!file.isDirectory())
-                    file.delete();
-        }
-    }
-
     public static class Directories {
 
         /**
@@ -87,7 +78,6 @@ public class IOUtils {
             return new File(getMetaDataFilePath(context));
         }
 
-        // TODO: ID should be an Integer
         public static String getEventsFileName(Integer rideId, boolean isTempFile) {
             return (isTempFile ? "Temp" : "") + "accEvents" + rideId + ".csv";
         }
@@ -110,6 +100,10 @@ public class IOUtils {
 
         public static File getGPSLogFile(int rideId, boolean isTempFile, Context context) {
             return new File(getGPSLogFilePath(rideId, isTempFile, context));
+        }
+
+        public static File getRegionsFile(Context context) {
+            return new File(IOUtils.Directories.getBaseFolderPath(context) + "simRa_regions.config");
         }
 
     }

@@ -57,6 +57,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -76,11 +77,11 @@ import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
-import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
@@ -89,6 +90,7 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPref
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
+import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
@@ -936,7 +938,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
             Log.d(TAG, "GET regions response: " + checkRegionsResponse.toString());
             if (status == 200) {
-                Utils.overWriteFile(checkRegionsResponse.toString(), "simRa_regions.config", MainActivity.this);
+                File regionsFile = IOUtils.Files.getRegionsFile(MainActivity.this);
+                overwriteFile(checkRegionsResponse.toString(), regionsFile);
             }
             installedAppVersion = getAppVersionNumber(MainActivity.this);
 

@@ -12,6 +12,7 @@ import org.osmdroid.views.overlay.Polyline;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,7 +27,6 @@ import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
-import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.recalculateStatistics;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
@@ -192,7 +192,7 @@ public class VersionUpdater {
                     contentOfNewMetaData.append(line).append(System.lineSeparator());
                 }
                 Log.d(TAG, "metaData.csv new content: " + contentOfNewMetaData.toString());
-                overWriteFile(contentOfNewMetaData.toString(), "metaData.csv", context);
+                Legacy.overWriteFile(contentOfNewMetaData.toString(), "metaData.csv", context);
             } catch (IOException ioe) {
                 Log.d(TAG, "++++++++++++++++++++++++++++++");
                 Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
@@ -248,7 +248,7 @@ public class VersionUpdater {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    overWriteFile(contentOfNewAccEvents.toString(), file.getName(), context);
+                    Legacy.overWriteFile(contentOfNewAccEvents.toString(), file.getName(), context);
                 }
             }
         }
@@ -315,7 +315,7 @@ public class VersionUpdater {
                 Log.d(TAG, "updateToV31() exception: " + e.getLocalizedMessage());
                 Log.d(TAG, Arrays.toString(e.getStackTrace()));
             }
-            overWriteFile(contentOfNewMetaData.toString(), metaDataFile.getName(), context);
+            Legacy.overWriteFile(contentOfNewMetaData.toString(), metaDataFile.getName(), context);
         }
     }
 
@@ -400,7 +400,7 @@ public class VersionUpdater {
                 }
                 String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
 
-                overWriteFile(fileInfoLine + METADATA_HEADER + contentOfNewMetaData.toString(), metaDataFile.getName(), context);
+                Legacy.overWriteFile(fileInfoLine + METADATA_HEADER + contentOfNewMetaData.toString(), metaDataFile.getName(), context);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -463,7 +463,7 @@ public class VersionUpdater {
                             .append(metaDataLine[7]).append(",")
                             .append(region).append(System.lineSeparator());
                 }
-                overWriteFile(contentOfNewMetaData.toString(), metaDataFile.getName(), context);
+                Legacy.overWriteFile(contentOfNewMetaData.toString(), metaDataFile.getName(), context);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -555,6 +555,23 @@ public class VersionUpdater {
 
             br.close();
             return new Object[]{waitedTime, polyLine, distance};
+        }
+
+        /**
+         * Use Utils.overwriteFile(file) instead.
+         * Why? For Clarity filename does not say where the file is...
+         *
+         * @deprecated
+         */
+        public static void overWriteFile(String content, String fileName, Context context) {
+            try {
+                FileOutputStream writer = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+                writer.write(content.getBytes());
+                writer.flush();
+                writer.close();
+            } catch (IOException ioe) {
+                Log.d("Legacy", Arrays.toString(ioe.getStackTrace()));
+            }
         }
     }
 }

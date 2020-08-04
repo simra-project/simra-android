@@ -48,7 +48,6 @@ import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileWithoutDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegionProfilesArrays;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
-import static de.tuberlin.mcc.simra.app.util.Utils.overWriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFileAndIncreaseFileVersion;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
