@@ -60,7 +60,9 @@
     <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um ihre Privatsphäre zu schützen.\nSie können dies im Menü "Einstellungen" anpassen.</string>
     <string name="startButtonText">Aufzeichnung\nstarten</string>
     <string name="stopButtonText">Aufzeichnung\nbeenden</string>
-    <string name="reportIncident">Incident melden</string>
+    <string name="reportIncidentText">Ereignis melden</string>
+    <string name="reportIncidentClosepass">Knappe Überholung</string>
+    <string name="reportIncidentObstacle">Hindernis ausweichen</string>
     <string name="cancel">Abbrechen</string>
     <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalten Sie es aus, damit die Fahrt aufgezeichnet werden kann.</string>
     <string name="locationServiceisOff">Der Ortungsdienst Ihres Geräts ist aus. Bitte schalten Sie den Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
@@ -79,6 +81,7 @@
     <string name="cancel_button">Nein, mit dem Radmesser verbinden</string>
     <string name="bluetooth_not_enable_title">Warnung: Bluetooth is ausgeschaltet</string>
     <string name="bluetooth_not_enable_message">Möchten Sie die Bluetooth einschalten ? Ansonsten kann der Radmesser nicht verwendet werden</string>
+    <string name="recorded_incident">Ereignis gespeichert</string>
 
 
     <!--- RecorderService -->
@@ -197,7 +200,14 @@
     <string name="radmesserTakePictureDuringRideIntervalText">Intervall wie oft ein Bild aufgenommen wird</string>
     <string name="radmesserAdvancedSettings">Weitere Einstellungen</string>
     <string name="radmesserHandlebarWidthText">Weite des Lenkers von der Außenseite zum Rahmen</string>
-
+    <string name="radmesserIncidentDescriptionHeaderLine">Dieses Ereignis wurde durch das OpenBikeSensor-Event %1$s ausgelöst.</string>
+    <string name="radmesserIncidentDescriptionDataLine">Weitere Daten: %1$s</string>
+    <string name="radmesserIncidentDescriptionButtonHeaderLine">Dieses Ereignis wurde durch einen physischen Button am OpenBikeSensor ausgelöst.</string>
+    <string name="radmesserIncidentDescriptionButtonDataLine">Distanz während der dichten Überholung: %1$s cm</string>
+    <string name="radmesserIncidentDescriptionAvg2sHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da die durchschnittliche Distanz während einer dichten Überholung unter dem Grenzwert lag.</string>
+    <string name="radmesserIncidentDescriptionAvg2sDataLine">Durchschnittliche Distanz: %1$s cm, kleinste Distanz: %2$s cm</string>
+    <string name="radmesserIncidentDescriptionMinKalmanHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da es die kleinste Distanz während einer dichten Überholung erkannt hat.</string>
+    <string name="radmesserIncidentDescriptionMinKalmanDataLine">Kleinste Distanz: %1$s cm</string>
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
@@ -323,5 +333,6 @@
 
     <!-- 58 -->
     <string name="added_new_regions_news_58">Folgende Regionen wurden freigeschaltet: Leipzig, Wuppertal/Solingen/Remscheid und Düsseldorf</string>
-
+    <string name="openbikesensor_toast_devicefound">Gerät gefunden, klicke auf dem Bluetooth Knopf um dich damit zu verbinden</string>
+    <string name="openbikesensor_bluetooth_incompatible">Dein Gerät unterstützt kein Bluetooth.</string>
 </resources>

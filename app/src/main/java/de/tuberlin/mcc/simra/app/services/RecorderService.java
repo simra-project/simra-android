@@ -30,7 +30,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -78,15 +77,15 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     Location startLocation;
     // Radmesser
     private LinkedList<RadmesserService.Measurement> lastRadmesserDistanceValues = new LinkedList<>();
-    private List<RadmesserService.ClosePassEvent> lastRadmesserClosePassEvents = new LinkedList<>();
+    private LinkedList<RadmesserService.ClosePassEvent> lastRadmesserClosePassEvents = new LinkedList<>();
     private LocationManager locationManager;
     private ExecutorService executor;
     private Sensor accelerometer;
     private Sensor gyroscope;
     private int key;
     private long lastPictureTaken = 0;
-    private Integer thereWasAnIncident = null;
-    private BroadcastReceiver openBikeSensorMessageReceiverDistanceValue  = new BroadcastReceiver() {
+    private Integer incidentDuringRide = null;
+    private BroadcastReceiver openBikeSensorMessageReceiverDistanceValue = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
@@ -106,12 +105,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             }
         }
     };
-    private BroadcastReceiver incidentBroadcastReceiver = IncidentBroadcaster.recieveIncidents(this, new IncidentBroadcaster.IncidentCallbacks() {
-        @Override
-        public void onManualIncident(int incidentType) {
-            thereWasAnIncident = incidentType;
-        }
-    });
+    private BroadcastReceiver incidentBroadcastReceiver;
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
     private boolean recordingAllowed;
@@ -128,10 +122,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private IBinder mBinder = new MyBinder();
     private StringBuilder accGpsString = new StringBuilder();
     private IncidentLog incidentLog = null;
-
-    {
-
-    }
 
     public int getCurrentRideKey() {
         return key;
@@ -166,7 +156,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             }
             accelerometerMatrix = event.values;
 
-
             if (((curTime - lastAccUpdate) >= Constants.ACCELEROMETER_FREQUENCY) && recordingAllowed) {
 
                 lastAccUpdate = curTime;
@@ -177,12 +166,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 } catch (Exception e) {
                     Log.e(TAG, "insertData: " + e.getMessage(), e);
                 }
-
             }
         }
+
         if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             gyroscopeMatrix = event.values;
-
         }
     }
 
@@ -190,12 +178,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     // LocationListener Methods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
     }
-
 
     @Override
     public void onLocationChanged(Location location) {
@@ -212,17 +197,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -235,15 +217,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         super.onCreate();
 
         // Initialize sharedPrefs & editor
-        sharedPrefs = getApplicationContext()
-                .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
+        sharedPrefs = getApplicationContext().getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
 
         editor = sharedPrefs.edit();
 
         takePictureDuringRideActivated = SharedPref.Settings.Ride.PicturesDuringRide.isActivated(this);
         takePictureDuringRideInterval = SharedPref.Settings.Ride.PicturesDuringRideInterval.getInterval(this);
         safetyDistanceWithTolerances = SharedPref.Settings.Ride.OvertakeWidth.getWidth(this);
-
 
         // Prepare the accelerometer accGpsFile
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -254,7 +234,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 .LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager
                 .GPS_PROVIDER, 3000, 1.0f, this);
-
 
         // When the user records a route for the first time, the ride key is 0.
         // For all subsequent rides, the key value increases by one at a time.
@@ -270,7 +249,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         privacyDuration = SharedPref.Settings.Ride.PrivacyDuration.getDuration(this) * 1000;
         Log.d(TAG, "privacyDistance: " + privacyDistance + " privacyDuration: " + privacyDuration);
 
-
         // Prevent the App to be killed while recording
         PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG + ":RecorderService");
@@ -281,6 +259,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverDistanceValue, new IntentFilter(ACTION_VALUE_RECEIVED_DISTANCE));
         localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverClosePassEvent, new IntentFilter(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT));
+        incidentBroadcastReceiver = IncidentBroadcaster.receiveIncidents(this, new IncidentBroadcaster.IncidentCallbacks() {
+            @Override
+            public void onManualIncident(int incidentType) {
+                incidentDuringRide = incidentType;
+            }
+        });
     }
 
     @Override
@@ -386,7 +370,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
             }
         }).start();
-
     }
 
     private float computeAverage(Collection<Float> myVals) {
@@ -463,9 +446,18 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                             lastLocation.getAccuracy()
                     );
 
-                    if (thereWasAnIncident != null) {
-                        incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(thereWasAnIncident).withBaseInformation(curTime, lastLocation.getLatitude(), lastLocation.getLongitude()).build());
-                        thereWasAnIncident = null;
+                    if (incidentDuringRide != null) {
+                        incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(incidentDuringRide).withBaseInformation(curTime, lastLocation.getLatitude(), lastLocation.getLongitude()).build());
+                        incidentDuringRide = null;
+                    }
+
+                    while (lastRadmesserClosePassEvents.size() > 0) {
+                        RadmesserService.ClosePassEvent closePassEvent = lastRadmesserClosePassEvents.removeFirst();
+                        incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder()
+                                .withIncidentType(closePassEvent.getIncidentType())
+                                .withDescription(closePassEvent.getIncidentDescription(getApplicationContext()))
+                                .withBaseInformation(curTime, lastLocation.getLatitude(), lastLocation.getLongitude())
+                                .build());
                     }
                 }
                 dataLogEntryBuilder.withGyroscope(
@@ -475,21 +467,15 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 );
 
                 if (lastRadmesserDistanceValues.size() > 0) {
-                    RadmesserService.Measurement lastRadmesserDistanceValue = lastRadmesserDistanceValues.remove(0);
-
+                    RadmesserService.Measurement lastRadmesserDistanceValue = lastRadmesserDistanceValues.removeFirst();
                     dataLogEntryBuilder.withRadmesser(lastRadmesserDistanceValue.leftSensorValues.get(0), null, null, null);
+
                     if (takePictureDuringRideActivated) {
                         if (lastRadmesserDistanceValue.leftSensorValues.get(0) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= curTime) {
                             lastPictureTaken = curTime;
                             CameraService.takePicture(RecorderService.this, String.valueOf(curTime), IOUtils.Directories.getPictureCacheDirectoryPath());
                         }
                     }
-                }
-
-                if (lastRadmesserClosePassEvents.size() > 0) {
-                    RadmesserService.ClosePassEvent lastRadmesserClosePassEvent = lastRadmesserClosePassEvents.remove(0);
-
-                    dataLogEntryBuilder.withRadmesserClosePassEvent(lastRadmesserClosePassEvent);
                 }
 
                 String str = dataLogEntryBuilder.build().stringifyDataLogEntry();
@@ -504,12 +490,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 }
 
                 for (int i = 0; i < Constants.MVG_AVG_STEP; i++) {
-
                     accelerometerQueueX.remove();
                     accelerometerQueueY.remove();
                     accelerometerQueueZ.remove();
                 }
-
             }
         }
     }

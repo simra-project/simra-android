@@ -22,12 +22,15 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +38,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.util.Consumer;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -53,6 +57,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -72,11 +77,11 @@ import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
-import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
@@ -85,6 +90,7 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPref
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
+import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
@@ -112,10 +118,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private Boolean recording = false;
     private MaterialButton startBtn;
     private MaterialButton stopBtn;
-    private MaterialButton reportIncidentBtn;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Radmesser
     private FloatingActionButton radmesserButton;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // other UI Elements
+    private Toolbar toolbar;
+    private LinearLayout reportIncidentContainer;
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -296,7 +306,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (1): Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -339,9 +349,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             startRecording();
         });
 
-        reportIncidentBtn = findViewById(R.id.report_incident);
-        reportIncidentBtn.setOnClickListener(v -> {
-            IncidentBroadcaster.broadcastIncident(this, IncidentLogEntry.INCIDENT_TYPE.NOTHING);
+        Consumer<Integer> recordIncident = (incidentType) -> {
+            Toast t = Toast.makeText(MainActivity.this, R.string.recorded_incident, Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 230);
+            t.show();
+
+            IncidentBroadcaster.broadcastIncident(MainActivity.this, incidentType);
+        };
+
+        reportIncidentContainer = findViewById(R.id.reportIncidentContainer);
+        this.<MaterialButton>findViewById(R.id.report_closepass_incident).setOnClickListener(v -> {
+            recordIncident.accept(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS);
+        });
+
+        this.<MaterialButton>findViewById(R.id.report_obstacle_incident).setOnClickListener(v -> {
+            recordIncident.accept(IncidentLogEntry.INCIDENT_TYPE.OBSTACLE);
         });
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -349,7 +371,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         stopBtn = findViewById(R.id.button_stop);
         stopBtn.setOnClickListener(v -> {
             try {
-                showStart();
+                displayButtonsForMenu();
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 // Stop RecorderService which is recording accelerometer data
                 unbindService(mRecorderServiceConnection);
                 stopService(recService);
@@ -392,9 +415,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             if (mBluetoothAdapter == null) {
                 // Device does not support Bluetooth
                 deactivateRadmesser();
-                Toast.makeText(MainActivity.this, "Your device does not support bluetooth, radmesser feature cannot be activated", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, R.string.openbikesensor_bluetooth_incompatible, Toast.LENGTH_LONG).show();
             } else if (!mBluetoothAdapter.isEnabled() && radmesserEnabled) {
-                // Bluetooth is not enabled :)
+                // Bluetooth is disabled
                 showBluetoothNotEnableWarning();
             } else {
                 // Bluetooth is enabled
@@ -422,11 +445,26 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     // (2) stop button visible, start button invisible
 
-    public void showStart() {
-
+    public void displayButtonsForMenu() {
         startBtn.setVisibility(View.VISIBLE);
         stopBtn.setVisibility(View.INVISIBLE);
-        reportIncidentBtn.setVisibility(View.INVISIBLE);
+
+        toolbar.setVisibility(View.VISIBLE);
+        reportIncidentContainer.setVisibility(View.GONE);
+
+        findViewById(R.id.button_ride_settings_general).setVisibility(View.VISIBLE);
+        findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.VISIBLE);
+    }
+
+    public void displayButtonsForDrive() {
+        stopBtn.setVisibility(View.VISIBLE);
+        startBtn.setVisibility(View.INVISIBLE);
+
+        toolbar.setVisibility(View.INVISIBLE);
+        reportIncidentContainer.setVisibility(View.VISIBLE);
+
+        findViewById(R.id.button_ride_settings_general).setVisibility(View.INVISIBLE);
+        findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.INVISIBLE);
 
     }
 
@@ -434,21 +472,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // Lifecycle (onResume onPause onStop):
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private void setRadmesserButtonVisibility() {
-
-    }
-
     private void registerRadmesserService() {
         receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks() {
             public void onConnectionStateChanged(RadmesserService.ConnectionState newState) {
-                Log.d(TAG, "Staus changed in main " + newState.toString());
                 updateRadmesserButtonStatus(newState);
             }
 
             public void onDeviceFound(String deviceName, String deviceId) {
-                Log.d(TAG, "Device found from main");
                 if (!RadmesserService.getConnectionState().equals(RadmesserService.ConnectionState.CONNECTED)) {
-                    Toast.makeText(MainActivity.this, "Gerät gefunden, clicke auf dem Bluetooth Knopf um dich damit zu verbinden", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, R.string.openbikesensor_toast_devicefound, Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -481,9 +513,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             } else {
                 // show stop button, hide start button
-                showStop();
-                stopBtn.setVisibility(View.VISIBLE);
-                startBtn.setVisibility(View.INVISIBLE);
+                displayButtonsForDrive();
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
                 // start RecorderService for accelerometer data recording
                 Intent intent = new Intent(MainActivity.this, RecorderService.class);
@@ -517,17 +548,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             case SEARCHING:
                 radmesserButton.setImageResource(R.drawable.ic_bluetooth_searching);
                 radmesserButton.setContentDescription("Radmesser wird gesucht");
-                radmesserButton.setColorFilter(Color.BLACK);
+                radmesserButton.setColorFilter(Color.WHITE);
                 break;
             case PAIRING:
                 radmesserButton.setImageResource(R.drawable.ic_bluetooth_searching);
                 radmesserButton.setContentDescription("Verbinde");
-                radmesserButton.setColorFilter(Color.BLACK);
+                radmesserButton.setColorFilter(Color.WHITE);
                 break;
             case CONNECTED:
                 radmesserButton.setImageResource(R.drawable.ic_bluetooth_connected);
                 radmesserButton.setContentDescription("Radmesser verbunden");
-                radmesserButton.setColorFilter(Color.BLACK);
+                radmesserButton.setColorFilter(Color.GREEN);
                 break;
             default:
                 break;
@@ -536,14 +567,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public void showStop() {
-
-        stopBtn.setVisibility(View.VISIBLE);
-        reportIncidentBtn.setVisibility(View.VISIBLE);
-        startBtn.setVisibility(View.INVISIBLE);
-
-
-    }
 
     public void onResume() {
 
@@ -561,9 +584,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Ensure the button that matches current state is presented.
         if (recording) {
-            showStop();
+            displayButtonsForDrive();
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         } else {
-            showStart();
+            displayButtonsForMenu();
         }
 
         // Load Configuration with changes from onCreate
@@ -591,6 +615,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Log.d(TAG, "OnPause called");
 
         super.onPause();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Load Configuration with changes from onCreate
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -913,7 +938,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
             Log.d(TAG, "GET regions response: " + checkRegionsResponse.toString());
             if (status == 200) {
-                Utils.overWriteFile(checkRegionsResponse.toString(), "simRa_regions.config", MainActivity.this);
+                File regionsFile = IOUtils.Files.getRegionsFile(MainActivity.this);
+                overwriteFile(checkRegionsResponse.toString(), regionsFile);
             }
             installedAppVersion = getAppVersionNumber(MainActivity.this);
 

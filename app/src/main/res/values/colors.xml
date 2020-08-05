@@ -14,4 +14,7 @@
     <color name="transparent">#bd000000</color>
     <color name="simraDarkBlue">#041035</color>
     <color name="simraBlue">#092477</color>
+
+    <color name="distanceMarkerWarning">#ffbf00</color>
+    <color name="distanceMarkerDanger">#ff3300</color>
 </resources>

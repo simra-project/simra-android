@@ -78,7 +78,7 @@ public class Utils {
             while ((line = br.readLine()) != null) {
                 content.append(line).append(System.lineSeparator());
             }
-            overWriteFile((fileInfoLine + content.toString()), fileName, context);
+            VersionUpdater.Legacy.overWriteFile((fileInfoLine + content.toString()), fileName, context);
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
         }
@@ -134,23 +134,6 @@ public class Utils {
         return new Pair<>(content.toString(), accEventsContentToUpload.toString());
     }
 
-    /**
-     * Use Utils.overwriteFile(file) instead.
-     * Why? For Clarity filename does not say where the file is...
-     *
-     * @deprecated
-     */
-    public static void overWriteFile(String content, String fileName, Context context) {
-        try {
-            FileOutputStream writer = context.openFileOutput(fileName, Context.MODE_PRIVATE);
-            writer.write(content.getBytes());
-            writer.flush();
-            writer.close();
-        } catch (IOException ioe) {
-            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
-        }
-    }
-
     public static void overwriteFile(String content, File file) {
         try {
             FileOutputStream writer = new FileOutputStream(file);
@@ -160,20 +143,6 @@ public class Utils {
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
         }
-    }
-
-    /**
-     * Use Utils.fileExists(path) instead for clarity
-     * Why? For Clarity filename does not say where the file is...
-     *
-     * @deprecated
-     */
-    public static boolean fileExists(String fileName, Context context) {
-        return new File(IOUtils.Directories.getBaseFolderPath(context) + fileName).exists();
-    }
-
-    public static boolean fileExists(String path) {
-        return new File(path).exists();
     }
 
     /**

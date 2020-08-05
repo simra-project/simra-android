@@ -11,16 +11,17 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
+import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
@@ -75,6 +76,8 @@ public class RadmesserService extends Service {
                 "SimRa RadmesseR connection",
                 newState.toString()
         );
+        if (newState == ConnectionState.CONNECTED)
+            setPairedRadmesserID(connectedDevice.getID(), this);
     }
 
     @Override
@@ -155,7 +158,7 @@ public class RadmesserService extends Service {
     private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
             new BLEService(RadmesserDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
                     RadmesserDevice.UUID_SERVICE_HEARTRATE_CHAR,
-                    val -> Log.i("onHeartRate", String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
+                    val -> broadcastHeartRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
             ),
 
             new BLEService(RadmesserDevice.UUID_SERVICE_CLOSEPASS).addCharacteristic(
@@ -175,12 +178,10 @@ public class RadmesserService extends Service {
             new BLEService(RadmesserDevice.UUID_SERVICE_CONNECTION).addCharacteristic(
                     RadmesserDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED,
                     val -> {
-                        Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
+                        //Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
                         String strVal = val.getStringValue(0);
                         if (strVal != null && strVal.equals("1")) {
                             connectedDevice.devicePaired = true;
-                            setConnectionState(ConnectionState.CONNECTED);
-                            setPairedRadmesserID(connectedDevice.getID(), this);
                         }
                     }
             )
@@ -236,13 +237,13 @@ public class RadmesserService extends Service {
      * returns false if there is no device paired yet
      */
     public static boolean tryConnectPairedDevice(Context ctx) {
-        String connectedDevice = getPairedRadmesserID(ctx);
-        if (connectedDevice == null)
+        String deviceId = getPairedRadmesserID(ctx);
+        if (deviceId == null)
             return false;
 
         Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_CONNECT_DEVICE);
-        intent.putExtra(EXTRA_CONNECT_DEVICE, connectedDevice);
+        intent.putExtra(EXTRA_CONNECT_DEVICE, deviceId);
         ctx.startService(intent);
         return true;
     }
@@ -299,6 +300,9 @@ public class RadmesserService extends Service {
     }
 
     private void connectDevice(String deviceId) {
+        if (connectedDevice != null && connectedDevice.getID().equals(deviceId) && connectionState == ConnectionState.CONNECTED)
+            return;
+
         disconnectAndUnpairDevice();
         bluetoothScanner.findDeviceById(deviceId,
                 device -> connectedDevice = new RadmesserDevice(device, radmesserConnectionCallbacks, radmesserServicesDefinition, this)
@@ -327,6 +331,7 @@ public class RadmesserService extends Service {
     final static String ACTION_DEVICE_FOUND = "de.tuberlin.mcc.simra.app.radmesserservice.actiondevicefound";
     final static String ACTION_CONNECTION_STATE_CHANGED = "de.tuberlin.mcc.simra.app.radmesserservice.actiondconnectionstatechanged";
     final static String ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedclosepass.distance";
+    final static String ACTION_VALUE_RECEIVED_HEARTRATE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedheartrate";
     final static String ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedclosepass.event";
     final static String ACTION_VALUE_RECEIVED_DISTANCE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceiveddistance";
 
@@ -357,10 +362,16 @@ public class RadmesserService extends Service {
         broadcastManager.sendBroadcast(intent);
     }
 
+    private void broadcastHeartRate(String value) {
+        Intent intent = new Intent(ACTION_VALUE_RECEIVED_HEARTRATE);
+        intent.putExtra(EXTRA_VALUE, value);
+        broadcastManager.sendBroadcast(intent);
+    }
+
     private void broadcastClosePassEvent(String value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
         intent.putExtra(EXTRA_VALUE, value);
-        intent.putExtra(EXTRA_VALUE_SERIALIZED, ClosePassEvent.fromString(value));
+        intent.putExtra(EXTRA_VALUE_SERIALIZED, new ClosePassEvent(value));
         broadcastManager.sendBroadcast(intent);
     }
 
@@ -385,6 +396,9 @@ public class RadmesserService extends Service {
         }
 
         public void onDistanceValue(@Nullable Measurement measurement) {
+        }
+
+        public void onHeartRate(Short value) {
         }
     }
 
@@ -438,11 +452,25 @@ public class RadmesserService extends Service {
                             callbacks.onClosePassIncidentEvent((ClosePassEvent) serializable);
                         }
                         break;
+                    case ACTION_VALUE_RECEIVED_HEARTRATE:
+                        callbacks.onHeartRate(
+                                parseShort(intent.getStringExtra(EXTRA_VALUE))
+                        );
+                        break;
                 }
             }
         };
         LocalBroadcastManager.getInstance(ctx).registerReceiver(rec, filter);
         return rec;
+    }
+
+    private static Short parseShort(String value) {
+        try {
+            return new Short(value);
+        } catch (NumberFormatException nex) {
+            return null;
+        }
+
     }
 
     public static class Measurement implements Serializable {
@@ -452,10 +480,6 @@ public class RadmesserService extends Service {
 
         private Measurement(String line) throws MeasurementFormatException {
             try {
-                if (line.equals(""))
-                    throw new MeasurementFormatException();
-
-
                 String[] sections = line.split(";", -1);
 
                 timestamp = Long.parseLong(sections[0]);
@@ -494,27 +518,77 @@ public class RadmesserService extends Service {
     }
 
     public static class ClosePassEvent implements Serializable {
-        //enum EventType {BUTTON, AVG2S}
-        public String eventType;     //todo: consider this to be an enum, but also have in mind,that the format could change in future
-        public long timestamp;
+        private static final String EVENT_TYPE_BUTTON = "button";
+        private static final String EVENT_TYPE_AVG2S = "avg2s";
+        private static final String EVENT_TYPE_MIN_KALMAN = "min_kalman";
+
+        private String originalValue;
+        private String eventType;
+        private long timestamp;
         public List<String> payload;
 
         public ClosePassEvent(String rawData) {
+            originalValue = rawData;
             Log.i("ClosePassEvent", rawData);
 
             String[] sections = rawData.split(";", -1);
             timestamp = Long.parseLong(sections[0]);
-            eventType = sections[1].toUpperCase();
-            payload = Collections.singletonList(sections[2]);
-        }
-
-        public static ClosePassEvent fromString(String line) {
-            return new ClosePassEvent(line);
+            eventType = sections[1];
+            payload = Arrays.asList(sections[2].split(",", -1));
         }
 
         @Override
         public String toString() {
-            return timestamp + " " + eventType + " " + payload;
+            return timestamp + " " + eventType + " " + TextUtils.join(", ", payload);
+        }
+
+        /**
+         * Only button events should be treated as a real close pass event. All
+         * other events therefore will be assigned an "unknown" incident type
+         * (prefixed with 'OBS_') to be hidden from the regular incident view
+         * after a ride ends.
+         */
+        public int getIncidentType() {
+            if (eventType.equals(EVENT_TYPE_BUTTON)) return IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS;
+            if (eventType.equals(EVENT_TYPE_AVG2S)) return IncidentLogEntry.INCIDENT_TYPE.OBS_AVG2S;
+            if (eventType.equals(EVENT_TYPE_MIN_KALMAN)) return IncidentLogEntry.INCIDENT_TYPE.OBS_MIN_KALMAN;
+            return IncidentLogEntry.INCIDENT_TYPE.OBS_UNKNOWN;
+        }
+
+        /**
+         * Creates an incident description that will be viewable by users and should therefore be human-readable.
+         * This description always consists of a general description line, the payload data in a readable format and the
+         * raw event string that was passed over bluetooth (formatted in square brackets). These sections are always
+         * separated by a newline.
+         */
+        public String getIncidentDescription(Context context) {
+            String headerLine = context.getString(R.string.radmesserIncidentDescriptionHeaderLine, eventType);
+            String dataLine = context.getString(R.string.radmesserIncidentDescriptionDataLine, TextUtils.join(", ",  payload));
+
+            switch (eventType) {
+                case EVENT_TYPE_BUTTON:
+                    headerLine = context.getString(R.string.radmesserIncidentDescriptionButtonHeaderLine);
+                    if (payload.size() >= 1) {
+                        dataLine = context.getString(R.string.radmesserIncidentDescriptionButtonDataLine, payload.get(0));
+                    }
+                    break;
+                case EVENT_TYPE_AVG2S:
+                    headerLine = context.getString(R.string.radmesserIncidentDescriptionAvg2sHeaderLine);
+                    if (payload.size() >= 2) {
+                        dataLine = context.getString(R.string.radmesserIncidentDescriptionAvg2sDataLine, payload.get(0), payload.get(1));
+                    }
+                    break;
+                case EVENT_TYPE_MIN_KALMAN:
+                    headerLine = context.getString(R.string.radmesserIncidentDescriptionMinKalmanHeaderLine);
+                    if (payload.size() >= 1) {
+                        dataLine = context.getString(R.string.radmesserIncidentDescriptionMinKalmanDataLine, payload.get(0));
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return String.format("%s\n%s\n[%s]", headerLine, dataLine, originalValue);
         }
     }
 

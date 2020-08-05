@@ -70,7 +70,8 @@
     <string name="newest_version">newest version:</string>
     <string name="new_app_version_title">New update available</string>
     <string name="later">Later</string>
-    <string name="reportIncident">Report incident</string>
+    <string name="reportIncidentClosepass">Close Pass</string>
+    <string name="reportIncidentObstacle">Dodging Obstacle</string>
     <string name="recording_not_started">Recording did NOT start.</string>
     <string name="recording_started">Recording started.</string>
 
@@ -195,7 +196,14 @@
     <string name="cancel_button">No, connect with the Radmesser</string>
     <string name="bluetooth_not_enable_title">Warning: Bluetooth is off</string>
     <string name="bluetooth_not_enable_message">Do you want to enable Bluetooth ? Otherwise the radmesser feature cannot be activated</string>
-
+    <string name="radmesserIncidentDescriptionHeaderLine">This incident was triggered from the OpenBikeSensor event %1$s.</string>
+    <string name="radmesserIncidentDescriptionDataLine">Additional data: %1$s</string>
+    <string name="radmesserIncidentDescriptionButtonHeaderLine">This incident was triggered using a physical button on a OpenBikeSensor.</string>
+    <string name="radmesserIncidentDescriptionButtonDataLine">Distance during close pass: %1$s cm</string>
+    <string name="radmesserIncidentDescriptionAvg2sHeaderLine">This incident was automatically triggered from the OpenBikeSensor because the average distance during the close pass was below the threshold.</string>
+    <string name="radmesserIncidentDescriptionAvg2sDataLine">Average distance: %1$s cm, mininum distance: %2$s cm</string>
+    <string name="radmesserIncidentDescriptionMinKalmanHeaderLine">This incident was automatically triggered from the OpenBikeSensor because it detected the smallest distance during a close pass.</string>
+    <string name="radmesserIncidentDescriptionMinKalmanDataLine">Minimum distance: %1$s cm</string>
 
     <!-- Units -->
     <string name="meter_short">m</string>
@@ -317,5 +325,8 @@
 
     <!-- 55 -->
     <string name="added_new_regions_news_58">Following regions are now available: Leipzig, Wuppertal/Solingen/Remscheid und Düsseldorf</string>
-
+    <string name="reportIncidentText">Report Incident</string>
+    <string name="recorded_incident">Saved Incident</string>
+    <string name="openbikesensor_toast_devicefound">Device found. Push the Bluetooth Button to connect to it.</string>
+    <string name="openbikesensor_bluetooth_incompatible">Your device does not support bluetooth.</string>
 </resources>

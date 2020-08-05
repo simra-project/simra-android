@@ -215,7 +215,6 @@ public class ShowRouteActivity extends BaseActivity {
         trailer = SharedPref.Settings.Ride.BikeWithTrailer.getValue(this);
         pLoc = SharedPref.Settings.Ride.PhoneLocation.getPhoneLocation(this);
 
-
         privacySlider = findViewById(R.id.routePrivacySlider);
         privacySlider.addOnSliderTouchListener(new RangeSlider.OnSliderTouchListener() {
             @Override
@@ -362,7 +361,9 @@ public class ShowRouteActivity extends BaseActivity {
                 myMarkerFunct.deleteAllMarkers();
             }
             myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, dataLog, incidentLog);
-            myMarkerFunct.updateMarkers(this.incidentLog);
+            myMarkerFunct.updateIncidentMarkers(this.incidentLog);
+
+            myMarkerFunct.updateOBSMarkers(this.incidentLog, ShowRouteActivity.this);
         });
 
         addCustomMarkerMode = false;
@@ -645,7 +646,7 @@ public class ShowRouteActivity extends BaseActivity {
             editableRoute = new Polyline();
             editableRoute.setPoints(originalRoute.getPoints());
             editableRoute.setWidth(40.0f);
-            editableRoute.getPaint().setColor(getColor(R.color.colorAccent));
+            editableRoute.getPaint().setColor(getColor(R.color.colorPrimaryDark));
             editableRoute.getPaint().setStrokeCap(Paint.Cap.ROUND);
             mMapView.getOverlayManager().add(editableRoute);
             runOnUiThread(() -> {

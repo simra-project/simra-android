@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.entities;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class IncidentLogEntry implements Serializable {
     public Integer key;
@@ -153,6 +154,11 @@ public class IncidentLogEntry implements Serializable {
             return this;
         }
 
+        public Builder withDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
         public Builder withKey(Integer key) {
             this.key = key;
             return this;
@@ -161,7 +167,6 @@ public class IncidentLogEntry implements Serializable {
         public IncidentLogEntry build() {
             return new IncidentLogEntry(this);
         }
-
     }
 
     public static class InvolvedRoadUser implements Serializable {
@@ -195,6 +200,9 @@ public class IncidentLogEntry implements Serializable {
     }
 
     public static class INCIDENT_TYPE {
+        public static final int OBS_MIN_KALMAN = -4;
+        public static final int OBS_AVG2S = -3;
+        public static final int OBS_UNKNOWN = -2;
         public static final int AUTO_GENERATED = -1;
         public static final int NOTHING = 0;
         public static final int CLOSE_PASS = 1;
@@ -205,5 +213,14 @@ public class IncidentLogEntry implements Serializable {
         public static final int NEAR_DOORING = 6;
         public static final int OBSTACLE = 7;
         public static final int OTHER = 8;
+
+        public static boolean isRegular(Integer test) {
+            return Arrays.asList(AUTO_GENERATED, NOTHING, CLOSE_PASS, PULL_OUT, HOOK, HEAD_ON, TAILGATING, NEAR_DOORING, OBSTACLE, OTHER)
+                    .contains(test);
+        }
+
+        public static boolean isOBS(Integer test) {
+            return Arrays.asList(OBS_UNKNOWN, OBS_AVG2S, OBS_MIN_KALMAN).contains(test);
+        }
     }
 }

@@ -13,19 +13,6 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
-    <ImageButton
-        android:id="@+id/center_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="85dp"
-        android:layout_marginRight="15dp"
-        android:background="@drawable/my_center"
-        android:clickable="true"
-        android:elevation="2dp"
-        android:focusable="true" />
-
     <RelativeLayout
         android:id="@+id/checkingAppVersionProgressBarRelativeLayout"
         android:layout_width="match_parent"
