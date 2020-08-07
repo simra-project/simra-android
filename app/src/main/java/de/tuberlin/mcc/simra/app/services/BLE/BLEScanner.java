@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.services.radmesser;
+package de.tuberlin.mcc.simra.app.services.BLE;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
