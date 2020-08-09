@@ -71,14 +71,10 @@
     </style>
 
     <!-- This configures the styles for the pop up window used for incident annotation -->
-    <style name="AppTheme.PopUpWindow">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
-        <item name="android:windowBackground">@color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">true</item>
+    <style name="AppTheme.PopUpWindow" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.TextButton</item>
     </style>
 
     <!-- See here for more information: https://github.com/material-components/material-components-android/blob/master/docs/components/FloatingActionButton.md -->
