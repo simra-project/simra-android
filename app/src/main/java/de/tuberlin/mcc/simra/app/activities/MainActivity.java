@@ -82,6 +82,7 @@ import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
+import de.tuberlin.mcc.simra.app.util.UpdateHelper;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
@@ -94,16 +95,17 @@ import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
+public class MainActivity extends BaseActivity
+        implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
 
     // Log tag
     private static final String TAG = "MainActivity_LOG";
     private final static int REQUEST_ENABLE_BT = 1;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Map stuff, Overlays
     public static ExecutorService myEx;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Service encapsulating accelerometer accGpsFile recording functionality
     Intent recService;
     RecorderService mBoundRecorderService;
@@ -112,23 +114,23 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private MapView mMapView;
     private MapController mMapController;
     private MyLocationNewOverlay mLocationOverlay;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CLICKABLES --> INTENTS
     private LocationManager locationManager;
     private Boolean recording = false;
     private MaterialButton startBtn;
     private MaterialButton stopBtn;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Radmesser
     private FloatingActionButton radmesserButton;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // other UI Elements
     private Toolbar toolbar;
     private LinearLayout reportIncidentContainer;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private ServiceConnection mRecorderServiceConnection = new ServiceConnection() {
 
         @Override
@@ -142,9 +144,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     };
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Switching between buttons:
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // (1) start button visible, stop button invisible
 
@@ -202,39 +204,36 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
-
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        Log.d(TAG, "OnCreate called");
         super.onCreate(savedInstanceState);
+        UpdateHelper.checkForUpdates(this);
 
         myEx = Executors.newFixedThreadPool(4);
 
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Set some params (context, DisplayMetrics, Config, ContentView)
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Context of application environment
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
         setContentView(R.layout.activity_main);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Prepare RecorderService for accelerometer and location data recording
         recService = new Intent(this, RecorderService.class);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // set up location manager to get location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Map configuration
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         mMapView = findViewById(R.id.map);
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
@@ -245,33 +244,35 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         TextView copyrightTxt = findViewById(R.id.copyright_text);
         copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
-        // Set compass (from OSMdroid sample project: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
-        //                       java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        CompassOverlay mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx),
-                mMapView);
+        // Set compass (from OSMdroid sample project:
+        // https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
+        // java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        CompassOverlay mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx), mMapView);
 
         // Sets the icon to device location.
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // MyLocationONewOverlayParameters.
         // --> enableMyLocation: Enable receiving location updates from the provided
-        //                          IMyLocationProvider and show your location on the maps.
+        // IMyLocationProvider and show your location on the maps.
         // --> enableFollowLocation: Enables "follow" functionality.
-        // --> setEnableAutoStop: if true, when the user pans the map, follow my location will
-        //                          automatically disable if false, when the user pans the map,
-        //                           the map will continue to follow current location
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // --> setEnableAutoStop: if true, when the user pans the map, follow my
+        // location will
+        // automatically disable if false, when the user pans the map,
+        // the map will continue to follow current location
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         mLocationOverlay.enableMyLocation();
 
-        // If app has been used before and therefore a last known location is available in sharedPrefs,
+        // If app has been used before and therefore a last known location is available
+        // in sharedPrefs,
         // animate the map to that location.
-        // Move map to last location known by locationManager if app is started for the first time.
+        // Move map to last location known by locationManager if app is started for the
+        // first time.
         SharedPreferences sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
         if (sharedPrefs.contains("lastLoc_latitude") & sharedPrefs.contains("lastLoc_longitude")) {
-            GeoPoint lastLoc = new GeoPoint(
-                    Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")),
+            GeoPoint lastLoc = new GeoPoint(Double.parseDouble(sharedPrefs.getString("lastLoc_latitude", "")),
                     Double.parseDouble(sharedPrefs.getString("lastLoc_longitude", "")));
             mMapController.animateTo(lastLoc);
         } else {
@@ -300,29 +301,30 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // CLICKABLES
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (1): Toolbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (2): Helmet
         ImageButton helmetButton = findViewById(R.id.helmet_icon);
         helmetButton.setOnClickListener(v -> {
         });
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (3): CenterMap
         ImageButton centerMap = findViewById(R.id.center_button);
 
@@ -332,7 +334,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             mMapController.setZoom(ZOOM_LEVEL);
         });
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (4): NEUE ROUTE / START BUTTON
         startBtn = findViewById(R.id.button_start);
         startBtn.setOnClickListener(v -> {
@@ -366,7 +368,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             recordIncident.accept(IncidentLogEntry.INCIDENT_TYPE.OBSTACLE);
         });
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (5): AUFZEICHNUNG STOPPEN / STOP-BUTTON
         stopBtn = findViewById(R.id.button_stop);
         stopBtn.setOnClickListener(v -> {
@@ -378,11 +380,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 stopService(recService);
                 recording = false;
                 if (mBoundRecorderService.getRecordingAllowed()) {
-                    ShowRouteActivity.startShowRouteActivity(
-                            mBoundRecorderService.getCurrentRideKey(),
-                            MetaData.STATE.JUST_RECORDED,
-                            this
-                    );
+                    ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(),
+                            MetaData.STATE.JUST_RECORDED, this);
                 } else {
                     DialogInterface.OnClickListener errorOnClickListener = (dialog, which) -> {
                     };
@@ -392,12 +391,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
             }
         });
-        new CheckVersionTask().execute();
+        new BackgroundTask().execute();
         if (lookUpIntSharedPrefs("regionLastChangedAtVersion", -1, "simraPrefs", MainActivity.this) < 53) {
             int region = lookUpIntSharedPrefs("Region", -1, "Profile", MainActivity.this);
             if (region == 2 || region == 3 || region == 8) {
                 fireRegionPrompt();
-                writeIntToSharedPrefs("regionLastChangedAtVersion", getAppVersionNumber(MainActivity.this), "simraPrefs", MainActivity.this);
+                writeIntToSharedPrefs("regionLastChangedAtVersion", getAppVersionNumber(MainActivity.this),
+                        "simraPrefs", MainActivity.this);
             }
         }
 
@@ -415,7 +415,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             if (mBluetoothAdapter == null) {
                 // Device does not support Bluetooth
                 deactivateRadmesser();
-                Toast.makeText(MainActivity.this, R.string.openbikesensor_bluetooth_incompatible, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, R.string.openbikesensor_bluetooth_incompatible, Toast.LENGTH_LONG)
+                        .show();
             } else if (!mBluetoothAdapter.isEnabled() && radmesserEnabled) {
                 // Bluetooth is disabled
                 showBluetoothNotEnableWarning();
@@ -442,7 +443,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         registerRadmesserService();
     }
 
-
     // (2) stop button visible, start button invisible
 
     public void displayButtonsForMenu() {
@@ -468,9 +468,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Lifecycle (onResume onPause onStop):
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void registerRadmesserService() {
         receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks() {
@@ -480,7 +480,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             public void onDeviceFound(String deviceName, String deviceId) {
                 if (!RadmesserService.getConnectionState().equals(RadmesserService.ConnectionState.CONNECTED)) {
-                    Toast.makeText(MainActivity.this, R.string.openbikesensor_toast_devicefound, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, R.string.openbikesensor_toast_devicefound, Toast.LENGTH_LONG)
+                            .show();
                 }
             }
         });
@@ -504,11 +505,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else {
             if (isLocationServiceOff(MainActivity.this)) {
                 // notify user
-                new AlertDialog.Builder(MainActivity.this)
-                        .setMessage(R.string.locationServiceisOff)
-                        .setPositiveButton(android.R.string.ok, (paramDialogInterface, paramInt) -> MainActivity.this.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
+                new AlertDialog.Builder(MainActivity.this).setMessage(R.string.locationServiceisOff)
+                        .setPositiveButton(android.R.string.ok,
+                                (paramDialogInterface, paramInt) -> MainActivity.this
+                                        .startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
+                        .setNegativeButton(R.string.cancel, null).show();
                 Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
 
             } else {
@@ -526,7 +527,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void updateRadmesserButtonStatus(RadmesserService.ConnectionState status) {
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -565,10 +566,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public void onResume() {
+
+
+        UpdateHelper.checkForUpdates(this);
 
         // Log.d(TAG, "OnResume called");
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
@@ -594,10 +597,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().load(this, prefs);
 
-
         try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-                    0, this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         } catch (SecurityException se) {
             Log.d(TAG, "onStart() permission not granted yet");
         }
@@ -649,14 +650,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Log.d(TAG, "OnStop finished");
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // LocationListener Methods
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
-                && keyCode == KeyEvent.KEYCODE_BACK
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5 && keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
             onBackPressed();
             return true;
@@ -664,9 +664,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return super.onKeyDown(keyCode, event);
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Navigation Drawer
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -708,12 +708,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             i.setData(Uri.parse(getString(R.string.link_to_tutorial)));
             startActivity(i);
         } else if (id == R.id.nav_feedback) {
-            // src: https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
+            // src:
+            // https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType("message/rfc822");
             i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
-            i.putExtra(Intent.EXTRA_TEXT, (getString(R.string.feedbackReceiver)) + System.lineSeparator() + "App Version: " + getAppVersionNumber(this) + System.lineSeparator() + "Android Version: ");
+            i.putExtra(Intent.EXTRA_TEXT, (getString(R.string.feedbackReceiver)) + System.lineSeparator()
+                    + "App Version: " + getAppVersionNumber(this) + System.lineSeparator() + "Android Version: ");
             try {
                 startActivity(Intent.createChooser(i, "Send mail..."));
             } catch (android.content.ActivityNotFoundException ex) {
@@ -755,58 +757,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void onProviderDisabled(String provider) {
     }
 
-    private void fireNewAppVersionPrompt(int installedAppVersion, int newestAppVersion, String urlToNewestAPK, Boolean critical) {
-        Log.d(TAG, "fireRideSettingsDialog()");
-        // Store the created AlertDialog instance.
-        // Because only AlertDialog has cancel method.
-        AlertDialog alertDialog = null;
-        // Create a alert dialog builder.
-        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        // Get custom login form view.
-        View settingsView = getLayoutInflater().inflate(R.layout.new_update_prompt, null);
-
-        // Set above view in alert dialog.
-        builder.setView(settingsView);
-
-        builder.setTitle(getString(R.string.new_app_version_title));
-
-        ((TextView) settingsView.findViewById(R.id.installed_version_textView)).setText(getString(R.string.installed_version) + " " + installedAppVersion);
-        ((TextView) settingsView.findViewById(R.id.newest_version_textView)).setText(getString(R.string.newest_version) + " " + newestAppVersion);
-
-        Button googlePlayStoreButton = settingsView.findViewById(R.id.google_play_store_button);
-
-        googlePlayStoreButton.setOnClickListener(v -> {
-            final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
-            try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-            } catch (android.content.ActivityNotFoundException anfe) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-            }
-        });
-
-        Button apkButton = settingsView.findViewById(R.id.apk_button);
-
-        apkButton.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(urlToNewestAPK))));
-
-        alertDialog = builder.create();
-
-        if (critical) {
-            Button closeSimRaButton = settingsView.findViewById(R.id.close_simra_button);
-            closeSimRaButton.setVisibility(View.VISIBLE);
-            closeSimRaButton.setOnClickListener(v -> finish());
-        } else {
-            Button laterButton = settingsView.findViewById(R.id.later_button);
-            laterButton.setVisibility(View.VISIBLE);
-            AlertDialog finalAlertDialog = alertDialog;
-            laterButton.setOnClickListener(v -> finalAlertDialog.cancel());
-        }
-
-        alertDialog.setCanceledOnTouchOutside(false);
-        alertDialog.setCancelable(false);
-        alertDialog.show();
-
-    }
-
     private void fireWhatIsNewPrompt(int version) {
         Log.d(TAG, "fireWhatIsNewPrompt()");
         // Store the created AlertDialog instance.
@@ -823,7 +773,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         builder.setTitle(getString(R.string.what_is_new_title));
 
         alertDialog = builder.create();
-
 
         Button okButton = settingsView.findViewById(R.id.ok_button);
         AlertDialog finalAlertDialog = alertDialog;
@@ -858,8 +807,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 }
             }
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                MainActivity.this, android.R.layout.simple_spinner_item, regionContentArray);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item,
+                regionContentArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Collections.sort(regionContentArray);
         regionContentArray.add(0, getText(R.string.pleaseChoose).toString());
@@ -883,7 +832,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             int region1 = -1;
             String selectedRegion = spinner.getSelectedItem().toString();
             for (int i = 0; i < simRa_regions_config.length; i++) {
-                if (selectedRegion.equals(simRa_regions_config[i].split("=")[0]) || selectedRegion.equals(simRa_regions_config[i].split("=")[1])) {
+                if (selectedRegion.equals(simRa_regions_config[i].split("=")[0])
+                        || selectedRegion.equals(simRa_regions_config[i].split("=")[1])) {
                     region1 = i;
                     break;
                 }
@@ -895,19 +845,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         alert.show();
     }
 
-    private class CheckVersionTask extends AsyncTask<String, String, String> {
-        int installedAppVersion = -1;
-        int newestAppVersion = 0;
-        String urlToNewestAPK = null;
-        Boolean critical = null;
+    private class BackgroundTask extends AsyncTask<String, String, String> {
 
-        private CheckVersionTask() {
+        private BackgroundTask() {
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            runOnUiThread(() -> MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.VISIBLE));
         }
 
         @Override
@@ -917,15 +862,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             int status = 0;
             try {
 
-                URL url = new URL(BuildConfig.API_ENDPOINT + "check/regions?clientHash=" + SimRAuthenticator.getClientHash());
+                URL url = new URL(
+                        BuildConfig.API_ENDPOINT + "check-regions?clientHash=" + SimRAuthenticator.getClientHash());
                 Log.d(TAG, "URL: " + url.toString());
-                HttpsURLConnection urlConnection =
-                        (HttpsURLConnection) url.openConnection();
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setReadTimeout(10000);
                 urlConnection.setConnectTimeout(15000);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(urlConnection.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
                     checkRegionsResponse.append(inputLine).append(System.lineSeparator());
@@ -941,57 +885,16 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 File regionsFile = IOUtils.Files.getRegionsFile(MainActivity.this);
                 overwriteFile(checkRegionsResponse.toString(), regionsFile);
             }
-            installedAppVersion = getAppVersionNumber(MainActivity.this);
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            StringBuilder checkVersionResponse = new StringBuilder();
-            try {
-                URL url = new URL(BuildConfig.API_ENDPOINT + "check/version?clientHash=" + SimRAuthenticator.getClientHash());
-                Log.d(TAG, "URL: " + url.toString());
-                HttpsURLConnection urlConnection =
-                        (HttpsURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                // urlConnection.setRequestProperty("Content-Type","text/plain");
-                // urlConnection.setDoOutput(true);
-                urlConnection.setReadTimeout(10000);
-                urlConnection.setConnectTimeout(15000);
-
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-
-                while ((inputLine = in.readLine()) != null) {
-                    checkVersionResponse.append(inputLine);
-                }
-                in.close();
-                status = urlConnection.getResponseCode();
-                Log.d(TAG, "Server status: " + status);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.d(TAG, "GET version response: " + checkVersionResponse.toString());
-            String[] responseArray = checkVersionResponse.toString().split("splitter");
-            if (responseArray.length > 2) {
-                critical = Boolean.valueOf(responseArray[0]);
-                newestAppVersion = Integer.parseInt(responseArray[1]);
-                urlToNewestAPK = responseArray[2];
-                return checkVersionResponse.toString();
-            } else {
-                return null;
-            }
+            return null;
         }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            runOnUiThread(() -> MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.GONE));
-            if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
-                MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
-            } else if (!lookUpBooleanSharedPrefs("news58seen", false, "simraPrefs", MainActivity.this)) {
+            if (!lookUpBooleanSharedPrefs("news58seen", false, "simraPrefs", MainActivity.this)) {
                 fireWhatIsNewPrompt(58);
             }
         }
     }
 
 }
-
