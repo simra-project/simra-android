@@ -87,7 +87,6 @@ public class MarkerFunct {
         editDoneCust = activity.getResources().getDrawable(R.drawable.edited_event_green, null);
 
         pool.execute(new SimpleThreadFactory().newThread(() -> {
-                    // TODO: Only do it when Internet is available
                     geocoderNominatim = new GeocoderNominatim(userAgent);
                     geocoderNominatim.setService("https://nominatim.openstreetmap.org/");
                 }

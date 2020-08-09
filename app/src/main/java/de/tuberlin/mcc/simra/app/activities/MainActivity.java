@@ -24,6 +24,7 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -32,7 +33,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -72,6 +72,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
@@ -98,13 +99,11 @@ import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
 
-    // Log tag
     private static final String TAG = "MainActivity_LOG";
     private final static int REQUEST_ENABLE_BT = 1;
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Map stuff, Overlays
     public static ExecutorService myEx;
+    ActivityMainBinding binding;
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Service encapsulating accelerometer accGpsFile recording functionality
     Intent recService;
@@ -210,6 +209,9 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         UpdateHelper.checkForUpdates(this);
 
+        binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
+        setContentView(binding.getRoot());
+
         myEx = Executors.newFixedThreadPool(4);
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -221,7 +223,7 @@ public class MainActivity extends BaseActivity
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
-        setContentView(R.layout.activity_main);
+
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Prepare RecorderService for accelerometer and location data recording
@@ -235,14 +237,14 @@ public class MainActivity extends BaseActivity
         // Map configuration
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        mMapView = findViewById(R.id.map);
+
+        mMapView = binding.appBarMain.mainContent.map;
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mMapView.setMultiTouchControls(true); // gesture zooming
         mMapView.setFlingEnabled(true);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
-        TextView copyrightTxt = findViewById(R.id.copyright_text);
-        copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
+        binding.appBarMain.copyrightText.setMovementMethod(LinkMovementMethod.getInstance());
 
         // Set compass (from OSMdroid sample project:
         // https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
@@ -453,7 +455,7 @@ public class MainActivity extends BaseActivity
         reportIncidentContainer.setVisibility(View.GONE);
 
         findViewById(R.id.button_ride_settings_general).setVisibility(View.VISIBLE);
-        findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.VISIBLE);
+        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
     }
 
     public void displayButtonsForDrive() {
@@ -464,7 +466,7 @@ public class MainActivity extends BaseActivity
         reportIncidentContainer.setVisibility(View.VISIBLE);
 
         findViewById(R.id.button_ride_settings_general).setVisibility(View.INVISIBLE);
-        findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.INVISIBLE);
+        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
 
     }
 
