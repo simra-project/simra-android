@@ -42,7 +42,7 @@ android {
         release {
             // Uncomment if you want to test the release configuration locally
             //signingConfig debug.signingConfig
-            debuggable true
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
