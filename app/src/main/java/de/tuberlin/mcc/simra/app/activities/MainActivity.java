@@ -340,7 +340,6 @@ public class MainActivity extends BaseActivity
                 Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
             }
         });
-
         new BackgroundTask().execute();
         if (lookUpIntSharedPrefs("regionLastChangedAtVersion", -1, "simraPrefs", MainActivity.this) < 53) {
             int region = lookUpIntSharedPrefs("Region", -1, "Profile", MainActivity.this);
@@ -505,8 +504,6 @@ public class MainActivity extends BaseActivity
     }
 
     public void onResume() {
-
-
         UpdateHelper.checkForUpdates(this);
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
         if (radmesserEnabled) {
