@@ -6,6 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
+    <include
+        android:id="@+id/main_content"
+        layout="@layout/content_main" />
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -15,6 +19,7 @@
         android:elevation="8dp"
         android:theme="@style/ToolbarTheme"
         android:titleTextColor="#FEFEFE"
+        android:visibility="visible"
         app:popupTheme="@style/AppTheme.PopupOverlay"
         app:titleTextAppearance="@style/Toolbar.TitleText">
 
@@ -32,7 +37,6 @@
         android:id="@+id/reportIncidentContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -64,8 +68,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@+id/report_obstacle_incident"
                     android:layout_alignBottom="@+id/report_obstacle_incident"
-                    android:layout_alignParentLeft="true"
-                    android:layout_toLeftOf="@+id/reportHelperSpace"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/reportHelperSpace"
                     android:backgroundTint="@color/colorAccent"
                     android:maxLines="2"
                     android:text="@string/reportIncidentClosepass"
@@ -84,8 +88,8 @@
                     android:id="@+id/report_obstacle_incident"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_toRightOf="@+id/reportHelperSpace"
+                    android:layout_alignParentEnd="true"
+                    android:layout_toEndOf="@+id/reportHelperSpace"
                     android:backgroundTint="@color/colorAccent"
                     android:maxLines="2"
                     android:text="@string/reportIncidentObstacle"
@@ -107,24 +111,21 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_below="@id/reportIncidentContainer"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginTop="12dp"
-        android:layout_marginRight="15dp"
+        android:layout_marginEnd="15dp"
         android:background="@drawable/my_center"
         android:clickable="true"
         android:elevation="2dp"
         android:focusable="true" />
 
-    <include
-        android:id="@+id/main_content"
-        layout="@layout/content_main" />
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_ride_settings_general"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@id/toolbar"
-        android:layout_alignBottom="@id/button_start"
+        android:layout_alignBottom="@id/button_start_recording"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="15dp"
         android:gravity="center_vertical"
         android:src="@drawable/ic_settings_black_24dp" />
 
@@ -132,14 +133,15 @@
         android:id="@+id/button_ride_settings_radmesser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@id/toolbar"
-        android:layout_alignBottom="@id/button_start"
+        android:layout_alignBottom="@id/button_start_recording"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="15dp"
         android:gravity="center_vertical"
         android:src="@drawable/ic_bluetooth_disabled"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/button_start"
+        android:id="@+id/button_start_recording"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/copyright_text"
@@ -153,7 +155,7 @@
         app:icon="@drawable/route" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/button_stop"
+        android:id="@+id/button_stop_recording"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/copyright_text"
