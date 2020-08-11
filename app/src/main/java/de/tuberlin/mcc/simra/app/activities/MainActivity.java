@@ -24,20 +24,18 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.util.Consumer;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -72,6 +70,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
@@ -98,15 +97,11 @@ import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
 
-    // Log tag
     private static final String TAG = "MainActivity_LOG";
     private final static int REQUEST_ENABLE_BT = 1;
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Map stuff, Overlays
     public static ExecutorService myEx;
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Service encapsulating accelerometer accGpsFile recording functionality
+    ActivityMainBinding binding;
     Intent recService;
     RecorderService mBoundRecorderService;
     boolean radmesserEnabled = false;
@@ -114,19 +109,8 @@ public class MainActivity extends BaseActivity
     private MapView mMapView;
     private MapController mMapController;
     private MyLocationNewOverlay mLocationOverlay;
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // CLICKABLES --> INTENTS
     private LocationManager locationManager;
     private Boolean recording = false;
-    private MaterialButton startBtn;
-    private MaterialButton stopBtn;
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Radmesser
-    private FloatingActionButton radmesserButton;
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // other UI Elements
-    private Toolbar toolbar;
-    private LinearLayout reportIncidentContainer;
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
@@ -144,14 +128,7 @@ public class MainActivity extends BaseActivity
         }
     };
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Switching between buttons:
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // (1) start button visible, stop button invisible
-
     private static boolean isLocationServiceOff(MainActivity mainActivity) {
-
         boolean gps_enabled = false;
 
         try {
@@ -210,44 +187,37 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         UpdateHelper.checkForUpdates(this);
 
+        binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
+        setContentView(binding.getRoot());
+
         myEx = Executors.newFixedThreadPool(4);
 
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // Set some params (context, DisplayMetrics, Config, ContentView)
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Context of application environment
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
-        setContentView(R.layout.activity_main);
+
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Prepare RecorderService for accelerometer and location data recording
         recService = new Intent(this, RecorderService.class);
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         // set up location manager to get location updates
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Map configuration
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        mMapView = findViewById(R.id.map);
+        mMapView = binding.appBarMain.mainContent.map;
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mMapView.setMultiTouchControls(true); // gesture zooming
         mMapView.setFlingEnabled(true);
         mMapController = (MapController) mMapView.getController();
         mMapController.setZoom(ZOOM_LEVEL);
-        TextView copyrightTxt = findViewById(R.id.copyright_text);
-        copyrightTxt.setMovementMethod(LinkMovementMethod.getInstance());
+        binding.appBarMain.copyrightText.setMovementMethod(LinkMovementMethod.getInstance());
 
         // Set compass (from OSMdroid sample project:
         // https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
         // java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         CompassOverlay mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx), mMapView);
 
         // Sets the icon to device location.
@@ -276,7 +246,6 @@ public class MainActivity extends BaseActivity
                     Double.parseDouble(sharedPrefs.getString("lastLoc_longitude", "")));
             mMapController.animateTo(lastLoc);
         } else {
-
             try {
                 mMapController.animateTo(new GeoPoint(mLocationOverlay.getLastFix().getLatitude(),
                         mLocationOverlay.getLastFix().getLongitude()));
@@ -301,16 +270,11 @@ public class MainActivity extends BaseActivity
         mLocationOverlay.setOptionsMenuEnabled(true);
         mCompassOverlay.enableCompass();
 
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // CLICKABLES
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // (1): Toolbar
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, binding.appBarMain.toolbar, R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -318,26 +282,15 @@ public class MainActivity extends BaseActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // (2): Helmet
-        ImageButton helmetButton = findViewById(R.id.helmet_icon);
-        helmetButton.setOnClickListener(v -> {
-        });
-
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // (3): CenterMap
+        // CenterMap
         ImageButton centerMap = findViewById(R.id.center_button);
-
         centerMap.setOnClickListener(v -> {
             Log.d(TAG, "centerMap clicked ");
             mLocationOverlay.enableFollowLocation();
             mMapController.setZoom(ZOOM_LEVEL);
         });
 
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // (4): NEUE ROUTE / START BUTTON
-        startBtn = findViewById(R.id.button_start);
-        startBtn.setOnClickListener(v -> {
+        binding.appBarMain.buttonStartRecording.setOnClickListener(v -> {
             if (radmesserEnabled) {
                 RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
                 if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
@@ -359,7 +312,6 @@ public class MainActivity extends BaseActivity
             IncidentBroadcaster.broadcastIncident(MainActivity.this, incidentType);
         };
 
-        reportIncidentContainer = findViewById(R.id.reportIncidentContainer);
         this.<MaterialButton>findViewById(R.id.report_closepass_incident).setOnClickListener(v -> {
             recordIncident.accept(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS);
         });
@@ -368,10 +320,7 @@ public class MainActivity extends BaseActivity
             recordIncident.accept(IncidentLogEntry.INCIDENT_TYPE.OBSTACLE);
         });
 
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // (5): AUFZEICHNUNG STOPPEN / STOP-BUTTON
-        stopBtn = findViewById(R.id.button_stop);
-        stopBtn.setOnClickListener(v -> {
+        binding.appBarMain.buttonStopRecording.setOnClickListener(v -> {
             try {
                 displayButtonsForMenu();
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -401,13 +350,10 @@ public class MainActivity extends BaseActivity
             }
         }
 
-        radmesserButton = findViewById(R.id.button_ride_settings_radmesser);
-        radmesserButton.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
-
-        FloatingActionButton settingsButton = findViewById(R.id.button_ride_settings_general);
-        settingsButton.setOnClickListener(view -> startActivity(new Intent(this, SettingsActivity.class)));
-
         // Radmesser
+        binding.appBarMain.buttonRideSettingsRadmesser.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
+        binding.appBarMain.buttonRideSettingsGeneral.setOnClickListener(view -> startActivity(new Intent(this, SettingsActivity.class)));
+
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
         updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
         if (radmesserEnabled) {
@@ -425,8 +371,6 @@ public class MainActivity extends BaseActivity
                 startRadmesserService();
             }
         }
-
-        Log.d(TAG, "OnCreate finished");
     }
 
     private void deactivateRadmesser() {
@@ -443,34 +387,28 @@ public class MainActivity extends BaseActivity
         registerRadmesserService();
     }
 
-    // (2) stop button visible, start button invisible
-
     public void displayButtonsForMenu() {
-        startBtn.setVisibility(View.VISIBLE);
-        stopBtn.setVisibility(View.INVISIBLE);
+        binding.appBarMain.buttonStartRecording.setVisibility(View.VISIBLE);
+        binding.appBarMain.buttonStopRecording.setVisibility(View.INVISIBLE);
 
-        toolbar.setVisibility(View.VISIBLE);
-        reportIncidentContainer.setVisibility(View.GONE);
+        binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
+        binding.appBarMain.reportIncidentContainer.setVisibility(View.GONE);
 
-        findViewById(R.id.button_ride_settings_general).setVisibility(View.VISIBLE);
-        findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.VISIBLE);
+        binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.VISIBLE);
+        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
     }
 
     public void displayButtonsForDrive() {
-        stopBtn.setVisibility(View.VISIBLE);
-        startBtn.setVisibility(View.INVISIBLE);
+        binding.appBarMain.buttonStopRecording.setVisibility(View.VISIBLE);
+        binding.appBarMain.buttonStartRecording.setVisibility(View.INVISIBLE);
 
-        toolbar.setVisibility(View.INVISIBLE);
-        reportIncidentContainer.setVisibility(View.VISIBLE);
+        binding.appBarMain.toolbar.setVisibility(View.INVISIBLE);
+        binding.appBarMain.reportIncidentContainer.setVisibility(View.VISIBLE);
 
-        findViewById(R.id.button_ride_settings_general).setVisibility(View.INVISIBLE);
-        findViewById(R.id.button_ride_settings_radmesser).setVisibility(View.INVISIBLE);
+        binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.GONE);
+        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
 
     }
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Lifecycle (onResume onPause onStop):
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void registerRadmesserService() {
         receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks() {
@@ -527,9 +465,8 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     private void updateRadmesserButtonStatus(RadmesserService.ConnectionState status) {
+        FloatingActionButton radmesserButton = binding.appBarMain.buttonRideSettingsRadmesser;
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (radmesserEnabled) {
             // einblenden
@@ -566,19 +503,12 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     public void onResume() {
-
-
         UpdateHelper.checkForUpdates(this);
-
-        // Log.d(TAG, "OnResume called");
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
-        boolean isConnecting;
-
-        if (radmesserEnabled)
-            isConnecting = RadmesserService.tryConnectPairedDevice(this);
+        if (radmesserEnabled) {
+            RadmesserService.tryConnectPairedDevice(this);
+        }
 
         if (receiver == null && radmesserEnabled) {
             registerRadmesserService();
@@ -612,9 +542,6 @@ public class MainActivity extends BaseActivity
     }
 
     public void onPause() {
-
-        Log.d(TAG, "OnPause called");
-
         super.onPause();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -649,10 +576,6 @@ public class MainActivity extends BaseActivity
         }
         Log.d(TAG, "OnStop finished");
     }
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // LocationListener Methods
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

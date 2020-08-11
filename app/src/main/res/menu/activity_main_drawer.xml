@@ -26,7 +26,7 @@
             android:title="@string/title_activity_bluetooth_connection" />
         <item
             android:id="@+id/nav_aboutSimRa"
-            android:icon="@drawable/helmet"
+            android:icon="@drawable/simra_logo"
             android:title="@string/about_simra" />
         <item
             android:id="@+id/nav_tutorial"

@@ -9,20 +9,16 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -40,6 +36,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.databinding.ActivityHistoryBinding;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -50,17 +47,11 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 
 public class HistoryActivity extends BaseActivity {
-
-    // Log tag
     private static final String TAG = "HistoryActivity_LOG";
-    ImageButton backBtn;
-    TextView toolbarTxt;
-
+    ActivityHistoryBinding binding;
     boolean exitWhenDone = false;
 
-    ListView listView;
     String[] ridesArr;
-
     BroadcastReceiver br;
 
     public static void startHistoryActivity(Context context) {
@@ -71,24 +62,21 @@ public class HistoryActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate()");
-        setContentView(R.layout.activity_history);
+        binding = ActivityHistoryBinding.inflate(LayoutInflater.from(this));
+        setContentView(binding.getRoot());
 
         //  Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle("");
-        toolbar.setSubtitle("");
-        toolbarTxt = findViewById(R.id.toolbar_title);
-        toolbarTxt.setText(R.string.title_activity_history);
+        binding.toolbar.toolbar.setTitle("");
+        binding.toolbar.toolbar.setSubtitle("");
+        binding.toolbar.toolbarTitle.setText(R.string.title_activity_history);
 
-        backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(v -> finish());
+        binding.toolbar.backButton.setOnClickListener(v -> finish());
 
-        listView = findViewById(R.id.listView);
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            LinearLayout historyButtons = findViewById(R.id.historyButtons);
+
+        binding.listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            LinearLayout historyButtons = binding.buttons;
             boolean isUp = true;
 
             @Override
@@ -112,48 +100,13 @@ public class HistoryActivity extends BaseActivity {
             }
         });
 
-        RelativeLayout justUploadButton = findViewById(R.id.justUpload);
-        justUploadButton.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                justUploadButton.setElevation(0.0f);
-                justUploadButton.setBackground(getDrawable(R.drawable.button_pressed));
-            }
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                justUploadButton.setElevation(2 * HistoryActivity.this.getResources().getDisplayMetrics().density);
-                justUploadButton.setBackground(getDrawable(R.drawable.button_unpressed));
-            }
-            return false;
-        });
-        justUploadButton.setOnClickListener(view -> {
+        binding.upload.setOnClickListener(view -> {
             if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", HistoryActivity.this)) {
                 fireUploadPrompt();
             } else {
                 Intent intent = new Intent(HistoryActivity.this, UploadService.class);
                 startService(intent);
                 Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        RelativeLayout uploadAndExitButton = findViewById(R.id.uploadAndExit);
-        uploadAndExitButton.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                uploadAndExitButton.setElevation(0.0f);
-                uploadAndExitButton.setBackground(getDrawable(R.drawable.button_pressed));
-            }
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                uploadAndExitButton.setElevation(2 * HistoryActivity.this.getResources().getDisplayMetrics().density);
-                uploadAndExitButton.setBackground(getDrawable(R.drawable.button_unpressed));
-            }
-            return false;
-        });
-        uploadAndExitButton.setOnClickListener(view -> {
-            exitWhenDone = true;
-            if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", HistoryActivity.this)) {
-                fireUploadPrompt();
-            } else {
-                justUploadButton.performClick();
-                HistoryActivity.this.moveTaskToBack(true);
             }
         });
     }
@@ -191,7 +144,7 @@ public class HistoryActivity extends BaseActivity {
             Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             List<String> stringArrayList = new ArrayList<>(Arrays.asList(ridesArr));
             MyArrayAdapter myAdapter = new MyArrayAdapter(this, R.layout.row_icons, stringArrayList, metaDataLines);
-            listView.setAdapter(myAdapter);
+            binding.listView.setAdapter(myAdapter);
 
         } else {
 
@@ -254,7 +207,7 @@ public class HistoryActivity extends BaseActivity {
         alert.setPositiveButton(R.string.delete_ride_approve, (dialog, id) -> {
             File[] dirFiles = getFilesDir().listFiles();
             Log.d(TAG, "btnDelete.onClick() dirFiles: " + Arrays.deepToString(dirFiles));
-            String clicked = (String) listView.getItemAtPosition(position);
+            String clicked = (String) binding.listView.getItemAtPosition(position);
             Log.d(TAG, "btnDelete.onClick() clicked: " + clicked);
             clicked = clicked.replace("#", "").split(";")[0];
             if (dirFiles.length != 0) {
@@ -390,7 +343,7 @@ public class HistoryActivity extends BaseActivity {
                 // gets the files in the directory
                 // lists all the files into an array
                 File[] dirFiles = new File(IOUtils.Directories.getBaseFolderPath(context)).listFiles();
-                String clicked = (String) listView.getItemAtPosition(position);
+                String clicked = (String) binding.listView.getItemAtPosition(position);
                 Log.d(TAG, "dirFiles.length: " + dirFiles.length + " clicked: " + clicked + " position: " + position);
                 clicked = clicked.replace("#", "").split(";")[0];
                 if (dirFiles.length != 0) {

@@ -14,13 +14,12 @@
         android:layout_alignParentTop="true"
         android:background="@drawable/mcc_ecdf" />
 
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/doublePic"
         android:layout_alignParentStart="true"
-        android:background="@drawable/button_unpressed"
+        android:background="@color/simraDarkBlue"
         android:fontFamily="@font/assistant_extralight"
         android:padding="5dp">
 
@@ -30,7 +29,8 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/nextBtn"
             android:layout_alignParentEnd="true"
-            app:srcCompat="@drawable/helmet" />
+            app:srcCompat="@drawable/simra_logo" />
+
 
         <TextView
             android:id="@+id/textView"
@@ -38,7 +38,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginHorizontal="25dp"
-            android:background="@drawable/button_unpressed"
             android:padding="5dp"
             android:text="@string/welcome_header"
             android:textColor="#FEFEFE"

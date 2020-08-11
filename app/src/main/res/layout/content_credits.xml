@@ -29,7 +29,7 @@
                 android:layout_height="60dp"
                 android:layout_alignParentStart="true"
                 android:layout_marginLeft="15dp"
-                android:background="@drawable/helmet"
+                android:background="@drawable/simra_logo"
                 android:scaleType="centerCrop" />
 
             <TextView

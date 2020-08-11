@@ -96,7 +96,6 @@ public class IncidentLogEntry implements Serializable {
                 (latitude != null ? latitude : "") + "," +
                 (longitude != null ? longitude : "") + "," +
                 (timestamp != null ? timestamp : "") + "," +
-                // TODO: Use enum mapping
                 (bikeType != null ? bikeType : "") + "," +
                 booleanToInt(childOnBoard) + "," +
                 booleanToInt(bikeWithTrailer) + "," +

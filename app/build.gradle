@@ -65,6 +65,9 @@ android {
             initWith buildTypes.release
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
@@ -124,5 +127,5 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:${camerax_version}"
 
     // "Backporting" Java 8 streams for Android < 24
-    compile 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
+    implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
 }

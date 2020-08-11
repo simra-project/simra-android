@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,76 +15,32 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
-    <RelativeLayout
-        android:id="@+id/addIncidentModeButton"
-        android:layout_width="140dp"
-        android:layout_height="50dp"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/addIncidentButton"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
         android:layout_alignEnd="@id/toolbar"
-        android:background="@drawable/button_unpressed"
-        android:clickable="true"
-        android:elevation="2dp"
-        android:focusable="true">
+        android:text="@string/addIncident"
+        app:icon="@drawable/ic_baseline_touch_app_24" />
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/tap_64" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
-            android:fontFamily="@font/assistant_extralight"
-            android:text="@string/addIncident"
-            android:textColor="#FEFEFE"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/exitAddIncidentModeButton"
-        android:layout_width="140dp"
-        android:layout_height="50dp"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
         android:layout_alignEnd="@id/toolbar"
-        android:background="@drawable/button_pressed"
-        android:clickable="true"
-        android:focusable="true">
+        android:text="@string/quitAddIncident"
+        app:icon="@drawable/ic_baseline_touch_app_24" />
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/tap_64" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
-            android:fontFamily="@font/assistant_extralight"
-            android:text="@string/quitAddIncident"
-            android:textColor="#FEFEFE"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
 
     <ImageButton
         android:id="@+id/bounding_box_center_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_below="@id/addIncidentModeButton"
+        android:layout_below="@id/addIncidentButton"
         android:layout_alignEnd="@id/toolbar"
         android:layout_marginTop="10dp"
         android:background="@drawable/my_center"
@@ -126,94 +83,27 @@
 
     </RelativeLayout>
 
-
-    <RelativeLayout
-        android:id="@+id/exitShowRoute"
-        android:layout_width="140dp"
-        android:layout_height="50dp"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/exitShowRouteButton"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignEnd="@id/exitAddIncidentModeButton"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/button_unpressed"
-        android:clickable="true"
-        android:elevation="2dp"
-        android:focusable="true"
-        android:padding="2dp">
+        android:text="@string/returnAsText"
+        app:icon="@drawable/ic_undo" />
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
-
-            <ImageView
-                android:id="@+id/revert_imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="3dp"
-                android:background="@android:drawable/ic_menu_revert"
-                android:scaleType="centerInside" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="3dp"
-                android:layout_toEndOf="@id/revert_imageView"
-                android:fontFamily="@font/assistant_extralight"
-                android:gravity="center"
-                android:text="@string/returnAsText"
-                android:textColor="#FEFEFE"
-                android:textStyle="bold" />
-        </RelativeLayout>
-
-
-    </RelativeLayout>
-
-    <!-- <Button
-        android:id="@+id/saveRide"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/saveRouteButton"
         style="@style/Widget.MaterialComponents.Button.Icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/privacySliderDescription"
-        android:layout_alignEnd="@id/exitAddIncident"
-        android:layout_marginBottom="20dp"
-        android:text="@string/ride_reset"
-        app:icon="@drawable/ic_undo" /> -->
-
-    <RelativeLayout
-        android:id="@+id/saveIncident"
-        android:layout_width="140dp"
-        android:layout_height="50dp"
-        android:layout_above="@id/privacySliderDescription"
         android:layout_alignEnd="@id/exitAddIncidentModeButton"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/button_unpressed"
-        android:clickable="true"
-        android:elevation="2dp"
-        android:focusable="true">
-
-        <ImageView
-            android:id="@+id/save_ImageView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:background="@android:drawable/ic_menu_save" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_toEndOf="@id/save_ImageView"
-            android:fontFamily="@font/assistant_extralight"
-            android:gravity="center"
-            android:text="@string/saveIncident"
-            android:textColor="#FEFEFE"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
+        android:text="@string/saveIncident"
+        app:icon="@drawable/ic_save" />
 
     <TextView
         android:id="@+id/privacySliderDescription"

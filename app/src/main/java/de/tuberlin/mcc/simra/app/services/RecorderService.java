@@ -68,7 +68,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Strings for storing data to enable continued use by other activities
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO: Can Use CircularQueue instead of removing elements by hand?
     Queue<Float> accelerometerQueueX = new LinkedList<>();
     Queue<Float> accelerometerQueueY = new LinkedList<>();
     Queue<Float> accelerometerQueueZ = new LinkedList<>();
@@ -418,7 +417,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 dataLogEntryBuilder.withTimestamp(curTime);
                 dataLogEntryBuilder.withAccelerometer(
                         // Every average is computed over 30 data points
-                        // TODO: Why?
                         computeAverage(accelerometerQueueX),
                         computeAverage(accelerometerQueueY),
                         computeAverage(accelerometerQueueZ)

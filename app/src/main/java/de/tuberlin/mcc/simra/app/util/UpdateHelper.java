@@ -46,7 +46,6 @@ public class UpdateHelper {
 
         // Checks that the platform will allow the specified type of update.
         appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
-            Log.d("FUCK", appUpdateInfo.updateAvailability() + "");
             // Check if there is an outstanding update to complete (for Flexible Update Strategy)
             if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
                 popupSnackbarForCompleteUpdate(appUpdateManager, activity);
