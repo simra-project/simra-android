@@ -246,7 +246,7 @@ public class MarkerFunct {
             ex.printStackTrace();
         }
 
-        InfoWindow infoWindow = new MyInfoWindow(R.layout.bonuspack_bubble,
+        InfoWindow infoWindow = new MyInfoWindow(R.layout.incident_bubble,
                 activity.getmMapView(),
                 addressForLoc, activity, state, incidentLogEntry);
         incidentMarker.setInfoWindow(infoWindow);
