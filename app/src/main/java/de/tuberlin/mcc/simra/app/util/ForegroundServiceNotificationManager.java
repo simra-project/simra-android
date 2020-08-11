@@ -37,7 +37,7 @@ public class ForegroundServiceNotificationManager {
 
         // Set the intent that will fire when the user taps the notification
         Notification notification = new NotificationCompat.Builder(ctx, CHANNEL_ID)
-                .setSmallIcon(R.drawable.helmet)
+                .setSmallIcon(R.drawable.simra_logo)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_LOW)

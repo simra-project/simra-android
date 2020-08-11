@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
@@ -62,8 +61,6 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 
 public class ShowRouteActivity extends BaseActivity {
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Log tag
     private static final String TAG = "ShowRouteActivity_LOG";
     private static final String EXTRA_RIDE_ID = "EXTRA_RIDE_ID";
     private static final String EXTRA_STATE = "EXTRA_STATE";
@@ -143,7 +140,6 @@ public class ShowRouteActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate() started");
 
         binding = ActivityShowRouteBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
@@ -230,17 +226,6 @@ public class ShowRouteActivity extends BaseActivity {
             binding.privacySliderLinearLayout.setVisibility(View.INVISIBLE);
             binding.privacySliderDescription.setVisibility(View.INVISIBLE);
             binding.saveRouteButton.setVisibility(View.INVISIBLE);
-            binding.exitShowRouteButton.setOnTouchListener((v, event) -> {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    binding.exitShowRouteButton.setElevation(0.0f);
-                    binding.exitShowRouteButton.setBackground(getDrawable(R.drawable.button_pressed));
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    binding.exitShowRouteButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
-                    binding.exitShowRouteButton.setBackground(getDrawable(R.drawable.button_unpressed));
-                }
-                return false;
-            });
             binding.exitShowRouteButton.setOnClickListener(v -> finish());
         }
 
@@ -374,19 +359,6 @@ public class ShowRouteActivity extends BaseActivity {
             finishFlagOverlay = new IconOverlay(finishFlagPoint, finishFlag);
             binding.showRouteMap.getOverlays().add(startFlagOverlay);
             binding.showRouteMap.getOverlays().add(finishFlagOverlay);
-        });
-
-
-        binding.saveRouteButton.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                binding.saveRouteButton.setElevation(0.0f);
-                binding.saveRouteButton.setBackground(getDrawable(R.drawable.button_pressed));
-            }
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                binding.saveRouteButton.setElevation(2 * ShowRouteActivity.this.getResources().getDisplayMetrics().density);
-                binding.saveRouteButton.setBackground(getDrawable(R.drawable.button_unpressed));
-            }
-            return false;
         });
 
         binding.saveRouteButton.setOnClickListener((View v) -> saveChanges());
