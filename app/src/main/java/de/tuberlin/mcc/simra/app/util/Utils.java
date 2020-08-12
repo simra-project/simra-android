@@ -40,6 +40,7 @@ import javax.net.ssl.HttpsURLConnection;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
+import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
@@ -632,9 +633,8 @@ public class Utils {
      * Uses sophisticated AI to analyze the ride
      * */
     public static List<IncidentLogEntry> findAccEvents(int rideId, Context context) {
-        rideId = 20;//todo: remove!
 
-
+        //todo: if online anabled
         try {
             String responseString = "";
 
@@ -642,9 +642,8 @@ public class Utils {
                     + "&bikeType=" + SharedPref.Settings.Ride.BikeType.getBikeType(context)
                     + "&phoneLocation=" + SharedPref.Settings.Ride.PhoneLocation.getPhoneLocation(context));
 
-            Log.d(TAG, "URL: " + url.toString());
-            HttpsURLConnection urlConnection =
-                    (HttpsURLConnection) url.openConnection();
+            Log.d(TAG, "URL for AI-Backend: " + url.toString());
+            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
             urlConnection.setRequestProperty("Content-Type", "text/plain");
             //urlConnection.setRequestProperty("Accept", "application/json");
@@ -652,11 +651,10 @@ public class Utils {
             urlConnection.setReadTimeout(10000);
             urlConnection.setConnectTimeout(10000);
 
-
-            //Read File to byteArr
+            //Read log file in to byte Array
             File rideFile = IOUtils.Files.getGPSLogFile(rideId, false, context);
             FileInputStream fileInputStream = new FileInputStream(rideFile);
-            long byteLength = rideFile.length(); // byte count of the file-content
+            long byteLength = rideFile.length();
 
             byte[] fileContent = new byte[(int) byteLength];
             fileInputStream.read(fileContent, 0, (int) byteLength);
@@ -677,7 +675,6 @@ public class Utils {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 responseString += inputLine;
-
             }
             in.close();
             Log.d(TAG, responseString);
@@ -685,22 +682,22 @@ public class Utils {
             int status = urlConnection.getResponseCode();
             Log.d(TAG, "Server status: " + status);
 
-
+            // response okay
             if (status == 200) {
                 JSONArray jsonArr = new JSONArray(responseString);
                 List<IncidentLogEntry> foundIncedents = new ArrayList<>();
-
                 DataLog allLogs = DataLog.loadDataLog(rideId, context);
 
-                // find log entry and make an incedent
+                // find log entrys and make them an incident
                 for (int i = 0; i < jsonArr.length(); i++) {
                     JSONArray incidentAI = jsonArr.getJSONArray(i);
                     for (DataLogEntry log : allLogs.dataLogEntries) {
-                        if (log.timestamp >= allLogs.startTime + incidentAI.getLong(0)) {
+                        if (log.timestamp >= allLogs.startTime + incidentAI.getLong(0) && log.latitude != null) {
                             foundIncedents.add(IncidentLogEntry.newBuilder()
                                     .withBaseInformation(
                                             log.timestamp,
-                                            log.latitude, log.longitude
+                                            log.latitude,
+                                            log.longitude
                                     )
                                     .withIncidentType(incidentAI.getInt(1))
                                     .build());
@@ -709,7 +706,13 @@ public class Utils {
 
                     }
                 }
-                int i = 0;
+
+                //write incidents to file
+                IncidentLog incidentLog = IncidentLog.loadIncidentLog(rideId, context);
+                for (IncidentLogEntry incedent : foundIncedents) {
+                    incidentLog.updateOrAddIncident(incedent);
+                }
+                //return incidents
                 return foundIncedents;
             }
 
