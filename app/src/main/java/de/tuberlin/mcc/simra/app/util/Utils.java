@@ -688,13 +688,16 @@ public class Utils {
 
             if (status == 200) {
                 JSONArray jsonArr = new JSONArray(responseString);
+                List<IncidentLogEntry> incidents = new ArrayList<>();
 
                 for (int i = 0; i < jsonArr.length(); i++) {
                     jsonArr.getJSONArray(i);
-                    // todo: retrive and return Data
-                    // IncidentLogEntry
-                    // return data
+                    // todo: retrive and parese Data
+                    //  incidents.add(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.AUTO_GENERATED).withBaseInformation(accEvent.timeStamp, accEvent.position.getLatitude(), accEvent.position.getLongitude()).build());
+
                 }
+
+                return incidents;
             }
 
         } catch (IOException | JSONException e) {
