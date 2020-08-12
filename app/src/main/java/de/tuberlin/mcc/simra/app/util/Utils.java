@@ -38,6 +38,8 @@ import java.util.Locale;
 import javax.net.ssl.HttpsURLConnection;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
+import de.tuberlin.mcc.simra.app.entities.DataLog;
+import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
@@ -630,10 +632,8 @@ public class Utils {
      * Uses sophisticated AI to analyze the ride
      * */
     public static List<IncidentLogEntry> findAccEvents(int rideId, Context context) {
-        rideId = 10;//todo: remove!
-        //check online
-        long startTimeMillis = System.currentTimeMillis();
-        //start time = currTime
+        rideId = 20;//todo: remove!
+
 
         try {
             String responseString = "";
@@ -688,16 +688,29 @@ public class Utils {
 
             if (status == 200) {
                 JSONArray jsonArr = new JSONArray(responseString);
-                List<IncidentLogEntry> incidents = new ArrayList<>();
+                List<IncidentLogEntry> foundIncedents = new ArrayList<>();
 
+                DataLog allLogs = DataLog.loadDataLog(rideId, context);
+
+                // find log entry and make an incedent
                 for (int i = 0; i < jsonArr.length(); i++) {
-                    jsonArr.getJSONArray(i);
-                    // todo: retrive and parese Data
-                    //  incidents.add(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.AUTO_GENERATED).withBaseInformation(accEvent.timeStamp, accEvent.position.getLatitude(), accEvent.position.getLongitude()).build());
+                    JSONArray incidentAI = jsonArr.getJSONArray(i);
+                    for (DataLogEntry log : allLogs.dataLogEntries) {
+                        if (log.timestamp >= allLogs.startTime + incidentAI.getLong(0)) {
+                            foundIncedents.add(IncidentLogEntry.newBuilder()
+                                    .withBaseInformation(
+                                            log.timestamp,
+                                            log.latitude, log.longitude
+                                    )
+                                    .withIncidentType(incidentAI.getInt(1))
+                                    .build());
+                            break;
+                        }
 
+                    }
                 }
-
-                return incidents;
+                int i = 0;
+                return foundIncedents;
             }
 
         } catch (IOException | JSONException e) {
@@ -881,7 +894,7 @@ public class Utils {
     }
 
     /**
-     * @deprecated Use IncidentLogEntry instead
+     * @deprecated Use  instead
      */
     private static class AccEvent {
 
