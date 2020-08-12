@@ -674,11 +674,15 @@ public class Utils {
                 int chunkSize = 1024;
                 int chunkIndex = 0;
 
-                while (chunkSize * chunkIndex < fileContent.length && startTime + uploadTimeoutMS > System.currentTimeMillis()) {
+                while (chunkSize * chunkIndex < fileContent.length) {
                     int offset = chunkSize * chunkIndex;
                     int remaining = fileContent.length - offset;
                     os.write(fileContent, offset, remaining > chunkSize ? chunkSize : remaining);
                     chunkIndex += 1;
+
+                    //upload timeout
+                    if(startTime + uploadTimeoutMS < System.currentTimeMillis())
+                        return null;
                 }
 
                 os.flush();
