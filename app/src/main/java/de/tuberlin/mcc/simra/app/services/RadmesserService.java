@@ -29,7 +29,7 @@ import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 
 import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEService;
 
-public class OpenBikeSensorService extends Service {
+public class RadmesserService extends Service {
     private static final String TAG = "RadmesserService";
     private static final String sharedPrefsKey = "RadmesserServiceBLE";
     private static final String sharedPrefsKeyRadmesserID = "connectedDevice";
@@ -204,7 +204,7 @@ public class OpenBikeSensorService extends Service {
      * Scan results can be subscribed with registerCallbacks()
      * */
     public static void startScanning(Context ctx) {
-        Intent intent = new Intent(ctx, OpenBikeSensorService.class);
+        Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_START_SCANN);
         ctx.startService(intent);
     }
@@ -224,7 +224,7 @@ public class OpenBikeSensorService extends Service {
 
         lastConnectionRequest = deviceId;
 
-        Intent intent = new Intent(ctx, OpenBikeSensorService.class);
+        Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_CONNECT_DEVICE);
         intent.putExtra(EXTRA_CONNECT_DEVICE, deviceId);
         ctx.startService(intent);
@@ -241,7 +241,7 @@ public class OpenBikeSensorService extends Service {
         if (deviceId == null)
             return false;
 
-        Intent intent = new Intent(ctx, OpenBikeSensorService.class);
+        Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_CONNECT_DEVICE);
         intent.putExtra(EXTRA_CONNECT_DEVICE, deviceId);
         ctx.startService(intent);
@@ -254,7 +254,7 @@ public class OpenBikeSensorService extends Service {
      */
 
     public static void disconnectAndUnpairDevice(Context ctx) {
-        Intent intent = new Intent(ctx, OpenBikeSensorService.class);
+        Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_DISCONNECT_AND_UNPAIR);
         ctx.startService(intent);
     }
@@ -264,7 +264,7 @@ public class OpenBikeSensorService extends Service {
      *
      * */
     public static void terminateService(Context ctx) {
-        Intent intent = new Intent(ctx, OpenBikeSensorService.class);
+        Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_STOP_SERVICE);
         ctx.startService(intent);
     }

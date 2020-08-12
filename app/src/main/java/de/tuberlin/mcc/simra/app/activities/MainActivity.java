@@ -73,7 +73,7 @@ import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
-import de.tuberlin.mcc.simra.app.services.OpenBikeSensorService;
+import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -292,9 +292,9 @@ public class MainActivity extends BaseActivity
 
         binding.appBarMain.buttonStartRecording.setOnClickListener(v -> {
             if (radmesserEnabled) {
-                OpenBikeSensorService.ConnectionState currentState = OpenBikeSensorService.getConnectionState();
-                if (!currentState.equals(OpenBikeSensorService.ConnectionState.CONNECTED)) {
-                    boolean reconected = OpenBikeSensorService.tryConnectPairedDevice(this);
+                RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
+                if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
+                    boolean reconected = RadmesserService.tryConnectPairedDevice(this);
                     if (!reconected) {
                         showRadmesserNotConnectedWarning();
                         return;
@@ -355,7 +355,7 @@ public class MainActivity extends BaseActivity
         binding.appBarMain.buttonRideSettingsGeneral.setOnClickListener(view -> startActivity(new Intent(this, SettingsActivity.class)));
 
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
-        updateRadmesserButtonStatus(OpenBikeSensorService.ConnectionState.DISCONNECTED);
+        updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
         if (radmesserEnabled) {
             BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (mBluetoothAdapter == null) {
@@ -375,14 +375,14 @@ public class MainActivity extends BaseActivity
 
     private void deactivateRadmesser() {
         radmesserEnabled = false;
-        updateRadmesserButtonStatus(OpenBikeSensorService.ConnectionState.DISCONNECTED);
+        updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
         SharedPref.Settings.Radmesser.setEnabled(false, this);
     }
 
     private void startRadmesserService() {
-        OpenBikeSensorService.ConnectionState currentState = OpenBikeSensorService.getConnectionState();
-        if (radmesserEnabled && currentState.equals(OpenBikeSensorService.ConnectionState.DISCONNECTED)) {
-            OpenBikeSensorService.startScanning(this);
+        RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
+        if (radmesserEnabled && currentState.equals(RadmesserService.ConnectionState.DISCONNECTED)) {
+            RadmesserService.startScanning(this);
         }
         registerRadmesserService();
     }
@@ -395,7 +395,7 @@ public class MainActivity extends BaseActivity
         binding.appBarMain.reportIncidentContainer.setVisibility(View.GONE);
 
         binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.VISIBLE);
-        updateRadmesserButtonStatus(OpenBikeSensorService.getConnectionState());
+        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
     }
 
     public void displayButtonsForDrive() {
@@ -406,18 +406,18 @@ public class MainActivity extends BaseActivity
         binding.appBarMain.reportIncidentContainer.setVisibility(View.VISIBLE);
 
         binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.GONE);
-        updateRadmesserButtonStatus(OpenBikeSensorService.getConnectionState());
+        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
 
     }
 
     private void registerRadmesserService() {
-        receiver = OpenBikeSensorService.registerCallbacks(this, new OpenBikeSensorService.RadmesserServiceCallbacks() {
-            public void onConnectionStateChanged(OpenBikeSensorService.ConnectionState newState) {
+        receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks() {
+            public void onConnectionStateChanged(RadmesserService.ConnectionState newState) {
                 updateRadmesserButtonStatus(newState);
             }
 
             public void onDeviceFound(String deviceName, String deviceId) {
-                if (!OpenBikeSensorService.getConnectionState().equals(OpenBikeSensorService.ConnectionState.CONNECTED)) {
+                if (!RadmesserService.getConnectionState().equals(RadmesserService.ConnectionState.CONNECTED)) {
                     Toast.makeText(MainActivity.this, R.string.openbikesensor_toast_devicefound, Toast.LENGTH_LONG)
                             .show();
                 }
@@ -427,12 +427,12 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onDestroy() {
-        OpenBikeSensorService.terminateService(this);
+        RadmesserService.terminateService(this);
         super.onDestroy();
     }
 
     private void unregisterRadmesserService() {
-        OpenBikeSensorService.unRegisterCallbacks(receiver, this);
+        RadmesserService.unRegisterCallbacks(receiver, this);
         receiver = null;
     }
 
@@ -465,7 +465,7 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void updateRadmesserButtonStatus(OpenBikeSensorService.ConnectionState status) {
+    private void updateRadmesserButtonStatus(RadmesserService.ConnectionState status) {
         FloatingActionButton radmesserButton = binding.appBarMain.buttonRideSettingsRadmesser;
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (radmesserEnabled) {
@@ -507,7 +507,7 @@ public class MainActivity extends BaseActivity
         UpdateHelper.checkForUpdates(this);
         radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
         if (radmesserEnabled) {
-            OpenBikeSensorService.tryConnectPairedDevice(this);
+            RadmesserService.tryConnectPairedDevice(this);
         }
 
         if (receiver == null && radmesserEnabled) {
@@ -537,7 +537,7 @@ public class MainActivity extends BaseActivity
         mMapView.onResume(); // needed for compass and icons
         mLocationOverlay.onResume();
         mLocationOverlay.enableMyLocation();
-        updateRadmesserButtonStatus(OpenBikeSensorService.getConnectionState());
+        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
 
     }
 

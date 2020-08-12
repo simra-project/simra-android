@@ -121,7 +121,7 @@
             android:enabled="true"
             android:parentActivityName=".HistoryActivity" />
         <service
-            android:name=".services.OpenBikeSensorService"
+            android:name=".services.RadmesserService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
