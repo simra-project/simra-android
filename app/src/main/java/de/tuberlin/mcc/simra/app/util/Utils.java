@@ -698,7 +698,7 @@ public class Utils {
                                                 log.latitude,
                                                 log.longitude
                                         )
-                                        .withIncidentType(incidentAI.getInt(1))
+                                        //.withIncidentType(incidentAI.getInt(1))
                                         .build());
                                 break;
                             }
@@ -707,10 +707,10 @@ public class Utils {
                     }
 
                     //write incidents to file
-                    IncidentLog incidentLog = IncidentLog.loadIncidentLog(rideId, context);
+                  /*  IncidentLog incidentLog = IncidentLog.loadIncidentLog(rideId, context);
                     for (IncidentLogEntry incedent : foundIncedents) {
                         incidentLog.updateOrAddIncident(incedent);
-                    }
+                    }*/
                     //return incidents
                     return foundIncedents;
                 }
