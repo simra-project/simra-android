@@ -136,6 +136,14 @@ public class SettingsActivity extends BaseActivity {
         });
 
 
+        // Switch: AI Select
+        Switch AISwitch = findViewById(R.id.AISwitch);
+        if (SharedPref.Settings.AI.getAIEnabled(this)) {
+            AISwitch.setChecked(true);
+        }
+        AISwitch.setOnCheckedChangeListener((buttonView, isChecked) -> SharedPref.Settings.AI.setAIEnabled(isChecked,this));
+
+
         // Switch: Radmesser device enabled
         boolean radmesserActivated = SharedPref.Settings.Radmesser.isEnabled(this);
         radmesserConnectionSwitch = findViewById(R.id.radmesserSwitch);

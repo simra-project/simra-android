@@ -140,6 +140,19 @@ public class SharedPref {
             }
         }
 
+        public static class AI {
+            // See top of this class before changing this string
+            public static final String AI_ENABLED = SETTINGS + "AI";
+
+            public static void setAIEnabled(boolean enabled, Context context) {
+                writeBooleanToAppSharedPrefsAsync(AI_ENABLED, enabled, SHARED_PREF_NAME, context);
+            }
+
+            public static boolean getAIEnabled(Context context) {
+                return readBooleanFromAppSharedPrefs(AI_ENABLED, false, SHARED_PREF_NAME, context);
+            }
+        }
+
         public static class Ride {
             public static final String RIDE = "RIDE";
 

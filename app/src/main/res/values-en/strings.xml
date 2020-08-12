@@ -178,6 +178,9 @@
     <string name="unitDescription">Unit System</string>
     <string name="imperial">Imperial</string>
     <string name="metric">Metric</string>
+    <string name="rideAnalysis">Ride analysis</string>
+    <string name="onlineAI">Online AI</string>
+    <string name="offlineNoAI">Offline mode</string>
     <string name="dateFormatDescription">Date Format</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>

@@ -633,91 +633,91 @@ public class Utils {
      * Uses sophisticated AI to analyze the ride
      * */
     public static List<IncidentLogEntry> findAccEvents(int rideId, Context context) {
+        if (SharedPref.Settings.AI.getAIEnabled(context)) {
+            try {
+                String responseString = "";
 
-        //todo: if online anabled
-        try {
-            String responseString = "";
+                URL url = new URL(BuildConfig.API_ENDPOINT + "11/classify-ride?clientHash=" + SimRAuthenticator.getClientHash()
+                        + "&bikeType=" + SharedPref.Settings.Ride.BikeType.getBikeType(context)
+                        + "&phoneLocation=" + SharedPref.Settings.Ride.PhoneLocation.getPhoneLocation(context));
 
-            URL url = new URL(BuildConfig.API_ENDPOINT + "11/classify-ride?clientHash=" + SimRAuthenticator.getClientHash()
-                    + "&bikeType=" + SharedPref.Settings.Ride.BikeType.getBikeType(context)
-                    + "&phoneLocation=" + SharedPref.Settings.Ride.PhoneLocation.getPhoneLocation(context));
+                Log.d(TAG, "URL for AI-Backend: " + url.toString());
+                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "text/plain");
+                //urlConnection.setRequestProperty("Accept", "application/json");
+                urlConnection.setDoOutput(true);
+                urlConnection.setReadTimeout(10000);
+                urlConnection.setConnectTimeout(10000);
 
-            Log.d(TAG, "URL for AI-Backend: " + url.toString());
-            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("POST");
-            urlConnection.setRequestProperty("Content-Type", "text/plain");
-            //urlConnection.setRequestProperty("Accept", "application/json");
-            urlConnection.setDoOutput(true);
-            urlConnection.setReadTimeout(10000);
-            urlConnection.setConnectTimeout(10000);
+                //Read log file in to byte Array
+                File rideFile = IOUtils.Files.getGPSLogFile(rideId, false, context);
+                FileInputStream fileInputStream = new FileInputStream(rideFile);
+                long byteLength = rideFile.length();
 
-            //Read log file in to byte Array
-            File rideFile = IOUtils.Files.getGPSLogFile(rideId, false, context);
-            FileInputStream fileInputStream = new FileInputStream(rideFile);
-            long byteLength = rideFile.length();
+                byte[] fileContent = new byte[(int) byteLength];
+                fileInputStream.read(fileContent, 0, (int) byteLength);
 
-            byte[] fileContent = new byte[(int) byteLength];
-            fileInputStream.read(fileContent, 0, (int) byteLength);
+                //upload byteArr
+                Log.d(TAG, "send data: ");
+                try (OutputStream os = urlConnection.getOutputStream()) {
+                    os.write(fileContent, 0, fileContent.length);
+                    os.flush();
+                    os.close();
+                }
 
-            //upload byteArr
-            Log.d(TAG, "send data: ");
-            try (OutputStream os = urlConnection.getOutputStream()) {
-                os.write(fileContent, 0, fileContent.length);
-                os.flush();
-                os.close();
-            }
+                // receive results
+                Log.d(TAG, "receive data: ");
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(urlConnection.getInputStream()
+                        ));
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    responseString += inputLine;
+                }
+                in.close();
+                Log.d(TAG, responseString);
 
-            // receive results
-            Log.d(TAG, "receive data: ");
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(urlConnection.getInputStream()
-                    ));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                responseString += inputLine;
-            }
-            in.close();
-            Log.d(TAG, responseString);
+                int status = urlConnection.getResponseCode();
+                Log.d(TAG, "Server status: " + status);
 
-            int status = urlConnection.getResponseCode();
-            Log.d(TAG, "Server status: " + status);
+                // response okay
+                if (status == 200) {
+                    JSONArray jsonArr = new JSONArray(responseString);
+                    List<IncidentLogEntry> foundIncedents = new ArrayList<>();
+                    DataLog allLogs = DataLog.loadDataLog(rideId, context);
 
-            // response okay
-            if (status == 200) {
-                JSONArray jsonArr = new JSONArray(responseString);
-                List<IncidentLogEntry> foundIncedents = new ArrayList<>();
-                DataLog allLogs = DataLog.loadDataLog(rideId, context);
+                    // find log entrys and make them an incident
+                    for (int i = 0; i < jsonArr.length(); i++) {
+                        JSONArray incidentAI = jsonArr.getJSONArray(i);
+                        for (DataLogEntry log : allLogs.dataLogEntries) {
+                            if (log.timestamp >= allLogs.startTime + incidentAI.getLong(0) && log.latitude != null) {
+                                foundIncedents.add(IncidentLogEntry.newBuilder()
+                                        .withBaseInformation(
+                                                log.timestamp,
+                                                log.latitude,
+                                                log.longitude
+                                        )
+                                        .withIncidentType(incidentAI.getInt(1))
+                                        .build());
+                                break;
+                            }
 
-                // find log entrys and make them an incident
-                for (int i = 0; i < jsonArr.length(); i++) {
-                    JSONArray incidentAI = jsonArr.getJSONArray(i);
-                    for (DataLogEntry log : allLogs.dataLogEntries) {
-                        if (log.timestamp >= allLogs.startTime + incidentAI.getLong(0) && log.latitude != null) {
-                            foundIncedents.add(IncidentLogEntry.newBuilder()
-                                    .withBaseInformation(
-                                            log.timestamp,
-                                            log.latitude,
-                                            log.longitude
-                                    )
-                                    .withIncidentType(incidentAI.getInt(1))
-                                    .build());
-                            break;
                         }
-
                     }
+
+                    //write incidents to file
+                    IncidentLog incidentLog = IncidentLog.loadIncidentLog(rideId, context);
+                    for (IncidentLogEntry incedent : foundIncedents) {
+                        incidentLog.updateOrAddIncident(incedent);
+                    }
+                    //return incidents
+                    return foundIncedents;
                 }
 
-                //write incidents to file
-                IncidentLog incidentLog = IncidentLog.loadIncidentLog(rideId, context);
-                for (IncidentLogEntry incedent : foundIncedents) {
-                    incidentLog.updateOrAddIncident(incedent);
-                }
-                //return incidents
-                return foundIncedents;
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
             }
-
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
         }
         return findAccEventsLocal(rideId, context);
     }

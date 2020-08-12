@@ -187,6 +187,9 @@
     <string name="unitDescription">Einheitensystem</string>
     <string name="imperial">Angloamerikanisch</string>
     <string name="metric">Metrisch</string>
+    <string name="rideAnalysis">Fahrten Analyse</string>
+    <string name="onlineAI">Online KI gestützt</string>
+    <string name="offlineNoAI">Offline Modus</string>
     <string name="dateFormatDescription">Datumsformat</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>

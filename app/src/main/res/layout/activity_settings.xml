@@ -358,6 +358,42 @@
                     android:layout_height="20dp" />
 
                 <TextView
+                    android:id="@+id/unitTitle2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rideAnalysis"
+                    android:textAlignment="textStart"
+                    android:textSize="15sp" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/AITextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/offlineNoAI" />
+
+                    <Switch
+                        android:id="@+id/AISwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/AITextView" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/AISwitch"
+                        android:text="@string/onlineAI" />
+                </RelativeLayout>
+
+                <Space
+                    android:id="@+id/generalSettingsSpace4"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp" />
+
+                <TextView
                     android:id="@+id/devicesTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -366,7 +402,7 @@
                     android:textStyle="bold" />
 
                 <Space
-                    android:id="@+id/generalSettingsSpace4"
+                    android:id="@+id/generalSettingsSpace5"
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
 
@@ -396,7 +432,7 @@
                     android:visibility="gone" />
 
                 <Space
-                    android:id="@+id/generalSettingsSpace5"
+                    android:id="@+id/generalSettingsSpace6"
                     android:layout_width="match_parent"
                     android:layout_height="20dp" />
 
