@@ -49,9 +49,9 @@ import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 
-import static de.tuberlin.mcc.simra.app.services.RadmesserService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
-import static de.tuberlin.mcc.simra.app.services.RadmesserService.ACTION_VALUE_RECEIVED_DISTANCE;
-import static de.tuberlin.mcc.simra.app.services.RadmesserService.EXTRA_VALUE_SERIALIZED;
+import static de.tuberlin.mcc.simra.app.services.OpenBikeSensorService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
+import static de.tuberlin.mcc.simra.app.services.OpenBikeSensorService.ACTION_VALUE_RECEIVED_DISTANCE;
+import static de.tuberlin.mcc.simra.app.services.OpenBikeSensorService.EXTRA_VALUE_SERIALIZED;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
@@ -75,8 +75,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences.Editor editor;
     Location startLocation;
     // Radmesser
-    private LinkedList<RadmesserService.Measurement> lastRadmesserDistanceValues = new LinkedList<>();
-    private LinkedList<RadmesserService.ClosePassEvent> lastRadmesserClosePassEvents = new LinkedList<>();
+    private LinkedList<OpenBikeSensorService.Measurement> lastRadmesserDistanceValues = new LinkedList<>();
+    private LinkedList<OpenBikeSensorService.ClosePassEvent> lastRadmesserClosePassEvents = new LinkedList<>();
     private LocationManager locationManager;
     private ExecutorService executor;
     private Sensor accelerometer;
@@ -89,8 +89,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         public void onReceive(Context context, Intent intent) {
             Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
-            if (serializable instanceof RadmesserService.Measurement) {
-                lastRadmesserDistanceValues.add((RadmesserService.Measurement) serializable);
+            if (serializable instanceof OpenBikeSensorService.Measurement) {
+                lastRadmesserDistanceValues.add((OpenBikeSensorService.Measurement) serializable);
             }
         }
     };
@@ -99,8 +99,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         public void onReceive(Context context, Intent intent) {
             Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
-            if (serializable instanceof RadmesserService.ClosePassEvent) {
-                lastRadmesserClosePassEvents.add((RadmesserService.ClosePassEvent) serializable);
+            if (serializable instanceof OpenBikeSensorService.ClosePassEvent) {
+                lastRadmesserClosePassEvents.add((OpenBikeSensorService.ClosePassEvent) serializable);
             }
         }
     };
@@ -450,7 +450,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     }
 
                     while (lastRadmesserClosePassEvents.size() > 0) {
-                        RadmesserService.ClosePassEvent closePassEvent = lastRadmesserClosePassEvents.removeFirst();
+                        OpenBikeSensorService.ClosePassEvent closePassEvent = lastRadmesserClosePassEvents.removeFirst();
                         incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder()
                                 .withIncidentType(closePassEvent.getIncidentType())
                                 .withDescription(closePassEvent.getIncidentDescription(getApplicationContext()))
@@ -465,7 +465,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 );
 
                 if (lastRadmesserDistanceValues.size() > 0) {
-                    RadmesserService.Measurement lastRadmesserDistanceValue = lastRadmesserDistanceValues.removeFirst();
+                    OpenBikeSensorService.Measurement lastRadmesserDistanceValue = lastRadmesserDistanceValues.removeFirst();
                     dataLogEntryBuilder.withRadmesser(lastRadmesserDistanceValue.leftSensorValues.get(0), null, null, null);
 
                     if (takePictureDuringRideActivated) {

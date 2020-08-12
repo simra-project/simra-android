@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
-import de.tuberlin.mcc.simra.app.services.RadmesserService;
+import de.tuberlin.mcc.simra.app.services.OpenBikeSensorService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
@@ -118,7 +118,7 @@ public class SettingsActivity extends BaseActivity {
 
 
         // Switch: AI Select
-        Switch AISwitch = findViewById(R.id.switchAI);
+        Switch AISwitch = binding.switchAI;
         if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(this)) {
             AISwitch.setChecked(true);
         }
@@ -146,7 +146,7 @@ public class SettingsActivity extends BaseActivity {
                     startRadmesserService();
                 }
             } else {
-                RadmesserService.terminateService(this);
+                OpenBikeSensorService.terminateService(this);
             }
         });
 
@@ -192,13 +192,13 @@ public class SettingsActivity extends BaseActivity {
         } else {
             SharedPref.Settings.Radmesser.setEnabled(false, this);
             binding.radmesserSwitch.setChecked(false);
-            RadmesserService.terminateService(this);
+            OpenBikeSensorService.terminateService(this);
             binding.radmesserButton.setVisibility(View.GONE);
         }
     }
 
     private void startRadmesserService() {
-        Intent intent = new Intent(this, RadmesserService.class);
+        Intent intent = new Intent(this, OpenBikeSensorService.class);
         startService(intent);
     }
 
