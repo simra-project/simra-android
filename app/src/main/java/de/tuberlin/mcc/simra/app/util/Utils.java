@@ -630,7 +630,7 @@ public class Utils {
 
     public static List<IncidentLogEntry> findAccEvents(int rideId, int bike, int pLoc, Context context) {
         List<IncidentLogEntry> foundEvents = null;
-        if (SharedPref.Settings.AI.getAIEnabled(context)) {
+        if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(context)) {
             foundEvents = findAccEventOnlines(rideId, bike, pLoc, context);
         }
         if (foundEvents != null && foundEvents.size() > 0)
@@ -648,7 +648,7 @@ public class Utils {
 
             URL url = new URL(BuildConfig.API_ENDPOINT + "11/classify-ride?clientHash=" + SimRAuthenticator.getClientHash()
                     + "&bikeType=" +bike
-                    + "&phoneLocation=" + pLoc;
+                    + "&phoneLocation=" + pLoc);
 
             Log.d(TAG, "URL for AI-Backend: " + url.toString());
             HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();

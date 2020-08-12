@@ -405,7 +405,6 @@ public class RadmesserService extends Service {
     /*
      * the caller ist responible for unregistering thr receiver, when he does not need him anymore
      */
-    //todo: how to handle exceptions due to "wrong formmat" of the received data?
 
     public static BroadcastReceiver registerCallbacks(Context ctx, RadmesserServiceCallbacks callbacks) {
         IntentFilter filter = new IntentFilter();

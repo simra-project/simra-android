@@ -140,7 +140,7 @@ public class SharedPref {
             }
         }
 
-        public static class AI {
+        public static class IncidentGenerationAIActive {
             // See top of this class before changing this string
             public static final String AI_ENABLED = SETTINGS + "AI";
 

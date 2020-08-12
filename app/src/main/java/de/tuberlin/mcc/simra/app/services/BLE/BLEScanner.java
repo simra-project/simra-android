@@ -77,8 +77,9 @@ public class BLEScanner {
         startScan(
                 5,
                 filterList,
-                deviceFoundCallback // todo: maybe tops scan after, but may not be needed?
+                deviceFoundCallback
         );
+
     }
 
     public void findDevicesByServices(BLEServiceManager bleServices, DeviceFoundCallback deviceFoundCallback) {
