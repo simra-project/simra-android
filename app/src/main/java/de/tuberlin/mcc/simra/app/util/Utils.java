@@ -13,6 +13,8 @@ import android.util.Pair;
 
 import androidx.appcompat.app.AlertDialog;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.osmdroid.util.GeoPoint;
 
 import java.io.BufferedReader;
@@ -23,6 +25,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,6 +35,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.net.ssl.HttpsURLConnection;
+
+import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
@@ -619,7 +626,86 @@ public class Utils {
         return (startTimeBoundary == null && endTimeBoundary == null) || (endTimeBoundary == null && timestamp >= startTimeBoundary) || (startTimeBoundary == null && timestamp <= endTimeBoundary) || (timestamp >= startTimeBoundary && timestamp <= endTimeBoundary);
     }
 
+    /*
+     * Uses sophisticated AI to analyze the ride
+     * */
     public static List<IncidentLogEntry> findAccEvents(int rideId, Context context) {
+        rideId = 10;//todo: remove!
+        //check online
+        long startTimeMillis = System.currentTimeMillis();
+        //start time = currTime
+
+        try {
+            String responseString = "";
+
+            URL url = new URL(BuildConfig.API_ENDPOINT + "11/classify-ride?clientHash=" + SimRAuthenticator.getClientHash()
+                    + "&bikeType=" + SharedPref.Settings.Ride.BikeType.getBikeType(context)
+                    + "&phoneLocation=" + SharedPref.Settings.Ride.PhoneLocation.getPhoneLocation(context));
+
+            Log.d(TAG, "URL: " + url.toString());
+            HttpsURLConnection urlConnection =
+                    (HttpsURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Content-Type", "text/plain");
+            //urlConnection.setRequestProperty("Accept", "application/json");
+            urlConnection.setDoOutput(true);
+            urlConnection.setReadTimeout(10000);
+            urlConnection.setConnectTimeout(10000);
+
+
+            //Read File to byteArr
+            File rideFile = IOUtils.Files.getGPSLogFile(rideId, false, context);
+            FileInputStream fileInputStream = new FileInputStream(rideFile);
+            long byteLength = rideFile.length(); // byte count of the file-content
+
+            byte[] fileContent = new byte[(int) byteLength];
+            fileInputStream.read(fileContent, 0, (int) byteLength);
+
+            //upload byteArr
+            Log.d(TAG, "send data: ");
+            try (OutputStream os = urlConnection.getOutputStream()) {
+                os.write(fileContent, 0, fileContent.length);
+                os.flush();
+                os.close();
+            }
+
+            // receive results
+            Log.d(TAG, "receive data: ");
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(urlConnection.getInputStream()
+                    ));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                responseString += inputLine;
+
+            }
+            in.close();
+            Log.d(TAG, responseString);
+
+            int status = urlConnection.getResponseCode();
+            Log.d(TAG, "Server status: " + status);
+
+
+            if (status == 200) {
+                JSONArray jsonArr = new JSONArray(responseString);
+
+                for (int i = 0; i < jsonArr.length(); i++) {
+                    jsonArr.getJSONArray(i);
+                    // todo: retrive and return Data
+                    // IncidentLogEntry
+                    // return data
+                }
+            }
+
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+        return findAccEventsLocal(rideId, context);
+    }
+
+
+    public static List<IncidentLogEntry> findAccEventsLocal(int rideId, Context context) {
+        Log.d(TAG, "findAccEventsLocal()");
         List<AccEvent> accEvents = new ArrayList<>(6);
 
         // Each String[] in ride is a part of the ride which is approx. 3 seconds long.

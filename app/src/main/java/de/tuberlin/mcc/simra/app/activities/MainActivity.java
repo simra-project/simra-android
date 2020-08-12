@@ -377,7 +377,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 unbindService(mRecorderServiceConnection);
                 stopService(recService);
                 recording = false;
-                if (mBoundRecorderService.getRecordingAllowed()) {
+                if (true||mBoundRecorderService.getRecordingAllowed()) {    //todo: remove "true||"
                     ShowRouteActivity.startShowRouteActivity(
                             mBoundRecorderService.getCurrentRideKey(),
                             MetaData.STATE.JUST_RECORDED,
@@ -992,6 +992,5 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
         }
     }
-
 }
 
