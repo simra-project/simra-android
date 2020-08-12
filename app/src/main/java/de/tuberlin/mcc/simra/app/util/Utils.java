@@ -40,7 +40,6 @@ import javax.net.ssl.HttpsURLConnection;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
-import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
@@ -648,7 +647,7 @@ public class Utils {
                 //urlConnection.setRequestProperty("Accept", "application/json");
                 urlConnection.setDoOutput(true);
                 urlConnection.setReadTimeout(10000);
-                urlConnection.setConnectTimeout(10000);
+                urlConnection.setConnectTimeout(3000);
 
                 //Read log file in to byte Array
                 File rideFile = IOUtils.Files.getGPSLogFile(rideId, false, context);
@@ -661,7 +660,18 @@ public class Utils {
                 //upload byteArr
                 Log.d(TAG, "send data: ");
                 try (OutputStream os = urlConnection.getOutputStream()) {
-                    os.write(fileContent, 0, fileContent.length);
+                    long startTime = System.currentTimeMillis();
+                    long uploadTimeoutMS = 8000;
+                    int chunkSize = 1024;
+                    int chunkIndex = 0;
+
+                    while (chunkSize * chunkIndex < fileContent.length && startTime + uploadTimeoutMS > System.currentTimeMillis()) {
+                        int offset = chunkSize * chunkIndex;
+                        int remaining = fileContent.length - offset;
+                        os.write(fileContent, offset, remaining > chunkSize ? chunkSize : remaining);
+                        chunkIndex += 1;
+                    }
+
                     os.flush();
                     os.close();
                 }
@@ -680,6 +690,7 @@ public class Utils {
 
                 int status = urlConnection.getResponseCode();
                 Log.d(TAG, "Server status: " + status);
+                Log.d(TAG, "Server Message: " + responseString);
 
                 // response okay
                 if (status == 200) {
