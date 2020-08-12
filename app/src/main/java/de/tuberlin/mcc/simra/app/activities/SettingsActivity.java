@@ -4,22 +4,17 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import androidx.appcompat.widget.Toolbar;
-
-import com.google.android.material.slider.Slider;
-
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
@@ -34,49 +29,35 @@ public class SettingsActivity extends BaseActivity {
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int BLUETOOTH_SUCCESS = -1;
 
-    // Sliders
-    Slider distanceSlider;
-    TextView distanceSliderTextLeft;
-    TextView distanceSliderTextRight;
-    Button radmesserButton;
-    Switch radmesserConnectionSwitch;
-
+    ActivitySettingsBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Setup
-        setContentView(R.layout.activity_settings);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle("");
-        toolbar.setSubtitle("");
-        TextView toolbarTxt = findViewById(R.id.toolbar_title);
-        toolbarTxt.setText(R.string.title_activity_settings);
 
-        ImageButton backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(v -> finish());
+        binding = ActivitySettingsBinding.inflate(LayoutInflater.from(this));
+        setContentView(binding.getRoot());
+        // Setup
+        setSupportActionBar(binding.toolbar.toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        binding.toolbar.toolbar.setTitle("");
+        binding.toolbar.toolbar.setSubtitle("");
+        binding.toolbar.toolbarTitle.setText(R.string.title_activity_settings);
+        binding.toolbar.backButton.setOnClickListener(v -> finish());
 
         // Slider: Duration
-        Slider durationSlider = findViewById(R.id.privacyDurationSlider);
-        TextView durationSliderTextLeft = findViewById(R.id.privacyDurationTextLeft);
-        TextView durationSliderTextRight = findViewById(R.id.privacyDurationTextRight);
-        durationSlider.setValueFrom(SharedPref.Settings.Ride.PrivacyDuration.getMinDuration());
-        durationSlider.setValueTo(SharedPref.Settings.Ride.PrivacyDuration.getMaxDuration());
-        durationSlider.setValue(SharedPref.Settings.Ride.PrivacyDuration.getDuration(this));
-        durationSliderTextLeft.setText(SharedPref.Settings.Ride.PrivacyDuration.getMinDuration() + getString(R.string.seconds_short));
-        durationSliderTextRight.setText(SharedPref.Settings.Ride.PrivacyDuration.getMaxDuration() + getString(R.string.seconds_short));
-        durationSlider.addOnChangeListener((slider, changeListener, touchChangeListener) -> {
+        binding.privacyDurationSlider.setValueFrom(SharedPref.Settings.Ride.PrivacyDuration.getMinDuration());
+        binding.privacyDurationSlider.setValueTo(SharedPref.Settings.Ride.PrivacyDuration.getMaxDuration());
+        binding.privacyDurationSlider.setValue(SharedPref.Settings.Ride.PrivacyDuration.getDuration(this));
+        binding.privacyDurationTextLeft.setText(SharedPref.Settings.Ride.PrivacyDuration.getMinDuration() + getString(R.string.seconds_short));
+        binding.privacyDurationTextRight.setText(SharedPref.Settings.Ride.PrivacyDuration.getMaxDuration() + getString(R.string.seconds_short));
+        binding.privacyDurationSlider.addOnChangeListener((slider, changeListener, touchChangeListener) -> {
             SharedPref.Settings.Ride.PrivacyDuration.setDuration(Math.round(slider.getValue()), this);
         });
 
         // Slider: Distance
-        distanceSlider = findViewById(R.id.privacyDistanceSlider);
-        distanceSliderTextLeft = findViewById(R.id.privacyDistanceTextLeft);
-        distanceSliderTextRight = findViewById(R.id.privacyDistanceTextRight);
         updatePrivacyDistanceSlider(SharedPref.Settings.DisplayUnit.getDisplayUnit(this));
-        distanceSlider.addOnChangeListener((slider, changeListener, touchChangeListener) -> {
+        binding.privacyDistanceSlider.addOnChangeListener((slider, changeListener, touchChangeListener) -> {
             SharedPref.Settings.Ride.PrivacyDistance.setDistance(Math.round(slider.getValue()), SharedPref.Settings.DisplayUnit.getDisplayUnit(this), this);
         });
 
@@ -146,20 +127,17 @@ public class SettingsActivity extends BaseActivity {
 
         // Switch: Radmesser device enabled
         boolean radmesserActivated = SharedPref.Settings.Radmesser.isEnabled(this);
-        radmesserConnectionSwitch = findViewById(R.id.radmesserSwitch);
-        radmesserButton = findViewById(R.id.radmesserButton);
-        radmesserButton.setVisibility(radmesserActivated ? View.VISIBLE : View.GONE);
-        radmesserButton.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
+        binding.radmesserButton.setVisibility(radmesserActivated ? View.VISIBLE : View.GONE);
+        binding.radmesserButton.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
 
         if (BluetoothAdapter.getDefaultAdapter() == null) {
             // Device does not support Bluetooth
-            radmesserConnectionSwitch.setEnabled(false);
-            RadmesserService.terminateService(this);
+            binding.radmesserSwitch.setEnabled(false);
         }
-        radmesserConnectionSwitch.setChecked(radmesserActivated);
-        radmesserConnectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        binding.radmesserSwitch.setChecked(radmesserActivated);
+        binding.radmesserSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             SharedPref.Settings.Radmesser.setEnabled(isChecked, SettingsActivity.this);
-            radmesserButton.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            binding.radmesserButton.setVisibility(isChecked ? View.VISIBLE : View.GONE);
 
             if (isChecked) {
                 if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
@@ -180,11 +158,11 @@ public class SettingsActivity extends BaseActivity {
     }
 
     private void updatePrivacyDistanceSlider(UnitHelper.DISTANCE unit) {
-        distanceSlider.setValueFrom(SharedPref.Settings.Ride.PrivacyDistance.getMinDistance(unit));
-        distanceSlider.setValueTo(SharedPref.Settings.Ride.PrivacyDistance.getMaxDistance(unit));
-        distanceSlider.setValue(SharedPref.Settings.Ride.PrivacyDistance.getDistance(unit, this));
-        distanceSliderTextLeft.setText(SharedPref.Settings.Ride.PrivacyDistance.getMinDistance(unit) + UnitHelper.getShortTranslationForUnit(unit, this));
-        distanceSliderTextRight.setText(SharedPref.Settings.Ride.PrivacyDistance.getMaxDistance(unit) + UnitHelper.getShortTranslationForUnit(unit, this));
+        binding.privacyDistanceSlider.setValueFrom(SharedPref.Settings.Ride.PrivacyDistance.getMinDistance(unit));
+        binding.privacyDistanceSlider.setValueTo(SharedPref.Settings.Ride.PrivacyDistance.getMaxDistance(unit));
+        binding.privacyDistanceSlider.setValue(SharedPref.Settings.Ride.PrivacyDistance.getDistance(unit, this));
+        binding.privacyDistanceTextLeft.setText(SharedPref.Settings.Ride.PrivacyDistance.getMinDistance(unit) + UnitHelper.getShortTranslationForUnit(unit, this));
+        binding.privacyDistanceTextRight.setText(SharedPref.Settings.Ride.PrivacyDistance.getMaxDistance(unit) + UnitHelper.getShortTranslationForUnit(unit, this));
     }
 
     private void showTutorialDialog() {
@@ -213,9 +191,9 @@ public class SettingsActivity extends BaseActivity {
             showTutorialDialog();
         } else {
             SharedPref.Settings.Radmesser.setEnabled(false, this);
-            radmesserConnectionSwitch.setChecked(false);
+            binding.radmesserSwitch.setChecked(false);
             RadmesserService.terminateService(this);
-            radmesserButton.setVisibility(View.GONE);
+            binding.radmesserButton.setVisibility(View.GONE);
         }
     }
 
@@ -228,13 +206,4 @@ public class SettingsActivity extends BaseActivity {
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop called");
-    }
-
-
-
 }

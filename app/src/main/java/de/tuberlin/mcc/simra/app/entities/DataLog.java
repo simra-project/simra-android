@@ -27,10 +27,6 @@ public class DataLog {
     public final long startTime;
     public final long endTime;
 
-
-    // TODO: Implement convienience Functions (duration, startTime, endTime, waitedTime, distance,
-    // TODO: Build Map for accessing values by timestamp
-
     private DataLog(
             int rideId,
             List<DataLogEntry> dataLogEntries,

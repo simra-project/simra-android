@@ -11,8 +11,8 @@ android {
         applicationId "dsp2020.simra.app"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 61
-        versionName "61.0"
+        versionCode 63
+        versionName "63.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
@@ -40,8 +40,10 @@ android {
     buildTypes {
 
         release {
-            minifyEnabled false
+            // Uncomment if you want to test the release configuration locally
+            //signingConfig debug.signingConfig
             debuggable false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             // Allow loading the configuration Settings from environment variables
@@ -63,6 +65,9 @@ android {
             initWith buildTypes.release
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
@@ -83,6 +88,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.android.play:core:1.8.0'
 
     def lifecycle_version = "2.2.0"
     // optional - helpers for implementing LifecycleOwner in a Service
@@ -121,5 +127,5 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:${camerax_version}"
 
     // "Backporting" Java 8 streams for Android < 24
-    compile 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
+    implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
 }
