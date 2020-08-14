@@ -19,7 +19,7 @@ import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
 public class DataLog {
-    public final static String DATA_LOG_HEADER = "lat,lon,X,Y,Z,timeStamp,acc,a,b,c,radmesserDistanceLeft1,radmesserDistanceLeft2,radmesserDistanceRight1,radmesserDistanceRight2,radmesserClosePassEvent,radmesserClosePassEventPayload1,radmesserClosePassEventPayload2";
+    public final static String DATA_LOG_HEADER = "lat,lon,X,Y,Z,timeStamp,acc,a,b,c,radmesserDistanceLeft1,radmesserDistanceLeft2,radmesserDistanceRight1,radmesserDistanceRight2,radmesserClosePassEvent";
     public final int rideId;
     public final List<DataLogEntry> dataLogEntries;
     public final List<DataLogEntry> onlyGPSDataLogEntries;
