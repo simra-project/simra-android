@@ -4,13 +4,14 @@
     "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
     "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 
+<!--suppress XmlHighlighting -->
 <module name="Checker">
     <module name="TreeWalker">
         <!-- <module name="JavadocType"></module> -->
         <!-- <module name="JavadocVariable"></module> -->
         <!-- <module name="JavadocStyle"></module> -->
 
-        <module name="AvoidStarImport"></module>    
+        <module name="AvoidStarImport"></module>
         <module name="RedundantImport" />
         <module name="UnusedImports" />
         <module name="ImportControl">

@@ -2,6 +2,7 @@
     "-//Puppy Crawl//DTD Import Control 1.4//EN"
     "http://checkstyle.sourceforge.net/dtds/import_control_1_4.dtd">
 
+<!--suppress XmlHighlighting -->
 <import-control pkg="de.tuberlin.mcc.simra.app" strategyOnMismatch="allowed">
     <disallow pkg="de.tuberlin.mcc.simra.app.update" />
 
