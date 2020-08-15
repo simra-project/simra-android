@@ -2,7 +2,6 @@ package de.tuberlin.mcc.simra.app.annotation;
 
 import android.text.format.DateUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -38,10 +37,8 @@ public class MyInfoWindow extends InfoWindow {
 
     public void onOpen(Object arg0) {
         LinearLayout layout = mView.findViewById(R.id.bubble_layout);
-        Button btnMoreInfo = mView.findViewById(R.id.bubble_moreinfo);
         TextView txtTitle = mView.findViewById(R.id.bubble_title);
         TextView txtDescription = mView.findViewById(R.id.bubble_description);
-        TextView txtSubdescription = mView.findViewById(R.id.bubble_subdescription);
 
         txtTitle.setText(motherActivity.getString(R.string.incidentDetected));
         long millis = this.incidentLogEntry.timestamp;
@@ -51,7 +48,6 @@ public class MyInfoWindow extends InfoWindow {
         }
 
         txtDescription.setText(time + " " + addressForLoc);
-        txtSubdescription.setText("You can also edit the subdescription");
 
         layout.setOnClickListener((View v) -> {
             IncidentPopUpActivity.startIncidentPopUpActivity(incidentLogEntry, state, motherActivity);
