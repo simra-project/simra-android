@@ -181,6 +181,7 @@
                 android:background="@color/light_grey"
                 android:gravity="top"
                 android:hint="@string/descriptionBody"
+                android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 android:lines="5"
                 android:padding="5dp" />

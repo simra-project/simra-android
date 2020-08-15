@@ -31,11 +31,11 @@ public class MetaData {
     }
 
     public static void saveMetaData(MetaData metaData, Context context) {
-        String metaDataString = "";
+        StringBuilder metaDataString = new StringBuilder();
         Iterator<Map.Entry<Integer, MetaDataEntry>> iterator = metaData.metaDataEntries.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Integer, MetaDataEntry> entry = iterator.next();
-            metaDataString += entry.getValue().stringifyMetaDataEntry() + System.lineSeparator();
+            metaDataString.append(entry.getValue().stringifyMetaDataEntry()).append(System.lineSeparator());
         }
         File newFile = IOUtils.Files.getMetaDataFile(context);
         Utils.overwriteFile(IOUtils.Files.getFileInfoLine() + METADATA_HEADER + System.lineSeparator() + metaDataString, newFile);
@@ -75,7 +75,7 @@ public class MetaData {
                 while ((line = bufferedReader.readLine()) != null) {
                     if (!line.trim().isEmpty()) {
                         MetaDataEntry metaDataEntry = MetaDataEntry.parseEntryFromLine(line);
-                        if (metaDataEntry.rideId == rideId) {
+                        if (metaDataEntry.rideId.equals(rideId)) {
                             return metaDataEntry;
                         }
                     }

@@ -1,5 +1,6 @@
 package de.tuberlin.mcc.simra.app.update;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -25,6 +26,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+
+@SuppressLint("all")
 
 /**
  * Independent Package for Migrating Data between Versions.
@@ -427,15 +430,21 @@ public class VersionUpdater {
         }
     }
 
+    /**
+     * Do not make make PUBLIC!
+     * This is Legacy Code only intended for not changing the Migrations
+     */
     private static class Constants {
         public static final String METADATA_HEADER = "key,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary,region" + System.lineSeparator();
 
         public static final String ACCEVENTS_HEADER = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10" + System.lineSeparator();
     }
 
+    /**
+     * Do not make make PUBLIC!
+     * This is Legacy Code only intended for not changing the Migrations
+     */
     private static class Legacy {
-
-
         // Takes a File which contains all the data and creates a
         // PolyLine to be displayed on the map as a route.
         public static Object[] calculateWaitedTimePolylineDistance(File gpsFile) throws IOException {

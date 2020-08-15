@@ -412,9 +412,9 @@ public class UploadService extends Service {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(urlConnection.getInputStream()));
             String inputLine;
-            String response = "";
+            StringBuilder response = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
-                response += inputLine;
+                response.append(inputLine);
             }
             in.close();
             int status = urlConnection.getResponseCode();
@@ -424,7 +424,7 @@ public class UploadService extends Service {
             Log.d(TAG, "Server status: " + status);
             Log.d(TAG, "Server Response: " + response);
 
-            return new Pair<>(status, response);
+            return new Pair<>(status, response.toString());
         }
 
         // fileType = profile | ride

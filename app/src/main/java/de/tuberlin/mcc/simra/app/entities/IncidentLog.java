@@ -120,11 +120,11 @@ public class IncidentLog {
 
     @Override
     public String toString() {
-        String incidentString = "";
+        StringBuilder incidentString = new StringBuilder();
         Iterator<Map.Entry<Integer, IncidentLogEntry>> iterator = this.incidents.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Integer, IncidentLogEntry> entry = iterator.next();
-            incidentString += entry.getValue().stringifyDataLogEntry() + System.lineSeparator();
+            incidentString.append(entry.getValue().stringifyDataLogEntry()).append(System.lineSeparator());
         }
         return IOUtils.Files.getFileInfoLine() + INCIDENT_LOG_HEADER + System.lineSeparator() + incidentString;
     }

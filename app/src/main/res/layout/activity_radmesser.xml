@@ -56,8 +56,7 @@
                     android:height="38dip"
                     android:minHeight="38dip"
                     android:text="Retry"
-                    android:visibility="visible"
-                    />
+                    android:visibility="visible" />
 
 
             </RelativeLayout>
@@ -105,7 +104,7 @@
                 style="@style/TextAppearance.AppCompat.Large"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Connected to device" />
+                android:text="@string/radmesser_activity_button_connect_device" />
 
             <TextView
                 android:id="@+id/deviceInfoTextView"
@@ -114,24 +113,24 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp"
-                android:text="Geräte-Info" />
+                android:text="@string/activity_radmesser_title_device_info" />
 
             <ProgressBar
+                android:id="@+id/progressBarClosePass"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/progressBarClosePass"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:max="100"
-                android:progress="45"/>
+                android:progress="45" />
 
-             <Button
+            <Button
                 android:id="@+id/btnDisconnect"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Disconnect device" />
+                android:text="@string/radmesser_activity_button_disconnect_device" />
         </LinearLayout>
 
         <TextView

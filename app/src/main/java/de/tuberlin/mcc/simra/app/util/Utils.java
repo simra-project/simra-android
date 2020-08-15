@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.location.Location;
 import android.util.Log;
 import android.util.Pair;
 
@@ -262,82 +261,6 @@ public class Utils {
         return result;
     }
 
-    // returns distance (m), duration (ms) and waited time (s) start and end time stamps (ms) of a ride
-    // long[distance, duration, waitedTime, firstTimeStamp, lastTimeStamp]
-    public static long[] calculateRideStatistics(Context context, String key) {
-        long[] result = new long[5];
-        File accGpsFile = context.getFileStreamPath(key + "_accGps.csv");
-        Location previousLocation = null; // lat,lon
-        Location thisLocation = null; // lat,lon
-        long previousTimeStamp = 0; // milliseconds
-        long thisTimeStamp = 0; // milliseconds
-        long distance = 0; // meters
-        long startTimeStamp = 0; // milliseconds
-        long endTimeStamp = 0; // milliseconds
-        long waitedTime = 0; // seconds
-        // loop through each line of the accGps csv
-        try (BufferedReader accGpsReader = new BufferedReader(new InputStreamReader(new FileInputStream(accGpsFile)))) {
-            // skip fileInfo line (47#2)
-            String accGpsLine = accGpsReader.readLine();
-            // skip ACCGPS_HEADER
-            // key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10
-            // 2,52.4251924,13.4405942,1553427047561,0,0,0,0,,,,,,,,,,,,,
-            // 21 entries per metaDataLine (index 0-20)
-            accGpsReader.readLine();
-            while ((accGpsLine = accGpsReader.readLine()) != null) {
-                String[] accGpsLineArray = accGpsLine.split(",", -1);
-                if (startTimeStamp == 0) {
-                    startTimeStamp = Long.parseLong(accGpsLineArray[5]);
-                } else {
-                    endTimeStamp = Long.parseLong(accGpsLineArray[5]);
-                }
-                if (!accGpsLine.startsWith(",,")) {
-                    try {
-                        // initialize this and previous locations
-                        if (thisLocation == null || previousLocation == null) {
-                            thisLocation = new Location("thisLocation");
-                            thisLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
-                            thisLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
-                            previousLocation = new Location("lastLocation");
-                            previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
-                            previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
-                            previousTimeStamp = Long.parseLong(accGpsLineArray[5]);
-                        } else {
-                            thisLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
-                            thisLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
-                            thisTimeStamp = Long.parseLong(accGpsLineArray[5]);
-                            double distanceToLastPoint = thisLocation.distanceTo(previousLocation);
-                            long timePassed = (thisTimeStamp - previousTimeStamp) / 1000;
-                            // if speed < 2.99km/h: waiting
-                            if (distanceToLastPoint < 2.5) {
-                                waitedTime += timePassed;
-                            }
-                            // if speed > 80km/h: too fast, do not consider for distance
-                            if (distanceToLastPoint < 66) {
-                                distance += distanceToLastPoint;
-                            } else {
-                                Log.d(TAG, "speed between " + previousLocation.getLatitude() + "," + previousLocation.getLongitude() + " and " + thisLocation.getLatitude() + "," + thisLocation.getLongitude() + " was " + (int) distanceToLastPoint / timePassed + " m/s or " + (int) (distanceToLastPoint / timePassed) * 3.6 + " km/h.");
-                            }
-                            previousLocation.setLatitude(Double.parseDouble(accGpsLineArray[0]));
-                            previousLocation.setLongitude(Double.parseDouble(accGpsLineArray[1]));
-                            previousTimeStamp = Long.parseLong(accGpsLineArray[5]);
-                        }
-                    } catch (NumberFormatException nfe) {
-                        Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(nfe.getStackTrace()));
-                    }
-                }
-            }
-        } catch (IOException e) {
-            Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(e.getStackTrace()));
-        }
-        result[0] = distance;
-        result[1] = endTimeStamp - startTimeStamp;
-        // result[2] = (long)(distance / 1000.0 * 138.0); // CO2-Savings = 138g/km
-        result[2] = waitedTime;
-        result[3] = startTimeStamp; // for metaData.csv
-        result[4] = endTimeStamp; // for metaData.csv
-        return result;
-    }
 
     public static String[] getRegions(Context context) {
         String[] simRa_regions_config = (Utils.readContentFromFile("simRa_regions.config", context)).split(System.lineSeparator());
@@ -352,7 +275,7 @@ public class Utils {
 
                 while ((receiveString = bufferedReader.readLine()) != null) {
 
-                    stringBuilder.append(receiveString.trim() + System.lineSeparator());
+                    stringBuilder.append(receiveString.trim()).append(System.lineSeparator());
 
                 }
                 is.close();

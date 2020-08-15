@@ -81,7 +81,7 @@ public class IncidentLogEntry implements Serializable {
         return new IncidentLogEntry.Builder();
     }
 
-    private static final Number booleanToInt(Boolean booleanValue) {
+    private static Number booleanToInt(Boolean booleanValue) {
         if (booleanValue == null) {
             return 0;
         }

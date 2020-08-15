@@ -119,9 +119,9 @@ public class HistoryActivity extends BaseActivity {
             try {
                 BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
                 // br.readLine() to skip the first line which contains the headers
-                String line = br.readLine();
-                line = br.readLine();
-
+                br.readLine();
+                br.readLine();
+                String line;
                 while (((line = br.readLine()) != null)) {
                     if (!line.startsWith("key") && !line.startsWith("null")) {
                         metaDataLines.add(line.split(","));

@@ -614,7 +614,7 @@ public class MainActivity extends BaseActivity
         if (id == R.id.nav_history) {
             Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_democraphic_data) {
+        } else if (id == R.id.nav_demographic_data) {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_statistics) {
@@ -645,7 +645,7 @@ public class MainActivity extends BaseActivity
                 Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
             }
 
-        } else if (id == R.id.nav_impressum) {
+        } else if (id == R.id.nav_imprint) {
             Intent intent = new Intent(MainActivity.this, WebActivity.class);
             intent.putExtra("URL", getString(R.string.tuberlin_impressum));
 
@@ -684,7 +684,7 @@ public class MainActivity extends BaseActivity
         Log.d(TAG, "fireWhatIsNewPrompt()");
         // Store the created AlertDialog instance.
         // Because only AlertDialog has cancel method.
-        AlertDialog alertDialog = null;
+        AlertDialog alertDialog;
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         // Get custom login form view.
