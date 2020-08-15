@@ -76,10 +76,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     lintOptions {
-        htmlReport true
+        htmlReport false
+        xmlReport false
         htmlOutput file("lint-report.html")
         // Not yet enabled, too many errors. 
-        //warningsAsErrors true
+        warningsAsErrors true
         abortOnError true
     }
     buildToolsVersion = '29.0.3'
@@ -135,5 +136,6 @@ task checkstyle(type: Checkstyle) {
     ignoreFailures = false
 }
 
+
 preBuild.dependsOn('checkstyle')
-check.dependsOn 'checkstyle'
+check.dependsOn('checkstyle')

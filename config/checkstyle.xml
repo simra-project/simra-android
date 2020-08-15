@@ -6,6 +6,11 @@
 
 <module name="Checker">
     <module name="TreeWalker">
+        <!-- <module name="JavadocType"></module> -->
+        <!-- <module name="JavadocVariable"></module> -->
+        <!-- <module name="JavadocStyle"></module> -->
+
+        <module name="AvoidStarImport"></module>    
         <module name="RedundantImport" />
         <module name="UnusedImports" />
         <module name="ImportControl">

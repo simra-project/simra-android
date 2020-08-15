@@ -1,34 +1,34 @@
 package de.tuberlin.mcc.simra.app.activities;
 
 import android.os.Bundle;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.view.LayoutInflater;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.databinding.ActivityCreditsBinding;
 
 public class CreditsActivity extends AppCompatActivity {
 
-
-    ImageButton backBtn;
-    TextView toolbarTxt;
+    /**
+     * Layout Binding.
+     */
+    ActivityCreditsBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_credits);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle("");
-        toolbar.setSubtitle("");
-        toolbarTxt = findViewById(R.id.toolbar_title);
-        toolbarTxt.setText(R.string.title_activity_credits);
 
-        backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(v -> finish());
+        binding = ActivityCreditsBinding.inflate(LayoutInflater.from(this));
+        setContentView(binding.getRoot());
+
+        setSupportActionBar(binding.toolbar.toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        binding.toolbar.toolbar.setTitle("");
+        binding.toolbar.toolbar.setSubtitle("");
+        binding.toolbar.toolbarTitle.setText(R.string.title_activity_credits);
+
+        binding.toolbar.backButton.setOnClickListener(v -> finish());
     }
 
 }

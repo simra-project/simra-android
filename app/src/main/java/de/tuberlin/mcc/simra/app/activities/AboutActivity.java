@@ -2,45 +2,46 @@ package de.tuberlin.mcc.simra.app.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.databinding.ActivityAboutBinding;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 
+/**
+ * About Activity displaying information about licenses and privacy policies.
+ */
 public class AboutActivity extends BaseActivity {
 
-    ImageButton backBtn;
-    TextView toolbarTxt;
-    ListView listView;
+    /**
+     * Layout Binding.
+     */
+    ActivityAboutBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about_simra);
+
+        binding = ActivityAboutBinding.inflate(LayoutInflater.from(this));
+        setContentView(binding.getRoot());
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbar.setTitle("");
         toolbar.setSubtitle("");
-        toolbarTxt = findViewById(R.id.toolbar_title);
-        toolbarTxt.setText(R.string.title_activity_about_simra);
+        binding.toolbar.toolbarTitle.setText(R.string.title_activity_about_simra);
 
-        backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(v -> finish());
-
-        listView = findViewById(R.id.listView);
+        binding.toolbar.backButton.setOnClickListener(v -> finish());
 
         String[] items = getResources().getStringArray(R.array.aboutSimraItems);
-        listView.setAdapter(new ArrayAdapter<>(AboutActivity.this,
+        binding.listView.setAdapter(new ArrayAdapter<>(AboutActivity.this,
                 android.R.layout.simple_list_item_1, items));
-        listView.setOnItemClickListener((parent, view, position, id) -> {
+        binding.listView.setOnItemClickListener((parent, view, position, id) -> {
             Intent intent = null;
             switch (position) {
                 case 0:
