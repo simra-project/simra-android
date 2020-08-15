@@ -259,7 +259,7 @@ public class ShowRouteActivity extends BaseActivity {
             long startTime = this.originalDataLog.onlyGPSDataLogEntries.get(start).timestamp;
             long endTime = this.originalDataLog.onlyGPSDataLogEntries.get(end).timestamp;
             this.dataLog = DataLog.loadDataLog(rideId, startTime, endTime, this);
-            this.incidentLog = IncidentLog.filterIncidentLog(IncidentLog.mergeIncidentLogs(this.incidentLog, IncidentLog.loadIncidentLog(rideId, startTime, endTime, this)), startTime, endTime);
+            this.incidentLog = IncidentLog.filterIncidentLogTime(IncidentLog.mergeIncidentLogs(this.incidentLog, IncidentLog.loadIncidentLog(rideId, startTime, endTime, this)), startTime, endTime);
         } else {
             this.dataLog = DataLog.loadDataLog(rideId, this);
             this.incidentLog = IncidentLog.loadIncidentLog(rideId, this);

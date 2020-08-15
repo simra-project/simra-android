@@ -3,6 +3,8 @@ package de.tuberlin.mcc.simra.app.entities;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import de.tuberlin.mcc.simra.app.util.Utils;
+
 public class IncidentLogEntry implements Serializable {
     public Integer key;
     public Double latitude;
@@ -84,6 +86,21 @@ public class IncidentLogEntry implements Serializable {
             return 0;
         }
         return booleanValue ? 1 : 0;
+    }
+
+    public boolean isReadyForUpload() {
+        boolean shouldBeUploaded = true;
+        if (this.incidentType == null || this.incidentType <= 0) {
+            shouldBeUploaded = false;
+        }
+        if (this.scarySituation == null) {
+            shouldBeUploaded = false;
+        }
+        return shouldBeUploaded;
+    }
+
+    public boolean isInTimeFrame(Long startTimeBoundary, Long endTimeBoundary) {
+        return Utils.isInTimeFrame(startTimeBoundary, endTimeBoundary, this.timestamp);
     }
 
     /**

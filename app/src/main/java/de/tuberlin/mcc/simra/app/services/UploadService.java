@@ -29,6 +29,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
@@ -36,8 +37,6 @@ import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
-import static de.tuberlin.mcc.simra.app.util.Constants.BACKEND_VERSION;
-import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
@@ -48,29 +47,16 @@ import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileWithoutDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegionProfilesArrays;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
-import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFileAndIncreaseFileVersion;
+import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFile;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
 public class UploadService extends Service {
 
     public static final String TAG = "UploadService_LOG:";
-    int numberOfTasks = 0;
     boolean foundARideToUpload = false;
     private PowerManager.WakeLock wakeLock = null;
     private boolean uploadSuccessful = false;
     private IBinder mBinder = new UploadService.MyBinder();
-
-    public void decreaseNumberOfTasks() {
-        numberOfTasks--;
-    }
-
-    public int getNumberOfTasks() {
-        return this.numberOfTasks;
-    }
-
-    public void setNumberOfTasks(int numberOfTasks) {
-        this.numberOfTasks = numberOfTasks;
-    }
 
     @Override
     public void onCreate() {
@@ -87,7 +73,7 @@ public class UploadService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy()");
+
         ForegroundServiceNotificationManager.cancelNotification(this);
         wakeLock.release();
     }
@@ -145,7 +131,6 @@ public class UploadService extends Service {
                 uploadFile(context);
             } catch (IOException e) {
                 e.printStackTrace();
-                UploadService.this.decreaseNumberOfTasks();
             }
 
             return null;
@@ -153,7 +138,7 @@ public class UploadService extends Service {
 
         @Override
         protected void onPostExecute(String s) {
-            Log.d(TAG, "onPostExecute()");
+            super.onPostExecute(s);
             if (foundARideToUpload) {
                 Intent intent = new Intent();
                 intent.setAction("de.tuberlin.mcc.simra.app.UPLOAD_COMPLETE");
@@ -161,8 +146,7 @@ public class UploadService extends Service {
                 intent.putExtra("foundARideToUpload", foundARideToUpload);
                 sendBroadcast(intent);
             }
-            super.onPostExecute(s);
-            stopSelf();
+            stopForeground(true);
         }
 
         private void uploadFile(Context context) throws IOException {
@@ -175,7 +159,7 @@ public class UploadService extends Service {
                 for (File dirFile : dirFiles) {
                     String path = dirFile.getName();
                     if (!((new File(path)).isDirectory()) && path.startsWith("CRASH")) {
-                        String contentToSend = readContentFromFileAndIncreaseFileVersion(path, context);
+                        String contentToSend = readContentFromFile(path, context);
                         postFile("crash", contentToSend, -1);
                         context.deleteFile(path);
                     }
@@ -187,7 +171,6 @@ public class UploadService extends Service {
 
                 // If there wasn't a crash or the user did not gave us the permission, upload ride(s)
             } else {
-                UploadService.this.setNumberOfTasks(((dirFiles.length - 3) / 2) + 1);
                 // String[] globalProfileContentWithoutDemographics = getProfileWithoutDemographics();
                 Object[] globalProfileContentWithoutDemographics = getProfileWithoutDemographics("Profile", context);
                 Log.d(TAG, "globalProfileContentWithoutDemographics:" + Arrays.toString(globalProfileContentWithoutDemographics));
@@ -233,28 +216,15 @@ public class UploadService extends Service {
                         if (metaDataLine.length > 1 && metaDataLine[3].equals(String.valueOf(MetaData.STATE.ANNOTATED))) {
                             foundARideToUpload = true;
                             String rideKey = metaDataLine[0];
-                            File accGpsFile = null, accEventFile = null;
 
-                            // find the accGps and accEvents file of that ride
-                            for (File dirFile : dirFiles) {
-                                if (dirFile.getName().startsWith(rideKey + "_accGps")) {
-                                    Log.d(TAG, "dirFiles[i]: " + dirFile.getName());
-                                    accGpsFile = dirFile.getAbsoluteFile();
-                                    accEventFile = IOUtils.Files.getEventsFile(Integer.parseInt(rideKey), false, context);
-                                    break;
-                                }
-                            }
-                            if (accGpsFile == null || accEventFile == null) {
-                                Log.e(TAG, "Couldn't find the required files! (acccGps, accEvent)");
-                                continue;
-                            }
-
-                            Log.d(TAG, "accEventName: " + accEventFile.getName() + " accGpsName: " + accGpsFile.getName());
                             // concatenate fileInfoVersion, accEvents and accGps content
-                            Pair<String, String> contentToUploadAndAccEventsContentToOverwrite = Utils.appendAccGpsToAccEvents(accEventFile, accGpsFile, context);
+                            Pair<String, IncidentLog> contentToUploadAndAccEventsContentToOverwrite = Utils.getConsolidatedRideForUpload(Integer.parseInt(rideKey), context);
+
                             String contentToUpload = contentToUploadAndAccEventsContentToOverwrite.first;
-                            String accEventsContentToOverwrite = contentToUploadAndAccEventsContentToOverwrite.second;
+                            IncidentLog incidentLogToOverwrite = contentToUploadAndAccEventsContentToOverwrite.second;
+
                             String password = lookUpSharedPrefs(rideKey, "-1", "keyPrefs", context);
+
                             int region = Integer.parseInt(metaDataLine[8]);
                             Log.d(TAG, "Saved password: " + password);
                             Pair<Integer, String> response;
@@ -277,8 +247,11 @@ public class UploadService extends Service {
                             }
 
 
-                            // if the respond is ok, mark ride as uploaded in metaData.csv and delete "nothing" incidents from accEvents.csv
+                            // if the respond is ok, mark ride as uploaded in metaData.csv
                             if (response.first.equals(200)) {
+                                // Delete "nothing" events from accEvents.csv
+                                IncidentLog.saveIncidentLog(incidentLogToOverwrite, context);
+
                                 metaDataLine[3] = String.valueOf(MetaData.STATE.SYNCED);
                                 totalNumberOfRides++;
                                 totalDuration += (Long.parseLong(metaDataLine[2]) - Long.parseLong(metaDataLine[1]));
@@ -305,7 +278,7 @@ public class UploadService extends Service {
                                 }
                                 totalNumberOfScary += Integer.parseInt(metaDataLine[7]);
 
-                                Utils.overwriteFile(accEventsContentToOverwrite, accEventFile);
+
                                 Integer thisNumberOfRides = (Integer) regionProfiles[region][0];//numberOfRides
                                 regionProfiles[region][0] = ++thisNumberOfRides;
                                 Long thisDuration = (Long) regionProfiles[region][1];//Duration
@@ -348,7 +321,7 @@ public class UploadService extends Service {
                         return;
                     }
                     String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
-                    Utils.overwriteFile((fileInfoLine + METADATA_HEADER + metaDataContent.toString()), IOUtils.Files.getMetaDataFile(context));
+                    Utils.overwriteFile((fileInfoLine + MetaData.METADATA_HEADER + System.lineSeparator() + metaDataContent.toString()), IOUtils.Files.getMetaDataFile(context));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -422,7 +395,7 @@ public class UploadService extends Service {
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileName + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(BuildConfig.API_ENDPOINT + BACKEND_VERSION + "/" + fileType + "?loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
+            URL url = new URL(BuildConfig.API_ENDPOINT + fileType + "?loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection) url.openConnection();
@@ -450,7 +423,6 @@ public class UploadService extends Service {
             }
             Log.d(TAG, "Server status: " + status);
             Log.d(TAG, "Server Response: " + response);
-            UploadService.this.decreaseNumberOfTasks();
 
             return new Pair<>(status, response);
         }
@@ -464,7 +436,7 @@ public class UploadService extends Service {
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(BuildConfig.API_ENDPOINT + BACKEND_VERSION + "/" + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
+            URL url = new URL(BuildConfig.API_ENDPOINT + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection) url.openConnection();
@@ -486,7 +458,6 @@ public class UploadService extends Service {
             Log.d(TAG, "Server status: " + status);
             String response = urlConnection.getResponseMessage();
             Log.d(TAG, "Server Response: " + response);
-            UploadService.this.decreaseNumberOfTasks();
 
             return new Pair<>(status, response);
         }

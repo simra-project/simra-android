@@ -93,6 +93,12 @@ public class MetaData {
         saveMetaData(metaData, context);
     }
 
+    public static void deleteMetaDataEntryForRide(int rideId, Context context) {
+        MetaData metaData = loadMetaData(context);
+        metaData.metaDataEntries.remove(rideId);
+        saveMetaData(metaData, context);
+    }
+
     public static class STATE {
         /**
          * The ride is saved locally and was not yet annotated
