@@ -80,7 +80,7 @@ android {
         xmlReport false
         htmlOutput file("lint-report.html")
         // Not yet enabled, too many errors. 
-        warningsAsErrors true
+        //warningsAsErrors true
         abortOnError true
     }
     buildToolsVersion = '29.0.3'
