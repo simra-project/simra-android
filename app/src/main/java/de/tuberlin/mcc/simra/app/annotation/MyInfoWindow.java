@@ -13,8 +13,6 @@ import de.tuberlin.mcc.simra.app.activities.ShowRouteActivity;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 
 public class MyInfoWindow extends InfoWindow {
-    private static final String TAG = "MyInfoWindow_LOG";
-
     private ShowRouteActivity motherActivity;
     private String addressForLoc;
     private int state;
@@ -35,7 +33,7 @@ public class MyInfoWindow extends InfoWindow {
     public void onClose() {
     }
 
-    public void onOpen(Object arg0) {
+    public void onOpen(Object item) {
         LinearLayout layout = mView.findViewById(R.id.bubble_layout);
         TextView txtTitle = mView.findViewById(R.id.bubble_title);
         TextView txtDescription = mView.findViewById(R.id.bubble_description);
