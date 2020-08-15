@@ -3,8 +3,14 @@
     "http://checkstyle.sourceforge.net/dtds/import_control_1_4.dtd">
 
 <import-control pkg="de.tuberlin.mcc.simra.app" strategyOnMismatch="allowed">
+    <disallow pkg="de.tuberlin.mcc.simra.app.update" />
 
     <subpackage name="update">
-        <disallow pkg="de.tuberlin.mcc.simra.app.util" />
+        <allow class="de.tuberlin.mcc.simra.app.R" />
+        <disallow pkg="de.tuberlin.mcc.simra.app" />
     </subpackage>
+
+    <file name="UpdateHelper">
+        <allow pkg="de.tuberlin.mcc.simra.app.update" />
+    </file>
 </import-control>
