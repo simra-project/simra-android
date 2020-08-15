@@ -19,6 +19,7 @@ import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
+import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UpdateHelper;
 
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showDataDirectory;
@@ -26,9 +27,7 @@ import static de.tuberlin.mcc.simra.app.util.LogHelper.showKeyPrefs;
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showMetadata;
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showStatistics;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.deleteErrorLogsForVersion;
 
 /**
@@ -61,6 +60,7 @@ public class StartActivity extends BaseActivity {
         // Check Permissions
 
         navigateIfAllPermissionsGranted();
+        showErrorDialogIfCrashedBefore();
 
         Button next = findViewById(R.id.nextBtn);
         next.setOnClickListener(v -> {
@@ -71,7 +71,6 @@ public class StartActivity extends BaseActivity {
     public boolean allPermissionGranted() {
         if (
                 privacyPolicyAccepted()
-                        && !showUnsentErrorDialogPermitted()
                         && PermissionHelper.hasBasePermissions(this)
         ) {
             return true;
@@ -99,21 +98,19 @@ public class StartActivity extends BaseActivity {
         return accepted;
     }
 
-    // Look up whether to ask the user for a permission to
-    // send the crash logs to the server. If the user gives permission, upload the crash report(s).
-    private boolean showUnsentErrorDialogPermitted() {
-        String crashSendState = lookUpSharedPrefs("SEND-CRASH", "UNKNOWN", "simraPrefs", this);
-        boolean newCrash = lookUpBooleanSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", this);
-        if (crashSendState.equals("UNKNOWN") && newCrash) {
-            fireSendErrorDialog();
-            return true;
-        } else if (crashSendState.equals("ALWAYS-SEND") && newCrash) {
-            Intent intent = new Intent(StartActivity.this, UploadService.class);
-            intent.putExtra("CRASH_REPORT", true);
-            startService(intent);
-            return false;
-        } else {
-            return false;
+    /**
+     * Look up whether to ask the user for a permission to
+     * send the crash logs to the server. If the user gives permission, upload the crash report(s).
+     */
+    private void showErrorDialogIfCrashedBefore() {
+        if (SharedPref.App.Crash.NewCrash.isActive(this)) {
+            if (SharedPref.App.Crash.SendCrashReportAllowed.isUnknown(this)) {
+                fireSendErrorDialog();
+            } else if (SharedPref.App.Crash.SendCrashReportAllowed.isAllowed(this)) {
+                Intent intent = new Intent(StartActivity.this, UploadService.class);
+                intent.putExtra("CRASH_REPORT", true);
+                startService(intent);
+            }
         }
     }
 
@@ -130,7 +127,7 @@ public class StartActivity extends BaseActivity {
         alert.setView(checkBoxView);
         alert.setPositiveButton(R.string.yes, (dialog, id) -> {
             if (rememberChoice[0]) {
-                writeToSharedPrefs("SEND-CRASH", "ALWAYS-SEND", "simraPrefs", StartActivity.this);
+                SharedPref.App.Crash.SendCrashReportAllowed.setAllowed(this);
             }
             Intent intent = new Intent(StartActivity.this, UploadService.class);
             intent.putExtra("CRASH_REPORT", true);
@@ -138,7 +135,7 @@ public class StartActivity extends BaseActivity {
         });
         alert.setNegativeButton(R.string.no, (dialog, id) -> {
             if (rememberChoice[0]) {
-                writeToSharedPrefs("SEND-CRASH", "NEVER-SEND", "simraPrefs", StartActivity.this);
+                SharedPref.App.Crash.SendCrashReportAllowed.setDisallowed(this);
             }
         });
         alert.show();

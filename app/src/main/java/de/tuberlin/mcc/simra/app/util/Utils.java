@@ -121,7 +121,7 @@ public class Utils {
     public static void deleteErrorLogsForVersion(Context context, int version) {
         int appVersion = SharedPref.lookUpIntSharedPrefs("App-Version", -1, "simraPrefs", context);
         if (appVersion < version) {
-            SharedPref.writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", context);
+            SharedPref.App.Crash.NewCrash.setEnabled(false, context);
             File[] dirFiles = context.getFilesDir().listFiles();
             String path;
             for (File dirFile : dirFiles) {

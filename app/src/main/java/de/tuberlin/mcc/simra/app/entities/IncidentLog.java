@@ -53,7 +53,7 @@ public class IncidentLog {
      * @return Incident Log of the ride, empty if ride not found.
      */
     public static IncidentLog loadIncidentLog(int rideId, Long startTimeBoundary, Long endTimeBoundary, Context context) {
-        File incidentFile = IOUtils.Files.getEventsFile(rideId, false, context);
+        File incidentFile = getEventsFile(rideId, context);
         Map<Integer, IncidentLogEntry> incidents = new HashMap() {
         };
         if (incidentFile.exists()) {
@@ -102,7 +102,7 @@ public class IncidentLog {
     }
 
     public static void saveIncidentLog(IncidentLog incidentLog, Context context) {
-        File newFile = IOUtils.Files.getEventsFile(incidentLog.rideId, false, context);
+        File newFile = getEventsFile(incidentLog.rideId, context);
         Utils.overwriteFile(incidentLog.toString(), newFile);
     }
 
@@ -116,6 +116,10 @@ public class IncidentLog {
             }
         }
         return scaryIncidents;
+    }
+
+    private static File getEventsFile(Integer rideId, Context context) {
+        return new File(IOUtils.Directories.getBaseFolderPath(context) + "accEvents" + rideId + ".csv");
     }
 
     @Override

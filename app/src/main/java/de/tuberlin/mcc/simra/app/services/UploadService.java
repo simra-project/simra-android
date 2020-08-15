@@ -34,12 +34,12 @@ import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
+import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
@@ -167,7 +167,7 @@ public class UploadService extends Service {
                 // set the boolean "NEW-UNSENT-ERROR" in simraPrefs.xml to false
                 // so that the StartActivity doesn't think there are still unsent
                 // crash logs.
-                writeBooleanToSharedPrefs("NEW-UNSENT-ERROR", false, "simraPrefs", context);
+                SharedPref.App.Crash.NewCrash.setEnabled(false, context);
 
                 // If there wasn't a crash or the user did not gave us the permission, upload ride(s)
             } else {

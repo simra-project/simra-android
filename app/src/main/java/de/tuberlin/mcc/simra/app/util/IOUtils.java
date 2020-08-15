@@ -78,18 +78,6 @@ public class IOUtils {
             return new File(getMetaDataFilePath(context));
         }
 
-        public static String getEventsFileName(Integer rideId, boolean isTempFile) {
-            return (isTempFile ? "Temp" : "") + "accEvents" + rideId + ".csv";
-        }
-
-        public static String getEventsFilePath(Integer rideId, boolean isTempFile, Context context) {
-            return IOUtils.Directories.getBaseFolderPath(context) + getEventsFileName(rideId, isTempFile);
-        }
-
-        public static File getEventsFile(Integer rideId, boolean isTempFile, Context context) {
-            return new File(getEventsFilePath(rideId, isTempFile, context));
-        }
-
         public static String getGPSLogFileName(int rideId, boolean isTempFile) {
             return (isTempFile ? "Temp" : "") + rideId + "_accGps.csv";
         }
