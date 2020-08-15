@@ -17,9 +17,9 @@ import java.util.Arrays;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.services.UploadService;
+import de.tuberlin.mcc.simra.app.update.VersionUpdater;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
-import de.tuberlin.mcc.simra.app.util.VersionUpdater;
 
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showDataDirectory;
 import static de.tuberlin.mcc.simra.app.util.LogHelper.showKeyPrefs;

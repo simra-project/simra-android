@@ -1,8 +1,7 @@
-package de.tuberlin.mcc.simra.app.util;
+package de.tuberlin.mcc.simra.app.update;
 
 import android.app.Activity;
 import android.content.IntentSender;
-import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 
