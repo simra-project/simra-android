@@ -14,6 +14,7 @@ import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
 
+import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.update.VersionUpdater;
 
@@ -113,7 +114,7 @@ public class UpdateHelper {
         VersionUpdater.updateToV50(context, lastAppVersion);
         VersionUpdater.updateToV52(context, lastAppVersion);
         VersionUpdater.updateToV58(context, lastAppVersion);
-        SharedPref.writeIntToSharedPrefs("App-Version", Utils.getAppVersionNumber(context), "simraPrefs", context);
+        SharedPref.writeIntToSharedPrefs("App-Version", BuildConfig.VERSION_CODE, "simraPrefs", context);
     }
 
     private static void popupSnackbarForCompleteUpdate(AppUpdateManager appUpdateManager, Activity activity) {

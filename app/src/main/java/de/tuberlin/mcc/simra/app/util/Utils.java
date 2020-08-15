@@ -1,15 +1,10 @@
 package de.tuberlin.mcc.simra.app.util;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.util.Log;
 import android.util.Pair;
-
-import androidx.appcompat.app.AlertDialog;
 
 import org.osmdroid.util.GeoPoint;
 
@@ -91,31 +86,6 @@ public class Utils {
         } catch (IOException ioe) {
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
         }
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Create an AlertDialog with an OK Button displaying a message
-    public static void showMessageOK(String message, DialogInterface.OnClickListener okListener, Context context) {
-        new AlertDialog.Builder(context)
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("OK", okListener)
-                .create()
-                .show();
-    }
-
-    public static int getAppVersionNumber(Context context) {
-        PackageInfo pinfo = null;
-        try {
-            pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.d(TAG, Arrays.toString(e.getStackTrace()));
-        }
-        int installedVersionNumber = -1;
-        if (pinfo != null) {
-            installedVersionNumber = pinfo.versionCode;
-        }
-        return installedVersionNumber;
     }
 
     public static void deleteErrorLogsForVersion(Context context, int version) {

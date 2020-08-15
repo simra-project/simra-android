@@ -42,7 +42,6 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getProfileWithoutDemographics;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegionProfilesArrays;
@@ -188,7 +187,6 @@ public class UploadService extends Service {
                     timeBuckets[i] = (float) globalProfileContentWithoutDemographics[i + 6];
                 }
                 int totalNumberOfScary = (int) globalProfileContentWithoutDemographics[30];
-                int appVersion = getAppVersionNumber(context);
                 int numberOfRegions = getRegions(context).length;
                 boolean[] regionProfileUpdated = new boolean[numberOfRegions];
                 // contains one Object[] for each region. The arrays contain the following information:
@@ -320,7 +318,7 @@ public class UploadService extends Service {
                         stopSelf();
                         return;
                     }
-                    String fileInfoLine = appVersion + "#" + fileVersion + System.lineSeparator();
+                    String fileInfoLine = BuildConfig.VERSION_CODE + "#" + fileVersion + System.lineSeparator();
                     Utils.overwriteFile((fileInfoLine + MetaData.METADATA_HEADER + System.lineSeparator() + metaDataContent.toString()), IOUtils.Files.getMetaDataFile(context));
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -336,7 +334,7 @@ public class UploadService extends Service {
                     if (regionProfileUpdated[p]) {
                         updateProfile(false, context, -1, -1, p, -1, Integer.parseInt(String.valueOf(regionProfiles[p][0])), (long) regionProfiles[p][1], Integer.parseInt(String.valueOf(regionProfiles[p][2])), (long) regionProfiles[p][3], (long) regionProfiles[p][4], (long) regionProfiles[p][5], Arrays.copyOfRange(regionProfiles[p], 6, 30), -2, Integer.parseInt(String.valueOf(regionProfiles[p][30])));
                         int profileVersion = lookUpIntSharedPrefs("Version", 1, "Profile_" + p, context);
-                        StringBuilder profileContentToSend = new StringBuilder().append(appVersion).append("#").append(profileVersion).append(System.lineSeparator());
+                        StringBuilder profileContentToSend = new StringBuilder().append(BuildConfig.VERSION_CODE).append("#").append(profileVersion).append(System.lineSeparator());
                         profileContentToSend.append(Constants.PROFILE_HEADER);
                         int[] demographics = getProfileDemographics(context);
                         for (int i = 0; i < demographics.length - 1; i++) {

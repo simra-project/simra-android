@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -88,10 +87,8 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
 import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
 public class MainActivity extends BaseActivity
@@ -332,9 +329,13 @@ public class MainActivity extends BaseActivity
                     ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(),
                             MetaData.STATE.JUST_RECORDED, this);
                 } else {
-                    DialogInterface.OnClickListener errorOnClickListener = (dialog, which) -> {
-                    };
-                    showMessageOK(getString(R.string.errorRideNotRecorded), errorOnClickListener, MainActivity.this);
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setMessage(getString(R.string.errorRideNotRecorded))
+                            .setCancelable(false)
+                            .setPositiveButton("OK", (dialog, which) -> {
+                            })
+                            .create()
+                            .show();
                 }
             } catch (Exception e) {
                 Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
@@ -345,7 +346,7 @@ public class MainActivity extends BaseActivity
             int region = lookUpIntSharedPrefs("Region", -1, "Profile", MainActivity.this);
             if (region == 2 || region == 3 || region == 8) {
                 fireRegionPrompt();
-                writeIntToSharedPrefs("regionLastChangedAtVersion", getAppVersionNumber(MainActivity.this),
+                writeIntToSharedPrefs("regionLastChangedAtVersion", BuildConfig.VERSION_CODE,
                         "simraPrefs", MainActivity.this);
             }
         }
@@ -638,7 +639,7 @@ public class MainActivity extends BaseActivity
             i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
             i.putExtra(Intent.EXTRA_TEXT, (getString(R.string.feedbackReceiver)) + System.lineSeparator()
-                    + "App Version: " + getAppVersionNumber(this) + System.lineSeparator() + "Android Version: ");
+                    + "App Version: " + BuildConfig.VERSION_CODE + System.lineSeparator() + "Android Version: ");
             try {
                 startActivity(Intent.createChooser(i, "Send mail..."));
             } catch (android.content.ActivityNotFoundException ex) {
