@@ -19,7 +19,8 @@ public class PermissionHelper {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     });
-    public static final BasePermission Camera = new BasePermission(1003, new String[]{
+    public static final int REQUEST_CODE_CAMERA = 1003;
+    public static final BasePermission Camera = new BasePermission(REQUEST_CODE_CAMERA, new String[]{
             Manifest.permission.CAMERA
     });
 

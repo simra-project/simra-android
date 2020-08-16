@@ -2,6 +2,7 @@ package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,8 +13,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashSet;
@@ -34,6 +35,22 @@ public class RadmesserActivity extends AppCompatActivity {
     ActivityRadmesserBinding binding;
     RadioGroup devices;
     private AlertDialog alertDialog;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PermissionHelper.REQUEST_CODE_CAMERA:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(true, this);
+                } else {
+                    updateTakePictureDuringRideViews(false);
+                }
+                return;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,9 +108,10 @@ public class RadmesserActivity extends AppCompatActivity {
             SharedPref.Settings.Ride.PicturesDuringRideInterval.setInterval(newVal, this);
         });
 
-        binding.takePictureDuringRideButton.setChecked(SharedPref.Settings.Ride.PicturesDuringRide.isActivated(this));
+        updateTakePictureDuringRideViews(SharedPref.Settings.Ride.PicturesDuringRide.isActivated(this));
         binding.takePictureDuringRideButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
+                updateTakePictureDuringRideViews(true);
                 if (PermissionHelper.Camera.hasPermission(this)) {
                     // Wants to activate this Functionality and already has Camera Permission
                     SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(true, this);
@@ -103,7 +121,7 @@ public class RadmesserActivity extends AppCompatActivity {
                 }
             } else {
                 // Deactivate Functionality
-                SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(false, this);
+                updateTakePictureDuringRideViews(false);
             }
         });
 
@@ -116,6 +134,12 @@ public class RadmesserActivity extends AppCompatActivity {
 
         binding.connectDevicesLayout.addView(devices);
         binding.connectDevicesLayout.addView(connectButton);
+    }
+
+    public void updateTakePictureDuringRideViews(boolean allowed) {
+        SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(allowed, this);
+        binding.takePictureDuringRideButton.setChecked(allowed);
+        binding.takePictureDuringRideAdvancedSettingsView.setVisibility(allowed ? View.VISIBLE : View.GONE);
     }
 
     private void setClosePassBarColor(int distanceInCm) {
@@ -263,7 +287,6 @@ public class RadmesserActivity extends AppCompatActivity {
         if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
             startScanningDevices();
         }
-        Toast.makeText(this, currentState.toString(), Toast.LENGTH_SHORT).show();
         super.onResume();
     }
 
