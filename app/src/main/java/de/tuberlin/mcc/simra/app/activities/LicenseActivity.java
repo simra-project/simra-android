@@ -110,7 +110,7 @@ public class LicenseActivity extends AppCompatActivity {
 
                 while ((receiveString = bufferedReader.readLine()) != null) {
 
-                    stringBuilder.append(receiveString.trim() + System.lineSeparator());
+                    stringBuilder.append(receiveString.trim()).append(System.lineSeparator());
 
                 }
                 is.close();

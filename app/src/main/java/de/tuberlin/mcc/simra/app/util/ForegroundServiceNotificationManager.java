@@ -25,8 +25,6 @@ public class ForegroundServiceNotificationManager {
         mainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 0, mainActivityIntent, 0);
-        PendingIntent snoozePendingIntent =
-                PendingIntent.getBroadcast(ctx, 0, mainActivityIntent, 0);
 
         // From API 26+ onwards a NotificationChannel has to be created
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

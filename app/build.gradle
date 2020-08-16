@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'checkstyle'
 
 def ENV_VARIABLE_PREFIX = "SIMRA_"
 def API_ENDPOINT = "API_ENDPOINT"
@@ -12,7 +13,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 29
         versionCode 64
-        versionName "63.0"
+        versionName "64.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
@@ -75,7 +76,8 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     lintOptions {
-        htmlReport true
+        htmlReport false
+        xmlReport false
         htmlOutput file("lint-report.html")
         // Not yet enabled, too many errors. 
         //warningsAsErrors true
@@ -86,21 +88,15 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.play:core:1.8.0'
 
     def lifecycle_version = "2.2.0"
-    // optional - helpers for implementing LifecycleOwner in a Service
     implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
-    // implementation 'com.google.code.gson:gson:2.8.5'
-    // implementation 'org.apache.commons:commons-csv:1.6'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.material:material:1.3.0-alpha01'
+    implementation 'com.google.android.material:material:1.3.0-alpha02'
     api 'org.osmdroid:osmdroid-android:6.0.3'
-    // api 'org.osmdroid:osmdroid-wms:6.0.3'
-    // api 'org.osmdroid:osmdroid-mapsforge:6.0.3'
-    // api 'org.osmdroid:osmdroid-geopackage:6.0.3'
     api 'com.github.MKergall:osmbonuspack:6.5.3'
     implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.4'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.4'
@@ -119,8 +115,7 @@ dependencies {
     // androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     // CameraX core library using the camera2 implementation
-    def camerax_version = "1.0.0-beta04"
-    // The following line is optional, as the core library is included indirectly by camera-camera2
+    def camerax_version = "1.0.0-beta07"
     implementation "androidx.camera:camera-core:${camerax_version}"
     implementation "androidx.camera:camera-camera2:${camerax_version}"
     // If you want to additionally use the CameraX Lifecycle library
@@ -129,3 +124,18 @@ dependencies {
     // "Backporting" Java 8 streams for Android < 24
     implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
 }
+
+task checkstyle(type: Checkstyle) {
+    description 'Check code standard'
+    group 'verification'
+    configFile rootProject.file('config/checkstyle.xml')
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    classpath = files()
+    ignoreFailures = false
+}
+
+
+preBuild.dependsOn('checkstyle')
+check.dependsOn('checkstyle')

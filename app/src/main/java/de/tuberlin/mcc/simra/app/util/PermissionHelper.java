@@ -11,15 +11,16 @@ import androidx.core.content.ContextCompat;
 
 
 public class PermissionHelper {
-    public static BasePermission Location = new BasePermission(1001, new String[]{
+    public static final BasePermission Location = new BasePermission(1001, new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_BACKGROUND_LOCATION,
     });
-    public static BasePermission Storage = new BasePermission(1002, new String[]{
+    public static final BasePermission Storage = new BasePermission(1002, new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     });
-    public static BasePermission Camera = new BasePermission(1003, new String[]{
+    public static final int REQUEST_CODE_CAMERA = 1003;
+    public static final BasePermission Camera = new BasePermission(REQUEST_CODE_CAMERA, new String[]{
             Manifest.permission.CAMERA
     });
 

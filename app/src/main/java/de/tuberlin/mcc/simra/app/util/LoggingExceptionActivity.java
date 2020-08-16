@@ -13,9 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.File;
 import java.util.Date;
 
+import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.activities.StartActivity;
 
-import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
@@ -51,7 +51,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
                     stackTrace.append(ex.getCause().getStackTrace()[i]).append("\n");
                 }
             }
-            String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
+            String fileInfoLine = BuildConfig.VERSION_CODE + "#1" + System.lineSeparator();
 
             String errorReport =
                     "System Timestamp: " + System.currentTimeMillis() + "\n" +
@@ -59,7 +59,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
                             "Build.DEVICE: " + Build.DEVICE + "\n" +
                             "Build.MODEL: " + Build.MODEL + "\n" +
                             "Build.PRODUCT: " + Build.PRODUCT + "\n" +
-                            "App Version: " + getAppVersionNumber(this) + "\n" +
+                            "App Version: " + BuildConfig.VERSION_CODE + "\n" +
                             "Exception in: " + context.getClass().getName()
                             + " " + ex.getClass().getName() + "\n" +
                             ex.getMessage() + "\n" +

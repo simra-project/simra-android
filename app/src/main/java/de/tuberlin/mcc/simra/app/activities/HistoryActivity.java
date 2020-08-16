@@ -37,11 +37,11 @@ import java.util.TimeZone;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityHistoryBinding;
+import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
-import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
@@ -119,9 +119,9 @@ public class HistoryActivity extends BaseActivity {
             try {
                 BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
                 // br.readLine() to skip the first line which contains the headers
-                String line = br.readLine();
-                line = br.readLine();
-
+                br.readLine();
+                br.readLine();
+                String line;
                 while (((line = br.readLine()) != null)) {
                     if (!line.startsWith("key") && !line.startsWith("null")) {
                         metaDataLines.add(line.split(","));
@@ -219,19 +219,7 @@ public class HistoryActivity extends BaseActivity {
                     }
                 }
             }
-            String content = "";
-            try (BufferedReader br = new BufferedReader(new FileReader(IOUtils.Files.getMetaDataFile(this)))) {
-                String line;
-
-                while ((line = br.readLine()) != null) {
-                    if (!line.split(",")[0].equals(clicked)) {
-                        content += line += System.lineSeparator();
-                    }
-                }
-                Utils.overwriteFile(content, IOUtils.Files.getMetaDataFile(this));
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
+            MetaData.deleteMetaDataEntryForRide(Integer.parseInt(clicked), this);
             Toast.makeText(HistoryActivity.this, R.string.ride_deleted, Toast.LENGTH_SHORT).show();
             refreshMyRides();
         });

@@ -1,1 +1,1 @@
-App for Tracking Bicylce Safety.
+App for Tracking Bicycle Safety.

@@ -74,36 +74,96 @@ public class SharedPref {
         editor.apply();
     }
 
-    private static Boolean readBooleanFromAppSharedPrefs(String name, boolean defaultValue, String sharedPrefName, Context context) {
-        return context.getApplicationContext().getSharedPreferences(sharedPrefName, SharedPref.DEFAULT_MODE).getBoolean(name, defaultValue);
+    private static Boolean readBooleanFromAppSharedPrefs(String name, Context context) {
+        return context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).getBoolean(name, false);
     }
 
-    private static void writeBooleanToAppSharedPrefsAsync(String name, boolean value, String sharedPrefName, Context context) {
-        context.getApplicationContext().getSharedPreferences(sharedPrefName, SharedPref.DEFAULT_MODE).edit().putBoolean(name, value).apply();
+    private static void writeBooleanToAppSharedPrefsAsync(String name, boolean value, Context context) {
+        context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().putBoolean(name, value).apply();
     }
 
-    private static int readIntegerFromAppSharedPrefs(String name, int defaultValue, String sharedPrefName, Context context) {
-        return context.getApplicationContext().getSharedPreferences(sharedPrefName, SharedPref.DEFAULT_MODE).getInt(name, defaultValue);
+    private static int readIntegerFromAppSharedPrefs(String name, int defaultValue, Context context) {
+        return context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).getInt(name, defaultValue);
     }
 
-    private static void writeIntegerToAppSharedPrefsAsync(String name, int value, String sharedPrefName, Context context) {
-        context.getApplicationContext().getSharedPreferences(sharedPrefName, SharedPref.DEFAULT_MODE).edit().putInt(name, value).apply();
+    private static void writeIntegerToAppSharedPrefsAsync(String name, int value, Context context) {
+        context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().putInt(name, value).apply();
     }
 
-    private static String readStringFromAppSharedPrefs(String name, String defaultValue, String sharedPrefName, Context context) {
-        return context.getApplicationContext().getSharedPreferences(sharedPrefName, SharedPref.DEFAULT_MODE).getString(name, defaultValue);
+    private static String readStringFromAppSharedPrefs(String defaultValue, Context context) {
+        return context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).getString(Settings.DisplayUnit.DISPLAY_UNIT, defaultValue);
     }
 
-    private static void writeStringToAppSharedPrefsAsync(String name, String value, String sharedPrefName, Context context) {
-        context.getApplicationContext().getSharedPreferences(sharedPrefName, SharedPref.DEFAULT_MODE).edit().putString(name, value).apply();
+    private static void writeStringToAppSharedPrefsAsync(String value, Context context) {
+        context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().putString(Settings.DisplayUnit.DISPLAY_UNIT, value).apply();
     }
 
-    private static long readLongFromAppSharedPrefs(String name, long defaultValue, String sharedPrefName, Context context) {
-        return context.getApplicationContext().getSharedPreferences(sharedPrefName, SharedPref.DEFAULT_MODE).getLong(name, defaultValue);
+    private static long readLongFromAppSharedPrefs(Context context) {
+        return context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).getLong(Settings.Ride.PrivacyDuration.PRIVACY_DURATION, 30);
     }
 
-    private static void writeLongToAppSharedPrefsAsync(String name, long value, String sharedPrefName, Context context) {
-        context.getApplicationContext().getSharedPreferences(sharedPrefName, SharedPref.DEFAULT_MODE).edit().putLong(name, value).apply();
+    private static void writeLongToAppSharedPrefsAsync(long value, Context context) {
+        context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().putLong(Settings.Ride.PrivacyDuration.PRIVACY_DURATION, value).apply();
+    }
+
+    public static class App {
+        // See top of this class before changing this string
+        private static final String APP = "App-";
+
+        /**
+         * Grouped State for Crash Data
+         */
+        public static class Crash {
+            /**
+             * Whether the use gave his permission to send Crash Reports
+             */
+            public static class SendCrashReportAllowed {
+                private static final String SEND_CRASH_ALLOWED = "SEND-CRASH";
+                private static final String ALLOWED = "ALWAYS-SEND";
+                private static final String UNKNOWN = "ALLOWED";
+                private static final String DISALLOWED = "NEVER-SEND";
+
+                public static void setAllowed(Context context) {
+                    setStatus(ALLOWED, context);
+                }
+
+                public static void setDisallowed(Context context) {
+                    setStatus(DISALLOWED, context);
+                }
+
+                public static void reset(Context context) {
+                    setStatus(UNKNOWN, context);
+                }
+
+                public static boolean isAllowed(Context context) {
+                    return getStatus(context).equals(ALLOWED);
+                }
+
+                public static boolean isUnknown(Context context) {
+                    return getStatus(context).equals(UNKNOWN);
+                }
+
+                public static String getStatus(Context context) {
+                    return readStringFromAppSharedPrefs(UNKNOWN, context);
+                }
+
+                public static void setStatus(String enabled, Context context) {
+                    writeStringToAppSharedPrefsAsync(enabled, context);
+                }
+            }
+
+            public static class NewCrash {
+                private static final String NEW_CRASH_REPORT = "NEW-UNSENT-ERROR";
+
+                public static boolean isActive(Context context) {
+                    return readBooleanFromAppSharedPrefs(NEW_CRASH_REPORT, context);
+                }
+
+                public static void setEnabled(Boolean enabled, Context context) {
+                    writeBooleanToAppSharedPrefsAsync(NEW_CRASH_REPORT, enabled, context);
+                }
+            }
+        }
     }
 
 
@@ -115,11 +175,11 @@ public class SharedPref {
             private static final String RADMESSER_ENABLED = SETTINGS + "RADMESSER_ENABLED";
 
             public static boolean isEnabled(Context context) {
-                return readBooleanFromAppSharedPrefs(RADMESSER_ENABLED, false, SHARED_PREF_NAME, context);
+                return readBooleanFromAppSharedPrefs(RADMESSER_ENABLED, context);
             }
 
             public static void setEnabled(Boolean enabled, Context context) {
-                writeBooleanToAppSharedPrefsAsync(RADMESSER_ENABLED, enabled, SHARED_PREF_NAME, context);
+                writeBooleanToAppSharedPrefsAsync(RADMESSER_ENABLED, enabled, context);
             }
         }
 
@@ -128,11 +188,11 @@ public class SharedPref {
             public static final String DISPLAY_UNIT = SETTINGS + "Unit";
 
             public static void setDisplayUnit(UnitHelper.DISTANCE unit, Context context) {
-                writeStringToAppSharedPrefsAsync(DISPLAY_UNIT, unit.getName(), SHARED_PREF_NAME, context);
+                writeStringToAppSharedPrefsAsync(unit.getName(), context);
             }
 
             public static UnitHelper.DISTANCE getDisplayUnit(Context context) {
-                return UnitHelper.DISTANCE.parseFromString(readStringFromAppSharedPrefs(DISPLAY_UNIT, UnitHelper.DISTANCE.METRIC.getName(), SHARED_PREF_NAME, context));
+                return UnitHelper.DISTANCE.parseFromString(readStringFromAppSharedPrefs(UnitHelper.DISTANCE.METRIC.getName(), context));
             }
 
             public static boolean isImperial(Context context) {
@@ -145,11 +205,11 @@ public class SharedPref {
             public static final String AI_ENABLED = SETTINGS + "AI";
 
             public static void setAIEnabled(boolean enabled, Context context) {
-                writeBooleanToAppSharedPrefsAsync(AI_ENABLED, enabled, SHARED_PREF_NAME, context);
+                writeBooleanToAppSharedPrefsAsync(AI_ENABLED, enabled, context);
             }
 
             public static boolean getAIEnabled(Context context) {
-                return readBooleanFromAppSharedPrefs(AI_ENABLED, false, SHARED_PREF_NAME, context);
+                return readBooleanFromAppSharedPrefs(AI_ENABLED,  context);
             }
         }
 
@@ -169,7 +229,7 @@ public class SharedPref {
                 private static final int MIN_DISTANCE = 0;
 
                 public static int getDistance(UnitHelper.DISTANCE unit, Context context) {
-                    int value = readIntegerFromAppSharedPrefs(PRIVACY_DISTANCE, 30, SHARED_PREF_NAME, context);
+                    int value = readIntegerFromAppSharedPrefs(PRIVACY_DISTANCE, 30, context);
 
                     if (unit == UnitHelper.DISTANCE.IMPERIAL) {
                         value = (int) UnitHelper.convertMeterToFeet(value);
@@ -180,10 +240,10 @@ public class SharedPref {
                 public static void setDistance(int distance, UnitHelper.DISTANCE unit, Context context) {
                     switch (unit) {
                         case METRIC:
-                            writeIntegerToAppSharedPrefsAsync(PRIVACY_DISTANCE, distance, SHARED_PREF_NAME, context);
+                            writeIntegerToAppSharedPrefsAsync(PRIVACY_DISTANCE, distance, context);
                             break;
                         case IMPERIAL:
-                            writeIntegerToAppSharedPrefsAsync(PRIVACY_DISTANCE, (int) UnitHelper.convertFeetToMeter(distance), SHARED_PREF_NAME, context);
+                            writeIntegerToAppSharedPrefsAsync(PRIVACY_DISTANCE, (int) UnitHelper.convertFeetToMeter(distance), context);
                             break;
                     }
                 }
@@ -218,11 +278,11 @@ public class SharedPref {
                 private static final int MIN_DURATION = 0;
 
                 public static long getDuration(Context context) {
-                    return readLongFromAppSharedPrefs(PRIVACY_DURATION, 30L, SHARED_PREF_NAME, context);
+                    return readLongFromAppSharedPrefs(context);
                 }
 
                 public static void setDuration(long duration, Context context) {
-                    writeLongToAppSharedPrefsAsync(PRIVACY_DURATION, duration, SHARED_PREF_NAME, context);
+                    writeLongToAppSharedPrefsAsync(duration, context);
                 }
 
                 public static long getMaxDuration() {
@@ -239,11 +299,11 @@ public class SharedPref {
                 public static final String BIKE_TYPE = SETTINGS + "BikeType";
 
                 public static int getBikeType(Context context) {
-                    return readIntegerFromAppSharedPrefs(BIKE_TYPE, 0, SHARED_PREF_NAME, context);
+                    return readIntegerFromAppSharedPrefs(BIKE_TYPE, 0, context);
                 }
 
                 public static void setBikeType(int bikeType, Context context) {
-                    writeIntegerToAppSharedPrefsAsync(BIKE_TYPE, bikeType, SHARED_PREF_NAME, context);
+                    writeIntegerToAppSharedPrefsAsync(BIKE_TYPE, bikeType, context);
                 }
             }
 
@@ -252,11 +312,11 @@ public class SharedPref {
                 public static final String PHONE_LOCATION = SETTINGS + "PhoneLocation";
 
                 public static int getPhoneLocation(Context context) {
-                    return readIntegerFromAppSharedPrefs(PHONE_LOCATION, 0, SHARED_PREF_NAME, context);
+                    return readIntegerFromAppSharedPrefs(PHONE_LOCATION, 0, context);
                 }
 
                 public static void setPhoneLocation(int phoneLocation, Context context) {
-                    writeIntegerToAppSharedPrefsAsync(PHONE_LOCATION, phoneLocation, SHARED_PREF_NAME, context);
+                    writeIntegerToAppSharedPrefsAsync(PHONE_LOCATION, phoneLocation, context);
                 }
             }
 
@@ -277,11 +337,11 @@ public class SharedPref {
                 }
 
                 public static void setChildOnBoardByValue(int isChildOnBoard, Context context) {
-                    writeIntegerToAppSharedPrefsAsync(CHILD_ON_BOARD, isChildOnBoard, SHARED_PREF_NAME, context);
+                    writeIntegerToAppSharedPrefsAsync(CHILD_ON_BOARD, isChildOnBoard, context);
                 }
 
                 public static int getValue(Context context) {
-                    return readIntegerFromAppSharedPrefs(CHILD_ON_BOARD, 0, SHARED_PREF_NAME, context);
+                    return readIntegerFromAppSharedPrefs(CHILD_ON_BOARD, 0, context);
                 }
             }
 
@@ -302,11 +362,11 @@ public class SharedPref {
                 }
 
                 public static void setTrailerByValue(int hasTrailer, Context context) {
-                    writeIntegerToAppSharedPrefsAsync(BIKE_WITH_TRAILER, hasTrailer, SHARED_PREF_NAME, context);
+                    writeIntegerToAppSharedPrefsAsync(BIKE_WITH_TRAILER, hasTrailer, context);
                 }
 
                 public static int getValue(Context context) {
-                    return readIntegerFromAppSharedPrefs(BIKE_WITH_TRAILER, 0, SHARED_PREF_NAME, context);
+                    return readIntegerFromAppSharedPrefs(BIKE_WITH_TRAILER, 0, context);
                 }
             }
 
@@ -316,14 +376,14 @@ public class SharedPref {
                 /**
                  * Safety Clearance + Side Mirror Length in cm
                  */
-                private static int SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH = 150 + 13;
+                private static final int SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH = 150 + 13;
 
                 public static int getWidth(Context context) {
-                    return readIntegerFromAppSharedPrefs(OVERTAKE_WIDTH, SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH, SHARED_PREF_NAME, context);
+                    return readIntegerFromAppSharedPrefs(OVERTAKE_WIDTH, SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH, context);
                 }
 
                 public static void setWidth(int width, Context context) {
-                    writeIntegerToAppSharedPrefsAsync(OVERTAKE_WIDTH, width, SHARED_PREF_NAME, context);
+                    writeIntegerToAppSharedPrefsAsync(OVERTAKE_WIDTH, width, context);
                 }
 
                 public static int getHandlebarWidth(Context context) {
@@ -348,11 +408,11 @@ public class SharedPref {
                 public static final String PICTURES_DURING_RIDE = SETTINGS + "PICTURES_DURING_RIDE";
 
                 public static boolean isActivated(Context context) {
-                    return readBooleanFromAppSharedPrefs(PICTURES_DURING_RIDE, false, SHARED_PREF_NAME, context);
+                    return readBooleanFromAppSharedPrefs(PICTURES_DURING_RIDE, context);
                 }
 
                 public static void setMakePictureDuringRide(boolean activated, Context context) {
-                    writeBooleanToAppSharedPrefsAsync(PICTURES_DURING_RIDE, activated, SHARED_PREF_NAME, context);
+                    writeBooleanToAppSharedPrefsAsync(PICTURES_DURING_RIDE, activated, context);
                 }
             }
 
@@ -361,11 +421,11 @@ public class SharedPref {
                 public static final String PICTURES_DURING_RIDE_INTERVAL = SETTINGS + "PICTURES_DURING_RIDE_INTERVAL";
 
                 public static int getInterval(Context context) {
-                    return readIntegerFromAppSharedPrefs(PICTURES_DURING_RIDE_INTERVAL, 1, SHARED_PREF_NAME, context);
+                    return readIntegerFromAppSharedPrefs(PICTURES_DURING_RIDE_INTERVAL, 1, context);
                 }
 
                 public static void setInterval(int interval, Context context) {
-                    writeIntegerToAppSharedPrefsAsync(PICTURES_DURING_RIDE_INTERVAL, interval, SHARED_PREF_NAME, context);
+                    writeIntegerToAppSharedPrefsAsync(PICTURES_DURING_RIDE_INTERVAL, interval, context);
                 }
             }
         }

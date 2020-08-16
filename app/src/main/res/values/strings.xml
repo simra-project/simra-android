@@ -338,4 +338,8 @@
     <string name="added_new_regions_news_58">Folgende Regionen wurden freigeschaltet: Leipzig, Wuppertal/Solingen/Remscheid und Düsseldorf</string>
     <string name="openbikesensor_toast_devicefound">Gerät gefunden, klicke auf dem Bluetooth Knopf um dich damit zu verbinden</string>
     <string name="openbikesensor_bluetooth_incompatible">Dein Gerät unterstützt kein Bluetooth.</string>
+    <string name="activity_radmesser_title_device_info">Geräte-Info</string>
+    <string name="radmesser_activity_button_connect_device">Mit Gerät verbinden</string>
+    <string name="radmesser_activity_button_disconnect_device">Geräteverbindung trennen</string>
+    <string name="radmesser_activity_text_last_distance">Letzer Wert:</string>
 </resources>

@@ -8,12 +8,9 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.LayoutInflater;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -23,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.databinding.ActivityEvaluateClosepassBinding;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
@@ -32,14 +30,27 @@ import de.tuberlin.mcc.simra.app.util.IOUtils;
 public class EvaluateClosePassActivity extends AppCompatActivity {
     private static final String TAG = "EvaluateClosePass";
     private static final String EXTRA_RIDE_ID = "EXTRA_RIDE_ID";
-    ImageButton backBtn;
-    TextView toolbarTxt;
-    ImageView closePassPicture;
-    TextView currentDistanceValue;
-    List<File> imageQueue;
+
+    /**
+     * Layout Binding.
+     */
+    ActivityEvaluateClosepassBinding binding;
+    /**
+     * DataLogEntry that is next to the current picture.
+     */
     DataLogEntry currentDataLogEntry;
+    /**
+     * The incident Log of the current ride.
+     */
     IncidentLog incidentLog;
+    /**
+     * The data Log of the current ride.
+     */
     DataLog dataLog;
+    /**
+     * The imageQueue of the current ride.
+     */
+    List<File> imageQueue;
 
     public static void startEvaluateClosePassActivity(int rideId, Context context) {
         Intent intent = new Intent(context, EvaluateClosePassActivity.class);
@@ -92,22 +103,17 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         if (!getIntent().hasExtra(EXTRA_RIDE_ID)) {
             throw new RuntimeException("Extra: " + EXTRA_RIDE_ID + " not defined.");
         }
-        setContentView(R.layout.activity_evaluate_closepass);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        binding = ActivityEvaluateClosepassBinding.inflate(LayoutInflater.from(this));
+        setContentView(binding.getRoot());
+
+        setSupportActionBar(binding.toolbar.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle("");
-        toolbar.setSubtitle("");
-        toolbarTxt = findViewById(R.id.toolbar_title);
-        toolbarTxt.setText("Evaluate Close Passes");
+        binding.toolbar.toolbar.setTitle("");
+        binding.toolbar.toolbar.setSubtitle("");
+        binding.toolbar.toolbarTitle.setText("Evaluate Close Passes");
 
-        backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(v -> finish());
-
-        closePassPicture = findViewById(R.id.closePassPicture);
-        currentDistanceValue = findViewById(R.id.closePassCurrentValue);
-
+        binding.toolbar.backButton.setOnClickListener(v -> finish());
 
         int rideId = getIntent().getIntExtra(EXTRA_RIDE_ID, 0);
         incidentLog = IncidentLog.loadIncidentLog(rideId, this);
@@ -138,10 +144,10 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         boolean foundPicture = false;
         for (DataLogEntry d : dataLog.dataLogEntries) {
             if (d.timestamp == Long.parseLong(imageQueue.get(0).getName().split("\\.")[0])) {
-                currentDistanceValue.setText(String.valueOf(((DataLogEntry) d).radmesserDistanceLeft1));
+                binding.closePassCurrentValue.setText(String.valueOf(((DataLogEntry) d).radmesserDistanceLeft1));
                 DisplayMetrics displayMetrics = new DisplayMetrics();
                 getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-                closePassPicture.setImageBitmap(decodeSampledBitmapFromFile(imageQueue.get(0).getAbsolutePath(), displayMetrics.widthPixels, displayMetrics.heightPixels));
+                binding.closePassPicture.setImageBitmap(decodeSampledBitmapFromFile(imageQueue.get(0).getAbsolutePath(), displayMetrics.widthPixels, displayMetrics.heightPixels));
                 foundPicture = true;
             }
             // Find next DataLogEntry with GPS Location attached

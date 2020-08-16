@@ -6,8 +6,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -31,11 +33,11 @@ public class MetaData {
     }
 
     public static void saveMetaData(MetaData metaData, Context context) {
-        String metaDataString = "";
+        StringBuilder metaDataString = new StringBuilder();
         Iterator<Map.Entry<Integer, MetaDataEntry>> iterator = metaData.metaDataEntries.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Integer, MetaDataEntry> entry = iterator.next();
-            metaDataString += entry.getValue().stringifyMetaDataEntry() + System.lineSeparator();
+            metaDataString.append(entry.getValue().stringifyMetaDataEntry()).append(System.lineSeparator());
         }
         File newFile = IOUtils.Files.getMetaDataFile(context);
         Utils.overwriteFile(IOUtils.Files.getFileInfoLine() + METADATA_HEADER + System.lineSeparator() + metaDataString, newFile);
@@ -75,7 +77,7 @@ public class MetaData {
                 while ((line = bufferedReader.readLine()) != null) {
                     if (!line.trim().isEmpty()) {
                         MetaDataEntry metaDataEntry = MetaDataEntry.parseEntryFromLine(line);
-                        if (metaDataEntry.rideId == rideId) {
+                        if (metaDataEntry.rideId.equals(rideId)) {
                             return metaDataEntry;
                         }
                     }
@@ -91,6 +93,22 @@ public class MetaData {
         MetaData metaData = loadMetaData(context);
         metaData.metaDataEntries.put(metaDataEntry.rideId, metaDataEntry);
         saveMetaData(metaData, context);
+    }
+
+    public static void deleteMetaDataEntryForRide(int rideId, Context context) {
+        MetaData metaData = loadMetaData(context);
+        metaData.metaDataEntries.remove(rideId);
+        saveMetaData(metaData, context);
+    }
+
+    public static List<MetaDataEntry> getMetaDataEntries(Context context) {
+        List<MetaDataEntry> metaDataEntries = new ArrayList<>();
+        Iterator<Map.Entry<Integer, MetaDataEntry>> iterator = loadMetaData(context).metaDataEntries.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, MetaDataEntry> entry = iterator.next();
+            metaDataEntries.add(entry.getValue());
+        }
+        return metaDataEntries;
     }
 
     public static class STATE {

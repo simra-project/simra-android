@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -73,6 +72,7 @@ import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
+import de.tuberlin.mcc.simra.app.entities.Profile;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
@@ -80,7 +80,6 @@ import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
-import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.UpdateHelper;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
@@ -88,11 +87,8 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.showMessageOK;
-import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
@@ -332,9 +328,13 @@ public class MainActivity extends BaseActivity
                     ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(),
                             MetaData.STATE.JUST_RECORDED, this);
                 } else {
-                    DialogInterface.OnClickListener errorOnClickListener = (dialog, which) -> {
-                    };
-                    showMessageOK(getString(R.string.errorRideNotRecorded), errorOnClickListener, MainActivity.this);
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setMessage(getString(R.string.errorRideNotRecorded))
+                            .setCancelable(false)
+                            .setPositiveButton("OK", (dialog, which) -> {
+                            })
+                            .create()
+                            .show();
                 }
             } catch (Exception e) {
                 Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
@@ -345,7 +345,7 @@ public class MainActivity extends BaseActivity
             int region = lookUpIntSharedPrefs("Region", -1, "Profile", MainActivity.this);
             if (region == 2 || region == 3 || region == 8) {
                 fireRegionPrompt();
-                writeIntToSharedPrefs("regionLastChangedAtVersion", getAppVersionNumber(MainActivity.this),
+                writeIntToSharedPrefs("regionLastChangedAtVersion", BuildConfig.VERSION_CODE,
                         "simraPrefs", MainActivity.this);
             }
         }
@@ -402,7 +402,7 @@ public class MainActivity extends BaseActivity
         binding.appBarMain.buttonStopRecording.setVisibility(View.VISIBLE);
         binding.appBarMain.buttonStartRecording.setVisibility(View.INVISIBLE);
 
-        binding.appBarMain.toolbar.setVisibility(View.INVISIBLE);
+        binding.appBarMain.toolbar.setVisibility(View.GONE);
         binding.appBarMain.reportIncidentContainer.setVisibility(View.VISIBLE);
 
         binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.GONE);
@@ -614,7 +614,7 @@ public class MainActivity extends BaseActivity
         if (id == R.id.nav_history) {
             Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_democraphic_data) {
+        } else if (id == R.id.nav_demographic_data) {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_statistics) {
@@ -638,14 +638,14 @@ public class MainActivity extends BaseActivity
             i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
             i.putExtra(Intent.EXTRA_TEXT, (getString(R.string.feedbackReceiver)) + System.lineSeparator()
-                    + "App Version: " + getAppVersionNumber(this) + System.lineSeparator() + "Android Version: ");
+                    + "App Version: " + BuildConfig.VERSION_CODE + System.lineSeparator() + "Android Version: ");
             try {
                 startActivity(Intent.createChooser(i, "Send mail..."));
             } catch (android.content.ActivityNotFoundException ex) {
                 Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
             }
 
-        } else if (id == R.id.nav_impressum) {
+        } else if (id == R.id.nav_imprint) {
             Intent intent = new Intent(MainActivity.this, WebActivity.class);
             intent.putExtra("URL", getString(R.string.tuberlin_impressum));
 
@@ -684,7 +684,7 @@ public class MainActivity extends BaseActivity
         Log.d(TAG, "fireWhatIsNewPrompt()");
         // Store the created AlertDialog instance.
         // Because only AlertDialog has cancel method.
-        AlertDialog alertDialog = null;
+        AlertDialog alertDialog;
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         // Get custom login form view.
@@ -761,8 +761,9 @@ public class MainActivity extends BaseActivity
                     break;
                 }
             }
-            updateProfile(true, MainActivity.this, -1, -1, region1, -1, -2);
-
+            Profile profile = Profile.loadProfile(null, MainActivity.this);
+            profile.region = region1;
+            Profile.saveProfile(profile, null, MainActivity.this);
         });
         alert.setCancelable(false);
         alert.show();
@@ -786,7 +787,7 @@ public class MainActivity extends BaseActivity
             try {
 
                 URL url = new URL(
-                        BuildConfig.API_ENDPOINT + "check-regions?clientHash=" + SimRAuthenticator.getClientHash());
+                        BuildConfig.API_ENDPOINT + "check-regions?clientHash=" + BuildConfig.API_SECRET);
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
