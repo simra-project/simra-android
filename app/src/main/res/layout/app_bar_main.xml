@@ -10,107 +10,115 @@
         android:id="@+id/main_content"
         layout="@layout/content_main" />
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_margin="10dp"
-        android:background="@color/simraDarkBlue"
-        android:elevation="8dp"
-        android:theme="@style/ToolbarTheme"
-        android:titleTextColor="#FEFEFE"
-        android:visibility="visible"
-        app:popupTheme="@style/AppTheme.PopupOverlay"
-        app:titleTextAppearance="@style/Toolbar.TitleText">
-
-        <ImageButton
-            android:id="@+id/helmet_icon"
-            android:layout_width="65dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="15dp"
-            android:background="@drawable/simra_logo" />
-
-    </androidx.appcompat.widget.Toolbar>
-
     <LinearLayout
-        android:id="@+id/reportIncidentContainer"
+        android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_margin="10dp"
+            android:background="@color/simraDarkBlue"
+            android:elevation="8dp"
+            android:theme="@style/ToolbarTheme"
+            android:titleTextColor="#FEFEFE"
+            android:visibility="visible"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:titleTextAppearance="@style/Toolbar.TitleText">
+
+            <ImageButton
+                android:id="@+id/helmet_icon"
+                android:layout_width="65dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/simra_logo" />
+
+        </androidx.appcompat.widget.Toolbar>
 
         <LinearLayout
+            android:id="@+id/reportIncidentContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:visibility="gone">
 
-            <TextView
-                android:id="@+id/reportTextView"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/reportIncidentText"
-                android:textAlignment="center"
-                android:textAllCaps="true"
-                android:textColor="@color/white" />
+                android:background="@color/colorPrimary"
+                android:orientation="vertical"
+                android:padding="8dp">
 
-            <RelativeLayout
+                <TextView
+                    android:id="@+id/reportTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/reportIncidentText"
+                    android:textAlignment="center"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/report_closepass_incident"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@+id/report_obstacle_incident"
+                        android:layout_alignBottom="@+id/report_obstacle_incident"
+                        android:layout_alignParentStart="true"
+                        android:layout_toStartOf="@+id/reportHelperSpace"
+                        android:backgroundTint="@color/colorAccent"
+                        android:maxLines="2"
+                        android:text="@string/reportIncidentClosepass"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:visibility="visible"
+                        app:icon="@drawable/ic_directions_car_24" />
+
+                    <Space
+                        android:id="@+id/reportHelperSpace"
+                        android:layout_width="16dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true" />
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/report_obstacle_incident"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_toEndOf="@+id/reportHelperSpace"
+                        android:backgroundTint="@color/colorAccent"
+                        android:maxLines="2"
+                        android:text="@string/reportIncidentObstacle"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:visibility="visible"
+                        app:icon="@drawable/ic_alt_route_24" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                    android:id="@+id/report_closepass_incident"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignTop="@+id/report_obstacle_incident"
-                    android:layout_alignBottom="@+id/report_obstacle_incident"
-                    android:layout_alignParentStart="true"
-                    android:layout_toStartOf="@+id/reportHelperSpace"
-                    android:backgroundTint="@color/colorAccent"
-                    android:maxLines="2"
-                    android:text="@string/reportIncidentClosepass"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:visibility="visible"
-                    app:icon="@drawable/ic_directions_car_24" />
-
-                <Space
-                    android:id="@+id/reportHelperSpace"
-                    android:layout_width="16dp"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true" />
-
-                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                    android:id="@+id/report_obstacle_incident"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_toEndOf="@+id/reportHelperSpace"
-                    android:backgroundTint="@color/colorAccent"
-                    android:maxLines="2"
-                    android:text="@string/reportIncidentObstacle"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:visibility="visible"
-                    app:icon="@drawable/ic_alt_route_24" />
-            </RelativeLayout>
+                android:layout_height="10dp"
+                android:background="@drawable/shadow_gradient" />
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            android:background="@drawable/shadow_gradient" />
     </LinearLayout>
+
 
     <ImageButton
         android:id="@+id/center_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_below="@id/reportIncidentContainer"
+        android:layout_below="@id/top_bar"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="15dp"

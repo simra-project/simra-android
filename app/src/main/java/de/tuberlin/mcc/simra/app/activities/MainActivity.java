@@ -402,7 +402,7 @@ public class MainActivity extends BaseActivity
         binding.appBarMain.buttonStopRecording.setVisibility(View.VISIBLE);
         binding.appBarMain.buttonStartRecording.setVisibility(View.INVISIBLE);
 
-        binding.appBarMain.toolbar.setVisibility(View.INVISIBLE);
+        binding.appBarMain.toolbar.setVisibility(View.GONE);
         binding.appBarMain.reportIncidentContainer.setVisibility(View.VISIBLE);
 
         binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.GONE);
