@@ -631,7 +631,7 @@ public class Utils {
     public static List<IncidentLogEntry> findAccEvents(int rideId, int bike, int pLoc, Context context) {
         List<IncidentLogEntry> foundEvents = null;
         if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(context)) {
-            foundEvents = findAccEventOnlines(rideId, bike, pLoc, context);
+            foundEvents = findAccEventOnline(rideId, bike, pLoc, context);
         }
         if (foundEvents != null && foundEvents.size() > 0)
             return foundEvents;
@@ -642,7 +642,7 @@ public class Utils {
     /*
      * Uses sophisticated AI to analyze the ride
      * */
-    public static List<IncidentLogEntry> findAccEventOnlines(int rideId, int bike, int pLoc, Context context) {
+    public static List<IncidentLogEntry> findAccEventOnline(int rideId, int bike, int pLoc, Context context) {
         try {
             String responseString = "";
 
@@ -729,8 +729,6 @@ public class Utils {
 
                     }
                 }
-
-                //return incidents
                 return foundIncedents;
             }
 
@@ -916,7 +914,7 @@ public class Utils {
     }
 
     /**
-     * @deprecated Use  instead
+     * @deprecated Use IncidentLogEntry  instead
      */
     private static class AccEvent {
 

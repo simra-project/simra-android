@@ -118,11 +118,10 @@ public class SettingsActivity extends BaseActivity {
 
 
         // Switch: AI Select
-        Switch AISwitch = binding.switchAI;
         if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(this)) {
-            AISwitch.setChecked(true);
+            binding.switchAI.setChecked(true);
         }
-        AISwitch.setOnCheckedChangeListener((buttonView, isChecked) -> SharedPref.Settings.IncidentGenerationAIActive.setAIEnabled(isChecked,this));
+        binding.switchAI.setOnCheckedChangeListener((buttonView, isChecked) -> SharedPref.Settings.IncidentGenerationAIActive.setAIEnabled(isChecked,this));
 
 
         // Switch: Radmesser device enabled
