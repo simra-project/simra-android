@@ -95,6 +95,16 @@ public class DataLog {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder dataLogString = new StringBuilder();
+        dataLogString.append(IOUtils.Files.getFileInfoLine()).append(DATA_LOG_HEADER).append(System.lineSeparator());
+        for (DataLogEntry dataLogEntry : this.dataLogEntries) {
+            dataLogString.append(dataLogEntry.stringifyDataLogEntry()).append(System.lineSeparator());
+        }
+        return dataLogString.toString();
+    }
+
 
     public static class RideAnalysisData {
         public final long waitedTime;

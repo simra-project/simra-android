@@ -1,12 +1,25 @@
 package de.tuberlin.mcc.simra.app;
 
 import android.app.Application;
+import android.os.StrictMode;
 
 import io.sentry.android.core.SentryAndroid;
 
+/**
+ * Simra Main Application Class.
+ */
 public class SimraApplication extends Application {
     public void onCreate() {
         super.onCreate();
+        if (BuildConfig.BUILD_TYPE == "debug") {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .build());
+        }
+
         /**
          * Manual Initialization of the Sentry Android SDK
          * @Context - Instance of the Android Context

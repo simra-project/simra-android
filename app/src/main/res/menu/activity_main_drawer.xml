@@ -9,7 +9,7 @@
             android:icon="@drawable/ic_list_black_24dp"
             android:title="@string/title_activity_history" />
         <item
-            android:id="@+id/nav_democraphic_data"
+            android:id="@+id/nav_demographic_data"
             android:icon="@drawable/ic_face_black_24dp"
             android:title="@string/title_activity_profile" />
         <item
@@ -37,7 +37,7 @@
             android:icon="@drawable/ic_content_paste_black_24dp"
             android:title="@string/feedback" />
         <item
-            android:id="@+id/nav_impressum"
+            android:id="@+id/nav_imprint"
             android:icon="@drawable/ic_info_black_24dp"
             android:title="@string/imprint" />
         <item

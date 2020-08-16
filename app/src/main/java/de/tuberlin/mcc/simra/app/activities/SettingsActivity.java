@@ -13,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
@@ -20,8 +21,6 @@ import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 import pl.droidsonroids.gif.GifImageView;
-
-import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -145,7 +144,7 @@ public class SettingsActivity extends BaseActivity {
 
         // Version Text
         TextView appVersionTextView = findViewById(R.id.appVersionTextView);
-        appVersionTextView.setText("Version: " + getAppVersionNumber(this));
+        appVersionTextView.setText("Version: " + BuildConfig.VERSION_CODE + "(" + BuildConfig.VERSION_NAME + ")");
 
     }
 
