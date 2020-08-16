@@ -6,8 +6,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -97,6 +99,14 @@ public class MetaData {
         MetaData metaData = loadMetaData(context);
         metaData.metaDataEntries.remove(rideId);
         saveMetaData(metaData, context);
+    }
+
+    public static List<MetaDataEntry> getMetaDataEntries(Context context) {
+        List<MetaDataEntry> metaDataEntries = new ArrayList<>();
+        Iterator iterator = loadMetaData(context).metaDataEntries.entrySet().iterator();
+        while (iterator.hasNext()) {
+            metaDataEntries.add(iterator.next());
+        }
     }
 
     public static class STATE {

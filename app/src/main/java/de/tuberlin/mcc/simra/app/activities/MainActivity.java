@@ -72,6 +72,7 @@ import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
+import de.tuberlin.mcc.simra.app.entities.Profile;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
@@ -89,7 +90,6 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPref
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
@@ -762,8 +762,9 @@ public class MainActivity extends BaseActivity
                     break;
                 }
             }
-            updateProfile(true, MainActivity.this, -1, -1, region1, -1, -2);
-
+            Profile profile = Profile.loadProfile(null, MainActivity.this);
+            profile.region = region1;
+            Profile.saveProfile(profile, null, MainActivity.this);
         });
         alert.setCancelable(false);
         alert.show();

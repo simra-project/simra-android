@@ -21,8 +21,10 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -31,6 +33,7 @@ import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
+import de.tuberlin.mcc.simra.app.entities.Profile;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -42,12 +45,8 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.Utils.getProfileDemographics;
-import static de.tuberlin.mcc.simra.app.util.Utils.getProfileWithoutDemographics;
-import static de.tuberlin.mcc.simra.app.util.Utils.getRegionProfilesArrays;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.updateProfile;
 
 public class UploadService extends Service {
 
@@ -170,31 +169,26 @@ public class UploadService extends Service {
 
                 // If there wasn't a crash or the user did not gave us the permission, upload ride(s)
             } else {
-                // String[] globalProfileContentWithoutDemographics = getProfileWithoutDemographics();
-                Object[] globalProfileContentWithoutDemographics = getProfileWithoutDemographics("Profile", context);
-                Log.d(TAG, "globalProfileContentWithoutDemographics:" + Arrays.toString(globalProfileContentWithoutDemographics));
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                int totalNumberOfRides = (int) globalProfileContentWithoutDemographics[0];
-                long totalDuration = (long) globalProfileContentWithoutDemographics[1];
-                int totalNumberOfIncidents = (int) globalProfileContentWithoutDemographics[2];
-                Log.d(TAG, "totalNumberOfIncidents: " + totalNumberOfIncidents);
-                long totalWaitedTime = (long) globalProfileContentWithoutDemographics[3];
-                long totalDistance = (long) globalProfileContentWithoutDemographics[4];
-                long totalCO2 = (long) globalProfileContentWithoutDemographics[5];
-                //Object[] timeBuckets = Arrays.copyOfRange(globalProfileContentWithoutDemographics,6,30);
-                Float[] timeBuckets = new Float[24];
-                for (int i = 0; i < timeBuckets.length; i++) {
-                    timeBuckets[i] = (float) globalProfileContentWithoutDemographics[i + 6];
-                }
-                int totalNumberOfScary = (int) globalProfileContentWithoutDemographics[30];
+                Profile globalProfile = Profile.loadProfile(null, context);
+
                 int numberOfRegions = getRegions(context).length;
                 boolean[] regionProfileUpdated = new boolean[numberOfRegions];
-                // contains one Object[] for each region. The arrays contain the following information:
-                // {NumberOfRides,Duration,NumberOfIncidents,WaitedTime,Distance,Co2,0,...,23,NumberOfScary}
-                Object[][] regionProfiles = getRegionProfilesArrays(numberOfRegions, context);
+
+                List<Profile> regionProfilesList = new ArrayList<>();
+                for (int i = 0; i < numberOfRegions; i++) {
+                    regionProfilesList.add(Profile.loadProfile(i, context));
+                }
 
                 String fileVersion = "";
                 StringBuilder metaDataContent = new StringBuilder();
+
+                MetaData metaData = MetaData.loadMetaData(context);
+                Iterator it = mp.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry) it.next();
+                    System.out.println(pair.getKey() + " = " + pair.getValue());
+                    it.remove(); // avoids a ConcurrentModificationException
+                }
 
                 try {
                     BufferedReader metaDataReader = new BufferedReader(new FileReader(IOUtils.Files.getMetaDataFile(context)));
@@ -224,6 +218,8 @@ public class UploadService extends Service {
                             String password = lookUpSharedPrefs(rideKey, "-1", "keyPrefs", context);
 
                             int region = Integer.parseInt(metaDataLine[8]);
+                            Profile regionProfile = regionProfilesList.get(region);
+
                             Log.d(TAG, "Saved password: " + password);
                             Pair<Integer, String> response;
                             // send data with POST, if it is being sent the first time
@@ -251,12 +247,15 @@ public class UploadService extends Service {
                                 IncidentLog.saveIncidentLog(incidentLogToOverwrite, context);
 
                                 metaDataLine[3] = String.valueOf(MetaData.STATE.SYNCED);
-                                totalNumberOfRides++;
-                                totalDuration += (Long.parseLong(metaDataLine[2]) - Long.parseLong(metaDataLine[1]));
-                                totalNumberOfIncidents += Integer.parseInt(metaDataLine[4]);
-                                totalWaitedTime += Long.parseLong(metaDataLine[5]);
-                                totalDistance += Long.parseLong(metaDataLine[6]);
-                                totalCO2 += (long) ((Long.parseLong(metaDataLine[6]) / (float) 1000) * 138);
+                                globalProfile.numberOfRides++;
+                                globalProfile.duration += (Long.parseLong(metaDataLine[2]) - Long.parseLong(metaDataLine[1]));
+                                globalProfile.numberOfIncidents += Integer.parseInt(metaDataLine[4]);
+                                globalProfile.waitedTime += Long.parseLong(metaDataLine[5]);
+                                globalProfile.distance += Long.parseLong(metaDataLine[6]);
+                                globalProfile.co2 += (long) ((Long.parseLong(metaDataLine[6]) / (float) 1000) * 138);
+                                globalProfile.numberOfScaryIncidents += Integer.parseInt(metaDataLine[7]);
+
+
                                 // update the timebuckets
                                 Date startDate = new Date(Long.parseLong(metaDataLine[1]));
                                 Date endDate = new Date(Long.parseLong(metaDataLine[2]));
@@ -265,36 +264,24 @@ public class UploadService extends Service {
                                 int startHour = Integer.parseInt(sdf.format(startDate));
                                 int endHour = Integer.parseInt(sdf.format(endDate));
                                 float durationOfThisRide = endHour - startHour + 1;
-                                Log.d(TAG, region + " buckets before: " + Arrays.toString(regionProfiles[region]));
+
                                 for (int i = startHour; i <= endHour; i++) {
                                     // for global profile
-                                    timeBuckets[i] = timeBuckets[i] + (1 / durationOfThisRide);
+                                    globalProfile.timeDistribution.set(i, globalProfile.timeDistribution.get(i).floatValue() + (1 / durationOfThisRide));
                                     // for region profiles
-                                    Float thisTimeBucket = (Float) regionProfiles[region][i + 6];
-                                    regionProfiles[region][i + 6] = thisTimeBucket + (1 / durationOfThisRide);
-                                    // regionTimeBuckets[region][i] = (Float)regionProfiles[region][i];
+                                    regionProfile.timeDistribution.set(i, regionProfile.timeDistribution.get(i).floatValue() + (1 / durationOfThisRide));
                                 }
-                                totalNumberOfScary += Integer.parseInt(metaDataLine[7]);
 
 
-                                Integer thisNumberOfRides = (Integer) regionProfiles[region][0];//numberOfRides
-                                regionProfiles[region][0] = ++thisNumberOfRides;
-                                Long thisDuration = (Long) regionProfiles[region][1];//Duration
-                                regionProfiles[region][1] = thisDuration + (Long.parseLong(metaDataLine[2]) - Long.parseLong(metaDataLine[1]));
-                                Integer thisNumberOfIncidents = (Integer) regionProfiles[region][2];//NumberOfIncidents
-                                regionProfiles[region][2] = thisNumberOfIncidents + Integer.parseInt(metaDataLine[4]);
-                                Long thisWaitedTime = (Long) regionProfiles[region][3];//WaitedTime
-                                regionProfiles[region][3] = thisWaitedTime + Long.parseLong(metaDataLine[5]);
-                                Long thisDistance = (Long) regionProfiles[region][4];//Distance
-                                regionProfiles[region][4] = thisDistance + Long.parseLong(metaDataLine[6]);
-                                Long thisCo2 = (Long) regionProfiles[region][5];//Co2
-                                regionProfiles[region][5] = thisCo2 + (long) ((Long.parseLong(metaDataLine[6]) / (float) 1000) * 138);
-
-                                Integer thisNumberOfScary = (Integer) regionProfiles[region][30];//NumberOfScary
-                                regionProfiles[region][30] = thisNumberOfScary + Integer.parseInt(metaDataLine[7]);
+                                regionProfile.numberOfRides++;
+                                regionProfile.duration += (Long.parseLong(metaDataLine[2]) - Long.parseLong(metaDataLine[1]));
+                                regionProfile.numberOfIncidents += Integer.parseInt(metaDataLine[4]);
+                                regionProfile.waitedTime += Long.parseLong(metaDataLine[5]);
+                                regionProfile.distance += Long.parseLong(metaDataLine[6]);
+                                regionProfile.co2 += (long) ((Long.parseLong(metaDataLine[6]) / (float) 1000) * 138);
+                                regionProfile.numberOfScaryIncidents = Integer.parseInt(metaDataLine[7]);
                                 regionProfileUpdated[region] = true;
-                                Log.d(TAG, region + " buckets after: " + Arrays.toString(regionProfiles[region]));
-
+                                regionProfilesList.set(region, regionProfile);
                             }
 
                         }
@@ -325,34 +312,35 @@ public class UploadService extends Service {
                 }
 
 
-                Log.d(TAG, "uploadFile() totalWaitedTime: " + totalWaitedTime);
                 // Now after the rides have been uploaded, we can update the profile with the new statistics
-                updateProfile(true, context, -1, -1, -1, -1, totalNumberOfRides, totalDuration, totalNumberOfIncidents, totalWaitedTime, totalDistance, totalCO2, timeBuckets, -2, totalNumberOfScary);
+                Profile.saveProfile(globalProfile, null, context);
 
                 // update region profiles
-                for (int p = 0; p < regionProfiles.length; p++) {
+                for (int p = 0; p < regionProfilesList.toArray().length; p++) {
                     if (regionProfileUpdated[p]) {
-                        updateProfile(false, context, -1, -1, p, -1, Integer.parseInt(String.valueOf(regionProfiles[p][0])), (long) regionProfiles[p][1], Integer.parseInt(String.valueOf(regionProfiles[p][2])), (long) regionProfiles[p][3], (long) regionProfiles[p][4], (long) regionProfiles[p][5], Arrays.copyOfRange(regionProfiles[p], 6, 30), -2, Integer.parseInt(String.valueOf(regionProfiles[p][30])));
+                        Profile regionProfile = regionProfilesList.get(p);
+
+                        Profile.saveProfile(regionProfile, p, context);
+
                         int profileVersion = lookUpIntSharedPrefs("Version", 1, "Profile_" + p, context);
                         StringBuilder profileContentToSend = new StringBuilder().append(BuildConfig.VERSION_CODE).append("#").append(profileVersion).append(System.lineSeparator());
-                        profileContentToSend.append(Constants.PROFILE_HEADER);
-                        int[] demographics = getProfileDemographics(context);
-                        for (int i = 0; i < demographics.length - 1; i++) {
-                            profileContentToSend.append(demographics[i]).append(",");
-                        }
-
                         profileContentToSend
-                                .append(regionProfiles[p][0]).append(",")//NumberOfRides
-                                .append(regionProfiles[p][1]).append(",")//Duration
-                                .append(regionProfiles[p][2]).append(",")//NumberOfIncidents
-                                .append(regionProfiles[p][3]).append(",")//WaitedTime
-                                .append(regionProfiles[p][4]).append(",")//Distance
-                                .append(regionProfiles[p][5]).append(",");//Co2
+                                .append(Constants.PROFILE_HEADER)
+                                .append(globalProfile.ageGroup).append(",")
+                                .append(globalProfile.gender).append(",")
+                                .append(globalProfile.region).append(",")
+                                .append(globalProfile.experience).append(",")
+                                .append(regionProfile.numberOfRides).append(",")
+                                .append(regionProfile.duration).append(",")
+                                .append(regionProfile.numberOfIncidents).append(",")
+                                .append(regionProfile.waitedTime).append(",")
+                                .append(regionProfile.distance).append(",")
+                                .append(regionProfile.co2).append(",");
                         for (int i = 0; i < 24; i++) {
-                            profileContentToSend.append(regionProfiles[p][i + 6]).append(",");
+                            profileContentToSend.append(regionProfile.timeDistribution.get(i)).append(",");
                         }
-                        profileContentToSend.append(demographics[4]).append(",");
-                        profileContentToSend.append(regionProfiles[p][30]);
+                        profileContentToSend.append(globalProfile.behaviour).append(",");
+                        profileContentToSend.append(regionProfile.numberOfScaryIncidents);
 
                         String profilePassword = lookUpSharedPrefs("Profile_" + p, "-1", "keyPrefs", context);
                         Log.d(TAG, "Saved password: " + profilePassword);
