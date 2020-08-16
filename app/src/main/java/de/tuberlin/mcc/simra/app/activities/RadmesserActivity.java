@@ -6,25 +6,21 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.NumberPicker;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.databinding.ActivityRadmesserBinding;
 import de.tuberlin.mcc.simra.app.services.RadmesserService;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
@@ -32,47 +28,47 @@ import pl.droidsonroids.gif.GifImageView;
 
 
 public class RadmesserActivity extends AppCompatActivity {
-    LinearLayout connectDevicesLayout; // Verfügbare Geräte
-    LinearLayout deviceLayout; // Connected Device
-    LinearLayout pairingLayout; // Connected Device
-    LinearLayout devicesList; // Button list (Innerhalb ConnectDevicesLayout)
-    ProgressBar closePassBar;
-    ProgressBar searchingCircle;
-    TextView deviceInfoTextView; // (Innerhalb deviceLayout)
     BroadcastReceiver receiver;
-    Switch takePicturesButton;
-    Button retryButton;
-    Button connectButton;
-    private AlertDialog alertDialog;
     Set<BluetoothDevice> foundDevices;
     BluetoothDevice selectedDevice;
+    ActivityRadmesserBinding binding;
     RadioGroup devices;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = ActivityRadmesserBinding.inflate(LayoutInflater.from(this));
+        setContentView(binding.getRoot());
+
         foundDevices = new HashSet<>();
-        setContentView(R.layout.activity_radmesser);
         initializeToolBar();
         Log.i("start", "RadmesserActivity");
-        connectDevicesLayout = findViewById(R.id.connectDevicesLayout);
-        devicesList = findViewById(R.id.devicesList);
-        searchingCircle = findViewById(R.id.searching);
-        retryButton = findViewById(R.id.retry);
-        retryButton.setOnClickListener(new View.OnClickListener() {
+        binding.retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startScanningDevices();
                 foundDevices = new HashSet<>();
             }
         });
-        devices  = new RadioGroup(this);
+        Button connectButton = new Button(this);
+        connectButton.setVisibility(View.GONE);
+        connectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedDevice != null) {
+                    RadmesserService.connectDevice(RadmesserActivity.this, selectedDevice.deviceId);
+
+                }
+            }
+        });
+        devices = new RadioGroup(this);
         devices.setOrientation(RadioGroup.VERTICAL);
         devices.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int id) {
-                for(BluetoothDevice device : foundDevices){
-                    if(device.hashCode() == id){
+                for (BluetoothDevice device : foundDevices) {
+                    if (device.hashCode() == id) {
                         selectedDevice = device;
                         connectButton.setText("Connect to " + selectedDevice.deviceName);
                         connectButton.setVisibility(View.VISIBLE);
@@ -81,29 +77,22 @@ public class RadmesserActivity extends AppCompatActivity {
 
             }
         });
-        deviceLayout = findViewById(R.id.deviceLayout);
-        pairingLayout = findViewById(R.id.pairing);
-        closePassBar = findViewById(R.id.progressBarClosePass);
-        deviceInfoTextView = findViewById(R.id.deviceInfoTextView);
-        NumberPicker handleBarWidth = findViewById(R.id.handleBarWidth);
-        handleBarWidth.setMaxValue(40);
-        handleBarWidth.setMinValue(0);
-        handleBarWidth.setValue(SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(this));
-        handleBarWidth.setOnValueChangedListener((numberPicker, oldVal, newVal) -> {
+        binding.handleBarWidth.setMaxValue(40);
+        binding.handleBarWidth.setMinValue(0);
+        binding.handleBarWidth.setValue(SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(this));
+        binding.handleBarWidth.setOnValueChangedListener((numberPicker, oldVal, newVal) -> {
             SharedPref.Settings.Ride.OvertakeWidth.setTotalWidthThroughHandlebarWidth(newVal, this);
         });
 
-        NumberPicker takePictureInterval = findViewById(R.id.takePictureDuringRideInterval);
-        takePictureInterval.setMaxValue(20);
-        takePictureInterval.setMinValue(0);
-        takePictureInterval.setValue(SharedPref.Settings.Ride.PicturesDuringRideInterval.getInterval(this));
-        takePictureInterval.setOnValueChangedListener((numberPicker, oldVal, newVal) -> {
+        binding.takePictureDuringRideInterval.setMaxValue(20);
+        binding.takePictureDuringRideInterval.setMinValue(0);
+        binding.takePictureDuringRideInterval.setValue(SharedPref.Settings.Ride.PicturesDuringRideInterval.getInterval(this));
+        binding.takePictureDuringRideInterval.setOnValueChangedListener((numberPicker, oldVal, newVal) -> {
             SharedPref.Settings.Ride.PicturesDuringRideInterval.setInterval(newVal, this);
         });
 
-        takePicturesButton = findViewById(R.id.takePictureDuringRideButton);
-        takePicturesButton.setChecked(SharedPref.Settings.Ride.PicturesDuringRide.isActivated(this));
-        takePicturesButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        binding.takePictureDuringRideButton.setChecked(SharedPref.Settings.Ride.PicturesDuringRide.isActivated(this));
+        binding.takePictureDuringRideButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 if (PermissionHelper.Camera.hasPermission(this)) {
                     // Wants to activate this Functionality and already has Camera Permission
@@ -118,25 +107,15 @@ public class RadmesserActivity extends AppCompatActivity {
             }
         });
 
-        Button disconnectBTN = findViewById(R.id.btnDisconnect);
-        disconnectBTN.setOnClickListener(view -> RadmesserService.disconnectAndUnpairDevice(this));
+        binding.btnDisconnect.setOnClickListener(view -> RadmesserService.disconnectAndUnpairDevice(this));
         RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
         updateUI(currentState);
         if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
             startScanningDevices();
         }
-        connectButton = new Button(this);
-        connectButton.setVisibility(View.GONE);
-        connectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(selectedDevice != null){
-                    RadmesserService.connectDevice(RadmesserActivity.this, selectedDevice.deviceId);
-                }
-            }
-        });
-        connectDevicesLayout.addView(devices);
-        connectDevicesLayout.addView(connectButton);
+
+        binding.connectDevicesLayout.addView(devices);
+        binding.connectDevicesLayout.addView(connectButton);
     }
 
     private void setClosePassBarColor(int distanceInCm) {
@@ -144,43 +123,43 @@ public class RadmesserActivity extends AppCompatActivity {
         // Algoritmus found https://stackoverflow.com/questions/340209/generate-colors-between-red-and-green-for-a-power-meter
         // Da n zwischen 0 -100 liegen soll und das maximum 200 ist, dann halbieren immer den Wert.
         int normalizedValue = maxColorValue / 2;
-        int red = (255 * normalizedValue) / 100;
-        int green = (255 * (100 - normalizedValue)) / 100;
+        int red = (255 * (100 - normalizedValue)) / 100;
+        int green = (255 * normalizedValue) / 100;
         int blue = 0;
         // Color und Progress sind abhängig
-        closePassBar.setProgressTintList(ColorStateList.valueOf(Color.rgb(red, green, blue)));
-        closePassBar.setProgress(normalizedValue);
+        binding.progressBarClosePass.setProgressTintList(ColorStateList.valueOf(Color.rgb(red, green, blue)));
+        binding.progressBarClosePass.setProgress(normalizedValue);
     }
 
     private void createRadioButton(BluetoothDevice device) {
-        RadioButton radioButton =  new RadioButton(this);
+        RadioButton radioButton = new RadioButton(this);
         radioButton.setText(device.deviceName);
         radioButton.setId(device.hashCode());
         devices.addView(radioButton);
     }
 
-    private void showRetryButton(){
-        searchingCircle.setVisibility(View.GONE);
-        retryButton.setVisibility(View.VISIBLE);
+    private void showRetryButton() {
+        binding.searchingCircle.setVisibility(View.GONE);
+        binding.retryButton.setVisibility(View.VISIBLE);
     }
 
-    private void hideRetryButton(){
-        searchingCircle.setVisibility(View.VISIBLE);
-        retryButton.setVisibility(View.GONE);
+    private void hideRetryButton() {
+        binding.searchingCircle.setVisibility(View.VISIBLE);
+        binding.retryButton.setVisibility(View.GONE);
     }
 
     private void updateUI(RadmesserService.ConnectionState state) {
         switch (state) {
             case PAIRING:
-                deviceLayout.setVisibility(View.GONE);
-                connectDevicesLayout.setVisibility(View.GONE);
-                pairingLayout.setVisibility(View.VISIBLE);
+                binding.deviceLayout.setVisibility(View.GONE);
+                binding.connectDevicesLayout.setVisibility(View.GONE);
+                binding.pairingLayout.setVisibility(View.VISIBLE);
                 showTutorialDialog();
                 break;
             case CONNECTED:
-                deviceLayout.setVisibility(View.VISIBLE);
-                connectDevicesLayout.setVisibility(View.GONE);
-                pairingLayout.setVisibility(View.GONE);
+                binding.deviceLayout.setVisibility(View.VISIBLE);
+                binding.connectDevicesLayout.setVisibility(View.GONE);
+                binding.pairingLayout.setVisibility(View.GONE);
                 closeTutorialDialog();
                 break;
             case CONNECTION_REFUSED:
@@ -188,9 +167,9 @@ public class RadmesserActivity extends AppCompatActivity {
             case DISCONNECTED:
                 showRetryButton();
             case SEARCHING:
-                deviceLayout.setVisibility(View.GONE);
-                connectDevicesLayout.setVisibility(View.VISIBLE);
-                pairingLayout.setVisibility(View.GONE);
+                binding.deviceLayout.setVisibility(View.GONE);
+                binding.connectDevicesLayout.setVisibility(View.VISIBLE);
+                binding.pairingLayout.setVisibility(View.GONE);
                 hideRetryButton();
             default:
                 break;
@@ -202,7 +181,7 @@ public class RadmesserActivity extends AppCompatActivity {
             @Override
             public void onDeviceFound(String deviceName, String deviceId) {
                 BluetoothDevice foundDevice = new BluetoothDevice(deviceName, deviceId);
-                if(!foundDevices.contains(foundDevice)){
+                if (!foundDevices.contains(foundDevice)) {
                     foundDevices.add(foundDevice);
                     createRadioButton(foundDevice);
 
@@ -219,7 +198,7 @@ public class RadmesserActivity extends AppCompatActivity {
                 int distance = -1;
                 if (value != null && value.leftSensorValues.size() > 0) {
                     distance = value.leftSensorValues.get(0);
-                    deviceInfoTextView.setText("Connected with " + "\n" + "Last distance: " + distance + " cm");
+                    binding.deviceInfoTextView.setText(getString(R.string.radmesser_activity_text_last_distance) + " " + distance + " cm");
                     setClosePassBarColor(distance);
                 }
             }
@@ -228,21 +207,18 @@ public class RadmesserActivity extends AppCompatActivity {
     }
 
     private void startScanningDevices() {
-        devicesList.removeAllViews();
+        binding.devicesList.removeAllViews();
         RadmesserService.startScanning(this);
     }
 
     private void initializeToolBar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle("");
-        toolbar.setSubtitle("");
-        TextView toolbarTxt = findViewById(R.id.toolbar_title);
-        toolbarTxt.setText("Radmesser");
+        binding.toolbar.toolbar.setTitle("");
+        binding.toolbar.toolbar.setSubtitle("");
+        binding.toolbar.toolbarTitle.setText("Radmesser");
 
-        ImageButton backBtn = findViewById(R.id.back_button);
-        backBtn.setOnClickListener(v -> finish());
+        binding.toolbar.backButton.setOnClickListener(v -> finish());
     }
 
     private void connectToDevice(String deviceId) {
@@ -296,11 +272,11 @@ public class RadmesserActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private class BluetoothDevice{
+    private class BluetoothDevice {
         private String deviceName;
         private String deviceId;
 
-        public BluetoothDevice(String deviceName, String deviceId){
+        public BluetoothDevice(String deviceName, String deviceId) {
             this.deviceName = deviceName;
             this.deviceId = deviceId;
         }

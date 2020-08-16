@@ -332,4 +332,5 @@
     <string name="activity_radmesser_title_device_info">Device-Info</string>
     <string name="radmesser_activity_button_connect_device">Connected to device</string>
     <string name="radmesser_activity_button_disconnect_device">Disconnect device</string>
+    <string name="radmesser_activity_text_last_distance">Last distance:</string>
 </resources>
