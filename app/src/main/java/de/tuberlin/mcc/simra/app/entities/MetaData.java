@@ -103,10 +103,12 @@ public class MetaData {
 
     public static List<MetaDataEntry> getMetaDataEntries(Context context) {
         List<MetaDataEntry> metaDataEntries = new ArrayList<>();
-        Iterator iterator = loadMetaData(context).metaDataEntries.entrySet().iterator();
+        Iterator<Map.Entry<Integer, MetaDataEntry>> iterator = loadMetaData(context).metaDataEntries.entrySet().iterator();
         while (iterator.hasNext()) {
-            metaDataEntries.add(iterator.next());
+            Map.Entry<Integer, MetaDataEntry> entry = iterator.next();
+            metaDataEntries.add(entry.getValue());
         }
+        return metaDataEntries;
     }
 
     public static class STATE {

@@ -14,7 +14,6 @@ import android.util.Pair;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -22,7 +21,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -33,12 +31,12 @@ import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
+import de.tuberlin.mcc.simra.app.entities.MetaDataEntry;
 import de.tuberlin.mcc.simra.app.entities.Profile;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
-import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
@@ -55,6 +53,31 @@ public class UploadService extends Service {
     private PowerManager.WakeLock wakeLock = null;
     private boolean uploadSuccessful = false;
     private IBinder mBinder = new UploadService.MyBinder();
+
+    private static Profile updateProfileFromMetaData(Profile profile, MetaDataEntry metaDataEntry) {
+        profile.numberOfRides++;
+        profile.duration += (metaDataEntry.endTime - metaDataEntry.startTime);
+        profile.numberOfIncidents += metaDataEntry.numberOfIncidents;
+        profile.waitedTime += metaDataEntry.waitedTime;
+        profile.distance += metaDataEntry.distance;
+        profile.co2 += (long) (metaDataEntry.distance / (float) 1000) * 138;
+        profile.numberOfScaryIncidents += metaDataEntry.numberOfScaryIncidents;
+
+        // update the timebuckets
+        Date startDate = new Date(metaDataEntry.startTime);
+        Date endDate = new Date(metaDataEntry.endTime);
+        Locale locale = Resources.getSystem().getConfiguration().locale;
+        SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
+        int startHour = Integer.parseInt(sdf.format(startDate));
+        int endHour = Integer.parseInt(sdf.format(endDate));
+        float durationOfThisRide = endHour - startHour + 1;
+
+        for (int i = startHour; i <= endHour; i++) {
+            profile.timeDistribution.set(i, profile.timeDistribution.get(i).floatValue() + (1 / durationOfThisRide));
+        }
+
+        return profile;
+    }
 
     @Override
     public void onCreate() {
@@ -179,138 +202,66 @@ public class UploadService extends Service {
                     regionProfilesList.add(Profile.loadProfile(i, context));
                 }
 
-                String fileVersion = "";
-                StringBuilder metaDataContent = new StringBuilder();
+                List<MetaDataEntry> metaDataEntries = MetaData.getMetaDataEntries(context);
+                for (MetaDataEntry metaDataEntry : metaDataEntries) {
+                    // found a ride which is ready to upload in metaData.csv
+                    if (metaDataEntry.state.equals(MetaData.STATE.ANNOTATED)) {
+                        foundARideToUpload = true;
+                        // concatenate fileInfoVersion, accEvents and accGps content
+                        Pair<String, IncidentLog> contentToUploadAndAccEventsContentToOverwrite = Utils.getConsolidatedRideForUpload(metaDataEntry.rideId, context);
 
-                MetaData metaData = MetaData.loadMetaData(context);
-                Iterator it = mp.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry pair = (Map.Entry) it.next();
-                    System.out.println(pair.getKey() + " = " + pair.getValue());
-                    it.remove(); // avoids a ConcurrentModificationException
-                }
+                        String contentToUpload = contentToUploadAndAccEventsContentToOverwrite.first;
+                        IncidentLog incidentLogToOverwrite = contentToUploadAndAccEventsContentToOverwrite.second;
 
-                try {
-                    BufferedReader metaDataReader = new BufferedReader(new FileReader(IOUtils.Files.getMetaDataFile(context)));
-                    String line;
-                    fileVersion = metaDataReader.readLine().split("#")[1];
+                        String password = lookUpSharedPrefs(String.valueOf(metaDataEntry.rideId), "-1", "keyPrefs", context);
 
-                    // skip header
-                    metaDataReader.readLine();
-                    // loop through lines of metaData.csv to find rides ready for upload (state = 1)
-                    while ((line = metaDataReader.readLine()) != null) {
+                        Profile regionProfile = regionProfilesList.get(metaDataEntry.region);
 
-                        // key,startTime,endTime,state,numberOfIncidents,waitedTime,distance,numberOfScary,region
-                        // 17,1558605594337,1558606191224,2,1,180,648,0,1
-                        String[] metaDataLine = line.split(",", -1);
-                        Log.d(TAG, "metaDataLine: " + Arrays.toString(metaDataLine));
-                        // found a ride which is ready to upload in metaData.csv
-                        if (metaDataLine.length > 1 && metaDataLine[3].equals(String.valueOf(MetaData.STATE.ANNOTATED))) {
-                            foundARideToUpload = true;
-                            String rideKey = metaDataLine[0];
+                        Log.d(TAG, "Saved password: " + password);
+                        Pair<Integer, String> response;
+                        // send data with POST, if it is being sent the first time
+                        if (password.equals("-1")) {
+                            Log.d(TAG, "sending ride with POST: " + metaDataEntry.rideId);
+                            response = postFile("ride", contentToUpload, metaDataEntry.region);
 
-                            // concatenate fileInfoVersion, accEvents and accGps content
-                            Pair<String, IncidentLog> contentToUploadAndAccEventsContentToOverwrite = Utils.getConsolidatedRideForUpload(Integer.parseInt(rideKey), context);
-
-                            String contentToUpload = contentToUploadAndAccEventsContentToOverwrite.first;
-                            IncidentLog incidentLogToOverwrite = contentToUploadAndAccEventsContentToOverwrite.second;
-
-                            String password = lookUpSharedPrefs(rideKey, "-1", "keyPrefs", context);
-
-                            int region = Integer.parseInt(metaDataLine[8]);
-                            Profile regionProfile = regionProfilesList.get(region);
-
-                            Log.d(TAG, "Saved password: " + password);
-                            Pair<Integer, String> response;
-                            // send data with POST, if it is being sent the first time
-                            if (password.equals("-1")) {
-                                Log.d(TAG, "sending ride with POST: " + rideKey);
-                                response = postFile("ride", contentToUpload, region);
-
-                                if (response.second.split(",").length >= 2) {
-                                    writeToSharedPrefs(rideKey, response.second, "keyPrefs", context);
-                                }
-                                Log.d(TAG, "hashPassword: " + response + " written to keyPrefs");
-                                // send data with PUT, if it is being overwritten on the server
-                            } else {
-                                Log.d(TAG, "sending ride with PUT: " + rideKey);
-                                String fileHash = password.split(",")[0];
-                                String filePassword = password.split(",")[1];
-                                response = putFile("ride", fileHash, filePassword, contentToUpload, region);
-                                Log.d(TAG, "PUT response: " + response);
+                            if (response.second.split(",").length >= 2) {
+                                writeToSharedPrefs(String.valueOf(metaDataEntry.rideId), response.second, "keyPrefs", context);
                             }
-
-
-                            // if the respond is ok, mark ride as uploaded in metaData.csv
-                            if (response.first.equals(200)) {
-                                // Delete "nothing" events from accEvents.csv
-                                IncidentLog.saveIncidentLog(incidentLogToOverwrite, context);
-
-                                metaDataLine[3] = String.valueOf(MetaData.STATE.SYNCED);
-                                globalProfile.numberOfRides++;
-                                globalProfile.duration += (Long.parseLong(metaDataLine[2]) - Long.parseLong(metaDataLine[1]));
-                                globalProfile.numberOfIncidents += Integer.parseInt(metaDataLine[4]);
-                                globalProfile.waitedTime += Long.parseLong(metaDataLine[5]);
-                                globalProfile.distance += Long.parseLong(metaDataLine[6]);
-                                globalProfile.co2 += (long) ((Long.parseLong(metaDataLine[6]) / (float) 1000) * 138);
-                                globalProfile.numberOfScaryIncidents += Integer.parseInt(metaDataLine[7]);
-
-
-                                // update the timebuckets
-                                Date startDate = new Date(Long.parseLong(metaDataLine[1]));
-                                Date endDate = new Date(Long.parseLong(metaDataLine[2]));
-                                Locale locale = Resources.getSystem().getConfiguration().locale;
-                                SimpleDateFormat sdf = new SimpleDateFormat("HH", locale);
-                                int startHour = Integer.parseInt(sdf.format(startDate));
-                                int endHour = Integer.parseInt(sdf.format(endDate));
-                                float durationOfThisRide = endHour - startHour + 1;
-
-                                for (int i = startHour; i <= endHour; i++) {
-                                    // for global profile
-                                    globalProfile.timeDistribution.set(i, globalProfile.timeDistribution.get(i).floatValue() + (1 / durationOfThisRide));
-                                    // for region profiles
-                                    regionProfile.timeDistribution.set(i, regionProfile.timeDistribution.get(i).floatValue() + (1 / durationOfThisRide));
-                                }
-
-
-                                regionProfile.numberOfRides++;
-                                regionProfile.duration += (Long.parseLong(metaDataLine[2]) - Long.parseLong(metaDataLine[1]));
-                                regionProfile.numberOfIncidents += Integer.parseInt(metaDataLine[4]);
-                                regionProfile.waitedTime += Long.parseLong(metaDataLine[5]);
-                                regionProfile.distance += Long.parseLong(metaDataLine[6]);
-                                regionProfile.co2 += (long) ((Long.parseLong(metaDataLine[6]) / (float) 1000) * 138);
-                                regionProfile.numberOfScaryIncidents = Integer.parseInt(metaDataLine[7]);
-                                regionProfileUpdated[region] = true;
-                                regionProfilesList.set(region, regionProfile);
-                            }
-
+                            Log.d(TAG, "hashPassword: " + response + " written to keyPrefs");
+                            // send data with PUT, if it is being overwritten on the server
+                        } else {
+                            Log.d(TAG, "sending ride with PUT: " + metaDataEntry.rideId);
+                            String fileHash = password.split(",")[0];
+                            String filePassword = password.split(",")[1];
+                            response = putFile("ride", fileHash, filePassword, contentToUpload, metaDataEntry.region);
+                            Log.d(TAG, "PUT response: " + response);
                         }
-                        // update metaData.csv. change status from 1 to 2, if upload was successful
-                        for (int i = 0; i < metaDataLine.length; i++) {
-                            if (i == metaDataLine.length - 1) {
-                                metaDataContent.append(metaDataLine[i]).append(System.lineSeparator());
-                            } else {
-                                metaDataContent.append(metaDataLine[i]).append(",");
-                            }
-                        }
-                        //content.append((Arrays.toString(metaDataLine).replace("[","")
-                        //      .replace(", ",",").replace("]","")) + System.lineSeparator());
-                    }
-                    if (!foundARideToUpload) {
-                        Intent intent = new Intent();
-                        intent.setAction("de.tuberlin.mcc.simra.app.UPLOAD_COMPLETE");
-                        intent.putExtra("uploadSuccessful", uploadSuccessful);
-                        intent.putExtra("foundARideToUpload", foundARideToUpload);
-                        sendBroadcast(intent);
-                        stopSelf();
-                        return;
-                    }
-                    String fileInfoLine = BuildConfig.VERSION_CODE + "#" + fileVersion + System.lineSeparator();
-                    Utils.overwriteFile((fileInfoLine + MetaData.METADATA_HEADER + System.lineSeparator() + metaDataContent.toString()), IOUtils.Files.getMetaDataFile(context));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
+
+                        // if the respond is ok, mark ride as uploaded in metaData.csv
+                        if (response.first.equals(200)) {
+                            IncidentLog.saveIncidentLog(incidentLogToOverwrite, context);
+                            metaDataEntry.state = MetaData.STATE.SYNCED;
+                            MetaData.updateOrAddMetaDataEntryForRide(metaDataEntry, context);
+
+
+                            globalProfile = updateProfileFromMetaData(globalProfile, metaDataEntry);
+                            regionProfile = updateProfileFromMetaData(regionProfile, metaDataEntry);
+
+                            regionProfileUpdated[metaDataEntry.region] = true;
+                            regionProfilesList.set(metaDataEntry.region, regionProfile);
+                        }
+                    }
+                }
+                if (!foundARideToUpload) {
+                    Intent intent = new Intent();
+                    intent.setAction("de.tuberlin.mcc.simra.app.UPLOAD_COMPLETE");
+                    intent.putExtra("uploadSuccessful", uploadSuccessful);
+                    intent.putExtra("foundARideToUpload", foundARideToUpload);
+                    sendBroadcast(intent);
+                    stopSelf();
+                    return;
+                }
 
                 // Now after the rides have been uploaded, we can update the profile with the new statistics
                 Profile.saveProfile(globalProfile, null, context);
@@ -380,8 +331,7 @@ public class UploadService extends Service {
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
-            // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileName + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(BuildConfig.API_ENDPOINT + fileType + "?loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
+            URL url = new URL(BuildConfig.API_ENDPOINT + fileType + "?loc=" + locale + "&clientHash=" + BuildConfig.API_SECRET);
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection) url.openConnection();
@@ -422,8 +372,8 @@ public class UploadService extends Service {
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(BuildConfig.API_ENDPOINT + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + SimRAuthenticator.getClientHash());
-            Log.d(TAG, "URL: " + url.toString());
+            URL url = new URL(BuildConfig.API_ENDPOINT + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + BuildConfig.API_SECRET);
+
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod("PUT");

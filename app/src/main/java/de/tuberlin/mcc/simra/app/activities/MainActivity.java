@@ -80,7 +80,6 @@ import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
-import de.tuberlin.mcc.simra.app.util.SimRAuthenticator;
 import de.tuberlin.mcc.simra.app.util.UpdateHelper;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
@@ -788,7 +787,7 @@ public class MainActivity extends BaseActivity
             try {
 
                 URL url = new URL(
-                        BuildConfig.API_ENDPOINT + "check-regions?clientHash=" + SimRAuthenticator.getClientHash());
+                        BuildConfig.API_ENDPOINT + "check-regions?clientHash=" + BuildConfig.API_SECRET);
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
