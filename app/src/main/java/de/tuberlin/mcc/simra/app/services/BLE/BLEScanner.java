@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.services.radmesser;
+package de.tuberlin.mcc.simra.app.services.BLE;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -77,8 +77,9 @@ public class BLEScanner {
         startScan(
                 5,
                 filterList,
-                deviceFoundCallback // todo: maybe tops scan after, but may not be needed?
+                deviceFoundCallback
         );
+
     }
 
     public void findDevicesByServices(BLEServiceManager bleServices, DeviceFoundCallback deviceFoundCallback) {

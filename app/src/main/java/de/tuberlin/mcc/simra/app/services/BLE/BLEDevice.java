@@ -1,4 +1,4 @@
-package de.tuberlin.mcc.simra.app.services.radmesser;
+package de.tuberlin.mcc.simra.app.services.BLE;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -12,10 +12,10 @@ import android.util.Log;
 
 import java.util.UUID;
 
-import static de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager.BLEService;
-import static de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager.BLEServiceCharacteristic;
+import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEService;
+import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEServiceCharacteristic;
 
-public class RadmesserDevice {
+public class BLEDevice {
     /**
      * Bluetooth Service UUIDs
      */
@@ -38,7 +38,7 @@ public class RadmesserDevice {
     private Context ctx;
     private ConnectionStatus connectionState = ConnectionStatus.GATT_DISCONNECTED;
 
-    public RadmesserDevice(BluetoothDevice bleDevice, ConnectionStateCallbacks stateCallbacks, BLEServiceManager servicesDefinitions, Context parentContext) {
+    public BLEDevice(BluetoothDevice bleDevice, ConnectionStateCallbacks stateCallbacks, BLEServiceManager servicesDefinitions, Context parentContext) {
         this.bleDevice = bleDevice;
         this.callbacks = stateCallbacks;
         this.servicesDefinitions = servicesDefinitions;
@@ -150,7 +150,7 @@ public class RadmesserDevice {
     }
 
     public interface ConnectionStateCallbacks {
-        void onConnectionStateChange(ConnectionStatus newState, RadmesserDevice instnace);
+        void onConnectionStateChange(ConnectionStatus newState, BLEDevice instnace);
     }
     private void logCharacteristics(BluetoothGatt gatt) {
         for (BluetoothGattService service : gatt.getServices()) {

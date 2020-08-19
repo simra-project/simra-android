@@ -116,6 +116,13 @@ public class SettingsActivity extends BaseActivity {
         });
 
 
+        // Switch: AI Select
+        if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(this)) {
+            binding.switchAI.setChecked(true);
+        }
+        binding.switchAI.setOnCheckedChangeListener((buttonView, isChecked) -> SharedPref.Settings.IncidentGenerationAIActive.setAIEnabled(isChecked,this));
+
+
         // Switch: Radmesser device enabled
         boolean radmesserActivated = SharedPref.Settings.Radmesser.isEnabled(this);
         binding.radmesserButton.setVisibility(radmesserActivated ? View.VISIBLE : View.GONE);

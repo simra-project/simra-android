@@ -200,6 +200,19 @@ public class SharedPref {
             }
         }
 
+        public static class IncidentGenerationAIActive {
+            // See top of this class before changing this string
+            public static final String AI_ENABLED = SETTINGS + "AI";
+
+            public static void setAIEnabled(boolean enabled, Context context) {
+                writeBooleanToAppSharedPrefsAsync(AI_ENABLED, enabled, context);
+            }
+
+            public static boolean getAIEnabled(Context context) {
+                return readBooleanFromAppSharedPrefs(AI_ENABLED,  context);
+            }
+        }
+
         public static class Ride {
             public static final String RIDE = "RIDE";
 

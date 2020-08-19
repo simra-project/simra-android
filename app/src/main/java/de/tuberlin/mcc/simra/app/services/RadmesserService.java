@@ -22,18 +22,18 @@ import java.util.List;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
-import de.tuberlin.mcc.simra.app.services.radmesser.BLEScanner;
-import de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager;
-import de.tuberlin.mcc.simra.app.services.radmesser.RadmesserDevice;
+import de.tuberlin.mcc.simra.app.services.BLE.BLEScanner;
+import de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager;
+import de.tuberlin.mcc.simra.app.services.BLE.BLEDevice;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 
-import static de.tuberlin.mcc.simra.app.services.radmesser.BLEServiceManager.BLEService;
+import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEService;
 
 public class RadmesserService extends Service {
     private static final String TAG = "RadmesserService";
     private static final String sharedPrefsKey = "RadmesserServiceBLE";
     private static final String sharedPrefsKeyRadmesserID = "connectedDevice";
-    private RadmesserDevice connectedDevice;
+    private BLEDevice connectedDevice;
     private volatile HandlerThread mHandlerThread;
     private BLEScanner bluetoothScanner;
     private LocalBroadcastManager broadcastManager;
@@ -135,7 +135,7 @@ public class RadmesserService extends Service {
         }
     };
 
-    private RadmesserDevice.ConnectionStateCallbacks radmesserConnectionCallbacks = (RadmesserDevice.ConnectionStatus newState, RadmesserDevice instance) -> {
+    private BLEDevice.ConnectionStateCallbacks radmesserConnectionCallbacks = (BLEDevice.ConnectionStatus newState, BLEDevice instance) -> {
         if (instance != connectedDevice) return;    // only interested in currently connected device
 
         switch (newState) {
@@ -156,27 +156,27 @@ public class RadmesserService extends Service {
 
 
     private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
-            new BLEService(RadmesserDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
-                    RadmesserDevice.UUID_SERVICE_HEARTRATE_CHAR,
+            new BLEService(BLEDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_HEARTRATE_CHAR,
                     val -> broadcastHeartRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
             ),
 
-            new BLEService(RadmesserDevice.UUID_SERVICE_CLOSEPASS).addCharacteristic(
-                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE,
+            new BLEService(BLEDevice.UUID_SERVICE_CLOSEPASS).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE,
                     val -> broadcastClosePassDistance(val.getStringValue(0))
             ).addCharacteristic(
-                    RadmesserDevice.UUID_SERVICE_CLOSEPASS_CHAR_EVENT,
+                    BLEDevice.UUID_SERVICE_CLOSEPASS_CHAR_EVENT,
                     val -> broadcastClosePassEvent(val.getStringValue(0))
             ),
 
-            new BLEService(RadmesserDevice.UUID_SERVICE_DISTANCE).addCharacteristic(
-                    RadmesserDevice.UUID_SERVICE_DISTANCE_CHAR_50MS,
+            new BLEService(BLEDevice.UUID_SERVICE_DISTANCE).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_DISTANCE_CHAR_50MS,
                     val -> broadcastDistanceValue(val.getStringValue(0))
             ),
 
             //legacy Service from Radmesser
-            new BLEService(RadmesserDevice.UUID_SERVICE_CONNECTION).addCharacteristic(
-                    RadmesserDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED,
+            new BLEService(BLEDevice.UUID_SERVICE_CONNECTION).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED,
                     val -> {
                         //Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
                         String strVal = val.getStringValue(0);
@@ -305,7 +305,7 @@ public class RadmesserService extends Service {
 
         disconnectAndUnpairDevice();
         bluetoothScanner.findDeviceById(deviceId,
-                device -> connectedDevice = new RadmesserDevice(device, radmesserConnectionCallbacks, radmesserServicesDefinition, this)
+                device -> connectedDevice = new BLEDevice(device, radmesserConnectionCallbacks, radmesserServicesDefinition, this)
         );
     }
 
@@ -405,7 +405,6 @@ public class RadmesserService extends Service {
     /*
      * the caller ist responible for unregistering thr receiver, when he does not need him anymore
      */
-    //todo: how to handle exceptions due to "wrong formmat" of the received data?
 
     public static BroadcastReceiver registerCallbacks(Context ctx, RadmesserServiceCallbacks callbacks) {
         IntentFilter filter = new IntentFilter();
