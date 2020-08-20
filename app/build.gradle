@@ -12,7 +12,7 @@ android {
         applicationId "dsp2020.simra.app"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 64
+        versionCode 65
         versionName "64.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
