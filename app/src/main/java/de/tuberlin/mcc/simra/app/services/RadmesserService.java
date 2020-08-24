@@ -13,8 +13,10 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,9 +24,9 @@ import java.util.List;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
+import de.tuberlin.mcc.simra.app.services.BLE.BLEDevice;
 import de.tuberlin.mcc.simra.app.services.BLE.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager;
-import de.tuberlin.mcc.simra.app.services.BLE.BLEDevice;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 
 import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEService;
@@ -37,6 +39,7 @@ public class RadmesserService extends Service {
     private volatile HandlerThread mHandlerThread;
     private BLEScanner bluetoothScanner;
     private LocalBroadcastManager broadcastManager;
+    private static boolean isServiceActive;
 
     public static ConnectionState getConnectionState() {
         return connectionState;
@@ -88,6 +91,7 @@ public class RadmesserService extends Service {
 
     @Override
     public void onCreate() {
+        isServiceActive = true;
         bluetoothScanner = new BLEScanner(scannerStatusCallbacks);
         broadcastManager = LocalBroadcastManager.getInstance(this);
         mHandlerThread = new HandlerThread(TAG + ".HandlerThread");
@@ -264,6 +268,8 @@ public class RadmesserService extends Service {
      *
      * */
     public static void terminateService(Context ctx) {
+        if (!isServiceActive) return;
+        isServiceActive = false;
         Intent intent = new Intent(ctx, RadmesserService.class);
         intent.setAction(ACTION_STOP_SERVICE);
         ctx.startService(intent);
@@ -548,9 +554,11 @@ public class RadmesserService extends Service {
          * after a ride ends.
          */
         public int getIncidentType() {
-            if (eventType.equals(EVENT_TYPE_BUTTON)) return IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS;
+            if (eventType.equals(EVENT_TYPE_BUTTON))
+                return IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS;
             if (eventType.equals(EVENT_TYPE_AVG2S)) return IncidentLogEntry.INCIDENT_TYPE.OBS_AVG2S;
-            if (eventType.equals(EVENT_TYPE_MIN_KALMAN)) return IncidentLogEntry.INCIDENT_TYPE.OBS_MIN_KALMAN;
+            if (eventType.equals(EVENT_TYPE_MIN_KALMAN))
+                return IncidentLogEntry.INCIDENT_TYPE.OBS_MIN_KALMAN;
             return IncidentLogEntry.INCIDENT_TYPE.OBS_UNKNOWN;
         }
 
@@ -562,7 +570,7 @@ public class RadmesserService extends Service {
          */
         public String getIncidentDescription(Context context) {
             String headerLine = context.getString(R.string.radmesserIncidentDescriptionHeaderLine, eventType);
-            String dataLine = context.getString(R.string.radmesserIncidentDescriptionDataLine, TextUtils.join(", ",  payload));
+            String dataLine = context.getString(R.string.radmesserIncidentDescriptionDataLine, TextUtils.join(", ", payload));
 
             switch (eventType) {
                 case EVENT_TYPE_BUTTON:
