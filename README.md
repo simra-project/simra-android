@@ -25,6 +25,7 @@ Have a look at the [`build.gradle`](./app/build.gradle) File. All Build Time Var
 To set the variables during development edit your [`local.properties`](./local.properties) file and add the variables to your liking:
 
 ```properties
+# The API Endpoint includes the version number e.g. https://server1.simra-backend.de/11/
 API_ENDPOINT="https://server1.simra-backend.de/"
 API_SECRET="mysecret"
 ```
