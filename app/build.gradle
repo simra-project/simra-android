@@ -1,4 +1,9 @@
 apply plugin: 'com.android.application'
+apply plugin: 'checkstyle'
+
+def ENV_VARIABLE_PREFIX = "SIMRA_"
+def API_ENDPOINT = "API_ENDPOINT"
+def API_VERSION = "API_VERSION"
 
 android {
     compileSdkVersion 29
@@ -9,12 +14,41 @@ android {
         versionCode 59
         versionName "59.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // defining the build date
+        buildConfigField "long", "BUILD_DATE", System.currentTimeMillis() + "L"
+
+        // Load `local.properties` (from root) for development configuration
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        }
+
+        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://localhost:8082/\""
+        buildConfigField "String", API_VERSION, properties.getProperty(API_VERSION) ?: "\"10/\""
+
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            // Allow loading the configuration Settings from environment variables
+            def VAR_API_ENDPOINT = System.getenv(ENV_VARIABLE_PREFIX + API_ENDPOINT)
+            if (VAR_API_ENDPOINT != null) {
+                buildConfigField "String", API_ENDPOINT, "\"" + VAR_API_ENDPOINT + "\""
+            }
+            def VAR_API_VERSION = System.getenv(ENV_VARIABLE_PREFIX + API_VERSION)
+            if (VAR_API_VERSION != null) {
+                buildConfigField "String", API_VERSION, "\"" + VAR_API_VERSION + "\""
+            }
         }
+        qa {
+            initWith buildTypes.release
+        }
+    }
+    buildFeatures {
+        viewBinding = true
     }
     compileOptions {
         sourceCompatibility = '1.8'
@@ -44,4 +78,24 @@ dependencies {
     api 'com.github.MKergall:osmbonuspack:6.5.3'
     implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.4'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.4'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
+
+    // RingBuffer
+    implementation 'org.apache.commons:commons-collections4:4.4'
+
+    // Tests
+    testImplementation 'junit:junit:4.13'
+    testImplementation "org.assertj:assertj-core:3.16.1"
+    // androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    // androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    // CameraX core library using the camera2 implementation
+    def camerax_version = "1.0.0-beta07"
+    implementation "androidx.camera:camera-core:${camerax_version}"
+    implementation "androidx.camera:camera-camera2:${camerax_version}"
+    // If you want to additionally use the CameraX Lifecycle library
+    implementation "androidx.camera:camera-lifecycle:${camerax_version}"
+
+    // "Backporting" Java 8 streams for Android < 24
+    implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
 }

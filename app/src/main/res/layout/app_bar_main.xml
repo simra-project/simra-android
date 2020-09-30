@@ -21,25 +21,32 @@
         app:popupTheme="@style/AppTheme.PopupOverlay"
         app:titleTextAppearance="@style/Toolbar.TitleText">
 
+    <!--
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_ride_settings_general"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/button_start_recording"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="15dp"
+        android:gravity="center_vertical"
+        android:src="@drawable/ic_settings_black_24dp" />
+    -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_ride_settings_radmesser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/button_start_recording"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="15dp"
+        android:gravity="center_vertical"
+        android:src="@drawable/ic_bluetooth_disabled"
+        android:visibility="visible" />
 
-        <ImageButton
-            android:id="@+id/helmet_icon"
-            android:layout_width="65dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="15dp"
-            android:background="@drawable/helmet" />
-
-
-    </androidx.appcompat.widget.Toolbar>
-
-
-    <include layout="@layout/content_main" />
-
-    <RelativeLayout
-        android:id="@+id/start_button"
-        android:layout_width="250dp"
-        android:layout_height="85dp"
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/button_start_recording"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_above="@id/copyright_text"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"

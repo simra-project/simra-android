@@ -35,6 +35,8 @@ import static android.content.Context.MODE_APPEND;
 import static de.tuberlin.mcc.simra.app.util.Constants.ACCEVENTS_HEADER;
 import static de.tuberlin.mcc.simra.app.util.Constants.METADATA_HEADER;
 
+import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
+
 public class Utils {
 
     private static final String TAG = "Utils_LOG";
@@ -348,7 +350,51 @@ public class Utils {
         Log.d(TAG, "===========================Λ=Statistics=Λ===========================");
     }
 
-    public static void updateProfile(boolean global, Context context, int ageGroup, int gender, int region, int experience, int behaviour) {
+    /*
+     * Uses sophisticated AI to analyze the ride
+     * */
+    public static List<IncidentLogEntry> findAccEventOnline(int rideId, int bike, int pLoc, Context context) {
+        try {
+            String responseString = "";
+
+            URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + "classify-ride?clientHash=" + getClientHash(context)
+                    + "&bikeType=" +bike
+                    + "&phoneLocation=" + pLoc);
+
+            Log.d(TAG, "URL for AI-Backend: " + url.toString());
+            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Content-Type", "text/plain");
+            urlConnection.setDoOutput(true);
+            urlConnection.setReadTimeout(10000);
+            urlConnection.setConnectTimeout(3000);
+
+            //Read log file in to byte Array
+            File rideFile = IOUtils.Files.getGPSLogFile(rideId, false, context);
+            FileInputStream fileInputStream = new FileInputStream(rideFile);
+            long byteLength = rideFile.length();
+
+            byte[] fileContent = new byte[(int) byteLength];
+            fileInputStream.read(fileContent, 0, (int) byteLength);
+
+            //upload byteArr
+            Log.d(TAG, "send data: ");
+            try (OutputStream os = urlConnection.getOutputStream()) {
+                long startTime = System.currentTimeMillis();
+                long uploadTimeoutMS = 8000;
+                int chunkSize = 1024;
+                int chunkIndex = 0;
+
+                while (chunkSize * chunkIndex < fileContent.length) {
+                    int offset = chunkSize * chunkIndex;
+                    int remaining = fileContent.length - offset;
+                    os.write(fileContent, offset, remaining > chunkSize ? chunkSize : remaining);
+                    chunkIndex += 1;
+
+                    //upload timeout
+                    if(startTime + uploadTimeoutMS < System.currentTimeMillis())
+                        return null;
+                }
 
         updateProfile(global, context, ageGroup, gender, region, experience, -1,-1,-1,-1,-1,-1,null,behaviour,-1);
 
