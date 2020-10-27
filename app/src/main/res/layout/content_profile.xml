@@ -163,7 +163,6 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
-
         <TextView
             android:id="@+id/experienceSpinnerTitle"
             android:layout_width="wrap_content"
@@ -171,7 +170,6 @@
             android:text="@string/experienceSpinnerTitle"
             android:textAlignment="center"
             android:textSize="15sp" />
-
         <Spinner
             android:id="@+id/experienceSpinner"
             android:layout_width="match_parent"

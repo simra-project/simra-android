@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/incidentPopupLayout"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:background="@color/white"
+    android:layout_gravity="center"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
+    android:gravity="center"
+    >
+<RelativeLayout
+    android:id="@+id/ScrollViewRelativeLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:layout_centerHorizontal="true">
+
+
+<ScrollView
+    android:id="@+id/ScrollView01"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:fadingEdgeLength="80dp"
+    android:requiresFadingEdge="vertical"
+    android:scrollbars="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
+
+        <!--Put form controls here-->
+
+        <TextView
+            android:id="@+id/ActivityTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/annotation_title"
+            android:textSize="11pt"
+            android:textStyle="bold"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+            <requestFocus/>
+        </TextView>
+
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/incident_type"
+            android:textSize="10pt" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light_grey">
+        <Spinner
+            android:id="@+id/incidentTypeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/incidenttypelist"
+            android:prompt="@string/incidentType1" />
+        </RelativeLayout>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/involved_type"
+            android:textSize="10pt" />
+
+        <LinearLayout
+            android:id="@+id/involvedCheckboxes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="vertical"
+                android:weightSum="2">
+            <CheckBox android:id="@+id/involvedType7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/involvedType7" />
+            <CheckBox android:id="@+id/involvedType8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/involvedType8" />
+            <CheckBox android:id="@+id/involvedType4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/involvedType4" />
+            <CheckBox android:id="@+id/involvedType1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/involvedType1" />
+            <CheckBox android:id="@+id/involvedType5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/involvedType5" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="vertical"
+                android:weightSum="2">
+                <CheckBox android:id="@+id/involvedType3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/involvedType3" />
+                <CheckBox android:id="@+id/involvedType2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/involvedType2" />
+                <CheckBox android:id="@+id/involvedType6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/involvedType6" />
+                <CheckBox android:id="@+id/involvedType10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/involvedType10" />
+                <CheckBox android:id="@+id/involvedType9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/involvedType9" />
+            </LinearLayout>
+        </LinearLayout>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+        <CheckBox android:id="@+id/scarinessCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/scarinessString" />
+
+        <!--
+        <TextView
+            android:id="@+id/DropDown2Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/locationSpinner"
+            android:textSize="10pt" />
+
+        <Spinner
+            android:id="@+id/phoneLocationSpinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/phoneLocations"
+            android:prompt="@string/locationType1" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+        -->
+        <TextView
+            android:id="@+id/DescriptionTextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/description"
+            android:textSize="10pt" />
+
+        <EditText
+            android:id="@+id/EditTextDescriptionBody"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light_grey"
+            android:gravity="top"
+            android:hint="@string/descriptionBody"
+            android:inputType="textMultiLine"
+            android:lines="5"
+            android:padding="5dp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <!--
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@color/light_grey"
+            android:backgroundTint="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:drawableEnd="@drawable/save_icon"
+            android:paddingRight="50dp"
+            android:paddingLeft="50dp"
+            android:text="@string/doneEditingIncident"
+            tools:text="@string/doneEditingIncident" />
+            -->
+
+    </LinearLayout>
+</ScrollView>
+</RelativeLayout>
+
+<RelativeLayout
+    android:id="@+id/exitButton"
+    android:layout_width="wrap_content"
+    android:layout_height="50dp"
+    android:layout_alignEnd="@id/ScrollViewRelativeLayout"
+    android:layout_alignStart="@id/ScrollViewRelativeLayout"
+    android:layout_alignParentBottom="true"
+    android:padding="2dp"
+    android:layout_margin="10dp"
+    android:elevation="2dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="@drawable/button_unpressed">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+        <ImageView
+            android:id="@+id/revert_imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:background="@android:drawable/ic_menu_revert"
+            android:scaleType="centerInside"
+            android:layout_marginEnd="3dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/assistant_extralight"
+            android:layout_toEndOf="@id/revert_imageView"
+            android:gravity="center"
+            android:text="@string/returnAsText"
+            android:textColor="#FEFEFE"
+            android:textStyle="bold"
+            android:layout_marginStart="3dp"/>
+    </RelativeLayout>
+
+
+
+</RelativeLayout>
+</RelativeLayout>

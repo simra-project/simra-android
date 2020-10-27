@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+=======
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+>>>>>>> master
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/startScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+<<<<<<< HEAD
     tools:context=".activities.StartActivity">
+=======
+    tools:context=".main.StartActivity">
+>>>>>>> master
 
     <ImageView
         android:id="@+id/doublePic"
@@ -14,12 +23,22 @@
         android:layout_alignParentTop="true"
         android:background="@drawable/mcc_ecdf" />
 
+<<<<<<< HEAD
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/doublePic"
         android:layout_alignParentStart="true"
         android:background="@color/simraDarkBlue"
+=======
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/doublePic"
+        android:background="@drawable/button_unpressed"
+>>>>>>> master
         android:fontFamily="@font/assistant_extralight"
         android:padding="5dp">
 
@@ -28,6 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/nextBtn"
+<<<<<<< HEAD
             android:layout_alignParentEnd="true"
             app:srcCompat="@drawable/simra_logo" />
 
@@ -40,6 +60,24 @@
             android:layout_marginHorizontal="25dp"
             android:padding="5dp"
             android:text="@string/welcome_header"
+=======
+            android:layout_alignEnd="@+id/textView4"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="20dp"
+
+            app:srcCompat="@drawable/helmet" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginHorizontal="25dp"
+            android:background="@drawable/button_unpressed"
+            android:padding="5dp"
+            android:text="@string/welcome_header"
+            android:textAlignment="textEnd"
+>>>>>>> master
             android:textColor="#FEFEFE"
             android:textSize="20dp"
             android:textStyle="bold" />
@@ -53,10 +91,15 @@
             android:layout_marginHorizontal="25dp"
             android:fontFamily="@font/assistant_extralight"
             android:text="@string/welcome_text"
+<<<<<<< HEAD
+=======
+            android:textAlignment="textEnd"
+>>>>>>> master
             android:textColor="#FEFEFE"
             android:textSize="20dp"
             android:textStyle="bold" />
 
+<<<<<<< HEAD
 
         <TextView
             android:id="@+id/textView5"
@@ -67,6 +110,32 @@
             android:layout_marginTop="20dp"
             android:fontFamily="@font/assistant_extralight"
             android:text="@string/base_permission_rationale"
+=======
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginHorizontal="25dp"
+            android:fontFamily="@font/assistant_extralight"
+            android:text="@string/welcome_text2"
+            android:textAlignment="textEnd"
+            android:textColor="#FEFEFE"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView3"
+            android:layout_centerHorizontal="true"
+            android:layout_marginHorizontal="25dp"
+            android:fontFamily="@font/assistant_extralight"
+            android:text="@string/welcome_text3"
+            android:textAlignment="textEnd"
+>>>>>>> master
             android:textColor="#FEFEFE"
             android:textSize="20dp"
             android:textStyle="bold" />
