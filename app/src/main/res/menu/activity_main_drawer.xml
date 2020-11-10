@@ -9,7 +9,7 @@
             android:icon="@drawable/ic_list_black_24dp"
             android:title="@string/title_activity_history" />
         <item
-            android:id="@+id/nav_democraphic_data"
+            android:id="@+id/nav_demographic_data"
             android:icon="@drawable/ic_face_black_24dp"
             android:title="@string/title_activity_profile" />
         <item
@@ -21,8 +21,12 @@
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/title_activity_settings" />
         <item
+            android:id="@+id/nav_bluetooth_connection"
+            android:icon="@drawable/ic_bluetooth"
+            android:title="@string/title_activity_bluetooth_connection" />
+        <item
             android:id="@+id/nav_aboutSimRa"
-            android:icon="@drawable/helmet"
+            android:icon="@drawable/simra_logo"
             android:title="@string/about_simra" />
         <item
             android:id="@+id/nav_tutorial"
@@ -33,7 +37,7 @@
             android:icon="@drawable/ic_content_paste_black_24dp"
             android:title="@string/feedback" />
         <item
-            android:id="@+id/nav_impressum"
+            android:id="@+id/nav_imprint"
             android:icon="@drawable/ic_info_black_24dp"
             android:title="@string/imprint" />
         <item

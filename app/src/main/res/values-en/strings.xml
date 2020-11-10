@@ -13,13 +13,12 @@
     <string name="title_activity_library_license">Third Party Licenses</string>
     <string name="title_activity_about_simra">About SimRa</string>
     <string name="title_activity_statistics">Statistics</string>
+    <string name="title_activity_bluetooth_connection">OpenBikeSensor</string>
 
 
     <!--- Start -->
     <string name="welcome_header">Welcome to SimRa!</string>
-    <string name="welcome_text">Thank you for supporting the SimRa project.</string>
-    <string name="welcome_text2">Have fun, and bon voyage.</string>
-    <string name="welcome_text3">Best, the SimRa team</string>
+    <string name="welcome_text">Thank you for supporting the SimRa project.\nHave fun, and a great ride!</string>
     <string name="sendErrorTitle">Whoops!</string>
     <string name="sendErrorMessage">Seems like an error occurred during your last session. Would you like to send a report to help us improve the app?</string>
     <string name="simra_closed">SimRa closed</string>
@@ -27,7 +26,8 @@
     <string name="close_simra">Close SimRa</string>
     <string name="iAccept">I accept the privacy policy statement</string>
     <string name="privacyAgreementTitle">Privacy Policy Statement</string>
-    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).</string>
+    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).
+    </string>
 
     <!--- Menu -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -41,13 +41,12 @@
     <string name="imprint">Imprint</string>
     <string name="feedback">Feedback</string>
     <string name="title_tutorial">Tutorial</string>
-    <string name="twitter">\@SimRa_Berlin</string>
-    <string name="link_to_twitter">https://twitter.com/SimRa_Berlin</string>
+    <string name="twitter">\@SimRa_App</string>
+    <string name="link_to_twitter">https://twitter.com/SimRa_App</string>
 
     <!--- Permission -->
-    <string name="permissionFineLocation">In order to continue, please allow SimRa to access your location.</string>
-    <string name="locationPermissionRequestRationale">This app needs permission to access your location data in order to show you your location on the map and to record your rides.</string>
-    <string name="storagePermissionRequestRationale">This app needs permission to access your storage in order to show you the map.</string>
+
+    <string name="base_permission_rationale">In order to continue, please allow SimRa to access your location and storage.\nWe need those to show your location on the map and record your rides.</string>
 
     <!--- WebActivity -->
     <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
@@ -56,7 +55,7 @@
     <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/en/mobil/</string>
 
     <!--- MainActivity -->
-    <string name="osmCopyright">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
+    <string name="osmCopyright">©        <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
     <string name="errorRideNotRecorded">The ride was not recorded due to privacy settings!\nYou can check your privacy settings in the settings menu.</string>
     <string name="cancel">Cancel</string>
     <string name="startButtonText">Start\nRecording</string>
@@ -71,14 +70,16 @@
     <string name="newest_version">newest version:</string>
     <string name="new_app_version_title">New update available</string>
     <string name="later">Later</string>
+    <string name="reportIncidentClosepass">Close Pass</string>
+    <string name="reportIncidentObstacle">Dodging Obstacle</string>
     <string name="recording_not_started">Recording did NOT start.</string>
     <string name="recording_started">Recording started.</string>
 
-    <!--- RecorderService -->
-    <string name="recorder_channel_name">Recording</string>
-    <string name="recorder_channel_description">Recording ride</string>
-    <string name="recordingNotificationTitle">Recording Ride</string>
-    <string name="recordingNotificationBody">Your Ride is being recorded.</string>
+
+    <!--- ForegroundNotification -->
+    <string name="foregroundNotificationTitle_record">Recording Ride</string>
+    <string name="foregroundNotificationBody_record">Your Ride is being recorded.</string>
+    <string name="foregroundNotificationButtonBack">Back to the App</string>
 
     <!--- History -->
     <string name="noHistory">"No rides found."</string>
@@ -102,8 +103,6 @@
     <string name="uploadingNotificationTitle">SimRa</string>
     <string name="uploadingNotificationBody">SimRa is uploading rides</string>
     <string name="upload_started">SimRa ride upload started</string>
-    <string name="upload_channel_name">Uploading</string>
-    <string name="upload_channel_description">Uploading rides</string>
     <string name="upload_completed">SimRa upload completed.</string>
     <string name="upload_failed">SimRa failed to upload. Please try again later</string>
     <string name="nothing_to_upload">SimRa could not find a ride to upload</string>
@@ -123,6 +122,8 @@
     <string name="returnAsText">Return</string>
     <string name="savedRide">Ride saved</string>
     <string name="doNotShowAgain">Don\'t show this again</string>
+    <string name="ride_undo">Reset</string>
+
 
     <!--- IncidentPopUp -->
     <string name="description">Optional Comment</string>
@@ -169,17 +170,55 @@
     <string name="privacyLink">https://www.mcc.tu-berlin.de/menue/research/projects/simra/privacy_policy_statement/parameter/en?isMobile=1</string>
 
     <!--- Settings -->
-    <string name="privacyDurationDescription">The delay after which the recording starts\n(in seconds)</string>
+    <string name="privacyDurationDescription">The delay after which the recording starts (in seconds)</string>
     <string name="privacy_settings_title">Privacy</string>
-    <string name="privacyDistanceDescription">The delay after which the recording starts\n(in Feet)</string>
+    <string name="privacyDistanceDescription">The delay after which the recording starts</string>
     <string name="settingsSaved">Settings saved</string>
     <string name="general_settings_title">General Settings</string>
     <string name="unitDescription">Unit System</string>
     <string name="imperial">Imperial</string>
     <string name="metric">Metric</string>
+    <string name="showButtonsDescription">Buttons to add incidents during the ride</string>
+    <string name="hideButtons">hide</string>
+    <string name="showButtons">show</string>
+    <string name="incident_buttons_during_ride_warning">Please use the \"Close Pass\" and \"Dodging Obstacle\" buttons which are shown during the recording of a ride with great caution and only if your smartphone is attached to the bicycle handle bar. Concentrate always on the traffic and mind the STVO §23 (1a) for your own safety.</string>
+    <string name="rideAnalysis">Ride analysis</string>
+    <string name="onlineAI">Online AI</string>
+    <string name="offlineNoAI">Offline mode</string>
     <string name="dateFormatDescription">Date Format</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
+    <string name="devices">Devices</string>
+
+    <!--- OpenBikeSensor -->
+    <string name="obsSwitchTitle">OpenBikeSensor connection</string>
+    <string name="obsButton">Open OpenBikeSensor settings</string>
+    <string name="availableDevices">Available Devices</string>
+    <string name="obsTakePictureDuringRideSetting">Take Pictures during the Ride</string>
+    <string name="obsTakePictureDuringRideIntervalText">Interval how often a picture will be taken</string>
+    <string name="obsAdvancedSettings">Advanced Settings</string>
+    <string name="obsHandlebarWidthText">Distance of the outer point of the Handlebar to the frame</string>
+    <string name="not_connected_warnung_title">Warning : OpenBikeSensor is not connected</string>
+    <string name="not_connected_warnung_message">Do you still want to record the ride ?</string>
+    <string name="cancel_button">No, connect with the OpenBikeSensor</string>
+    <string name="bluetooth_not_enable_title">Warning: Bluetooth is off</string>
+    <string name="bluetooth_not_enable_message">Do you want to enable Bluetooth ? Otherwise the OpenBikeSensor feature cannot be activated</string>
+    <string name="obsIncidentDescriptionHeaderLine">This incident was triggered from the OpenBikeSensor event %1$s.</string>
+    <string name="obsIncidentDescriptionDataLine">Additional data: %1$s</string>
+    <string name="obsIncidentDescriptionButtonHeaderLine">This incident was triggered using a physical button on a OpenBikeSensor.</string>
+    <string name="obsIncidentDescriptionButtonDataLine">Distance during close pass: %1$s cm</string>
+    <string name="obsIncidentDescriptionAvg2sHeaderLine">This incident was automatically triggered from the OpenBikeSensor because the average distance during the close pass was below the threshold.</string>
+    <string name="obsIncidentDescriptionAvg2sDataLine">Average distance: %1$s cm, mininum distance: %2$s cm</string>
+    <string name="obsIncidentDescriptionMinKalmanHeaderLine">This incident was automatically triggered from the OpenBikeSensor because it detected the smallest distance during a close pass.</string>
+    <string name="obsIncidentDescriptionMinKalmanDataLine">Minimum distance: %1$s cm</string>
+
+    <!-- Units -->
+    <string name="meter_short">m</string>
+    <string name="feet_short">ft</string>
+    <string name="seconds_short">s</string>
+    <string name="centimeter_short">cm</string>
+    <string name="hour_format">hh:mm aa</string>
+    <string name="datetime_format">MM/dd/yy,hh:mm aa</string>
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Year of Birth</string>
@@ -249,7 +288,7 @@
     <string name="hourOfDay">Hour</string>
 
     <!--- News -->
-    <string name="what_is_new_title">What is new?</string>
+    <string name="news">News</string>
     <!--- 24 -->
     <string name="statistics_news">New: You can see your profile statistics under the respective entry in the menu.</string>
     <string name="profile_news">New: There is a new option you can set under \"Profile\".</string>
@@ -293,10 +332,19 @@
 
     <!-- 55 -->
     <string name="added_new_regions_news_58">Following regions are now available: Leipzig, Wuppertal/Solingen/Remscheid und Düsseldorf</string>
-
-    <!-- 59 -->
-    <string name="workshop_ad_title_news_59">SimRa-Workshop August 2020 Registration</string>
-    <string name="workshop_ad_text_news_59">Seid ihr schon gespannt darauf, was bei SimRa rauskommt? Wir auch. Darum veranstalten wir am 3. oder 4.8. einen virtuellen Workshop zur Auswertung der Berliner Daten.\nAlle Detailinformationen gibt es <a href="https://forms.gle/7iUMHxy8rfEKLBAi6">hier</a>. </string>
-
-
+    <string name="reportIncidentText">Report Incident</string>
+    <string name="recorded_incident">Saved Incident</string>
+    <string name="openbikesensor_toast_devicefound">Device found. Push the Bluetooth Button to connect to it.</string>
+    <string name="openbikesensor_bluetooth_incompatible">Your device does not support bluetooth.</string>
+    <string name="activity_obs_title_device_info">Device-Info</string>
+    <string name="obs_activity_button_connect_device">Connected to device</string>
+    <string name="obs_activity_button_disconnect_device">Disconnect device</string>
+    <string name="obs_activity_text_last_distance">Last distance:</string>
+    <string name="obsConnected">OpenBikeSensor connected</string>
+    <string name="connecting">Connecting</string>
+    <string name="obsSearching">Searching OpenBikeSensor</string>
+    <string name="obsNotConnected">OpenBikeSensor disconnected</string>
+    <string name="obsConnecting">Connecting to OpenBikeSensor</string>
+    <string name="obsTutorial">\nPlease hold your hand close to the distance sensor for 3 seconds</string>
+    <string name="obs">OpenBikeSensor</string>
 </resources>

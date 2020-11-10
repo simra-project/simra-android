@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".subactivites.CreditsActivity"
+    tools:context=".activities.CreditsActivity"
     tools:showIn="@layout/activity_credits">
 
 
@@ -13,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:layout_marginBottom="50dp"
         android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -29,15 +29,15 @@
                 android:layout_height="60dp"
                 android:layout_alignParentStart="true"
                 android:layout_marginLeft="15dp"
-                android:scaleType="centerCrop"
-                android:background="@drawable/helmet" />
+                android:background="@drawable/simra_logo"
+                android:scaleType="centerCrop" />
 
             <TextView
                 android:id="@+id/helmetCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/helmetCredit_icon"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/helmetCredit_icon"
@@ -66,8 +66,8 @@
                 android:id="@+id/routeCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/route_icon"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/route_icon"
@@ -96,8 +96,8 @@
                 android:id="@+id/directionArrowText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/directionArrow_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/directionArrow_image"
@@ -127,8 +127,8 @@
                 android:id="@+id/bycicleCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/bycicle_icon"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/bycicle_icon"
@@ -158,8 +158,8 @@
                 android:id="@+id/stopCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/stop_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/stop_image"
@@ -188,8 +188,8 @@
                 android:id="@+id/locationMarkerCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/locationMarker_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/locationMarker_image"
@@ -218,8 +218,8 @@
                 android:id="@+id/locationMarkerEditedCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/locationMarkerEdited_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/locationMarkerEdited_image"
@@ -229,7 +229,6 @@
 
 
         </RelativeLayout>
-
 
 
         <RelativeLayout
@@ -250,8 +249,8 @@
                 android:id="@+id/tabCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/tab_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/tab_image"
@@ -263,34 +262,35 @@
         </RelativeLayout>
 
         <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
-
-
-        <ImageView
-            android:id="@+id/center_image"
-            android:layout_width="65dp"
-            android:layout_height="60dp"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/center" />
-
-        <TextView
-            android:id="@+id/centerCreditText"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignRight="@id/center_image"
-            android:layout_centerVertical="true"
-            android:layout_margin="10dp"
-            android:layout_toEndOf="@+id/center_image"
-            android:autoLink="web"
-            android:scrollHorizontally="false"
-            android:text="@string/icons8Credit" />
+            android:layout_marginTop="20dp">
 
 
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/center_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/center" />
+
+            <TextView
+                android:id="@+id/centerCreditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@id/center_image"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/center_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/icons8Credit" />
+
+
+        </RelativeLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -309,8 +309,8 @@
                 android:id="@+id/startCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/start_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/start_image"
@@ -337,8 +337,8 @@
                 android:id="@+id/racingflagCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/racingflag_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/racingflag_image"
@@ -365,8 +365,8 @@
                 android:id="@+id/redLightCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/redLight_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/redLight_image"
@@ -393,8 +393,8 @@
                 android:id="@+id/co2CreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/co2_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/co2_image"
@@ -421,8 +421,8 @@
                 android:id="@+id/tachometerCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/tachometer_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/tachometer_image"
@@ -449,8 +449,8 @@
                 android:id="@+id/uploadCreditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignRight="@id/upload_image"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
                 android:layout_toEndOf="@+id/upload_image"

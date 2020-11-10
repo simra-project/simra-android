@@ -1,124 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.MainActivity">
+    tools:context=".activities.MainActivity">
 
+    <include
+        android:id="@+id/main_content"
+        layout="@layout/content_main" />
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <LinearLayout
+        android:id="@+id/top_bar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_alignParentTop="true"
-        android:layout_margin="10dp"
-        android:background="@drawable/button_unpressed"
-        android:elevation="8dp"
-        android:theme="@style/ToolbarTheme"
-        android:titleTextColor="#FEFEFE"
-        app:popupTheme="@style/AppTheme.PopupOverlay"
-        app:titleTextAppearance="@style/Toolbar.TitleText">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_margin="10dp"
+            android:background="@color/simraDarkBlue"
+            android:elevation="8dp"
+            android:theme="@style/ToolbarTheme"
+            android:titleTextColor="#FEFEFE"
+            android:visibility="visible"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:titleTextAppearance="@style/Toolbar.TitleText">
+
+            <ImageButton
+                android:id="@+id/helmet_icon"
+                android:layout_width="65dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/simra_logo" />
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <LinearLayout
+            android:id="@+id/reportIncidentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/reportTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/reportIncidentText"
+                    android:textAlignment="center"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/report_closepass_incident"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@+id/report_obstacle_incident"
+                        android:layout_alignBottom="@+id/report_obstacle_incident"
+                        android:layout_alignParentStart="true"
+                        android:layout_toStartOf="@+id/reportHelperSpace"
+                        android:backgroundTint="@color/colorAccent"
+                        android:maxLines="2"
+                        android:text="@string/reportIncidentClosepass"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:visibility="visible"
+                        app:icon="@drawable/ic_directions_car_24" />
+
+                    <Space
+                        android:id="@+id/reportHelperSpace"
+                        android:layout_width="16dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true" />
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/report_obstacle_incident"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_toEndOf="@+id/reportHelperSpace"
+                        android:backgroundTint="@color/colorAccent"
+                        android:maxLines="2"
+                        android:text="@string/reportIncidentObstacle"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:visibility="visible"
+                        app:icon="@drawable/ic_alt_route_24" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@drawable/shadow_gradient" />
+        </LinearLayout>
+    </LinearLayout>
 
 
-        <ImageButton
-            android:id="@+id/helmet_icon"
-            android:layout_width="65dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="15dp"
-            android:background="@drawable/helmet" />
-
-
-    </androidx.appcompat.widget.Toolbar>
-
-
-    <include layout="@layout/content_main" />
-
-    <RelativeLayout
-        android:id="@+id/start_button"
-        android:layout_width="250dp"
-        android:layout_height="85dp"
-        android:layout_above="@id/copyright_text"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
-        android:background="@drawable/button_unpressed"
+    <ImageButton
+        android:id="@+id/center_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/top_bar"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/my_center"
         android:clickable="true"
-        android:focusable="true"
-        android:elevation="2dp">
+        android:elevation="2dp"
+        android:focusable="true" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_ride_settings_obs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/button_start_recording"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="15dp"
+        android:gravity="center_vertical"
+        android:src="@drawable/ic_bluetooth_disabled"
+        android:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/route_image"
-            android:layout_width="65dp"
-            android:layout_height="60dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="15dp"
-            android:background="@drawable/route" />
-
-        <TextView
-            android:id="@+id/route_text"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/assistant_extralight"
-
-            android:gravity="center"
-            android:text="@string/startButtonText"
-            android:textColor="#FEFEFE"
-            android:textSize="21sp"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/stop_button"
-        android:layout_width="250dp"
-        android:layout_height="85dp"
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/button_start_recording"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_above="@id/copyright_text"
         android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
-        android:background="@drawable/button_unpressed"
-        android:visibility="invisible"
-        android:elevation="2dp">
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="63dp"
+        android:gravity="center"
+        android:icon="@drawable/ic_route"
+        android:maxLines="2"
+        android:text="@string/startButtonText"
+        app:icon="@drawable/route" />
 
-        <ImageView
-            android:id="@+id/stop_image"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="15dp"
-            android:background="@drawable/stop" />
-
-        <TextView
-            android:id="@+id/stop_text"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="5dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginTop="5dp"
-            android:fontFamily="@font/assistant_extralight"
-            android:gravity="center"
-            android:text="@string/stopButtonText"
-            android:textColor="#FEFEFE"
-            android:textSize="21sp"
-            android:textStyle="bold" />
-    </RelativeLayout>
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/button_stop_recording"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/copyright_text"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="63dp"
+        android:backgroundTint="@color/design_default_color_error"
+        android:gravity="center"
+        android:icon="@drawable/ic_route"
+        android:maxLines="2"
+        android:text="@string/stopButtonText"
+        app:icon="@drawable/stop" />
 
     <TextView
         android:id="@+id/copyright_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
         android:layout_marginEnd="5dp"
         android:text="@string/osmCopyright"
         android:textSize="10sp" />
+
 </RelativeLayout>

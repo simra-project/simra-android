@@ -8,26 +8,27 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.File;
 import java.util.Date;
 
-import androidx.appcompat.app.AppCompatActivity;
-import de.tuberlin.mcc.simra.app.main.StartActivity;
+import de.tuberlin.mcc.simra.app.BuildConfig;
+import de.tuberlin.mcc.simra.app.activities.StartActivity;
 
-import static de.tuberlin.mcc.simra.app.util.Utils.appendToFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
 public class LoggingExceptionActivity extends AppCompatActivity implements Thread.UncaughtExceptionHandler {
 
     private final static String TAG = LoggingExceptionActivity.class.getSimpleName() + "_LOG";
     private final Context context;
-    private final Thread.UncaughtExceptionHandler rootHandler;
 
 
     public LoggingExceptionActivity(Context context) {
         this.attachBaseContext(context);
         this.context = context;
         // we should store the current exception handler -- to invoke it for all not handled exceptions ...
-        rootHandler = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.UncaughtExceptionHandler rootHandler = Thread.getDefaultUncaughtExceptionHandler();
         // we replace the exception handler now with us -- we will properly dispatch the exceptions ...
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
@@ -40,32 +41,32 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
 
             // log this exception ...
 
-            String stackTrace = "";
+            StringBuilder stackTrace = new StringBuilder();
             for (int i = 0; i < ex.getStackTrace().length; i++) {
-                stackTrace += ex.getStackTrace()[i] + "\n";
+                stackTrace.append(ex.getStackTrace()[i]).append("\n");
             }
             String causeTrace = "";
             if (ex.getCause() != null) {
                 for (int i = 0; i < ex.getCause().getStackTrace().length; i++) {
-                    stackTrace += ex.getCause().getStackTrace()[i] + "\n";
+                    stackTrace.append(ex.getCause().getStackTrace()[i]).append("\n");
                 }
             }
-            String fileInfoLine = getAppVersionNumber(context) + "#1" + System.lineSeparator();
+            String fileInfoLine = BuildConfig.VERSION_CODE + "#1" + System.lineSeparator();
 
             String errorReport =
                     "System Timestamp: " + System.currentTimeMillis() + "\n" +
-                    "Build.VERSION.RELEASE: " + Build.VERSION.RELEASE + "\n" +
-                    "Build.DEVICE: " + Build.DEVICE + "\n" +
-                    "Build.MODEL: " + Build.MODEL + "\n" +
-                    "Build.PRODUCT: " + Build.PRODUCT + "\n" +
-                    "App Version: " + getAppVersionNumber(this) + "\n" +
-                    "Exception in: " + context.getClass().getName()
-                    + " " + ex.getClass().getName() + "\n" +
-                    ex.getMessage() + "\n" +
-                    "stackTrace: " + stackTrace + "\n" +
-                    "causeTrace: " + causeTrace + "\n";
+                            "Build.VERSION.RELEASE: " + Build.VERSION.RELEASE + "\n" +
+                            "Build.DEVICE: " + Build.DEVICE + "\n" +
+                            "Build.MODEL: " + Build.MODEL + "\n" +
+                            "Build.PRODUCT: " + Build.PRODUCT + "\n" +
+                            "App Version: " + BuildConfig.VERSION_CODE + "\n" +
+                            "Exception in: " + context.getClass().getName()
+                            + " " + ex.getClass().getName() + "\n" +
+                            ex.getMessage() + "\n" +
+                            "stackTrace: " + stackTrace + "\n" +
+                            "causeTrace: " + causeTrace + "\n";
 
-            appendToFile((fileInfoLine + errorReport), "CRASH_REPORT" + new Date().toString() + ".txt", this);
+            overwriteFile((fileInfoLine + errorReport), new File(IOUtils.Directories.getBaseFolderPath(this) + "CRASH_REPORT" + new Date().toString() + ".txt"));
 
             SharedPreferences sharedPrefs = getApplicationContext()
                     .getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);

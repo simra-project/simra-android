@@ -10,3 +10,9 @@ hash-suffix.h
 *.apk
 .idea/*
 *.properties
+app/qa
+app/release
+lint-report.html
+.project
+.settings
+.classpath

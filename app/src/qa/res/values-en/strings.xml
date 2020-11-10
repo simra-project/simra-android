@@ -1,0 +1,5 @@
+<!--- This file is for overwriting strings in debug mode -->
+<!--suppress XmlHighlighting -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="en">
+    <string name="app_name">SimRa QA</string>
+</resources>
