@@ -13,7 +13,7 @@
     <string name="title_activity_library_license">Third Party Licenses</string>
     <string name="title_activity_about_simra">About SimRa</string>
     <string name="title_activity_statistics">Statistics</string>
-    <string name="title_activity_bluetooth_connection">Radmesser</string>
+    <string name="title_activity_bluetooth_connection">OpenBikeSensor</string>
 
 
     <!--- Start -->
@@ -41,8 +41,8 @@
     <string name="imprint">Imprint</string>
     <string name="feedback">Feedback</string>
     <string name="title_tutorial">Tutorial</string>
-    <string name="twitter">\@SimRa_Berlin</string>
-    <string name="link_to_twitter">https://twitter.com/SimRa_Berlin</string>
+    <string name="twitter">\@SimRa_App</string>
+    <string name="link_to_twitter">https://twitter.com/SimRa_App</string>
 
     <!--- Permission -->
 
@@ -178,6 +178,10 @@
     <string name="unitDescription">Unit System</string>
     <string name="imperial">Imperial</string>
     <string name="metric">Metric</string>
+    <string name="showButtonsDescription">Buttons to add incidents during the ride</string>
+    <string name="hideButtons">hide</string>
+    <string name="showButtons">show</string>
+    <string name="incident_buttons_during_ride_warning">Please use the \"Close Pass\" and \"Dodging Obstacle\" buttons which are shown during the recording of a ride with great caution and only if your smartphone is attached to the bicycle handle bar. Concentrate always on the traffic and mind the STVO §23 (1a) for your own safety.</string>
     <string name="rideAnalysis">Ride analysis</string>
     <string name="onlineAI">Online AI</string>
     <string name="offlineNoAI">Offline mode</string>
@@ -186,27 +190,27 @@
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Devices</string>
 
-    <!--- Radmesser -->
-    <string name="radmesserSwitchTitle">Radmesser connection</string>
-    <string name="radmesserButton">Open Radmesser settings</string>
+    <!--- OpenBikeSensor -->
+    <string name="obsSwitchTitle">OpenBikeSensor connection</string>
+    <string name="obsButton">Open OpenBikeSensor settings</string>
     <string name="availableDevices">Available Devices</string>
-    <string name="radmesserTakePictureDuringRideSetting">Take Pictures during the Ride</string>
-    <string name="radmesserTakePictureDuringRideIntervalText">Interval how often a picture will be taken</string>
-    <string name="radmesserAdvancedSettings">Advanced Settings</string>
-    <string name="radmesserHandlebarWidthText">Distance of the outer point of the Handlebar to the frame</string>
-    <string name="not_connected_warnung_title">Warning : Radmesser is not connected</string>
+    <string name="obsTakePictureDuringRideSetting">Take Pictures during the Ride</string>
+    <string name="obsTakePictureDuringRideIntervalText">Interval how often a picture will be taken</string>
+    <string name="obsAdvancedSettings">Advanced Settings</string>
+    <string name="obsHandlebarWidthText">Distance of the outer point of the Handlebar to the frame</string>
+    <string name="not_connected_warnung_title">Warning : OpenBikeSensor is not connected</string>
     <string name="not_connected_warnung_message">Do you still want to record the ride ?</string>
-    <string name="cancel_button">No, connect with the Radmesser</string>
+    <string name="cancel_button">No, connect with the OpenBikeSensor</string>
     <string name="bluetooth_not_enable_title">Warning: Bluetooth is off</string>
-    <string name="bluetooth_not_enable_message">Do you want to enable Bluetooth ? Otherwise the radmesser feature cannot be activated</string>
-    <string name="radmesserIncidentDescriptionHeaderLine">This incident was triggered from the OpenBikeSensor event %1$s.</string>
-    <string name="radmesserIncidentDescriptionDataLine">Additional data: %1$s</string>
-    <string name="radmesserIncidentDescriptionButtonHeaderLine">This incident was triggered using a physical button on a OpenBikeSensor.</string>
-    <string name="radmesserIncidentDescriptionButtonDataLine">Distance during close pass: %1$s cm</string>
-    <string name="radmesserIncidentDescriptionAvg2sHeaderLine">This incident was automatically triggered from the OpenBikeSensor because the average distance during the close pass was below the threshold.</string>
-    <string name="radmesserIncidentDescriptionAvg2sDataLine">Average distance: %1$s cm, mininum distance: %2$s cm</string>
-    <string name="radmesserIncidentDescriptionMinKalmanHeaderLine">This incident was automatically triggered from the OpenBikeSensor because it detected the smallest distance during a close pass.</string>
-    <string name="radmesserIncidentDescriptionMinKalmanDataLine">Minimum distance: %1$s cm</string>
+    <string name="bluetooth_not_enable_message">Do you want to enable Bluetooth ? Otherwise the OpenBikeSensor feature cannot be activated</string>
+    <string name="obsIncidentDescriptionHeaderLine">This incident was triggered from the OpenBikeSensor event %1$s.</string>
+    <string name="obsIncidentDescriptionDataLine">Additional data: %1$s</string>
+    <string name="obsIncidentDescriptionButtonHeaderLine">This incident was triggered using a physical button on a OpenBikeSensor.</string>
+    <string name="obsIncidentDescriptionButtonDataLine">Distance during close pass: %1$s cm</string>
+    <string name="obsIncidentDescriptionAvg2sHeaderLine">This incident was automatically triggered from the OpenBikeSensor because the average distance during the close pass was below the threshold.</string>
+    <string name="obsIncidentDescriptionAvg2sDataLine">Average distance: %1$s cm, mininum distance: %2$s cm</string>
+    <string name="obsIncidentDescriptionMinKalmanHeaderLine">This incident was automatically triggered from the OpenBikeSensor because it detected the smallest distance during a close pass.</string>
+    <string name="obsIncidentDescriptionMinKalmanDataLine">Minimum distance: %1$s cm</string>
 
     <!-- Units -->
     <string name="meter_short">m</string>
@@ -284,7 +288,7 @@
     <string name="hourOfDay">Hour</string>
 
     <!--- News -->
-    <string name="what_is_new_title">What is new?</string>
+    <string name="news">News</string>
     <!--- 24 -->
     <string name="statistics_news">New: You can see your profile statistics under the respective entry in the menu.</string>
     <string name="profile_news">New: There is a new option you can set under \"Profile\".</string>
@@ -332,8 +336,15 @@
     <string name="recorded_incident">Saved Incident</string>
     <string name="openbikesensor_toast_devicefound">Device found. Push the Bluetooth Button to connect to it.</string>
     <string name="openbikesensor_bluetooth_incompatible">Your device does not support bluetooth.</string>
-    <string name="activity_radmesser_title_device_info">Device-Info</string>
-    <string name="radmesser_activity_button_connect_device">Connected to device</string>
-    <string name="radmesser_activity_button_disconnect_device">Disconnect device</string>
-    <string name="radmesser_activity_text_last_distance">Last distance:</string>
+    <string name="activity_obs_title_device_info">Device-Info</string>
+    <string name="obs_activity_button_connect_device">Connected to device</string>
+    <string name="obs_activity_button_disconnect_device">Disconnect device</string>
+    <string name="obs_activity_text_last_distance">Last distance:</string>
+    <string name="obsConnected">OpenBikeSensor connected</string>
+    <string name="connecting">Connecting</string>
+    <string name="obsSearching">Searching OpenBikeSensor</string>
+    <string name="obsNotConnected">OpenBikeSensor disconnected</string>
+    <string name="obsConnecting">Connecting to OpenBikeSensor</string>
+    <string name="obsTutorial">\nPlease hold your hand close to the distance sensor for 3 seconds</string>
+    <string name="obs">OpenBikeSensor</string>
 </resources>

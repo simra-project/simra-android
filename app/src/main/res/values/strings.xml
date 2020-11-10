@@ -13,7 +13,7 @@
     <string name="title_activity_credits">Grafikreferenzen</string>
     <string name="title_activity_about_simra">Über SimRa</string>
     <string name="title_activity_statistics">Statistiken</string>
-    <string name="title_activity_bluetooth_connection">Radmesser</string>
+    <string name="title_activity_bluetooth_connection">OpenBikeSensor</string>
 
 
     <!--- Start -->
@@ -41,8 +41,8 @@
     <string name="imprint">Impressum</string>
     <string name="feedback">Feedback</string>
     <string name="title_tutorial">Anleitung</string>
-    <string name="twitter">\@SimRa_Berlin</string>
-    <string name="link_to_twitter">https://twitter.com/SimRa_Berlin</string>
+    <string name="twitter">\@SimRa_App</string>
+    <string name="link_to_twitter">https://twitter.com/SimRa_App</string>
 
     <!--- Permission -->
     <string name="base_permission_rationale">Um fortzufahren, erlaube bitte den Zugriff auf Deine Standortdaten und Speicher.\nWir benötigen diese um deinen Standort auf der Karte anzuzeigen und deine Fahrt aufzuzeichnen</string>
@@ -61,7 +61,7 @@
     <string name="startButtonText">Aufzeichnung\nstarten</string>
     <string name="stopButtonText">Aufzeichnung\nbeenden</string>
     <string name="reportIncidentText">Ereignis melden</string>
-    <string name="reportIncidentClosepass">Knappe Überholung</string>
+    <string name="reportIncidentClosepass">Dichtes Überholen</string>
     <string name="reportIncidentObstacle">Hindernis ausweichen</string>
     <string name="cancel">Abbrechen</string>
     <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalten Sie es aus, damit die Fahrt aufgezeichnet werden kann.</string>
@@ -76,11 +76,11 @@
     <string name="later">Später</string>
     <string name="recording_not_started">Fahrtaufzeichnung wurde NICHT gestartet.</string>
     <string name="recording_started">Fahrtaufzeichnung wurde gestartet.</string>
-    <string name="not_connected_warnung_title">Warnung : Radmesser ist nicht verbunden</string>
+    <string name="not_connected_warnung_title">Warnung : OpenBikeSensor ist nicht verbunden</string>
     <string name="not_connected_warnung_message">Wollen Sie trotzdem den Fahrt aufzeichnen ?</string>
-    <string name="cancel_button">Nein, mit dem Radmesser verbinden</string>
+    <string name="cancel_button">Nein, mit dem OpenBikeSensor verbinden</string>
     <string name="bluetooth_not_enable_title">Warnung: Bluetooth is ausgeschaltet</string>
-    <string name="bluetooth_not_enable_message">Möchten Sie die Bluetooth einschalten ? Ansonsten kann der Radmesser nicht verwendet werden</string>
+    <string name="bluetooth_not_enable_message">Möchten Sie die Bluetooth einschalten ? Ansonsten kann der OpenBikeSensor nicht verwendet werden</string>
     <string name="recorded_incident">Ereignis gespeichert</string>
 
 
@@ -187,6 +187,10 @@
     <string name="unitDescription">Einheitensystem</string>
     <string name="imperial">Angloamerikanisch</string>
     <string name="metric">Metrisch</string>
+    <string name="showButtonsDescription">Buttons zum Hinzufügen von Ereignissen während der Fahrt</string>
+    <string name="hideButtons">verstecken</string>
+    <string name="showButtons">anzeigen</string>
+    <string name="incident_buttons_during_ride_warning">Bitte nutzen Sie die Buttons \"Dichtes Überholen\" und \"Hindernis Auswichen\", die während der Aufzeichnung angezeigt werden, mit großer Vorsicht und nur, wenn das Gerät auf dem SimRa läuft am Lenkrad befestigt ist. Achten Sie stets auf den Straßenverkehr, insbesondere auf STVO §23 (1a), damit Ihre Sicherheit und die der anderen nicht beeinträchtigt wird.</string>
     <string name="rideAnalysis">Fahrten Analyse</string>
     <string name="onlineAI">Online KI gestützt</string>
     <string name="offlineNoAI">Offline Modus</string>
@@ -195,22 +199,22 @@
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Geräte</string>
 
-    <!--- Radmesser -->
-    <string name="radmesserSwitchTitle">Radmesser verbinden</string>
-    <string name="radmesserButton">Radmesser Einstellungen öffnen</string>
+    <!--- OpenBikeSensor -->
+    <string name="obsSwitchTitle">OpenBikeSensor verbinden</string>
+    <string name="obsButton">OpenBikeSensor Einstellungen öffnen</string>
     <string name="availableDevices">Verfügbare Geräte</string>
-    <string name="radmesserTakePictureDuringRideSetting">Während der Fahrt Bilder aufnehmen</string>
-    <string name="radmesserTakePictureDuringRideIntervalText">Intervall wie oft ein Bild aufgenommen wird</string>
-    <string name="radmesserAdvancedSettings">Weitere Einstellungen</string>
-    <string name="radmesserHandlebarWidthText">Weite des Lenkers von der Außenseite zum Rahmen</string>
-    <string name="radmesserIncidentDescriptionHeaderLine">Dieses Ereignis wurde durch das OpenBikeSensor-Event %1$s ausgelöst.</string>
-    <string name="radmesserIncidentDescriptionDataLine">Weitere Daten: %1$s</string>
-    <string name="radmesserIncidentDescriptionButtonHeaderLine">Dieses Ereignis wurde durch einen physischen Button am OpenBikeSensor ausgelöst.</string>
-    <string name="radmesserIncidentDescriptionButtonDataLine">Distanz während der dichten Überholung: %1$s cm</string>
-    <string name="radmesserIncidentDescriptionAvg2sHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da die durchschnittliche Distanz während einer dichten Überholung unter dem Grenzwert lag.</string>
-    <string name="radmesserIncidentDescriptionAvg2sDataLine">Durchschnittliche Distanz: %1$s cm, kleinste Distanz: %2$s cm</string>
-    <string name="radmesserIncidentDescriptionMinKalmanHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da es die kleinste Distanz während einer dichten Überholung erkannt hat.</string>
-    <string name="radmesserIncidentDescriptionMinKalmanDataLine">Kleinste Distanz: %1$s cm</string>
+    <string name="obsTakePictureDuringRideSetting">Während der Fahrt Bilder aufnehmen</string>
+    <string name="obsTakePictureDuringRideIntervalText">Intervall wie oft ein Bild aufgenommen wird</string>
+    <string name="obsAdvancedSettings">Weitere Einstellungen</string>
+    <string name="obsHandlebarWidthText">Weite des Lenkers von der Außenseite zum Rahmen</string>
+    <string name="obsIncidentDescriptionHeaderLine">Dieses Ereignis wurde durch das OpenBikeSensor-Event %1$s ausgelöst.</string>
+    <string name="obsIncidentDescriptionDataLine">Weitere Daten: %1$s</string>
+    <string name="obsIncidentDescriptionButtonHeaderLine">Dieses Ereignis wurde durch einen physischen Button am OpenBikeSensor ausgelöst.</string>
+    <string name="obsIncidentDescriptionButtonDataLine">Distanz während der dichten Überholung: %1$s cm</string>
+    <string name="obsIncidentDescriptionAvg2sHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da die durchschnittliche Distanz während einer dichten Überholung unter dem Grenzwert lag.</string>
+    <string name="obsIncidentDescriptionAvg2sDataLine">Durchschnittliche Distanz: %1$s cm, kleinste Distanz: %2$s cm</string>
+    <string name="obsIncidentDescriptionMinKalmanHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da es die kleinste Distanz während einer dichten Überholung erkannt hat.</string>
+    <string name="obsIncidentDescriptionMinKalmanDataLine">Kleinste Distanz: %1$s cm</string>
 
     <!--- Profil -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
@@ -289,7 +293,7 @@
     <string name="datetime_format">dd.MM.yy,HH:mm\'h\'</string>
 
     <!--- News -->
-    <string name="what_is_new_title">Was ist neu?</string>
+    <string name="news">Neuigkeiten</string>
 
     <!--- 24 -->
     <string name="statistics_news">Neu: Die persönlichen Statistiken können im gleichnamigen Menüeintrag eingesehen werden.</string>
@@ -336,10 +340,19 @@
 
     <!-- 58 -->
     <string name="added_new_regions_news_58">Folgende Regionen wurden freigeschaltet: Leipzig, Wuppertal/Solingen/Remscheid und Düsseldorf</string>
+
+    <!-- 66 -->
     <string name="openbikesensor_toast_devicefound">Gerät gefunden, klicke auf dem Bluetooth Knopf um dich damit zu verbinden</string>
     <string name="openbikesensor_bluetooth_incompatible">Dein Gerät unterstützt kein Bluetooth.</string>
-    <string name="activity_radmesser_title_device_info">Geräte-Info</string>
-    <string name="radmesser_activity_button_connect_device">Mit Gerät verbinden</string>
-    <string name="radmesser_activity_button_disconnect_device">Geräteverbindung trennen</string>
-    <string name="radmesser_activity_text_last_distance">Letzer Wert:</string>
+    <string name="activity_obs_title_device_info">Geräte-Info</string>
+    <string name="obs_activity_button_connect_device">Mit Gerät verbinden</string>
+    <string name="obs_activity_button_disconnect_device">Geräteverbindung trennen</string>
+    <string name="obs_activity_text_last_distance">Letzer Wert:</string>
+    <string name="obsConnected">OpenBikeSensor verbunden</string>
+    <string name="connecting">Verbinde</string>
+    <string name="obsSearching">OpenBikeSensor wird gesucht</string>
+    <string name="obsNotConnected">OpenBikeSensor nicht verbunden</string>
+    <string name="obsConnecting">Verbindung mit OpenBikeSensor</string>
+    <string name="obsTutorial">\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden</string>
+    <string name="obs">OpenBikeSensor</string>
 </resources>

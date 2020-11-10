@@ -25,8 +25,8 @@ public class IOUtils {
          * @return Path with trailing slash
          */
         public static String getBaseFolderPath(Context ctx) {
-            return getExternalBaseDirectoryPath();
-            //return ctx.getFilesDir() + "/";
+            // return getExternalBaseDirectoryPath();
+            return ctx.getFilesDir() + "/";
         }
 
         /**
@@ -92,6 +92,13 @@ public class IOUtils {
 
         public static File getRegionsFile(Context context) {
             return new File(IOUtils.Directories.getBaseFolderPath(context) + "simRa_regions.config");
+        }
+
+        public static File getDENewsFile(Context context) {
+            return new File(IOUtils.Directories.getBaseFolderPath(context) + "simRa_news_de.config");
+        }
+        public static File getENNewsFile(Context context) {
+            return new File(IOUtils.Directories.getBaseFolderPath(context) + "simRa_news_en.config");
         }
 
     }

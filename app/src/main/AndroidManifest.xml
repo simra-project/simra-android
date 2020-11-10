@@ -55,7 +55,7 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_about_simra" />
         <activity
-            android:name=".activities.RadmesserActivity"
+            android:name=".activities.OpenBikeSensorActivity"
             android:label="@string/title_activity_bluetooth_connection" />
         <activity
             android:name=".activities.LicenseActivity"
@@ -103,11 +103,14 @@
         <activity
             android:name=".annotation.IncidentPopUpActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.PopUpWindow" />
+            android:theme="@style/AppTheme.PopUpWindow"/>
         <activity
             android:name=".activities.CreditsActivity"
             android:label="@string/title_activity_credits"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activities.SingleRideStatisticsActivity"
+            android:configChanges="orientation|screenSize"/>
         <!-- Services -->
         <service
             android:name=".services.RecorderService"
@@ -117,7 +120,7 @@
             android:enabled="true"
             android:parentActivityName=".HistoryActivity" />
         <service
-            android:name=".services.RadmesserService"
+            android:name=".services.OBSService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />

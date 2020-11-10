@@ -12,10 +12,10 @@ public class DataLogEntry {
     public final Float gyroscopeA;
     public final Float gyroscopeB;
     public final Float gyroscopeC;
-    public final Integer radmesserDistanceLeft1;
-    public final Integer radmesserDistanceLeft2;
-    public final Integer radmesserDistanceRight1;
-    public final Integer radmesserDistanceRight2;
+    public final Integer obsDistanceLeft1;
+    public final Integer obsDistanceLeft2;
+    public final Integer obsDistanceRight1;
+    public final Integer obsDistanceRight2;
 
     private DataLogEntry(DataLogEntryBuilder dataLogEntryBuilder) {
         this.rideId = dataLogEntryBuilder.rideId;
@@ -29,10 +29,10 @@ public class DataLogEntry {
         this.gyroscopeA = dataLogEntryBuilder.gyroscopeA;
         this.gyroscopeB = dataLogEntryBuilder.gyroscopeB;
         this.gyroscopeC = dataLogEntryBuilder.gyroscopeC;
-        this.radmesserDistanceLeft1 = dataLogEntryBuilder.radmesserDistanceLeft1;
-        this.radmesserDistanceLeft2 = dataLogEntryBuilder.radmesserDistanceLeft2;
-        this.radmesserDistanceRight1 = dataLogEntryBuilder.radmesserDistanceRight1;
-        this.radmesserDistanceRight2 = dataLogEntryBuilder.radmesserDistanceRight2;
+        this.obsDistanceLeft1 = dataLogEntryBuilder.obsDistanceLeft1;
+        this.obsDistanceLeft2 = dataLogEntryBuilder.obsDistanceLeft2;
+        this.obsDistanceRight1 = dataLogEntryBuilder.obsDistanceRight1;
+        this.obsDistanceRight2 = dataLogEntryBuilder.obsDistanceRight2;
     }
 
     public static DataLogEntry parseDataLogEntryFromLine(String string) {
@@ -69,7 +69,7 @@ public class DataLogEntry {
             );
         }
 
-        dataLogEntryBuilder.withRadmesser(
+        dataLogEntryBuilder.withOBS(
                 dataLogLine.length > 10 ? (!dataLogLine[10].isEmpty() ? Integer.parseInt(dataLogLine[10]) : null) : null,
                 dataLogLine.length > 11 ? (!dataLogLine[11].isEmpty() ? Integer.parseInt(dataLogLine[11]) : null) : null,
                 dataLogLine.length > 12 ? (!dataLogLine[12].isEmpty() ? Integer.parseInt(dataLogLine[12]) : null) : null,
@@ -99,10 +99,10 @@ public class DataLogEntry {
                 (gyroscopeA != null ? gyroscopeA : "") + "," +
                 (gyroscopeB != null ? gyroscopeB : "") + "," +
                 (gyroscopeC != null ? gyroscopeC : "") + "," +
-                (radmesserDistanceLeft1 != null ? radmesserDistanceLeft1 : "") + "," +
-                (radmesserDistanceLeft2 != null ? radmesserDistanceLeft2 : "") + "," +
-                (radmesserDistanceRight1 != null ? radmesserDistanceRight1 : "") + "," +
-                (radmesserDistanceRight2 != null ? radmesserDistanceRight2 : "");
+                (obsDistanceLeft1 != null ? obsDistanceLeft1 : "") + "," +
+                (obsDistanceLeft2 != null ? obsDistanceLeft2 : "") + "," +
+                (obsDistanceRight1 != null ? obsDistanceRight1 : "") + "," +
+                (obsDistanceRight2 != null ? obsDistanceRight2 : "");
     }
 
     public static final class DataLogEntryBuilder {
@@ -117,10 +117,10 @@ public class DataLogEntry {
         private Float gyroscopeA;
         private Float gyroscopeB;
         private Float gyroscopeC;
-        private Integer radmesserDistanceLeft1;
-        private Integer radmesserDistanceLeft2;
-        private Integer radmesserDistanceRight1;
-        private Integer radmesserDistanceRight2;
+        private Integer obsDistanceLeft1;
+        private Integer obsDistanceLeft2;
+        private Integer obsDistanceRight1;
+        private Integer obsDistanceRight2;
 
         private DataLogEntryBuilder() {
         }
@@ -156,18 +156,18 @@ public class DataLogEntry {
             return this;
         }
 
-        public DataLogEntryBuilder withRadmesser(Integer vRadmesserDistanceLeft1, Integer vRadmesserDistanceLeft2, Integer vRadmesserDistanceRight1, Integer vRadmesserDistanceRight2) {
-            if (vRadmesserDistanceLeft1 != null) {
-                radmesserDistanceLeft1 = vRadmesserDistanceLeft1;
+        public DataLogEntryBuilder withOBS(Integer vOBSDistanceLeft1, Integer vOBSDistanceLeft2, Integer vOBSDistanceRight1, Integer vOBSDistanceRight2) {
+            if (vOBSDistanceLeft1 != null) {
+                obsDistanceLeft1 = vOBSDistanceLeft1;
             }
-            if (vRadmesserDistanceLeft2 != null) {
-                radmesserDistanceLeft2 = vRadmesserDistanceLeft2;
+            if (vOBSDistanceLeft2 != null) {
+                obsDistanceLeft2 = vOBSDistanceLeft2;
             }
-            if (vRadmesserDistanceRight1 != null) {
-                radmesserDistanceRight1 = vRadmesserDistanceRight1;
+            if (vOBSDistanceRight1 != null) {
+                obsDistanceRight1 = vOBSDistanceRight1;
             }
-            if (vRadmesserDistanceRight2 != null) {
-                radmesserDistanceRight2 = vRadmesserDistanceRight2;
+            if (vOBSDistanceRight2 != null) {
+                obsDistanceRight2 = vOBSDistanceRight2;
             }
             return this;
         }

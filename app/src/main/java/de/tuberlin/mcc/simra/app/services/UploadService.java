@@ -43,6 +43,8 @@ import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
+import static de.tuberlin.mcc.simra.app.util.Utils.calculateCO2Savings;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.readContentFromFile;
 
@@ -60,7 +62,7 @@ public class UploadService extends Service {
         profile.numberOfIncidents += metaDataEntry.numberOfIncidents;
         profile.waitedTime += metaDataEntry.waitedTime;
         profile.distance += metaDataEntry.distance;
-        profile.co2 += (long) (metaDataEntry.distance / (float) 1000) * 138;
+        profile.co2 += calculateCO2Savings(metaDataEntry.distance);
         profile.numberOfScaryIncidents += metaDataEntry.numberOfScaryIncidents;
 
         // update the timebuckets
@@ -96,7 +98,9 @@ public class UploadService extends Service {
         super.onDestroy();
 
         ForegroundServiceNotificationManager.cancelNotification(this);
-        wakeLock.release();
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
     }
 
     @Override
@@ -299,7 +303,7 @@ public class UploadService extends Service {
                             Log.d(TAG, "sending profile with POST: " + profileContentToSend.toString());
                             String hashPassword = postFile("profile", profileContentToSend.toString(), p).second;
                             if (hashPassword.split(",").length >= 2) {
-                                writeToSharedPrefs("Profile_" + regionProfileUpdated[p], hashPassword, "keyPrefs", context);
+                                writeToSharedPrefs("Profile_" + p, hashPassword, "keyPrefs", context);
                                 writeIntToSharedPrefs("Version", profileVersion + 1, "Profile", context);
                             }
                             Log.d(TAG, "hashPassword: " + hashPassword + " written to keyPrefs");
@@ -331,7 +335,7 @@ public class UploadService extends Service {
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
-            URL url = new URL(BuildConfig.API_ENDPOINT + fileType + "?loc=" + locale + "&clientHash=" + BuildConfig.API_SECRET);
+            URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + fileType + "?loc=" + locale + "&clientHash=" + getClientHash(context));
             Log.d(TAG, "URL: " + url.toString());
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection) url.openConnection();
@@ -372,7 +376,7 @@ public class UploadService extends Service {
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
-            URL url = new URL(BuildConfig.API_ENDPOINT + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + BuildConfig.API_SECRET);
+            URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + getClientHash(context));
 
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection) url.openConnection();

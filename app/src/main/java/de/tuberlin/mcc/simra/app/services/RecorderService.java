@@ -49,9 +49,9 @@ import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 
-import static de.tuberlin.mcc.simra.app.services.RadmesserService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
-import static de.tuberlin.mcc.simra.app.services.RadmesserService.ACTION_VALUE_RECEIVED_DISTANCE;
-import static de.tuberlin.mcc.simra.app.services.RadmesserService.EXTRA_VALUE_SERIALIZED;
+import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
+import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_DISTANCE;
+import static de.tuberlin.mcc.simra.app.services.OBSService.EXTRA_VALUE_SERIALIZED;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
@@ -74,9 +74,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences sharedPrefs;
     SharedPreferences.Editor editor;
     Location startLocation;
-    // Radmesser
-    private LinkedList<RadmesserService.Measurement> lastRadmesserDistanceValues = new LinkedList<>();
-    private LinkedList<RadmesserService.ClosePassEvent> lastRadmesserClosePassEvents = new LinkedList<>();
+    // OpenBikeSensor
+    private LinkedList<OBSService.Measurement> lastOBSDistanceValues = new LinkedList<>();
+    private LinkedList<OBSService.ClosePassEvent> lastOBSClosePassEvents = new LinkedList<>();
     private LocationManager locationManager;
     private ExecutorService executor;
     private Sensor accelerometer;
@@ -89,8 +89,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         public void onReceive(Context context, Intent intent) {
             Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
-            if (serializable instanceof RadmesserService.Measurement) {
-                lastRadmesserDistanceValues.add((RadmesserService.Measurement) serializable);
+            if (serializable instanceof OBSService.Measurement) {
+                lastOBSDistanceValues.add((OBSService.Measurement) serializable);
             }
         }
     };
@@ -99,8 +99,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         public void onReceive(Context context, Intent intent) {
             Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
-            if (serializable instanceof RadmesserService.ClosePassEvent) {
-                lastRadmesserClosePassEvents.add((RadmesserService.ClosePassEvent) serializable);
+            if (serializable instanceof OBSService.ClosePassEvent) {
+                lastOBSClosePassEvents.add((OBSService.ClosePassEvent) serializable);
             }
         }
     };
@@ -338,7 +338,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // Stop requesting location updates
         locationManager.removeUpdates(this);
 
-        // Stop Radmesser LocalBroadcast Listener
+        // Stop OpenBikeSensor LocalBroadcast Listener
         LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverDistanceValue);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverClosePassEvent);
 
@@ -394,7 +394,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         public void run() {
             /**
              * How is this Working?
-             * We are collecting GPS, Accelerometer, Gyroscope (and Radmesser) Data, those are updated as following;
+             * We are collecting GPS, Accelerometer, Gyroscope (and OpenBikeSensor) Data, those are updated as following;
              * - GPS (lat, lon, accuracy) roughly every 3 seconds
              * - accelerometer data (x,y,z) roughly 50 times a second
              * - gyroscope data (a,b,c) roughly every 3 seconds
@@ -449,8 +449,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         incidentDuringRide = null;
                     }
 
-                    while (lastRadmesserClosePassEvents.size() > 0) {
-                        RadmesserService.ClosePassEvent closePassEvent = lastRadmesserClosePassEvents.removeFirst();
+                    while (lastOBSClosePassEvents.size() > 0) {
+                        OBSService.ClosePassEvent closePassEvent = lastOBSClosePassEvents.removeFirst();
                         incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder()
                                 .withIncidentType(closePassEvent.getIncidentType())
                                 .withDescription(closePassEvent.getIncidentDescription(getApplicationContext()))
@@ -464,12 +464,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         gyroscopeMatrix[2]
                 );
 
-                if (lastRadmesserDistanceValues.size() > 0) {
-                    RadmesserService.Measurement lastRadmesserDistanceValue = lastRadmesserDistanceValues.removeFirst();
-                    dataLogEntryBuilder.withRadmesser(lastRadmesserDistanceValue.leftSensorValues.get(0), null, null, null);
+                if (lastOBSDistanceValues.size() > 0) {
+                    OBSService.Measurement lastOBSDistanceValue = lastOBSDistanceValues.removeFirst();
+                    dataLogEntryBuilder.withOBS(lastOBSDistanceValue.leftSensorValues.get(0), null, null, null);
 
                     if (takePictureDuringRideActivated) {
-                        if (lastRadmesserDistanceValue.leftSensorValues.get(0) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= curTime) {
+                        if (lastOBSDistanceValue.leftSensorValues.get(0) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= curTime) {
                             lastPictureTaken = curTime;
                             CameraService.takePicture(RecorderService.this, String.valueOf(curTime), IOUtils.Directories.getPictureCacheDirectoryPath());
                         }

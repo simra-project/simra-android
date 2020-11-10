@@ -23,7 +23,7 @@ public class IncidentPopUpActivity extends AppCompatActivity {
     private IncidentLogEntry incidentLogEntry;
 
     public static Integer startIncidentPopUpActivity(IncidentLogEntry incidentLogEntry, int state, Activity activity) {
-        Intent intent = new Intent(activity, IncidentPopUpActivity.class);
+        Intent intent = new Intent(activity, de.tuberlin.mcc.simra.app.annotation.IncidentPopUpActivity.class);
         intent.putExtra(EXTRA_INCIDENT, incidentLogEntry);
         intent.putExtra(EXTRA_RIDE_STATE, state);
         activity.startActivityForResult(intent, REQUEST_CODE);

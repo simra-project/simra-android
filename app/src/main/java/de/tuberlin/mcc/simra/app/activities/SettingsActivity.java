@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,15 +13,19 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
-import de.tuberlin.mcc.simra.app.services.RadmesserService;
+import de.tuberlin.mcc.simra.app.services.OBSService;
+import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 import pl.droidsonroids.gif.GifImageView;
+
+import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -115,36 +120,47 @@ public class SettingsActivity extends BaseActivity {
             updatePrivacyDistanceSlider(displayUnit);
         });
 
-
+        // Switch: Buttons for adding incidents during ride
+        if (SharedPref.Settings.IncidentsButtonsDuringRide.getIncidentButtonsEnabled(this)) {
+            binding.switchButtons.setChecked(true);
+        }
+        binding.switchButtons.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> {
+                    SharedPref.Settings.IncidentsButtonsDuringRide.setIncidentButtonsEnabled(isChecked,this);
+                    if (isChecked) {
+                        fireIncidentButtonsEnablePrompt();
+                    }
+                });
+        /*
         // Switch: AI Select
         if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(this)) {
             binding.switchAI.setChecked(true);
         }
         binding.switchAI.setOnCheckedChangeListener((buttonView, isChecked) -> SharedPref.Settings.IncidentGenerationAIActive.setAIEnabled(isChecked,this));
+        */
 
-
-        // Switch: Radmesser device enabled
-        boolean radmesserActivated = SharedPref.Settings.Radmesser.isEnabled(this);
-        binding.radmesserButton.setVisibility(radmesserActivated ? View.VISIBLE : View.GONE);
-        binding.radmesserButton.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
+        // Switch: OpenBikeSensor device enabled
+        boolean obsActivated = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
+        binding.obsButton.setVisibility(obsActivated ? View.VISIBLE : View.GONE);
+        binding.obsButton.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
 
         if (BluetoothAdapter.getDefaultAdapter() == null) {
             // Device does not support Bluetooth
-            binding.radmesserSwitch.setEnabled(false);
+            binding.obsSwitch.setEnabled(false);
         }
-        binding.radmesserSwitch.setChecked(radmesserActivated);
-        binding.radmesserSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            SharedPref.Settings.Radmesser.setEnabled(isChecked, SettingsActivity.this);
-            binding.radmesserButton.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        binding.obsSwitch.setChecked(obsActivated);
+        binding.obsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPref.Settings.OpenBikeSensor.setEnabled(isChecked, SettingsActivity.this);
+            binding.obsButton.setVisibility(isChecked ? View.VISIBLE : View.GONE);
 
             if (isChecked) {
                 if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
                     enableBluetooth();
                 } else {
-                    startRadmesserService();
+                    startOBSService();
                 }
             } else {
-                RadmesserService.terminateService(this);
+                OBSService.terminateService(this);
             }
         });
 
@@ -165,8 +181,8 @@ public class SettingsActivity extends BaseActivity {
 
     private void showTutorialDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Verbindung mit Radmesser");
-        alert.setMessage("\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden");
+        alert.setTitle(getString(R.string.obsConnecting));
+        alert.setMessage(getString(R.string.obsTutorial));
 
         LinearLayout gifLayout = new LinearLayout(this);
         LinearLayout.LayoutParams gifMargins = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -185,23 +201,31 @@ public class SettingsActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == BLUETOOTH_SUCCESS && requestCode == REQUEST_ENABLE_BT) {
-            startRadmesserService();
+            startOBSService();
             showTutorialDialog();
         } else {
-            SharedPref.Settings.Radmesser.setEnabled(false, this);
-            binding.radmesserSwitch.setChecked(false);
-            RadmesserService.terminateService(this);
-            binding.radmesserButton.setVisibility(View.GONE);
+            SharedPref.Settings.OpenBikeSensor.setEnabled(false, this);
+            binding.obsSwitch.setChecked(false);
+            OBSService.terminateService(this);
+            binding.obsButton.setVisibility(View.GONE);
         }
     }
 
-    private void startRadmesserService() {
-        Intent intent = new Intent(this, RadmesserService.class);
+    private void startOBSService() {
+        Intent intent = new Intent(this, OBSService.class);
         startService(intent);
     }
 
     private void enableBluetooth() {
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+    }
+
+    public void fireIncidentButtonsEnablePrompt() {
+        androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(SettingsActivity.this);
+        alert.setTitle(getString(R.string.warning));
+        alert.setMessage(getString(R.string.incident_buttons_during_ride_warning));
+        alert.setNeutralButton("Ok", (dialog, id) -> { });
+        alert.show();
     }
 }

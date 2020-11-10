@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -181,6 +182,13 @@ public class ShowRouteActivity extends BaseActivity {
 
         // scales tiles to dpi of current display
         mMapView.setTilesScaledToDpi(true);
+
+        // add statistics button
+        ImageButton statisticsButton = binding.statisticsButton;
+        statisticsButton.setOnClickListener(v -> {
+            Log.d(TAG, "statisticsButton clicked ");
+            SingleRideStatisticsActivity.startSingeRideStatisticsActivity(rideId,ShowRouteActivity.this);
+        });
 
         gpsFile = IOUtils.Files.getGPSLogFile(rideId, false, this);
 

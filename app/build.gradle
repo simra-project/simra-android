@@ -1,25 +1,21 @@
 apply plugin: 'com.android.application'
-apply plugin: 'checkstyle'
 
 def ENV_VARIABLE_PREFIX = "SIMRA_"
 def API_ENDPOINT = "API_ENDPOINT"
-def API_SECRET = "API_SECRET"
-def SENTRY_DSN = "SENTRY_DSN"
+def API_VERSION = "API_VERSION"
 
 android {
     compileSdkVersion 29
     defaultConfig {
-        applicationId "dsp2020.simra.app"
+        applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 66
-        versionName "66.0"
+        versionCode 69
+        versionName "69.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
         buildConfigField "long", "BUILD_DATE", System.currentTimeMillis() + "L"
-        // define whether this build is a production build
-        buildConfigField "boolean", "IS_PRODUCTION", "false"
 
         // Load `local.properties` (from root) for development configuration
         Properties properties = new Properties()
@@ -27,61 +23,39 @@ android {
             properties.load(project.rootProject.file('local.properties').newDataInputStream())
         }
 
-        buildConfigField "String", SENTRY_DSN, properties.getProperty(SENTRY_DSN) ?: "\"\""
-        def VAR_SENTRY_DSN = System.getenv(ENV_VARIABLE_PREFIX + SENTRY_DSN)
-        if (VAR_SENTRY_DSN != null) {
-            buildConfigField "String", SENTRY_DSN, "\"" + VAR_SENTRY_DSN + "\""
-        }
 
-
-        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://localhost:8082/\""
-        buildConfigField "String", API_SECRET, properties.getProperty(API_SECRET) ?: "\"mysecret\""
+        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://vm2.mcc.tu-berlin.de:8082/\""
+        buildConfigField "String", API_VERSION, properties.getProperty(API_VERSION) ?: "\"11/\""
 
     }
     buildTypes {
 
         release {
-            // Uncomment if you want to test the release configuration locally
-            //signingConfig debug.signingConfig
-            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             // Allow loading the configuration Settings from environment variables
-            buildConfigField "boolean", "IS_PRODUCTION", "true"
             def VAR_API_ENDPOINT = System.getenv(ENV_VARIABLE_PREFIX + API_ENDPOINT)
             if (VAR_API_ENDPOINT != null) {
                 buildConfigField "String", API_ENDPOINT, "\"" + VAR_API_ENDPOINT + "\""
             }
-            def VAR_API_SECRET = System.getenv(ENV_VARIABLE_PREFIX + API_SECRET)
-            if (VAR_API_SECRET != null) {
-                buildConfigField "String", API_SECRET, "\"" + VAR_API_SECRET + "\""
+            def VAR_API_VERSION = System.getenv(ENV_VARIABLE_PREFIX + API_VERSION)
+            if (VAR_API_VERSION != null) {
+                buildConfigField "String", API_VERSION, "\"" + VAR_API_VERSION + "\""
             }
-        }
-        debug {
-            debuggable true
-            applicationIdSuffix ".debug"
         }
         qa {
             initWith buildTypes.release
         }
     }
-    buildFeatures {
-        viewBinding = true
+    viewBinding {
+        enabled = true
     }
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-    }
-    lintOptions {
-        htmlReport false
-        xmlReport false
-        htmlOutput file("lint-report.html")
-        // Not yet enabled, too many errors. 
-        //warningsAsErrors true
-        abortOnError true
     }
     buildToolsVersion = '29.0.3'
 }
@@ -124,18 +98,3 @@ dependencies {
     // "Backporting" Java 8 streams for Android < 24
     implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
 }
-
-task checkstyle(type: Checkstyle) {
-    description 'Check code standard'
-    group 'verification'
-    configFile rootProject.file('config/checkstyle.xml')
-    source 'src'
-    include '**/*.java'
-    exclude '**/gen/**'
-    classpath = files()
-    ignoreFailures = false
-}
-
-
-preBuild.dependsOn('checkstyle')
-check.dependsOn('checkstyle')

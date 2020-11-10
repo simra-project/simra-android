@@ -31,10 +31,10 @@ import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 
 import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEService;
 
-public class RadmesserService extends Service {
-    private static final String TAG = "RadmesserService";
-    private static final String sharedPrefsKey = "RadmesserServiceBLE";
-    private static final String sharedPrefsKeyRadmesserID = "connectedDevice";
+public class OBSService extends Service {
+    private static final String TAG = "OBSService";
+    private static final String sharedPrefsKey = "OBSServiceBLE";
+    private static final String sharedPrefsKeyOBSID = "connectedDevice";
     private BLEDevice connectedDevice;
     private volatile HandlerThread mHandlerThread;
     private BLEScanner bluetoothScanner;
@@ -76,11 +76,11 @@ public class RadmesserService extends Service {
         boradcastConnectionStateChanged(newState);
         ForegroundServiceNotificationManager.createOrUpdateNotification(
                 this,
-                "SimRa RadmesseR connection",
+                "SimRa OpenBikeSensor connection",
                 newState.toString()
         );
         if (newState == ConnectionState.CONNECTED)
-            setPairedRadmesserID(connectedDevice.getID(), this);
+            setPairedOBSID(connectedDevice.getID(), this);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class RadmesserService extends Service {
         Notification notification =
                 ForegroundServiceNotificationManager.createOrUpdateNotification(
                         this,
-                        "SimRa RadmesseR connection",
+                        "SimRa OpenBikeSensor connection",
                         "Disconnected"
                 );
         startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
@@ -127,7 +127,7 @@ public class RadmesserService extends Service {
             if (connectionState == ConnectionState.SEARCHING && connectedDevice == null)
                 setConnectionState(ConnectionState.DISCONNECTED);
             else if (connectedDevice != null)   //restore connection state of the current device, after scan
-                radmesserConnectionCallbacks.onConnectionStateChange(connectedDevice.getConnectionState(), connectedDevice);
+                obsConnectionCallbacks.onConnectionStateChange(connectedDevice.getConnectionState(), connectedDevice);
         }
 
         @Override
@@ -135,11 +135,11 @@ public class RadmesserService extends Service {
             if (connectionState == ConnectionState.SEARCHING && connectedDevice == null)
                 setConnectionState(ConnectionState.DISCONNECTED);
             else if (connectedDevice != null) //restore connection state of the current device, after scan
-                radmesserConnectionCallbacks.onConnectionStateChange(connectedDevice.getConnectionState(), connectedDevice);
+                obsConnectionCallbacks.onConnectionStateChange(connectedDevice.getConnectionState(), connectedDevice);
         }
     };
 
-    private BLEDevice.ConnectionStateCallbacks radmesserConnectionCallbacks = (BLEDevice.ConnectionStatus newState, BLEDevice instance) -> {
+    private BLEDevice.ConnectionStateCallbacks obsConnectionCallbacks = (BLEDevice.ConnectionStatus newState, BLEDevice instance) -> {
         if (instance != connectedDevice) return;    // only interested in currently connected device
 
         switch (newState) {
@@ -159,7 +159,7 @@ public class RadmesserService extends Service {
     };
 
 
-    private BLEServiceManager radmesserServicesDefinition = new BLEServiceManager(
+    private BLEServiceManager obsServicesDefinition = new BLEServiceManager(
             new BLEService(BLEDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
                     BLEDevice.UUID_SERVICE_HEARTRATE_CHAR,
                     val -> broadcastHeartRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
@@ -194,7 +194,7 @@ public class RadmesserService extends Service {
 
     // ## incoming communication
     // Action-Requests
-    final static String ACTION_PREFIX = "de.tuberlin.mcc.simra.app.radmesserservice.";
+    final static String ACTION_PREFIX = "de.tuberlin.mcc.simra.app.obsservice.";
     final static String ACTION_START_SCANN = ACTION_PREFIX + ".ACTION_START_SCANN";
     final static String ACTION_CONNECT_DEVICE = ACTION_PREFIX + ".ACTION_CONNECT_DEVICE";
     final static String ACTION_DISCONNECT_AND_UNPAIR = ACTION_PREFIX + ".ACTION_DISCONNECT_AND_UNPAIR";
@@ -204,11 +204,11 @@ public class RadmesserService extends Service {
     // incoming Action-Requests
 
     /*
-     * Request Service to scan for Radmesser devices
+     * Request Service to scan for OpenBikeSensor devices
      * Scan results can be subscribed with registerCallbacks()
      * */
     public static void startScanning(Context ctx) {
-        Intent intent = new Intent(ctx, RadmesserService.class);
+        Intent intent = new Intent(ctx, OBSService.class);
         intent.setAction(ACTION_START_SCANN);
         ctx.startService(intent);
     }
@@ -228,7 +228,7 @@ public class RadmesserService extends Service {
 
         lastConnectionRequest = deviceId;
 
-        Intent intent = new Intent(ctx, RadmesserService.class);
+        Intent intent = new Intent(ctx, OBSService.class);
         intent.setAction(ACTION_CONNECT_DEVICE);
         intent.putExtra(EXTRA_CONNECT_DEVICE, deviceId);
         ctx.startService(intent);
@@ -241,11 +241,11 @@ public class RadmesserService extends Service {
      * returns false if there is no device paired yet
      */
     public static boolean tryConnectPairedDevice(Context ctx) {
-        String deviceId = getPairedRadmesserID(ctx);
+        String deviceId = getPairedOBSID(ctx);
         if (deviceId == null)
             return false;
 
-        Intent intent = new Intent(ctx, RadmesserService.class);
+        Intent intent = new Intent(ctx, OBSService.class);
         intent.setAction(ACTION_CONNECT_DEVICE);
         intent.putExtra(EXTRA_CONNECT_DEVICE, deviceId);
         ctx.startService(intent);
@@ -258,7 +258,7 @@ public class RadmesserService extends Service {
      */
 
     public static void disconnectAndUnpairDevice(Context ctx) {
-        Intent intent = new Intent(ctx, RadmesserService.class);
+        Intent intent = new Intent(ctx, OBSService.class);
         intent.setAction(ACTION_DISCONNECT_AND_UNPAIR);
         ctx.startService(intent);
     }
@@ -270,7 +270,7 @@ public class RadmesserService extends Service {
     public static void terminateService(Context ctx) {
         if (!isServiceActive) return;
         isServiceActive = false;
-        Intent intent = new Intent(ctx, RadmesserService.class);
+        Intent intent = new Intent(ctx, OBSService.class);
         intent.setAction(ACTION_STOP_SERVICE);
         ctx.startService(intent);
     }
@@ -300,7 +300,7 @@ public class RadmesserService extends Service {
 
     // internal processing of Action-Requests
     private void startScanning() {
-        bluetoothScanner.findDevicesByServices(radmesserServicesDefinition,
+        bluetoothScanner.findDevicesByServices(obsServicesDefinition,
                 device -> boradcastDeviceFound(device.getName(), device.getAddress())
         );
     }
@@ -311,16 +311,16 @@ public class RadmesserService extends Service {
 
         disconnectAndUnpairDevice();
         bluetoothScanner.findDeviceById(deviceId,
-                device -> connectedDevice = new BLEDevice(device, radmesserConnectionCallbacks, radmesserServicesDefinition, this)
+                device -> connectedDevice = new BLEDevice(device, obsConnectionCallbacks, obsServicesDefinition, this)
         );
     }
 
     private void disconnectAndUnpairDevice() {
-        disconnectAnyRadmesser();
-        unPairedRadmesser();
+        disconnectAnyOBS();
+        unPairedOBS();
     }
 
-    private void disconnectAnyRadmesser() {
+    private void disconnectAnyOBS() {
         setConnectionState(ConnectionState.DISCONNECTED);
         if (connectedDevice != null)
             connectedDevice.disconnectDevice();
@@ -328,24 +328,24 @@ public class RadmesserService extends Service {
     }
 
     private void terminateService() {
-        disconnectAnyRadmesser();
+        disconnectAnyOBS();
         stopSelf();
     }
     // ## outgoing communication
 
     // Broadcasts
-    final static String ACTION_DEVICE_FOUND = "de.tuberlin.mcc.simra.app.radmesserservice.actiondevicefound";
-    final static String ACTION_CONNECTION_STATE_CHANGED = "de.tuberlin.mcc.simra.app.radmesserservice.actiondconnectionstatechanged";
-    final static String ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedclosepass.distance";
-    final static String ACTION_VALUE_RECEIVED_HEARTRATE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedheartrate";
-    final static String ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceivedclosepass.event";
-    final static String ACTION_VALUE_RECEIVED_DISTANCE = "de.tuberlin.mcc.simra.app.radmesserservice.actiondvaluereceiveddistance";
+    final static String ACTION_DEVICE_FOUND = "de.tuberlin.mcc.simra.app.obsservice.actiondevicefound";
+    final static String ACTION_CONNECTION_STATE_CHANGED = "de.tuberlin.mcc.simra.app.obsservice.actiondconnectionstatechanged";
+    final static String ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedclosepass.distance";
+    final static String ACTION_VALUE_RECEIVED_HEARTRATE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedheartrate";
+    final static String ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedclosepass.event";
+    final static String ACTION_VALUE_RECEIVED_DISTANCE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceiveddistance";
 
-    final static String EXTRA_DEVICE_ID = "de.tuberlin.mcc.simra.app.radmesserservice.extraid";
-    final static String EXTRA_DEVICE_NAME = "de.tuberlin.mcc.simra.app.radmesserservice.extraname";
-    final static String EXTRA_CONNECTION_STATE = "de.tuberlin.mcc.simra.app.radmesserservice.extraconnectionstate";
-    final static String EXTRA_VALUE = "de.tuberlin.mcc.simra.app.radmesserservice.extravalue";
-    final static String EXTRA_VALUE_SERIALIZED = "de.tuberlin.mcc.simra.app.radmesserservice.extravalueserialized";
+    final static String EXTRA_DEVICE_ID = "de.tuberlin.mcc.simra.app.obsservice.extraid";
+    final static String EXTRA_DEVICE_NAME = "de.tuberlin.mcc.simra.app.obsservice.extraname";
+    final static String EXTRA_CONNECTION_STATE = "de.tuberlin.mcc.simra.app.obsservice.extraconnectionstate";
+    final static String EXTRA_VALUE = "de.tuberlin.mcc.simra.app.obsservice.extravalue";
+    final static String EXTRA_VALUE_SERIALIZED = "de.tuberlin.mcc.simra.app.obsservice.extravalueserialized";
 
 
     private void boradcastDeviceFound(String deviceName, String deviceId) {
@@ -388,7 +388,7 @@ public class RadmesserService extends Service {
         broadcastManager.sendBroadcast(intent);
     }
 
-    public abstract static class RadmesserServiceCallbacks {
+    public abstract static class OBSServiceCallbacks {
         public void onDeviceFound(String deviceName, String deviceId) {
         }
 
@@ -412,7 +412,7 @@ public class RadmesserService extends Service {
      * the caller ist responible for unregistering thr receiver, when he does not need him anymore
      */
 
-    public static BroadcastReceiver registerCallbacks(Context ctx, RadmesserServiceCallbacks callbacks) {
+    public static BroadcastReceiver registerCallbacks(Context ctx, OBSServiceCallbacks callbacks) {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_DEVICE_FOUND);
         filter.addAction(ACTION_CONNECTION_STATE_CHANGED);
@@ -569,26 +569,26 @@ public class RadmesserService extends Service {
          * separated by a newline.
          */
         public String getIncidentDescription(Context context) {
-            String headerLine = context.getString(R.string.radmesserIncidentDescriptionHeaderLine, eventType);
-            String dataLine = context.getString(R.string.radmesserIncidentDescriptionDataLine, TextUtils.join(", ", payload));
+            String headerLine = context.getString(R.string.obsIncidentDescriptionHeaderLine, eventType);
+            String dataLine = context.getString(R.string.obsIncidentDescriptionDataLine, TextUtils.join(", ", payload));
 
             switch (eventType) {
                 case EVENT_TYPE_BUTTON:
-                    headerLine = context.getString(R.string.radmesserIncidentDescriptionButtonHeaderLine);
+                    headerLine = context.getString(R.string.obsIncidentDescriptionButtonHeaderLine);
                     if (payload.size() >= 1) {
-                        dataLine = context.getString(R.string.radmesserIncidentDescriptionButtonDataLine, payload.get(0));
+                        dataLine = context.getString(R.string.obsIncidentDescriptionButtonDataLine, payload.get(0));
                     }
                     break;
                 case EVENT_TYPE_AVG2S:
-                    headerLine = context.getString(R.string.radmesserIncidentDescriptionAvg2sHeaderLine);
+                    headerLine = context.getString(R.string.obsIncidentDescriptionAvg2sHeaderLine);
                     if (payload.size() >= 2) {
-                        dataLine = context.getString(R.string.radmesserIncidentDescriptionAvg2sDataLine, payload.get(0), payload.get(1));
+                        dataLine = context.getString(R.string.obsIncidentDescriptionAvg2sDataLine, payload.get(0), payload.get(1));
                     }
                     break;
                 case EVENT_TYPE_MIN_KALMAN:
-                    headerLine = context.getString(R.string.radmesserIncidentDescriptionMinKalmanHeaderLine);
+                    headerLine = context.getString(R.string.obsIncidentDescriptionMinKalmanHeaderLine);
                     if (payload.size() >= 1) {
-                        dataLine = context.getString(R.string.radmesserIncidentDescriptionMinKalmanDataLine, payload.get(0));
+                        dataLine = context.getString(R.string.obsIncidentDescriptionMinKalmanDataLine, payload.get(0));
                     }
                     break;
                 default:
@@ -606,16 +606,16 @@ public class RadmesserService extends Service {
 
     // TODO: Use Utils (or refactor) shared Prefs usage
 
-    public void unPairedRadmesser() {
-        getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().remove(sharedPrefsKeyRadmesserID).apply();
+    public void unPairedOBS() {
+        getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().remove(sharedPrefsKeyOBSID).apply();
     }
 
     @Nullable
-    private static String getPairedRadmesserID(Context ctx) {
-        return ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).getString(sharedPrefsKeyRadmesserID, null);
+    private static String getPairedOBSID(Context ctx) {
+        return ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).getString(sharedPrefsKeyOBSID, null);
     }
 
-    private static void setPairedRadmesserID(String id, Context ctx) {
-        ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().putString(sharedPrefsKeyRadmesserID, id).apply();
+    private static void setPairedOBSID(String id, Context ctx) {
+        ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().putString(sharedPrefsKeyOBSID, id).apply();
     }
 }

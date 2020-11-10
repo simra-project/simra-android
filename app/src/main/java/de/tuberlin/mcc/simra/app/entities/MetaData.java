@@ -45,8 +45,7 @@ public class MetaData {
 
     public static MetaData loadMetaData(Context context) {
         File metaDataFile = IOUtils.Files.getMetaDataFile(context);
-        Map<Integer, MetaDataEntry> metaDataEntries = new HashMap() {
-        };
+        Map<Integer, MetaDataEntry> metaDataEntries = new HashMap() {};
         if (metaDataFile.exists()) {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(metaDataFile))) {
                 // Skip first two line as they do only contain the Header

@@ -41,7 +41,7 @@ import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry.INCIDENT_TYPE;
-import de.tuberlin.mcc.simra.app.services.RadmesserService;
+import de.tuberlin.mcc.simra.app.services.OBSService;
 import java9.util.function.Function;
 import java9.util.function.Predicate;
 import java9.util.stream.Collectors;
@@ -111,7 +111,7 @@ public class MarkerFunct {
             if (x.incidentType != INCIDENT_TYPE.OBS_MIN_KALMAN) return false;
 
             try {
-                RadmesserService.ClosePassEvent event = new RadmesserService.ClosePassEvent(x.description.split("\n", -1)[2].replace("[", "").replace("]", ""));
+                OBSService.ClosePassEvent event = new OBSService.ClosePassEvent(x.description.split("\n", -1)[2].replace("[", "").replace("]", ""));
                 return Integer.parseInt(event.payload.get(0)) < 50;
             } catch (Exception e) {
                 return false;

@@ -104,7 +104,7 @@
                 style="@style/TextAppearance.AppCompat.Large"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/radmesser_activity_button_connect_device" />
+                android:text="@string/obs_activity_button_connect_device" />
 
             <TextView
                 android:id="@+id/deviceInfoTextView"
@@ -113,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp"
-                android:text="@string/activity_radmesser_title_device_info" />
+                android:text="@string/activity_obs_title_device_info" />
 
             <ProgressBar
                 android:id="@+id/progressBarClosePass"
@@ -130,14 +130,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/radmesser_activity_button_disconnect_device" />
+                android:text="@string/obs_activity_button_disconnect_device" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/devicesTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/radmesserAdvancedSettings"
+            android:text="@string/obsAdvancedSettings"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -150,7 +150,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/radmesserHandlebarWidthText" />
+                android:text="@string/obsHandlebarWidthText" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -188,7 +188,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/radmesserTakePictureDuringRideSetting" />
+                android:text="@string/obsTakePictureDuringRideSetting" />
 
             <Switch
                 android:id="@+id/takePictureDuringRideButton"
@@ -207,7 +207,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/radmesserTakePictureDuringRideIntervalText" />
+                android:text="@string/obsTakePictureDuringRideIntervalText" />
 
             <LinearLayout
                 android:layout_width="match_parent"

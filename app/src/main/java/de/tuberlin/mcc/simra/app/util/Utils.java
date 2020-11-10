@@ -2,6 +2,7 @@ package de.tuberlin.mcc.simra.app.util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.util.Log;
 import android.util.Pair;
 import org.json.JSONArray;
@@ -21,6 +22,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+
 import javax.net.ssl.HttpsURLConnection;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
@@ -28,15 +31,14 @@ import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 
+import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
+
 public class Utils {
 
     private static final String TAG = "Utils_LOG";
 
     /**
-     * Use Utils.overwriteFile(file) instead.
-     * Why? For Clarity filename does not say where the file is...
-     *
-     * @deprecated
+     * @return content from file with given fileName as a String
      */
     public static String readContentFromFile(String fileName, Context context) {
         File file = new File(IOUtils.Directories.getBaseFolderPath(context) + fileName);
@@ -131,8 +133,28 @@ public class Utils {
         return simRa_regions_config;
     }
 
+    /**
+     *
+     * @param context
+     * @return String[], where each element is one news element.
+     */
+    public static String[] getNews(Context context) {
+        String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
+        boolean languageIsEnglish = locale.equals(new Locale("en").getLanguage());
+        if (languageIsEnglish) {
+            return readContentFromFile(IOUtils.Files.getENNewsFile(context).getName(),context).split(System.lineSeparator());
+        } else {
+            return readContentFromFile(IOUtils.Files.getDENewsFile(context).getName(),context).split(System.lineSeparator());
+        }
+    }
+
     public static boolean isInTimeFrame(Long startTimeBoundary, Long endTimeBoundary, long timestamp) {
         return (startTimeBoundary == null && endTimeBoundary == null) || (endTimeBoundary == null && timestamp >= startTimeBoundary) || (startTimeBoundary == null && timestamp <= endTimeBoundary) || (timestamp >= startTimeBoundary && timestamp <= endTimeBoundary);
+    }
+
+    // co2 savings on a bike: 138g/km
+    public static long calculateCO2Savings(Long totalDistance) {
+        return (long) ((totalDistance / (float) 1000) * 138);
     }
 
     public static List<IncidentLogEntry> findAccEvents(int rideId, int bike, int pLoc, Context context) {
@@ -153,7 +175,7 @@ public class Utils {
         try {
             String responseString = "";
 
-            URL url = new URL(BuildConfig.API_ENDPOINT + "11/classify-ride?clientHash=" + BuildConfig.API_SECRET
+            URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + "classify-ride?clientHash=" + getClientHash(context)
                     + "&bikeType=" +bike
                     + "&phoneLocation=" + pLoc);
 

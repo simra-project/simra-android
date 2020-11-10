@@ -68,10 +68,10 @@ public class BLEScanner {
         return currentScan != null;
     }
 
-    public void findDeviceById(String radmesserID, DeviceFoundCallback deviceFoundCallback) {
+    public void findDeviceById(String obsID, DeviceFoundCallback deviceFoundCallback) {
         List<ScanFilter> filterList = new ArrayList<>();
         ScanFilter.Builder builder = new ScanFilter.Builder();
-        builder.setDeviceAddress(radmesserID);
+        builder.setDeviceAddress(obsID);
         filterList.add(builder.build());
 
         startScan(

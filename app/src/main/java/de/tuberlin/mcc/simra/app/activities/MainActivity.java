@@ -30,7 +30,9 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -73,7 +75,7 @@ import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.Profile;
-import de.tuberlin.mcc.simra.app.services.RadmesserService;
+import de.tuberlin.mcc.simra.app.services.OBSService;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -83,10 +85,10 @@ import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UpdateHelper;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
+import static de.tuberlin.mcc.simra.app.util.Utils.getNews;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
@@ -100,7 +102,7 @@ public class MainActivity extends BaseActivity
     ActivityMainBinding binding;
     Intent recService;
     RecorderService mBoundRecorderService;
-    boolean radmesserEnabled = false;
+    boolean obsEnabled = false;
     BroadcastReceiver receiver;
     private MapView mMapView;
     private MapController mMapController;
@@ -136,7 +138,7 @@ public class MainActivity extends BaseActivity
         return (!gps_enabled);
     }
 
-    private void showRadmesserNotConnectedWarning() {
+    private void showOBSNotConnectedWarning() {
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
         alert.setTitle(R.string.not_connected_warnung_title);
         alert.setMessage(R.string.not_connected_warnung_message);
@@ -144,7 +146,7 @@ public class MainActivity extends BaseActivity
             startRecording();
         });
         alert.setNegativeButton(R.string.cancel_button, (dialog, whichButton) -> {
-            startActivity(new Intent(this, RadmesserActivity.class));
+            startActivity(new Intent(this, OpenBikeSensorActivity.class));
         });
         alert.show();
     }
@@ -158,7 +160,7 @@ public class MainActivity extends BaseActivity
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         });
         alert.setNegativeButton(R.string.no, (dialog, whichButton) -> {
-            deactivateRadmesser();
+            deactivateOBS();
         });
         alert.show();
     }
@@ -169,10 +171,10 @@ public class MainActivity extends BaseActivity
         if (requestCode == REQUEST_ENABLE_BT) {
             if (resultCode == RESULT_OK) {
                 // Bluetooth was enabled
-                startRadmesserService();
+                startOBSService();
             } else if (resultCode == RESULT_CANCELED) {
                 // Bluetooth was not enabled
-                deactivateRadmesser();
+                deactivateOBS();
             }
         }
     }
@@ -287,12 +289,12 @@ public class MainActivity extends BaseActivity
         });
 
         binding.appBarMain.buttonStartRecording.setOnClickListener(v -> {
-            if (radmesserEnabled) {
-                RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
-                if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
-                    boolean reconected = RadmesserService.tryConnectPairedDevice(this);
-                    if (!reconected) {
-                        showRadmesserNotConnectedWarning();
+            if (obsEnabled) {
+                OBSService.ConnectionState currentState = OBSService.getConnectionState();
+                if (!currentState.equals(OBSService.ConnectionState.CONNECTED)) {
+                    boolean reconnect = OBSService.tryConnectPairedDevice(this);
+                    if (!reconnect) {
+                        showOBSNotConnectedWarning();
                         return;
                     }
                 }
@@ -340,7 +342,7 @@ public class MainActivity extends BaseActivity
                 Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
             }
         });
-        new BackgroundTask().execute();
+        new RegionTask().execute();
         if (lookUpIntSharedPrefs("regionLastChangedAtVersion", -1, "simraPrefs", MainActivity.this) < 53) {
             int region = lookUpIntSharedPrefs("Region", -1, "Profile", MainActivity.this);
             if (region == 2 || region == 3 || region == 8) {
@@ -349,42 +351,43 @@ public class MainActivity extends BaseActivity
                         "simraPrefs", MainActivity.this);
             }
         }
+        new NewsTask().execute();
 
-        // Radmesser
-        binding.appBarMain.buttonRideSettingsRadmesser.setOnClickListener(view -> startActivity(new Intent(this, RadmesserActivity.class)));
-        binding.appBarMain.buttonRideSettingsGeneral.setOnClickListener(view -> startActivity(new Intent(this, SettingsActivity.class)));
+        // OpenBikeSensor
+        binding.appBarMain.buttonRideSettingsObs.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
+        // binding.appBarMain.buttonRideSettingsGeneral.setOnClickListener(view -> startActivity(new Intent(this, SettingsActivity.class)));
 
-        radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
-        updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
-        if (radmesserEnabled) {
+        obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
+        updateOBSButtonStatus(OBSService.ConnectionState.DISCONNECTED);
+        if (obsEnabled) {
             BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (mBluetoothAdapter == null) {
                 // Device does not support Bluetooth
-                deactivateRadmesser();
+                deactivateOBS();
                 Toast.makeText(MainActivity.this, R.string.openbikesensor_bluetooth_incompatible, Toast.LENGTH_LONG)
                         .show();
-            } else if (!mBluetoothAdapter.isEnabled() && radmesserEnabled) {
+            } else if (!mBluetoothAdapter.isEnabled() && obsEnabled) {
                 // Bluetooth is disabled
                 showBluetoothNotEnableWarning();
             } else {
                 // Bluetooth is enabled
-                startRadmesserService();
+                startOBSService();
             }
         }
     }
 
-    private void deactivateRadmesser() {
-        radmesserEnabled = false;
-        updateRadmesserButtonStatus(RadmesserService.ConnectionState.DISCONNECTED);
-        SharedPref.Settings.Radmesser.setEnabled(false, this);
+    private void deactivateOBS() {
+        obsEnabled = false;
+        updateOBSButtonStatus(OBSService.ConnectionState.DISCONNECTED);
+        SharedPref.Settings.OpenBikeSensor.setEnabled(false, this);
     }
 
-    private void startRadmesserService() {
-        RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
-        if (radmesserEnabled && currentState.equals(RadmesserService.ConnectionState.DISCONNECTED)) {
-            RadmesserService.startScanning(this);
+    private void startOBSService() {
+        OBSService.ConnectionState currentState = OBSService.getConnectionState();
+        if (obsEnabled && currentState.equals(OBSService.ConnectionState.DISCONNECTED)) {
+            OBSService.startScanning(this);
         }
-        registerRadmesserService();
+        registerOBSService();
     }
 
     public void displayButtonsForMenu() {
@@ -394,8 +397,8 @@ public class MainActivity extends BaseActivity
         binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
         binding.appBarMain.reportIncidentContainer.setVisibility(View.GONE);
 
-        binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.VISIBLE);
-        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
+        //binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.VISIBLE);
+        updateOBSButtonStatus(OBSService.getConnectionState());
     }
 
     public void displayButtonsForDrive() {
@@ -403,21 +406,23 @@ public class MainActivity extends BaseActivity
         binding.appBarMain.buttonStartRecording.setVisibility(View.INVISIBLE);
 
         binding.appBarMain.toolbar.setVisibility(View.GONE);
-        binding.appBarMain.reportIncidentContainer.setVisibility(View.VISIBLE);
+        if (SharedPref.Settings.IncidentsButtonsDuringRide.getIncidentButtonsEnabled(this)) {
+            binding.appBarMain.reportIncidentContainer.setVisibility(View.VISIBLE);
+        }
 
-        binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.GONE);
-        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
+        //binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.GONE);
+        updateOBSButtonStatus(OBSService.getConnectionState());
 
     }
 
-    private void registerRadmesserService() {
-        receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks() {
-            public void onConnectionStateChanged(RadmesserService.ConnectionState newState) {
-                updateRadmesserButtonStatus(newState);
+    private void registerOBSService() {
+        receiver = OBSService.registerCallbacks(this, new OBSService.OBSServiceCallbacks() {
+            public void onConnectionStateChanged(OBSService.ConnectionState newState) {
+                updateOBSButtonStatus(newState);
             }
 
             public void onDeviceFound(String deviceName, String deviceId) {
-                if (!RadmesserService.getConnectionState().equals(RadmesserService.ConnectionState.CONNECTED)) {
+                if (!OBSService.getConnectionState().equals(OBSService.ConnectionState.CONNECTED)) {
                     Toast.makeText(MainActivity.this, R.string.openbikesensor_toast_devicefound, Toast.LENGTH_LONG)
                             .show();
                 }
@@ -427,12 +432,12 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onDestroy() {
-        RadmesserService.terminateService(this);
+        OBSService.terminateService(this);
         super.onDestroy();
     }
 
-    private void unregisterRadmesserService() {
-        RadmesserService.unRegisterCallbacks(receiver, this);
+    private void unregisterOBSService() {
+        OBSService.unRegisterCallbacks(receiver, this);
         receiver = null;
     }
 
@@ -465,38 +470,38 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void updateRadmesserButtonStatus(RadmesserService.ConnectionState status) {
-        FloatingActionButton radmesserButton = binding.appBarMain.buttonRideSettingsRadmesser;
+    private void updateOBSButtonStatus(OBSService.ConnectionState status) {
+        FloatingActionButton obsButton = binding.appBarMain.buttonRideSettingsObs;
         NavigationView navigationView = findViewById(R.id.nav_view);
-        if (radmesserEnabled) {
+        if (obsEnabled) {
             // einblenden
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(true);
-            radmesserButton.setVisibility(View.VISIBLE);
+            obsButton.setVisibility(View.VISIBLE);
         } else {
             // ausblenden
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
-            radmesserButton.setVisibility(View.GONE);
+            obsButton.setVisibility(View.GONE);
         }
         switch (status) {
             case DISCONNECTED:
-                radmesserButton.setImageResource(R.drawable.ic_bluetooth_disabled);
-                radmesserButton.setContentDescription("Radmesser nicht verbunden");
-                radmesserButton.setColorFilter(Color.RED);
+                obsButton.setImageResource(R.drawable.ic_bluetooth_disabled);
+                obsButton.setContentDescription(getString(R.string.obsNotConnected));
+                obsButton.setColorFilter(Color.RED);
                 break;
             case SEARCHING:
-                radmesserButton.setImageResource(R.drawable.ic_bluetooth_searching);
-                radmesserButton.setContentDescription("Radmesser wird gesucht");
-                radmesserButton.setColorFilter(Color.WHITE);
+                obsButton.setImageResource(R.drawable.ic_bluetooth_searching);
+                obsButton.setContentDescription(getString(R.string.obsSearching));
+                obsButton.setColorFilter(Color.WHITE);
                 break;
             case PAIRING:
-                radmesserButton.setImageResource(R.drawable.ic_bluetooth_searching);
-                radmesserButton.setContentDescription("Verbinde");
-                radmesserButton.setColorFilter(Color.WHITE);
+                obsButton.setImageResource(R.drawable.ic_bluetooth_searching);
+                obsButton.setContentDescription(getString(R.string.connecting));
+                obsButton.setColorFilter(Color.WHITE);
                 break;
             case CONNECTED:
-                radmesserButton.setImageResource(R.drawable.ic_bluetooth_connected);
-                radmesserButton.setContentDescription("Radmesser verbunden");
-                radmesserButton.setColorFilter(Color.GREEN);
+                obsButton.setImageResource(R.drawable.ic_bluetooth_connected);
+                obsButton.setContentDescription(getString(R.string.obsConnected));
+                obsButton.setColorFilter(Color.GREEN);
                 break;
             default:
                 break;
@@ -505,13 +510,13 @@ public class MainActivity extends BaseActivity
 
     public void onResume() {
         UpdateHelper.checkForUpdates(this);
-        radmesserEnabled = SharedPref.Settings.Radmesser.isEnabled(this);
-        if (radmesserEnabled) {
-            RadmesserService.tryConnectPairedDevice(this);
+        obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
+        if (obsEnabled) {
+            OBSService.tryConnectPairedDevice(this);
         }
 
-        if (receiver == null && radmesserEnabled) {
-            registerRadmesserService();
+        if (receiver == null && obsEnabled) {
+            registerOBSService();
         }
         super.onResume();
 
@@ -537,7 +542,7 @@ public class MainActivity extends BaseActivity
         mMapView.onResume(); // needed for compass and icons
         mLocationOverlay.onResume();
         mLocationOverlay.enableMyLocation();
-        updateRadmesserButtonStatus(RadmesserService.getConnectionState());
+        updateOBSButtonStatus(OBSService.getConnectionState());
 
     }
 
@@ -555,7 +560,7 @@ public class MainActivity extends BaseActivity
         mLocationOverlay.onPause();
         mLocationOverlay.disableMyLocation();
         Log.d(TAG, "OnPause finished");
-        unregisterRadmesserService();
+        unregisterOBSService();
     }
 
     @SuppressLint("MissingPermission")
@@ -655,7 +660,7 @@ public class MainActivity extends BaseActivity
             i.setData(Uri.parse(getString(R.string.link_to_twitter)));
             startActivity(i);
         } else if (id == R.id.nav_bluetooth_connection) {
-            Intent intent = new Intent(MainActivity.this, RadmesserActivity.class);
+            Intent intent = new Intent(MainActivity.this, OpenBikeSensorActivity.class);
             startActivity(intent);
         }
 
@@ -680,27 +685,53 @@ public class MainActivity extends BaseActivity
     public void onProviderDisabled(String provider) {
     }
 
-    private void fireWhatIsNewPrompt(int version) {
+    private void fireNewsPrompt() {
         Log.d(TAG, "fireWhatIsNewPrompt()");
+
+        // get the news from the downloaded config
+        String[] simRa_news_config = getNews(MainActivity.this);
+        if(simRa_news_config.length <=1) {
+            Log.e(TAG, "Empty simRa_new_config!");
+            return;
+        }
+
         // Store the created AlertDialog instance.
         // Because only AlertDialog has cancel method.
         AlertDialog alertDialog;
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        // Get custom login form view.
-        View settingsView = getLayoutInflater().inflate(R.layout.what_is_new_58, null);
+        // Get news popup view.
+        View newsView = getLayoutInflater().inflate(R.layout.news_popup, null);
+        LinearLayout linearLayout = newsView.findViewById(R.id.news_blocks);
+        for (int i = 1; i < simRa_news_config.length; i++) {
+            // get TextView to be filled with news element
+            TextView thisTextView = (TextView) linearLayout.getChildAt(i-1);
+            // make TextView visible
+            thisTextView.setVisibility(View.VISIBLE);
+            // set text color to colorAccent, if the news element starts with a * instead of a -
+            int textColor = getResources().getColor(R.color.colorPrimary,null);
+            if(simRa_news_config[i].startsWith("*")) {
+                textColor = getResources().getColor(R.color.colorAccent,null);
+            }
+            thisTextView.setTextColor(textColor);
+            // set text of TextView to text of news element
+            thisTextView.setText(simRa_news_config[i].substring(1));
+        }
 
         // Set above view in alert dialog.
-        builder.setView(settingsView);
+        builder.setView(newsView);
 
-        builder.setTitle(getString(R.string.what_is_new_title));
+        builder.setTitle(getString(R.string.news));
 
         alertDialog = builder.create();
 
-        Button okButton = settingsView.findViewById(R.id.ok_button);
+        Button okButton = newsView.findViewById(R.id.ok_button);
+
+        int newsID = Integer.parseInt(simRa_news_config[0].substring(1));
+
         AlertDialog finalAlertDialog = alertDialog;
         okButton.setOnClickListener(v -> {
-            writeBooleanToSharedPrefs("news" + version + "seen", true, "simraPrefs", MainActivity.this);
+            SharedPref.App.News.setLastSeenNewsID(newsID,MainActivity.this);
             finalAlertDialog.cancel();
         });
 
@@ -769,9 +800,9 @@ public class MainActivity extends BaseActivity
         alert.show();
     }
 
-    private class BackgroundTask extends AsyncTask<String, String, String> {
+    private class RegionTask extends AsyncTask<String, String, String> {
 
-        private BackgroundTask() {
+        private RegionTask() {
         }
 
         @Override
@@ -787,7 +818,7 @@ public class MainActivity extends BaseActivity
             try {
 
                 URL url = new URL(
-                        BuildConfig.API_ENDPOINT + "check-regions?clientHash=" + BuildConfig.API_SECRET);
+                        BuildConfig.API_ENDPOINT + "check/regions?clientHash=" + getClientHash(MainActivity.this));
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -815,9 +846,85 @@ public class MainActivity extends BaseActivity
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if (!lookUpBooleanSharedPrefs("news58seen", false, "simraPrefs", MainActivity.this)) {
-                fireWhatIsNewPrompt(58);
+        }
+    }
+    private class NewsTask extends AsyncTask<String, String, String> {
+        int newsID = -1;
+        private NewsTask() {
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            StringBuilder checkNewsResponseDE = new StringBuilder();
+            StringBuilder checkNewsResponseEN = new StringBuilder();
+            int statusDE = 0;
+            int statusEN = 0;
+            try {
+
+                URL url_de = new URL(
+                        BuildConfig.API_ENDPOINT + "check/news_de?clientHash=" + getClientHash(MainActivity.this));
+                Log.d(TAG, "URL_DE: " + url_de.toString());
+                URL url_en = new URL(
+                        BuildConfig.API_ENDPOINT + "check/news_en?clientHash=" + getClientHash(MainActivity.this));
+                Log.d(TAG, "URL_EN: " + url_en.toString());
+                HttpsURLConnection url_de_Connection = (HttpsURLConnection) url_de.openConnection();
+                HttpsURLConnection url_en_Connection = (HttpsURLConnection) url_en.openConnection();
+                url_de_Connection.setRequestMethod("GET");
+                url_en_Connection.setRequestMethod("GET");
+                url_de_Connection.setReadTimeout(10000);
+                url_en_Connection.setReadTimeout(10000);
+                url_de_Connection.setConnectTimeout(15000);
+                url_en_Connection.setConnectTimeout(15000);
+                BufferedReader in_de = new BufferedReader(new InputStreamReader(url_de_Connection.getInputStream()));
+                BufferedReader in_en = new BufferedReader(new InputStreamReader(url_en_Connection.getInputStream()));
+
+                String inputLine_de;
+                String inputLine_en;
+
+                while ((inputLine_de = in_de.readLine()) != null) {
+                    if (newsID == -1 && inputLine_de.startsWith("#")){
+                        newsID = Integer.parseInt(inputLine_de.replace("#",""));
+                    }
+                    checkNewsResponseDE.append(inputLine_de).append(System.lineSeparator());
+                }
+                in_de.close();
+                while ((inputLine_en = in_en.readLine()) != null) {
+                    checkNewsResponseEN.append(inputLine_en).append(System.lineSeparator());
+                }
+                in_en.close();
+                statusDE = url_de_Connection.getResponseCode();
+                statusEN = url_en_Connection.getResponseCode();
+
+                Log.d(TAG, "Server statusDE: " + statusDE + " statusEN: " + statusEN);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, "GET news DE response: " + checkNewsResponseDE.toString());
+            Log.d(TAG, "GET news EN response: " + checkNewsResponseEN.toString());
+            if (statusDE == 200) {
+                File newsFile = IOUtils.Files.getDENewsFile(MainActivity.this);
+                overwriteFile(checkNewsResponseDE.toString(), newsFile);
+            }
+            if (statusEN == 200) {
+                File newsFile = IOUtils.Files.getENNewsFile(MainActivity.this);
+                overwriteFile(checkNewsResponseEN.toString(), newsFile);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if(SharedPref.App.News.getLastSeenNewsID(MainActivity.this) < newsID) {
+                fireNewsPrompt();
             }
         }
     }
+
 }

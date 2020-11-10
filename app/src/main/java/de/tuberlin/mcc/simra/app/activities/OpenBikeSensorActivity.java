@@ -21,18 +21,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.databinding.ActivityRadmesserBinding;
-import de.tuberlin.mcc.simra.app.services.RadmesserService;
+import de.tuberlin.mcc.simra.app.databinding.ActivityOpenbikesensorBinding;
+import de.tuberlin.mcc.simra.app.services.OBSService;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import pl.droidsonroids.gif.GifImageView;
 
 
-public class RadmesserActivity extends AppCompatActivity {
+public class OpenBikeSensorActivity extends AppCompatActivity {
     BroadcastReceiver receiver;
     Set<BluetoothDevice> foundDevices;
     BluetoothDevice selectedDevice;
-    ActivityRadmesserBinding binding;
+    ActivityOpenbikesensorBinding binding;
     RadioGroup devices;
     private AlertDialog alertDialog;
 
@@ -55,12 +55,12 @@ public class RadmesserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityRadmesserBinding.inflate(LayoutInflater.from(this));
+        binding = ActivityOpenbikesensorBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
 
         foundDevices = new HashSet<>();
         initializeToolBar();
-        Log.i("start", "RadmesserActivity");
+        Log.i("start", "OpenBikeSensorActivity");
         binding.retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,7 +74,7 @@ public class RadmesserActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (selectedDevice != null) {
-                    RadmesserService.connectDevice(RadmesserActivity.this, selectedDevice.deviceId);
+                    OBSService.connectDevice(OpenBikeSensorActivity.this, selectedDevice.deviceId);
 
                 }
             }
@@ -117,7 +117,7 @@ public class RadmesserActivity extends AppCompatActivity {
                     SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(true, this);
                 } else {
                     // Wants to activate this Functionality and already has does not have Camera Permission
-                    PermissionHelper.Camera.requestPermissions(RadmesserActivity.this);
+                    PermissionHelper.Camera.requestPermissions(OpenBikeSensorActivity.this);
                 }
             } else {
                 // Deactivate Functionality
@@ -125,10 +125,10 @@ public class RadmesserActivity extends AppCompatActivity {
             }
         });
 
-        binding.btnDisconnect.setOnClickListener(view -> RadmesserService.disconnectAndUnpairDevice(this));
-        RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
+        binding.btnDisconnect.setOnClickListener(view -> OBSService.disconnectAndUnpairDevice(this));
+        OBSService.ConnectionState currentState = OBSService.getConnectionState();
         updateUI(currentState);
-        if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
+        if (!currentState.equals(OBSService.ConnectionState.CONNECTED)) {
             startScanningDevices();
         }
 
@@ -172,7 +172,7 @@ public class RadmesserActivity extends AppCompatActivity {
         binding.retryButton.setVisibility(View.GONE);
     }
 
-    private void updateUI(RadmesserService.ConnectionState state) {
+    private void updateUI(OBSService.ConnectionState state) {
         switch (state) {
             case PAIRING:
                 binding.deviceLayout.setVisibility(View.GONE);
@@ -201,7 +201,7 @@ public class RadmesserActivity extends AppCompatActivity {
     }
 
     private void registerReceiver() {
-        receiver = RadmesserService.registerCallbacks(this, new RadmesserService.RadmesserServiceCallbacks() {
+        receiver = OBSService.registerCallbacks(this, new OBSService.OBSServiceCallbacks() {
             @Override
             public void onDeviceFound(String deviceName, String deviceId) {
                 BluetoothDevice foundDevice = new BluetoothDevice(deviceName, deviceId);
@@ -213,16 +213,16 @@ public class RadmesserActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onConnectionStateChanged(RadmesserService.ConnectionState newState) {
+            public void onConnectionStateChanged(OBSService.ConnectionState newState) {
                 updateUI(newState);
             }
 
             @Override
-            public void onDistanceValue(RadmesserService.Measurement value) {
+            public void onDistanceValue(OBSService.Measurement value) {
                 int distance = -1;
                 if (value != null && value.leftSensorValues.size() > 0) {
                     distance = value.leftSensorValues.get(0);
-                    binding.deviceInfoTextView.setText(getString(R.string.radmesser_activity_text_last_distance) + " " + distance + " cm");
+                    binding.deviceInfoTextView.setText(getString(R.string.obs_activity_text_last_distance) + " " + distance + " cm");
                     setClosePassBarColor(distance);
                 }
             }
@@ -232,7 +232,7 @@ public class RadmesserActivity extends AppCompatActivity {
 
     private void startScanningDevices() {
         binding.devicesList.removeAllViews();
-        RadmesserService.startScanning(this);
+        OBSService.startScanning(this);
     }
 
     private void initializeToolBar() {
@@ -240,19 +240,19 @@ public class RadmesserActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         binding.toolbar.toolbar.setTitle("");
         binding.toolbar.toolbar.setSubtitle("");
-        binding.toolbar.toolbarTitle.setText("Radmesser");
+        binding.toolbar.toolbarTitle.setText(getString(R.string.obs));
 
         binding.toolbar.backButton.setOnClickListener(v -> finish());
     }
 
     private void connectToDevice(String deviceId) {
-        RadmesserService.connectDevice(this, deviceId);
+        OBSService.connectDevice(this, deviceId);
     }
 
     private void showTutorialDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Verbindung mit Radmesser");
-        alert.setMessage("\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden");
+        alert.setTitle(getString(R.string.obsConnecting));
+        alert.setMessage(getString(R.string.obsTutorial));
 
         LinearLayout gifLayout = new LinearLayout(this);
         LinearLayout.LayoutParams gifMargins = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -276,15 +276,15 @@ public class RadmesserActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        RadmesserService.unRegisterCallbacks(receiver, this);
+        OBSService.unRegisterCallbacks(receiver, this);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
         registerReceiver();
-        RadmesserService.ConnectionState currentState = RadmesserService.getConnectionState();
-        if (!currentState.equals(RadmesserService.ConnectionState.CONNECTED)) {
+        OBSService.ConnectionState currentState = OBSService.getConnectionState();
+        if (!currentState.equals(OBSService.ConnectionState.CONNECTED)) {
             startScanningDevices();
         }
         super.onResume();

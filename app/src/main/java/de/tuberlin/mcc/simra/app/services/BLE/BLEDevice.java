@@ -29,7 +29,7 @@ public class BLEDevice {
     public static final String UUID_SERVICE_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000000";
     public static final String UUID_SERVICE_CONNECTION_CHAR_CONNECTED = "1FE7FAF9-CE63-4236-0002-000000000001";
 
-    private final String TAG = "RadmesserDevice";
+    private final String TAG = "OpenBikeSensorDevice";
     public boolean devicePaired = true; // needed from the outside
     private final BluetoothDevice bleDevice;
     private final ConnectionStateCallbacks callbacks;

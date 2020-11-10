@@ -351,7 +351,43 @@
                         android:layout_toEndOf="@id/unitSwitch"
                         android:text="@string/imperial" />
                 </RelativeLayout>
+                <Space
+                    android:id="@+id/generalSettingsSpace3"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp" />
 
+                <TextView
+                    android:id="@+id/addIncidentDuringRideButtonTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/showButtonsDescription"
+                    android:textAlignment="textStart"
+                    android:textSize="15sp" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/textViewButtonsOff"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hideButtons" />
+
+                    <Switch
+                        android:id="@+id/switchButtons"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/textViewButtonsOff" />
+
+                    <TextView
+                        android:id="@+id/textViewButtonsOn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/switchButtons"
+                        android:text="@string/showButtons" />
+                </RelativeLayout>
+                <!--
                 <Space
                     android:id="@+id/generalSettingsSpace3"
                     android:layout_width="match_parent"
@@ -388,7 +424,7 @@
                         android:layout_toEndOf="@id/switchAI"
                         android:text="@string/onlineAI" />
                 </RelativeLayout>
-
+                -->
                 <Space
                     android:id="@+id/generalSettingsSpace4"
                     android:layout_width="match_parent"
@@ -412,24 +448,24 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/radmesserTitle"
+                        android:id="@+id/obsTitle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/radmesserSwitchTitle"
+                        android:text="@string/obsSwitchTitle"
                         android:textSize="15sp" />
 
                     <Switch
-                        android:id="@+id/radmesserSwitch"
+                        android:id="@+id/obsSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/radmesserButton"
+                    android:id="@+id/obsButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/radmesserButton"
+                    android:text="@string/obsButton"
                     android:visibility="gone" />
 
                 <Space

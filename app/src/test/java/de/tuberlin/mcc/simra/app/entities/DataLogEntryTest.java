@@ -42,31 +42,31 @@ public class DataLogEntryTest {
     }
 
     @Test
-    public void parseDataLogEntryFromLine_Radmesser_One_Value() {
+    public void parseDataLogEntryFromLine_OBS_One_Value() {
         assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(1, null, null, null).build());
+                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, null, null, null).build());
     }
 
     @Test
-    public void parseDataLogEntryFromLine_Radmesser_Two_Value() {
+    public void parseDataLogEntryFromLine_OBS_Two_Value() {
         assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(1, 2, null, null).build());
+                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, 2, null, null).build());
     }
 
     @Test
-    public void parseDataLogEntryFromLine_Radmesser_Three_Value() {
+    public void parseDataLogEntryFromLine_OBS_Three_Value() {
         assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2,3"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(1, 2, 3, null).build());
+                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, 2, 3, null).build());
     }
 
     @Test
-    public void parseDataLogEntryFromLine_Radmesser_Four_Value() {
+    public void parseDataLogEntryFromLine_OBS_Four_Value() {
         assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2,3,4"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withRadmesser(1, 2, 3, 4).build());
+                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, 2, 3, 4).build());
     }
 
     @Test
@@ -78,7 +78,7 @@ public class DataLogEntryTest {
                         .withGPS(1D, 2D, 7F)
                         .withAccelerometer(3F, 4F, 5F)
                         .withGyroscope(8F, 9F, 10F)
-                        .withRadmesser(11, 12, 13, 14).build());
+                        .withOBS(11, 12, 13, 14).build());
     }
 
     @Test
@@ -88,7 +88,7 @@ public class DataLogEntryTest {
                 .withGPS(1D, 2D, 7F)
                 .withAccelerometer(3F, 4F, 5F)
                 .withGyroscope(8F, 9F, 10F)
-                .withRadmesser(11, 12, 13, 14).build().stringifyDataLogEntry())
+                .withOBS(11, 12, 13, 14).build().stringifyDataLogEntry())
                 .isEqualTo("1.0,2.0,3.0,4.0,5.0,6,7.0,8.0,9.0,10.0,11,12,13,14");
     }
 
@@ -99,7 +99,7 @@ public class DataLogEntryTest {
                 .withGPS(52.53949384561807D, 13.371213365189773, 6.0F)
                 .withAccelerometer(-0.8885537F, -9.369222F, -2.433742F)
                 .withGyroscope(0.008709193F, 0.21959732F, -0.057107173F)
-                .withRadmesser(255, null, null, null).build().stringifyDataLogEntry())
+                .withOBS(255, null, null, null).build().stringifyDataLogEntry())
                 .isEqualTo("52.53949384561807,13.371213365189773,-0.8885537,-9.369222,-2.433742,1592319028261,6.0,0.008709193,0.21959732,-0.057107173,255,,,");
     }
 

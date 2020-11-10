@@ -128,17 +128,7 @@
         android:focusable="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_ride_settings_general"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/button_start_recording"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="15dp"
-        android:gravity="center_vertical"
-        android:src="@drawable/ic_settings_black_24dp" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_ride_settings_radmesser"
+        android:id="@+id/button_ride_settings_obs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/button_start_recording"

@@ -111,6 +111,19 @@ public class SharedPref {
         private static final String APP = "App-";
 
         /**
+         * Last news number displayed from backend simRa_news.config
+         */
+        public static class News {
+            private static final String LAST_SEEN_NEWS_ID = "LAST_SEEN_NEWS_ID";
+            public static void setLastSeenNewsID(int lastSeenNewsID, Context context) {
+                writeIntegerToAppSharedPrefsAsync(LAST_SEEN_NEWS_ID,lastSeenNewsID,context);
+            }
+            public static int getLastSeenNewsID(Context context) {
+                return readIntegerFromAppSharedPrefs(LAST_SEEN_NEWS_ID,0,context);
+            }
+        }
+
+        /**
          * Grouped State for Crash Data
          */
         public static class Crash {
@@ -171,15 +184,15 @@ public class SharedPref {
         // See top of this class before changing this string
         private static final String SETTINGS = "Settings-";
 
-        public static class Radmesser {
-            private static final String RADMESSER_ENABLED = SETTINGS + "RADMESSER_ENABLED";
+        public static class OpenBikeSensor {
+            private static final String OBS_ENABLED = SETTINGS + "OBS_ENABLED";
 
             public static boolean isEnabled(Context context) {
-                return readBooleanFromAppSharedPrefs(RADMESSER_ENABLED, context);
+                return readBooleanFromAppSharedPrefs(OBS_ENABLED, context);
             }
 
             public static void setEnabled(Boolean enabled, Context context) {
-                writeBooleanToAppSharedPrefsAsync(RADMESSER_ENABLED, enabled, context);
+                writeBooleanToAppSharedPrefsAsync(OBS_ENABLED, enabled, context);
             }
         }
 
@@ -210,6 +223,19 @@ public class SharedPref {
 
             public static boolean getAIEnabled(Context context) {
                 return readBooleanFromAppSharedPrefs(AI_ENABLED,  context);
+            }
+        }
+
+        public static class IncidentsButtonsDuringRide {
+            // See top of this class before changing this string
+            public static final String INCIDENT_BUTTONS_ENABLED = SETTINGS + "Incident-Buttons";
+
+            public static void setIncidentButtonsEnabled(boolean enabled, Context context) {
+                writeBooleanToAppSharedPrefsAsync(INCIDENT_BUTTONS_ENABLED, enabled, context);
+            }
+
+            public static boolean getIncidentButtonsEnabled(Context context) {
+                return readBooleanFromAppSharedPrefs(INCIDENT_BUTTONS_ENABLED, context);
             }
         }
 

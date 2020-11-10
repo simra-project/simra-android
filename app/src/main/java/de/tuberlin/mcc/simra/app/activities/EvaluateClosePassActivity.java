@@ -144,7 +144,7 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         boolean foundPicture = false;
         for (DataLogEntry d : dataLog.dataLogEntries) {
             if (d.timestamp == Long.parseLong(imageQueue.get(0).getName().split("\\.")[0])) {
-                binding.closePassCurrentValue.setText(String.valueOf(((DataLogEntry) d).radmesserDistanceLeft1));
+                binding.closePassCurrentValue.setText(String.valueOf(((DataLogEntry) d).obsDistanceLeft1));
                 DisplayMetrics displayMetrics = new DisplayMetrics();
                 getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                 binding.closePassPicture.setImageBitmap(decodeSampledBitmapFromFile(imageQueue.get(0).getAbsolutePath(), displayMetrics.widthPixels, displayMetrics.heightPixels));

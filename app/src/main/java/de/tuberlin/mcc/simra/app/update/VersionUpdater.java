@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
+import static de.tuberlin.mcc.simra.app.util.Utils.calculateCO2Savings;
+
 @SuppressWarnings("ALL")
 @SuppressLint("all")
 
@@ -195,7 +197,7 @@ public class VersionUpdater {
             int experience = Legacy.Utils.lookUpIntSharedPrefs("Profile-Experience", 0, "simraPrefs", context);
 
             // co2 savings on a bike per kilometer: 138g CO2
-            long co2 = (long) ((totalDistance / (float) 1000) * 138);
+            long co2 = calculateCO2Savings(totalDistance);
             Legacy.Utils.updateProfile(true, context, birth, gender, region, experience, totalNumberOfRides, totalDuration, totalNumberOfIncidents, totalWaitedTime, totalDistance, co2, timeBuckets, -2, -1);
 
         }
@@ -829,7 +831,7 @@ public class VersionUpdater {
                                 .append(actualNumberOfScary).append(System.lineSeparator());
 
                     }
-                    totalCO2Savings = (long) (totalDistance / 1000.0 * 138.0);
+                    totalCO2Savings = calculateCO2Savings(totalDistance);
                     Log.d(TAG, "recalculateStatistics() overwriting profile with following statistics");
                     Log.d(TAG, "totalNumberOfRides: " + totalNumberOfRides);
                     Log.d(TAG, "totalDuration: " + totalDuration);
