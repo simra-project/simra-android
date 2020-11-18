@@ -120,7 +120,7 @@ public class MetaData {
          */
         public static final int ANNOTATED = 1;
         /**
-         * The ride is was synced with the server and can not be edited anymore
+         * The ride is synced with the server and can not be edited anymore
          */
         public static final int SYNCED = 2;
     }

@@ -54,8 +54,7 @@ public class IncidentLog {
      */
     public static IncidentLog loadIncidentLog(int rideId, Long startTimeBoundary, Long endTimeBoundary, Context context) {
         File incidentFile = getEventsFile(rideId, context);
-        Map<Integer, IncidentLogEntry> incidents = new HashMap() {
-        };
+        Map<Integer, IncidentLogEntry> incidents = new HashMap() {};
         if (incidentFile.exists()) {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(incidentFile))) {
                 // Skip first two line as they do only contain the Header
@@ -65,8 +64,7 @@ public class IncidentLog {
                 while ((line = bufferedReader.readLine()) != null) {
                     if (!line.trim().isEmpty()) {
                         IncidentLogEntry incidentLogEntry = IncidentLogEntry.parseEntryFromLine(line);
-                        if (incidentLogEntry.isInTimeFrame(startTimeBoundary, endTimeBoundary)
-                        ) {
+                        if (incidentLogEntry.isInTimeFrame(startTimeBoundary, endTimeBoundary)) {
                             incidents.put(incidentLogEntry.key, incidentLogEntry);
                         }
                     }
@@ -79,8 +77,7 @@ public class IncidentLog {
     }
 
     public static IncidentLog filterIncidentLogTime(IncidentLog incidentLog, Long startTimeBoundary, Long endTimeBoundary) {
-        Map<Integer, IncidentLogEntry> incidents = new HashMap() {
-        };
+        Map<Integer, IncidentLogEntry> incidents = new HashMap() {};
         for (Map.Entry<Integer, IncidentLogEntry> incidentLogEntry : incidentLog.getIncidents().entrySet()) {
             if (incidentLogEntry.getValue().isInTimeFrame(startTimeBoundary, endTimeBoundary)
             ) {
@@ -91,8 +88,7 @@ public class IncidentLog {
     }
 
     public static IncidentLog filterIncidentLogUploadReady(IncidentLog incidentLog) {
-        Map<Integer, IncidentLogEntry> incidents = new HashMap() {
-        };
+        Map<Integer, IncidentLogEntry> incidents = new HashMap() {};
         for (Map.Entry<Integer, IncidentLogEntry> incidentLogEntry : incidentLog.getIncidents().entrySet()) {
             if (incidentLogEntry.getValue().isReadyForUpload()) {
                 incidents.put(incidentLogEntry.getValue().key, incidentLogEntry.getValue());
@@ -149,12 +145,9 @@ public class IncidentLog {
 
     public IncidentLogEntry updateOrAddIncident(IncidentLogEntry incidentLogEntry) {
         if (incidentLogEntry.key == null) {
-            incidentLogEntry.key = incidents.size();
+            incidentLogEntry.key = (1000 + incidents.size());
         }
-        incidents.put(
-                incidentLogEntry.key,
-                incidentLogEntry
-        );
+        incidents.put(incidentLogEntry.key, incidentLogEntry);
         return incidentLogEntry;
     }
 

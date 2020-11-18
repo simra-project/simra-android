@@ -19,7 +19,7 @@ public class MetaDataEntry {
         this.numberOfIncidents = numberOfIncidents != null ? numberOfIncidents : 0;
         this.waitedTime = waitedTime != null ? waitedTime : 0;
         this.distance = distance != null ? distance : 0;
-        this.numberOfScaryIncidents = numberOfScaryIncidents != null ? region : 0;
+        this.numberOfScaryIncidents = numberOfScaryIncidents != null ? numberOfScaryIncidents : 0;
         this.region = region != null ? region : 0;
     }
 

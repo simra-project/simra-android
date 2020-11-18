@@ -39,9 +39,7 @@ public class IncidentLogEntry implements Serializable {
         IncidentLogEntry.Builder dataLogEntry = IncidentLogEntry.newBuilder();
 
         if (dataLogLine.length >= 0 && !dataLogLine[0].isEmpty()) {
-            dataLogEntry.withKey(
-                    Integer.valueOf(dataLogLine[0])
-            );
+            dataLogEntry.withKey(Integer.valueOf(dataLogLine[0]));
         }
 
         if (dataLogLine.length >= 3 && !dataLogLine[0].isEmpty() && !dataLogLine[1].isEmpty() && !dataLogLine[3].isEmpty()) {

@@ -66,7 +66,7 @@ public class Utils {
      *
      * @param rideId
      * @param context
-     * @return The ride to upload and the filtered incident log to overwrite after successfull upload
+     * @return The ride to upload and the filtered incident log to overwrite after successful upload
      */
     public static Pair<String, IncidentLog> getConsolidatedRideForUpload(int rideId, Context context) {
 
@@ -240,7 +240,7 @@ public class Utils {
                 List<IncidentLogEntry> foundIncedents = new ArrayList<>();
                 DataLog allLogs = DataLog.loadDataLog(rideId, context);
 
-                // find log entrys and make them an incident
+                // find log entries and make them an incident
                 for (int i = 0; i < jsonArr.length(); i++) {
                     JSONArray incidentAI = jsonArr.getJSONArray(i);
                     for (DataLogEntry log : allLogs.dataLogEntries) {

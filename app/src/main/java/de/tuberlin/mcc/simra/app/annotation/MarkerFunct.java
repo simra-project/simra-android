@@ -165,8 +165,8 @@ public class MarkerFunct {
     public void addCustomMarker(GeoPoint geoPoint) {
         DataLogEntry closestDataLogEntry = getClosesDataLogEntryToGeoPoint(geoPoint, gpsDataLog);
         // set Marker for new AccEvent, refresh map
-        IncidentLogEntry newIncidentLogEnty = incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(closestDataLogEntry.timestamp, closestDataLogEntry.latitude, closestDataLogEntry.longitude).withIncidentType(INCIDENT_TYPE.NOTHING).build());
-        setMarker(newIncidentLogEnty);
+        IncidentLogEntry newIncidentLogEntry = incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(closestDataLogEntry.timestamp, closestDataLogEntry.latitude, closestDataLogEntry.longitude).withIncidentType(INCIDENT_TYPE.NOTHING).build());
+        setMarker(newIncidentLogEntry);
         activity.getmMapView().invalidate();
 
         // Now we display a dialog box to allow the user to decide if she/he is happy
@@ -183,12 +183,12 @@ public class MarkerFunct {
         // added to those structures yet.
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, activity.getResources().getString(R.string.no),
                 (DialogInterface dialog, int which) -> {
-                    Marker custMarker = markerMap.get(newIncidentLogEnty.key);
+                    Marker custMarker = markerMap.get(newIncidentLogEntry.key);
                     activity.getmMapView().getOverlays().remove(custMarker);
                     //mother.getmMapView().getOverlayManager().remove(custMarker);
                     activity.getmMapView().invalidate();
                     markerMap.remove(custMarker);
-                    incidentLog.removeIncident(newIncidentLogEnty);
+                    incidentLog.removeIncident(newIncidentLogEntry);
                 });
 
         // POSITIVE BUTTON: user approves of button. Add to ride.events & file.
@@ -207,10 +207,12 @@ public class MarkerFunct {
 
     public void setMarker(IncidentLogEntry incidentLogEntry) {
         Marker incidentMarker = new Marker(activity.getmMapView());
+        /** I don't know why this exists, but this removes markers when adding new markers. DSP code.
         Marker previousMarker = markerMap.get(incidentLogEntry.key);
         if (previousMarker != null) {
             activity.getmMapView().getOverlays().remove(previousMarker);
         }
+        */
         // Add the marker + corresponding key to map so we can manage markers if
         // necessary (e.g., remove them)
         markerMap.put(incidentLogEntry.key, incidentMarker);
