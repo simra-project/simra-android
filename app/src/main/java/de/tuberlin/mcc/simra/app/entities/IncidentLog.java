@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.entities;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,6 +20,7 @@ public class IncidentLog {
     public final static String INCIDENT_LOG_HEADER = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10";
     public final int rideId;
     private Map<Integer, IncidentLogEntry> incidents;
+    private static final String TAG = "IncidentLog_LOG";
 
     public IncidentLog(int rideId, Map<Integer, IncidentLogEntry> incidents) {
         this.rideId = rideId;
@@ -64,7 +66,7 @@ public class IncidentLog {
                 while ((line = bufferedReader.readLine()) != null) {
                     if (!line.trim().isEmpty()) {
                         IncidentLogEntry incidentLogEntry = IncidentLogEntry.parseEntryFromLine(line);
-                        if (incidentLogEntry.isInTimeFrame(startTimeBoundary, endTimeBoundary)) {
+                        if (!(incidentLogEntry.incidentType == IncidentLogEntry.INCIDENT_TYPE.FOR_RIDE_SETTINGS) && incidentLogEntry.isInTimeFrame(startTimeBoundary, endTimeBoundary)) {
                             incidents.put(incidentLogEntry.key, incidentLogEntry);
                         }
                     }
@@ -87,12 +89,18 @@ public class IncidentLog {
         return new IncidentLog(incidentLog.rideId, incidents);
     }
 
-    public static IncidentLog filterIncidentLogUploadReady(IncidentLog incidentLog) {
+    public static IncidentLog filterIncidentLogUploadReady(IncidentLog incidentLog, Integer bikeType, Boolean childOnBoard, Boolean bikeWithTrailer, Integer phoneLocation, Boolean forUpload) {
+
         Map<Integer, IncidentLogEntry> incidents = new HashMap() {};
         for (Map.Entry<Integer, IncidentLogEntry> incidentLogEntry : incidentLog.getIncidents().entrySet()) {
+            Log.d(TAG," for loop 1 incidentLogEntry: " + incidentLogEntry.getValue().stringifyDataLogEntry());
             if (incidentLogEntry.getValue().isReadyForUpload()) {
+                Log.d(TAG, "adding incidentLogEntry to incidents");
                 incidents.put(incidentLogEntry.getValue().key, incidentLogEntry.getValue());
             }
+        }
+        if (incidents.size() == 0) {
+            incidents.put(-1,(IncidentLogEntry.newBuilder().withRideInformation(bikeType,childOnBoard,bikeWithTrailer,phoneLocation, IncidentLogEntry.INCIDENT_TYPE.FOR_RIDE_SETTINGS,null,false,null).build()));
         }
         return new IncidentLog(incidentLog.rideId, incidents);
     }
@@ -143,6 +151,17 @@ public class IncidentLog {
         return incidents;
     }
 
+    public int getIncidentNumberWithoutRideSettingsIncident() {
+        int numberOfIncidentsNotCountingRideSettingsIncident = 0;
+
+        for (Map.Entry<Integer, IncidentLogEntry> incidentLogEntry : this.getIncidents().entrySet()) {
+            if (incidentLogEntry.getValue().incidentType != IncidentLogEntry.INCIDENT_TYPE.FOR_RIDE_SETTINGS) {
+                numberOfIncidentsNotCountingRideSettingsIncident++;
+            }
+        }
+
+        return numberOfIncidentsNotCountingRideSettingsIncident;
+    }
     public IncidentLogEntry updateOrAddIncident(IncidentLogEntry incidentLogEntry) {
         if (incidentLogEntry.key == null) {
             incidentLogEntry.key = (1000 + incidents.size());

@@ -72,7 +72,7 @@ public class Utils {
 
         StringBuilder content = new StringBuilder();
 
-        IncidentLog incidentLog = IncidentLog.filterIncidentLogUploadReady(IncidentLog.loadIncidentLog(rideId, context));
+        IncidentLog incidentLog = IncidentLog.filterIncidentLogUploadReady(IncidentLog.loadIncidentLog(rideId, context),null,null,null,null,true);
         String dataLog = DataLog.loadDataLog(rideId, context).toString();
 
         content.append(incidentLog.toString());
@@ -433,9 +433,10 @@ public class Utils {
         }
 
         List<IncidentLogEntry> incidents = new ArrayList<>();
+        int key = 0;
         for (AccEvent accEvent : accEvents) {
             if (!(accEvent.position.getLatitude() == 999 || accEvent.position.getLatitude() == 0f)) {
-                incidents.add(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.AUTO_GENERATED).withBaseInformation(accEvent.timeStamp, accEvent.position.getLatitude(), accEvent.position.getLongitude()).build());
+                incidents.add(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.AUTO_GENERATED).withBaseInformation(accEvent.timeStamp, accEvent.position.getLatitude(), accEvent.position.getLongitude()).withKey(key++).build());
             }
         }
 

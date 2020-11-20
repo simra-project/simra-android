@@ -381,7 +381,7 @@ public class ShowRouteActivity extends BaseActivity {
 
     private void saveChanges() {
         // Save incidents
-        incidentLog = IncidentLog.filterIncidentLogUploadReady(incidentLog);
+        incidentLog = IncidentLog.filterIncidentLogUploadReady(incidentLog,bike,child == 1,trailer == 1,pLoc,false);
         IncidentLog.saveIncidentLog(incidentLog, this);
         // Save new Route
         DataLog.saveDataLog(dataLog, this);
@@ -391,7 +391,7 @@ public class ShowRouteActivity extends BaseActivity {
         metaDataEntry.endTime = dataLog.endTime;
         metaDataEntry.distance = dataLog.rideAnalysisData.distance;
         metaDataEntry.waitedTime = dataLog.rideAnalysisData.waitedTime;
-        metaDataEntry.numberOfIncidents = incidentLog.getIncidents().size();
+        metaDataEntry.numberOfIncidents = incidentLog.getIncidentNumberWithoutRideSettingsIncident();
         metaDataEntry.numberOfScaryIncidents = IncidentLog.getScaryIncidents(incidentLog).size();
         metaDataEntry.region = lookUpIntSharedPrefs("Region", 0, "Profile", this);
         metaDataEntry.state = MetaData.STATE.ANNOTATED;

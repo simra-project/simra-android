@@ -88,7 +88,7 @@ public class IncidentLogEntry implements Serializable {
 
     public boolean isReadyForUpload() {
         boolean shouldBeUploaded = true;
-        if (this.incidentType == null || this.incidentType <= 0) {
+        if (this.incidentType == null || (this.incidentType <= INCIDENT_TYPE.NOTHING && this.incidentType != INCIDENT_TYPE.FOR_RIDE_SETTINGS)) {
             shouldBeUploaded = false;
         }
         if (this.scarySituation == null) {
@@ -214,6 +214,7 @@ public class IncidentLogEntry implements Serializable {
     }
 
     public static class INCIDENT_TYPE {
+        public static final int FOR_RIDE_SETTINGS = -5;
         public static final int OBS_MIN_KALMAN = -4;
         public static final int OBS_AVG2S = -3;
         public static final int OBS_UNKNOWN = -2;
