@@ -43,7 +43,11 @@ public class SettingsActivity extends BaseActivity {
         setContentView(binding.getRoot());
         // Setup
         setSupportActionBar(binding.toolbar.toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        try {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        } catch (NullPointerException ignored){
+            Log.d(TAG, "NullPointerException");
+        }
         binding.toolbar.toolbar.setTitle("");
         binding.toolbar.toolbar.setSubtitle("");
         binding.toolbar.toolbarTitle.setText(R.string.title_activity_settings);
