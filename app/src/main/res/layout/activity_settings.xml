@@ -387,9 +387,9 @@
                         android:layout_toEndOf="@id/switchButtons"
                         android:text="@string/showButtons" />
                 </RelativeLayout>
-                <!--
+
                 <Space
-                    android:id="@+id/generalSettingsSpace3"
+                    android:id="@+id/generalSettingsSpace4"
                     android:layout_width="match_parent"
                     android:layout_height="20dp" />
 
@@ -424,9 +424,9 @@
                         android:layout_toEndOf="@id/switchAI"
                         android:text="@string/onlineAI" />
                 </RelativeLayout>
-                -->
+
                 <Space
-                    android:id="@+id/generalSettingsSpace4"
+                    android:id="@+id/generalSettingsSpace5"
                     android:layout_width="match_parent"
                     android:layout_height="20dp" />
 
@@ -439,7 +439,7 @@
                     android:textStyle="bold" />
 
                 <Space
-                    android:id="@+id/generalSettingsSpace5"
+                    android:id="@+id/generalSettingsSpace6"
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
 
@@ -469,7 +469,7 @@
                     android:visibility="gone" />
 
                 <Space
-                    android:id="@+id/generalSettingsSpace6"
+                    android:id="@+id/generalSettingsSpace7"
                     android:layout_width="match_parent"
                     android:layout_height="20dp" />
 

@@ -234,31 +234,30 @@ public class Utils {
             Log.d(TAG, "Server status: " + status);
             Log.d(TAG, "Server Message: " + responseString);
 
+            JSONArray incidentTimestamps;
             // response okay
-            if (status == 200) {
-                JSONArray jsonArr = new JSONArray(responseString);
-                List<IncidentLogEntry> foundIncedents = new ArrayList<>();
+            if (status == 200 && ((incidentTimestamps = new JSONArray(responseString)).length() > 0)) {
+                List<IncidentLogEntry> foundIncidents = new ArrayList<>();
                 DataLog allLogs = DataLog.loadDataLog(rideId, context);
 
-                // find log entries and make them an incident
-                for (int i = 0; i < jsonArr.length(); i++) {
-                    JSONArray incidentAI = jsonArr.getJSONArray(i);
-                    for (DataLogEntry log : allLogs.dataLogEntries) {
-                        if (log.timestamp >= allLogs.startTime + incidentAI.getLong(0) && log.latitude != null) {
-                            foundIncedents.add(IncidentLogEntry.newBuilder()
-                                    .withBaseInformation(
-                                            log.timestamp,
-                                            log.latitude,
-                                            log.longitude
-                                    )
+                // for each gps data log entries loop through the incident timestamps and create an incident at position, if the timestamps match
+                int key = 0;
+                int index = 0;
+                while (!allLogs.onlyGPSDataLogEntries.isEmpty() && incidentTimestamps.length() > 0 && index < allLogs.onlyGPSDataLogEntries.size()) {
+                    DataLogEntry gpsLine = allLogs.onlyGPSDataLogEntries.get(index);
+                    for (int i = 0; i < incidentTimestamps.length(); i++) {
+                        if(gpsLine.timestamp == incidentTimestamps.getLong(i)) {
+                            foundIncidents.add(IncidentLogEntry.newBuilder()
+                                    .withBaseInformation(gpsLine.timestamp, gpsLine.latitude, gpsLine.longitude)
                                     .withIncidentType(IncidentLogEntry.INCIDENT_TYPE.AUTO_GENERATED)
+                                    .withKey(key++)
                                     .build());
-                            break;
+                            incidentTimestamps.remove(index);
                         }
-
                     }
+                    index++;
                 }
-                return foundIncedents;
+                return foundIncidents;
             }
 
         } catch (IOException | JSONException e) {

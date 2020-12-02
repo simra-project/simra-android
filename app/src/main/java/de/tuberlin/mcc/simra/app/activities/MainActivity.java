@@ -865,13 +865,14 @@ public class MainActivity extends BaseActivity
             StringBuilder checkNewsResponseEN = new StringBuilder();
             int statusDE = 0;
             int statusEN = 0;
+            int lastSeenNewsID = SharedPref.App.News.getLastSeenNewsID(MainActivity.this);
             try {
 
                 URL url_de = new URL(
-                        BuildConfig.API_ENDPOINT + "check/news_de?clientHash=" + getClientHash(MainActivity.this));
+                        BuildConfig.API_ENDPOINT + "check/news?clientHash=" + getClientHash(MainActivity.this) + "&lastSeenNewsID=" + lastSeenNewsID + "&newsLanguage=de");
                 Log.d(TAG, "URL_DE: " + url_de.toString());
                 URL url_en = new URL(
-                        BuildConfig.API_ENDPOINT + "check/news_en?clientHash=" + getClientHash(MainActivity.this));
+                        BuildConfig.API_ENDPOINT + "check/news?clientHash=" + getClientHash(MainActivity.this) + "&lastSeenNewsID=" + lastSeenNewsID + "&newsLanguage=en");
                 Log.d(TAG, "URL_EN: " + url_en.toString());
                 HttpsURLConnection url_de_Connection = (HttpsURLConnection) url_de.openConnection();
                 HttpsURLConnection url_en_Connection = (HttpsURLConnection) url_en.openConnection();
@@ -907,11 +908,11 @@ public class MainActivity extends BaseActivity
             }
             Log.d(TAG, "GET news DE response: " + checkNewsResponseDE.toString());
             Log.d(TAG, "GET news EN response: " + checkNewsResponseEN.toString());
-            if (statusDE == 200) {
+            if (statusDE == 200 && checkNewsResponseDE.length() > 0) {
                 File newsFile = IOUtils.Files.getDENewsFile(MainActivity.this);
                 overwriteFile(checkNewsResponseDE.toString(), newsFile);
             }
-            if (statusEN == 200) {
+            if (statusEN == 200 && checkNewsResponseDE.length() > 0) {
                 File newsFile = IOUtils.Files.getENNewsFile(MainActivity.this);
                 overwriteFile(checkNewsResponseEN.toString(), newsFile);
             }

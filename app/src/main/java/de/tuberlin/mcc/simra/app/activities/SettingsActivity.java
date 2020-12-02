@@ -135,13 +135,13 @@ public class SettingsActivity extends BaseActivity {
                         fireIncidentButtonsEnablePrompt();
                     }
                 });
-        /*
+
         // Switch: AI Select
         if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(this)) {
             binding.switchAI.setChecked(true);
         }
         binding.switchAI.setOnCheckedChangeListener((buttonView, isChecked) -> SharedPref.Settings.IncidentGenerationAIActive.setAIEnabled(isChecked,this));
-        */
+
 
         // Switch: OpenBikeSensor device enabled
         boolean obsActivated = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
