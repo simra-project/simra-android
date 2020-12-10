@@ -78,15 +78,16 @@
                     android:textSize="13sp"
                     android:layout_toEndOf="@id/incidentSymbol"
                     android:layout_centerVertical="true"/>
-                <Button
-                    android:id="@+id/button1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignEnd="@id/incidentSymbol"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerInParent="true"
-                    android:text="Die Anzahl der Vorfälle in ihren hochgeladenen Fahrten" />
-            </RelativeLayout>
+               </RelativeLayout>
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
+                android:textSize="12sp"
+                android:text="Die Anzahl der Vorfälle in ihren hochgeladenen Fahrten" />
+
             <RelativeLayout
                 android:id="@+id/numberOfScaryIncidents"
                 android:layout_width="match_parent"
@@ -160,15 +161,22 @@
                     android:textSize="13sp"
                     android:layout_toEndOf="@id/routeDistanceSymbol2"
                     android:layout_centerVertical="true"/>
-                <Button
-                    android:id="@+id/button2"
-                    android:layout_width="wrap_content"
+               </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/avgdistbtn"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignEnd="@id/routeDistanceSymbol2"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerInParent="true"
-                    android:text="Zurückgelegte Strecke / Anzahl der Fahrten" />
-            </RelativeLayout>
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp">
+                    <Button
+                        android:id="@+id/button2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerInParent="true"
+                        android:textSize="12sp"
+                        android:text="Zurückgelegte Strecke / \nAnzahl der Fahrten" />
+                </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/durationOfRides"
                 android:layout_width="match_parent"
@@ -216,15 +224,16 @@
                     android:textSize="13sp"
                     android:layout_toEndOf="@id/idleDurationSymbol"
                     android:layout_centerVertical="true"/>
-                <Button
-                    android:id="@+id/button3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignEnd="@id/idleDurationSymbol"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerInParent="true"
-                    android:text="Zeit während dem der Fahrt ohne Bewegeung" />
-            </RelativeLayout>
+                </RelativeLayout>
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
+                android:text="Zeit während dem der Fahrt ohne Bewegeung" />
+
             <RelativeLayout
                 android:id="@+id/averageIdleDuration"
                 android:layout_width="match_parent"
@@ -273,15 +282,14 @@
                     android:textSize="13sp"
                     android:layout_toEndOf="@id/co2SavingsSymbol"
                     android:layout_centerVertical="true"/>
-                <Button
-                    android:id="@+id/button4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignEnd="@id/co2SavingsSymbol"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerInParent="true"
-                    android:text="138g/km - Ersparnis wenn man die selbe Strecke mit dem Auto gefahren wäre" />
             </RelativeLayout>
+            <Button
+                android:id="@+id/button4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:text="138g/km - Ersparnis wenn man die selbe Strecke mit dem Auto gefahren wäre" />
+
             <RelativeLayout
                 android:id="@+id/averageSpeed"
                 android:layout_width="match_parent"
@@ -332,6 +340,7 @@
             android:layout_alignEnd="@id/barChartHeader"
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
+            android:textSize="15sp"
             android:text="Kummulierte Verteilung ihrer Fahrten über den Tag" />
 
 

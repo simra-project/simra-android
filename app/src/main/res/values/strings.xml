@@ -355,4 +355,5 @@
     <string name="obsConnecting">Verbindung mit OpenBikeSensor</string>
     <string name="obsTutorial">\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden</string>
     <string name="obs">OpenBikeSensor</string>
+    <string name="toast_help_clicked">Sie können die Fenster durch jeweiliges antippen oder durch erneutes drücken des Logos schließen.</string>
 </resources>

@@ -6,25 +6,23 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.appcompat.app.AppCompatActivity;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityProfileBinding;
 import de.tuberlin.mcc.simra.app.entities.Profile;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 
-public class ProfileActivity extends AppCompatActivity {
-    private static final String TAG = "ProfileActivity_LOG";
+public class ProfileActivityHelp extends AppCompatActivity {
+    private static final String TAG = "ProfileActivityHelp_LOG";
 
     ActivityProfileBinding binding;
 
@@ -45,7 +43,8 @@ public class ProfileActivity extends AppCompatActivity {
         binding.toolbar.toolbar.setSubtitle("");
         binding.toolbar.toolbarTitle.setText(R.string.title_activity_profile);
         binding.toolbar.backButton.setOnClickListener(v -> finish());
-        binding.toolbar.helmetIcon.setOnClickListener(v -> findViewById(R.id.button2).setVisibility(View.VISIBLE));
+        binding.toolbar.helmetIcon.setOnClickListener(v -> finish());
+
 
         profile = Profile.loadProfile(null, this);
         simRa_regions_config = getRegions(this);
