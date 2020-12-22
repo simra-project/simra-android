@@ -4,8 +4,11 @@ package de.tuberlin.mcc.simra.app.activities;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -30,6 +33,7 @@ public class StatisticsActivity extends AppCompatActivity {
     private static final String TAG = "StatisticsActivity_LOG";
 
     ImageButton backBtn;
+    ImageButton helmetBtn;
     TextView toolbarTxt;
     BarChart chart;
 
@@ -48,6 +52,8 @@ public class StatisticsActivity extends AppCompatActivity {
 
         backBtn = findViewById(R.id.back_button);
         backBtn.setOnClickListener(v -> finish());
+        helmetBtn = findViewById(R.id.helmet_icon);
+        helmetBtn.setOnClickListener(v -> helpButtonClicked());
         Boolean isImperialUnit = SharedPref.Settings.DisplayUnit.isImperial(this);
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
 
@@ -152,6 +158,28 @@ public class StatisticsActivity extends AppCompatActivity {
         averageDurationOfWaitedTime.setText(getText(R.string.avgIdle) + " " + avgWaitDurationMinutes + " min");
         averageDurationOfWaitedTime.invalidate();
 
+    // help disappears when clicked
+        Button button5 = findViewById(R.id.button5);
+        button5.setOnClickListener(v -> {
+            findViewById(R.id.button5).setVisibility(View.GONE);
+        });
+        Button button4 = findViewById(R.id.button4);
+        button4.setOnClickListener(view -> {
+            findViewById(R.id.button4).setVisibility(View.GONE);
+        });
+        Button button3 = findViewById(R.id.button3);
+        button3.setOnClickListener(v -> {
+            findViewById(R.id.button3).setVisibility(View.GONE);
+        });
+        Button button2 = findViewById(R.id.button2);
+        button2.setOnClickListener(v -> {
+            findViewById(R.id.button2).setVisibility(View.GONE);
+        });
+        Button button1 = findViewById(R.id.button1);
+        button1.setOnClickListener(v -> {
+            findViewById(R.id.button1).setVisibility(View.GONE);
+        });
+
         chart = findViewById(R.id.timeBucketBarChart);
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -241,6 +269,29 @@ public class StatisticsActivity extends AppCompatActivity {
         chart.setHighlightPerDragEnabled(false);
 
         chart.invalidate();
+    }
+
+    // Help    // showing help when clicking Logo
+    public void helpButtonClicked() {
+        if (findViewById(R.id.button1).getVisibility() == View.VISIBLE && findViewById(R.id.button2).getVisibility() ==
+                View.VISIBLE && findViewById(R.id.button3).getVisibility() == View.VISIBLE && findViewById(R.id.button4).getVisibility() ==
+                View.VISIBLE && findViewById(R.id.button5).getVisibility() == View.VISIBLE) {
+
+            findViewById(R.id.button1).setVisibility(View.GONE);
+            findViewById(R.id.button2).setVisibility(View.GONE);
+            findViewById(R.id.button3).setVisibility(View.GONE);
+            findViewById(R.id.button4).setVisibility(View.GONE);
+            findViewById(R.id.button5).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.button1).setVisibility(View.VISIBLE);
+            findViewById(R.id.button2).setVisibility(View.VISIBLE);
+            findViewById(R.id.button3).setVisibility(View.VISIBLE);
+            findViewById(R.id.button4).setVisibility(View.VISIBLE);
+            findViewById(R.id.button5).setVisibility(View.VISIBLE);
+
+            Toast.makeText(StatisticsActivity.this, R.string.toast_help_clicked, Toast.LENGTH_LONG)
+                    .show();
+        }
     }
 
     @Override

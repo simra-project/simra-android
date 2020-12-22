@@ -47,6 +47,8 @@ public class ProfileActivity extends AppCompatActivity {
         binding.toolbar.backButton.setOnClickListener(v -> finish());
         binding.toolbar.helmetIcon.setOnClickListener(v -> findViewById(R.id.button2).setVisibility(View.VISIBLE));
 
+
+
         profile = Profile.loadProfile(null, this);
         simRa_regions_config = getRegions(this);
 

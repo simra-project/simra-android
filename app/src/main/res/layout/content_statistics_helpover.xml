@@ -85,6 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerInParent="true"
+                android:visibility="gone"
                 android:textSize="12sp"
                 android:text="Die Anzahl der Vorfälle in ihren hochgeladenen Fahrten" />
 
@@ -175,6 +176,7 @@
                         android:layout_centerHorizontal="true"
                         android:layout_centerInParent="true"
                         android:textSize="12sp"
+                        android:visibility="gone"
                         android:text="Zurückgelegte Strecke / \nAnzahl der Fahrten" />
                 </RelativeLayout>
             <RelativeLayout
@@ -232,6 +234,7 @@
                 android:textSize="12sp"
                 android:layout_centerHorizontal="true"
                 android:layout_centerInParent="true"
+                android:visibility="gone"
                 android:text="Zeit während dem der Fahrt ohne Bewegeung" />
 
             <RelativeLayout
@@ -288,6 +291,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
+                android:visibility="gone"
                 android:text="138g/km - Ersparnis wenn man die selbe Strecke mit dem Auto gefahren wäre" />
 
             <RelativeLayout
@@ -341,6 +345,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
             android:textSize="15sp"
+            android:visibility="gone"
             android:text="Kummulierte Verteilung ihrer Fahrten über den Tag" />
 
 
