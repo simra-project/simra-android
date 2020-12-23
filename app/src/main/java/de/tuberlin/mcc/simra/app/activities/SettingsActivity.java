@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -33,6 +35,8 @@ public class SettingsActivity extends BaseActivity {
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int BLUETOOTH_SUCCESS = -1;
 
+    ImageButton helmetBtn;
+
     ActivitySettingsBinding binding;
 
     @Override
@@ -49,6 +53,27 @@ public class SettingsActivity extends BaseActivity {
         binding.toolbar.toolbarTitle.setText(R.string.title_activity_settings);
         binding.toolbar.backButton.setOnClickListener(v -> finish());
 
+        helmetBtn = findViewById(R.id.helmet_icon);
+        helmetBtn.setOnClickListener(v -> {
+            if (findViewById(R.id.button1).getVisibility() == View.VISIBLE && findViewById(R.id.button2).getVisibility() == View.VISIBLE) {
+                findViewById(R.id.button1).setVisibility(View.GONE);
+                findViewById(R.id.button2).setVisibility(View.GONE);
+            } else {
+                findViewById(R.id.button1).setVisibility(View.VISIBLE);
+                findViewById(R.id.button2).setVisibility(View.VISIBLE);
+
+                Toast.makeText(SettingsActivity.this, R.string.toast_help_clicked, Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
+        Button button1 = findViewById(R.id.button1);
+        button1.setOnClickListener(v -> {
+            findViewById(R.id.button1).setVisibility(View.GONE);
+        });
+        Button button2 = findViewById(R.id.button2);
+        button1.setOnClickListener(v -> {
+            findViewById(R.id.button2).setVisibility(View.GONE);
+        });
         // Slider: Duration
         binding.privacyDurationSlider.setValueFrom(SharedPref.Settings.Ride.PrivacyDuration.getMinDuration());
         binding.privacyDurationSlider.setValueTo(SharedPref.Settings.Ride.PrivacyDuration.getMaxDuration());
