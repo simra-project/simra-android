@@ -355,5 +355,24 @@
     <string name="obsConnecting">Verbindung mit OpenBikeSensor</string>
     <string name="obsTutorial">\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden</string>
     <string name="obs">OpenBikeSensor</string>
+    <string name="close_pass">Is this a Close Pass Incident?</string>
+
+
+    <!-- 67 -->
+
     <string name="toast_help_clicked">Sie können die Fenster durch jeweiliges antippen oder durch erneutes drücken des Logos schließen.</string>
+    <string name="more_information">Hier finden Sie weiterführende Informationen zu SimRa.</string>
+    <string name="help_button_desc">Das SimRa Logo fungiert zusätzlich als Hilfe Button. Hierdurch kommen Sie jederzeit in die aktuelle Ansicht und können sie anschließend wieder schließen.</string>
+    <string name="help_data">Alle Daten werden ausschließlich in aggregierter Form verwendet um die Repräsentativität der Stichprobe abzuschätzen.</string>
+    <string name="help_rides">Alle lokal gespeicherte Fahrten werden anonymisiert hochgeladen.</string>
+    <string name="help_data_security">Ihre Datenschutz Einstellungen geben Ihnen die maximale Kontrolle und machen Ihren Abfahrtsort unkenntlich. In dicht besidelten Gebieten ist dies nicht notwendig.</string>
+    <string name="help_ride_settings">Ihre Einstellungen geben uns Auskunft über die Empfindlichkeit Ihres Smartphones gegenüber Erschütterungen. Und helfen so, die Senssordaten besser zu interpretieren.</string>
+    <string name="help_center_button">Dieser Button zentriert die Karte auf ihren aktuellen Ort</string>
+    <string name="help_start_stop">Auf diesem Button starten \nund Stoppen Sie die Aufzeichnung</string>
+     <string name="help_region">Wählen sie ihre Region aus, wir informieren sie wenn wir Kooperationspartner in neuen Regionen haben</string>
+    <string name="help_number_incidents">Die Anzahl der Vorfälle in ihren hochgeladenen Fahrten</string>
+    <string name="help_avg_distance">Zurückgelegte Strecke / \nAnzahl der Fahrten</string>
+    <string name="help_duration_idle">Zeit während dem der Fahrt ohne Bewegeung</string>
+    <string name="help_co2_savings">138g/km - Ersparnis wenn man die selbe Strecke mit dem Auto gefahren wäre</string>
+    <string name="help_bar_chart">Kummulierte Verteilung ihrer Fahrten über den Tag</string>
 </resources>

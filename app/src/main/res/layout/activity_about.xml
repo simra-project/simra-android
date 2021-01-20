@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
 
         android:layout_marginTop="@dimen/toolbar_space"
-        android:text="Hier finden Sie weiterführende Informationen zu SimRa."
+        android:text="@string/more_information"
         android:textAlignment="center"
         android:visibility="gone"
         android:textSize="12sp" />

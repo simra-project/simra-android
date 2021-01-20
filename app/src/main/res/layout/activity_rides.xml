@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/toolbar_space"
-        android:text="Alle Daten werden ausschließlich in aggregierter Form verwendet um die Repräsentativität der Stichprobe abzuschätzen."
+        android:text="@string/help_data"
         android:textAlignment="center"
 
         android:visibility="gone"
@@ -48,7 +48,7 @@
             style="@style/Widget.MaterialComponents.Button.Icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Alle lokal gespeicherte Fahrten werden anonymisiert hochgeladen."
+            android:text="@string/help_rides"
             android:textAlignment="center"
 android:visibility="gone"
             android:layout_marginBottom="5dp"

@@ -48,8 +48,7 @@
                     android:layout_margin="5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ihre Datenschutz Einstellungen geben Ihnen die maximale Kontrolle und machen Ihren Abfahrtsort unkenntlich.
-                    In dicht besidelten Gebieten ist dies nicht notwendig."
+                    android:text="@string/help_data_security"
                     android:textAlignment="center"
                     android:visibility="gone"
                     android:textSize="12sp" />
@@ -178,7 +177,7 @@
                 android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ihre Einstellungen geben uns Auskunft über die Empfindlichkeit Ihres Smartphones gegenüber Erschütterungen. Und helfen so, die Senssordaten besser zu interpretieren."
+                android:text="@string/help_ride_settings"
                 android:textAlignment="center"
                 android:visibility="gone"
                 android:textSize="12sp" />

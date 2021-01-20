@@ -30,7 +30,7 @@
             android:textAlignment="center"
             android:visibility="gone"
             android:textSize="12sp"
-            android:text="Alle Daten werden ausschließlich in aggregierter Form verwendet um die Repräsentativität der Stichprobe abzuschätzen." />
+            android:text="@string/help_data" />
 
 
         <TextView
@@ -92,7 +92,7 @@
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:visibility="gone"
-            android:text="Wählen sie ihre Region aus, wir informieren sie wenn wir Kooperationspartner in neuen Regionen haben"
+            android:text="@string/help_region"
         />
 
         <Space

@@ -87,7 +87,7 @@
                 android:layout_margin="5dp"
                 android:visibility="gone"
                 android:textSize="12sp"
-                android:text="Die Anzahl der Vorfälle in ihren hochgeladenen Fahrten" />
+                android:text="@string/help_number_incidents" />
 
             <RelativeLayout
                 android:id="@+id/numberOfScaryIncidents"
@@ -179,7 +179,7 @@
                         android:layout_centerInParent="true"
                         android:textSize="12sp"
                         android:visibility="gone"
-                        android:text="Zurückgelegte Strecke / \nAnzahl der Fahrten" />
+                        android:text="@string/help_avg_distance" />
                 </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/durationOfRides"
@@ -237,7 +237,7 @@
                 style="@style/Widget.MaterialComponents.Button.Icon"
                 android:layout_margin="5dp"
                 android:visibility="gone"
-                android:text="Zeit während dem der Fahrt ohne Bewegeung" />
+                android:text="@string/help_duration_idle" />
 
             <RelativeLayout
                 android:id="@+id/averageIdleDuration"
@@ -296,7 +296,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:visibility="gone"
-                android:text="138g/km - Ersparnis wenn man die selbe Strecke mit dem Auto gefahren wäre" />
+                android:text="@string/help_co2_savings" />
 
             <RelativeLayout
                 android:id="@+id/averageSpeed"
@@ -352,7 +352,7 @@
             android:layout_centerInParent="true"
             android:textSize="15sp"
             android:visibility="gone"
-            android:text="Kummulierte Verteilung ihrer Fahrten über den Tag" />
+            android:text="@string/help_bar_chart" />
 
 
         <TextView
