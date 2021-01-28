@@ -42,31 +42,38 @@ public class DataLogEntryTest {
     }
 
     @Test
+    public void parseDataLogEntryFromLine_Rotation() {
+        assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,,,,,,,,,1.0,2.0,3.0,4.0,5.0"))
+                .usingRecursiveComparison()
+                .isEqualTo(DataLogEntry.newBuilder().withRotation(1F, 2F, 3F, 4F, 5F).build());
+    }
+
+    @Test
     public void parseDataLogEntryFromLine_OBS_One_Value() {
         assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, null, null, null).build());
+                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, null, null, null, null));
     }
 
     @Test
     public void parseDataLogEntryFromLine_OBS_Two_Value() {
         assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, 2, null, null).build());
+                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, 2, null, null, null));
     }
 
     @Test
     public void parseDataLogEntryFromLine_OBS_Three_Value() {
         assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2,3"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, 2, 3, null).build());
+                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, 2, 3, null, null));
     }
 
     @Test
     public void parseDataLogEntryFromLine_OBS_Four_Value() {
-        assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2,3,4"))
+        assertThat(DataLogEntry.parseDataLogEntryFromLine(",,,,,,,,,,1,2,3,4,"))
                 .usingRecursiveComparison()
-                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, 2, 3, 4).build());
+                .isEqualTo(DataLogEntry.newBuilder().withOBS(1, 2, 3, 4, null));
     }
 
     @Test
@@ -78,7 +85,7 @@ public class DataLogEntryTest {
                         .withGPS(1D, 2D, 7F)
                         .withAccelerometer(3F, 4F, 5F)
                         .withGyroscope(8F, 9F, 10F)
-                        .withOBS(11, 12, 13, 14).build());
+                        .withOBS(11, 12, 13, 14, null));
     }
 
     @Test
@@ -88,8 +95,10 @@ public class DataLogEntryTest {
                 .withGPS(1D, 2D, 7F)
                 .withAccelerometer(3F, 4F, 5F)
                 .withGyroscope(8F, 9F, 10F)
-                .withOBS(11, 12, 13, 14).build().stringifyDataLogEntry())
-                .isEqualTo("1.0,2.0,3.0,4.0,5.0,6,7.0,8.0,9.0,10.0,11,12,13,14");
+                .withOBS(11, 12, 13, 14, 15)
+                .withLinearAccelerometer(16F, 17F, 18F)
+                .withRotation(19F, 20F, 21F, 22F, 23F).build().stringifyDataLogEntry())
+                .isEqualTo("1.0,2.0,3.0,4.0,5.0,6,7.0,8.0,9.0,10.0,11,12,13,14,15,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0");
     }
 
     @Test
@@ -99,13 +108,14 @@ public class DataLogEntryTest {
                 .withGPS(52.53949384561807D, 13.371213365189773, 6.0F)
                 .withAccelerometer(-0.8885537F, -9.369222F, -2.433742F)
                 .withGyroscope(0.008709193F, 0.21959732F, -0.057107173F)
-                .withOBS(255, null, null, null).build().stringifyDataLogEntry())
-                .isEqualTo("52.53949384561807,13.371213365189773,-0.8885537,-9.369222,-2.433742,1592319028261,6.0,0.008709193,0.21959732,-0.057107173,255,,,");
+                .withOBS(255, null, null, null, null)
+                .withLinearAccelerometer(-0.8885537F, -9.369222F, -12.243742F).build().stringifyDataLogEntry())
+                .isEqualTo("52.53949384561807,13.371213365189773,-0.8885537,-9.369222,-2.433742,1592319028261,6.0,0.008709193,0.21959732,-0.057107173,255,,,,,-0.8885537,-9.369222,-12.243742,,,,,");
     }
 
     @Test
     public void stringifyLogEntry_EmptyLine() {
         assertThat(DataLogEntry.newBuilder().build().stringifyDataLogEntry())
-                .isEqualTo(",,,,,,,,,,,,,");
+                .isEqualTo(",,,,,,,,,,,,,,,,,,,,,,");
     }
 }

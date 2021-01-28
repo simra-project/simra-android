@@ -26,7 +26,7 @@
     <string name="close_simra">Close SimRa</string>
     <string name="iAccept">I accept the privacy policy statement</string>
     <string name="privacyAgreementTitle">Privacy Policy Statement</string>
-    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).
+    <string name="privacyAgreementMessage">SimRa records your location and sensor data, as well as demographics provided by you to show you your rides recorded with SimRa. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).
     </string>
 
     <!--- Menu -->

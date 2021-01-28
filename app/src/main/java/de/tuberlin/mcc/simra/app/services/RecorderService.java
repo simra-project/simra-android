@@ -27,6 +27,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -62,6 +63,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     long endTime;
     float[] accelerometerMatrix = new float[3];
     float[] gyroscopeMatrix = new float[3];
+    float[] linearAccelerometerMatrix = new float[3];
+    float[] rotationMatrix = new float[5];
     Location lastLocation;
     Polyline route = new Polyline();
     long waitedTime = 0;
@@ -71,6 +74,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     Queue<Float> accelerometerQueueX = new LinkedList<>();
     Queue<Float> accelerometerQueueY = new LinkedList<>();
     Queue<Float> accelerometerQueueZ = new LinkedList<>();
+    Queue<Float> linearAccelerometerQueueX = new LinkedList<>();
+    Queue<Float> linearAccelerometerQueueY = new LinkedList<>();
+    Queue<Float> linearAccelerometerQueueZ = new LinkedList<>();
+    Queue<Float> rotationQueueX = new LinkedList<>();
+    Queue<Float> rotationQueueY = new LinkedList<>();
+    Queue<Float> rotationQueueZ = new LinkedList<>();
+    Queue<Float> rotationQueueC = new LinkedList<>();
+    Queue<Float> rotationQueueAcc = new LinkedList<>();
     SharedPreferences sharedPrefs;
     SharedPreferences.Editor editor;
     Location startLocation;
@@ -81,6 +92,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private ExecutorService executor;
     private Sensor accelerometer;
     private Sensor gyroscope;
+    private Sensor linearAccelerometer;
+    private Sensor rotation;
     private int key;
     private long lastPictureTaken = 0;
     private Integer incidentDuringRide = null;
@@ -142,6 +155,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            accelerometerMatrix = event.values;
+        } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+            gyroscopeMatrix = event.values;
+        } else if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
             curTime = System.currentTimeMillis();
 
             // Privacy filter: Set recordingAllowed to true, when enough time (privacyDuration) passed
@@ -153,23 +170,20 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     recordingAllowed = true;
                 }
             }
-            accelerometerMatrix = event.values;
-
+            linearAccelerometerMatrix = event.values;
             if (((curTime - lastAccUpdate) >= Constants.ACCELEROMETER_FREQUENCY) && recordingAllowed) {
 
                 lastAccUpdate = curTime;
                 // Write data to file in background thread
                 try {
-                    Runnable insertHandler = new InsertHandler(accelerometerMatrix, gyroscopeMatrix);
+                    Runnable insertHandler = new InsertHandler(accelerometerMatrix, gyroscopeMatrix, linearAccelerometerMatrix, rotationMatrix);
                     executor.execute(insertHandler);
                 } catch (Exception e) {
                     Log.e(TAG, "insertData: " + e.getMessage(), e);
                 }
             }
-        }
-
-        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            gyroscopeMatrix = event.values;
+        } else if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            rotationMatrix = event.values;
         }
     }
 
@@ -185,13 +199,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     public void onLocationChanged(Location location) {
 
         // Take only GPS fixes that are somewhat accurate to prevent spikes in the route.
-        if (location.getAccuracy() < Constants.GPS_ACCURACY_THRESHOLD) {
+        // if (location.getAccuracy() < Constants.GPS_ACCURACY_THRESHOLD) {
             // Set start location. Important for privacy distance.
             if (startLocation == null) {
                 startLocation = location;
             }
             lastLocation = location;
-        }
+        //}
     }
 
     @Override
@@ -224,10 +238,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         takePictureDuringRideInterval = SharedPref.Settings.Ride.PicturesDuringRideInterval.getInterval(this);
         safetyDistanceWithTolerances = SharedPref.Settings.Ride.OvertakeWidth.getWidth(this);
 
-        // Prepare the accelerometer accGpsFile
+        // Prepare the sensors for accGpsFile
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        linearAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        rotation = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
         // Request location updates
         locationManager = (LocationManager) getSystemService(Context
                 .LOCATION_SERVICE);
@@ -309,7 +325,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         sensorManager.registerListener(this, accelerometer,
                 SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this, gyroscope,
-                2900);
+                SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, linearAccelerometer,
+                SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, rotation,
+                SensorManager.SENSOR_DELAY_FASTEST);
         return START_STICKY;
     }
 
@@ -383,11 +403,15 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         final float[] accelerometerMatrix;
         final float[] gyroscopeMatrix;
+        final float[] linearAccelerometerMatrix;
+        final float[] rotationMatrix;
 
         // Store the current accGpsFile array values into THIS objects arrays, and db insert from this object
-        public InsertHandler(float[] accelerometerMatrix, float[] gyroscopeMatrix) {
+        public InsertHandler(float[] accelerometerMatrix, float[] gyroscopeMatrix, float[] linearAccelerometerMatrix, float[] rotationMatrix) {
             this.accelerometerMatrix = accelerometerMatrix;
             this.gyroscopeMatrix = gyroscopeMatrix;
+            this.linearAccelerometerMatrix = linearAccelerometerMatrix;
+            this.rotationMatrix = rotationMatrix;
         }
 
         @SuppressLint("MissingPermission")
@@ -412,7 +436,21 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 accelerometerQueueY.add(accelerometerMatrix[1]);
                 accelerometerQueueZ.add(accelerometerMatrix[2]);
 
-            } else {
+            }
+            if (linearAccelerometerQueueX.size() < 30) {
+                linearAccelerometerQueueX.add(linearAccelerometerMatrix[0]);
+                linearAccelerometerQueueY.add(linearAccelerometerMatrix[1]);
+                linearAccelerometerQueueZ.add(linearAccelerometerMatrix[2]);
+            }
+            if (rotationQueueX.size() < 30) {
+                rotationQueueX.add(rotationMatrix[0]);
+                rotationQueueY.add(rotationMatrix[1]);
+                rotationQueueZ.add(rotationMatrix[2]);
+                rotationQueueC.add(rotationMatrix[3]);
+                rotationQueueAcc.add(rotationMatrix[4]);
+
+            }
+            if (accelerometerQueueX.size() >= 30 && linearAccelerometerQueueX.size() >= 30 && rotationQueueX.size() >= 30) {
                 DataLogEntry.DataLogEntryBuilder dataLogEntryBuilder = DataLogEntry.newBuilder();
                 dataLogEntryBuilder.withTimestamp(curTime);
                 dataLogEntryBuilder.withAccelerometer(
@@ -420,6 +458,22 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         computeAverage(accelerometerQueueX),
                         computeAverage(accelerometerQueueY),
                         computeAverage(accelerometerQueueZ)
+                );
+
+                dataLogEntryBuilder.withLinearAccelerometer(
+                        // Every average is computed over 30 data points
+                        computeAverage(linearAccelerometerQueueX),
+                        computeAverage(linearAccelerometerQueueY),
+                        computeAverage(linearAccelerometerQueueZ)
+                );
+
+                dataLogEntryBuilder.withRotation(
+                        // Every average is computed over 30 data points
+                        computeAverage(rotationQueueX),
+                        computeAverage(rotationQueueY),
+                        computeAverage(rotationQueueZ),
+                        computeAverage(rotationQueueC),
+                        computeAverage(rotationQueueAcc)
                 );
 
                 if ((lastAccUpdate - lastGPSUpdate) >= Constants.GPS_FREQUENCY) {
@@ -466,7 +520,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 if (lastOBSDistanceValues.size() > 0) {
                     OBSService.Measurement lastOBSDistanceValue = lastOBSDistanceValues.removeFirst();
-                    dataLogEntryBuilder.withOBS(lastOBSDistanceValue.leftSensorValues.get(0), null, null, null);
+                    dataLogEntryBuilder.withOBS(lastOBSDistanceValue.leftSensorValues.get(0), null, null, null, null);
 
                     if (takePictureDuringRideActivated) {
                         if (lastOBSDistanceValue.leftSensorValues.get(0) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= curTime) {
@@ -477,7 +531,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 }
 
                 String str = dataLogEntryBuilder.build().stringifyDataLogEntry();
-                Log.i(TAG, str);
+                // Log.i(TAG, str);
 
                 accGpsString.append(str).append(System.getProperty("line.separator"));
                 lineAdded = true;
@@ -491,6 +545,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     accelerometerQueueX.remove();
                     accelerometerQueueY.remove();
                     accelerometerQueueZ.remove();
+                    linearAccelerometerQueueX.remove();
+                    linearAccelerometerQueueY.remove();
+                    linearAccelerometerQueueZ.remove();
+                    rotationQueueX.remove();
+                    rotationQueueY.remove();
+                    rotationQueueZ.remove();
+                    rotationQueueC.remove();
                 }
             }
         }

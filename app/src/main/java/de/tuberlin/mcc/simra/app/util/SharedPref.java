@@ -99,7 +99,7 @@ public class SharedPref {
     }
 
     private static long readLongFromAppSharedPrefs(Context context) {
-        return context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).getLong(Settings.Ride.PrivacyDuration.PRIVACY_DURATION, 30);
+        return context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).getLong(Settings.Ride.PrivacyDuration.PRIVACY_DURATION, 3);
     }
 
     private static void writeLongToAppSharedPrefsAsync(long value, Context context) {
@@ -255,7 +255,7 @@ public class SharedPref {
                 private static final int MIN_DISTANCE = 0;
 
                 public static int getDistance(UnitHelper.DISTANCE unit, Context context) {
-                    int value = readIntegerFromAppSharedPrefs(PRIVACY_DISTANCE, 30, context);
+                    int value = readIntegerFromAppSharedPrefs(PRIVACY_DISTANCE, 0, context);
 
                     if (unit == UnitHelper.DISTANCE.IMPERIAL) {
                         value = (int) UnitHelper.convertMeterToFeet(value);

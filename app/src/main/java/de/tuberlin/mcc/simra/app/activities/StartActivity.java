@@ -1,5 +1,6 @@
 package de.tuberlin.mcc.simra.app.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
@@ -69,13 +70,7 @@ public class StartActivity extends BaseActivity {
     }
 
     public boolean allPermissionGranted() {
-        if (
-                privacyPolicyAccepted()
-                        && PermissionHelper.hasBasePermissions(this)
-        ) {
-            return true;
-        }
-        return false;
+        return privacyPolicyAccepted() && PermissionHelper.hasBasePermissions(this);
     }
 
     public void navigateIfAllPermissionsGranted() {
@@ -86,16 +81,12 @@ public class StartActivity extends BaseActivity {
             // when the Back Button is pressed in MainActivity
             finish();
         } else {
-            PermissionHelper.requestFirstBasePermissionsNotGranted(StartActivity.this);
+            firePrivacyDialog();
         }
     }
 
     private boolean privacyPolicyAccepted() {
-        boolean accepted = lookUpBooleanSharedPrefs("Privacy-Policy-Accepted", false, "simraPrefs", this);
-        if (!accepted) {
-            firePrivacyDialog();
-        }
-        return accepted;
+        return lookUpBooleanSharedPrefs("Privacy-Policy-Accepted", false, "simraPrefs", this);
     }
 
     /**
@@ -153,7 +144,14 @@ public class StartActivity extends BaseActivity {
         builder.setTitle(getString(R.string.privacyAgreementTitle));
         builder.setMessage(getResources().getText(R.string.privacyAgreementMessage));
         builder.setView(checkBoxView);
-        builder.setPositiveButton(R.string.next, (dialog, id) -> writeBooleanToSharedPrefs("Privacy-Policy-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this));
+        DialogInterface.OnClickListener positiveButtonListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                writeBooleanToSharedPrefs("Privacy-Policy-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this);
+                PermissionHelper.requestFirstBasePermissionsNotGranted(StartActivity.this);
+            }
+        };
+        builder.setPositiveButton(R.string.next, positiveButtonListener);
         builder.setNegativeButton(R.string.close_simra, (dialog, id) -> {
             finish();
             Toast.makeText(StartActivity.this, getString(R.string.simra_closed), Toast.LENGTH_LONG).show();
