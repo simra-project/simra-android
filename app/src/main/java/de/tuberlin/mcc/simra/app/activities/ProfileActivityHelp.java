@@ -12,27 +12,27 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.appcompat.app.AppCompatActivity;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityProfileBinding;
 import de.tuberlin.mcc.simra.app.entities.Profile;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 
-public class ProfileActivity extends AppCompatActivity {
-    private static final String TAG = "ProfileActivity_LOG";
+public class ProfileActivityHelp extends AppCompatActivity {
+    private static final String TAG = "ProfileActivityHelp_LOG";
 
     ActivityProfileBinding binding;
 
     String[] simRa_regions_config;
 
     ImageButton helmetBtn;
+
     Profile profile;
 
     @Override
@@ -48,27 +48,19 @@ public class ProfileActivity extends AppCompatActivity {
         binding.toolbar.toolbar.setSubtitle("");
         binding.toolbar.toolbarTitle.setText(R.string.title_activity_profile);
         binding.toolbar.backButton.setOnClickListener(v -> finish());
-        // binding.toolbar.helmetIcon.setOnClickListener(v -> {findViewById(R.id.button1).setVisibility(View.VISIBLE); findViewById(R.id.button2).setVisibility(View.VISIBLE);});
-
         helmetBtn = findViewById(R.id.helmet_icon);
+        //binding.toolbar.helmetIcon.setOnClickListener(v -> finish());
         helmetBtn.setOnClickListener(v -> {
-            if (findViewById(R.id.button1).getVisibility() == View.VISIBLE && findViewById(R.id.button2).getVisibility() == View.VISIBLE) {
+            if (findViewById(R.id.button1).getVisibility() == View.VISIBLE)
                 findViewById(R.id.button1).setVisibility(View.GONE);
-                findViewById(R.id.button2).setVisibility(View.GONE);
-            } else {
+            else {
                 findViewById(R.id.button1).setVisibility(View.VISIBLE);
-                findViewById(R.id.button2).setVisibility(View.VISIBLE);
             }
         });
         Button button1 = findViewById(R.id.button1);
         button1.setOnClickListener(v -> {
             findViewById(R.id.button1).setVisibility(View.GONE);
         });
-        Button button2 = findViewById(R.id.button2);
-        button2.setOnClickListener(v -> {
-            findViewById(R.id.button2).setVisibility(View.GONE);
-        });
-
 
         profile = Profile.loadProfile(null, this);
         simRa_regions_config = getRegions(this);

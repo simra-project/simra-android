@@ -78,7 +78,17 @@
                     android:textSize="13sp"
                     android:layout_toEndOf="@id/incidentSymbol"
                     android:layout_centerVertical="true"/>
-                  </RelativeLayout>
+               </RelativeLayout>
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_margin="5dp"
+                android:visibility="gone"
+                android:textSize="12sp"
+                android:text="@string/help_number_incidents" />
+
             <RelativeLayout
                 android:id="@+id/numberOfScaryIncidents"
                 android:layout_width="match_parent"
@@ -152,7 +162,25 @@
                     android:textSize="13sp"
                     android:layout_toEndOf="@id/routeDistanceSymbol2"
                     android:layout_centerVertical="true"/>
-            </RelativeLayout>
+               </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/avgdistbtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp">
+                    <Button
+                        android:id="@+id/button2"
+                        style="@style/Widget.MaterialComponents.Button.Icon"
+                        android:layout_margin="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerInParent="true"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:text="@string/help_avg_distance" />
+                </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/durationOfRides"
                 android:layout_width="match_parent"
@@ -200,7 +228,17 @@
                     android:textSize="13sp"
                     android:layout_toEndOf="@id/idleDurationSymbol"
                     android:layout_centerVertical="true"/>
-            </RelativeLayout>
+                </RelativeLayout>
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_margin="5dp"
+                android:visibility="gone"
+                android:text="@string/help_duration_idle" />
+
             <RelativeLayout
                 android:id="@+id/averageIdleDuration"
                 android:layout_width="match_parent"
@@ -250,6 +288,16 @@
                     android:layout_toEndOf="@id/co2SavingsSymbol"
                     android:layout_centerVertical="true"/>
             </RelativeLayout>
+            <Button
+                android:id="@+id/button4"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:visibility="gone"
+                android:text="@string/help_co2_savings" />
+
             <RelativeLayout
                 android:id="@+id/averageSpeed"
                 android:layout_width="match_parent"
@@ -292,6 +340,20 @@
             android:layout_marginTop="10dp"
             android:text="@string/rideDistribution"
             android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/button5"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/barChartHeader"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:textSize="15sp"
+            android:visibility="gone"
+            android:text="@string/help_bar_chart" />
+
 
         <TextView
             android:id="@+id/barChartXAxisName"

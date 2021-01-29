@@ -347,4 +347,23 @@
     <string name="obsConnecting">Connecting to OpenBikeSensor</string>
     <string name="obsTutorial">\nPlease hold your hand close to the distance sensor for 3 seconds</string>
     <string name="obs">OpenBikeSensor</string>
+    <string name="close_pass">Is this a Close Pass Incident?</string>
+
+
+    <!-- 66 -->
+    <string name="more_information">For more information to our project click the topic of interest.</string>
+    <string name="toast_help_clicked">You can close the explanations pressing the logo again or each explanation individually</string>
+    <string name="help_button_desc">You can click the SimRa Logo for help and a short description of each function. Clicking the logo again closes the explanations.</string>
+    <string name="help_data">The data of all users combined is needed to calculate the representativy of the data sample.</string>
+    <string name="help_rides">Your local rides gets uploaded anonymisly.</string>
+    <string name="help_data_security">You have different privacy settings for maximum protection of your private data. Your point of departure is irrecognizable through a simple delay.</string>
+    <string name="help_ride_settings">These informations help us evaluating the sensitivity of your smatrphone to concussion.</string>
+    <string name="help_center_button">This button centers the map on your location</string>
+    <string name="help_start_stop">Press this button to start \nand stop the recording</string>
+    <string name="help_region">Choose your region, we inform you as soon as we support new regions.</string>
+    <string name="help_number_incidents">The sum of Incidents from all your uploaded rides.</string>
+    <string name="help_avg_distance">Total distance traveled / \nsum of rides</string>
+    <string name="help_duration_idle">time idle, while recording</string>
+    <string name="help_co2_savings">138g/km - Saving for cycling instead of driving the same distance in a car</string>
+    <string name="help_bar_chart">accumulated distribution of your rides across the day</string>
 </resources>

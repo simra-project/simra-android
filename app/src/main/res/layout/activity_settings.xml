@@ -42,6 +42,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="25dp" />
 
+                <Button
+                    android:id="@+id/button1"
+                    style="@style/Widget.MaterialComponents.Button.Icon"
+                    android:layout_margin="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/help_data_security"
+                    android:textAlignment="center"
+                    android:visibility="gone"
+                    android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/PrivacySettingsTitle"
                     android:layout_width="wrap_content"
@@ -160,6 +171,16 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="10dp" />
+            <Button
+                android:id="@+id/button2"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/help_ride_settings"
+                android:textAlignment="center"
+                android:visibility="gone"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/bikeTypeSpinnerTitle"

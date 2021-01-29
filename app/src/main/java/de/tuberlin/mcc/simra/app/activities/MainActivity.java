@@ -27,6 +27,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -109,6 +111,7 @@ public class MainActivity extends BaseActivity
     private MyLocationNewOverlay mLocationOverlay;
     private LocationManager locationManager;
     private Boolean recording = false;
+    private ImageButton helmetBtn;
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
@@ -280,12 +283,23 @@ public class MainActivity extends BaseActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
         // CenterMap
         ImageButton centerMap = findViewById(R.id.center_button);
         centerMap.setOnClickListener(v -> {
             Log.d(TAG, "centerMap clicked ");
             mLocationOverlay.enableFollowLocation();
             mMapController.setZoom(ZOOM_LEVEL);
+        });
+
+        // help disappears when clicked
+        Button button4 = findViewById(R.id.button4);
+        button4.setOnClickListener(view -> {
+            findViewById(R.id.button4).setVisibility(View.GONE);
+        });
+        Button button3 = findViewById(R.id.button3);
+        button3.setOnClickListener(v -> {
+            findViewById(R.id.button3).setVisibility(View.GONE);
         });
 
         binding.appBarMain.buttonStartRecording.setOnClickListener(v -> {
@@ -390,6 +404,27 @@ public class MainActivity extends BaseActivity
         registerOBSService();
     }
 
+
+    // Help    // showing help when clicking Logo
+    public void helpButtonClicked() {
+        if (findViewById(R.id.button3).getVisibility() == View.VISIBLE && findViewById(R.id.button4).getVisibility() == View.VISIBLE) {
+
+            findViewById(R.id.button3).setVisibility(View.GONE);
+            findViewById(R.id.button4).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.button3).setVisibility(View.VISIBLE);
+            findViewById(R.id.button4).setVisibility(View.VISIBLE);
+            Toast.makeText(MainActivity.this, R.string.toast_help_clicked, Toast.LENGTH_LONG)
+                    .show();
+
+            getSharedPreferences("simraPrefs", Context.MODE_PRIVATE).edit().putBoolean("introduction_help_icon",true).apply();
+           // SharedPreferences.Editor editor = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE).edit();
+           // editor.putString("introduction_help_icon", "true");
+           // editor.apply();
+        }
+    }
+
+
     public void displayButtonsForMenu() {
         binding.appBarMain.buttonStartRecording.setVisibility(View.VISIBLE);
         binding.appBarMain.buttonStopRecording.setVisibility(View.INVISIBLE);
@@ -397,9 +432,26 @@ public class MainActivity extends BaseActivity
         binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
         binding.appBarMain.reportIncidentContainer.setVisibility(View.GONE);
 
-        //binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.VISIBLE);
+
+        helmetBtn = findViewById(R.id.helmet_icon);
+        binding.appBarMain.helmetIcon.setOnClickListener(view -> helpButtonClicked());
+
+        SharedPreferences sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
+        if(sharedPrefs.getBoolean("introduction_help_icon",false)){
+            helmetBtn.setBackground(getDrawable(R.drawable.simra_logo_news));
+           // helmetBtn.setForeground(getDrawable(R.mipmap.ic_icon_news));
+        }
+
         updateOBSButtonStatus(OBSService.getConnectionState());
     }
+
+
+    private void wiggle(){
+        Animation animation=AnimationUtils.loadAnimation(this,R.anim.wiggle_animation);
+        // v.startAnimation(animation);
+       // helmetBtn.animate()=animation;
+    }
+
 
     public void displayButtonsForDrive() {
         binding.appBarMain.buttonStopRecording.setVisibility(View.VISIBLE);
@@ -617,7 +669,7 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_history) {
-            Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+            Intent intent = new Intent(MainActivity.this, RidesActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_demographic_data) {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
@@ -690,7 +742,7 @@ public class MainActivity extends BaseActivity
 
         // get the news from the downloaded config
         String[] simRa_news_config = getNews(MainActivity.this);
-        if(simRa_news_config.length <=1) {
+        if (simRa_news_config.length <= 1) {
             Log.e(TAG, "Empty simRa_new_config!");
             return;
         }
@@ -705,13 +757,13 @@ public class MainActivity extends BaseActivity
         LinearLayout linearLayout = newsView.findViewById(R.id.news_blocks);
         for (int i = 1; i < simRa_news_config.length; i++) {
             // get TextView to be filled with news element
-            TextView thisTextView = (TextView) linearLayout.getChildAt(i-1);
+            TextView thisTextView = (TextView) linearLayout.getChildAt(i - 1);
             // make TextView visible
             thisTextView.setVisibility(View.VISIBLE);
             // set text color to colorAccent, if the news element starts with a * instead of a -
-            int textColor = getResources().getColor(R.color.colorPrimary,null);
-            if(simRa_news_config[i].startsWith("*")) {
-                textColor = getResources().getColor(R.color.colorAccent,null);
+            int textColor = getResources().getColor(R.color.colorPrimary, null);
+            if (simRa_news_config[i].startsWith("*")) {
+                textColor = getResources().getColor(R.color.colorAccent, null);
             }
             thisTextView.setTextColor(textColor);
             // set text of TextView to text of news element
@@ -731,7 +783,7 @@ public class MainActivity extends BaseActivity
 
         AlertDialog finalAlertDialog = alertDialog;
         okButton.setOnClickListener(v -> {
-            SharedPref.App.News.setLastSeenNewsID(newsID,MainActivity.this);
+            SharedPref.App.News.setLastSeenNewsID(newsID, MainActivity.this);
             finalAlertDialog.cancel();
         });
 
@@ -848,8 +900,10 @@ public class MainActivity extends BaseActivity
             super.onPostExecute(s);
         }
     }
+
     private class NewsTask extends AsyncTask<String, String, String> {
         int newsID = -1;
+
         private NewsTask() {
         }
 
@@ -889,8 +943,8 @@ public class MainActivity extends BaseActivity
                 String inputLine_en;
 
                 while ((inputLine_de = in_de.readLine()) != null) {
-                    if (newsID == -1 && inputLine_de.startsWith("#")){
-                        newsID = Integer.parseInt(inputLine_de.replace("#",""));
+                    if (newsID == -1 && inputLine_de.startsWith("#")) {
+                        newsID = Integer.parseInt(inputLine_de.replace("#", ""));
                     }
                     checkNewsResponseDE.append(inputLine_de).append(System.lineSeparator());
                 }
@@ -922,7 +976,7 @@ public class MainActivity extends BaseActivity
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if(SharedPref.App.News.getLastSeenNewsID(MainActivity.this) < newsID) {
+            if (SharedPref.App.News.getLastSeenNewsID(MainActivity.this) < newsID) {
                 fireNewsPrompt();
             }
         }
