@@ -155,9 +155,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            accelerometerMatrix = event.values;
+            //accelerometerMatrix = event.values;
         } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            gyroscopeMatrix = event.values;
+            //gyroscopeMatrix = event.values;
         } else if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
             curTime = System.currentTimeMillis();
 
@@ -170,7 +170,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     recordingAllowed = true;
                 }
             }
-            linearAccelerometerMatrix = event.values;
+            //linearAccelerometerMatrix = event.values;
             if (((curTime - lastAccUpdate) >= Constants.ACCELEROMETER_FREQUENCY) && recordingAllowed) {
 
                 lastAccUpdate = curTime;
@@ -430,7 +430,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
              *    as this number of values is removed at the end of this function
              *    and we wait again till there are 30
              */
-
+            /*
             if (accelerometerQueueX.size() < 30) {
                 accelerometerQueueX.add(accelerometerMatrix[0]);
                 accelerometerQueueY.add(accelerometerMatrix[1]);
@@ -450,30 +450,31 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 rotationQueueAcc.add(rotationMatrix[4]);
 
             }
-            if (accelerometerQueueX.size() >= 30 && linearAccelerometerQueueX.size() >= 30 && rotationQueueX.size() >= 30) {
+             */
+            //if (accelerometerQueueX.size() >= 30 && linearAccelerometerQueueX.size() >= 30 && rotationQueueX.size() >= 30) {
                 DataLogEntry.DataLogEntryBuilder dataLogEntryBuilder = DataLogEntry.newBuilder();
                 dataLogEntryBuilder.withTimestamp(curTime);
                 dataLogEntryBuilder.withAccelerometer(
                         // Every average is computed over 30 data points
-                        computeAverage(accelerometerQueueX),
-                        computeAverage(accelerometerQueueY),
-                        computeAverage(accelerometerQueueZ)
+                0f,0f,0f//        computeAverage(accelerometerQueueX),
+                                                                           //computeAverage(accelerometerQueueY),
+                                                                           //computeAverage(accelerometerQueueZ)
                 );
 
                 dataLogEntryBuilder.withLinearAccelerometer(
                         // Every average is computed over 30 data points
-                        computeAverage(linearAccelerometerQueueX),
-                        computeAverage(linearAccelerometerQueueY),
-                        computeAverage(linearAccelerometerQueueZ)
+                        0f,0f,0f//computeAverage(linearAccelerometerQueueX),
+                        //computeAverage(linearAccelerometerQueueY),
+                        //computeAverage(linearAccelerometerQueueZ)
                 );
 
                 dataLogEntryBuilder.withRotation(
                         // Every average is computed over 30 data points
-                        computeAverage(rotationQueueX),
-                        computeAverage(rotationQueueY),
-                        computeAverage(rotationQueueZ),
-                        computeAverage(rotationQueueC),
-                        computeAverage(rotationQueueAcc)
+                        0f,0f,0f,0f,0f//computeAverage(rotationQueueX),
+                        //computeAverage(rotationQueueY),
+                        //computeAverage(rotationQueueZ),
+                        //computeAverage(rotationQueueC),
+                        //computeAverage(rotationQueueAcc)
                 );
 
                 if ((lastAccUpdate - lastGPSUpdate) >= Constants.GPS_FREQUENCY) {
@@ -513,9 +514,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     }
                 }
                 dataLogEntryBuilder.withGyroscope(
-                        gyroscopeMatrix[0],
-                        gyroscopeMatrix[1],
-                        gyroscopeMatrix[2]
+                        0f,0f,0f//gyroscopeMatrix[0],
+                        //gyroscopeMatrix[1],
+                        //gyroscopeMatrix[2]
                 );
 
                 if (lastOBSDistanceValues.size() > 0) {
@@ -540,7 +541,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 } else {
                     endTime = curTime;
                 }
-
+                /*
                 for (int i = 0; i < Constants.MVG_AVG_STEP; i++) {
                     accelerometerQueueX.remove();
                     accelerometerQueueY.remove();
@@ -553,7 +554,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     rotationQueueZ.remove();
                     rotationQueueC.remove();
                 }
-            }
+                 */
+            //}
         }
     }
 
