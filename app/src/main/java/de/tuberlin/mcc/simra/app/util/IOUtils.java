@@ -25,8 +25,8 @@ public class IOUtils {
          * @return Path with trailing slash
          */
         public static String getBaseFolderPath(Context ctx) {
-            // return getExternalBaseDirectoryPath();
-            return ctx.getFilesDir() + "/";
+            return getExternalBaseDirectoryPath();
+            // return ctx.getFilesDir() + "/";
         }
 
         /**
