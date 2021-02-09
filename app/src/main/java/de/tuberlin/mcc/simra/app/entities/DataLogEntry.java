@@ -29,7 +29,6 @@ public class DataLogEntry {
     public final Float rotationY;
     public final Float rotationZ;
     public final Float rotationC;
-    public final Long GPSTime;
 
     private DataLogEntry(DataLogEntryBuilder dataLogEntryBuilder) {
         this.rideId = dataLogEntryBuilder.rideId;
@@ -55,7 +54,6 @@ public class DataLogEntry {
         this.rotationY = dataLogEntryBuilder.rotationY;
         this.rotationZ = dataLogEntryBuilder.rotationZ;
         this.rotationC = dataLogEntryBuilder.rotationC;
-        this.GPSTime = dataLogEntryBuilder.GPSTime;
     }
 
     public static DataLogEntry parseDataLogEntryFromLine(String string) {
@@ -66,8 +64,7 @@ public class DataLogEntry {
             dataLogEntryBuilder.withGPS(
                     Double.parseDouble(dataLogLine[0]),
                     Double.parseDouble(dataLogLine[1]),
-                    Float.parseFloat(dataLogLine[6]),
-                    Long.parseLong(dataLogLine[22])
+                    Float.parseFloat(dataLogLine[6])
             );
         }
 
@@ -110,7 +107,7 @@ public class DataLogEntry {
             );
         }
 
-        if(dataLogLine.length > 22 && !dataLogLine[18].isEmpty() && !dataLogLine[19].isEmpty() && !dataLogLine[20].isEmpty() && !dataLogLine[21].isEmpty() && !dataLogLine[22].isEmpty()) {
+        if(dataLogLine.length > 20 && !dataLogLine[18].isEmpty() && !dataLogLine[19].isEmpty() && !dataLogLine[20].isEmpty() && !dataLogLine[21].isEmpty()) {
             dataLogEntryBuilder.withRotation(
                     Float.parseFloat(dataLogLine[18]),
                     Float.parseFloat(dataLogLine[19]),
@@ -152,8 +149,7 @@ public class DataLogEntry {
                 (rotationX != null ? rotationX : "") + "," +
                 (rotationY != null ? rotationY : "") + "," +
                 (rotationZ != null ? rotationZ : "") + "," +
-                (rotationC != null ? rotationC : "") + "," +
-                (GPSTime != null ? GPSTime : "");
+                (rotationC != null ? rotationC : "");
     }
 
     public static final class DataLogEntryBuilder {
@@ -180,7 +176,6 @@ public class DataLogEntry {
         private Float rotationY;
         private Float rotationZ;
         private Float rotationC;
-        private Long GPSTime;
 
         private DataLogEntryBuilder() {
         }
@@ -202,11 +197,10 @@ public class DataLogEntry {
             return this;
         }
 
-        public DataLogEntryBuilder withGPS(Double latitude, Double longitude, Float GPSAccuracy, Long GPSTime) {
+        public DataLogEntryBuilder withGPS(Double latitude, Double longitude, Float GPSAccuracy) {
             this.latitude = latitude;
             this.longitude = longitude;
             this.GPSAccuracy = GPSAccuracy;
-            this.GPSTime = GPSTime;
             return this;
         }
 

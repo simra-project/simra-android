@@ -28,11 +28,12 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
@@ -52,11 +53,11 @@ import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVE
 import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_DISTANCE;
 import static de.tuberlin.mcc.simra.app.services.OBSService.EXTRA_VALUE_SERIALIZED;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.mergeGPSandSensorLines;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
 public class RecorderService extends Service implements SensorEventListener, LocationListener {
     public static final String TAG = "RecorderService_LOG:";
-    //long curTime;
     long startTime = 0;
     long endTime;
     float[] accelerometerMatrix = new float[3];
@@ -130,7 +131,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private SensorManager sensorManager = null;
     private PowerManager.WakeLock wakeLock = null;
     private final IBinder mBinder = new MyBinder();
-    private final StringBuilder accGpsString = new StringBuilder();
+    private String accGpsString = "";
+    private Queue<DataLogEntry> gpsLines = new LinkedList<>();
+    private Queue<DataLogEntry> sensorLines = new LinkedList<>();
     private IncidentLog incidentLog = null;
 
     public int getCurrentRideKey() {
@@ -388,7 +391,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         if (recordingAllowed && lineAdded) {
             recordingHandler.removeCallbacksAndMessages(null);
             int region = lookUpIntSharedPrefs("Region", 0, "Profile", this);
-            overwriteFile((IOUtils.Files.getFileInfoLine() + DataLog.DATA_LOG_HEADER + System.lineSeparator() + accGpsString.toString()), IOUtils.Files.getGPSLogFile(key, false, this));
+            accGpsString = mergeGPSandSensorLines(gpsLines,sensorLines);
+            overwriteFile((IOUtils.Files.getFileInfoLine() + DataLog.DATA_LOG_HEADER + System.lineSeparator() + accGpsString), IOUtils.Files.getGPSLogFile(key, false, this));
             MetaData.updateOrAddMetaDataEntryForRide(new MetaDataEntry(key, startTime, endTime, MetaData.STATE.JUST_RECORDED, 0, waitedTime, Math.round(route.getDistance()), 0, region), this);
             IncidentLog.saveIncidentLog(incidentLog, this);
             editor.putInt("RIDE-KEY", key + 1);
@@ -488,6 +492,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                  as this number of values is removed at the end of this function
                  and we wait again till there are 30
              */
+            boolean isGPSLine = false;
             long start = System.currentTimeMillis() - startTime;
             /**/
             if (accelerometerQueueX.size() < 30) {
@@ -538,8 +543,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 );
 
                 if ((lastAccUpdate - lastGPSUpdate) >= Constants.GPS_FREQUENCY) {
+                    isGPSLine = true;
                     lastGPSUpdate = lastAccUpdate;
                     Location thisLocation = lastLocation;
+                    dataLogEntryBuilder.withTimestamp(thisLocation.getTime());
+
                     if (thisLocation == null) {
                         thisLocation = locationManager.getLastKnownLocation(LocationManager
                                 .GPS_PROVIDER);
@@ -556,8 +564,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     dataLogEntryBuilder.withGPS(
                             thisLocation.getLatitude(),
                             thisLocation.getLongitude(),
-                            thisLocation.getAccuracy(),
-                            thisLocation.getTime()
+                            thisLocation.getAccuracy()
                     );
 
                     if (incidentDuringRide != null) {
@@ -593,9 +600,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     }
                 }
 
-                String str = dataLogEntryBuilder.build().stringifyDataLogEntry();
-
-                accGpsString.append(str).append(System.getProperty("line.separator"));
+                if(isGPSLine) {
+                    gpsLines.add(dataLogEntryBuilder.build());
+                } else {
+                    sensorLines.add(dataLogEntryBuilder.build());
+                }
                 lineAdded = true;
 
                 endTime = System.currentTimeMillis();
