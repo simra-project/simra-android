@@ -65,7 +65,7 @@ public class ProfileActivity extends AppCompatActivity {
             findViewById(R.id.button1).setVisibility(View.GONE);
         });
         Button button2 = findViewById(R.id.button2);
-        button2.setOnClickListener(v -> {
+        button1.setOnClickListener(v -> {
             findViewById(R.id.button2).setVisibility(View.GONE);
         });
 

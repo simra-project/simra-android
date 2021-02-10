@@ -27,8 +27,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -111,7 +109,6 @@ public class MainActivity extends BaseActivity
     private MyLocationNewOverlay mLocationOverlay;
     private LocationManager locationManager;
     private Boolean recording = false;
-    private ImageButton helmetBtn;
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
@@ -416,11 +413,6 @@ public class MainActivity extends BaseActivity
             findViewById(R.id.button4).setVisibility(View.VISIBLE);
             Toast.makeText(MainActivity.this, R.string.toast_help_clicked, Toast.LENGTH_LONG)
                     .show();
-
-            getSharedPreferences("simraPrefs", Context.MODE_PRIVATE).edit().putBoolean("introduction_help_icon",true).apply();
-           // SharedPreferences.Editor editor = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE).edit();
-           // editor.putString("introduction_help_icon", "true");
-           // editor.apply();
         }
     }
 
@@ -431,27 +423,11 @@ public class MainActivity extends BaseActivity
 
         binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
         binding.appBarMain.reportIncidentContainer.setVisibility(View.GONE);
-
-
-        helmetBtn = findViewById(R.id.helmet_icon);
         binding.appBarMain.helmetIcon.setOnClickListener(view -> helpButtonClicked());
 
-        SharedPreferences sharedPrefs = getSharedPreferences("simraPrefs", Context.MODE_PRIVATE);
-        if(sharedPrefs.getBoolean("introduction_help_icon",false)){
-            helmetBtn.setBackground(getDrawable(R.drawable.simra_logo_news));
-           // helmetBtn.setForeground(getDrawable(R.mipmap.ic_icon_news));
-        }
-
+        //binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.VISIBLE);
         updateOBSButtonStatus(OBSService.getConnectionState());
     }
-
-
-    private void wiggle(){
-        Animation animation=AnimationUtils.loadAnimation(this,R.anim.wiggle_animation);
-        // v.startAnimation(animation);
-       // helmetBtn.animate()=animation;
-    }
-
 
     public void displayButtonsForDrive() {
         binding.appBarMain.buttonStopRecording.setVisibility(View.VISIBLE);

@@ -57,7 +57,6 @@ public class SettingsActivity extends BaseActivity {
         binding.toolbar.toolbarTitle.setText(R.string.title_activity_settings);
         binding.toolbar.backButton.setOnClickListener(v -> finish());
 
-        // help through icon
         helmetBtn = findViewById(R.id.helmet_icon);
         helmetBtn.setOnClickListener(v -> {
             if (findViewById(R.id.button1).getVisibility() == View.VISIBLE && findViewById(R.id.button2).getVisibility() == View.VISIBLE) {
@@ -76,7 +75,7 @@ public class SettingsActivity extends BaseActivity {
             findViewById(R.id.button1).setVisibility(View.GONE);
         });
         Button button2 = findViewById(R.id.button2);
-        button2.setOnClickListener(v -> {
+        button1.setOnClickListener(v -> {
             findViewById(R.id.button2).setVisibility(View.GONE);
         });
         // Slider: Duration

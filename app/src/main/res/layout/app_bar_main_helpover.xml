@@ -142,7 +142,7 @@
         android:maxLines="5"
         android:textSize="15sp"
         android:visibility="gone"
-        android:text="@string/help_center_button" />
+        android:text="Dieser Button zentriert die Karte auf ihren aktuellen Ort" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_ride_settings_obs"
@@ -181,7 +181,7 @@
         android:textSize="15sp"
         android:maxLines="3"
         android:visibility="gone"
-        android:text="@string/help_start_stop" />
+        android:text="Auf diesem Button starten \nund Stoppen  Sie die Aufzeichnung" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/button_stop_recording"
