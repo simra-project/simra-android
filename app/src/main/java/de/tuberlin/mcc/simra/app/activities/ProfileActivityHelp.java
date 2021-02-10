@@ -49,7 +49,7 @@ public class ProfileActivityHelp extends AppCompatActivity {
         binding.toolbar.toolbarTitle.setText(R.string.title_activity_profile);
         binding.toolbar.backButton.setOnClickListener(v -> finish());
         helmetBtn = findViewById(R.id.helmet_icon);
-        //binding.toolbar.helmetIcon.setOnClickListener(v -> finish());
+        binding.toolbar.helmetIcon.setOnClickListener(v -> finish());
         helmetBtn.setOnClickListener(v -> {
             if (findViewById(R.id.button1).getVisibility() == View.VISIBLE)
                 findViewById(R.id.button1).setVisibility(View.GONE);

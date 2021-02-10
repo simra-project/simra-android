@@ -42,18 +42,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="25dp" />
 
-                <Button
-                    android:id="@+id/button1"
-                    style="@style/Widget.MaterialComponents.Button.Icon"
-                    android:layout_margin="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ihre Datenschutz Einstellungen geben Ihnen die maximale Kontrolle und machen Ihren Abfahrtsort unkenntlich.
-                    In dicht besidelten Gebieten ist dies nicht notwendig."
-                    android:textAlignment="center"
-                    android:visibility="gone"
-                    android:textSize="12sp" />
-
                 <TextView
                     android:id="@+id/PrivacySettingsTitle"
                     android:layout_width="wrap_content"
@@ -172,16 +160,6 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="10dp" />
-            <Button
-                android:id="@+id/button2"
-                style="@style/Widget.MaterialComponents.Button.Icon"
-                android:layout_margin="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ihre Einstellungen geben uns Auskunft über die Empfindlichkeit Ihres Smartphones gegenüber Erschütterungen. Und helfen so, die Senssordaten besser zu interpretieren."
-                android:textAlignment="center"
-                android:visibility="gone"
-                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/bikeTypeSpinnerTitle"

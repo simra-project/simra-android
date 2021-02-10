@@ -83,8 +83,8 @@
                 android:id="@+id/button1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.Button.Icon"
-                android:layout_margin="5dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
                 android:visibility="gone"
                 android:textSize="12sp"
                 android:text="Die Anzahl der Vorfälle in ihren hochgeladenen Fahrten" />
@@ -171,8 +171,6 @@
                     android:layout_marginBottom="5dp">
                     <Button
                         android:id="@+id/button2"
-                        style="@style/Widget.MaterialComponents.Button.Icon"
-                        android:layout_margin="5dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
@@ -234,8 +232,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                style="@style/Widget.MaterialComponents.Button.Icon"
-                android:layout_margin="5dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
                 android:visibility="gone"
                 android:text="Zeit während dem der Fahrt ohne Bewegeung" />
 
@@ -290,8 +288,6 @@
             </RelativeLayout>
             <Button
                 android:id="@+id/button4"
-                style="@style/Widget.MaterialComponents.Button.Icon"
-                android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
@@ -343,8 +339,6 @@
 
         <Button
             android:id="@+id/button5"
-            style="@style/Widget.MaterialComponents.Button.Icon"
-            android:layout_margin="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignEnd="@id/barChartHeader"

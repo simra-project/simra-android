@@ -3,10 +3,7 @@ package de.tuberlin.mcc.simra.app.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -24,7 +21,6 @@ public class AboutActivity extends BaseActivity {
      * Layout Binding.
      */
     ActivityAboutBinding binding;
-    ImageButton helmetBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,25 +37,6 @@ public class AboutActivity extends BaseActivity {
         binding.toolbar.toolbarTitle.setText(R.string.title_activity_about_simra);
 
         binding.toolbar.backButton.setOnClickListener(v -> finish());
-
-        helmetBtn = findViewById(R.id.helmet_icon);
-
-        helmetBtn.setOnClickListener(v -> {
-            if (findViewById(R.id.button1).getVisibility() == View.VISIBLE) {
-                findViewById(R.id.button1).setVisibility(View.GONE);
-                // findViewById(R.id.button2).setVisibility(View.GONE);
-            } else {
-                findViewById(R.id.button1).setVisibility(View.VISIBLE);
-                // findViewById(R.id.button2).setVisibility(View.VISIBLE);
-
-                Toast.makeText(AboutActivity.this, R.string.toast_help_clicked, Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
-        Button button1 = findViewById(R.id.button1);
-        button1.setOnClickListener(v -> {
-            findViewById(R.id.button1).setVisibility(View.GONE);
-        });
 
         String[] items = getResources().getStringArray(R.array.aboutSimraItems);
         binding.listView.setAdapter(new ArrayAdapter<>(AboutActivity.this,
