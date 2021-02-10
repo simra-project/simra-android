@@ -78,13 +78,14 @@
                     android:textSize="13sp"
                     android:layout_toEndOf="@id/incidentSymbol"
                     android:layout_centerVertical="true"/>
-                  </RelativeLayout>
+            </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/numberOfScaryIncidents"
                 android:layout_width="match_parent"
                 android:layout_height="32sp"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp">
+
                 <ImageView
                     android:id="@+id/scaryIncidentsSymbol"
                     android:layout_width="24dp"
