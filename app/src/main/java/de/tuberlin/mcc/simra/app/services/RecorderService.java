@@ -160,34 +160,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             /**/gyroscopeMatrix = event.values;/**/
         } else if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
-            /*curTime = System.currentTimeMillis();*/
-            /*
-            // Privacy filter: Set recordingAllowed to true, when enough time (privacyDuration) passed
-            // since the user pressed Start Recording AND there is enough distance (privacyDistance)
-            // between the starting location and the current location.
-            if (!recordingAllowed && startLocation != null && lastLocation != null) {
-                if ((startLocation.distanceTo(lastLocation) >= privacyDistance)
-                        && ((curTime - startTime) > privacyDuration)) {
-                    recordingAllowed = true;
-                }
-            }
-            */
+
             /**/linearAccelerometerMatrix = event.values;/**/
-            /*
-            if (((curTime - lastAccUpdate) >= Constants.ACCELEROMETER_FREQUENCY) && recordingAllowed) {
 
-                lastAccUpdate = curTime;
-                // Write data to file in background thread
-                try {
-
-                    Runnable insertHandler = new InsertHandler(accelerometerMatrix, gyroscopeMatrix, linearAccelerometerMatrix, rotationMatrix);
-                    executor.execute(insertHandler);
-
-                } catch (Exception e) {
-                    Log.e(TAG, "insertData: " + e.getMessage(), e);
-                }
-            }
-            */
         } else if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             rotationMatrix = event.values;
         }
@@ -203,15 +178,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public void onLocationChanged(Location location) {
-
-        // Take only GPS fixes that are somewhat accurate to prevent spikes in the route.
-        // if (location.getAccuracy() < Constants.GPS_ACCURACY_THRESHOLD) {
-            // Set start location. Important for privacy distance.
-            if (startLocation == null) {
-                startLocation = location;
-            }
-            lastLocation = location;
-        //}
+        // Set start location. Important for privacy distance.
+        if (startLocation == null) {
+            startLocation = location;
+        }
+        lastLocation = location;
     }
 
     @Override
@@ -273,9 +244,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG + ":RecorderService");
 
-        // Executor service for writing data
-        /*executor = Executors.newSingleThreadExecutor();*/
-
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverDistanceValue, new IntentFilter(ACTION_VALUE_RECEIVED_DISTANCE));
         localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverClosePassEvent, new IntentFilter(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT));
@@ -324,21 +292,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     recordingAllowed = true;
                     /**/
                     recordingStarterHandler.removeCallbacksAndMessages(null);/**/
-                    /*
-                    float[] actualAccelerometerMatrix = accelerometerMatrix;
-                    float[] actualGyroscopeMatrix = gyroscopeMatrix;
-                    float[] actualLinearAccelerometerMatrix = linearAccelerometerMatrix;
-                    float[] actualRotationMatrix = rotationMatrix;
-                    Location actualLocation = lastLocation;
-                    if (actualLocation == null) {
-                        actualLocation = locationManager.getLastKnownLocation(LocationManager
-                                .GPS_PROVIDER);
-                    }
-                    if (actualLocation == null) {
-                        actualLocation = new Location(LocationManager
-                                .GPS_PROVIDER);
-                    }
-                    */
                     Runnable recorder = new InsertHandler(/*actualLocation,actualAccelerometerMatrix, actualGyroscopeMatrix, actualLinearAccelerometerMatrix, actualRotationMatrix*/);
                     recordingHandler.post(recorder);
 
@@ -399,9 +352,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             editor.apply();
         }
 
-        // Prevent new tasks from being added to thread
-        /*executor.shutdown();*/
-
         // Unregister receiver and listener prior to gpsExecutor shutdown
         sensorManager.unregisterListener(this);
 
@@ -417,29 +367,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         // Remove the Notification
         ForegroundServiceNotificationManager.cancelNotification(this);
-        /*
-        // Create new thread to wait for gpsExecutor to clear queue and wait for termination
-        new Thread(() -> {
-            try {
-                // Wait for all tasks to finish before we proceed
-                while (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                    Log.d(TAG, "Waiting for current tasks to finish");
-                }
-                Log.d(TAG, "No queue to clear");
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Exception caught while waiting for finishing gpsExecutor tasks");
-                executor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
 
-            if (executor.isTerminated()) {
-                // Stop everything else once the task queue is clear
-                stopForeground(true);
-                wakeLock.release();
-
-            }
-        }).start();
-        */
         /**/stopForeground(true);/**/
         /**/wakeLock.release();/**/
     }
@@ -458,22 +386,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     class InsertHandler implements Runnable {
 
-        /*
-        final float[] accelerometerMatrix;
-        final float[] gyroscopeMatrix;
-        final float[] linearAccelerometerMatrix;
-        final float[] rotationMatrix;
-        final Location lastLocation;
-        */
-        // Store the current accGpsFile array values into THIS objects arrays, and db insert from this object
-        public InsertHandler(/*Location lastLocation, float[] accelerometerMatrix, float[] gyroscopeMatrix, float[] linearAccelerometerMatrix, float[] rotationMatrix*/) {
-            /*
-            this.accelerometerMatrix = accelerometerMatrix;
-            this.gyroscopeMatrix = gyroscopeMatrix;
-            this.linearAccelerometerMatrix = linearAccelerometerMatrix;
-            this.rotationMatrix = rotationMatrix;
-            this.lastLocation = lastLocation;
-            */
+        public InsertHandler() {
         }
 
         @SuppressLint("MissingPermission")
@@ -519,7 +432,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 dataLogEntryBuilder.withTimestamp(lastAccUpdate);
                 dataLogEntryBuilder.withAccelerometer(
                         // Every average is computed over 30 data points
-                        /*0f,0f,0f*/
                         /**/computeAverage(accelerometerQueueX),
                         computeAverage(accelerometerQueueY),
                         computeAverage(accelerometerQueueZ)/**/
@@ -527,7 +439,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 dataLogEntryBuilder.withLinearAccelerometer(
                         // Every average is computed over 30 data points
-                        /*0f,0f,0f*/
                         /**/computeAverage(linearAccelerometerQueueX),
                         computeAverage(linearAccelerometerQueueY),
                         computeAverage(linearAccelerometerQueueZ)/**/
@@ -535,7 +446,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 dataLogEntryBuilder.withRotation(
                         // Every average is computed over 30 data points
-                        /*0f,0f,0f,0f,0f*/
                         /**/computeAverage(rotationQueueX),
                         computeAverage(rotationQueueY),
                         computeAverage(rotationQueueZ),
@@ -582,7 +492,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     }
                 }
                 dataLogEntryBuilder.withGyroscope(
-                        /*0f,0f,0f*/
                         /**/gyroscopeMatrix[0],
                         gyroscopeMatrix[1],
                         gyroscopeMatrix[2]/**/

@@ -458,18 +458,6 @@ public class Utils {
             }
         }
 
-        /*
-        for (int i = 0; i < sensorLines.size(); i++) {
-            DataLogEntry sensorLine = sensorLines.get(i);
-            long sensorTS = sensorLine.timestamp;
-            for (int j = 0; j < gpsLines.size(); j++) {
-                DataLogEntry gpsLine = gpsLines.get(i);
-                long gpsTS = gpsLine.timestamp;
-            }
-
-        }
-        */
-
         return accGpsString.toString();
     }
 

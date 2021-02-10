@@ -59,8 +59,6 @@ public class StartActivity extends BaseActivity {
         UpdateHelper.migrate(this);
 
         // Check Permissions
-
-        //navigateIfAllPermissionsGranted();
         if (allPermissionGranted()) {
             Intent intent = new Intent(StartActivity.this, MainActivity.class);
             startActivity(intent);
