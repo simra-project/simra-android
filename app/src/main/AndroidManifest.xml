@@ -84,7 +84,7 @@
             android:label="@string/title_activity_settings"
             android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".activities.RidesActivity"
+            android:name=".activities.HistoryActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_history"
             android:parentActivityName=".activities.MainActivity"

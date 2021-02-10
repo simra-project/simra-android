@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -37,7 +36,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.databinding.ActivityRidesBinding;
+import de.tuberlin.mcc.simra.app.databinding.ActivityHistoryBinding;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
@@ -47,24 +46,23 @@ import de.tuberlin.mcc.simra.app.util.SharedPref;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 
-public class RidesActivity extends BaseActivity {
+public class HistoryActivity extends BaseActivity {
     private static final String TAG = "HistoryActivity_LOG";
-    ActivityRidesBinding binding;
+    ActivityHistoryBinding binding;
     boolean exitWhenDone = false;
-    ImageButton helmetBtn;
 
     String[] ridesArr;
     BroadcastReceiver br;
 
     public static void startHistoryActivity(Context context) {
-        Intent intent = new Intent(context, RidesActivity.class);
+        Intent intent = new Intent(context, HistoryActivity.class);
         context.startActivity(intent);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityRidesBinding.inflate(LayoutInflater.from(this));
+        binding = ActivityHistoryBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
 
         //  Toolbar
@@ -75,16 +73,6 @@ public class RidesActivity extends BaseActivity {
         binding.toolbar.toolbarTitle.setText(R.string.title_activity_history);
 
         binding.toolbar.backButton.setOnClickListener(v -> finish());
-        helmetBtn = findViewById(R.id.helmet_icon);
-        helmetBtn.setOnClickListener(v -> helpButtonClicked());
-        Button button2 = findViewById(R.id.button2);
-        button2.setOnClickListener(v -> {
-            findViewById(R.id.button2).setVisibility(View.GONE);
-        });
-        Button button1 = findViewById(R.id.button1);
-        button1.setOnClickListener(v -> {
-            findViewById(R.id.button1).setVisibility(View.GONE);
-        });
 
 
         binding.listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -112,32 +100,15 @@ public class RidesActivity extends BaseActivity {
             }
         });
 
-
-
         binding.upload.setOnClickListener(view -> {
-            if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", RidesActivity.this)) {
+            if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", HistoryActivity.this)) {
                 fireUploadPrompt();
             } else {
-                Intent intent = new Intent(RidesActivity.this, UploadService.class);
+                Intent intent = new Intent(HistoryActivity.this, UploadService.class);
                 startService(intent);
-                Toast.makeText(RidesActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
+                Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    // Help    // showing help when clicking Logo
-    public void helpButtonClicked() {
-        if (findViewById(R.id.button1).getVisibility() == View.VISIBLE && findViewById(R.id.button2).getVisibility() == View.VISIBLE) {
-
-            findViewById(R.id.button1).setVisibility(View.GONE);
-            findViewById(R.id.button2).setVisibility(View.GONE);
-        } else {
-            findViewById(R.id.button1).setVisibility(View.VISIBLE);
-            findViewById(R.id.button2).setVisibility(View.VISIBLE);
-
-            Toast.makeText(RidesActivity.this, R.string.toast_help_clicked, Toast.LENGTH_LONG)
-                    .show();
-        }
     }
 
     private void refreshMyRides() {
@@ -230,7 +201,7 @@ public class RidesActivity extends BaseActivity {
     }
 
     public void fireDeletePrompt(int position, MyArrayAdapter arrayAdapter) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(RidesActivity.this);
+        AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.delete_file_warning));
         alert.setPositiveButton(R.string.delete_ride_approve, (dialog, id) -> {
@@ -249,7 +220,7 @@ public class RidesActivity extends BaseActivity {
                 }
             }
             MetaData.deleteMetaDataEntryForRide(Integer.parseInt(clicked), this);
-            Toast.makeText(RidesActivity.this, R.string.ride_deleted, Toast.LENGTH_SHORT).show();
+            Toast.makeText(HistoryActivity.this, R.string.ride_deleted, Toast.LENGTH_SHORT).show();
             refreshMyRides();
         });
         alert.setNegativeButton(R.string.cancel, (dialog, id) -> {
@@ -259,16 +230,16 @@ public class RidesActivity extends BaseActivity {
     }
 
     public void fireUploadPrompt() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(RidesActivity.this);
+        AlertDialog.Builder alert = new AlertDialog.Builder(HistoryActivity.this);
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.upload_file_warning));
         alert.setPositiveButton(R.string.upload, (dialog, id) -> {
-            writeBooleanToSharedPrefs("uploadWarningShown", true, "simraPrefs", RidesActivity.this);
-            Intent intent = new Intent(RidesActivity.this, UploadService.class);
+            writeBooleanToSharedPrefs("uploadWarningShown", true, "simraPrefs", HistoryActivity.this);
+            Intent intent = new Intent(HistoryActivity.this, UploadService.class);
             startService(intent);
-            Toast.makeText(RidesActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
+            Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
             if (exitWhenDone) {
-                RidesActivity.this.moveTaskToBack(true);
+                HistoryActivity.this.moveTaskToBack(true);
             }
         });
         alert.setNegativeButton(R.string.cancel, (dialog, id) -> {
@@ -344,7 +315,7 @@ public class RidesActivity extends BaseActivity {
                 holder.status.setBackground(null);
             }
             holder.duration.setText(itemComponents[3]);
-            if (SharedPref.Settings.DisplayUnit.isImperial(RidesActivity.this)) {
+            if (SharedPref.Settings.DisplayUnit.isImperial(HistoryActivity.this)) {
                 holder.distance.setText(String.valueOf(Math.round(((Double.parseDouble(itemComponents[5]) / 1600) * 100.0)) / 100.0));
                 holder.distanceUnit.setText("mi");
             } else {
@@ -369,7 +340,7 @@ public class RidesActivity extends BaseActivity {
                         String fileOutput = dirFile.getName();
                         Log.d(TAG, "fileOutput: " + fileOutput + " clicked: " + clicked + "_");
                         if (fileOutput.startsWith(clicked + "_")) {
-                            ShowRouteActivity.startShowRouteActivity(Integer.parseInt(fileOutput.split("_", -1)[0]), Integer.parseInt(metaDataLines.get(metaDataLines.size() - position - 1)[3]), RidesActivity.this);
+                            ShowRouteActivity.startShowRouteActivity(Integer.parseInt(fileOutput.split("_", -1)[0]), Integer.parseInt(metaDataLines.get(metaDataLines.size() - position - 1)[3]), HistoryActivity.this);
                         }
                     }
                 }

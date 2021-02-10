@@ -6,10 +6,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.SeekBar;
 
 import java.util.ArrayList;
@@ -31,8 +28,6 @@ public class ProfileActivityHelp extends AppCompatActivity {
 
     String[] simRa_regions_config;
 
-    ImageButton helmetBtn;
-
     Profile profile;
 
     @Override
@@ -48,19 +43,8 @@ public class ProfileActivityHelp extends AppCompatActivity {
         binding.toolbar.toolbar.setSubtitle("");
         binding.toolbar.toolbarTitle.setText(R.string.title_activity_profile);
         binding.toolbar.backButton.setOnClickListener(v -> finish());
-        helmetBtn = findViewById(R.id.helmet_icon);
         binding.toolbar.helmetIcon.setOnClickListener(v -> finish());
-        helmetBtn.setOnClickListener(v -> {
-            if (findViewById(R.id.button1).getVisibility() == View.VISIBLE)
-                findViewById(R.id.button1).setVisibility(View.GONE);
-            else {
-                findViewById(R.id.button1).setVisibility(View.VISIBLE);
-            }
-        });
-        Button button1 = findViewById(R.id.button1);
-        button1.setOnClickListener(v -> {
-            findViewById(R.id.button1).setVisibility(View.GONE);
-        });
+
 
         profile = Profile.loadProfile(null, this);
         simRa_regions_config = getRegions(this);
