@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Queue;
 
 import javax.net.ssl.HttpsURLConnection;
 import de.tuberlin.mcc.simra.app.BuildConfig;
@@ -440,6 +441,24 @@ public class Utils {
         }
 
         return incidents;
+    }
+
+    public static String mergeGPSandSensorLines(Queue<DataLogEntry> gpsLines, Queue<DataLogEntry> sensorLines) {
+        StringBuilder accGpsString = new StringBuilder();
+
+        while(!gpsLines.isEmpty() || !sensorLines.isEmpty()) {
+            DataLogEntry gpsLine = gpsLines.peek();
+            DataLogEntry sensorLine = sensorLines.peek();
+            long gpsTS = gpsLine != null ? gpsLine.timestamp : Long.MAX_VALUE;
+            long sensorTS = sensorLine != null ? sensorLine.timestamp : Long.MAX_VALUE;
+            if (gpsTS <= sensorTS) {
+                accGpsString.append(gpsLines.poll().stringifyDataLogEntry()).append(System.lineSeparator());
+            } else {
+                accGpsString.append(sensorLines.poll().stringifyDataLogEntry()).append(System.lineSeparator());
+            }
+        }
+
+        return accGpsString.toString();
     }
 
     /**

@@ -10,8 +10,8 @@ android {
         applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 72
-        versionName "72.0"
+        versionCode 73
+        versionName "73.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
@@ -48,8 +48,8 @@ android {
             initWith buildTypes.release
         }
     }
-    viewBinding {
-        enabled = true
+    buildFeatures {
+        viewBinding = true
     }
     compileOptions {
         sourceCompatibility = '1.8'

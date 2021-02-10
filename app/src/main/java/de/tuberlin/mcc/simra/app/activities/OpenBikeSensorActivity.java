@@ -94,7 +94,7 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
 
             }
         });
-        binding.handleBarWidth.setMaxValue(40);
+        binding.handleBarWidth.setMaxValue(60);
         binding.handleBarWidth.setMinValue(0);
         binding.handleBarWidth.setValue(SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(this));
         binding.handleBarWidth.setOnValueChangedListener((numberPicker, oldVal, newVal) -> {
