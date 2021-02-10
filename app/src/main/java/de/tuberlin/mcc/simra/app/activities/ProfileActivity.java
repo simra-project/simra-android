@@ -1,12 +1,10 @@
 package de.tuberlin.mcc.simra.app.activities;
 
 
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
 
@@ -45,7 +43,6 @@ public class ProfileActivity extends AppCompatActivity {
         binding.toolbar.toolbar.setSubtitle("");
         binding.toolbar.toolbarTitle.setText(R.string.title_activity_profile);
         binding.toolbar.backButton.setOnClickListener(v -> finish());
-        binding.toolbar.helmetIcon.setOnClickListener(v -> findViewById(R.id.button2).setVisibility(View.VISIBLE));
 
         profile = Profile.loadProfile(null, this);
         simRa_regions_config = getRegions(this);

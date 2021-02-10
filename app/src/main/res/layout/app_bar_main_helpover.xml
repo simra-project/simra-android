@@ -131,15 +131,13 @@
 
     <Button
         android:id="@+id/button4"
-        android:layout_width="150dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/center_button"
         android:layout_alignEnd="@id/center_button"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="-128dp"
         android:gravity="center"
-        android:maxLines="5"
-        android:textSize="15sp"
-        android:visibility="gone"
+        android:maxLines="3"
         android:text="Dieser Button zentriert die Karte auf ihren aktuellen Ort" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -175,9 +173,8 @@
         android:layout_margin="5dp"
         android:layout_marginEnd="63dp"
         android:gravity="center"
-        android:textSize="15sp"
+        android:icon="@drawable/ic_route"
         android:maxLines="3"
-        android:visibility="gone"
         android:text="Auf diesem Button starten \nund Stoppen  Sie die Aufzeichnung" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

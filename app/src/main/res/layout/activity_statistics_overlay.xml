@@ -3,17 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.ProfileActivityHelp">
+    tools:context=".activities.StatisticsActivity">
 
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
     <include
-        android:id="@+id/profile_content"
-        layout="@layout/content_profile_helpover"
+        layout="@layout/content_statistics"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginTop="@dimen/toolbar_space" />
+
 
 </RelativeLayout>

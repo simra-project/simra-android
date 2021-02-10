@@ -280,11 +280,6 @@ public class MainActivity extends BaseActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // help on helmet Buttom
-      //  ImageButton helmet = findViewById(R.id.helmet_icon);
-      //  Intent intent = new Intent(MainActivity.this, MainActivityHelp.class);
-      //  startActivity(intent);
-
         // CenterMap
         ImageButton centerMap = findViewById(R.id.center_button);
         centerMap.setOnClickListener(v -> {
@@ -395,20 +390,12 @@ public class MainActivity extends BaseActivity
         registerOBSService();
     }
 
-    public void helpButtonClicked(){
-        findViewById(R.id.button3).setVisibility(View.VISIBLE);
-        findViewById(R.id.button4).setVisibility(View.VISIBLE);
-        Toast.makeText(MainActivity.this, R.string.toast_help_clicked, Toast.LENGTH_LONG)
-                .show();
-    }
-
     public void displayButtonsForMenu() {
         binding.appBarMain.buttonStartRecording.setVisibility(View.VISIBLE);
         binding.appBarMain.buttonStopRecording.setVisibility(View.INVISIBLE);
 
         binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
         binding.appBarMain.reportIncidentContainer.setVisibility(View.GONE);
-        binding.appBarMain.helmetIcon.setOnClickListener(view -> helpButtonClicked());
 
         //binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.VISIBLE);
         updateOBSButtonStatus(OBSService.getConnectionState());
