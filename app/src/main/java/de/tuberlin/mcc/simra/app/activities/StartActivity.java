@@ -60,7 +60,14 @@ public class StartActivity extends BaseActivity {
 
         // Check Permissions
 
-        navigateIfAllPermissionsGranted();
+        //navigateIfAllPermissionsGranted();
+        if (allPermissionGranted()) {
+            Intent intent = new Intent(StartActivity.this, MainActivity.class);
+            startActivity(intent);
+            // Call finish() to prevent going back to StartActivity,
+            // when the Back Button is pressed in MainActivity
+            finish();
+        }
         showErrorDialogIfCrashedBefore();
 
         Button next = findViewById(R.id.nextBtn);

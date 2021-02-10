@@ -24,7 +24,7 @@ android {
         }
 
 
-        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://vm1.mcc.tu-berlin.de:8082/\""
+        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://vm2.mcc.tu-berlin.de:8082/\""
         buildConfigField "String", API_VERSION, properties.getProperty(API_VERSION) ?: "\"11/\""
 
     }
