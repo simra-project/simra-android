@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -61,9 +60,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -83,14 +82,20 @@ import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UpdateHelper;
+import de.tuberlin.mcc.simra.app.util.Utils;
 
+import static de.tuberlin.mcc.simra.app.activities.ProfileActivity.startProfileActivityForChooseRegion;
+import static de.tuberlin.mcc.simra.app.entities.Profile.profileIsInUnknownRegion;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
+import static de.tuberlin.mcc.simra.app.util.Utils.getCorrectRegionName;
 import static de.tuberlin.mcc.simra.app.util.Utils.getNews;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
+import static de.tuberlin.mcc.simra.app.util.Utils.isLocationServiceOff;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.regionEncoder;
+import static de.tuberlin.mcc.simra.app.util.Utils.regionsDecoder;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
@@ -113,7 +118,7 @@ public class MainActivity extends BaseActivity
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private ServiceConnection mRecorderServiceConnection = new ServiceConnection() {
+    private final ServiceConnection mRecorderServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -126,17 +131,6 @@ public class MainActivity extends BaseActivity
         }
     };
 
-    private static boolean isLocationServiceOff(MainActivity mainActivity) {
-        boolean gps_enabled = false;
-
-        try {
-            gps_enabled = mainActivity.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception ex) {
-            Log.d(TAG, ex.getMessage());
-        }
-
-        return (!gps_enabled);
-    }
 
     private void showOBSNotConnectedWarning() {
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
@@ -342,20 +336,12 @@ public class MainActivity extends BaseActivity
                 Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
             }
         });
+        // download the newest region list from the backend and prompt user to go to "Profile" and set region, if a new region has been added and the region is set as UNKNOWN or other.
         new RegionTask().execute();
-        if (lookUpIntSharedPrefs("regionLastChangedAtVersion", -1, "simraPrefs", MainActivity.this) < 53) {
-            int region = lookUpIntSharedPrefs("Region", -1, "Profile", MainActivity.this);
-            if (region == 2 || region == 3 || region == 8) {
-                fireRegionPrompt();
-                writeIntToSharedPrefs("regionLastChangedAtVersion", BuildConfig.VERSION_CODE,
-                        "simraPrefs", MainActivity.this);
-            }
-        }
         new NewsTask().execute();
 
         // OpenBikeSensor
         binding.appBarMain.buttonRideSettingsObs.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
-        // binding.appBarMain.buttonRideSettingsGeneral.setOnClickListener(view -> startActivity(new Intent(this, SettingsActivity.class)));
 
         obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
         updateOBSButtonStatus(OBSService.ConnectionState.DISCONNECTED);
@@ -374,6 +360,13 @@ public class MainActivity extends BaseActivity
                 startOBSService();
             }
         }
+    }
+
+    private boolean numberOfRegionsHasIncreased() {
+        int lastNumberOfRegions = getRegions(MainActivity.this).length;
+        int actualNumberOfRegions = SharedPref.App.Regions.getLastRegionNumberKnown(MainActivity.this);
+        SharedPref.App.Regions.setLastRegionNumberKnown(lastNumberOfRegions,MainActivity.this);
+        return actualNumberOfRegions < lastNumberOfRegions;
     }
 
     private void deactivateOBS() {
@@ -446,9 +439,9 @@ public class MainActivity extends BaseActivity
             PermissionHelper.requestFirstBasePermissionsNotGranted(MainActivity.this);
             Toast.makeText(MainActivity.this, R.string.recording_not_started, Toast.LENGTH_LONG).show();
         } else {
-            if (isLocationServiceOff(MainActivity.this)) {
+            if (isLocationServiceOff(locationManager)) {
                 // notify user
-                new AlertDialog.Builder(MainActivity.this).setMessage(R.string.locationServiceisOff)
+                new AlertDialog.Builder(MainActivity.this).setMessage((R.string.locationServiceisOff + " " + R.string.enableToRecord))
                         .setPositiveButton(android.R.string.ok,
                                 (paramDialogInterface, paramInt) -> MainActivity.this
                                         .startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
@@ -741,62 +734,14 @@ public class MainActivity extends BaseActivity
 
     }
 
-    public void fireRegionPrompt() {
-        // get the regions from the asset
-        String[] simRa_regions_config;
-        View spinnerView = View.inflate(MainActivity.this, R.layout.spinner, null);
-        Spinner spinner = spinnerView.findViewById(R.id.spinner);
-        simRa_regions_config = getRegions(MainActivity.this);
-        int region = lookUpIntSharedPrefs("Region", 0, "Profile", MainActivity.this);
-
-        String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
-        List<String> regionContentArray = new ArrayList<>();
-        boolean languageIsEnglish = locale.equals(new Locale("en").getLanguage());
-        for (String s : simRa_regions_config) {
-            if (!(s.startsWith("!") || s.startsWith("Please Choose"))) {
-                if (languageIsEnglish) {
-                    regionContentArray.add(s.split("=")[0]);
-                } else {
-                    regionContentArray.add(s.split("=")[1]);
-                }
-            }
-        }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item,
-                regionContentArray);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Collections.sort(regionContentArray);
-        regionContentArray.add(0, getText(R.string.pleaseChoose).toString());
-        spinner.setAdapter(adapter);
-        String regionString = simRa_regions_config[region];
-        if (!regionString.startsWith("!")) {
-            if (languageIsEnglish) {
-                spinner.setSelection(regionContentArray.indexOf(regionString.split("=")[0]));
-            } else {
-                spinner.setSelection(regionContentArray.indexOf(regionString.split("=")[1]));
-            }
-        } else {
-            spinner.setSelection(0);
-        }
-
+    public void fireProfileRegionPrompt() {
         AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
         alert.setTitle(getString(R.string.chooseRegion));
-        alert.setView(spinnerView);
-        alert.setNeutralButton(R.string.done, (dialogInterface, j) -> {
-
-            int region1 = -1;
-            String selectedRegion = spinner.getSelectedItem().toString();
-            for (int i = 0; i < simRa_regions_config.length; i++) {
-                if (selectedRegion.equals(simRa_regions_config[i].split("=")[0])
-                        || selectedRegion.equals(simRa_regions_config[i].split("=")[1])) {
-                    region1 = i;
-                    break;
-                }
-            }
-            Profile profile = Profile.loadProfile(null, MainActivity.this);
-            profile.region = region1;
-            Profile.saveProfile(profile, null, MainActivity.this);
+        alert.setMessage(R.string.pleaseChooseRegion);
+        alert.setNeutralButton(R.string.yes, (dialogInterface, j) -> {
+            startProfileActivityForChooseRegion(MainActivity.this);
         });
-        alert.setCancelable(false);
+        alert.setNegativeButton(R.string.later,null);
         alert.show();
     }
 
@@ -818,7 +763,7 @@ public class MainActivity extends BaseActivity
             try {
 
                 URL url = new URL(
-                        BuildConfig.API_ENDPOINT + "check/regions?clientHash=" + getClientHash(MainActivity.this));
+                        BuildConfig.API_ENDPOINT + "check/regions-coords?clientHash=" + getClientHash(MainActivity.this));
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -846,6 +791,10 @@ public class MainActivity extends BaseActivity
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            // prompt user to go to "Profile" and set region, if a new region has been added to SimRa and the region is set as UNKNOWN or other.
+            if (numberOfRegionsHasIncreased() && profileIsInUnknownRegion(MainActivity.this)) {
+                fireProfileRegionPrompt();
+            }
         }
     }
     private class NewsTask extends AsyncTask<String, String, String> {

@@ -3,11 +3,14 @@ package de.tuberlin.mcc.simra.app.util;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.location.LocationManager;
 import android.util.Log;
 import android.util.Pair;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.osmdroid.util.GeoPoint;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -460,6 +463,124 @@ public class Utils {
 
         return accGpsString.toString();
     }
+
+    /**
+     * calculates the nearest three regions to given location
+     * @param lat Latitude of current location
+     * @param lon Longitude of current location
+     * @param context
+     * @return int array with the nearest three regions to the location represented by their region IDs
+     */
+    public static int[] nearestRegionsToThisLocation(double lat, double lon, Context context) {
+        int[] result = {Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE};
+        double[] top3Distances = {Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE};
+        String[] simRa_regions_config = getRegions(context);
+
+        for (int i = 0; i < simRa_regions_config.length; i++) {
+            String s = simRa_regions_config[i];
+            if (s.split("=").length>3) {
+                String latlong = s.split("=")[3];
+                double regionLat = Double.parseDouble(latlong.split(",")[0]);
+                double regionLon = Double.parseDouble(latlong.split(",")[1]);
+                GeoPoint location = new GeoPoint(lat, lon);
+                GeoPoint thisRegionCenter = new GeoPoint(regionLat, regionLon);
+                double distance = location.distanceToAsDouble(thisRegionCenter);
+                if(distance < top3Distances[0]) {
+                    top3Distances[2] = top3Distances[1];
+                    result[2] = result[1];
+                    top3Distances[1] = top3Distances[0];
+                    result[1] = result[0];
+                    top3Distances[0] = distance;
+                    result[0] = i;
+                } else if (distance < top3Distances[1]) {
+                    top3Distances[2] = top3Distances[1];
+                    result[2] = result[1];
+                    top3Distances[1] = distance;
+                    result[1] = i;
+                } else if (distance < top3Distances[2]) {
+                    top3Distances[2] = distance;
+                    result[2] = i;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Converts region IDs to their respective names
+     * @param regionCodes int array with the region codes e.g. {2,3,5}
+     * @param context context (activity) needed for reading regions file
+     * @return string array with the region names of given int array in the same order
+     */
+    public static String[] regionsDecoder(int[] regionCodes, Context context) {
+        String[] result = new String[regionCodes.length];
+        String[] region = getRegions(context);
+        for (int i = 0; i < regionCodes.length; i++) {
+            result[i] = region[regionCodes[i]];
+        }
+        return result;
+    }
+
+    /**
+     * Converts names to their respective region IDs
+     * @param regionName string array with the region IDs e.g., {Berlin/Potsdam, Leipzig, Stuttgart}
+     * @param context context (activity) needed for reading regions file
+     * @return int array with the region IDs of given string array in the same order
+     */
+    public static int regionEncoder(String regionName, Context context) {
+        String[] region = getRegions(context);
+        for (int i = 0; i < region.length; i++) {
+            if (regionName.equals(getCorrectRegionName(region[i]))) {
+                return i;
+            }
+        }
+        return -1; // region not found
+    }
+
+    /**
+     * Gets the correct region names from the region lines of the region file. German or English
+     * @param regionLines a subset of getRegions()
+     * @return the correct display names in a string array according to System locale.
+     */
+    public static String[] getCorrectRegionNames(String[] regionLines) {
+        String[] result = new String[regionLines.length];
+        for (int i = 0; i < regionLines.length; i++) {
+            result[i] = getCorrectRegionName(regionLines[i]);
+        }
+        return result;
+    }
+
+    /**
+     * Gets the correct region name from the region line of the region file. German or English
+     * @param regionLine a region line from getRegions() e.g., Munich=München=München=48.13,11.57
+     * @return the correct display name as a string according to System locale
+     */
+    public static String getCorrectRegionName(String regionLine) {
+        String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
+        boolean languageIsEnglish = locale.equals(new Locale("en").getLanguage());
+        if (languageIsEnglish) {
+            return regionLine.split("=")[0];
+        } else {
+            return regionLine.split("=")[1];
+        }
+    }
+
+    /**
+     * checks whether location provider is enabled
+     * @param locationManager
+     * @return true if the gps provider is disabled, false, if it is enabled
+     */
+    public static boolean isLocationServiceOff(LocationManager locationManager) {
+        boolean gps_enabled = false;
+        try {
+            gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (Exception ex) {
+            Log.d(TAG, ex.getMessage());
+        }
+        return (!gps_enabled);
+    }
+
 
     /**
      * @deprecated Use IncidentLogEntry  instead

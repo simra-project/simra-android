@@ -61,7 +61,8 @@
     <string name="startButtonText">Start\nRecording</string>
     <string name="stopButtonText">End\nRecording</string>
     <string name="airplaneModeIsOn">The airplane mode is enabled! Please disable it, so the ride can be recorded.</string>
-    <string name="locationServiceisOff">The location service is disabled! Please enable it, so the ride can be recorded.</string>
+    <string name="locationServiceisOff">The location service is disabled!</string>
+    <string name="enableToRecord">Please enable it, so the ride can be recorded.</string>
     <string name="checking_for_updates">Checking for updates</string>
     <string name="new_app_version_text">To continue, please download the new version via Google Play or manually via the .APK file.</string>
     <string name="open_google_play_store">Open Google Play Store</string>
@@ -69,6 +70,7 @@
     <string name="installed_version">installed version:</string>
     <string name="newest_version">newest version:</string>
     <string name="new_app_version_title">New update available</string>
+    <string name="pleaseChooseRegion">SimRa now supports many regions. Do you want to set a region to improve your contributions to the project? This way, we can increase the significance of our results.</string>
     <string name="later">Later</string>
     <string name="reportIncidentClosepass">Close Pass</string>
     <string name="reportIncidentObstacle">Dodging Obstacle</string>
@@ -232,13 +234,18 @@
     <string name="experienceLessThen2">Less than 2 years</string>
     <string name="editingProfileCompleted">Profile data saved</string>
     <string name="regionSpinnerTitle">Region</string>
+    <string name="regionManual">Select manually</string>
+    <string name="regionAutomatic">Detect via GPS</string>
+    <string name="detectRegion">Detect region</string>
+    <string name="enableToDetectRegion">Please enable it, so your region can be detected.</string>
+    <string name="detectedRegion">Detected region: </string>
+    <string name="selectRegion">Select your region:</string>
     <string name="experienceSpinnerTitle">Experience as a Cyclist</string>
     <string name="rulesDescription">How often do you follow the traffic rules?</string>
     <string name="never">Never</string>
     <string name="always">Always</string>
     <string name="on">ON</string>
     <string name="off">OFF</string>
-    <!---  -->
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="pleaseChoose">Please Choose</string>

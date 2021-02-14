@@ -177,6 +177,19 @@ public class SharedPref {
                 }
             }
         }
+
+        /**
+         * Last checked number of regions from getRegions()
+         */
+        public static class Regions {
+            private static final String LAST_REGION_NUMBER_KNOWN = "LAST_REGION_NUMBER_KNOWN";
+            public static void setLastRegionNumberKnown(int lastRegionNumberKnown, Context context) {
+                writeIntegerToAppSharedPrefsAsync(LAST_REGION_NUMBER_KNOWN,lastRegionNumberKnown,context);
+            }
+            public static int getLastRegionNumberKnown(Context context) {
+                return readIntegerFromAppSharedPrefs(LAST_REGION_NUMBER_KNOWN,0,context);
+            }
+        }
     }
 
 
@@ -237,6 +250,20 @@ public class SharedPref {
             public static boolean getIncidentButtonsEnabled(Context context) {
                 return readBooleanFromAppSharedPrefs(INCIDENT_BUTTONS_ENABLED, context);
             }
+        }
+
+        public static class RegionSetting {
+            // See top of this class before changing this string
+            public static final String REGION_SETTING = SETTINGS + "Region-Setting";
+
+            public static void setRegionDetectionViaGPSEnabled(boolean enabled, Context context) {
+                writeBooleanToAppSharedPrefsAsync(REGION_SETTING, enabled, context);
+            }
+
+            public static boolean getRegionDetectionViaGPSEnabled(Context context) {
+                return readBooleanFromAppSharedPrefs(REGION_SETTING, context);
+            }
+
         }
 
         public static class Ride {

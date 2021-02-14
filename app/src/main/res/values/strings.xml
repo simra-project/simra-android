@@ -65,7 +65,8 @@
     <string name="reportIncidentObstacle">Hindernis ausweichen</string>
     <string name="cancel">Abbrechen</string>
     <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalten Sie es aus, damit die Fahrt aufgezeichnet werden kann.</string>
-    <string name="locationServiceisOff">Der Ortungsdienst Ihres Geräts ist aus. Bitte schalten Sie den Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
+    <string name="locationServiceisOff">Der Ortungsdienst Ihres Geräts ist aus.</string>
+    <string name="enableToRecord">Bitte schalten Sie den Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
     <string name="checking_for_updates">Überprüfe auf neue Versionen</string>
     <string name="new_app_version_text">Um fortzufahren, aktualisieren Sie bitte SimRa via Google Play Store oder laden Sie die .APK-Datei herunter.</string>
     <string name="open_google_play_store">Google Play Store öffnen</string>
@@ -74,9 +75,10 @@
     <string name="newest_version">neueste Version:</string>
     <string name="new_app_version_title">Neue Version verfügbar</string>
     <string name="later">Später</string>
+    <string name="pleaseChooseRegion">SimRa unterstützt eine Vielzahl an Regionen. Möchten Sie eine Region einstellen, um Ihren Beitrag zu verbessern? Dadurch können wir pro Region aussagekräftigere Ergebnisse liefern.</string>
     <string name="recording_not_started">Fahrtaufzeichnung wurde NICHT gestartet.</string>
     <string name="recording_started">Fahrtaufzeichnung wurde gestartet.</string>
-    <string name="not_connected_warnung_title">Warnung : OpenBikeSensor ist nicht verbunden</string>
+    <string name="not_connected_warnung_title">Warnung: OpenBikeSensor ist nicht verbunden</string>
     <string name="not_connected_warnung_message">Wollen Sie trotzdem den Fahrt aufzeichnen ?</string>
     <string name="cancel_button">Nein, mit dem OpenBikeSensor verbinden</string>
     <string name="bluetooth_not_enable_title">Warnung: Bluetooth is ausgeschaltet</string>
@@ -180,8 +182,6 @@
     <string name="privacyDurationDescription">Verzögerung des Aufnahmestarts (in Sekunden)</string>
     <string name="privacy_settings_title">Privatsphäre</string>
     <string name="privacyDistanceDescription">Verzögerung des Aufnahmestarts</string>
-
-
     <string name="settingsSaved">Einstellungen gespeichert</string>
     <string name="general_settings_title">Allgemeine Einstellungen</string>
     <string name="unitDescription">Einheitensystem</string>
@@ -228,13 +228,18 @@
     <string name="experienceLessThen2">Weniger als 2 Jahre</string>
     <string name="editingProfileCompleted">Profildaten wurden gespeichert</string>
     <string name="regionSpinnerTitle">Region</string>
+    <string name="regionManual">Selber bestimmen</string>
+    <string name="regionAutomatic">Via GPS bestimmen</string>
+    <string name="detectRegion">Region bestimmen</string>
+    <string name="enableToDetectRegion">Bitte schalten Sie den Ortungsdienst an, damit Ihre Region ermittelt werden kann.</string>
+    <string name="selectRegion">Wählen Sie Ihre Region aus:</string>
+    <string name="detectedRegion">Ermittelte Region: </string>
     <string name="experienceSpinnerTitle">Erfahrung als Fahrradfahrer</string>
     <string name="rulesDescription">Wie oft halten Sie sich an die Verkehrsregeln?</string>
     <string name="never">Nie</string>
     <string name="always">Immer</string>
     <string name="on">EIN</string>
     <string name="off">AUS</string>
-    <!---  -->
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="pleaseChoose">Bitte auswählen</string>
@@ -347,7 +352,7 @@
     <string name="activity_obs_title_device_info">Geräte-Info</string>
     <string name="obs_activity_button_connect_device">Mit Gerät verbinden</string>
     <string name="obs_activity_button_disconnect_device">Geräteverbindung trennen</string>
-    <string name="obs_activity_text_last_distance">Letzer Wert:</string>
+    <string name="obs_activity_text_last_distance">Letzter Wert:</string>
     <string name="obsConnected">OpenBikeSensor verbunden</string>
     <string name="connecting">Verbinde</string>
     <string name="obsSearching">OpenBikeSensor wird gesucht</string>

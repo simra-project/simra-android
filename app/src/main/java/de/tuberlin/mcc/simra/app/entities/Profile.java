@@ -39,7 +39,6 @@ public class Profile {
     }
 
     private static SharedPreferences getSharedPreferences(Integer regionId, Context context) {
-        SharedPreferences sharedPreferences;
         if (regionId == null) {
             return context.getApplicationContext()
                     .getSharedPreferences("Profile", Context.MODE_PRIVATE);
@@ -124,5 +123,15 @@ public class Profile {
             editSharedPreferences.putInt("Behaviour", profile.behaviour);
         }
         editSharedPreferences.apply();
+    }
+
+    /**
+     * returns true if region is UNKNOWN (0) or other (3)
+     * @param context
+     * @return true if region is UNKNOWN (0) or other (3)
+     */
+    public static boolean profileIsInUnknownRegion(Context context) {
+        int region = loadProfile(null, context).region;
+        return region == 0 || region == 3;
     }
 }
