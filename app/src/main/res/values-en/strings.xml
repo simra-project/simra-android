@@ -238,7 +238,7 @@
     <string name="regionAutomatic">Detect via GPS</string>
     <string name="detectRegion">Detect region</string>
     <string name="enableToDetectRegion">Please enable it, so your region can be detected.</string>
-    <string name="detectedRegion">Detected region: </string>
+    <string name="selectedRegion">Selected region: </string>
     <string name="selectRegion">Select your region:</string>
     <string name="experienceSpinnerTitle">Experience as a Cyclist</string>
     <string name="rulesDescription">How often do you follow the traffic rules?</string>

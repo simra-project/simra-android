@@ -128,7 +128,7 @@
                     android:layout_toEndOf="@id/regionAutomaticButton"
                     android:layout_centerVertical="true"
                     android:layout_marginHorizontal="10dp"
-                    android:text="@string/detectedRegion">
+                    android:text="@string/selectedRegion">
                 </TextView>
             </RelativeLayout>
         </LinearLayout>

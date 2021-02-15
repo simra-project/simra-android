@@ -233,7 +233,7 @@
     <string name="detectRegion">Region bestimmen</string>
     <string name="enableToDetectRegion">Bitte schalten Sie den Ortungsdienst an, damit Ihre Region ermittelt werden kann.</string>
     <string name="selectRegion">Wählen Sie Ihre Region aus:</string>
-    <string name="detectedRegion">Ermittelte Region: </string>
+    <string name="selectedRegion">Gewählte Region: </string>
     <string name="experienceSpinnerTitle">Erfahrung als Fahrradfahrer</string>
     <string name="rulesDescription">Wie oft halten Sie sich an die Verkehrsregeln?</string>
     <string name="never">Nie</string>

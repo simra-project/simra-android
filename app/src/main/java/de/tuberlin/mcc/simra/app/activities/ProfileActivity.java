@@ -121,7 +121,7 @@ public class ProfileActivity extends AppCompatActivity {
             binding.profileContent.regionSpinner.setVisibility(View.GONE);
             binding.profileContent.switchRegion.setChecked(true);
             binding.profileContent.regionAutomaticRelativeLayout.setVisibility(View.VISIBLE);
-            binding.profileContent.detectedRegionTextView.setText(getText(R.string.detectedRegion) + getCorrectRegionName(region));
+            binding.profileContent.detectedRegionTextView.setText(getText(R.string.selectedRegion) + getCorrectRegionName(region));
             binding.profileContent.regionAutomaticButton.setOnClickListener(new View.OnClickListener() {
                 @SuppressLint("MissingPermission")
                 @Override
