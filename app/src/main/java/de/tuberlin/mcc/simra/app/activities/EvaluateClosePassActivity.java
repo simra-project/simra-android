@@ -136,7 +136,7 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
             removePicture(true);
         });
 
-        imageQueue = new LinkedList<>(Arrays.asList(new File(IOUtils.Directories.getPictureCacheDirectoryPath()).listFiles()));
+        imageQueue = new LinkedList<>(Arrays.asList(new File(IOUtils.Directories.getPictureCacheDirectoryPath(EvaluateClosePassActivity.this)).listFiles()));
         updateView();
     }
 

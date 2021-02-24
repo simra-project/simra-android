@@ -21,17 +21,7 @@ public class PermissionHelper {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_BACKGROUND_LOCATION
     });
-    public static final BasePermission Storage = new BasePermission(1002, new String[]{
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    });
 
-    private static final BasePermission LocationAndStorage = new BasePermission(1004,new String[]{
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    });
     public static final int REQUEST_CODE_CAMERA = 1003;
     public static final BasePermission Camera = new BasePermission(REQUEST_CODE_CAMERA, new String[]{
             Manifest.permission.CAMERA
@@ -46,19 +36,14 @@ public class PermissionHelper {
      */
     public static boolean hasPermissions(String[] permissions, Context context) {
         for (String permission : permissions) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N && (Objects.equals(permission, Manifest.permission.WRITE_EXTERNAL_STORAGE) || Objects.equals(permission, Manifest.permission.READ_EXTERNAL_STORAGE))) {
-                // Before version N the Storage permissions were granted on app install, so we should not check
-                // https://developer.android.com/reference/android/Manifest.permission#READ_EXTERNAL_STORAGE
-                return true;
-            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N && Objects.equals(permission, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N && Objects.equals(permission, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
                 // Before SDK29 the Background Location Permission was automatically granted with a location request:
                 // https://developer.android.com/reference/android/Manifest.permission#ACCESS_BACKGROUND_LOCATION
                 return true;
 
             } else {
                 // Default Check
-                if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-                ) {
+                if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
                     return true;
                 }
             }
@@ -67,17 +52,13 @@ public class PermissionHelper {
     }
 
     public static void requestFirstBasePermissionsNotGranted( Activity activity) {
-        if (!hasBasePermissions(activity)) {
-            LocationAndStorage.requestPermissions(activity);
-        } else if (!hasPermissions(Location.permissions, activity)) {
+        if (!hasPermissions(Location.permissions, activity)) {
             Location.requestPermissions(activity);
-        } else if (!hasPermissions(Storage.permissions, activity)) {
-            Storage.requestPermissions(activity);
         }
     }
 
     public static boolean hasBasePermissions(Context context) {
-        return hasPermissions(Location.permissions, context) && hasPermissions(Storage.permissions, context);
+        return hasPermissions(Location.permissions, context);
     }
 
 

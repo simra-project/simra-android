@@ -35,6 +35,7 @@ public class IOUtils {
          *
          * @return Path with trailing slash
          */
+        /*
         public static String getExternalBaseDirectoryPath() {
             String app_folder_path = Environment.getExternalStorageDirectory().toString() + "/simra/";
             File dir = new File(app_folder_path);
@@ -43,15 +44,15 @@ public class IOUtils {
             }
             return app_folder_path;
         }
-
+         */
         /**
          * Returns the Path to the Picture Cache Directory (Shared File Directory)
          * Might be on SD Card
          *
          * @return Path with trailing slash
          */
-        public static String getPictureCacheDirectoryPath() {
-            String app_folder_path = getExternalBaseDirectoryPath() + "images/";
+        public static String getPictureCacheDirectoryPath(Context context) {
+            String app_folder_path = getBaseFolderPath(context) + "images/";
             File dir = new File(app_folder_path);
             if (!dir.exists() && !dir.mkdirs()) {
 

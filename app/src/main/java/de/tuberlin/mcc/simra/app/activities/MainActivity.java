@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -26,11 +27,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,10 +58,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
+import java.security.Permission;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -82,20 +79,16 @@ import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UpdateHelper;
-import de.tuberlin.mcc.simra.app.util.Utils;
 
 import static de.tuberlin.mcc.simra.app.activities.ProfileActivity.startProfileActivityForChooseRegion;
 import static de.tuberlin.mcc.simra.app.entities.Profile.profileIsInUnknownRegion;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
-import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
-import static de.tuberlin.mcc.simra.app.util.Utils.getCorrectRegionName;
 import static de.tuberlin.mcc.simra.app.util.Utils.getNews;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.isLocationServiceOff;
+import static de.tuberlin.mcc.simra.app.util.Utils.nearestRegionsToThisLocation;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.regionEncoder;
-import static de.tuberlin.mcc.simra.app.util.Utils.regionsDecoder;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
@@ -738,8 +731,14 @@ public class MainActivity extends BaseActivity
         AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
         alert.setTitle(getString(R.string.chooseRegion));
         alert.setMessage(R.string.pleaseChooseRegion);
-        alert.setNeutralButton(R.string.yes, (dialogInterface, j) -> {
+        alert.setPositiveButton(R.string.yes, (dialogInterface, j) -> {
             startProfileActivityForChooseRegion(MainActivity.this);
+        });
+        alert.setNeutralButton(R.string.doNotShowAgain, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SharedPref.App.RegionsPrompt.setDoNotShowRegionPrompt(true,MainActivity.this);
+            }
         });
         alert.setNegativeButton(R.string.later,null);
         alert.show();
@@ -792,11 +791,27 @@ public class MainActivity extends BaseActivity
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             // prompt user to go to "Profile" and set region, if a new region has been added to SimRa and the region is set as UNKNOWN or other.
-            if (numberOfRegionsHasIncreased() && profileIsInUnknownRegion(MainActivity.this)) {
+            if (!SharedPref.App.RegionsPrompt.getDoNotShowRegionPrompt(MainActivity.this) && ((numberOfRegionsHasIncreased() && profileIsInUnknownRegion(MainActivity.this)) || actualSelectedRegionNotInTopThreeNearestRegion())) {
                 fireProfileRegionPrompt();
             }
         }
     }
+
+    private boolean actualSelectedRegionNotInTopThreeNearestRegion() {
+        if(PermissionHelper.hasBasePermissions(MainActivity.this)) {
+            @SuppressLint("MissingPermission")
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            int selectedRegion = Profile.loadProfile(null,MainActivity.this).region;
+            int[] nearestRegions = nearestRegionsToThisLocation(location.getLatitude(),location.getLongitude(),MainActivity.this);
+            for (int nearestRegion : nearestRegions) {
+                if (nearestRegion == selectedRegion) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private class NewsTask extends AsyncTask<String, String, String> {
         int newsID = -1;
         private NewsTask() {

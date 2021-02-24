@@ -143,7 +143,7 @@ public class ProfileActivity extends AppCompatActivity {
                                     locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude(),
                                     ProfileActivity.this);
                             String[] nearestRegionNames = getCorrectRegionNames(regionsDecoder(nearestRegionCodes, ProfileActivity.this));
-                            AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);//.setMessage(R.string.selectRegion);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this).setTitle(R.string.nearestRegions);
                             createButtons(builder, nearestRegionNames, regionContentArray, profile, ProfileActivity.this);
                             builder.setNegativeButton(R.string.cancel,null);
                             builder.create().show();

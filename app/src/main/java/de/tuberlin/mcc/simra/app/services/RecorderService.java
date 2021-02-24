@@ -504,7 +504,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     if (takePictureDuringRideActivated) {
                         if (lastOBSDistanceValue.leftSensorValues.get(0) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= lastAccUpdate) {
                             lastPictureTaken = lastAccUpdate;
-                            CameraService.takePicture(RecorderService.this, String.valueOf(lastAccUpdate), IOUtils.Directories.getPictureCacheDirectoryPath());
+                            CameraService.takePicture(RecorderService.this, String.valueOf(lastAccUpdate), IOUtils.Directories.getPictureCacheDirectoryPath(RecorderService.this));
                         }
                     }
                 }

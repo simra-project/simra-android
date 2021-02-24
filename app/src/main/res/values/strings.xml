@@ -232,7 +232,7 @@
     <string name="regionAutomatic">Via GPS bestimmen</string>
     <string name="detectRegion">Region bestimmen</string>
     <string name="enableToDetectRegion">Bitte schalten Sie den Ortungsdienst an, damit Ihre Region ermittelt werden kann.</string>
-    <string name="selectRegion">Wählen Sie Ihre Region aus:</string>
+    <string name="nearestRegions">Nächste Regionen zu Ihrem Standort:</string>
     <string name="selectedRegion">Gewählte Region: </string>
     <string name="experienceSpinnerTitle">Erfahrung als Fahrradfahrer</string>
     <string name="rulesDescription">Wie oft halten Sie sich an die Verkehrsregeln?</string>

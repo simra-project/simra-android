@@ -190,6 +190,19 @@ public class SharedPref {
                 return readIntegerFromAppSharedPrefs(LAST_REGION_NUMBER_KNOWN,0,context);
             }
         }
+
+        /**
+         * whether to show region prompt or not
+         */
+        public static class RegionsPrompt {
+            private static final String DO_NOT_SHOW_REGION_PROMPT = "DO_NOT_SHOW_REGION_PROMPT";
+            public static void setDoNotShowRegionPrompt(boolean showRegionPrompt, Context context) {
+                writeBooleanToAppSharedPrefsAsync(DO_NOT_SHOW_REGION_PROMPT,showRegionPrompt,context);
+            }
+            public static boolean getDoNotShowRegionPrompt(Context context) {
+                return readBooleanFromAppSharedPrefs(DO_NOT_SHOW_REGION_PROMPT,context);
+            }
+        }
     }
 
 

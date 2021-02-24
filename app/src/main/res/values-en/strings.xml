@@ -239,7 +239,7 @@
     <string name="detectRegion">Detect region</string>
     <string name="enableToDetectRegion">Please enable it, so your region can be detected.</string>
     <string name="selectedRegion">Selected region: </string>
-    <string name="selectRegion">Select your region:</string>
+    <string name="nearestRegions">Nearest regions to your location:</string>
     <string name="experienceSpinnerTitle">Experience as a Cyclist</string>
     <string name="rulesDescription">How often do you follow the traffic rules?</string>
     <string name="never">Never</string>
