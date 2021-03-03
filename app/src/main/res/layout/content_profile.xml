@@ -72,9 +72,8 @@
             android:layout_height="20dp" />
         <LinearLayout
             android:id="@+id/profileRegionLinearLayout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
             android:orientation="vertical">
         <TextView
             android:id="@+id/regionSpinnerTitle"
@@ -131,13 +130,14 @@
                     android:text="@string/selectedRegion">
                 </TextView>
             </RelativeLayout>
+            <Spinner
+                android:id="@+id/regionSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
         </LinearLayout>
 
-        <Spinner
-            android:id="@+id/regionSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
+
 
         <!--
         <Space

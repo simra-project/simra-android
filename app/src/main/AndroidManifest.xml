@@ -119,6 +119,10 @@
             android:enabled="true"
             android:parentActivityName=".HistoryActivity" />
         <service
+            android:name=".services.DebugUploadService"
+            android:enabled="true"
+            android:parentActivityName=".SettingsActivity" />
+        <service
             android:name=".services.OBSService"
             android:enabled="true"
             android:exported="false"

@@ -123,6 +123,17 @@ public class SharedPref {
             }
         }
 
+        // RIDE-KEY
+        public static class RideKey {
+            private static final String RIDE_KEY = "RIDE-KEY";
+            public static void setRideKey(int lastSeenNewsID, Context context) {
+                writeIntegerToAppSharedPrefsAsync(RIDE_KEY,lastSeenNewsID,context);
+            }
+            public static int getRideKey(Context context) {
+                return readIntegerFromAppSharedPrefs(RIDE_KEY,0,context);
+            }
+        }
+
         /**
          * Grouped State for Crash Data
          */

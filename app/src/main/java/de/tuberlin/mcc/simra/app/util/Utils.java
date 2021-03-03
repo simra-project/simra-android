@@ -24,6 +24,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
@@ -35,6 +37,8 @@ import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 
+import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getSharedPrefsDirectory;
+import static de.tuberlin.mcc.simra.app.util.IOUtils.zip;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
 
 public class Utils {
@@ -581,6 +585,38 @@ public class Utils {
         return (!gps_enabled);
     }
 
+    public static void prepareDebugZip(int mode,List<File> ridesAndAccEvents , Context context) {
+        List<File> filesToUpload = new ArrayList<File>(ridesAndAccEvents);
+        if (mode == 2) {
+            filesToUpload.clear();
+        } else if (mode == 1) {
+            while (filesToUpload.size()>20) {
+                filesToUpload.remove(0);
+            }
+        }
+        filesToUpload.addAll(Arrays.asList(getSharedPrefsDirectory(context).listFiles()));
+        try {
+            zip(filesToUpload,new File(IOUtils.Directories.getBaseFolderPath(context) + "zip.zip"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void sortFileListLastModified(List<File> fileList) {
+        Collections.sort(fileList, new Comparator<File>() {
+            @Override
+            public int compare(File file1, File file2) {
+                long k = file1.lastModified() - file2.lastModified();
+                if(k > 0){
+                    return 1;
+                }else if(k == 0){
+                    return 0;
+                }else{
+                    return -1;
+                }
+            }
+        });
+    }
 
     /**
      * @deprecated Use IncidentLogEntry  instead

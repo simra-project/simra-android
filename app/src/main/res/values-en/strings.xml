@@ -191,6 +191,13 @@
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Devices</string>
+    <string name="debugPromptTitle1">Send local app data to the SimRa team?</string>
+    <string name="debugButtonText">Attention! Only tap the Continue button, if you were asked to do so by the SimRa team. By pressing the Upload button in the next step, you send your SimRa configuration to the SimRa team. You can also specify to upload the last 10 rides or all rides.</string>
+    <string name="continueText">Continue</string>
+    <string name="debugPromptTitle2">Do you also want to send rides?</string>
+    <string name="debugSendAllRides">Yes, all</string>
+    <string name="debugSend10Rides">Yes, the last 10</string>
+    <string name="debugDoNotSendRides">No, don\'t send any rides</string>
 
     <!--- OpenBikeSensor -->
     <string name="obsSwitchTitle">OpenBikeSensor connection</string>
@@ -354,4 +361,5 @@
     <string name="obsConnecting">Connecting to OpenBikeSensor</string>
     <string name="obsTutorial">\nPlease hold your hand close to the distance sensor for 3 seconds</string>
     <string name="obs">OpenBikeSensor</string>
+    <string name="uploadingDebugNotificationBody">SimRa is uploading files</string>
 </resources>

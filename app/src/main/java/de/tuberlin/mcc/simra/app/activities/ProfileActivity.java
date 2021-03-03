@@ -85,6 +85,7 @@ public class ProfileActivity extends AppCompatActivity {
         binding.profileContent.genderSpinner.setSelection(profile.gender); // Gender
         // Region:
         if(getIntent().hasExtra(EXTRA_PROFILE)) {
+            binding.profileContent.profileRegionLinearLayout.setPadding(10,10,10,10);
             binding.profileContent.profileRegionLinearLayout.setBackground(ContextCompat.getDrawable(ProfileActivity.this,R.drawable.profile_region_border));
         } else {
             binding.profileContent.profileRegionLinearLayout.setPadding(0,0,0,0);
@@ -113,7 +114,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void toggleRegionSwitch(ArrayList<String> regionContentArray) {
         String region = getCorrectRegionName(simRa_regions_config[profile.region]);
         if (!region.startsWith("!")) {
-            binding.profileContent.regionSpinner.setSelection(regionContentArray.indexOf(getCorrectRegionName(region)));
+            binding.profileContent.regionSpinner.setSelection(regionContentArray.indexOf(region));
         } else {
             binding.profileContent.regionSpinner.setSelection(0);
         }
@@ -121,7 +122,8 @@ public class ProfileActivity extends AppCompatActivity {
             binding.profileContent.regionSpinner.setVisibility(View.GONE);
             binding.profileContent.switchRegion.setChecked(true);
             binding.profileContent.regionAutomaticRelativeLayout.setVisibility(View.VISIBLE);
-            binding.profileContent.detectedRegionTextView.setText(getText(R.string.selectedRegion) + getCorrectRegionName(region));
+            Log.d(TAG, "region: " + region);
+            binding.profileContent.detectedRegionTextView.setText(getText(R.string.selectedRegion) + region);
             binding.profileContent.regionAutomaticButton.setOnClickListener(new View.OnClickListener() {
                 @SuppressLint("MissingPermission")
                 @Override

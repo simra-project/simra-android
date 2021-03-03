@@ -2,7 +2,11 @@ package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,24 +19,32 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
+import de.tuberlin.mcc.simra.app.services.DebugUploadService;
 import de.tuberlin.mcc.simra.app.services.OBSService;
-import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 import pl.droidsonroids.gif.GifImageView;
 
-import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.prepareDebugZip;
+import static de.tuberlin.mcc.simra.app.util.Utils.sortFileListLastModified;
 
 public class SettingsActivity extends BaseActivity {
 
     private static final String TAG = "SettingsActivity_LOG";
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int BLUETOOTH_SUCCESS = -1;
-
+    BroadcastReceiver br;
     ActivitySettingsBinding binding;
 
     @Override
@@ -168,11 +180,94 @@ public class SettingsActivity extends BaseActivity {
             }
         });
 
-
         // Version Text
         TextView appVersionTextView = findViewById(R.id.appVersionTextView);
         appVersionTextView.setText("Version: " + BuildConfig.VERSION_CODE + "(" + BuildConfig.VERSION_NAME + ")");
 
+        binding.appVersionTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(SettingsActivity.this).setTitle(R.string.debugPromptTitle1);
+                builder.setMessage(R.string.debugButtonText);
+                builder.setPositiveButton(R.string.continueText, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        fireDebugPrompt();
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel,null);
+                builder.show();
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        br = new SettingsActivity.MyBroadcastReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("de.tuberlin.mcc.simra.app.UPLOAD_COMPLETE");
+        this.registerReceiver(br, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(br);
+    }
+
+    private void fireDebugPrompt() {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(SettingsActivity.this).setTitle(R.string.debugPromptTitle2);
+        File[] dirFiles = new File(IOUtils.Directories.getBaseFolderPath(SettingsActivity.this)).listFiles();
+        List<File> files = new ArrayList<File>(Arrays.asList(dirFiles));
+        List<File> ridesAndAccEvents = new ArrayList<>();
+        sortFileListLastModified(files);
+        double sizeAllInMB = 0;
+        double size10InMB = 0;
+        int i10 = 0;
+        for (int i = 0; i < files.size(); i++) {
+            File file = files.get(i);
+            if (file.getName().contains("accGps")) {
+                int id = Integer.parseInt(file.getName().split("_")[0]);
+                String path = file.getParent()+File.separator+"accEvents" + id + ".csv";
+                File accEvents = new File(path);
+                sizeAllInMB += file.length()/1024.0/1024.0;
+                ridesAndAccEvents.add(file);
+                if (accEvents.exists()) {
+                    sizeAllInMB += accEvents.length()/1024.0/1024.0;
+                    ridesAndAccEvents.add(accEvents);
+                }
+                if (i10 < 10) {
+                    size10InMB = sizeAllInMB;
+                    i10++;
+                }
+            }
+        }
+        sizeAllInMB = Math.round(sizeAllInMB/3.0 * 100.0)/100.0;
+        size10InMB = Math.round(size10InMB/3.0 * 100.0)/100.0;
+        final int[] clicked = {2};
+        CharSequence[] array;
+        if (files.size() > 10) {
+            array = new CharSequence[]{getText(R.string.debugSendAllRides) + " (" + sizeAllInMB + " MB)", getText(R.string.debugSend10Rides) + " (" + size10InMB + " MB)", getText(R.string.debugDoNotSendRides)};
+        } else {
+            array = new CharSequence[]{getText(R.string.debugSendAllRides) + " (" + sizeAllInMB + " MB)", getText(R.string.debugDoNotSendRides)};
+        }
+        builder.setSingleChoiceItems(array, 2, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                clicked[0] = which;
+            }
+        });
+        builder.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                prepareDebugZip(clicked[0],ridesAndAccEvents,SettingsActivity.this);
+                Intent intent = new Intent(SettingsActivity.this, DebugUploadService.class);
+                startService(intent);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel,null);
+        builder.show();
     }
 
     private void updatePrivacyDistanceSlider(UnitHelper.DISTANCE unit) {
@@ -232,4 +327,17 @@ public class SettingsActivity extends BaseActivity {
         alert.setNeutralButton("Ok", (dialog, id) -> { });
         alert.show();
     }
+
+    public class MyBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean uploadSuccessful = intent.getBooleanExtra("uploadSuccessful", false);
+            if (!uploadSuccessful) {
+                Toast.makeText(getApplicationContext(), R.string.upload_failed, Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.upload_completed, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }

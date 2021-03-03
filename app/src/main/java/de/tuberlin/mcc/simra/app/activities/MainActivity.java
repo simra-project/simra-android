@@ -270,7 +270,6 @@ public class MainActivity extends BaseActivity
         // CenterMap
         ImageButton centerMap = findViewById(R.id.center_button);
         centerMap.setOnClickListener(v -> {
-            Log.d(TAG, "centerMap clicked ");
             mLocationOverlay.enableFollowLocation();
             mMapController.setZoom(ZOOM_LEVEL);
         });
@@ -545,14 +544,12 @@ public class MainActivity extends BaseActivity
         locationManager.removeUpdates(MainActivity.this);
         mLocationOverlay.onPause();
         mLocationOverlay.disableMyLocation();
-        Log.d(TAG, "OnPause finished");
         unregisterOBSService();
     }
 
     @SuppressLint("MissingPermission")
     public void onStop() {
         super.onStop();
-        Log.d(TAG, "OnStop called");
         try {
             final Location myLocation = mLocationOverlay.getLastFix();
             if (myLocation != null) {
@@ -565,7 +562,6 @@ public class MainActivity extends BaseActivity
         } catch (Exception se) {
             se.printStackTrace();
         }
-        Log.d(TAG, "OnStop finished");
     }
 
     @Override
@@ -672,7 +668,6 @@ public class MainActivity extends BaseActivity
     }
 
     private void fireNewsPrompt() {
-        Log.d(TAG, "fireWhatIsNewPrompt()");
 
         // get the news from the downloaded config
         String[] simRa_news_config = getNews(MainActivity.this);
@@ -801,6 +796,9 @@ public class MainActivity extends BaseActivity
         if(PermissionHelper.hasBasePermissions(MainActivity.this)) {
             @SuppressLint("MissingPermission")
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location == null) {
+                return false;
+            }
             int selectedRegion = Profile.loadProfile(null,MainActivity.this).region;
             int[] nearestRegions = nearestRegionsToThisLocation(location.getLatitude(),location.getLongitude(),MainActivity.this);
             for (int nearestRegion : nearestRegions) {

@@ -112,6 +112,7 @@
     <string name="ride_deleted">Fahrt gelöscht</string>
     <string name="uploadingNotificationTitle">SimRa</string>
     <string name="uploadingNotificationBody">SimRa lädt Fahrten hoch</string>
+    <string name="uploadingDebugNotificationBody">SimRa lädt Dateien hoch</string>
     <string name="upload_started">SimRa Hochladen gestartet</string>
     <string name="upload_completed">SimRa Hochladen abgeschlossen.</string>
     <string name="upload_failed">SimRa Hochladen fehlgeschlagen. Versuchen Sie es später erneut.</string>
@@ -198,6 +199,13 @@
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Geräte</string>
+    <string name="debugPromptTitle1">Eigene SimRa-Daten an das SimRa-Team senden?</string>
+    <string name="debugButtonText">Achtung! Nur auf den Weiterknopf tippen, wenn Sie vom SimRa Team dazu aufgefordert wurden. Mit dem betätigen des Hochladebuttons im nächsten Schritt werden ihre Einstellungen und Profilangaben, sowie interne Programmvariablen an das Backend geschickt. Sie können auswählen, ob keine Fahrten, die letzten 10 Fahrten oder alle Fahrten (auch die bereits hochgeladenen) hochgeladen werden sollen.</string>
+    <string name="continueText">Weiter</string>
+    <string name="debugPromptTitle2">Sollen Fahrten auch gesendet werden?</string>
+    <string name="debugSendAllRides">Ja, alle</string>
+    <string name="debugSend10Rides">Ja, die letzten 10</string>
+    <string name="debugDoNotSendRides">Nein, keine</string>
 
     <!--- OpenBikeSensor -->
     <string name="obsSwitchTitle">OpenBikeSensor verbinden</string>
