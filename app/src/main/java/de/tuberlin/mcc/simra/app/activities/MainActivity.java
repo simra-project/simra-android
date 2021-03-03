@@ -58,8 +58,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.security.Permission;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -78,10 +76,10 @@ import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
-import de.tuberlin.mcc.simra.app.util.UpdateHelper;
 
 import static de.tuberlin.mcc.simra.app.activities.ProfileActivity.startProfileActivityForChooseRegion;
 import static de.tuberlin.mcc.simra.app.entities.Profile.profileIsInUnknownRegion;
+import static de.tuberlin.mcc.simra.app.update.VersionUpdater.Legacy.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
 import static de.tuberlin.mcc.simra.app.util.Utils.getNews;
@@ -170,7 +168,7 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UpdateHelper.checkForUpdates(this);
+        // UpdateHelper.checkForUpdates(this);
 
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
@@ -328,9 +326,9 @@ public class MainActivity extends BaseActivity
                 Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
             }
         });
-        // download the newest region list from the backend and prompt user to go to "Profile" and set region, if a new region has been added and the region is set as UNKNOWN or other.
-        new RegionTask().execute();
-        new NewsTask().execute();
+
+        new CheckVersionTask().execute();
+
 
         // OpenBikeSensor
         binding.appBarMain.buttonRideSettingsObs.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
@@ -494,7 +492,7 @@ public class MainActivity extends BaseActivity
     }
 
     public void onResume() {
-        UpdateHelper.checkForUpdates(this);
+        // UpdateHelper.checkForUpdates(this);
         obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
         if (obsEnabled) {
             OBSService.tryConnectPairedDevice(this);
@@ -667,6 +665,154 @@ public class MainActivity extends BaseActivity
     public void onProviderDisabled(String provider) {
     }
 
+    private class CheckVersionTask extends AsyncTask<String, String, String> {
+        int installedAppVersion = -1;
+        int newestAppVersion = 0;
+        String urlToNewestAPK = null;
+        Boolean critical = null;
+        private CheckVersionTask() {};
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            installedAppVersion = getAppVersionNumber(MainActivity.this);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            StringBuilder response = new StringBuilder();
+            try {
+                URL url = new URL(BuildConfig.API_ENDPOINT + "check/version?clientHash=" + getClientHash(MainActivity.this));
+                Log.d(TAG, "URL: " + url.toString());
+                HttpsURLConnection urlConnection =
+                        (HttpsURLConnection)url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                // urlConnection.setRequestProperty("Content-Type","text/plain");
+                // urlConnection.setDoOutput(true);
+                urlConnection.setReadTimeout(10000);
+                urlConnection.setConnectTimeout(15000);
+
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                int status = urlConnection.getResponseCode();
+                Log.d(TAG, "Server status: " + status);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, "GET version response: " + response.toString());
+            String[] responseArray = response.toString().split("splitter");
+            if (responseArray.length > 2) {
+                critical = Boolean.valueOf(responseArray[0]);
+                newestAppVersion = Integer.valueOf(responseArray[1]);
+                urlToNewestAPK = responseArray[2];
+                return response.toString();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.GONE);
+                }
+            });
+            if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
+                MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
+            } else {
+                new NewsTask().execute();
+            }
+        }
+    }
+
+    private void fireNewAppVersionPrompt(int installedAppVersion, int newestAppVersion, String urlToNewestAPK, Boolean critical) {
+        Log.d(TAG, "fireNewAppVersionPrompt()");
+        // Store the created AlertDialog instance.
+        // Because only AlertDialog has cancel method.
+        AlertDialog alertDialog = null;
+        // Create a alert dialog builder.
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        // Get custom login form view.
+        View settingsView = getLayoutInflater().inflate(R.layout.new_update_prompt, null);
+
+        // Set above view in alert dialog.
+        builder.setView(settingsView);
+
+        builder.setTitle(getString(R.string.new_app_version_title));
+
+        ((TextView) settingsView.findViewById(R.id.installed_version_textView)).setText(getString(R.string.installed_version) + " " + installedAppVersion);
+        ((TextView) settingsView.findViewById(R.id.newest_version_textView)).setText(getString(R.string.newest_version) + " " + newestAppVersion);
+
+        Button googlePlayStoreButton = settingsView.findViewById(R.id.google_play_store_button);
+
+        googlePlayStoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
+            }
+        });
+
+        Button apkButton = settingsView.findViewById(R.id.apk_button);
+
+        apkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(urlToNewestAPK)));
+            }
+        });
+
+        alertDialog = builder.create();
+
+        if (critical) {
+            Button closeSimRaButton = settingsView.findViewById(R.id.close_simra_button);
+            closeSimRaButton.setVisibility(View.VISIBLE);
+            closeSimRaButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        } else {
+            Button laterButton = settingsView.findViewById(R.id.later_button);
+            laterButton.setVisibility(View.VISIBLE);
+            AlertDialog finalAlertDialog = alertDialog;
+            laterButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finalAlertDialog.cancel();
+                    new NewsTask().execute();
+                }
+            });
+        }
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+
+    }
+
+
     private void fireNewsPrompt() {
 
         // get the news from the downloaded config
@@ -684,19 +830,20 @@ public class MainActivity extends BaseActivity
         // Get news popup view.
         View newsView = getLayoutInflater().inflate(R.layout.news_popup, null);
         LinearLayout linearLayout = newsView.findViewById(R.id.news_blocks);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        layoutParams.setMargins(10, 10, 10, 10);
         for (int i = 1; i < simRa_news_config.length; i++) {
-            // get TextView to be filled with news element
-            TextView thisTextView = (TextView) linearLayout.getChildAt(i-1);
-            // make TextView visible
-            thisTextView.setVisibility(View.VISIBLE);
-            // set text color to colorAccent, if the news element starts with a * instead of a -
+            TextView tv = new TextView(MainActivity.this);
             int textColor = getResources().getColor(R.color.colorPrimary,null);
             if(simRa_news_config[i].startsWith("*")) {
                 textColor = getResources().getColor(R.color.colorAccent,null);
             }
-            thisTextView.setTextColor(textColor);
+            tv.setTextColor(textColor);
             // set text of TextView to text of news element
-            thisTextView.setText(simRa_news_config[i].substring(1));
+            tv.setText(simRa_news_config[i].substring(1));
+            tv.setWidth(linearLayout.getWidth());
+            linearLayout.addView(tv,i,layoutParams);
         }
 
         // Set above view in alert dialog.
@@ -714,6 +861,8 @@ public class MainActivity extends BaseActivity
         okButton.setOnClickListener(v -> {
             SharedPref.App.News.setLastSeenNewsID(newsID,MainActivity.this);
             finalAlertDialog.cancel();
+            // download the newest region list from the backend and prompt user to go to "Profile" and set region, if a new region has been added and the region is set as UNKNOWN or other.
+            new RegionTask().execute();
         });
 
         alertDialog.setCanceledOnTouchOutside(false);
@@ -886,6 +1035,9 @@ public class MainActivity extends BaseActivity
             super.onPostExecute(s);
             if(SharedPref.App.News.getLastSeenNewsID(MainActivity.this) < newsID) {
                 fireNewsPrompt();
+            } else {
+                // download the newest region list from the backend and prompt user to go to "Profile" and set region, if a new region has been added and the region is set as UNKNOWN or other.
+                new RegionTask().execute();
             }
         }
     }

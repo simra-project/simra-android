@@ -447,7 +447,7 @@ public class VersionUpdater {
      * Do not make make PUBLIC!
      * This is Legacy Code only intended for not changing the Migrations
      */
-    private static class Legacy {
+    public static class Legacy {
         // Takes a File which contains all the data and creates a
         // PolyLine to be displayed on the map as a route.
         public static Object[] calculateWaitedTimePolylineDistance(File gpsFile) throws IOException {
