@@ -355,4 +355,9 @@
     <string name="obsConnecting">Verbindung mit OpenBikeSensor</string>
     <string name="obsTutorial">\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden</string>
     <string name="obs">OpenBikeSensor</string>
+
+    <!-- 74 -->
+    <string name="exportTitle">Datenexport</string>
+    <string name="export" translatable="false">Export</string>
+   <!-- <string name="import" translatable="false">Import</string> -->
 </resources>

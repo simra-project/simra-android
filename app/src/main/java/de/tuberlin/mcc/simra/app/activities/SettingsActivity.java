@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -15,16 +16,34 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
 import de.tuberlin.mcc.simra.app.services.OBSService;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 import pl.droidsonroids.gif.GifImageView;
 
+import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 
 public class SettingsActivity extends BaseActivity {
@@ -34,6 +53,7 @@ public class SettingsActivity extends BaseActivity {
     private final static int BLUETOOTH_SUCCESS = -1;
 
     ActivitySettingsBinding binding;
+    String[] ridesArr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +163,34 @@ public class SettingsActivity extends BaseActivity {
         binding.switchAI.setOnCheckedChangeListener((buttonView, isChecked) -> SharedPref.Settings.IncidentGenerationAIActive.setAIEnabled(isChecked,this));
 
 
+        // Data Export
+        Button exportBtn = findViewById(R.id.exportButton);
+        exportBtn.setOnClickListener(v -> {
+            Log.d(TAG, "exportBtn clicked ");
+            //String basePath = IOUtils.Directories.getBaseFolderPath(SettingsActivity.this);
+            String basePath = IOUtils.Directories.getBaseFolderPath(getApplicationContext());
+            Log.d(TAG, "basePath = " + basePath);
+            // folder.listFiles();
+
+            Log.d(TAG, "Fill String array");
+
+            ridesArr = new String[5];
+
+            ridesArr[0] = "/data/de.tuberlin.mcc.simra.app/files/0_accGps.csv";
+            //ridesArr[0] = "/data/data/de.tuberlin.mcc.simra.app/files/0_accGps.csv";
+            //ridesArr[0] = basePath + "/0_accGps.csv";
+            ridesArr[1] = basePath + "/accEvents0.csv";
+            ridesArr[2] = basePath + "/metaData.csv";
+            ridesArr[3] = basePath + "/simRa_news_de.config";
+            ridesArr[4] = basePath + "/simRa_regions.config";
+
+
+            Log.d(TAG,  "String array filled");
+
+            zip(ridesArr, IOUtils.Directories.getExternalBaseDirectoryPath() + "/zipFile/");
+            });
+
+
         // Switch: OpenBikeSensor device enabled
         boolean obsActivated = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
         binding.obsButton.setVisibility(obsActivated ? View.VISIBLE : View.GONE);
@@ -231,5 +279,93 @@ public class SettingsActivity extends BaseActivity {
         alert.setMessage(getString(R.string.incident_buttons_during_ride_warning));
         alert.setNeutralButton("Ok", (dialog, id) -> { });
         alert.show();
+    }
+
+
+    // comparable to refreshMyRides in HistoryActivity
+
+    private void getMyRides() {
+        List<String[]> metaDataLines = new ArrayList<>();
+
+        File metaDataFile = IOUtils.Files.getMetaDataFile(this);
+        if (metaDataFile.exists()) {
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(metaDataFile));
+                // br.readLine() to skip the first line which contains the headers
+                br.readLine();
+                br.readLine();
+                String line;
+                while (((line = br.readLine()) != null)) {
+                    if (!line.startsWith("key") && !line.startsWith("null")) {
+                        metaDataLines.add(line.split(","));
+                    }
+                }
+                Log.d(TAG, "metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            ridesArr = new String[metaDataLines.size()];
+            Log.d(TAG, "getMyRides(): metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
+            for (int i = 0; i < metaDataLines.size(); i++) {
+                String[] metaDataLine = metaDataLines.get(i);
+                if (metaDataLine.length > 2 && !(metaDataLine[0].equals("key"))) {
+                    //ridesArr[((metaDataLines.size()) - i) - 1] = listToTextShape(metaDataLine);
+                }
+            }
+
+            Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
+            List<String> stringArrayList = new ArrayList<>(Arrays.asList(ridesArr));
+
+
+        } else {
+
+            Log.d(TAG, "metaData.csv doesn't exists");
+
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), (getString(R.string.noHistory)), Snackbar.LENGTH_LONG);
+            snackbar.show();
+
+        }
+
+    }
+
+    // _files : Array of files to zip
+    // Buffer can be used for limiting the buffer memory size while reading and writing data it to the zip stream
+
+    public void zip(String[] _files, String zipFileName) {
+        try {
+            BufferedInputStream origin = null;
+            int Buffer = 0;
+            FileOutputStream dest = new FileOutputStream(zipFileName);
+            ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
+                    dest));
+            byte data[] = new byte[Buffer];
+
+            Log.v(TAG, "primarily for loop");
+
+            for (int i = 0; i < _files.length; i++) {
+                Log.v(TAG, "Adding: " + _files[i]);
+                FileInputStream fi = new FileInputStream(_files[i]);
+                Log.v(TAG, "InputStream: " + fi.equals(null));
+                origin = new BufferedInputStream(fi, Buffer);
+                Log.v(TAG, "origin: " + origin.equals(null));
+
+                ZipEntry entry = new ZipEntry(_files[i].substring(_files[i].lastIndexOf("/") + 1));
+                out.putNextEntry(entry);
+                int count;
+
+                while ((count = origin.read(data, 0, Buffer)) != -1) {
+                    out.write(data, 0, count);
+                }
+                origin.close();
+            }
+
+            out.close();
+        } catch (Exception e) {
+            String exce = e.toString();
+            Log.d(TAG, "export catched:/n "+ exce);
+            e.printStackTrace();
+        }
+
     }
 }
