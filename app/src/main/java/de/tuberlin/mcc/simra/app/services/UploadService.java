@@ -118,9 +118,7 @@ public class UploadService extends Service {
 
         Log.d(TAG, "onStartCommand() called");
 
-
-        Notification notification =
-                ForegroundServiceNotificationManager.createOrUpdateNotification(
+        Notification notification = ForegroundServiceNotificationManager.createOrUpdateNotification(
                         this,
                         getResources().getString(R.string.uploadingNotificationTitle),
                         getResources().getString(R.string.uploadingNotificationBody)

@@ -338,6 +338,7 @@
                         android:id="@+id/metricSystemTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:text="@string/metric" />
 
                     <Switch
@@ -350,6 +351,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/unitSwitch"
+                        android:layout_centerVertical="true"
                         android:text="@string/imperial" />
                 </RelativeLayout>
                 <Space
@@ -373,6 +375,7 @@
                         android:id="@+id/textViewButtonsOff"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:text="@string/hideButtons" />
 
                     <Switch
@@ -386,6 +389,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/switchButtons"
+                        android:layout_centerVertical="true"
                         android:text="@string/showButtons" />
                 </RelativeLayout>
 
@@ -410,6 +414,7 @@
                         android:id="@+id/textViewAIOff"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:text="@string/offlineNoAI" />
 
                     <Switch
@@ -423,6 +428,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/switchAI"
+                        android:layout_centerVertical="true"
                         android:text="@string/onlineAI" />
                 </RelativeLayout>
 

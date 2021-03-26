@@ -61,7 +61,8 @@
     <string name="startButtonText">Start\nRecording</string>
     <string name="stopButtonText">End\nRecording</string>
     <string name="airplaneModeIsOn">The airplane mode is enabled! Please disable it, so the ride can be recorded.</string>
-    <string name="locationServiceisOff">The location service is disabled! Please enable it, so the ride can be recorded.</string>
+    <string name="locationServiceisOff">The location service is disabled!</string>
+    <string name="enableToRecord">Please enable it, so the ride can be recorded.</string>
     <string name="checking_for_updates">Checking for updates</string>
     <string name="new_app_version_text">To continue, please download the new version via Google Play or manually via the .APK file.</string>
     <string name="open_google_play_store">Open Google Play Store</string>
@@ -69,6 +70,7 @@
     <string name="installed_version">installed version:</string>
     <string name="newest_version">newest version:</string>
     <string name="new_app_version_title">New update available</string>
+    <string name="pleaseChooseRegion">SimRa now supports many regions. Do you want to set a region to improve your contributions to the project? This way, we can increase the significance of our results.</string>
     <string name="later">Later</string>
     <string name="reportIncidentClosepass">Close Pass</string>
     <string name="reportIncidentObstacle">Dodging Obstacle</string>
@@ -189,6 +191,13 @@
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Devices</string>
+    <string name="debugPromptTitle1">Send local app data to the SimRa team?</string>
+    <string name="debugButtonText">Attention! Only tap the Continue button, if you were asked to do so by the SimRa team. By pressing the Upload button in the next step, you send your SimRa configuration to the SimRa team. You can also specify to upload the last 10 rides or all rides.</string>
+    <string name="continueText">Continue</string>
+    <string name="debugPromptTitle2">Do you also want to send rides?</string>
+    <string name="debugSendAllRides">Yes, all</string>
+    <string name="debugSend10Rides">Yes, the last 10</string>
+    <string name="debugDoNotSendRides">No, don\'t send any rides</string>
 
     <!--- OpenBikeSensor -->
     <string name="obsSwitchTitle">OpenBikeSensor connection</string>
@@ -232,13 +241,18 @@
     <string name="experienceLessThen2">Less than 2 years</string>
     <string name="editingProfileCompleted">Profile data saved</string>
     <string name="regionSpinnerTitle">Region</string>
+    <string name="regionManual">Select manually</string>
+    <string name="regionAutomatic">Detect via GPS</string>
+    <string name="detectRegion">Detect region</string>
+    <string name="enableToDetectRegion">Please enable it, so your region can be detected.</string>
+    <string name="selectedRegion">Selected region: </string>
+    <string name="nearestRegions">Nearest regions to your location:</string>
     <string name="experienceSpinnerTitle">Experience as a Cyclist</string>
     <string name="rulesDescription">How often do you follow the traffic rules?</string>
     <string name="never">Never</string>
     <string name="always">Always</string>
     <string name="on">ON</string>
     <string name="off">OFF</string>
-    <!---  -->
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="pleaseChoose">Please Choose</string>
@@ -351,5 +365,7 @@
 
     <!-- 74 -->
     <string name="exportTitle">Data Export</string>
+    <string name="uploadingDebugNotificationBody">SimRa is uploading files</string>
+
 
 </resources>

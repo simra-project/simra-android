@@ -123,6 +123,17 @@ public class SharedPref {
             }
         }
 
+        // RIDE-KEY
+        public static class RideKey {
+            private static final String RIDE_KEY = "RIDE-KEY";
+            public static void setRideKey(int lastSeenNewsID, Context context) {
+                writeIntegerToAppSharedPrefsAsync(RIDE_KEY,lastSeenNewsID,context);
+            }
+            public static int getRideKey(Context context) {
+                return readIntegerFromAppSharedPrefs(RIDE_KEY,0,context);
+            }
+        }
+
         /**
          * Grouped State for Crash Data
          */
@@ -175,6 +186,32 @@ public class SharedPref {
                 public static void setEnabled(Boolean enabled, Context context) {
                     writeBooleanToAppSharedPrefsAsync(NEW_CRASH_REPORT, enabled, context);
                 }
+            }
+        }
+
+        /**
+         * Last checked number of regions from getRegions()
+         */
+        public static class Regions {
+            private static final String LAST_REGION_NUMBER_KNOWN = "LAST_REGION_NUMBER_KNOWN";
+            public static void setLastRegionNumberKnown(int lastRegionNumberKnown, Context context) {
+                writeIntegerToAppSharedPrefsAsync(LAST_REGION_NUMBER_KNOWN,lastRegionNumberKnown,context);
+            }
+            public static int getLastRegionNumberKnown(Context context) {
+                return readIntegerFromAppSharedPrefs(LAST_REGION_NUMBER_KNOWN,0,context);
+            }
+        }
+
+        /**
+         * whether to show region prompt or not
+         */
+        public static class RegionsPrompt {
+            private static final String DO_NOT_SHOW_REGION_PROMPT = "DO_NOT_SHOW_REGION_PROMPT";
+            public static void setDoNotShowRegionPrompt(boolean showRegionPrompt, Context context) {
+                writeBooleanToAppSharedPrefsAsync(DO_NOT_SHOW_REGION_PROMPT,showRegionPrompt,context);
+            }
+            public static boolean getDoNotShowRegionPrompt(Context context) {
+                return readBooleanFromAppSharedPrefs(DO_NOT_SHOW_REGION_PROMPT,context);
             }
         }
     }
@@ -237,6 +274,20 @@ public class SharedPref {
             public static boolean getIncidentButtonsEnabled(Context context) {
                 return readBooleanFromAppSharedPrefs(INCIDENT_BUTTONS_ENABLED, context);
             }
+        }
+
+        public static class RegionSetting {
+            // See top of this class before changing this string
+            public static final String REGION_SETTING = SETTINGS + "Region-Setting";
+
+            public static void setRegionDetectionViaGPSEnabled(boolean enabled, Context context) {
+                writeBooleanToAppSharedPrefsAsync(REGION_SETTING, enabled, context);
+            }
+
+            public static boolean getRegionDetectionViaGPSEnabled(Context context) {
+                return readBooleanFromAppSharedPrefs(REGION_SETTING, context);
+            }
+
         }
 
         public static class Ride {
