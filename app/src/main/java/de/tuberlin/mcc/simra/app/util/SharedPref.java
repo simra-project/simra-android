@@ -191,6 +191,7 @@ public class SharedPref {
 
         /**
          * Last checked number of regions from getRegions()
+         * Last regions number displayed from backend simRa_regions_coords_ID.config
          */
         public static class Regions {
             private static final String LAST_REGION_NUMBER_KNOWN = "LAST_REGION_NUMBER_KNOWN";
@@ -199,6 +200,14 @@ public class SharedPref {
             }
             public static int getLastRegionNumberKnown(Context context) {
                 return readIntegerFromAppSharedPrefs(LAST_REGION_NUMBER_KNOWN,0,context);
+            }
+
+            private static final String LAST_SEEN_REGIONS_ID = "LAST_SEEN_REGIONS_ID";
+            public static void setLastSeenRegionsID(int lastSeenRegionsID, Context context) {
+                writeIntegerToAppSharedPrefsAsync(LAST_SEEN_REGIONS_ID,lastSeenRegionsID,context);
+            }
+            public static int getLastSeenRegionsID(Context context) {
+                return readIntegerFromAppSharedPrefs(LAST_SEEN_REGIONS_ID,0,context);
             }
         }
 

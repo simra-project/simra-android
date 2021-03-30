@@ -310,7 +310,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // For all subsequent rides, the key value increases by one at a time.
 
         key = sharedPrefs.getInt("RIDE-KEY", 0);
-        incidentLog = new IncidentLog(key, new HashMap<>());
+        incidentLog = new IncidentLog(key, new HashMap<>(), 0);
 
         // Fire the notification while recording
         Notification notification =

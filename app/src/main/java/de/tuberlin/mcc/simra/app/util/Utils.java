@@ -165,13 +165,17 @@ public class Utils {
         return (long) ((totalDistance / (float) 1000) * 138);
     }
 
-    public static List<IncidentLogEntry> findAccEvents(int rideId, int bike, int pLoc, Context context) {
+    // returns the incidents to be proposed and true if findAccEventOnline worked and false if it failed to run
+    public static Pair<List<IncidentLogEntry>, Integer> findAccEvents(int rideId, int bike, int pLoc, Context context) {
         List<IncidentLogEntry> foundEvents = null;
+        Integer nn_version = 0;
         if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(context)) {
-            foundEvents = findAccEventOnline(rideId, bike, pLoc, context);
+            Pair<List<IncidentLogEntry>, Integer> findAccEventOnlineResult = findAccEventOnline(rideId, bike, pLoc, context);
+            foundEvents = findAccEventOnlineResult.first;
+            nn_version = findAccEventOnlineResult.second;
         }
         if (foundEvents != null && foundEvents.size() > 0)
-            return foundEvents;
+            return new Pair<>(foundEvents, nn_version);
         else
             return findAccEventsLocal(rideId, context);
     }
@@ -179,7 +183,7 @@ public class Utils {
     /*
      * Uses sophisticated AI to analyze the ride
      * */
-    public static List<IncidentLogEntry> findAccEventOnline(int rideId, int bike, int pLoc, Context context) {
+    public static Pair<List<IncidentLogEntry>, Integer> findAccEventOnline(int rideId, int bike, int pLoc, Context context) {
         try {
             String responseString = "";
 
@@ -231,7 +235,9 @@ public class Utils {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(urlConnection.getInputStream()
                     ));
-            String inputLine;
+            // first response line is neuronal network version used by backend to identify incidents
+            String inputLine = in.readLine();
+            Integer nn_version = Integer.parseInt(inputLine);
             while ((inputLine = in.readLine()) != null) {
                 responseString += inputLine;
             }
@@ -265,7 +271,7 @@ public class Utils {
                     }
                     index++;
                 }
-                return foundIncidents;
+                return new Pair<>(foundIncidents, nn_version);
             }
 
         } catch (IOException | JSONException e) {
@@ -276,7 +282,7 @@ public class Utils {
     }
 
 
-    public static List<IncidentLogEntry> findAccEventsLocal(int rideId, Context context) {
+    public static Pair<List<IncidentLogEntry>, Integer> findAccEventsLocal(int rideId, Context context) {
         Log.d(TAG, "findAccEventsLocal()");
         List<AccEvent> accEvents = new ArrayList<>(6);
 
@@ -447,7 +453,7 @@ public class Utils {
             }
         }
 
-        return incidents;
+        return new Pair<>(incidents,0);
     }
 
     public static String mergeGPSandSensorLines(Queue<DataLogEntry> gpsLines, Queue<DataLogEntry> sensorLines) {

@@ -126,7 +126,7 @@ public class UploadService extends Service {
         startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
         wakeLock.acquire(1000 * 60 * 15);
 
-        new UpdateTask(this, intent).execute();
+        new UploadTask(this, intent).execute();
         return Service.START_NOT_STICKY;
     }
 
@@ -136,12 +136,12 @@ public class UploadService extends Service {
         }
     }
 
-    private class UpdateTask extends AsyncTask<String, String, String> {
+    private class UploadTask extends AsyncTask<String, String, String> {
 
         private Context context;
         private Intent intent;
 
-        private UpdateTask(Context context, Intent intent) {
+        private UploadTask(Context context, Intent intent) {
             this.context = context;
             this.intent = intent;
         }

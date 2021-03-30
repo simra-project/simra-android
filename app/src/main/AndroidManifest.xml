@@ -116,6 +116,7 @@
         <!-- Services -->
         <service
             android:name=".services.RecorderService"
+            android:foregroundServiceType="location"
             android:parentActivityName=".MainActivity" />
         <service
             android:name=".services.UploadService"

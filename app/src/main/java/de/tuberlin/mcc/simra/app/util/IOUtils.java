@@ -122,7 +122,9 @@ public class IOUtils {
         public static String getFileInfoLine() {
             return BuildConfig.VERSION_CODE + "#1" + System.lineSeparator();
         }
-
+        public static String getFileInfoLine(int modelVersion) {
+            return BuildConfig.VERSION_CODE + "#1#" + modelVersion + System.lineSeparator();
+        }
         public static String getMetaDataFilePath(Context context) {
             return IOUtils.Directories.getBaseFolderPath(context) + "metaData.csv";
         }
