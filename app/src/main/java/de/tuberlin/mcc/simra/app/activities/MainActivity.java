@@ -312,7 +312,7 @@ public class MainActivity extends BaseActivity
                 recording = false;
                 if (mBoundRecorderService.getRecordingAllowed()) {
                     ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(),
-                            MetaData.STATE.JUST_RECORDED, this);
+                            MetaData.STATE.JUST_RECORDED, true, this);
                 } else {
                     new AlertDialog.Builder(MainActivity.this)
                             .setMessage(getString(R.string.errorRideNotRecorded))
