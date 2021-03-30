@@ -165,7 +165,7 @@ public class Utils {
         return (long) ((totalDistance / (float) 1000) * 138);
     }
 
-    public static List<IncidentLogEntry> findAccEvents(int rideId, int bike, int pLoc, Context context) {
+    public static List<IncidentLogEntry> findAccEvents(int rideId, int bike, int pLoc, int state, Context context) {
         List<IncidentLogEntry> foundEvents = null;
         if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(context)) {
             foundEvents = findAccEventOnline(rideId, bike, pLoc, context);
@@ -173,7 +173,7 @@ public class Utils {
         if (foundEvents != null && foundEvents.size() > 0)
             return foundEvents;
         else
-            return findAccEventsLocal(rideId, context);
+            return findAccEventsLocal(rideId, state, context);
     }
 
     /*
@@ -276,7 +276,7 @@ public class Utils {
     }
 
 
-    public static List<IncidentLogEntry> findAccEventsLocal(int rideId, Context context) {
+    public static List<IncidentLogEntry> findAccEventsLocal(int rideId, int state, Context context) {
         Log.d(TAG, "findAccEventsLocal()");
         List<AccEvent> accEvents = new ArrayList<>(6);
 
@@ -437,6 +437,14 @@ public class Utils {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            fixRide(rideId, context);
+            Log.d(TAG,"fixed ride");
+            List<IncidentLogEntry> dummyEntryList = new ArrayList<>();
+            IncidentLogEntry dummyIncident = IncidentLogEntry.newBuilder().withDescription("startShowRouteActivity").build();
+            dummyEntryList.add(dummyIncident);
+            return dummyEntryList;
         }
 
         List<IncidentLogEntry> incidents = new ArrayList<>();
@@ -448,6 +456,31 @@ public class Utils {
         }
 
         return incidents;
+    }
+
+    private static void fixRide(int rideId, Context context) {
+        try {
+            StringBuilder fixedRideContent = new StringBuilder();
+            BufferedReader br = new BufferedReader(new FileReader(IOUtils.Files.getGPSLogFile(rideId, false, context)));
+            String line = br.readLine(); // fileInfo line
+            fixedRideContent.append(line).append(System.lineSeparator());
+            line = br.readLine(); // csv header
+            fixedRideContent.append(line).append(System.lineSeparator());
+            // skip to first GPS Line
+            while ((line = br.readLine()) != null) {
+                if (!line.startsWith(",,")){
+                    break;
+                }
+            }
+            fixedRideContent.append(line).append(System.lineSeparator());
+            while ((line = br.readLine()) != null) {
+                fixedRideContent.append(line).append(System.lineSeparator());
+            }
+            overwriteFile(fixedRideContent.toString(),IOUtils.Files.getGPSLogFile(rideId, false, context));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static String mergeGPSandSensorLines(Queue<DataLogEntry> gpsLines, Queue<DataLogEntry> sensorLines) {
