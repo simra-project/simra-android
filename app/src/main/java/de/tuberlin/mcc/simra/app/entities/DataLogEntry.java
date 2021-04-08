@@ -1,9 +1,5 @@
 package de.tuberlin.mcc.simra.app.entities;
 
-import android.util.Log;
-
-import java.util.Arrays;
-
 public class DataLogEntry {
     private static final String TAG = "DataLogEntry_LOG:";
     public final Integer rideId;

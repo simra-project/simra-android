@@ -64,8 +64,9 @@ public class IncidentLog {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(incidentFile))) {
                 // Get nn_version
                 String line = bufferedReader.readLine();
-                if (line.split("#").length>1) {
+                if (line.split("#").length>2) {
                     nn_version = Integer.parseInt(line.split("#",-1)[2]);
+                    Log.d(TAG, "line: " + line + " nn_version: " + nn_version);
                 }
                 // Skip INCIDENT_LOG_HEADER
                 bufferedReader.readLine();
@@ -174,6 +175,10 @@ public class IncidentLog {
         }
         incidents.put(incidentLogEntry.key, incidentLogEntry);
         return incidentLogEntry;
+    }
+    public IncidentLogEntry updateOrAddIncident(IncidentLogEntry incidentLogEntry, int nn_version) {
+        this.nn_version = nn_version;
+        return updateOrAddIncident(incidentLogEntry);
     }
 
     public Map<Integer, IncidentLogEntry> removeIncident(IncidentLogEntry incidentLogEntry) {

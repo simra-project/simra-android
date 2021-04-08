@@ -132,7 +132,7 @@
     <string name="saveIncident">Speichern &amp;\nZurück</string>
     <string name="returnAsText">Zurück</string>
     <string name="savedRide">Die Fahrt wurde gespeichert</string>
-    <string name="doNotShowAgain">Diesen Dialog nicht mehr zeigen</string>
+    <string name="doNotShowAgain">Nicht mehr zeigen</string>
     <string name="ride_undo">Zurücksetzen</string>
 
     <!--- IncidentPopUp -->

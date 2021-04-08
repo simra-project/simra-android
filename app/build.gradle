@@ -5,11 +5,11 @@ def API_ENDPOINT = "API_ENDPOINT"
 def API_VERSION = "API_VERSION"
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 79
         versionName "79.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -24,8 +24,8 @@ android {
         }
 
 
-        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://vm2.mcc.tu-berlin.de:8082/\""
-        buildConfigField "String", API_VERSION, properties.getProperty(API_VERSION) ?: "\"11/\""
+        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://vm1.mcc.tu-berlin.de:8082/\""
+        buildConfigField "String", API_VERSION, properties.getProperty(API_VERSION) ?: "\"12/\""
 
     }
     buildTypes {
@@ -64,12 +64,12 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'com.google.android.play:core:1.8.0'
+    // implementation 'com.google.android.play:core:1.8.0'
 
     def lifecycle_version = "2.2.0"
     implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.material:material:1.3.0-alpha02'
+    implementation 'com.google.android.material:material:1.3.0'
     api 'org.osmdroid:osmdroid-android:6.0.3'
     api 'com.github.MKergall:osmbonuspack:6.5.3'
     implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.4'

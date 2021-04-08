@@ -83,7 +83,6 @@ import static de.tuberlin.mcc.simra.app.update.VersionUpdater.Legacy.Utils.getAp
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
 import static de.tuberlin.mcc.simra.app.util.Utils.getNews;
-import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.isLocationServiceOff;
 import static de.tuberlin.mcc.simra.app.util.Utils.nearestRegionsToThisLocation;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
@@ -939,7 +938,9 @@ public class MainActivity extends BaseActivity
             // prompt user to go to "Profile" and set region, if regions have been updated and the region is set as UNKNOWN or other.
             Log.d(TAG, lastSeenRegionsID + " < " + regionsID + ": " + (lastSeenRegionsID < regionsID));
             Log.d(TAG, "actualSelectedRegionNotInTopThreeNearestRegion(): " + actualSelectedRegionNotInTopThreeNearestRegion());
-            if (!SharedPref.App.RegionsPrompt.getDoNotShowRegionPrompt(MainActivity.this) && (((lastSeenRegionsID < regionsID) && profileIsInUnknownRegion(MainActivity.this)) || actualSelectedRegionNotInTopThreeNearestRegion())) {
+            if (!SharedPref.App.RegionsPrompt.getDoNotShowRegionPrompt(MainActivity.this) &&
+                    (((lastSeenRegionsID < regionsID) && profileIsInUnknownRegion(MainActivity.this)) ||
+                            actualSelectedRegionNotInTopThreeNearestRegion())) {
                 fireProfileRegionPrompt(regionsID);
             }
         }

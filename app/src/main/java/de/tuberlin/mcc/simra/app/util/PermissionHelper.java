@@ -3,15 +3,11 @@ package de.tuberlin.mcc.simra.app.util;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import de.tuberlin.mcc.simra.app.activities.MainActivity;
-import de.tuberlin.mcc.simra.app.activities.StartActivity;
 
 import java.util.Objects;
 

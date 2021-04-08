@@ -177,7 +177,7 @@ public class SharedPref {
             }
 
             public static class NewCrash {
-                private static final String NEW_CRASH_REPORT = "NEW-UNSENT-ERROR";
+                private static final String NEW_CRASH_REPORT = "NEW_CRASH_REPORT";
 
                 public static boolean isActive(Context context) {
                     return readBooleanFromAppSharedPrefs(NEW_CRASH_REPORT, context);

@@ -165,7 +165,7 @@ public class Utils {
         return (long) ((totalDistance / (float) 1000) * 138);
     }
 
-    // returns the incidents to be proposed and true if findAccEventOnline worked and false if it failed to run
+    // returns the incidents to be proposed and the neuronal network version that calculated the incidents (-1 if local algorithm was used)
     public static Pair<List<IncidentLogEntry>, Integer> findAccEvents(int rideId, int bike, int pLoc, int state, Context context) {
         List<IncidentLogEntry> foundEvents = null;
         Integer nn_version = 0;
@@ -235,9 +235,7 @@ public class Utils {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(urlConnection.getInputStream()
                     ));
-            // first response line is neuronal network version used by backend to identify incidents
-            String inputLine = in.readLine();
-            Integer nn_version = Integer.parseInt(inputLine);
+            String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 responseString += inputLine;
             }
@@ -248,9 +246,10 @@ public class Utils {
             Log.d(TAG, "Server status: " + status);
             Log.d(TAG, "Server Message: " + responseString);
 
-            JSONArray incidentTimestamps;
             // response okay
-            if (status == 200 && ((incidentTimestamps = new JSONArray(responseString)).length() > 0)) {
+            if (status == 200 && responseString.length() > 1) {
+                JSONArray incidentTimestamps = new JSONArray(responseString);
+                Integer nn_version = (Integer) incidentTimestamps.remove(0); // remove first element since it is the nn_version
                 List<IncidentLogEntry> foundIncidents = new ArrayList<>();
                 DataLog allLogs = DataLog.loadDataLog(rideId, context);
 
@@ -278,7 +277,7 @@ public class Utils {
             e.printStackTrace();
         }
 
-        return null;
+        return new Pair<>(null,-2);
     }
 
 
@@ -450,7 +449,7 @@ public class Utils {
             List<IncidentLogEntry> dummyEntryList = new ArrayList<>();
             IncidentLogEntry dummyIncident = IncidentLogEntry.newBuilder().withDescription("startShowRouteActivity").build();
             dummyEntryList.add(dummyIncident);
-            return dummyEntryList;
+            return new Pair<>(dummyEntryList,-1);
         }
 
         List<IncidentLogEntry> incidents = new ArrayList<>();
@@ -633,6 +632,7 @@ public class Utils {
                 filesToUpload.remove(0);
             }
         }
+        filesToUpload.add(IOUtils.Files.getMetaDataFile(context));
         filesToUpload.addAll(Arrays.asList(getSharedPrefsDirectory(context).listFiles()));
         try {
             zip(filesToUpload,new File(IOUtils.Directories.getBaseFolderPath(context) + "zip.zip"));
