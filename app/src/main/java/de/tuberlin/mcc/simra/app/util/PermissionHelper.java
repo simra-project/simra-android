@@ -13,6 +13,9 @@ import java.util.Objects;
 
 
 public class PermissionHelper {
+    // Log tag
+    private static final String TAG = "PermissionHelper_LOG";
+
     public static final BasePermission Storage = new BasePermission(1002, new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -27,6 +30,14 @@ public class PermissionHelper {
     public static final BasePermission Location = new BasePermission(1001, new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    });
+    private static final BasePermission LocationAndStorageAndroidR = new BasePermission(1004,new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    });
+    public static final BasePermission LocationAndroidR = new BasePermission(1001, new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION,
     });
 
     public static final int REQUEST_CODE_CAMERA = 1003;
@@ -62,17 +73,33 @@ public class PermissionHelper {
     }
 
     public static void requestFirstBasePermissionsNotGranted( Activity activity) {
-        if (!hasBasePermissions(activity)) {
-            LocationAndStorage.requestPermissions(activity);
-        } else if (!hasPermissions(Location.permissions, activity)) {
-            Location.requestPermissions(activity);
-        } else if (!hasPermissions(Storage.permissions, activity)) {
-            Storage.requestPermissions(activity);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            if (!hasBasePermissions(activity)) {
+                LocationAndStorage.requestPermissions(activity);
+            } else if (!hasPermissions(Location.permissions, activity)) {
+                Location.requestPermissions(activity);
+            } else if (!hasPermissions(Storage.permissions, activity)) {
+                Storage.requestPermissions(activity);
+            }
+        } else {
+            if (!hasBasePermissions(activity)) {
+                LocationAndStorageAndroidR.requestPermissions(activity);
+            } else if (!hasPermissions(LocationAndroidR.permissions, activity)) {
+                LocationAndroidR.requestPermissions(activity);
+            } else if (!hasPermissions(Storage.permissions, activity)) {
+                Storage.requestPermissions(activity);
+            }
         }
+
     }
 
     public static boolean hasBasePermissions(Context context) {
-        return hasPermissions(Location.permissions, context) && hasPermissions(Storage.permissions, context);    }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            return hasPermissions(Location.permissions, context) && hasPermissions(Storage.permissions, context);
+        } else {
+            return hasPermissions(LocationAndroidR.permissions, context) && hasPermissions(Storage.permissions, context);
+        }
+    }
 
 
     public static class BasePermission {
