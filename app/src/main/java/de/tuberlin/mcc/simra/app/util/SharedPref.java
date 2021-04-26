@@ -215,7 +215,15 @@ public class SharedPref {
          * whether to show region prompt or not
          */
         public static class RegionsPrompt {
-            private static final String DO_NOT_SHOW_REGION_PROMPT = "DO_NOT_SHOW_REGION_PROMPT";
+            private static final String DO_NOT_SHOW_REGION_PROMPT = "DONT_SHOW_REGION_PROMPT";
+            private static final String REGION_PROMPT_SHOWN_AFTER_V81 = "REGION_PROMPT_SHOWN_AFTER_V81";
+            public static void setRegionPromptShownAfterV81(boolean regionPromptShown, Context context) {
+                writeBooleanToAppSharedPrefsAsync(REGION_PROMPT_SHOWN_AFTER_V81,regionPromptShown,context);
+            }
+            public static boolean getRegionPromptShownAfterV81(Context context) {
+                return readBooleanFromAppSharedPrefs(REGION_PROMPT_SHOWN_AFTER_V81,context);
+            }
+
             public static void setDoNotShowRegionPrompt(boolean showRegionPrompt, Context context) {
                 writeBooleanToAppSharedPrefsAsync(DO_NOT_SHOW_REGION_PROMPT,showRegionPrompt,context);
             }

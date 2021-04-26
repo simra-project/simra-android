@@ -82,10 +82,14 @@ import static de.tuberlin.mcc.simra.app.entities.Profile.profileIsInUnknownRegio
 import static de.tuberlin.mcc.simra.app.update.VersionUpdater.Legacy.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
+import static de.tuberlin.mcc.simra.app.util.Utils.fireProfileRegionPrompt;
+import static de.tuberlin.mcc.simra.app.util.Utils.getCorrectRegionName;
 import static de.tuberlin.mcc.simra.app.util.Utils.getNews;
+import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.isLocationServiceOff;
 import static de.tuberlin.mcc.simra.app.util.Utils.nearestRegionsToThisLocation;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.regionsDecoder;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
@@ -863,25 +867,7 @@ public class MainActivity extends BaseActivity
 
     }
 
-    public void fireProfileRegionPrompt(int regionsID) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-        alert.setTitle(getString(R.string.chooseRegion));
-        alert.setMessage(R.string.pleaseChooseRegion);
-        alert.setPositiveButton(R.string.yes, (dialogInterface, j) -> {
-            SharedPref.App.News.setLastSeenNewsID(regionsID,MainActivity.this);
-            startProfileActivityForChooseRegion(MainActivity.this);
-        });
 
-        alert.setNeutralButton(R.string.doNotShowAgain, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                SharedPref.App.RegionsPrompt.setDoNotShowRegionPrompt(true,MainActivity.this);
-                SharedPref.App.News.setLastSeenNewsID(regionsID,MainActivity.this);
-            }
-        });
-        alert.setNegativeButton(R.string.later,null);
-        alert.show();
-    }
 
     private class RegionTask extends AsyncTask<String, String, String> {
         int regionsID = -1;
@@ -938,10 +924,10 @@ public class MainActivity extends BaseActivity
             // prompt user to go to "Profile" and set region, if regions have been updated and the region is set as UNKNOWN or other.
             Log.d(TAG, lastSeenRegionsID + " < " + regionsID + ": " + (lastSeenRegionsID < regionsID));
             Log.d(TAG, "actualSelectedRegionNotInTopThreeNearestRegion(): " + actualSelectedRegionNotInTopThreeNearestRegion());
-            if (!SharedPref.App.RegionsPrompt.getDoNotShowRegionPrompt(MainActivity.this) &&
+            if (!SharedPref.App.RegionsPrompt.getRegionPromptShownAfterV81(MainActivity.this) || (!SharedPref.App.RegionsPrompt.getDoNotShowRegionPrompt(MainActivity.this) &&
                     (((lastSeenRegionsID < regionsID) && profileIsInUnknownRegion(MainActivity.this)) ||
-                            actualSelectedRegionNotInTopThreeNearestRegion())) {
-                fireProfileRegionPrompt(regionsID);
+                            actualSelectedRegionNotInTopThreeNearestRegion()))) {
+                fireProfileRegionPrompt(regionsID, MainActivity.this);
             }
         }
     }

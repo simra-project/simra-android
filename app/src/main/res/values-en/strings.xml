@@ -70,7 +70,8 @@
     <string name="installed_version">installed version:</string>
     <string name="newest_version">newest version:</string>
     <string name="new_app_version_title">New update available</string>
-    <string name="pleaseChooseRegion">SimRa now supports many regions. Do you want to set a region to improve your contributions to the project? This way, we can increase the significance of our results.</string>
+    <string name="pleaseChooseRegion">Please choose your correct region, so that we can analyze your ride correctly. Your selected region:</string>
+    <string name="selectRegion">Select Region</string>
     <string name="later">Later</string>
     <string name="reportIncidentClosepass">Close Pass</string>
     <string name="reportIncidentObstacle">Dodging Obstacle</string>

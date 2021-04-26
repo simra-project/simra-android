@@ -38,6 +38,7 @@ import java.util.TimeZone;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityHistoryBinding;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
+import de.tuberlin.mcc.simra.app.entities.Profile;
 import de.tuberlin.mcc.simra.app.services.UploadService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -45,6 +46,7 @@ import de.tuberlin.mcc.simra.app.util.SharedPref;
 
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.Utils.fireProfileRegionPrompt;
 
 public class HistoryActivity extends BaseActivity {
     private static final String TAG = "HistoryActivity_LOG";
@@ -103,6 +105,8 @@ public class HistoryActivity extends BaseActivity {
         binding.upload.setOnClickListener(view -> {
             if (!lookUpBooleanSharedPrefs("uploadWarningShown", false, "simraPrefs", HistoryActivity.this)) {
                 fireUploadPrompt();
+            } else if (Profile.loadProfile(null, HistoryActivity.this).region == 0) {
+                fireProfileRegionPrompt(SharedPref.App.Regions.getLastSeenRegionsID(HistoryActivity.this),HistoryActivity.this);
             } else {
                 Intent intent = new Intent(HistoryActivity.this, UploadService.class);
                 startService(intent);
@@ -234,12 +238,16 @@ public class HistoryActivity extends BaseActivity {
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.upload_file_warning));
         alert.setPositiveButton(R.string.upload, (dialog, id) -> {
-            writeBooleanToSharedPrefs("uploadWarningShown", true, "simraPrefs", HistoryActivity.this);
-            Intent intent = new Intent(HistoryActivity.this, UploadService.class);
-            startService(intent);
-            Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
-            if (exitWhenDone) {
-                HistoryActivity.this.moveTaskToBack(true);
+            if (Profile.loadProfile(null, HistoryActivity.this).region == 0) {
+                fireProfileRegionPrompt(SharedPref.App.Regions.getLastSeenRegionsID(HistoryActivity.this),HistoryActivity.this);
+            } else {
+                writeBooleanToSharedPrefs("uploadWarningShown", true, "simraPrefs", HistoryActivity.this);
+                Intent intent = new Intent(HistoryActivity.this, UploadService.class);
+                startService(intent);
+                Toast.makeText(HistoryActivity.this, getString(R.string.upload_started), Toast.LENGTH_SHORT).show();
+                if (exitWhenDone) {
+                    HistoryActivity.this.moveTaskToBack(true);
+                }
             }
         });
         alert.setNegativeButton(R.string.cancel, (dialog, id) -> {

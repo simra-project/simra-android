@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.util;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.location.LocationManager;
@@ -31,12 +32,17 @@ import java.util.Locale;
 import java.util.Queue;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import androidx.appcompat.app.AlertDialog;
 import de.tuberlin.mcc.simra.app.BuildConfig;
+import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
+import de.tuberlin.mcc.simra.app.entities.Profile;
 
+import static de.tuberlin.mcc.simra.app.activities.ProfileActivity.startProfileActivityForChooseRegion;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getSharedPrefsDirectory;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.zip;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
@@ -606,6 +612,32 @@ public class Utils {
         } else {
             return regionLine.split("=")[1];
         }
+    }
+
+    public static void fireProfileRegionPrompt(int regionsID, Context context) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle(context.getString(R.string.chooseRegion));
+        CharSequence pleaseChooseRegionText = context.getText(R.string.pleaseChooseRegion);
+        CharSequence chosenRegion = getCorrectRegionName(regionsDecoder(new int[]{Profile.loadProfile(null, context).region},context)[0]);
+
+        alert.setMessage( pleaseChooseRegionText + System.lineSeparator() + chosenRegion);
+        // alert.setMessage(R.string.pleaseChooseRegion);
+        alert.setPositiveButton(R.string.selectRegion, (dialogInterface, j) -> {
+            SharedPref.App.News.setLastSeenNewsID(regionsID,context);
+            SharedPref.App.RegionsPrompt.setRegionPromptShownAfterV81(true,context);
+            startProfileActivityForChooseRegion(context);
+        });
+
+        alert.setNeutralButton(R.string.doNotShowAgain, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SharedPref.App.RegionsPrompt.setDoNotShowRegionPrompt(true,context);
+                SharedPref.App.RegionsPrompt.setRegionPromptShownAfterV81(true,context);
+                SharedPref.App.News.setLastSeenNewsID(regionsID,context);
+            }
+        });
+        alert.setNegativeButton(R.string.later,null);
+        alert.show();
     }
 
     /**

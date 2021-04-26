@@ -66,6 +66,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         profile = Profile.loadProfile(null, this);
         simRa_regions_config = getRegions(this);
+        if ( profile.region >= simRa_regions_config.length ) {
+            profile.region = 0;
+        }
 
         ArrayList<String> regionContentArray = new ArrayList<>();
         for (String s : simRa_regions_config) {
