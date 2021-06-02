@@ -18,6 +18,7 @@ public class IncidentLogEntry implements Serializable {
     public InvolvedRoadUser involvedRoadUser;
     public Boolean scarySituation;
     public String description;
+    private static final String TAG = "IncidentLogEntry_LOG";
 
     private IncidentLogEntry(Builder builder) {
         this.key = builder.key;
@@ -63,7 +64,7 @@ public class IncidentLogEntry implements Serializable {
                         dataLogLine.length > 12 ? (!dataLogLine[12].isEmpty() ? dataLogLine[12].equals("1") : false) : false,
                         dataLogLine.length > 13 ? (!dataLogLine[13].isEmpty() ? dataLogLine[13].equals("1") : false) : false,
                         dataLogLine.length > 14 ? (!dataLogLine[14].isEmpty() ? dataLogLine[14].equals("1") : false) : false,
-                        dataLogLine.length > 15 ? (!dataLogLine[15].isEmpty() ? dataLogLine[12].equals("1") : false) : false,
+                        dataLogLine.length > 15 ? (!dataLogLine[15].isEmpty() ? dataLogLine[15].equals("1") : false) : false,
                         dataLogLine.length > 16 ? (!dataLogLine[16].isEmpty() ? dataLogLine[16].equals("1") : false) : false,
                         dataLogLine.length > 17 ? (!dataLogLine[17].isEmpty() ? dataLogLine[17].equals("1") : false) : false,
                         dataLogLine.length > 20 ? (!dataLogLine[20].isEmpty() ? dataLogLine[20].equals("1") : false) : false
