@@ -1,13 +1,20 @@
 package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,32 +48,44 @@ import java.util.Arrays;
 import java.util.List;
 
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
 import de.tuberlin.mcc.simra.app.services.DebugUploadService;
 import de.tuberlin.mcc.simra.app.services.OBSService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.FilePickerFragment;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 import pl.droidsonroids.gif.GifImageView;
 
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
+import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getBaseFolderPath;
+import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getSharedPrefsDirectory;
+import static de.tuberlin.mcc.simra.app.util.IOUtils.zip;
+import static de.tuberlin.mcc.simra.app.util.IOUtils.zipto;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.prepareDebugZip;
 import static de.tuberlin.mcc.simra.app.util.Utils.sortFileListLastModified;
 
 
-public class SettingsActivity extends BaseActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG = "SettingsActivity_LOG";
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int BLUETOOTH_SUCCESS = -1;
+
+    public static final int REQUEST_CODE = 1;
+    private static final int CHOOSE_FILE_REQUESTCODE = 8777;
+    private static final int PICKFILE_RESULT_CODE = 8778;
     BroadcastReceiver br;
     ActivitySettingsBinding binding;
-    String[] ridesArr;
+    List<File> ridesArr = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +97,7 @@ public class SettingsActivity extends BaseActivity {
         setSupportActionBar(binding.toolbar.toolbar);
         try {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-        } catch (NullPointerException ignored){
+        } catch (NullPointerException ignored) {
             Log.d(TAG, "NullPointerException");
         }
         binding.toolbar.toolbar.setTitle("");
@@ -163,7 +182,7 @@ public class SettingsActivity extends BaseActivity {
         }
         binding.switchButtons.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> {
-                    SharedPref.Settings.IncidentsButtonsDuringRide.setIncidentButtonsEnabled(isChecked,this);
+                    SharedPref.Settings.IncidentsButtonsDuringRide.setIncidentButtonsEnabled(isChecked, this);
                     if (isChecked) {
                         fireIncidentButtonsEnablePrompt();
                     }
@@ -173,11 +192,148 @@ public class SettingsActivity extends BaseActivity {
         if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(this)) {
             binding.switchAI.setChecked(true);
         }
-        binding.switchAI.setOnCheckedChangeListener((buttonView, isChecked) -> SharedPref.Settings.IncidentGenerationAIActive.setAIEnabled(isChecked,this));
+        binding.switchAI.setOnCheckedChangeListener((buttonView, isChecked) -> SharedPref.Settings.IncidentGenerationAIActive.setAIEnabled(isChecked, this));
+
+
+        binding.importButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+
+
+                Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+                Log.d(TAG,"Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT");
+                chooseFile.setType("*/*");
+                Log.d(TAG,"chooseFile.setType(*/*)");
+                chooseFile = Intent.createChooser(chooseFile, "Choose a file");
+                Log.d(TAG,"chooseFile = Intent.createChooser(chooseFile, \"Choose a file\");");
+                //startActivityForResult(chooseFile, PICKFILE_RESULT_CODE);
+                //Log.d(TAG, "startActivityForResult(chooseFile, PICKFILE_RESULT_CODE);");
+
+                onActivityResult(PICKFILE_RESULT_CODE, REQUEST_CODE,chooseFile);
+
+                Log.d(TAG, "onActivityResult(PICKFILE_RESULT_CODE, REQUEST_CODE,chooseFile);");
+
+                Log.d(TAG, "before - chooseFile.getData().getPath()" + chooseFile.getData().getPath());
+
+                Uri uri = chooseFile.getData();
+                if(uri == null){
+                    String src = uri.getPath();
+                    Log.d(TAG, "src = uri.getPath()" + src);
+                }else{
+                    Log.d(TAG, "else - chooseFile.getData()" + chooseFile.getData());
+                    uri = chooseFile.getData();
+                    Log.d(TAG, "else - uri = chooseFile.getData()" + uri);
+                    Log.d(TAG, "else - uri.getPath()" + uri.getPath());
+                    String src = uri.getPath();
+                    Log.d(TAG, "else - src = uri.getPath()" + src);
+
+                }
+
+                Log.d(TAG, "FIRST chooseFile.getData()" + uri);
+              /*  int i= 0;
+
+                while (uri == null){
+                    i+=1;
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            // Actions to do after 10 seconds
+                            Log.d(TAG, "waited enough");
+
+                        }
+                    }, 1000);
+                    uri = chooseFile.getData();
+
+                }
+*/
+
+
+
+
+              /*  if (savedInstanceState == null) {
+                    getSupportFragmentManager().beginTransaction()
+                            .setReorderingAllowed(true)
+                            .add(R.id.file_picker_fragment_container_view, FilePickerFragment.class, null)
+                            .commit();
+
+                }
+
+               /* FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                Fragment fragment = new FilePickerFragment();
+                fragmentTransaction.replace(R.id.file_picker_fragment_container_view, fragment);
+    //            fragmentTransaction.replace(R.id.fragment_container, fragment);
+                fragmentTransaction.commit();*/
+                Log.d(TAG, "importButton clicked ,  startActivity(FilePicker) ");
+              //  startActivity(new Intent(SettingsActivity.this, FilePickerFragment.class));
+              /*  DialogProperties properties = new DialogProperties();
+                properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                properties.selection_type = DialogConfigs.FILE_SELECT;
+                properties.root = new File(DialogConfigs.DEFAULT_DIR);
+                properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
+                properties.offset = new File(DialogConfigs.DEFAULT_DIR);
+                properties.extensions = null;
+                properties.show_hidden_files = false;
+
+                FilePickerDialog dialog = new FilePickerDialog(MainActivity.this,properties);
+                dialog.setTitle("Select a File");
+                dialog.setDialogSelectionListener(new DialogSelectionListener() {
+                    @Override
+                    public void onSelectedFilePaths(String[] files) {
+                        //files is the array of the paths of files selected by the Application User.
+                    }
+                });
+                dialog.show();*/
+             /*   try {
+                    IOUtils.unpackZip(SettingsActivity.this.getFilesDir().getParent() + "/" , "zip3.zip");
+                    Log.d(TAG, getBaseFolderPath(SettingsActivity.this) + "/zip3.zip");
+
+                    Log.d(TAG,"unpack 3");
+
+                }catch (Exception e){
+                    Log.d(TAG,"problem 2");
+
+                } /*try {
+                    IOUtils.unpackZip("/data/data/de.tuberlin.mcc.simra.app.mark/files/" ,"zip2.zip");
+                    Log.d(TAG,"unpack 1");
+
+                }catch (Exception e){
+                    Log.d(TAG,"problem 1");
+
+                }*/
+                Log.d(TAG, "import button last line");
+
+            }
+        });
+
+        binding.exportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(SettingsActivity.this).setTitle(R.string.exportPromptTitle);
+                builder.setMessage(R.string.exportButtonText);
+                builder.setPositiveButton(R.string.continueText, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        //IOUtils.zipFolder("/data/data/de.tuberlin.mcc.simra.app.mark/shared_prefs","/data/data/de.tuberlin.mcc.simra.app.mark/files");
+                        //IOUtils.zipFolder("/data/data/de.tuberlin.mcc.simra.app.mark/files","/data/data/de.tuberlin.mcc.simra.app.mark/shared_prefs");
+                        // non static approach
+                        Log.d(TAG, SettingsActivity.this.getFilesDir().getParent());
+                        zipto(SettingsActivity.this.getFilesDir().getParent(),getBaseFolderPath(SettingsActivity.this) + "/zip3.zip",SettingsActivity.this);
+                        // zipto("/data/data/de.tuberlin.mcc.simra.app.mark/files","/data/data/de.tuberlin.mcc.simra.app.mark/shared_prefs");
+
+                         // fireExportPrompt();
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, null);
+                builder.show();
+            }
+        });
 
 
         // Data Export
-        Button exportBtn = findViewById(R.id.exportButton);
+       /* Button exportBtn = findViewById(R.id.exportButton);
         exportBtn.setOnClickListener(v -> {
             Log.d(TAG, "exportBtn clicked ");
             //String basePath = IOUtils.Directories.getBaseFolderPath(SettingsActivity.this);
@@ -187,22 +343,32 @@ public class SettingsActivity extends BaseActivity {
 
             Log.d(TAG, "Fill String array");
 
-            ridesArr = new String[5];
+           // ridesArr = new ArrayList<>();
 
-            ridesArr[0] = "/data/de.tuberlin.mcc.simra.app/files/0_accGps.csv";
+            ridesArr.add(new File("/data/de.tuberlin.mcc.simra.app/files/0_accGps.csv"));
             //ridesArr[0] = "/data/data/de.tuberlin.mcc.simra.app/files/0_accGps.csv";
             //ridesArr[0] = basePath + "/0_accGps.csv";
-            ridesArr[1] = basePath + "/accEvents0.csv";
+          /*  ridesArr[1] = basePath + "/accEvents0.csv";
             ridesArr[2] = basePath + "/metaData.csv";
             ridesArr[3] = basePath + "/simRa_news_de.config";
-            ridesArr[4] = basePath + "/simRa_regions.config";
+            ridesArr[4] = basePath + "/simRa_regions.config";*/
 
 
-            Log.d(TAG,  "String array filled");
+         /*   Log.d(TAG,  "String array filled");
+            Log.d(TAG,  "get(0): " + ridesArr.get(0).toString());
+            Log.d(TAG, "new File: " + new File ("/data/de.tuberlin.mcc.simra.app/files/0_accGps.csv").toString());
+            Log.d(TAG, "new File: " +  new File ("/data/de.tuberlin.mcc.simra.app/files/0_accGps.csv"));
+            Log.d(TAG, "new File: Events " + new File ("/data/de.tuberlin.mcc.simra.app/files/accEvents0.csv").toString());
 
-            zip(ridesArr, IOUtils.Directories.getExternalBaseDirectoryPath() + "/zipFile/");
+
+            try {
+                IOUtils.zip(ridesArr, new File(IOUtils.Directories.getExternalBaseDirectoryPath(),"zip.zip"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //   zip(ridesArr, IOUtils.Directories.getExternalBaseDirectoryPath() + "/zipFile/");
             });
-
+*/
 
         // Switch: OpenBikeSensor device enabled
         boolean obsActivated = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
@@ -244,7 +410,7 @@ public class SettingsActivity extends BaseActivity {
                         fireDebugPrompt();
                     }
                 });
-                builder.setNegativeButton(R.string.cancel,null);
+                builder.setNegativeButton(R.string.cancel, null);
                 builder.show();
             }
         });
@@ -265,9 +431,10 @@ public class SettingsActivity extends BaseActivity {
         this.unregisterReceiver(br);
     }
 
-    private void fireDebugPrompt() {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(SettingsActivity.this).setTitle(R.string.debugPromptTitle2);
-        File[] dirFiles = new File(IOUtils.Directories.getBaseFolderPath(SettingsActivity.this)).listFiles();
+    private void fireExportPrompt() {
+        // Dialog Fenster, Laden der Fahrten und berechnen der Größe
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(SettingsActivity.this).setTitle(R.string.exportPromptTitle);
+        File[] dirFiles = new File(getBaseFolderPath(SettingsActivity.this)).listFiles();
         List<File> files = new ArrayList<File>(Arrays.asList(dirFiles));
         List<File> ridesAndAccEvents = new ArrayList<>();
         sortFileListLastModified(files);
@@ -278,12 +445,12 @@ public class SettingsActivity extends BaseActivity {
             File file = files.get(i);
             if (file.getName().contains("accGps")) {
                 int id = Integer.parseInt(file.getName().split("_")[0]);
-                String path = file.getParent()+File.separator+"accEvents" + id + ".csv";
+                String path = file.getParent() + File.separator + "accEvents" + id + ".csv";
                 File accEvents = new File(path);
-                sizeAllInMB += file.length()/1024.0/1024.0;
+                sizeAllInMB += file.length() / 1024.0 / 1024.0;
                 ridesAndAccEvents.add(file);
                 if (accEvents.exists()) {
-                    sizeAllInMB += accEvents.length()/1024.0/1024.0;
+                    sizeAllInMB += accEvents.length() / 1024.0 / 1024.0;
                     ridesAndAccEvents.add(accEvents);
                 }
                 if (i10 < 10) {
@@ -292,8 +459,97 @@ public class SettingsActivity extends BaseActivity {
                 }
             }
         }
-        sizeAllInMB = Math.round(sizeAllInMB/3.0 * 100.0)/100.0;
-        size10InMB = Math.round(size10InMB/3.0 * 100.0)/100.0;
+        sizeAllInMB = Math.round(sizeAllInMB / 3.0 * 100.0) / 100.0;
+        size10InMB = Math.round(size10InMB / 3.0 * 100.0) / 100.0;
+        final int[] clicked = {2};
+        CharSequence[] array;
+        if (files.size() > 10) {
+            array = new CharSequence[]{getText(R.string.debugSendAllRides) + " (" + sizeAllInMB + " MB)", getText(R.string.debugSend10Rides) + " (" + size10InMB + " MB)", getText(R.string.debugDoNotSendRides)};
+        } else {
+            array = new CharSequence[]{getText(R.string.debugSendAllRides) + " (" + sizeAllInMB + " MB)", getText(R.string.debugDoNotSendRides)};
+        }
+        builder.setSingleChoiceItems(array, 2, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                clicked[0] = which;
+            }
+        });
+        builder.setPositiveButton(R.string.export, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d(TAG, "start prepare export zip ");
+
+                //prepareDebugZip(clicked[0],ridesAndAccEvents,SettingsActivity.this);
+                // Intent intent = new Intent(SettingsActivity.this, DebugUploadService.class);
+                // startService(intent);
+                int mode = clicked[0];
+                List<File> filesToUpload = new ArrayList<File>(ridesAndAccEvents);
+                if (mode == 2) {
+                    filesToUpload.clear();
+                } else if (mode == 1) {
+                    while (filesToUpload.size() > 20) {
+                        filesToUpload.remove(0);
+                    }
+                }
+                filesToUpload.addAll(Arrays.asList(getSharedPrefsDirectory(SettingsActivity.this).listFiles()));
+                filesToUpload.add(new File(getBaseFolderPath(SettingsActivity.this) + "metaData.csv"));
+                filesToUpload.add(new File(SettingsActivity.this.getFilesDir() + "metaData.csv"));
+
+                Log.d(TAG,"Folder zip:" + SettingsActivity.this.getFilesDir()+"/");
+                filesToUpload.add(new File(SettingsActivity.this.getFilesDir()+"/"));
+
+                Log.d(TAG, "metaData added: " + getBaseFolderPath(SettingsActivity.this) + "metaData.csv");
+                try {
+
+                    filesToUpload.add(new File(getBaseFolderPath(SettingsActivity.this) + "metaData.csv"));
+                    filesToUpload.add(new File(SettingsActivity.this.getFilesDir() + "metaData.csv"));
+
+                    Log.d(TAG, "try metaData added: " + getBaseFolderPath(SettingsActivity.this) + "metaData.csv");
+                    zip(filesToUpload, new File(SettingsActivity.this.getFilesDir() + "/zip2.zip"));
+                    Log.d(TAG, "pathname BaseFolder: " + getBaseFolderPath(SettingsActivity.this) + "zip.zip");
+                    Log.d(TAG, "pathname FilesDir: " + SettingsActivity.this.getFilesDir() + "/zip.zip");
+                    Log.d(TAG, "filesToUpload: " + filesToUpload.toString());
+                    Log.d(TAG, "filesToUpload(0): " + filesToUpload.get(0).toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "end prepare export zip ");
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
+    }
+
+
+    private void fireDebugPrompt() {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(SettingsActivity.this).setTitle(R.string.debugPromptTitle2);
+        File[] dirFiles = new File(getBaseFolderPath(SettingsActivity.this)).listFiles();
+        List<File> files = new ArrayList<File>(Arrays.asList(dirFiles));
+        List<File> ridesAndAccEvents = new ArrayList<>();
+        sortFileListLastModified(files);
+        double sizeAllInMB = 0;
+        double size10InMB = 0;
+        int i10 = 0;
+        for (int i = 0; i < files.size(); i++) {
+            File file = files.get(i);
+            if (file.getName().contains("accGps")) {
+                int id = Integer.parseInt(file.getName().split("_")[0]);
+                String path = file.getParent() + File.separator + "accEvents" + id + ".csv";
+                File accEvents = new File(path);
+                sizeAllInMB += file.length() / 1024.0 / 1024.0;
+                ridesAndAccEvents.add(file);
+                if (accEvents.exists()) {
+                    sizeAllInMB += accEvents.length() / 1024.0 / 1024.0;
+                    ridesAndAccEvents.add(accEvents);
+                }
+                if (i10 < 10) {
+                    size10InMB = sizeAllInMB;
+                    i10++;
+                }
+            }
+        }
+        sizeAllInMB = Math.round(sizeAllInMB / 3.0 * 100.0) / 100.0;
+        size10InMB = Math.round(size10InMB / 3.0 * 100.0) / 100.0;
         final int[] clicked = {2};
         CharSequence[] array;
         if (files.size() > 10) {
@@ -310,12 +566,12 @@ public class SettingsActivity extends BaseActivity {
         builder.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                prepareDebugZip(clicked[0],ridesAndAccEvents,SettingsActivity.this);
-                Intent intent = new Intent(SettingsActivity.this, DebugUploadService.class);
-                startService(intent);
+                prepareDebugZip(clicked[0], ridesAndAccEvents, SettingsActivity.this);
+                //  Intent intent = new Intent(SettingsActivity.this, DebugUploadService.class);
+                //  startService(intent);
             }
         });
-        builder.setNegativeButton(R.string.cancel,null);
+        builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
 
@@ -373,10 +629,10 @@ public class SettingsActivity extends BaseActivity {
         androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(SettingsActivity.this);
         alert.setTitle(getString(R.string.warning));
         alert.setMessage(getString(R.string.incident_buttons_during_ride_warning));
-        alert.setNeutralButton("Ok", (dialog, id) -> { });
+        alert.setNeutralButton("Ok", (dialog, id) -> {
+        });
         alert.show();
     }
-
 
 
     // comparable to refreshMyRides in HistoryActivity
@@ -402,7 +658,7 @@ public class SettingsActivity extends BaseActivity {
                 e.printStackTrace();
             }
 
-            ridesArr = new String[metaDataLines.size()];
+            //ridesArr = new String[metaDataLines.size()];
             Log.d(TAG, "getMyRides(): metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             for (int i = 0; i < metaDataLines.size(); i++) {
                 String[] metaDataLine = metaDataLines.get(i);
@@ -411,8 +667,8 @@ public class SettingsActivity extends BaseActivity {
                 }
             }
 
-            Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
-            List<String> stringArrayList = new ArrayList<>(Arrays.asList(ridesArr));
+            //Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
+            //List<String> stringArrayList = new ArrayList<>(Arrays.asList(ridesArr));
 
 
         } else {
@@ -429,7 +685,7 @@ public class SettingsActivity extends BaseActivity {
     // _files : Array of files to zip
     // Buffer can be used for limiting the buffer memory size while reading and writing data it to the zip stream
 
-    public void zip(String[] _files, String zipFileName) {
+    /*public void zip(String[] _files, String zipFileName) {
         try {
             BufferedInputStream origin = null;
             int Buffer = 0;
@@ -465,7 +721,7 @@ public class SettingsActivity extends BaseActivity {
         }
 
     }
-
+*/
 
     public class MyBroadcastReceiver extends BroadcastReceiver {
         @Override
@@ -477,6 +733,25 @@ public class SettingsActivity extends BaseActivity {
                 Toast.makeText(getApplicationContext(), R.string.upload_completed, Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    public String getPath(Uri uri) {
+
+        String path = null;
+        String[] projection = { MediaStore.Files.FileColumns.DATA };
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+
+        if(cursor == null){
+            path = uri.getPath();
+        }
+        else{
+            cursor.moveToFirst();
+            int column_index = cursor.getColumnIndexOrThrow(projection[0]);
+            path = cursor.getString(column_index);
+            cursor.close();
+        }
+
+        return ((path == null || path.isEmpty()) ? (uri.getPath()) : path);
     }
 
 }

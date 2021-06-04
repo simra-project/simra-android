@@ -372,5 +372,9 @@
     <!-- 74 -->
     <string name="exportTitle">Datenexport</string>
     <string name="export" translatable="false">Export</string>
-   <!-- <string name="import" translatable="false">Import</string> -->
+    <string name="exportPromptTitle">Datenexport der eigenen SimRa-Daten</string>
+    <string name="exportButtonText">Diese Funktion ermöglicht es Ihnen, die vorhandenen lokalen Daten zu exportieren und das zip File bei einem anderen Gerät (z.B. neues Smartphone) wieder zu importieren. Sie können dabei wählen ob Sie die letzten 10 Fahrten oder alle Fahrten (auch die bereits hochgeladenen) hochgeladen exportiert werden sollen.</string>
+    <string name="item_choose_file">item choose file</string>
+
+    <!-- <string name="import" translatable="false">Import</string> -->
 </resources>

@@ -366,6 +366,7 @@
     <!-- 74 -->
     <string name="exportTitle">Data Export</string>
     <string name="uploadingDebugNotificationBody">SimRa is uploading files</string>
+    <string name="item_choose_file">item choose file</string>
 
 
 </resources>
