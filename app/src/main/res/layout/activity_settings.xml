@@ -478,12 +478,6 @@
 
                     </LinearLayout>
 
-                <TextView
-                    android:id="@+id/filePath"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Hallo Hallo Test"
-                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/devicesTitle"
