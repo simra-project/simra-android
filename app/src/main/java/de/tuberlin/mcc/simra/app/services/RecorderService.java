@@ -28,8 +28,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -300,9 +298,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     // 'this' is referencing the Runnable object
                     recordingStarterHandler.postDelayed(this, 50);
                 }
-
-                Log.d(TAG, "Handler called on main thread: " + System.currentTimeMillis());
-
             }
         };
         recordingStarterHandler.post(recordingStarter);
@@ -310,7 +305,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // For all subsequent rides, the key value increases by one at a time.
 
         key = sharedPrefs.getInt("RIDE-KEY", 0);
-        incidentLog = new IncidentLog(key, new HashMap<>());
+        incidentLog = new IncidentLog(key, new HashMap<>(), 0);
 
         // Fire the notification while recording
         Notification notification =
@@ -511,7 +506,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 if(isGPSLine) {
                     gpsLines.add(dataLogEntryBuilder.build());
-                } else {
+                } else if(!gpsLines.isEmpty()) {
                     sensorLines.add(dataLogEntryBuilder.build());
                 }
                 lineAdded = true;

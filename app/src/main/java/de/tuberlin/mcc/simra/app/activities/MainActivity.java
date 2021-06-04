@@ -82,11 +82,14 @@ import static de.tuberlin.mcc.simra.app.entities.Profile.profileIsInUnknownRegio
 import static de.tuberlin.mcc.simra.app.update.VersionUpdater.Legacy.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
+import static de.tuberlin.mcc.simra.app.util.Utils.fireProfileRegionPrompt;
+import static de.tuberlin.mcc.simra.app.util.Utils.getCorrectRegionName;
 import static de.tuberlin.mcc.simra.app.util.Utils.getNews;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.isLocationServiceOff;
 import static de.tuberlin.mcc.simra.app.util.Utils.nearestRegionsToThisLocation;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
+import static de.tuberlin.mcc.simra.app.util.Utils.regionsDecoder;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
@@ -312,7 +315,7 @@ public class MainActivity extends BaseActivity
                 recording = false;
                 if (mBoundRecorderService.getRecordingAllowed()) {
                     ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(),
-                            MetaData.STATE.JUST_RECORDED, this);
+                            MetaData.STATE.JUST_RECORDED, true, this);
                 } else {
                     new AlertDialog.Builder(MainActivity.this)
                             .setMessage(getString(R.string.errorRideNotRecorded))
@@ -350,13 +353,6 @@ public class MainActivity extends BaseActivity
                 startOBSService();
             }
         }
-    }
-
-    private boolean numberOfRegionsHasIncreased() {
-        int lastNumberOfRegions = getRegions(MainActivity.this).length;
-        int actualNumberOfRegions = SharedPref.App.Regions.getLastRegionNumberKnown(MainActivity.this);
-        SharedPref.App.Regions.setLastRegionNumberKnown(lastNumberOfRegions,MainActivity.this);
-        return actualNumberOfRegions < lastNumberOfRegions;
     }
 
     private void deactivateOBS() {
@@ -689,7 +685,7 @@ public class MainActivity extends BaseActivity
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             StringBuilder response = new StringBuilder();
             try {
-                URL url = new URL(BuildConfig.API_ENDPOINT + "check/version?clientHash=" + getClientHash(MainActivity.this));
+                URL url = new URL(BuildConfig.API_ENDPOINT +BuildConfig.API_VERSION + "check-version?clientHash=" + getClientHash(MainActivity.this));
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection =
                         (HttpsURLConnection)url.openConnection();
@@ -871,25 +867,11 @@ public class MainActivity extends BaseActivity
 
     }
 
-    public void fireProfileRegionPrompt() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-        alert.setTitle(getString(R.string.chooseRegion));
-        alert.setMessage(R.string.pleaseChooseRegion);
-        alert.setPositiveButton(R.string.yes, (dialogInterface, j) -> {
-            startProfileActivityForChooseRegion(MainActivity.this);
-        });
-        alert.setNeutralButton(R.string.doNotShowAgain, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                SharedPref.App.RegionsPrompt.setDoNotShowRegionPrompt(true,MainActivity.this);
-            }
-        });
-        alert.setNegativeButton(R.string.later,null);
-        alert.show();
-    }
+
 
     private class RegionTask extends AsyncTask<String, String, String> {
-
+        int regionsID = -1;
+        int lastSeenRegionsID = 0;
         private RegionTask() {
         }
 
@@ -903,10 +885,11 @@ public class MainActivity extends BaseActivity
 
             StringBuilder checkRegionsResponse = new StringBuilder();
             int status = 0;
+            lastSeenRegionsID = SharedPref.App.Regions.getLastSeenRegionsID(MainActivity.this);
             try {
 
                 URL url = new URL(
-                        BuildConfig.API_ENDPOINT + "check/regions-coords?clientHash=" + getClientHash(MainActivity.this));
+                        BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + "check-regions?clientHash=" + getClientHash(MainActivity.this) + "&lastSeenRegionsID=" + lastSeenRegionsID);
                 Log.d(TAG, "URL: " + url.toString());
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -915,7 +898,11 @@ public class MainActivity extends BaseActivity
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
-                    checkRegionsResponse.append(inputLine).append(System.lineSeparator());
+                    if (regionsID == -1 && inputLine.startsWith("#")){
+                        regionsID = Integer.parseInt(inputLine.replace("#",""));
+                    } else {
+                        checkRegionsResponse.append(inputLine).append(System.lineSeparator());
+                    }
                 }
                 in.close();
                 status = urlConnection.getResponseCode();
@@ -924,7 +911,7 @@ public class MainActivity extends BaseActivity
                 e.printStackTrace();
             }
             Log.d(TAG, "GET regions response: " + checkRegionsResponse.toString());
-            if (status == 200) {
+            if (status == 200 && checkRegionsResponse.length() > 0) {
                 File regionsFile = IOUtils.Files.getRegionsFile(MainActivity.this);
                 overwriteFile(checkRegionsResponse.toString(), regionsFile);
             }
@@ -934,9 +921,13 @@ public class MainActivity extends BaseActivity
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            // prompt user to go to "Profile" and set region, if a new region has been added to SimRa and the region is set as UNKNOWN or other.
-            if (!SharedPref.App.RegionsPrompt.getDoNotShowRegionPrompt(MainActivity.this) && ((numberOfRegionsHasIncreased() && profileIsInUnknownRegion(MainActivity.this)) || actualSelectedRegionNotInTopThreeNearestRegion())) {
-                fireProfileRegionPrompt();
+            // prompt user to go to "Profile" and set region, if regions have been updated and the region is set as UNKNOWN or other.
+            Log.d(TAG, lastSeenRegionsID + " < " + regionsID + ": " + (lastSeenRegionsID < regionsID));
+            Log.d(TAG, "actualSelectedRegionNotInTopThreeNearestRegion(): " + actualSelectedRegionNotInTopThreeNearestRegion());
+            if (!SharedPref.App.RegionsPrompt.getRegionPromptShownAfterV81(MainActivity.this) || (!SharedPref.App.RegionsPrompt.getDoNotShowRegionPrompt(MainActivity.this) &&
+                    (((lastSeenRegionsID < regionsID) && profileIsInUnknownRegion(MainActivity.this)) ||
+                            actualSelectedRegionNotInTopThreeNearestRegion()))) {
+                fireProfileRegionPrompt(regionsID, MainActivity.this);
             }
         }
     }
@@ -980,7 +971,7 @@ public class MainActivity extends BaseActivity
             try {
 
                 URL url_de = new URL(
-                        BuildConfig.API_ENDPOINT + "check/news?clientHash=" + getClientHash(MainActivity.this) + "&lastSeenNewsID=" + lastSeenNewsID + "&newsLanguage=de");
+                        BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + "check-news?clientHash=" + getClientHash(MainActivity.this) + "&lastSeenNewsID=" + lastSeenNewsID + "&newsLanguage=de");
                 Log.d(TAG, "URL_DE: " + url_de.toString());
                 URL url_en = new URL(
                         BuildConfig.API_ENDPOINT + "check/news?clientHash=" + getClientHash(MainActivity.this) + "&lastSeenNewsID=" + lastSeenNewsID + "&newsLanguage=en");

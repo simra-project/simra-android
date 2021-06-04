@@ -2,15 +2,51 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+        <!-- If you want to style this app in a better manner follow this guide:  -->
+        <!-- https://medium.com/over-engineering/setting-up-a-material-components-theme-for-android-fbf7774da739 -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="colorPrimaryVariant">#000000</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">@color/colorPrimary</item>
+        <item name="colorSecondaryVariant">#0039CB</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorError">#F44336</item>
+        <item name="colorOnError">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#212121</item>
+        <item name="colorOnBackground">#212121</item>
+
+
+        <item name="shapeAppearanceSmallComponent">@style/AppShapeAppearance.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/AppShapeAppearance.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/AppShapeAppearance.LargeComponent</item>
+        <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
+        <item name="extendedFloatingActionButtonStyle">
+            @style/Widget.App.ExtendedFloatingActionButton
+        </item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
+    <style name="AppShapeAppearance.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
+    </style>
+
+    <style name="AppShapeAppearance.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
+    </style>
+
+    <style name="AppShapeAppearance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
+    </style>
 
     <style name="ToolbarTheme" parent="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <!-- android:textColorPrimary is the color of the title text in the Toolbar  -->
@@ -25,12 +61,6 @@
         <item name="colorControlActivated">@color/controlActivated</item>
         <!-- Applied to framework control highlights (i.e ripples or list selectors) -->
         <item name="colorControlHighlight">@color/controlActivated</item>
-
-        <!-- Enable these below if you want clicking icons to trigger a ripple effect -->
-        <!--
-        <item name="selectableItemBackground">?android:selectableItemBackground</item>
-        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackground</item>
-        -->
     </style>
 
     <!-- This configures the styles for the title within the Toolbar  -->
@@ -41,14 +71,33 @@
     </style>
 
     <!-- This configures the styles for the pop up window used for incident annotation -->
-    <style name="AppTheme.PopUpWindow" >
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
-        <item name="android:windowBackground">@color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">true</item>
+    <style name="AppTheme.PopUpWindow" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.TextButton</item>
+    </style>
+
+    <!-- See here for more information: https://github.com/material-components/material-components-android/blob/master/docs/components/FloatingActionButton.md -->
+    <style name="ShapeAppearance.FloatingActionButton" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">28dp</item>
+    </style>
+
+    <style name="ShapeAppearance.FloatingActionButton.Icon" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
+    </style>
+
+    <style name="Widget.App.ExtendedFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton.Icon">
+        <item name="shapeAppearanceOverlay">
+            @style/ShapeAppearance.FloatingActionButton.Icon
+        </item>
+    </style>
+
+    <style name="Widget.App.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="shapeAppearanceOverlay">
+            @style/ShapeAppearance.FloatingActionButton
+        </item>
     </style>
 
 </resources>

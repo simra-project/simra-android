@@ -75,7 +75,8 @@
     <string name="newest_version">neueste Version:</string>
     <string name="new_app_version_title">Neue Version verfügbar</string>
     <string name="later">Später</string>
-    <string name="pleaseChooseRegion">SimRa unterstützt eine Vielzahl an Regionen. Möchten Sie eine Region einstellen, um Ihren Beitrag zu verbessern? Dadurch können wir pro Region aussagekräftigere Ergebnisse liefern.</string>
+    <string name="pleaseChooseRegion">Bitte stellen Sie Ihre Region ein, damit Ihre Daten richtig ausgewertet können. Ihre derzeit ausgewählte Region ist: </string>
+    <string name="selectRegion">Region auswählen</string>
     <string name="recording_not_started">Fahrtaufzeichnung wurde NICHT gestartet.</string>
     <string name="recording_started">Fahrtaufzeichnung wurde gestartet.</string>
     <string name="not_connected_warnung_title">Warnung: OpenBikeSensor ist nicht verbunden</string>
@@ -132,7 +133,7 @@
     <string name="saveIncident">Speichern &amp;\nZurück</string>
     <string name="returnAsText">Zurück</string>
     <string name="savedRide">Die Fahrt wurde gespeichert</string>
-    <string name="doNotShowAgain">Diesen Dialog nicht mehr zeigen</string>
+    <string name="doNotShowAgain">Nicht mehr zeigen</string>
     <string name="ride_undo">Zurücksetzen</string>
 
     <!--- IncidentPopUp -->

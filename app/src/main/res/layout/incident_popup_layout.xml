@@ -3,7 +3,8 @@
     android:id="@+id/incidentPopupLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp">
+    android:layout_margin="10dp"
+    android:background="@android:color/background_light">
 
     <ScrollView
         android:id="@+id/ScrollView"
@@ -20,7 +21,6 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
-            android:background="@android:color/transparent"
             android:orientation="vertical">
 
             <TextView

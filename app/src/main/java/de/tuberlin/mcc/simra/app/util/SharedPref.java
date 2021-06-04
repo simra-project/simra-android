@@ -177,7 +177,7 @@ public class SharedPref {
             }
 
             public static class NewCrash {
-                private static final String NEW_CRASH_REPORT = "NEW-UNSENT-ERROR";
+                private static final String NEW_CRASH_REPORT = "NEW_CRASH_REPORT";
 
                 public static boolean isActive(Context context) {
                     return readBooleanFromAppSharedPrefs(NEW_CRASH_REPORT, context);
@@ -191,6 +191,7 @@ public class SharedPref {
 
         /**
          * Last checked number of regions from getRegions()
+         * Last regions number displayed from backend simRa_regions_coords_ID.config
          */
         public static class Regions {
             private static final String LAST_REGION_NUMBER_KNOWN = "LAST_REGION_NUMBER_KNOWN";
@@ -200,13 +201,29 @@ public class SharedPref {
             public static int getLastRegionNumberKnown(Context context) {
                 return readIntegerFromAppSharedPrefs(LAST_REGION_NUMBER_KNOWN,0,context);
             }
+
+            private static final String LAST_SEEN_REGIONS_ID = "LAST_SEEN_REGIONS_ID";
+            public static void setLastSeenRegionsID(int lastSeenRegionsID, Context context) {
+                writeIntegerToAppSharedPrefsAsync(LAST_SEEN_REGIONS_ID,lastSeenRegionsID,context);
+            }
+            public static int getLastSeenRegionsID(Context context) {
+                return readIntegerFromAppSharedPrefs(LAST_SEEN_REGIONS_ID,0,context);
+            }
         }
 
         /**
          * whether to show region prompt or not
          */
         public static class RegionsPrompt {
-            private static final String DO_NOT_SHOW_REGION_PROMPT = "DO_NOT_SHOW_REGION_PROMPT";
+            private static final String DO_NOT_SHOW_REGION_PROMPT = "DONT_SHOW_REGION_PROMPT";
+            private static final String REGION_PROMPT_SHOWN_AFTER_V81 = "REGION_PROMPT_SHOWN_AFTER_V81";
+            public static void setRegionPromptShownAfterV81(boolean regionPromptShown, Context context) {
+                writeBooleanToAppSharedPrefsAsync(REGION_PROMPT_SHOWN_AFTER_V81,regionPromptShown,context);
+            }
+            public static boolean getRegionPromptShownAfterV81(Context context) {
+                return readBooleanFromAppSharedPrefs(REGION_PROMPT_SHOWN_AFTER_V81,context);
+            }
+
             public static void setDoNotShowRegionPrompt(boolean showRegionPrompt, Context context) {
                 writeBooleanToAppSharedPrefsAsync(DO_NOT_SHOW_REGION_PROMPT,showRegionPrompt,context);
             }

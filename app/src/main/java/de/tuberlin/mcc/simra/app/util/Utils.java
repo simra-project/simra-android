@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.util;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.location.LocationManager;
@@ -31,12 +32,17 @@ import java.util.Locale;
 import java.util.Queue;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import androidx.appcompat.app.AlertDialog;
 import de.tuberlin.mcc.simra.app.BuildConfig;
+import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
+import de.tuberlin.mcc.simra.app.entities.Profile;
 
+import static de.tuberlin.mcc.simra.app.activities.ProfileActivity.startProfileActivityForChooseRegion;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getSharedPrefsDirectory;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.zip;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
@@ -165,21 +171,25 @@ public class Utils {
         return (long) ((totalDistance / (float) 1000) * 138);
     }
 
-    public static List<IncidentLogEntry> findAccEvents(int rideId, int bike, int pLoc, Context context) {
+    // returns the incidents to be proposed and the neuronal network version that calculated the incidents (-1 if local algorithm was used)
+    public static Pair<List<IncidentLogEntry>, Integer> findAccEvents(int rideId, int bike, int pLoc, int state, Context context) {
         List<IncidentLogEntry> foundEvents = null;
+        Integer nn_version = 0;
         if (SharedPref.Settings.IncidentGenerationAIActive.getAIEnabled(context)) {
-            foundEvents = findAccEventOnline(rideId, bike, pLoc, context);
+            Pair<List<IncidentLogEntry>, Integer> findAccEventOnlineResult = findAccEventOnline(rideId, bike, pLoc, context);
+            foundEvents = findAccEventOnlineResult.first;
+            nn_version = findAccEventOnlineResult.second;
         }
         if (foundEvents != null && foundEvents.size() > 0)
-            return foundEvents;
+            return new Pair<>(foundEvents, nn_version);
         else
-            return findAccEventsLocal(rideId, context);
+            return findAccEventsLocal(rideId, state, context);
     }
 
     /*
      * Uses sophisticated AI to analyze the ride
      * */
-    public static List<IncidentLogEntry> findAccEventOnline(int rideId, int bike, int pLoc, Context context) {
+    public static Pair<List<IncidentLogEntry>, Integer> findAccEventOnline(int rideId, int bike, int pLoc, Context context) {
         try {
             String responseString = "";
 
@@ -242,9 +252,10 @@ public class Utils {
             Log.d(TAG, "Server status: " + status);
             Log.d(TAG, "Server Message: " + responseString);
 
-            JSONArray incidentTimestamps;
             // response okay
-            if (status == 200 && ((incidentTimestamps = new JSONArray(responseString)).length() > 0)) {
+            if (status == 200 && responseString.length() > 1) {
+                JSONArray incidentTimestamps = new JSONArray(responseString);
+                Integer nn_version = (Integer) incidentTimestamps.remove(0); // remove first element since it is the nn_version
                 List<IncidentLogEntry> foundIncidents = new ArrayList<>();
                 DataLog allLogs = DataLog.loadDataLog(rideId, context);
 
@@ -265,18 +276,18 @@ public class Utils {
                     }
                     index++;
                 }
-                return foundIncidents;
+                return new Pair<>(foundIncidents, nn_version);
             }
 
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return new Pair<>(null,-2);
     }
 
 
-    public static List<IncidentLogEntry> findAccEventsLocal(int rideId, Context context) {
+    public static Pair<List<IncidentLogEntry>, Integer> findAccEventsLocal(int rideId, int state, Context context) {
         Log.d(TAG, "findAccEventsLocal()");
         List<AccEvent> accEvents = new ArrayList<>(6);
 
@@ -437,6 +448,14 @@ public class Utils {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            fixRide(rideId, context);
+            Log.d(TAG,"fixed ride");
+            List<IncidentLogEntry> dummyEntryList = new ArrayList<>();
+            IncidentLogEntry dummyIncident = IncidentLogEntry.newBuilder().withDescription("startShowRouteActivity").build();
+            dummyEntryList.add(dummyIncident);
+            return new Pair<>(dummyEntryList,-1);
         }
 
         List<IncidentLogEntry> incidents = new ArrayList<>();
@@ -447,7 +466,32 @@ public class Utils {
             }
         }
 
-        return incidents;
+        return new Pair<>(incidents,0);
+    }
+
+    private static void fixRide(int rideId, Context context) {
+        try {
+            StringBuilder fixedRideContent = new StringBuilder();
+            BufferedReader br = new BufferedReader(new FileReader(IOUtils.Files.getGPSLogFile(rideId, false, context)));
+            String line = br.readLine(); // fileInfo line
+            fixedRideContent.append(line).append(System.lineSeparator());
+            line = br.readLine(); // csv header
+            fixedRideContent.append(line).append(System.lineSeparator());
+            // skip to first GPS Line
+            while ((line = br.readLine()) != null) {
+                if (!line.startsWith(",,")){
+                    break;
+                }
+            }
+            fixedRideContent.append(line).append(System.lineSeparator());
+            while ((line = br.readLine()) != null) {
+                fixedRideContent.append(line).append(System.lineSeparator());
+            }
+            overwriteFile(fixedRideContent.toString(),IOUtils.Files.getGPSLogFile(rideId, false, context));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static String mergeGPSandSensorLines(Queue<DataLogEntry> gpsLines, Queue<DataLogEntry> sensorLines) {
@@ -570,6 +614,32 @@ public class Utils {
         }
     }
 
+    public static void fireProfileRegionPrompt(int regionsID, Context context) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle(context.getString(R.string.chooseRegion));
+        CharSequence pleaseChooseRegionText = context.getText(R.string.pleaseChooseRegion);
+        CharSequence chosenRegion = getCorrectRegionName(regionsDecoder(new int[]{Profile.loadProfile(null, context).region},context)[0]);
+
+        alert.setMessage( pleaseChooseRegionText + System.lineSeparator() + chosenRegion);
+        // alert.setMessage(R.string.pleaseChooseRegion);
+        alert.setPositiveButton(R.string.selectRegion, (dialogInterface, j) -> {
+            SharedPref.App.News.setLastSeenNewsID(regionsID,context);
+            SharedPref.App.RegionsPrompt.setRegionPromptShownAfterV81(true,context);
+            startProfileActivityForChooseRegion(context);
+        });
+
+        alert.setNeutralButton(R.string.doNotShowAgain, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SharedPref.App.RegionsPrompt.setDoNotShowRegionPrompt(true,context);
+                SharedPref.App.RegionsPrompt.setRegionPromptShownAfterV81(true,context);
+                SharedPref.App.News.setLastSeenNewsID(regionsID,context);
+            }
+        });
+        alert.setNegativeButton(R.string.later,null);
+        alert.show();
+    }
+
     /**
      * checks whether location provider is enabled
      * @param locationManager
@@ -594,6 +664,7 @@ public class Utils {
                 filesToUpload.remove(0);
             }
         }
+        filesToUpload.add(IOUtils.Files.getMetaDataFile(context));
         filesToUpload.addAll(Arrays.asList(getSharedPrefsDirectory(context).listFiles()));
         try {
             zip(filesToUpload,new File(IOUtils.Directories.getBaseFolderPath(context) + "zip.zip"));
