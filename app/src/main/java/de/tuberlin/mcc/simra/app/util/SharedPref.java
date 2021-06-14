@@ -2,6 +2,9 @@ package de.tuberlin.mcc.simra.app.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import java.util.Arrays;
 
 /**
  * Helper for central access to all shared prefs used by the app
@@ -66,6 +69,26 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    public static void writeLongToSharedPrefs(String key, long value, String sharedPrefName, Context context) {
+        SharedPreferences sharedPrefs = context.getApplicationContext()
+                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putLong(key, value);
+        editor.apply();
+    }
+
+    /**
+     * @deprecated
+     */
+    public static long lookUpLongSharedPrefs(String key, long defValue, String sharedPrefName, Context context) {
+        SharedPreferences sharedPrefs = context.getApplicationContext()
+                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
+        return sharedPrefs.getLong(key, defValue);
+    }
+
+    /**
+     * @deprecated
+     */
     public static void writeBooleanToSharedPrefs(String key, boolean value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -104,6 +127,43 @@ public class SharedPref {
 
     private static void writeLongToAppSharedPrefsAsync(long value, Context context) {
         context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().putLong(Settings.Ride.PrivacyDuration.PRIVACY_DURATION, value).apply();
+    }
+
+    public static void createEntry(String sharedPrefName, String line, Context context) {
+        String[] sharedPrefsEntry = line.replaceAll("<"," ").replaceAll(">"," ").replaceAll("/","").trim().split(" ");
+        // Log.d("SharedPref_LOG:","sharedPrefsEntry: " + Arrays.toString(sharedPrefsEntry));
+        String entryType = sharedPrefsEntry[0];
+        String entryName = sharedPrefsEntry[1].split("\"")[1];
+        String entryValue = "";
+        if (entryType.equals("string")) {
+            entryValue = sharedPrefsEntry[2];
+        } else {
+            entryValue = sharedPrefsEntry[2].split("\"")[1];
+        }
+        switch (entryType) {
+            case "string":
+                writeToSharedPrefs(entryName, entryValue, sharedPrefName, context);
+                break;
+            case "boolean":
+                writeBooleanToSharedPrefs(entryName, Boolean.parseBoolean(entryValue), sharedPrefName, context);
+                break;
+            case "int":
+                writeIntToSharedPrefs(entryName, Integer.parseInt(entryValue), sharedPrefName, context);
+                break;
+            case "long":
+                writeLongToSharedPrefs(entryName, Long.parseLong(entryValue), sharedPrefName, context);
+                break;
+        }
+        // Log.d("SharedPref_LOG", "entry: " + entryType + " " + entryName + " " + entryValue);
+    }
+
+    public static void clearSharedPrefs(String sharedPrefName, Context context) {
+        SharedPreferences preferences =
+                context.getSharedPreferences(sharedPrefName,
+                        Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
     }
 
     public static class App {

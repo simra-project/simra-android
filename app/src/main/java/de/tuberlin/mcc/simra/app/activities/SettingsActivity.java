@@ -1,18 +1,20 @@
 package de.tuberlin.mcc.simra.app.activities;
 
+import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -22,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,15 +32,16 @@ import java.util.List;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
+import de.tuberlin.mcc.simra.app.services.DebugUploadService;
 import de.tuberlin.mcc.simra.app.services.OBSService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 import pl.droidsonroids.gif.GifImageView;
 
 import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getBaseFolderPath;
-import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getSharedPrefsDirectory;
-import static de.tuberlin.mcc.simra.app.util.IOUtils.zip;
+import static de.tuberlin.mcc.simra.app.util.IOUtils.importSimRaData;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.zipto;
 
 import static de.tuberlin.mcc.simra.app.util.Utils.prepareDebugZip;
@@ -48,19 +52,19 @@ public class SettingsActivity extends BaseActivity {
 
     private static final String TAG = "SettingsActivity_LOG";
     private final static int REQUEST_ENABLE_BT = 1;
-    private final static int BLUETOOTH_SUCCESS = -1;
+    private final static int DIRECTORY_PICKER_EXPORT = 9999;
+    private static final int FILE_PICKER_IMPORT = 8778;
 
-    //public static final int REQUEST_CODE = 1;
-    //private static final int CHOOSE_FILE_REQUESTCODE = 8777;
-    private static final int PICKFILE_RESULT_CODE = 8778;
     BroadcastReceiver br;
     ActivitySettingsBinding binding;
-    List<File> ridesArr = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadActivity();
+    }
 
+    private void loadActivity() {
         binding = ActivitySettingsBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
         // Setup
@@ -169,79 +173,19 @@ public class SettingsActivity extends BaseActivity {
 
             @Override
             public void onClick(View view) {
-
-
-                Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
-                Log.d(TAG,"Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT");
-                chooseFile.setType("*/*");
-                Log.d(TAG,"chooseFile.setType(*/*)");
-                chooseFile = Intent.createChooser(chooseFile, "Choose a file");
-                Log.d(TAG,"chooseFile = Intent.createChooser(chooseFile, \"Choose a file\");");
-                startActivityForResult(chooseFile, PICKFILE_RESULT_CODE);
-                Log.d(TAG, "startActivityForResult(chooseFile, PICKFILE_RESULT_CODE);");
-
-                // wrong destination, need to be @Override  protected void
-                // onActivityResult(PICKFILE_RESULT_CODE, REQUEST_CODE,chooseFile);
-
-                Log.d(TAG, "onActivityResult(PICKFILE_RESULT_CODE, REQUEST_CODE,chooseFile);");
-
-                Log.d(TAG, "before - chooseFile.getData().getPath()" + chooseFile.getData().getPath());
-
-             //   Uri uri = chooseFile.getData();
-
-
-
-                int i= 0;
-                Uri uri = null;
-
-                while (uri == null){
-                    i+=1;
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        public void run() {
-                            // Actions to do after delay
-                            Log.d(TAG, "waited enough");
-
-                        }
-                    }, 1000);
-                    uri = chooseFile.getData();
-                    Log.d(TAG, i + ". chooseFile.getData()" + uri);
-                }
-                if(uri == null){
-                    String src = uri.getPath();
-                    Log.d(TAG, "src = uri.getPath()" + src);
-                }else{
-                    Log.d(TAG, "else - chooseFile.getData()" + chooseFile.getData());
-                    uri = chooseFile.getData();
-                    Log.d(TAG, "else - uri = chooseFile.getData()" + uri);
-                    Log.d(TAG, "else - uri.getPath()" + uri.getPath());
-                    String src = uri.getPath();
-                    Log.d(TAG, "else - src = uri.getPath()" + src);
-
-                }
-
-
-
-
-             /*   try {
-                    IOUtils.unpackZip(SettingsActivity.this.getFilesDir().getParent() + "/" , "zip3.zip");
-                    Log.d(TAG, getBaseFolderPath(SettingsActivity.this) + "/zip3.zip");
-
-                    Log.d(TAG,"unpack 3");
-
-                }catch (Exception e){
-                    Log.d(TAG,"problem 2");
-
-                } /*try {
-                    IOUtils.unpackZip("/data/data/de.tuberlin.mcc.simra.app.mark/files/" ,"zip2.zip");
-                    Log.d(TAG,"unpack 1");
-
-                }catch (Exception e){
-                    Log.d(TAG,"problem 1");
-
-                }*/
-                Log.d(TAG, "import button last line");
-
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(SettingsActivity.this).setTitle(R.string.importPromptTitle);
+                builder.setMessage(R.string.importButtonText);
+                builder.setPositiveButton(R.string.continueText, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+                        chooseFile.setType("application/zip");
+                        chooseFile = Intent.createChooser(chooseFile, getString(R.string.importFile));
+                        startActivityForResult(chooseFile, FILE_PICKER_IMPORT);
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, null);
+                builder.show();
             }
         });
 
@@ -253,23 +197,15 @@ public class SettingsActivity extends BaseActivity {
                 builder.setPositiveButton(R.string.continueText, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
-                        //IOUtils.zipFolder("/data/data/de.tuberlin.mcc.simra.app.mark/shared_prefs","/data/data/de.tuberlin.mcc.simra.app.mark/files");
-                        //IOUtils.zipFolder("/data/data/de.tuberlin.mcc.simra.app.mark/files","/data/data/de.tuberlin.mcc.simra.app.mark/shared_prefs");
-                        // non static approach
-                        Log.d(TAG, SettingsActivity.this.getFilesDir().getParent());
-                        zipto(SettingsActivity.this.getFilesDir().getParent(),getBaseFolderPath(SettingsActivity.this) + "/zip3.zip",SettingsActivity.this);
-                        // zipto("/data/data/de.tuberlin.mcc.simra.app.mark/files","/data/data/de.tuberlin.mcc.simra.app.mark/shared_prefs");
-
-                         // fireExportPrompt();
+                        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                        i.addCategory(Intent.CATEGORY_DEFAULT);
+                        startActivityForResult(Intent.createChooser(i, getString(R.string.exportDirectory)), DIRECTORY_PICKER_EXPORT);
                     }
                 });
                 builder.setNegativeButton(R.string.cancel, null);
                 builder.show();
             }
         });
-
-
 
         // Switch: OpenBikeSensor device enabled
         boolean obsActivated = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
@@ -379,8 +315,10 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 prepareDebugZip(clicked[0], ridesAndAccEvents, SettingsActivity.this);
-                //  Intent intent = new Intent(SettingsActivity.this, DebugUploadService.class);
-                //  startService(intent);
+                Intent intent = new Intent(SettingsActivity.this, DebugUploadService.class);
+                startService(intent);
+                // delete zip.zip after upload is finished
+                new File(IOUtils.Directories.getBaseFolderPath(SettingsActivity.this) + "zip.zip").deleteOnExit();
             }
         });
         builder.setNegativeButton(R.string.cancel, null);
@@ -416,14 +354,30 @@ public class SettingsActivity extends BaseActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == BLUETOOTH_SUCCESS && requestCode == REQUEST_ENABLE_BT) {
-            startOBSService();
-            showTutorialDialog();
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode == Activity.RESULT_OK) {
+                startOBSService();
+                showTutorialDialog();
+            } else {
+                SharedPref.Settings.OpenBikeSensor.setEnabled(false, this);
+                binding.obsSwitch.setChecked(false);
+                OBSService.terminateService(this);
+                binding.obsButton.setVisibility(View.GONE);
+            }
+        } else if (requestCode == DIRECTORY_PICKER_EXPORT && resultCode == Activity.RESULT_OK) {
+            // triggers export to SimRa.zip (in a given directory)
+            zipto(SettingsActivity.this.getFilesDir().getParent(),data.getData(),SettingsActivity.this);
+        } else if (requestCode == FILE_PICKER_IMPORT && resultCode == Activity.RESULT_OK) {
+            // triggers import data from given SimRa.zip
+            importSimRaData(data.getData() ,this);
+            // reload activity so that the imported settings are shown in this view.
+            loadActivity();
+            // show toast that data import is completed
+            Toast.makeText(this,R.string.importDone, Toast.LENGTH_LONG).show();
         } else {
-            SharedPref.Settings.OpenBikeSensor.setEnabled(false, this);
-            binding.obsSwitch.setChecked(false);
-            OBSService.terminateService(this);
-            binding.obsButton.setVisibility(View.GONE);
+            if (data != null) {
+                Log.d(TAG, " requestCode: " + requestCode + " resultCode: " + resultCode + " result " + data.getData());
+            }
         }
     }
 
@@ -479,4 +433,12 @@ public class SettingsActivity extends BaseActivity {
         return ((path == null || path.isEmpty()) ? (uri.getPath()) : path);
     }*/
 
+    private void restartApp() {
+        Intent intent = new Intent(getApplicationContext(), StartActivity.class);
+        int mPendingIntentId = 1337;
+        PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+        System.exit(0);
+    }
 }

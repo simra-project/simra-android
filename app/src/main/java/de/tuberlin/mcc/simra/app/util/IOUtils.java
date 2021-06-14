@@ -1,23 +1,51 @@
 package de.tuberlin.mcc.simra.app.util;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.util.Log;
+import android.util.Xml;
+import android.widget.Toast;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xmlpull.v1.XmlPullParser;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import androidx.documentfile.provider.DocumentFile;
 import de.tuberlin.mcc.simra.app.BuildConfig;
+import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.activities.AboutActivity;
 import de.tuberlin.mcc.simra.app.activities.SettingsActivity;
+
+import static de.tuberlin.mcc.simra.app.util.SharedPref.clearSharedPrefs;
+import static de.tuberlin.mcc.simra.app.util.SharedPref.createEntry;
 
 public class IOUtils {
     private static final String TAG = "IOUtils_LOG";
@@ -60,58 +88,48 @@ public class IOUtils {
         }
     }
 
-    public static boolean zipto(String sourcePath, String toLocation, Context ctx) {
+    public static boolean zipto(String sourcePath, Uri toLocation, Context ctx) {
 
         final int BUFFER = 2048;
 
         File sourceFile = new File(sourcePath);
-        Log.d(TAG, "sourcePath: " + sourcePath);
         try {
             BufferedInputStream origin = null;
-            FileOutputStream dest = new FileOutputStream(toLocation);
-            ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
-                    dest));
+            DocumentFile parent = DocumentFile.fromTreeUri(ctx, toLocation);
+            try {
+                parent.findFile("SimRa.zip").delete();
+            } catch (NullPointerException ignored) {
+
+            }
+            DocumentFile zipFile = parent.createFile("application/zip", "SimRa.zip");
+            Uri zipUri = null;
+            if (zipFile != null) {
+                zipUri = zipFile.getUri();
+            }
+            FileOutputStream dest = (FileOutputStream) ctx.getContentResolver().openOutputStream(zipUri);
+            ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
             if (sourceFile.isDirectory()) {
-                Log.d(TAG, sourcePath + " is directory. Entering zipSubFolder");
+                Log.d(TAG, "parent: " + sourceFile.getParent() + " length: " + sourceFile.getParent().length());
                 zipSubFolder(out, sourceFile, sourceFile.getParent().length(),ctx);
             } else {
-                // never used so far 14/05/21
-
-                Log.d(TAG, sourcePath + " is not directory. Zipping");
-                byte data[] = new byte[BUFFER];
-                Log.d(TAG, "80");
+                byte[] data = new byte[BUFFER];
                 FileInputStream fi = new FileInputStream(sourcePath);
-                Log.d(TAG, "82");
                 origin = new BufferedInputStream(fi, BUFFER);
                 ZipEntry entry = new ZipEntry(getLastPathComponent(sourcePath));
-                Log.d(TAG, "85");
-                Log.d(TAG, entry.getName() + " " + entry.getName().contains(".zip") + " wo ist der Log");
-                Log.d(TAG, entry.getName() + " so true ");
-
-                // if (entry.getName().contains(".zip")){
-                    Log.d(TAG, entry.getName() + " so true ");
-
-                    Log.d(TAG, "91");
-                    entry.setTime(sourceFile.lastModified()); // to keep modification time after unzipping
-
-                    Log.d(TAG, "95");
+                entry.setTime(sourceFile.lastModified()); // to keep modification time after unzipping
                 out.putNextEntry(entry);
 
-                    Log.d(TAG, "98");
                 int count;
                 while ((count = origin.read(data, 0, BUFFER)) != -1) {
-
-                    Log.d(TAG, "101");
                     out.write(data, 0, count);
                 }}
 
-
-            Log.d(TAG, "105");
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+        Toast.makeText(ctx, R.string.exportToast, Toast.LENGTH_SHORT).show();
         return true;
     }
 
@@ -123,43 +141,28 @@ public class IOUtils {
 
     private static void zipSubFolder(ZipOutputStream out, File folder,
                               int basePathLength, Context ctx) throws IOException {
-        if(! (folder.getAbsolutePath().equals(ctx.getFilesDir().getParent()) || folder.getAbsolutePath().contains("files") || folder.getAbsolutePath().contains("shared_prefs"))) {
-            Log.d(TAG, folder.getAbsolutePath() + " is not to be zipped");
-            Log.d(TAG, "folder.getAbsolutePath().equals(ctx.getFilesDir().getParent() " + folder.getAbsolutePath().equals(ctx.getFilesDir().getParent()) + " is the reason");
-            Log.d(TAG, "folder.getAbsolutePath().contains(\"files\") " + folder.getAbsolutePath().contains("files") + " is not to be zipped");
-            Log.d(TAG, "folder.getAbsolutePath().contains(\"shared_prefs\") " +  folder.getAbsolutePath().contains("shared_prefs") + " is not to be zipped");
-            // Log.d(TAG, "folder.getAbsolutePath().contains(.zip) " +  folder.getAbsolutePath().contains(".zip") + " is not to be zipped");
-
-
+        if(!(folder.getAbsolutePath().equals(ctx.getFilesDir().getParent()) || folder.getAbsolutePath().contains("files") || folder.getAbsolutePath().contains("shared_prefs"))) {
             return;
         }
-        Log.d(TAG, folder.getAbsolutePath() + " is to be zipped");
         final int BUFFER = 2048;
 
         File[] fileList = folder.listFiles();
         BufferedInputStream origin = null;
         for (File file : fileList) {
+            Log.d(TAG, "file: " + file.getPath() + " is directory: " + file.isDirectory());
             if (file.isDirectory()) {
-                Log.d(TAG, file.getAbsolutePath() + " is directory. Entering zipSubFolder");
                 zipSubFolder(out, file, basePathLength, ctx);
             } else {
 
-                Log.d(TAG, file.getAbsolutePath() + " is not directory.");
-
                 byte data[] = new byte[BUFFER];
-                Log.d(TAG, "149");
                 String unmodifiedFilePath = file.getPath();
                 String relativePath = unmodifiedFilePath
                         .substring(basePathLength);
                 if(!relativePath.contains(".zip")) {
-                    Log.d(TAG, "zipping");
                     FileInputStream fi = new FileInputStream(unmodifiedFilePath);
-                    Log.d(TAG, "157");
 
                     origin = new BufferedInputStream(fi, BUFFER);
                     ZipEntry entry = new ZipEntry(relativePath);
-                    Log.d(TAG, entry.getName() + " " + entry.getName().contains(".zip") + " wo ist der Log");
-                    Log.d(TAG, entry.getName() + " so true ");
 
                     entry.setTime(file.lastModified()); // to keep modification time after unzipping
                     out.putNextEntry(entry);
@@ -221,54 +224,101 @@ public class IOUtils {
         }
     }
 
-    public static boolean unpackZip(String path, String zipname)
-    {
+    /**
+     * imports rides, settings and statistics from a previously via export created SimRa.zip file.
+     * The settings and statistics (.xml files) are being parsed and written as shared preferences.
+     * The rides, incidents, metaData and other files and folders are simply extracted as .csv files.
+     * @param zipUri The URI of SimRa.zip chosen by the file picker
+     * @param context Activity context needed to write to shared preferences
+     * @return false, if IOException is thrown, true otherwise.
+     */
+    public static boolean importSimRaData(Uri zipUri, Context context) {
         InputStream is;
         ZipInputStream zis;
-        try
-        {
-            String filename;
-            is = new FileInputStream(path + "files/" + zipname);
+        try {
+            is = context.getContentResolver().openInputStream(zipUri);
             zis = new ZipInputStream(new BufferedInputStream(is));
             ZipEntry entry;
-            byte[] buffer = new byte[1024];
-            int count;
 
-            while ((entry = zis.getNextEntry()) != null)
-            {
-                filename = entry.getName();
-                Log.d(TAG,"filename: " + filename);
-                Log.d(TAG, "entry.isDirectory(): " + entry.isDirectory());
-                // Need to create directories if not exists, otherwise throws Exception
-                if (entry.isDirectory()) {
-                    File fmd = new File(path + filename);
-                    //mkdirs : Creates the directory named by this abstract pathname, including any necessary but nonexistent parent directories
-                    fmd.mkdirs();
-                    Log.d(TAG,"fmd: " + fmd.getAbsolutePath());
-                    continue;
+            while ((entry = zis.getNextEntry()) != null) {
+                String entryFilePath = entry.getName().replaceFirst("/" + context.getPackageName(), "");
+                String[] entryFilePathArray = entryFilePath.split("/");
+                StringBuilder tempPath = new StringBuilder(context.getFilesDir().getParentFile().getPath());
+                for (int i = 1; i < entryFilePathArray.length; i++) {
+                    tempPath.append("/").append(entryFilePathArray[i]);
+                    // create parent directories, if not present yet
+                    if (i < entryFilePathArray.length - 1) {
+                        File folder = new File(tempPath.toString());
+                        if (!folder.exists()) {
+                            folder.mkdir();
+                        }
+                    // delete the file if it already exists. Otherwise, extract it or parse the xml.
+                    } else {
+                        File file = new File(tempPath.toString());
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                        if (file.getName().endsWith(".xml")) {
+                            loadSharePrefs(file, zis, context);
+                        } else {
+                            unzipContent(file, zis);
+                        }
+                    }
                 }
-
-                Log.d(TAG, "path + filename: " + path + filename);
-                FileOutputStream fout = new FileOutputStream(path + filename);
-
-                while ((count = zis.read(buffer)) != -1)
-                {
-                    fout.write(buffer, 0, count);
-                }
-
-                fout.close();
                 zis.closeEntry();
             }
 
             zis.close();
         }
-        catch(IOException e)
-        {
+        catch(IOException e) {
             e.printStackTrace();
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Parses a shared preferences file (.xml) and overwrites/creates new entries in the respective
+     * shared preferences file.
+     * @param file
+     * @param zis
+     * @param context
+     * @throws IOException
+     */
+    private static void loadSharePrefs(File file, ZipInputStream zis, Context context) throws IOException {
+        File tempFile = new File(file.getAbsolutePath().replace(".xml","_temp.xml"));
+        unzipContent(tempFile, zis);
+        String sharedPrefName = file.getName().replace(".xml","");
+        clearSharedPrefs(sharedPrefName, context);
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(tempFile))) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (!line.trim().isEmpty() && !line.startsWith("<?xml") && !line.startsWith("<map>") && !line.startsWith("</map>")) {
+                    createEntry(sharedPrefName, line, context);
+                }
+            }
+        }
+        tempFile.delete();
+    }
+
+    /**
+     * Unzips the content in zis to file.
+     * @param file
+     * @param zis
+     * @throws IOException
+     */
+    private static void unzipContent(File file, ZipInputStream zis) throws IOException {
+        FileOutputStream fOut;
+        int count;
+        byte[] buffer = new byte[1024];
+        // Log.d(TAG, "file " + file.getPath() + " is being created");
+        file.createNewFile();
+        fOut = new FileOutputStream(file);
+        while ((count = zis.read(buffer)) != -1) {
+            fOut.write(buffer, 0, count);
+        }
+        fOut.close();
     }
 
     public static class Directories {

@@ -113,7 +113,6 @@
     <string name="ride_deleted">Fahrt gelöscht</string>
     <string name="uploadingNotificationTitle">SimRa</string>
     <string name="uploadingNotificationBody">SimRa lädt Fahrten hoch</string>
-    <string name="uploadingDebugNotificationBody">SimRa lädt Dateien hoch</string>
     <string name="upload_started">SimRa Hochladen gestartet</string>
     <string name="upload_completed">SimRa Hochladen abgeschlossen.</string>
     <string name="upload_failed">SimRa Hochladen fehlgeschlagen. Versuchen Sie es später erneut.</string>
@@ -196,6 +195,17 @@
     <string name="rideAnalysis">Fahrten Analyse</string>
     <string name="onlineAI">Online KI gestützt</string>
     <string name="offlineNoAI">Offline Modus</string>
+    <string name="importTitle">Datenimport</string>
+    <string name="importPromptTitle">Datenimport von zuvor exportierten SimRa-Daten</string>
+    <string name="importButtonText">Bitte wählen Sie die "SimRa.zip"-Datei aus, die zuvor mit der Exportfunktion in SimRa erstellt wurde. Dadurch werden die Fahrten, Statistiken und Einstellungen, die zuvor exportiert wurden, übernommen. ACHTUNG! Dadurch werden aktuelle Fahrten, Statistiken und Einstellungen gelöscht bzw. überschrieben.</string>
+    <string name="importFile">Navigieren Sie bitte zu dem Ordner mit "SimRa.zip" und wählen diese aus.</string>
+    <string name="importDone">Datenimport abgeschlossen.</string>
+    <string name="ok">Okay</string>
+    <string name="exportTitle">Datenexport</string>
+    <string name="exportPromptTitle">Datenexport der eigenen SimRa-Daten</string>
+    <string name="exportButtonText">Geben Sie bitte den Ort an, wo die Datei "SimRa.zip" gespeichert werden soll. Diese Datei kann dann in einem Android-Gerät in SimRa importiert werden. Dadurch können Sie Ihre Fahrten, Statistiken und Einstellungen behalten, wenn Sie ihr Handy wechseln oder formatieren. </string>
+    <string name="exportDirectory">Wo soll SimRa.zip gespeichert werden?</string>
+    <string name="exportToast">"SimRa-Datei zum Importieren wurde erfolgreich erstellt"</string>
     <string name="dateFormatDescription">Datumsformat</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
@@ -207,6 +217,7 @@
     <string name="debugSendAllRides">Ja, alle</string>
     <string name="debugSend10Rides">Ja, die letzten 10</string>
     <string name="debugDoNotSendRides">Nein, keine</string>
+    <string name="uploadingDebugNotificationBody">SimRa lädt Dateien hoch</string>
 
     <!--- OpenBikeSensor -->
     <string name="obsSwitchTitle">OpenBikeSensor verbinden</string>
@@ -369,13 +380,4 @@
     <string name="obsConnecting">Verbindung mit OpenBikeSensor</string>
     <string name="obsTutorial">\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden</string>
     <string name="obs">OpenBikeSensor</string>
-
-    <!-- 74 -->
-    <string name="exportTitle">Datenexport</string>
-    <string name="export" translatable="false">Export</string>
-    <string name="exportPromptTitle">Datenexport der eigenen SimRa-Daten</string>
-    <string name="exportButtonText">Diese Funktion ermöglicht es Ihnen, die vorhandenen lokalen Daten zu exportieren und das zip File bei einem anderen Gerät (z.B. neues Smartphone) wieder zu importieren. Sie können dabei wählen ob Sie die letzten 10 Fahrten oder alle Fahrten (auch die bereits hochgeladenen) hochgeladen exportiert werden sollen.</string>
-    <string name="item_choose_file">item choose file</string>
-
-    <!-- <string name="import" translatable="false">Import</string> -->
 </resources>

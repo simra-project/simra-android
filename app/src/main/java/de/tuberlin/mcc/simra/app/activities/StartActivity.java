@@ -54,6 +54,8 @@ public class StartActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
+
+
         // Just some Logs
         Log.d(TAG, "getFilesDir(): " + Arrays.toString(new File(getFilesDir(), "../shared_prefs").listFiles()));
         Log.d(TAG, "onCreate() started");

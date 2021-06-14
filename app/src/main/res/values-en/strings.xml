@@ -188,6 +188,17 @@
     <string name="rideAnalysis">Ride analysis</string>
     <string name="onlineAI">Online AI</string>
     <string name="offlineNoAI">Offline mode</string>
+    <string name="importTitle">Import Data</string>
+    <string name="importPromptTitle">Import data from previously exported SimRa data</string>
+    <string name="importButtonText">Please choose the "SimRa.zip" file previously created with the export feature in simRa. This will import all rides, statistics and settings from that file. WARNING! This will delete/overwrite all existing rides, statistics and settings.</string>
+    <string name="importFile">Please navigate to the directory containing "SimRa.zip" and select it.</string>
+    <string name="importDone">Data imported.</string>
+    <string name="ok">Okay</string>
+    <string name="exportTitle">Export Data</string>
+    <string name="exportPromptTitle">Export SimRa data</string>
+    <string name="exportButtonText">Please give the location where to save the "SimRa.zip" file. This file can be used to import your rides, statistics and settings to another Android phone. </string>
+    <string name="exportDirectory">Where shall SimRa.zip be saved?</string>
+    <string name="exportToast">"SimRa file for import was successfully created."</string>
     <string name="dateFormatDescription">Date Format</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
@@ -199,6 +210,7 @@
     <string name="debugSendAllRides">Yes, all</string>
     <string name="debugSend10Rides">Yes, the last 10</string>
     <string name="debugDoNotSendRides">No, don\'t send any rides</string>
+    <string name="uploadingDebugNotificationBody">SimRa is uploading files</string>
 
     <!--- OpenBikeSensor -->
     <string name="obsSwitchTitle">OpenBikeSensor connection</string>
@@ -362,12 +374,5 @@
     <string name="obsConnecting">Connecting to OpenBikeSensor</string>
     <string name="obsTutorial">\nPlease hold your hand close to the distance sensor for 3 seconds</string>
     <string name="obs">OpenBikeSensor</string>
-
-
-    <!-- 74 -->
-    <string name="exportTitle">Data Export</string>
-    <string name="uploadingDebugNotificationBody">SimRa is uploading files</string>
-    <string name="item_choose_file">item choose file</string>
-
 
 </resources>

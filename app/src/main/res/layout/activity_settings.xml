@@ -473,7 +473,7 @@
                             android:layout_marginBottom="20dp"
                             android:layout_weight=".5"
                             android:layout_margin="10dp"
-                            android:text="@string/export"
+                            android:text="Export"
                             app:icon="@android:drawable/stat_sys_upload" />
 
                     </LinearLayout>
