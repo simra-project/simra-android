@@ -281,7 +281,7 @@
     <string name="childString">Auf dem Fahrrad wird ein Kind transportiert.</string>
     <string name="trailerString">Am Fahrrad ist ein Anhänger angebracht.</string>
     <string name="ride_settings_description">Unten finden Sie die Einstellungen, die für diese Fahrt verwendet werden. Sie können diese sowohl in diesem Fenster, als auch unter \"Einstellungen\" im Hauptmenü finden.</string>
-    <string name="rememberMyChoice">Diese Einstellungen merken</string>
+    <string name="rememberChanges">Änderungen merken</string>
     <string name="locationTypeSpinnerTitle">Üblicher Ort des Geräts während der Fahrt:</string>
 
     <!--- Credits -->

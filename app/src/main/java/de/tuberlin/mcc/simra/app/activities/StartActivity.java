@@ -138,7 +138,7 @@ public class StartActivity extends BaseActivity {
         CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
         final boolean[] rememberChoice = {false};
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> rememberChoice[0] = isChecked);
-        checkBox.setText(getString(R.string.rememberMyChoice));
+        checkBox.setText(getString(R.string.rememberChanges));
         AlertDialog.Builder alert = new AlertDialog.Builder(StartActivity.this);
         alert.setTitle(getString(R.string.sendErrorTitle));
         alert.setMessage(getString(R.string.sendErrorMessage));

@@ -110,6 +110,7 @@
         <item>@string/recumbentBicycle</item>
         <item>@string/freightBicycle</item>
         <item>@string/tandemBike</item>
+        <item>@string/mountainBike</item>
         <item>@string/other</item>
     </string-array>
     <string-array name="aboutSimraItems">

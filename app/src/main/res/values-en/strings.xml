@@ -287,7 +287,7 @@
     <string name="childString">There is a child on the bicycle</string>
     <string name="trailerString">A trailer is attached to the bicycle</string>
     <string name="ride_settings_description">Below, you can find the settings chosen for this ride. You can change them here, or in the settings menu.</string>
-    <string name="rememberMyChoice">Remember My Choice</string>
+    <string name="rememberChanges">Remember changes</string>
     <string name="locationTypeSpinnerTitle">The usual location of your phone during a ride:</string>
 
     <!--- Credits -->

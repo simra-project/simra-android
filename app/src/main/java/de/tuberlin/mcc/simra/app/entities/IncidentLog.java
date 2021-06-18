@@ -43,8 +43,11 @@ public class IncidentLog {
         return secondaryIncidentLog;
     }
 
-    public static IncidentLog loadIncidentLog(int rideId, Context context) {
-        return loadIncidentLog(rideId, null, null, context);
+    public static IncidentLog loadIncidentLogFromFileOnly(int rideId, Context context) {
+        return loadIncidentLogWithRideSettingsInformation(rideId, null, null, null, null, context);
+    }
+    public static IncidentLog loadIncidentLogWithRideSettingsInformation(int rideId, Integer bikeType, Integer phoneLocation, Boolean child, Boolean trailer, Context context) {
+        return loadIncidentLogWithRideSettingsAndBoundary(rideId, bikeType, phoneLocation, child, trailer, null, null, context);
     }
 
     /**
@@ -56,7 +59,7 @@ public class IncidentLog {
      * @param context
      * @return Incident Log of the ride, empty if ride not found.
      */
-    public static IncidentLog loadIncidentLog(int rideId, Long startTimeBoundary, Long endTimeBoundary, Context context) {
+    public static IncidentLog loadIncidentLogWithRideSettingsAndBoundary(int rideId, Integer bikeType, Integer phoneLocation, Boolean childOnBoard, Boolean bikeWithTrailer, Long startTimeBoundary, Long endTimeBoundary, Context context) {
         File incidentFile = getEventsFile(rideId, context);
         Map<Integer, IncidentLogEntry> incidents = new HashMap() {};
         int nn_version = 0;
@@ -73,6 +76,10 @@ public class IncidentLog {
                 while ((line = bufferedReader.readLine()) != null) {
                     if (!line.trim().isEmpty()) {
                         IncidentLogEntry incidentLogEntry = IncidentLogEntry.parseEntryFromLine(line);
+                        incidentLogEntry.bikeType = bikeType;
+                        incidentLogEntry.phoneLocation = phoneLocation;
+                        incidentLogEntry.childOnBoard = childOnBoard;
+                        incidentLogEntry.bikeWithTrailer = bikeWithTrailer;
                         if (!(incidentLogEntry.incidentType == IncidentLogEntry.INCIDENT_TYPE.FOR_RIDE_SETTINGS) && incidentLogEntry.isInTimeFrame(startTimeBoundary, endTimeBoundary)) {
                             incidents.put(incidentLogEntry.key, incidentLogEntry);
                         }
@@ -113,8 +120,8 @@ public class IncidentLog {
     }
 
     public static void saveIncidentLog(IncidentLog incidentLog, Context context) {
-        File newFile = getEventsFile(incidentLog.rideId, context);
-        Utils.overwriteFile(incidentLog.toString(), newFile);
+        File accEventsFile = getEventsFile(incidentLog.rideId, context);
+        Utils.overwriteFile(incidentLog.toString(), accEventsFile);
     }
 
     public static List<IncidentLogEntry> getScaryIncidents(IncidentLog incidentLog) {

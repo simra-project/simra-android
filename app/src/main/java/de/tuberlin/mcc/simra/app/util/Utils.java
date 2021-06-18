@@ -86,7 +86,7 @@ public class Utils {
 
         StringBuilder content = new StringBuilder();
 
-        IncidentLog incidentLog = IncidentLog.filterIncidentLogUploadReady(IncidentLog.loadIncidentLog(rideId, context),null,null,null,null,true);
+        IncidentLog incidentLog = IncidentLog.filterIncidentLogUploadReady(IncidentLog.loadIncidentLogFromFileOnly(rideId, context),null,null,null,null,true);
         String dataLog = DataLog.loadDataLog(rideId, context).toString();
 
         content.append(incidentLog.toString());

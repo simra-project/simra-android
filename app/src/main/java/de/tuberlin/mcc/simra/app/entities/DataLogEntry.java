@@ -86,7 +86,6 @@ public class DataLogEntry {
             );
         }
 
-//        Log.d(TAG, Arrays.toString(dataLogLine));
         dataLogEntryBuilder.withOBS(
                 dataLogLine.length > 10 ? (!dataLogLine[10].isEmpty() ? Integer.parseInt(dataLogLine[10]) : null) : null,
                 dataLogLine.length > 11 ? (!dataLogLine[11].isEmpty() ? Integer.parseInt(dataLogLine[11]) : null) : null,

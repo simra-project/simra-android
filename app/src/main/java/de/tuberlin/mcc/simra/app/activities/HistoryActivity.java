@@ -88,12 +88,9 @@ public class HistoryActivity extends BaseActivity {
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                // Log.d(TAG, view.getLastVisiblePosition() + " " + firstVisibleItem + " " + visibleItemCount + " " + totalItemCount);
                 if (isUp && view.getLastVisiblePosition() + 1 == totalItemCount) {
-                    Log.d(TAG, "hide buttons");
                     historyButtons.animate().translationX(historyButtons.getWidth() / 2f);
                     isUp = false;
-                    // historyButtons.setVisibility(View.INVISIBLE);
                 } else if (!isUp && !(view.getLastVisiblePosition() + 1 == totalItemCount)) {
                     historyButtons.animate().translationX(0);
                     isUp = true;
@@ -137,7 +134,6 @@ public class HistoryActivity extends BaseActivity {
             }
 
             ridesArr = new String[metaDataLines.size()];
-            Log.d(TAG, "refreshMyRides(): metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             for (int i = 0; i < metaDataLines.size(); i++) {
                 String[] metaDataLine = metaDataLines.get(i);
                 if (metaDataLine.length > 2 && !(metaDataLine[0].equals("key"))) {
@@ -145,7 +141,6 @@ public class HistoryActivity extends BaseActivity {
                 }
             }
 
-            Log.d(TAG, "ridesArr: " + Arrays.toString(ridesArr));
             List<String> stringArrayList = new ArrayList<>(Arrays.asList(ridesArr));
             MyArrayAdapter myAdapter = new MyArrayAdapter(this, R.layout.row_icons, stringArrayList, metaDataLines);
             binding.listView.setAdapter(myAdapter);
@@ -178,7 +173,6 @@ public class HistoryActivity extends BaseActivity {
     }
 
     private String listToTextShape(String[] item) {
-        Log.d(TAG, "listToTextShape item: " + Arrays.toString(item));
         String todo = getString(R.string.newRideInHistoryActivity);
 
         if (item[3].equals("1")) {

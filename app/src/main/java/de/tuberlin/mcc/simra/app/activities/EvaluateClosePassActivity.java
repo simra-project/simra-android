@@ -30,6 +30,10 @@ import de.tuberlin.mcc.simra.app.util.IOUtils;
 public class EvaluateClosePassActivity extends AppCompatActivity {
     private static final String TAG = "EvaluateClosePass";
     private static final String EXTRA_RIDE_ID = "EXTRA_RIDE_ID";
+    private static final String EXTRA_BIKE_TYPE = "EXTRA_BIKE_TYPE";
+    private static final String EXTRA_PHONE_LOCATION = "EXTRA_PHONE_LOCATION";
+    private static final String EXTRA_CHILD_ON_BOARD = "EXTRA_CHILD_ON_BOARD";
+    private static final String EXTRA_WITH_TRAILER = "EXTRA_WITH_TRAILER";
 
     /**
      * Layout Binding.
@@ -52,9 +56,13 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
      */
     List<File> imageQueue;
 
-    public static void startEvaluateClosePassActivity(int rideId, Context context) {
+    public static void startEvaluateClosePassActivity(int rideId, int bikeType, int phoneLocation, boolean childOnBoard, boolean withTrailer, Context context) {
         Intent intent = new Intent(context, EvaluateClosePassActivity.class);
         intent.putExtra(EXTRA_RIDE_ID, rideId);
+        intent.putExtra(EXTRA_BIKE_TYPE, bikeType);
+        intent.putExtra(EXTRA_PHONE_LOCATION, phoneLocation);
+        intent.putExtra(EXTRA_CHILD_ON_BOARD, childOnBoard);
+        intent.putExtra(EXTRA_WITH_TRAILER, withTrailer);
         context.startActivity(intent);
     }
 
@@ -116,7 +124,11 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
         binding.toolbar.backButton.setOnClickListener(v -> finish());
 
         int rideId = getIntent().getIntExtra(EXTRA_RIDE_ID, 0);
-        incidentLog = IncidentLog.loadIncidentLog(rideId, this);
+        int bikeType = getIntent().getIntExtra(EXTRA_BIKE_TYPE, 0);
+        int phoneLocation = getIntent().getIntExtra(EXTRA_PHONE_LOCATION, 0);
+        boolean childOnBoard = getIntent().getBooleanExtra(EXTRA_CHILD_ON_BOARD, false);
+        boolean withTrailer = getIntent().getBooleanExtra(EXTRA_WITH_TRAILER, false);
+        incidentLog = IncidentLog.loadIncidentLogWithRideSettingsInformation(rideId, bikeType, phoneLocation, childOnBoard, withTrailer, this);
         dataLog = DataLog.loadDataLog(rideId, this);
 
 
@@ -179,6 +191,5 @@ public class EvaluateClosePassActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop() called");
     }
 }
