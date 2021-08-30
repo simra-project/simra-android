@@ -396,6 +396,33 @@
                 android:scrollHorizontally="false"
                 android:text="@string/googleCredit" />
         </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+
+            <ImageView
+                android:id="@+id/dashboard_image"
+                android:layout_width="65dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/ic_file_upload_black_24dp" />
+
+            <TextView
+                android:id="@+id/dashboardText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@id/dashboard_image"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/dashboard_image"
+                android:autoLink="web"
+                android:scrollHorizontally="false"
+                android:text="@string/freepikCredit" />
+        </RelativeLayout>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

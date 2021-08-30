@@ -25,26 +25,30 @@
             android:icon="@drawable/ic_bluetooth"
             android:title="@string/title_activity_bluetooth_connection" />
         <item
-            android:id="@+id/nav_aboutSimRa"
-            android:icon="@drawable/simra_logo"
-            android:title="@string/about_simra" />
-        <item
             android:id="@+id/nav_tutorial"
             android:icon="@drawable/ic_help_outline_black_24dp"
             android:title="@string/title_tutorial" />
         <item
             android:id="@+id/nav_feedback"
             android:icon="@drawable/ic_content_paste_black_24dp"
-            android:title="@string/feedback" />
+            android:title="@string/feedback"
+            android:visible="false" />
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/dashboard_icon"
+            android:title="@string/dashboard" />
+        <item
+            android:id="@+id/nav_contact"
+            android:icon="@drawable/ic_baseline_connect_without_contact_24"
+            android:title="@string/title_activity_contact" />
+        <item
+            android:id="@+id/nav_aboutSimRa"
+            android:icon="@drawable/simra_logo"
+            android:title="@string/about_simra" />
         <item
             android:id="@+id/nav_imprint"
             android:icon="@drawable/ic_info_black_24dp"
             android:title="@string/imprint" />
-        <item
-            android:id="@+id/nav_twitter"
-            android:icon="@drawable/ic_twitter_logo_blue"
-            android:title="@string/twitter" />
-
     </group>
 
 </menu>

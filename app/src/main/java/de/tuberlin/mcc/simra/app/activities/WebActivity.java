@@ -14,7 +14,7 @@ public class WebActivity extends BaseActivity {
         setContentView(R.layout.activity_web);
         WebView myWebView = new WebView(getBaseContext());
         setContentView(myWebView);
-        String URL = getString(R.string.mccPage);
+        String URL = getString(R.string.link_mcc_Page);
         URL = getIntent().getStringExtra("URL");
         myWebView.loadUrl(URL);
     }

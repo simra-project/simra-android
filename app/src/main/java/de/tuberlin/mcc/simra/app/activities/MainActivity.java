@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -33,12 +32,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.util.Consumer;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -63,6 +56,11 @@ import java.util.concurrent.Executors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.util.Consumer;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
@@ -77,19 +75,15 @@ import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 
-import static de.tuberlin.mcc.simra.app.activities.ProfileActivity.startProfileActivityForChooseRegion;
 import static de.tuberlin.mcc.simra.app.entities.Profile.profileIsInUnknownRegion;
 import static de.tuberlin.mcc.simra.app.update.VersionUpdater.Legacy.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
 import static de.tuberlin.mcc.simra.app.util.Utils.fireProfileRegionPrompt;
-import static de.tuberlin.mcc.simra.app.util.Utils.getCorrectRegionName;
 import static de.tuberlin.mcc.simra.app.util.Utils.getNews;
-import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.isLocationServiceOff;
 import static de.tuberlin.mcc.simra.app.util.Utils.nearestRegionsToThisLocation;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
-import static de.tuberlin.mcc.simra.app.util.Utils.regionsDecoder;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
@@ -101,14 +95,6 @@ public class MainActivity extends BaseActivity
     ActivityMainBinding binding;
     Intent recService;
     RecorderService mBoundRecorderService;
-    boolean obsEnabled = false;
-    BroadcastReceiver receiver;
-    private MapView mMapView;
-    private MapController mMapController;
-    private MyLocationNewOverlay mLocationOverlay;
-    private LocationManager locationManager;
-    private Boolean recording = false;
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ServiceConnection for communicating with RecorderService
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -124,7 +110,13 @@ public class MainActivity extends BaseActivity
             mBoundRecorderService = myBinder.getService();
         }
     };
-
+    boolean obsEnabled = false;
+    BroadcastReceiver receiver;
+    private MapView mMapView;
+    private MapController mMapController;
+    private MyLocationNewOverlay mLocationOverlay;
+    private LocationManager locationManager;
+    private Boolean recording = false;
 
     private void showOBSNotConnectedWarning() {
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
@@ -610,7 +602,12 @@ public class MainActivity extends BaseActivity
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(getString(R.string.link_to_tutorial)));
             startActivity(i);
-        } else if (id == R.id.nav_feedback) {
+        } else if (id == R.id.nav_dashboard) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            //intent = new Intent(SocialMediaActivity.this, WebActivity.class);
+            intent.setData(Uri.parse(getString(R.string.link_simra_Dashboard)));
+            startActivity(intent);
+      /*  } else if (id == R.id.nav_feedback) {
             // src:
             // https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
             Intent i = new Intent(Intent.ACTION_SEND);
@@ -624,15 +621,17 @@ public class MainActivity extends BaseActivity
             } catch (android.content.ActivityNotFoundException ex) {
                 Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
             }
-
+*/
         } else if (id == R.id.nav_imprint) {
             Intent intent = new Intent(MainActivity.this, WebActivity.class);
             intent.putExtra("URL", getString(R.string.tuberlin_impressum));
 
             startActivity(intent);
-        } else if (id == R.id.nav_twitter) {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(getString(R.string.link_to_twitter)));
+        } else if (id == R.id.nav_contact) {
+
+            Intent i = new Intent(MainActivity.this, ContactActivity.class);
+            // Intent i = new Intent(Intent.ACTION_VIEW);
+            // i.setData(Uri.parse(getString(R.string.link_to_twitter)));
             startActivity(i);
         } else if (id == R.id.nav_bluetooth_connection) {
             Intent intent = new Intent(MainActivity.this, OpenBikeSensorActivity.class);
@@ -658,82 +657,6 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onProviderDisabled(String provider) {
-    }
-
-    private class CheckVersionTask extends AsyncTask<String, String, String> {
-        int installedAppVersion = -1;
-        int newestAppVersion = 0;
-        String urlToNewestAPK = null;
-        Boolean critical = null;
-        private CheckVersionTask() {};
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.VISIBLE);
-                }
-            });
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            installedAppVersion = getAppVersionNumber(MainActivity.this);
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            StringBuilder response = new StringBuilder();
-            try {
-                URL url = new URL(BuildConfig.API_ENDPOINT +BuildConfig.API_VERSION + "check-version?clientHash=" + getClientHash(MainActivity.this));
-                Log.d(TAG, "URL: " + url.toString());
-                HttpsURLConnection urlConnection =
-                        (HttpsURLConnection)url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                // urlConnection.setRequestProperty("Content-Type","text/plain");
-                // urlConnection.setDoOutput(true);
-                urlConnection.setReadTimeout(10000);
-                urlConnection.setConnectTimeout(15000);
-
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-                int status = urlConnection.getResponseCode();
-                Log.d(TAG, "Server status: " + status);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.d(TAG, "GET version response: " + response.toString());
-            String[] responseArray = response.toString().split("splitter");
-            if (responseArray.length > 2) {
-                critical = Boolean.valueOf(responseArray[0]);
-                newestAppVersion = Integer.valueOf(responseArray[1]);
-                urlToNewestAPK = responseArray[2];
-                return response.toString();
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.GONE);
-                }
-            });
-            if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
-                MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
-            } else {
-                new NewsTask().execute();
-            }
-        }
     }
 
     private void fireNewAppVersionPrompt(int installedAppVersion, int newestAppVersion, String urlToNewestAPK, Boolean critical) {
@@ -807,12 +730,11 @@ public class MainActivity extends BaseActivity
 
     }
 
-
     private void fireNewsPrompt() {
 
         // get the news from the downloaded config
         String[] simRa_news_config = getNews(MainActivity.this);
-        if(simRa_news_config.length <=1) {
+        if (simRa_news_config.length <= 1) {
             Log.e(TAG, "Empty simRa_new_config!");
             return;
         }
@@ -833,15 +755,15 @@ public class MainActivity extends BaseActivity
                 continue;
             }
             TextView tv = new TextView(MainActivity.this);
-            int textColor = getResources().getColor(R.color.colorPrimary,null);
-            if(simRa_news_config[i].startsWith("*")) {
-                textColor = getResources().getColor(R.color.colorAccent,null);
+            int textColor = getResources().getColor(R.color.colorPrimary, null);
+            if (simRa_news_config[i].startsWith("*")) {
+                textColor = getResources().getColor(R.color.colorAccent, null);
             }
             tv.setTextColor(textColor);
             // set text of TextView to text of news element
             tv.setText(simRa_news_config[i].substring(1));
             tv.setWidth(linearLayout.getWidth());
-            linearLayout.addView(tv,i,layoutParams);
+            linearLayout.addView(tv, i, layoutParams);
         }
 
         // Set above view in alert dialog.
@@ -857,7 +779,7 @@ public class MainActivity extends BaseActivity
 
         AlertDialog finalAlertDialog = alertDialog;
         okButton.setOnClickListener(v -> {
-            SharedPref.App.News.setLastSeenNewsID(newsID,MainActivity.this);
+            SharedPref.App.News.setLastSeenNewsID(newsID, MainActivity.this);
             finalAlertDialog.cancel();
             // download the newest region list from the backend and prompt user to go to "Profile" and set region, if a new region has been added and the region is set as UNKNOWN or other.
             new RegionTask().execute();
@@ -869,11 +791,109 @@ public class MainActivity extends BaseActivity
 
     }
 
+    private boolean actualSelectedRegionNotInTopThreeNearestRegion() {
+        if (PermissionHelper.hasBasePermissions(MainActivity.this)) {
+            @SuppressLint("MissingPermission")
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location == null) {
+                return false;
+            }
+            int selectedRegion = Profile.loadProfile(null, MainActivity.this).region;
+            int[] nearestRegions = nearestRegionsToThisLocation(location.getLatitude(), location.getLongitude(), MainActivity.this);
+            for (int nearestRegion : nearestRegions) {
+                if (nearestRegion == selectedRegion) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
+    private class CheckVersionTask extends AsyncTask<String, String, String> {
+        int installedAppVersion = -1;
+        int newestAppVersion = 0;
+        String urlToNewestAPK = null;
+        Boolean critical = null;
+
+        private CheckVersionTask() {
+        }
+
+        ;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            installedAppVersion = getAppVersionNumber(MainActivity.this);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            StringBuilder response = new StringBuilder();
+            try {
+                URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + "check-version?clientHash=" + getClientHash(MainActivity.this));
+                Log.d(TAG, "URL: " + url.toString());
+                HttpsURLConnection urlConnection =
+                        (HttpsURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                // urlConnection.setRequestProperty("Content-Type","text/plain");
+                // urlConnection.setDoOutput(true);
+                urlConnection.setReadTimeout(10000);
+                urlConnection.setConnectTimeout(15000);
+
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                int status = urlConnection.getResponseCode();
+                Log.d(TAG, "Server status: " + status);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, "GET version response: " + response.toString());
+            String[] responseArray = response.toString().split("splitter");
+            if (responseArray.length > 2) {
+                critical = Boolean.valueOf(responseArray[0]);
+                newestAppVersion = Integer.valueOf(responseArray[1]);
+                urlToNewestAPK = responseArray[2];
+                return response.toString();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.findViewById(R.id.checkingAppVersionProgressBarRelativeLayout).setVisibility(View.GONE);
+                }
+            });
+            if ((newestAppVersion > 0 && urlToNewestAPK != null && critical != null) && installedAppVersion < newestAppVersion) {
+                MainActivity.this.fireNewAppVersionPrompt(installedAppVersion, newestAppVersion, urlToNewestAPK, critical);
+            } else {
+                new NewsTask().execute();
+            }
+        }
+    }
 
     private class RegionTask extends AsyncTask<String, String, String> {
         int regionsID = -1;
         int lastSeenRegionsID = 0;
+
         private RegionTask() {
         }
 
@@ -900,8 +920,8 @@ public class MainActivity extends BaseActivity
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
-                    if (regionsID == -1 && inputLine.startsWith("#")){
-                        regionsID = Integer.parseInt(inputLine.replace("#",""));
+                    if (regionsID == -1 && inputLine.startsWith("#")) {
+                        regionsID = Integer.parseInt(inputLine.replace("#", ""));
                     } else {
                         checkRegionsResponse.append(inputLine).append(System.lineSeparator());
                     }
@@ -934,26 +954,9 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private boolean actualSelectedRegionNotInTopThreeNearestRegion() {
-        if(PermissionHelper.hasBasePermissions(MainActivity.this)) {
-            @SuppressLint("MissingPermission")
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location == null) {
-                return false;
-            }
-            int selectedRegion = Profile.loadProfile(null,MainActivity.this).region;
-            int[] nearestRegions = nearestRegionsToThisLocation(location.getLatitude(),location.getLongitude(),MainActivity.this);
-            for (int nearestRegion : nearestRegions) {
-                if (nearestRegion == selectedRegion) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     private class NewsTask extends AsyncTask<String, String, String> {
         int newsID = -1;
+
         private NewsTask() {
         }
 
@@ -993,8 +996,8 @@ public class MainActivity extends BaseActivity
                 String inputLine_en;
 
                 while ((inputLine_de = in_de.readLine()) != null) {
-                    if (newsID == -1 && inputLine_de.startsWith("#")){
-                        newsID = Integer.parseInt(inputLine_de.replace("#",""));
+                    if (newsID == -1 && inputLine_de.startsWith("#")) {
+                        newsID = Integer.parseInt(inputLine_de.replace("#", ""));
                     }
                     checkNewsResponseDE.append(inputLine_de).append(System.lineSeparator());
                 }
@@ -1026,7 +1029,7 @@ public class MainActivity extends BaseActivity
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if(SharedPref.App.News.getLastSeenNewsID(MainActivity.this) < newsID) {
+            if (SharedPref.App.News.getLastSeenNewsID(MainActivity.this) < newsID) {
                 fireNewsPrompt();
             } else {
                 // download the newest region list from the backend and prompt user to go to "Profile" and set region, if a new region has been added and the region is set as UNKNOWN or other.

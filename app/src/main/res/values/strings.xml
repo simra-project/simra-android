@@ -14,6 +14,7 @@
     <string name="title_activity_about_simra">Über SimRa</string>
     <string name="title_activity_statistics">Statistiken</string>
     <string name="title_activity_bluetooth_connection">OpenBikeSensor</string>
+    <string name="title_activity_contact">Kontakt</string>
 
 
     <!--- Start -->
@@ -41,7 +42,7 @@
     <string name="imprint">Impressum</string>
     <string name="feedback">Feedback</string>
     <string name="title_tutorial">Anleitung</string>
-    <string name="twitter">\@SimRa_App</string>
+    <string name="twitter_simra">\@SimRa_App</string>
     <string name="link_to_twitter">https://twitter.com/SimRa_App</string>
 
     <!--- Permission -->
@@ -49,8 +50,8 @@
 
 
     <!--- WebActivity -->
-    <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
-    <string name="simRaPage">https://www.digital-future.berlin/forschung/projekte/simra/</string>
+    <string name="link_mcc_Page">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
+    <string name="link_simra_Page">https://www.digital-future.berlin/forschung/projekte/simra/</string>
     <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Anleitung.pdf</string>
     <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/mobil/</string>
 
@@ -236,7 +237,7 @@
     <string name="obsIncidentDescriptionMinKalmanHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da es die kleinste Distanz während einer dichten Überholung erkannt hat.</string>
     <string name="obsIncidentDescriptionMinKalmanDataLine">Kleinste Distanz: %1$s cm</string>
 
-    <!--- Profil -->
+    <!--- Profile -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
     <string name="genderSpinnerTitle">Geschlecht</string>
     <string name="male">Männlich</string>
@@ -307,6 +308,16 @@
     <string name="kcalConsumption">Kalorienverbrauch:</string>
     <string name="rideDistribution">Fahrtverteilung über den Tag</string>
     <string name="hourOfDay">Uhrzeit</string>
+
+    <!-- Contact -->
+    <string name="project_website">SimRa-Projektseite</string>
+    <string name="twitter" translatable="false">Twitter</string>
+    <string name="instagram" translatable="false">Instagram</string>
+
+    <string name="website_link_text">www.digital-future.berlin</string>
+    <string name="feedback_mail" translatable="false">\ask@mcc.tu-berlin.de</string>
+    <string name="twitter_at" translatable="false">\@SimRa_App</string>
+    <string name="instagram_at" translatable="false">\@SicherheitImRadverkehr</string>
 
 
     <!-- Units -->
@@ -380,4 +391,8 @@
     <string name="obsConnecting">Verbindung mit OpenBikeSensor</string>
     <string name="obsTutorial">\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden</string>
     <string name="obs">OpenBikeSensor</string>
+    <string name="link_to_instagram">https://www.instagram.com/sicherheitimradverkehr/</string>
+    <string name="link_simra_Dashboard">https://simra-project.github.io/dashboard/</string>
+    <string name="dashboard">Dashboard</string>
+
 </resources>

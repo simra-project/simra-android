@@ -119,4 +119,10 @@
         <item>Third Party Licenses</item>
         <item>Graphics References</item>
     </string-array>
+    <string-array name="ContactItems">
+        <item>SimRa Project Website</item>
+        <item>Feedback</item>
+        <item>Twitter</item>
+        <item>Instagram</item>
+    </string-array>
 </resources>

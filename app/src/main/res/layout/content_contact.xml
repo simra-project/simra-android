@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activities.ContactActivity"
+    tools:showIn="@layout/activity_contact">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/button_project_site"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/website_link_text"
+            android:textAllCaps="false"
+            app:icon="@drawable/globe_icon"/>
+
+        <Button
+            android:id="@+id/button_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/feedback_mail"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_baseline_email_24" />
+
+        <Button
+            android:id="@+id/button_twitter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/twitter_at"
+            android:textAllCaps="false"
+            app:icon="@drawable/twitter_black" />
+
+        <Button
+            android:id="@+id/button_instagram"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:textAllCaps="false"
+            android:text="@string/instagram_at"
+            app:icon="@drawable/ic_instagram_logo" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

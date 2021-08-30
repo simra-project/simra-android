@@ -66,4 +66,10 @@
         <item>Drittanbieter-Lizenzen</item>
         <item>Grafikreferenzen</item>
     </string-array>
+    <string-array name="ContactItems">
+        <item>SimRa-Projektseite</item>
+        <item>Feedback</item>
+        <item>Twitter</item>
+        <item>Instagram</item>
+    </string-array>
 </resources>

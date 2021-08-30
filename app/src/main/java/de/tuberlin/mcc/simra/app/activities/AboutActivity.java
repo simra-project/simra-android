@@ -46,7 +46,7 @@ public class AboutActivity extends BaseActivity {
             switch (position) {
                 case 0:
                     intent = new Intent(AboutActivity.this, WebActivity.class);
-                    intent.putExtra("URL", getString(R.string.simRaPage));
+                    intent.putExtra("URL", getString(R.string.link_simra_Page));
                     break;
                 case 1:
                     intent = new Intent(AboutActivity.this, WebActivity.class);

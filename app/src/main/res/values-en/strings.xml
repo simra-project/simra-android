@@ -14,6 +14,7 @@
     <string name="title_activity_about_simra">About SimRa</string>
     <string name="title_activity_statistics">Statistics</string>
     <string name="title_activity_bluetooth_connection">OpenBikeSensor</string>
+    <string name="title_activity_contact">Contact</string>
 
 
     <!--- Start -->
@@ -26,8 +27,7 @@
     <string name="close_simra">Close SimRa</string>
     <string name="iAccept">I accept the privacy policy statement</string>
     <string name="privacyAgreementTitle">Privacy Policy Statement</string>
-    <string name="privacyAgreementMessage">SimRa records your location and sensor data in the background, when you start the recording of your ride. as well as demographics provided by you to show you your rides recorded with SimRa. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).
-    </string>
+    <string name="privacyAgreementMessage">SimRa records your location and sensor data in the background, when you start the recording of your ride. as well as demographics provided by you to show you your rides recorded with SimRa. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).</string>
 
     <!--- Menu -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -41,7 +41,7 @@
     <string name="imprint">Imprint</string>
     <string name="feedback">Feedback</string>
     <string name="title_tutorial">Tutorial</string>
-    <string name="twitter">\@SimRa_App</string>
+    <string name="twitter_simra">\@SimRa_App</string>
     <string name="link_to_twitter">https://twitter.com/SimRa_App</string>
 
     <!--- Permission -->
@@ -49,13 +49,15 @@
     <string name="base_permission_rationale">In order to continue, please allow SimRa to access your location and storage while you record your ride in the background.\nWe need those to show your location on the map and record your rides.</string>
 
     <!--- WebActivity -->
-    <string name="mccPage">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
-    <string name="simRaPage">https://www.digital-future.berlin/en/research/projects/simra/</string>
+    <string name="link_mcc_Page">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
+    <string name="link_simra_Page">https://www.digital-future.berlin/en/research/projects/simra/</string>
     <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Instructions.pdf</string>
     <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/en/mobil/</string>
+    <string name="link_to_instagram">https://www.instagram.com/sicherheitimradverkehr/</string>
+    <string name="link_simra_Dashboard">https://simra-project.github.io/dashboard/</string>
 
     <!--- MainActivity -->
-    <string name="osmCopyright">©        <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
+    <string name="osmCopyright"><a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors </string>
     <string name="errorRideNotRecorded">The ride was not recorded due to privacy settings!\nYou can check your privacy settings in the settings menu.</string>
     <string name="cancel">Cancel</string>
     <string name="startButtonText">Start\nRecording</string>
@@ -374,5 +376,8 @@
     <string name="obsConnecting">Connecting to OpenBikeSensor</string>
     <string name="obsTutorial">\nPlease hold your hand close to the distance sensor for 3 seconds</string>
     <string name="obs">OpenBikeSensor</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="project_website">SimRa Project Website</string>
+    <string name="website_link_text">www.digital-future.berlin</string>
 
 </resources>
