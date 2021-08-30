@@ -829,6 +829,9 @@ public class MainActivity extends BaseActivity
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         layoutParams.setMargins(10, 10, 10, 10);
         for (int i = 1; i < simRa_news_config.length; i++) {
+            if (simRa_news_config[i].startsWith("i")){
+                continue;
+            }
             TextView tv = new TextView(MainActivity.this);
             int textColor = getResources().getColor(R.color.colorPrimary,null);
             if(simRa_news_config[i].startsWith("*")) {

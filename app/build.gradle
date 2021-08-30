@@ -10,8 +10,8 @@ android {
         applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 84
-        versionName "84.0"
+        versionCode 85
+        versionName "85.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
