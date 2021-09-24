@@ -15,6 +15,7 @@ import org.osmdroid.util.GeoPoint;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -43,6 +44,7 @@ import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.Profile;
 
 import static de.tuberlin.mcc.simra.app.activities.ProfileActivity.startProfileActivityForChooseRegion;
+import static de.tuberlin.mcc.simra.app.entities.IncidentLog.getEventsFile;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getSharedPrefsDirectory;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.zip;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
@@ -86,10 +88,23 @@ public class Utils {
 
         StringBuilder content = new StringBuilder();
 
+        File incidentFile = getEventsFile(rideId, context);
+
+        if (incidentFile.exists()) {
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(incidentFile))) {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    content.append(line).append(System.lineSeparator());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         IncidentLog incidentLog = IncidentLog.filterIncidentLogUploadReady(IncidentLog.loadIncidentLogFromFileOnly(rideId, context),null,null,null,null,true);
         String dataLog = DataLog.loadDataLog(rideId, context).toString();
 
-        content.append(incidentLog.toString());
+        // content.append(incidentLog.toString());
         content.append(System.lineSeparator()).append("=========================").append(System.lineSeparator());
         content.append(dataLog);
 

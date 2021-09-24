@@ -24,12 +24,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
+import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.MetaDataEntry;
 import de.tuberlin.mcc.simra.app.entities.Profile;
@@ -213,7 +215,6 @@ public class UploadService extends Service {
                         Pair<String, IncidentLog> contentToUploadAndAccEventsContentToOverwrite = Utils.getConsolidatedRideForUpload(metaDataEntry.rideId, context);
 
                         String contentToUpload = contentToUploadAndAccEventsContentToOverwrite.first;
-                        IncidentLog incidentLogToOverwrite = contentToUploadAndAccEventsContentToOverwrite.second;
 
                         String password = lookUpSharedPrefs(String.valueOf(metaDataEntry.rideId), "-1", "keyPrefs", context);
 
@@ -242,7 +243,6 @@ public class UploadService extends Service {
 
                         // if the respond is ok, mark ride as uploaded in metaData.csv
                         if (response.first.equals(200)) {
-                            IncidentLog.saveIncidentLog(incidentLogToOverwrite, context);
                             metaDataEntry.state = MetaData.STATE.SYNCED;
                             MetaData.updateOrAddMetaDataEntryForRide(metaDataEntry, context);
 

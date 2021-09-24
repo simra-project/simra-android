@@ -110,6 +110,10 @@ public class IncidentLog {
             Log.d(TAG," for loop 1 incidentLogEntry: " + incidentLogEntry.getValue().stringifyDataLogEntry());
             if (incidentLogEntry.getValue().isReadyForUpload()) {
                 Log.d(TAG, "adding incidentLogEntry to incidents");
+                IncidentLogEntry thisIncidentLogEntry = incidentLogEntry.getValue();
+                thisIncidentLogEntry.bikeType = bikeType;
+                thisIncidentLogEntry.phoneLocation = phoneLocation;
+                incidentLogEntry.setValue(thisIncidentLogEntry);
                 incidents.put(incidentLogEntry.getValue().key, incidentLogEntry.getValue());
             }
         }
@@ -136,7 +140,7 @@ public class IncidentLog {
         return scaryIncidents;
     }
 
-    private static File getEventsFile(Integer rideId, Context context) {
+    public static File getEventsFile(Integer rideId, Context context) {
         return new File(IOUtils.Directories.getBaseFolderPath(context) + "accEvents" + rideId + ".csv");
     }
 
