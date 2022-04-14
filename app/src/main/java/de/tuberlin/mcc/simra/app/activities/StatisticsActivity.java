@@ -89,7 +89,7 @@ public class StatisticsActivity extends AppCompatActivity {
         TextView avgDistanceOfRides = findViewById(R.id.averageDistanceOfRidesText);
         if (isImperialUnit && ridesCount > 0) {
             avgDistanceOfRides.setText(getText(R.string.avgDistance) + " " + (Math.round(((profile.distance / 1600 / ridesCount) * 100.0)) / 100.0) + " mi");
-        } else if (isImperialUnit && ridesCount > 0) {
+        } else if (!isImperialUnit && ridesCount > 0) {
             avgDistanceOfRides.setText(getText(R.string.avgDistance) + " " + (Math.round(((profile.distance / 1000 / ridesCount) * 100.0)) / 100.0) + " km");
         } else {
             avgDistanceOfRides.setText(getText(R.string.avgDistance) + " - ");

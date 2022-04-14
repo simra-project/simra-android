@@ -4,6 +4,7 @@ package de.tuberlin.mcc.simra.app.annotation;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -24,12 +25,17 @@ import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlay;
 import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlayOptions;
 import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +61,6 @@ public class MarkerFunct {
     private static final String TAG = "MarkerFunct_LOG";
     private final String userAgent = "SimRa/alpha";
     private ShowRouteActivity activity;
-    private ExecutorService pool;
     private GeocoderNominatim geocoderNominatim;
     private int state;
     private Map<Integer, Marker> markerMap = new HashMap<>();
@@ -73,7 +78,6 @@ public class MarkerFunct {
     public MarkerFunct(ShowRouteActivity activity, DataLog gpsDataLog, IncidentLog incidentLog, int bikeType, int phoneLocation, boolean child, boolean trailer) {
         this.activity = activity;
         this.gpsDataLog = gpsDataLog;
-        this.pool = activity.pool;
         this.incidentLog = incidentLog;
         this.bikeType = bikeType;
         this.phoneLocation = phoneLocation;
@@ -92,12 +96,6 @@ public class MarkerFunct {
 
         // (4) Custom, not yet annotated
         markerCustom_ready = activity.getResources().getDrawable(R.drawable.edited_event_green, null);
-
-        pool.execute(new SimpleThreadFactory().newThread(() -> {
-                    geocoderNominatim = new GeocoderNominatim(userAgent);
-                    geocoderNominatim.setService("https://nominatim.openstreetmap.org/");
-                }
-        ));
 
         this.state = activity.state;
     }
@@ -244,17 +242,9 @@ public class MarkerFunct {
             incidentMarker.setIcon(markerCustom_edit);
         }
 
-        String addressForLoc = "";
-
-        try {
-            addressForLoc = pool.submit(() -> getAddressFromLocation(currentLocHelper)).get(2, TimeUnit.SECONDS);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
 
         InfoWindow infoWindow = new MyInfoWindow(R.layout.incident_bubble,
-                activity.getmMapView(),
-                addressForLoc, activity, state, incidentLogEntry);
+                activity.getmMapView(), activity, state, incidentLogEntry);
         incidentMarker.setInfoWindow(infoWindow);
 
         activity.getmMapView().getOverlays().add(incidentMarker);
@@ -277,31 +267,6 @@ public class MarkerFunct {
         SimpleFastPointOverlay pointOverlay = new SimpleFastPointOverlay(adapter, opt);
         activity.getmMapView().getOverlays().add(pointOverlay);
 //        activity.getmMapView().invalidate();
-    }
-
-    // Generate a new GeoPoint from address String via Geocoding
-
-    public String getAddressFromLocation(GeoPoint incidentLoc) {
-        List<Address> address;
-        String addressForLocation = "";
-        try {
-            // This is the actual geocoding
-            address = geocoderNominatim.getFromLocation(incidentLoc.getLatitude(),
-                    incidentLoc.getLongitude(), 1);
-            if (address.size() == 0) {
-                Log.d(TAG, "getAddressFromLocation(): Couldn't find an address for input geoPoint");
-            } else {
-                // Get address result from geocoding result
-                Address location = address.get(0);
-                addressForLocation = location.getAddressLine(0);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return addressForLocation;
-
     }
 
     public void deleteAllMarkers() {

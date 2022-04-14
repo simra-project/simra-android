@@ -10,8 +10,8 @@ android {
         applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 87
-        versionName "87.0"
+        versionCode 88
+        versionName "88.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
@@ -25,7 +25,7 @@ android {
 
 
         buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://vm2.mcc.tu-berlin.de:8082/\""
-        buildConfigField "String", API_VERSION, properties.getProperty(API_VERSION) ?: "\"12/\""
+        buildConfigField "String", API_VERSION, properties.getProperty(API_VERSION) ?: "\"13/\""
 
     }
     buildTypes {

@@ -14,17 +14,14 @@ import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 
 public class MyInfoWindow extends InfoWindow {
     private ShowRouteActivity motherActivity;
-    private String addressForLoc;
     private int state;
     private IncidentLogEntry incidentLogEntry;
 
 
-    public MyInfoWindow(int layoutResId, MapView mapView,
-                        String addressForLoc, ShowRouteActivity motherActivity,
+    public MyInfoWindow(int layoutResId, MapView mapView, ShowRouteActivity motherActivity,
                         int state, IncidentLogEntry incidentLogEntry) {
 
         super(layoutResId, mapView);
-        this.addressForLoc = addressForLoc;
         this.motherActivity = motherActivity;
         this.incidentLogEntry = incidentLogEntry;
         this.state = state;
@@ -45,7 +42,7 @@ public class MyInfoWindow extends InfoWindow {
             time = DateUtils.formatDateTime(motherActivity, millis, DateUtils.FORMAT_SHOW_TIME);
         }
 
-        txtDescription.setText(time + " " + addressForLoc);
+        txtDescription.setText(time);
 
         layout.setOnClickListener((View v) -> {
             IncidentPopUpActivity.startIncidentPopUpActivity(incidentLogEntry, state, motherActivity);

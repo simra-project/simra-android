@@ -208,17 +208,17 @@ public class Utils {
         try {
             String responseString = "";
 
-            URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + "classify-ride?clientHash=" + getClientHash(context)
-                    + "&bikeType=" +bike
-                    + "&phoneLocation=" + pLoc);
+            URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + "classify-ride-cyclesense?clientHash=" + getClientHash(context)
+                    + "&os=android");
 
             Log.d(TAG, "URL for AI-Backend: " + url.toString());
             HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
             urlConnection.setRequestProperty("Content-Type", "text/plain");
+            urlConnection.setRequestProperty("Accept","*/*");
             urlConnection.setDoOutput(true);
-            urlConnection.setReadTimeout(10000);
-            urlConnection.setConnectTimeout(3000);
+            urlConnection.setReadTimeout(30000);
+            urlConnection.setConnectTimeout(30000);
 
             //Read log file in to byte Array
             File rideFile = IOUtils.Files.getGPSLogFile(rideId, false, context);
@@ -232,7 +232,7 @@ public class Utils {
             Log.d(TAG, "send data: ");
             try (OutputStream os = urlConnection.getOutputStream()) {
                 long startTime = System.currentTimeMillis();
-                long uploadTimeoutMS = 8000;
+                long uploadTimeoutMS = 30000;
                 int chunkSize = 1024;
                 int chunkIndex = 0;
 
@@ -253,6 +253,8 @@ public class Utils {
 
             // receive results
             Log.d(TAG, "receive data: ");
+            int status = urlConnection.getResponseCode();
+            Log.d(TAG, "Server status: " + status);
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(urlConnection.getInputStream()
                     ));
@@ -261,10 +263,7 @@ public class Utils {
                 responseString += inputLine;
             }
             in.close();
-            Log.d(TAG, responseString);
 
-            int status = urlConnection.getResponseCode();
-            Log.d(TAG, "Server status: " + status);
             Log.d(TAG, "Server Message: " + responseString);
 
             // response okay
