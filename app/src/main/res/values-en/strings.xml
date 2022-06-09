@@ -218,8 +218,6 @@
     <string name="obsSwitchTitle">OpenBikeSensor connection</string>
     <string name="obsButton">Open OpenBikeSensor settings</string>
     <string name="availableDevices">Available Devices</string>
-    <string name="obsTakePictureDuringRideSetting">Take Pictures during the Ride</string>
-    <string name="obsTakePictureDuringRideIntervalText">Interval how often a picture will be taken</string>
     <string name="obsAdvancedSettings">Advanced Settings</string>
     <string name="obsHandlebarWidthText">Distance of the outer point of the Handlebar to the frame</string>
     <string name="not_connected_warnung_title">Warning : OpenBikeSensor is not connected</string>

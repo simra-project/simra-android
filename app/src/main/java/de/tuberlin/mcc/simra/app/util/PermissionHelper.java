@@ -40,11 +40,6 @@ public class PermissionHelper {
             Manifest.permission.ACCESS_FINE_LOCATION,
     });
 
-    public static final int REQUEST_CODE_CAMERA = 1003;
-    public static final BasePermission Camera = new BasePermission(REQUEST_CODE_CAMERA, new String[]{
-            Manifest.permission.CAMERA
-    });
-
     /**
      * Checks if the Permission for this App where already granted by the user
      * or if they are given by default (e.g. for a previous SDK version)

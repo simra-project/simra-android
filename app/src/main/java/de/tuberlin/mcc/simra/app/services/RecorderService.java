@@ -93,7 +93,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private Sensor linearAccelerometer;
     private Sensor rotation;
     private int key;
-    private long lastPictureTaken = 0;
     private Integer incidentDuringRide = null;
     private final BroadcastReceiver openBikeSensorMessageReceiverDistanceValue = new BroadcastReceiver() {
         @Override
@@ -119,8 +118,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
     private boolean recordingAllowed;
-    private boolean takePictureDuringRideActivated;
-    private int takePictureDuringRideInterval;
     private int safetyDistanceWithTolerances;
     private float privacyDistance;
     private long privacyDuration;
@@ -208,8 +205,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         editor = sharedPrefs.edit();
 
-        takePictureDuringRideActivated = SharedPref.Settings.Ride.PicturesDuringRide.isActivated(this);
-        takePictureDuringRideInterval = SharedPref.Settings.Ride.PicturesDuringRideInterval.getInterval(this);
         safetyDistanceWithTolerances = SharedPref.Settings.Ride.OvertakeWidth.getWidth(this);
 
         // Prepare the sensors for accGpsFile
@@ -495,13 +490,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 if (lastOBSDistanceValues.size() > 0) {
                     OBSService.Measurement lastOBSDistanceValue = lastOBSDistanceValues.removeFirst();
                     dataLogEntryBuilder.withOBS(lastOBSDistanceValue.leftSensorValues.get(0), null, null, null, null);
-
-                    if (takePictureDuringRideActivated) {
-                        if (lastOBSDistanceValue.leftSensorValues.get(0) <= safetyDistanceWithTolerances && lastPictureTaken + takePictureDuringRideInterval * 1000 <= lastAccUpdate) {
-                            lastPictureTaken = lastAccUpdate;
-                            CameraService.takePicture(RecorderService.this, String.valueOf(lastAccUpdate), IOUtils.Directories.getPictureCacheDirectoryPath(RecorderService.this));
-                        }
-                    }
                 }
 
                 if(isGPSLine) {

@@ -557,31 +557,6 @@ public class SharedPref {
                 }
             }
 
-            public static class PicturesDuringRide {
-                // See top of this class before changing this string
-                public static final String PICTURES_DURING_RIDE = SETTINGS + "PICTURES_DURING_RIDE";
-
-                public static boolean isActivated(Context context) {
-                    return readBooleanFromAppSharedPrefs(PICTURES_DURING_RIDE, context);
-                }
-
-                public static void setMakePictureDuringRide(boolean activated, Context context) {
-                    writeBooleanToAppSharedPrefsAsync(PICTURES_DURING_RIDE, activated, context);
-                }
-            }
-
-            public static class PicturesDuringRideInterval {
-                // See top of this class before changing this string
-                public static final String PICTURES_DURING_RIDE_INTERVAL = SETTINGS + "PICTURES_DURING_RIDE_INTERVAL";
-
-                public static int getInterval(Context context) {
-                    return readIntegerFromAppSharedPrefs(PICTURES_DURING_RIDE_INTERVAL, 1, context);
-                }
-
-                public static void setInterval(int interval, Context context) {
-                    writeIntegerToAppSharedPrefsAsync(PICTURES_DURING_RIDE_INTERVAL, interval, context);
-                }
-            }
         }
     }
 }

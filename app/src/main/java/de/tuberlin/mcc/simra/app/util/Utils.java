@@ -139,26 +139,7 @@ public class Utils {
 
     public static String[] getRegions(Context context) {
         String[] simRa_regions_config = (Utils.readContentFromFile("simRa_regions.config", context)).split(System.lineSeparator());
-        if (simRa_regions_config.length < 8) {
-            try {
-                AssetManager am = context.getApplicationContext().getAssets();
-                InputStream is = am.open("simRa_regions.config");
-                InputStreamReader inputStreamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
 
-                while ((receiveString = bufferedReader.readLine()) != null) {
-
-                    stringBuilder.append(receiveString.trim()).append(System.lineSeparator());
-
-                }
-                is.close();
-                simRa_regions_config = stringBuilder.toString().split(System.lineSeparator());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         return simRa_regions_config;
     }
 

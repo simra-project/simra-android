@@ -77,9 +77,6 @@
             android:name=".activities.ShowRouteActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.EvaluateClosePassActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
             android:name=".annotation.IncidentPopUpActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.PopUpWindow" />
@@ -114,17 +111,10 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
-        <service
-            android:name=".services.CameraService"
-            android:exported="false" />
     </application>
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
     <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-feature android:name="android.hardware.location.network" />
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />

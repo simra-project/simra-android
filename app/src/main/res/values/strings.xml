@@ -224,8 +224,6 @@
     <string name="obsSwitchTitle">OpenBikeSensor verbinden</string>
     <string name="obsButton">OpenBikeSensor Einstellungen öffnen</string>
     <string name="availableDevices">Verfügbare Geräte</string>
-    <string name="obsTakePictureDuringRideSetting">Während der Fahrt Bilder aufnehmen</string>
-    <string name="obsTakePictureDuringRideIntervalText">Intervall wie oft ein Bild aufgenommen wird</string>
     <string name="obsAdvancedSettings">Weitere Einstellungen</string>
     <string name="obsHandlebarWidthText">Weite des Lenkers von der Außenseite zum Rahmen</string>
     <string name="obsIncidentDescriptionHeaderLine">Dieses Ereignis wurde durch das OpenBikeSensor-Event %1$s ausgelöst.</string>

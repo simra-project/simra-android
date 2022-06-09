@@ -359,21 +359,6 @@ public class IOUtils {
             }
             return app_folder_path;
         }
-
-        /**
-         * Returns the Path to the Picture Cache Directory (Shared File Directory)
-         * Might be on SD Card
-         *
-         * @return Path with trailing slash
-         */
-        public static String getPictureCacheDirectoryPath(Context context) {
-            String app_folder_path = getBaseFolderPath(context) + "images/";
-            File dir = new File(app_folder_path);
-            if (!dir.exists() && !dir.mkdirs()) {
-
-            }
-            return app_folder_path;
-        }
     }
 
     /**

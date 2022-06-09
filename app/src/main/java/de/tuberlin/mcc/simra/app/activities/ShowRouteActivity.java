@@ -229,9 +229,6 @@ public class ShowRouteActivity extends BaseActivity {
         if (state < MetaData.STATE.SYNCED) {
             binding.addIncidentButton.setVisibility(View.VISIBLE);
             binding.exitShowRouteButton.setVisibility(View.INVISIBLE);
-            if (!IOUtils.isDirectoryEmpty(IOUtils.Directories.getPictureCacheDirectoryPath(ShowRouteActivity.this))) {
-                EvaluateClosePassActivity.startEvaluateClosePassActivity(rideId, bike, pLoc, child == 1, trailer == 1, this);
-            }
         } else {
             binding.addIncidentButton.setVisibility(View.GONE);
             binding.privacySliderLinearLayout.setVisibility(View.INVISIBLE);

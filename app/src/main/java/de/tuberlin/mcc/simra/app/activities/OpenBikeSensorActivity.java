@@ -37,22 +37,6 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
     private AlertDialog alertDialog;
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PermissionHelper.REQUEST_CODE_CAMERA:
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(true, this);
-                } else {
-                    updateTakePictureDuringRideViews(false);
-                }
-                return;
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityOpenbikesensorBinding.inflate(LayoutInflater.from(this));
@@ -101,30 +85,6 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
             SharedPref.Settings.Ride.OvertakeWidth.setTotalWidthThroughHandlebarWidth(newVal, this);
         });
 
-        binding.takePictureDuringRideInterval.setMaxValue(20);
-        binding.takePictureDuringRideInterval.setMinValue(0);
-        binding.takePictureDuringRideInterval.setValue(SharedPref.Settings.Ride.PicturesDuringRideInterval.getInterval(this));
-        binding.takePictureDuringRideInterval.setOnValueChangedListener((numberPicker, oldVal, newVal) -> {
-            SharedPref.Settings.Ride.PicturesDuringRideInterval.setInterval(newVal, this);
-        });
-
-        updateTakePictureDuringRideViews(SharedPref.Settings.Ride.PicturesDuringRide.isActivated(this));
-        binding.takePictureDuringRideButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                updateTakePictureDuringRideViews(true);
-                if (PermissionHelper.Camera.hasPermission(this)) {
-                    // Wants to activate this Functionality and already has Camera Permission
-                    SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(true, this);
-                } else {
-                    // Wants to activate this Functionality and already has does not have Camera Permission
-                    PermissionHelper.Camera.requestPermissions(OpenBikeSensorActivity.this);
-                }
-            } else {
-                // Deactivate Functionality
-                updateTakePictureDuringRideViews(false);
-            }
-        });
-
         binding.btnDisconnect.setOnClickListener(view -> OBSService.disconnectAndUnpairDevice(this));
         OBSService.ConnectionState currentState = OBSService.getConnectionState();
         updateUI(currentState);
@@ -134,12 +94,6 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
 
         binding.connectDevicesLayout.addView(devices);
         binding.connectDevicesLayout.addView(connectButton);
-    }
-
-    public void updateTakePictureDuringRideViews(boolean allowed) {
-        SharedPref.Settings.Ride.PicturesDuringRide.setMakePictureDuringRide(allowed, this);
-        binding.takePictureDuringRideButton.setChecked(allowed);
-        binding.takePictureDuringRideAdvancedSettingsView.setVisibility(allowed ? View.VISIBLE : View.GONE);
     }
 
     private void setClosePassBarColor(int distanceInCm) {
