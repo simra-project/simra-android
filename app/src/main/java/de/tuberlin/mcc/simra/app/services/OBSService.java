@@ -165,17 +165,16 @@ public class OBSService extends Service {
                     val -> broadcastHeartRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
             ),
 
-            new BLEService(BLEDevice.UUID_SERVICE_CLOSEPASS).addCharacteristic(
-                    BLEDevice.UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE,
-                    val -> broadcastClosePassDistance(val.getStringValue(0))
-            ).addCharacteristic(
-                    BLEDevice.UUID_SERVICE_CLOSEPASS_CHAR_EVENT,
-                    val -> broadcastClosePassEvent(val.getStringValue(0))
-            ),
+            new BLEService(BLEDevice.UUID_SERVICE_OBS).addCharacteristic(
 
-            new BLEService(BLEDevice.UUID_SERVICE_DISTANCE).addCharacteristic(
-                    BLEDevice.UUID_SERVICE_DISTANCE_CHAR_50MS,
-                    val -> broadcastDistanceValue(val.getStringValue(0))
+                    BLEDevice.UUID_SERVICE_OBS_CHAR_DISTANCE ,
+                    val -> broadcastDistanceValue(val.getValue())
+            ).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_OBS_CHAR_CLOSEPASS ,
+                    val -> broadcastClosePassEvent(val.getValue())
+            ).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_OBS_CHAR_OFFSET ,
+                    val -> broadcastClosePassEvent(val.getValue())
             ),
 
             //legacy Service from Radmesser
@@ -190,6 +189,19 @@ public class OBSService extends Service {
                     }
             )
     );
+
+    private String ByteToString(byte[] data){
+
+        String line;
+        long timeStamp;
+        int leftSensor;
+        int rightSensor;
+        timeStamp = (data[3] & 0xFF << 24) | (data[2] & 0xFF) << 16 | (data[1] & 0xFF) << 8 | (data[0] & 0xFF);
+
+        leftSensor = (data[5] & 0xFF) << 8 | (data[4] & 0xFF);
+        rightSensor = (data[7] & 0xFF) << 8 | (data[6] & 0xFF);
+        return timeStamp + ";" + leftSensor +";" + rightSensor;
+    }
 
 
     // ## incoming communication
@@ -361,10 +373,11 @@ public class OBSService extends Service {
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void broadcastClosePassDistance(String value) {
+    private void broadcastClosePassDistance(byte[] value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);
+        String line = ByteToString(value);
         intent.putExtra(EXTRA_VALUE, value);
-        intent.putExtra(EXTRA_VALUE_SERIALIZED, Measurement.fromString(value));
+        intent.putExtra(EXTRA_VALUE_SERIALIZED, Measurement.fromString(line));
         broadcastManager.sendBroadcast(intent);
     }
 
@@ -374,17 +387,19 @@ public class OBSService extends Service {
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void broadcastClosePassEvent(String value) {
+    private void broadcastClosePassEvent(byte[] value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
+        String line = ByteToString(value);
         intent.putExtra(EXTRA_VALUE, value);
-        intent.putExtra(EXTRA_VALUE_SERIALIZED, new ClosePassEvent(value));
+        intent.putExtra(EXTRA_VALUE_SERIALIZED, new ClosePassEvent(line));
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void broadcastDistanceValue(String value) {
+    private void broadcastDistanceValue(byte[] value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_DISTANCE);
+        String line = ByteToString(value);
         intent.putExtra(EXTRA_VALUE, value);
-        intent.putExtra(EXTRA_VALUE_SERIALIZED, Measurement.fromString(value));
+        intent.putExtra(EXTRA_VALUE_SERIALIZED, Measurement.fromString(line));
         broadcastManager.sendBroadcast(intent);
     }
 
@@ -406,6 +421,7 @@ public class OBSService extends Service {
 
         public void onHeartRate(Short value) {
         }
+
     }
 
     /*
