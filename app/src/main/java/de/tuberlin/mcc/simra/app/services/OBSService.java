@@ -192,15 +192,24 @@ public class OBSService extends Service {
 
     private String ByteToString(byte[] data){
 
-        String line;
-        long timeStamp;
-        int leftSensor;
-        int rightSensor;
-        timeStamp = (data[3] & 0xFF << 24) | (data[2] & 0xFF) << 16 | (data[1] & 0xFF) << 8 | (data[0] & 0xFF);
+       if(data.length>=8) {
+           long timeStamp;
+           int leftSensor;
+           int rightSensor;
+           timeStamp = (data[3] & 0xFF << 24) | (data[2] & 0xFF) << 16 | (data[1] & 0xFF) << 8 | (data[0] & 0xFF);
 
-        leftSensor = (data[5] & 0xFF) << 8 | (data[4] & 0xFF);
-        rightSensor = (data[7] & 0xFF) << 8 | (data[6] & 0xFF);
-        return timeStamp + ";" + leftSensor +";" + rightSensor;
+           leftSensor = (data[5] & 0xFF) << 8 | (data[4] & 0xFF);
+           rightSensor = (data[7] & 0xFF) << 8 | (data[6] & 0xFF);
+           return timeStamp + ";" + leftSensor + ";" + rightSensor;
+       }
+       else{
+           int leftOffset;
+           int rightOffset;
+           leftOffset = (data[1] & 0xFF) << 8 | (data[0] & 0xFF);
+           rightOffset = (data[3] & 0xFF) << 8 | (data[2] & 0xFF);
+
+           return leftOffset+";" + rightOffset;
+       }
     }
 
 
@@ -348,10 +357,10 @@ public class OBSService extends Service {
     // Broadcasts
     final static String ACTION_DEVICE_FOUND = "de.tuberlin.mcc.simra.app.obsservice.actiondevicefound";
     final static String ACTION_CONNECTION_STATE_CHANGED = "de.tuberlin.mcc.simra.app.obsservice.actiondconnectionstatechanged";
-    final static String ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedclosepass.distance";
     final static String ACTION_VALUE_RECEIVED_HEARTRATE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedheartrate";
     final static String ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedclosepass.event";
     final static String ACTION_VALUE_RECEIVED_DISTANCE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceiveddistance";
+    final static String ACTION_VALUE_RECEIVED_OFFSET = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedoffset";
 
     final static String EXTRA_DEVICE_ID = "de.tuberlin.mcc.simra.app.obsservice.extraid";
     final static String EXTRA_DEVICE_NAME = "de.tuberlin.mcc.simra.app.obsservice.extraname";
@@ -370,14 +379,6 @@ public class OBSService extends Service {
     private void boradcastConnectionStateChanged(ConnectionState newState) {
         Intent intent = new Intent(ACTION_CONNECTION_STATE_CHANGED);
         intent.putExtra(EXTRA_CONNECTION_STATE, newState.toString());
-        broadcastManager.sendBroadcast(intent);
-    }
-
-    private void broadcastClosePassDistance(byte[] value) {
-        Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);
-        String line = ByteToString(value);
-        intent.putExtra(EXTRA_VALUE, value);
-        intent.putExtra(EXTRA_VALUE_SERIALIZED, Measurement.fromString(line));
         broadcastManager.sendBroadcast(intent);
     }
 
@@ -403,14 +404,19 @@ public class OBSService extends Service {
         broadcastManager.sendBroadcast(intent);
     }
 
+    private void broadcastOffsetValue(byte[] value) {
+        Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
+        String line = ByteToString(value);
+        intent.putExtra(EXTRA_VALUE, value);
+        broadcastManager.sendBroadcast(intent);
+    }
+
+
     public abstract static class OBSServiceCallbacks {
         public void onDeviceFound(String deviceName, String deviceId) {
         }
 
         public void onConnectionStateChanged(ConnectionState newState) {
-        }
-
-        public void onClosePassIncidentDistance(@Nullable Measurement measurement) {
         }
 
         public void onClosePassIncidentEvent(@Nullable ClosePassEvent measurement) {
@@ -421,6 +427,8 @@ public class OBSService extends Service {
 
         public void onHeartRate(Short value) {
         }
+
+        //public void onOffsetValue(String value){}
 
     }
 
@@ -433,7 +441,6 @@ public class OBSService extends Service {
         filter.addAction(ACTION_DEVICE_FOUND);
         filter.addAction(ACTION_CONNECTION_STATE_CHANGED);
         filter.addAction(ACTION_VALUE_RECEIVED_DISTANCE);
-        filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);
         filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
 
         BroadcastReceiver rec = new BroadcastReceiver() {
@@ -452,13 +459,7 @@ public class OBSService extends Service {
                                 ConnectionState.valueOf(intent.getStringExtra(EXTRA_CONNECTION_STATE))
                         );
                         break;
-                    case ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE:
-                        serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
-                        if (serializable instanceof Measurement) {
-                            callbacks.onClosePassIncidentDistance((Measurement) serializable);
-                        }
-                        break;
                     case ACTION_VALUE_RECEIVED_DISTANCE:
                         serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
@@ -546,7 +547,8 @@ public class OBSService extends Service {
         private String originalValue;
         private String eventType;
         private long timestamp;
-        public List<String> payload;
+        public List<String> leftSensor;
+        public List<String> rightSensor;
 
         public ClosePassEvent(String rawData) {
             originalValue = rawData;
@@ -554,13 +556,14 @@ public class OBSService extends Service {
 
             String[] sections = rawData.split(";", -1);
             timestamp = Long.parseLong(sections[0]);
-            eventType = sections[1];
-            payload = Arrays.asList(sections[2].split(",", -1));
+            eventType = EVENT_TYPE_BUTTON;
+            leftSensor = Arrays.asList(sections[1].split(",", -1));
+            rightSensor = Arrays.asList(sections[2].split(",", -1));
         }
 
         @Override
         public String toString() {
-            return timestamp + " " + eventType + " " + TextUtils.join(", ", payload);
+            return timestamp + " " + eventType + " " + TextUtils.join(", ", leftSensor);
         }
 
         /**
@@ -580,31 +583,31 @@ public class OBSService extends Service {
 
         /**
          * Creates an incident description that will be viewable by users and should therefore be human-readable.
-         * This description always consists of a general description line, the payload data in a readable format and the
+         * This description always consists of a general description line, the leftSensor data in a readable format and the
          * raw event string that was passed over bluetooth (formatted in square brackets). These sections are always
          * separated by a newline.
          */
         public String getIncidentDescription(Context context) {
             String headerLine = context.getString(R.string.obsIncidentDescriptionHeaderLine, eventType);
-            String dataLine = context.getString(R.string.obsIncidentDescriptionDataLine, TextUtils.join(", ", payload));
+            String dataLine = context.getString(R.string.obsIncidentDescriptionDataLine, TextUtils.join(", ", leftSensor));
 
             switch (eventType) {
                 case EVENT_TYPE_BUTTON:
                     headerLine = context.getString(R.string.obsIncidentDescriptionButtonHeaderLine);
-                    if (payload.size() >= 1) {
-                        dataLine = context.getString(R.string.obsIncidentDescriptionButtonDataLine, payload.get(0));
+                    if (leftSensor.size() >= 1) {
+                        dataLine = context.getString(R.string.obsIncidentDescriptionButtonDataLine, leftSensor.get(0));
                     }
                     break;
                 case EVENT_TYPE_AVG2S:
                     headerLine = context.getString(R.string.obsIncidentDescriptionAvg2sHeaderLine);
-                    if (payload.size() >= 2) {
-                        dataLine = context.getString(R.string.obsIncidentDescriptionAvg2sDataLine, payload.get(0), payload.get(1));
+                    if (leftSensor.size() >= 2) {
+                        dataLine = context.getString(R.string.obsIncidentDescriptionAvg2sDataLine, leftSensor.get(0), leftSensor.get(1));
                     }
                     break;
                 case EVENT_TYPE_MIN_KALMAN:
                     headerLine = context.getString(R.string.obsIncidentDescriptionMinKalmanHeaderLine);
-                    if (payload.size() >= 1) {
-                        dataLine = context.getString(R.string.obsIncidentDescriptionMinKalmanDataLine, payload.get(0));
+                    if (leftSensor.size() >= 1) {
+                        dataLine = context.getString(R.string.obsIncidentDescriptionMinKalmanDataLine, leftSensor.get(0));
                     }
                     break;
                 default:
