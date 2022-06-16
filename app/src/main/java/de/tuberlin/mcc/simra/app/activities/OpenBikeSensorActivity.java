@@ -29,6 +29,7 @@ import pl.droidsonroids.gif.GifImageView;
 
 
 public class OpenBikeSensorActivity extends AppCompatActivity {
+    private static final String TAG = "OpenBikeSensorActivity_LOG";
     BroadcastReceiver receiver;
     Set<BluetoothDevice> foundDevices;
     BluetoothDevice selectedDevice;
@@ -44,7 +45,7 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
 
         foundDevices = new HashSet<>();
         initializeToolBar();
-        Log.i("start", "OpenBikeSensorActivity");
+        Log.d(TAG, "onCreate");
         binding.retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,7 +60,7 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (selectedDevice != null) {
                     OBSService.connectDevice(OpenBikeSensorActivity.this, selectedDevice.deviceId);
-
+                    Log.d(TAG, "connecting to device: " + selectedDevice.deviceId);
                 }
             }
         });
@@ -168,11 +169,13 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
 
             @Override
             public void onConnectionStateChanged(OBSService.ConnectionState newState) {
+                Log.d(TAG, "connection state: " + newState.name());
                 updateUI(newState);
             }
 
             @Override
             public void onDistanceValue(OBSService.Measurement value) {
+                Log.d(TAG, "value: " + value.toString());
                 int distance = -1;
                 if (value != null && value.leftSensorValues.size() > 0) {
                     distance = value.leftSensorValues.get(0);
