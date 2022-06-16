@@ -118,7 +118,8 @@ public class MarkerFunct {
 
             try {
                 OBSService.ClosePassEvent event = new OBSService.ClosePassEvent(x.description.split("\n", -1)[2].replace("[", "").replace("]", ""));
-                return Integer.parseInt(event.LeftSensor.get(0)) < 50;
+                Log.d(TAG,"x.description: " + x.description);
+                return Integer.parseInt(event.leftSensor.get(0)) < 50;
             } catch (Exception e) {
                 return false;
             }

@@ -32,7 +32,7 @@ import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEService;
 
 public class OBSService extends Service {
-    private static final String TAG = "OBSService";
+    private static final String TAG = "OBSService_LOG";
     private static final String sharedPrefsKey = "OBSServiceBLE";
     private static final String sharedPrefsKeyOBSID = "connectedDevice";
     private BLEDevice connectedDevice;
@@ -91,6 +91,7 @@ public class OBSService extends Service {
 
     @Override
     public void onCreate() {
+        Log.d(TAG,"OBSCreated");
         isServiceActive = true;
         bluetoothScanner = new BLEScanner(scannerStatusCallbacks);
         broadcastManager = LocalBroadcastManager.getInstance(this);
@@ -160,6 +161,7 @@ public class OBSService extends Service {
 
 
     private BLEServiceManager obsServicesDefinition = new BLEServiceManager(
+
             new BLEService(BLEDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
                     BLEDevice.UUID_SERVICE_HEARTRATE_CHAR,
                     val -> broadcastHeartRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
@@ -174,7 +176,7 @@ public class OBSService extends Service {
                     val -> broadcastClosePassEvent(val.getValue())
             ).addCharacteristic(
                     BLEDevice.UUID_SERVICE_OBS_CHAR_OFFSET ,
-                    val -> broadcastClosePassEvent(val.getValue())
+                    val -> broadcastOffsetValue(val.getValue())
             ),
 
             //legacy Service from Radmesser
@@ -193,6 +195,8 @@ public class OBSService extends Service {
     private String ByteToString(byte[] data){
 
        if(data.length>=8) {
+
+           Log.d("BytetoString",Arrays.toString(data));
            long timeStamp;
            int leftSensor;
            int rightSensor;
@@ -302,7 +306,7 @@ public class OBSService extends Service {
             return;
 
         String action = intent.getAction();
-        Log.i(TAG, "Intent received " + action);
+        Log.d(TAG, "Intent received " + action);
         switch (intent.getAction()) {
             case ACTION_START_SCANN:
                 startScanning();
@@ -391,6 +395,7 @@ public class OBSService extends Service {
     private void broadcastClosePassEvent(byte[] value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
         String line = ByteToString(value);
+        Log.d(TAG, "ClosePassvalue: " + Arrays.toString(value));
         intent.putExtra(EXTRA_VALUE, value);
         intent.putExtra(EXTRA_VALUE_SERIALIZED, new ClosePassEvent(line));
         broadcastManager.sendBroadcast(intent);
@@ -399,6 +404,7 @@ public class OBSService extends Service {
     private void broadcastDistanceValue(byte[] value) {
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_DISTANCE);
         String line = ByteToString(value);
+        Log.d(TAG, "DistanceValue: " + Arrays.toString(value));
         intent.putExtra(EXTRA_VALUE, value);
         intent.putExtra(EXTRA_VALUE_SERIALIZED, Measurement.fromString(line));
         broadcastManager.sendBroadcast(intent);
@@ -437,6 +443,7 @@ public class OBSService extends Service {
      */
 
     public static BroadcastReceiver registerCallbacks(Context ctx, OBSServiceCallbacks callbacks) {
+        Log.d(TAG, "registerCallbacks");
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_DEVICE_FOUND);
         filter.addAction(ACTION_CONNECTION_STATE_CHANGED);
@@ -447,6 +454,7 @@ public class OBSService extends Service {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Serializable serializable;
+                Log.d(TAG, "intent: " + intent.getAction());
                 switch (intent.getAction()) {
                     case ACTION_DEVICE_FOUND:
                         callbacks.onDeviceFound(
@@ -455,6 +463,7 @@ public class OBSService extends Service {
                         );
                         break;
                     case ACTION_CONNECTION_STATE_CHANGED:
+                        Log.d(TAG, "case ACTION_CONNECTION_STATE_CHANGED: " + intent.getAction());
                         callbacks.onConnectionStateChanged(
                                 ConnectionState.valueOf(intent.getStringExtra(EXTRA_CONNECTION_STATE))
                         );
@@ -463,7 +472,9 @@ public class OBSService extends Service {
                     case ACTION_VALUE_RECEIVED_DISTANCE:
                         serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
+                        Log.d(TAG, "case ACTION_VALUE_RECEIVED_DISTANCE: " + intent.getAction());
                         if (serializable instanceof Measurement) {
+                            Log.d(TAG, "onDistanceValue: " + serializable);
                             callbacks.onDistanceValue((Measurement) serializable);
                         }
                         break;
@@ -552,7 +563,7 @@ public class OBSService extends Service {
 
         public ClosePassEvent(String rawData) {
             originalValue = rawData;
-            Log.i("ClosePassEvent", rawData);
+            Log.d(TAG, "ClosePassEvent: " +rawData);
 
             String[] sections = rawData.split(";", -1);
             timestamp = Long.parseLong(sections[0]);

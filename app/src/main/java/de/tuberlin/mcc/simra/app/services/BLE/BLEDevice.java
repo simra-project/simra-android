@@ -22,15 +22,15 @@ public class BLEDevice {
     public static final String UUID_SERVICE_HEARTRATE = "0000180D-0000-1000-8000-00805F9B34FB";
     public static final String UUID_SERVICE_HEARTRATE_CHAR = "00002a37-0000-1000-8000-00805f9b34fb";
     public static final String UUID_SERVICE_OBS = "1FE7FAF9-CE63-4236-0004-000000000000";
-    public static final String UUID_SERVICE_OBS_CHAR_TIME = "1FE7FAF9-CE63-4236-0004-000000000001";
+   // public static final String UUID_SERVICE_OBS_CHAR_TIME = "1FE7FAF9-CE63-4236-0004-000000000001";
     public static final String UUID_SERVICE_OBS_CHAR_DISTANCE = "1FE7FAF9-CE63-4236-0004-000000000002";
     public static final String UUID_SERVICE_OBS_CHAR_CLOSEPASS = "1FE7FAF9-CE63-4236-0004-000000000003";
     public static final String UUID_SERVICE_OBS_CHAR_OFFSET = "1FE7FAF9-CE63-4236-0004-000000000004";
-    public static final String UUID_SERVICE_OBS_CHAR_TRACK = "1FE7FAF9-CE63-4236-0004-000000000005";
+    //public static final String UUID_SERVICE_OBS_CHAR_TRACK = "1FE7FAF9-CE63-4236-0004-000000000005";
 
-    public static final String UUID_SERVICE_DEVICEINFO = "0000180A-0000-1000-8000-00805F9B34FB";
-    public static final String UUID_SERVICE_DEVICEINFO_CHAR_FIRMWARE = "00002a26-0000-1000-8000-00805f9b34fb";
-    public static final String UUID_SERVICE_DEVICEINFO_CHAR_MANUFACTURER = "00002a29-0000-1000-8000-00805f9b34fb";
+    //public static final String UUID_SERVICE_DEVICEINFO = "0000180A-0000-1000-8000-00805F9B34FB";
+    //public static final String UUID_SERVICE_DEVICEINFO_CHAR_FIRMWARE = "00002a26-0000-1000-8000-00805f9b34fb";
+    //public static final String UUID_SERVICE_DEVICEINFO_CHAR_MANUFACTURER = "00002a29-0000-1000-8000-00805f9b34fb";
     public static final String UUID_SERVICE_CONNECTION = "1FE7FAF9-CE63-4236-0002-000000000000";
     public static final String UUID_SERVICE_CONNECTION_CHAR_CONNECTED = "1FE7FAF9-CE63-4236-0002-000000000001";
 
@@ -112,11 +112,13 @@ public class BLEDevice {
 
             @Override
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+                Log.d(TAG,"Characteristic is getting read");
                 servicesDefinitions.getServiceByCharacteristicUUID(characteristic.getUuid()).onValue(characteristic);
             }
 
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+                Log.d(TAG,"Characteristic is getting changed");
                 servicesDefinitions.getServiceByCharacteristicUUID(characteristic.getUuid()).onValue(characteristic);
             }
         });
