@@ -32,7 +32,7 @@ import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEService;
 
 public class OBSService extends Service {
-    private static final String TAG = "OBSService";
+    private static final String TAG = "OBSService_LOG";
     private static final String sharedPrefsKey = "OBSServiceBLE";
     private static final String sharedPrefsKeyOBSID = "connectedDevice";
     private BLEDevice connectedDevice;
@@ -91,6 +91,7 @@ public class OBSService extends Service {
 
     @Override
     public void onCreate() {
+        Log.d(TAG,"OBS service started");
         isServiceActive = true;
         bluetoothScanner = new BLEScanner(scannerStatusCallbacks);
         broadcastManager = LocalBroadcastManager.getInstance(this);
@@ -160,10 +161,6 @@ public class OBSService extends Service {
 
 
     private BLEServiceManager obsServicesDefinition = new BLEServiceManager(
-            new BLEService(BLEDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
-                    BLEDevice.UUID_SERVICE_HEARTRATE_CHAR,
-                    val -> broadcastHeartRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
-            ),
 
             new BLEService(BLEDevice.UUID_SERVICE_OBS).addCharacteristic(
 
@@ -174,9 +171,14 @@ public class OBSService extends Service {
                     val -> broadcastClosePassEvent(val.getValue())
             ).addCharacteristic(
                     BLEDevice.UUID_SERVICE_OBS_CHAR_OFFSET ,
-                    val -> broadcastClosePassEvent(val.getValue())
+                    val -> broadcastOffsetValue(val.getValue())
             ),
-
+/*
+            new BLEService(BLEDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_HEARTRATE_CHAR,
+                    val -> broadcastHeartRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
+            ),
+*/
             //legacy Service from Radmesser
             new BLEService(BLEDevice.UUID_SERVICE_CONNECTION).addCharacteristic(
                     BLEDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED,
@@ -192,6 +194,7 @@ public class OBSService extends Service {
 
     private String ByteToString(byte[] data){
 
+
        if(data.length>=8) {
            long timeStamp;
            int leftSensor;
@@ -200,6 +203,7 @@ public class OBSService extends Service {
 
            leftSensor = (data[5] & 0xFF) << 8 | (data[4] & 0xFF);
            rightSensor = (data[7] & 0xFF) << 8 | (data[6] & 0xFF);
+           Log.d(TAG,timeStamp + ";" + leftSensor + ";" + rightSensor);
            return timeStamp + ";" + leftSensor + ";" + rightSensor;
        }
        else{
@@ -383,6 +387,7 @@ public class OBSService extends Service {
     }
 
     private void broadcastHeartRate(String value) {
+        Log.d("TRUE","heartRate Reached");
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_HEARTRATE);
         intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);
@@ -405,11 +410,15 @@ public class OBSService extends Service {
     }
 
     private void broadcastOffsetValue(byte[] value) {
+        Log.d("dam", "offsetbroadcasted");
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
         String line = ByteToString(value);
-        intent.putExtra(EXTRA_VALUE, value);
+        intent.putExtra(EXTRA_VALUE, line);
+        Log.d(TAG,line);
         broadcastManager.sendBroadcast(intent);
     }
+
+
 
 
     public abstract static class OBSServiceCallbacks {
@@ -428,7 +437,7 @@ public class OBSService extends Service {
         public void onHeartRate(Short value) {
         }
 
-        //public void onOffsetValue(String value){}
+
 
     }
 
@@ -437,6 +446,7 @@ public class OBSService extends Service {
      */
 
     public static BroadcastReceiver registerCallbacks(Context ctx, OBSServiceCallbacks callbacks) {
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_DEVICE_FOUND);
         filter.addAction(ACTION_CONNECTION_STATE_CHANGED);
@@ -479,7 +489,10 @@ public class OBSService extends Service {
                                 parseShort(intent.getStringExtra(EXTRA_VALUE))
                         );
                         break;
+
+
                 }
+
             }
         };
         LocalBroadcastManager.getInstance(ctx).registerReceiver(rec, filter);

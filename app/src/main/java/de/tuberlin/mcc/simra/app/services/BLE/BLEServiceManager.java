@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.services.BLE;
 
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,11 +15,12 @@ public class BLEServiceManager {
     private Map<UUID, BLEService> characteristicUuidToServiceMap = new HashMap<>();
 
     public BLEServiceManager(BLEService... services) {
+        Log.d("BLEServiceManager_LOG","it was made");
         for (BLEService service : services) {
             serviceMap.put(service.uuid, service);
-
             for (BLEServiceCharacteristic characteristic : service.characteristics) {
                 characteristicUuidToServiceMap.put(characteristic.uuid, service);
+
             }
         }
     }
