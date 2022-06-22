@@ -175,14 +175,28 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
 
             @Override
             public void onDistanceValue(OBSService.Measurement value) {
-                Log.d(TAG, "value: " + value.toString());
                 int distance = -1;
                 if (value != null && value.leftSensorValues.size() > 0) {
                     distance = value.leftSensorValues.get(0);
-                    binding.deviceInfoTextView.setText(getString(R.string.obs_activity_text_last_distance) + " " + distance + " cm");
+                    if(distance == 65535){
+                        binding.deviceInfoTextView.setText(getString(R.string.obs_activity_text_last_distance) + " " + distance + " cm(MAX)");
+                    }
+                    else {
+                        binding.deviceInfoTextView.setText(getString(R.string.obs_activity_text_last_distance) + " " + distance + " cm");
+                    }
                     setClosePassBarColor(distance);
                 }
             }
+            @Override
+            public void onOffset(String value){
+                Log.d(TAG, "The value of the Offset is: "+ value);
+            }
+            @Override
+            public void onTime(int value){
+                Log.d(TAG, "The value of the Time is: "+ value);
+            }
+
+
         });
 
     }

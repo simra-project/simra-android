@@ -163,22 +163,27 @@ public class OBSService extends Service {
     private BLEServiceManager obsServicesDefinition = new BLEServiceManager(
 
             new BLEService(BLEDevice.UUID_SERVICE_OBS).addCharacteristic(
-
                     BLEDevice.UUID_SERVICE_OBS_CHAR_DISTANCE ,
                     val -> broadcastDistanceValue(val.getValue())
             ).addCharacteristic(
                     BLEDevice.UUID_SERVICE_OBS_CHAR_CLOSEPASS ,
                     val -> broadcastClosePassEvent(val.getValue())
             ).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_OBS_CHAR_TIME,
+                    val -> broadcastTime(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32,0))
+            ).addCharacteristic(
                     BLEDevice.UUID_SERVICE_OBS_CHAR_OFFSET ,
-                    val -> broadcastOffsetValue(val.getValue())
+                    val -> broadcastOffset(val.getValue())
             ),
-/*
+
+
             new BLEService(BLEDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
                     BLEDevice.UUID_SERVICE_HEARTRATE_CHAR,
                     val -> broadcastHeartRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
             ),
-*/
+
+
+
             //legacy Service from Radmesser
             new BLEService(BLEDevice.UUID_SERVICE_CONNECTION).addCharacteristic(
                     BLEDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED,
@@ -203,7 +208,6 @@ public class OBSService extends Service {
 
            leftSensor = (data[5] & 0xFF) << 8 | (data[4] & 0xFF);
            rightSensor = (data[7] & 0xFF) << 8 | (data[6] & 0xFF);
-           Log.d(TAG,timeStamp + ";" + leftSensor + ";" + rightSensor);
            return timeStamp + ";" + leftSensor + ";" + rightSensor;
        }
        else{
@@ -365,6 +369,8 @@ public class OBSService extends Service {
     final static String ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedclosepass.event";
     final static String ACTION_VALUE_RECEIVED_DISTANCE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceiveddistance";
     final static String ACTION_VALUE_RECEIVED_OFFSET = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedoffset";
+    final static String ACTION_VALUE_RECEIVED_TIME = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedtime";
+
 
     final static String EXTRA_DEVICE_ID = "de.tuberlin.mcc.simra.app.obsservice.extraid";
     final static String EXTRA_DEVICE_NAME = "de.tuberlin.mcc.simra.app.obsservice.extraname";
@@ -387,7 +393,6 @@ public class OBSService extends Service {
     }
 
     private void broadcastHeartRate(String value) {
-        Log.d("TRUE","heartRate Reached");
         Intent intent = new Intent(ACTION_VALUE_RECEIVED_HEARTRATE);
         intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);
@@ -409,14 +414,20 @@ public class OBSService extends Service {
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void broadcastOffsetValue(byte[] value) {
-        Log.d("dam", "offsetbroadcasted");
-        Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
+    private void broadcastOffset(byte[] value){
+        Intent intent = new Intent(ACTION_VALUE_RECEIVED_OFFSET);
         String line = ByteToString(value);
         intent.putExtra(EXTRA_VALUE, line);
-        Log.d(TAG,line);
         broadcastManager.sendBroadcast(intent);
     }
+
+    private void broadcastTime(int value){
+        Intent intent = new Intent(ACTION_VALUE_RECEIVED_TIME);
+        intent.putExtra(EXTRA_VALUE, value);
+        broadcastManager.sendBroadcast(intent);
+    }
+
+
 
 
 
@@ -437,9 +448,13 @@ public class OBSService extends Service {
         public void onHeartRate(Short value) {
         }
 
-
-
+        public void onOffset(String value){
+        }
+        public void onTime(int value){
+        }
     }
+
+
 
     /*
      * the caller ist responible for unregistering thr receiver, when he does not need him anymore
@@ -452,6 +467,8 @@ public class OBSService extends Service {
         filter.addAction(ACTION_CONNECTION_STATE_CHANGED);
         filter.addAction(ACTION_VALUE_RECEIVED_DISTANCE);
         filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
+        filter.addAction(ACTION_VALUE_RECEIVED_OFFSET);
+        filter.addAction(ACTION_VALUE_RECEIVED_TIME);
 
         BroadcastReceiver rec = new BroadcastReceiver() {
             @Override
@@ -489,8 +506,15 @@ public class OBSService extends Service {
                                 parseShort(intent.getStringExtra(EXTRA_VALUE))
                         );
                         break;
+                    case ACTION_VALUE_RECEIVED_OFFSET:
+                        callbacks.onOffset(
+                                intent.getStringExtra(EXTRA_VALUE));
+                        break;
 
-
+                    case ACTION_VALUE_RECEIVED_TIME:
+                        callbacks.onTime(
+                                intent.getIntExtra(EXTRA_VALUE,0));
+                        break;
                 }
 
             }
@@ -516,7 +540,6 @@ public class OBSService extends Service {
         private Measurement(String line) throws MeasurementFormatException {
             try {
                 String[] sections = line.split(";", -1);
-
                 timestamp = Long.parseLong(sections[0]);
                 leftSensorValues = parseValues(sections[1].split(","));
                 rightSensorValues = parseValues(sections[2].split(","));
