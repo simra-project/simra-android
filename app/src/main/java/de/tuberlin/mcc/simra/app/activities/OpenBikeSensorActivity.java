@@ -187,16 +187,21 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
                     setClosePassBarColor(distance);
                 }
             }
+
             @Override
             public void onOffset(String value){
-                Log.d(TAG, "The value of the Offset is: "+ value);
+                Log.d(TAG, "The value of the Offset is: " + value);
             }
+
             @Override
             public void onTime(int value){
-                Log.d(TAG, "The value of the Time is: "+ value);
+                Log.d(TAG, "The value of the Time is: " + value);
             }
 
-
+            @Override
+            public void onTrack(String value) {
+                Log.d(TAG,"This value of TrackID is: " +  value);
+            }
         });
 
     }

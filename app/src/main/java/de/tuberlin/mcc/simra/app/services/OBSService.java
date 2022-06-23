@@ -174,6 +174,9 @@ public class OBSService extends Service {
             ).addCharacteristic(
                     BLEDevice.UUID_SERVICE_OBS_CHAR_OFFSET ,
                     val -> broadcastOffset(val.getValue())
+            ).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_OBS_CHAR_TRACK,
+                    val -> broadcastTrack(val.getStringValue(0))
             ),
 
 
@@ -370,7 +373,7 @@ public class OBSService extends Service {
     final static String ACTION_VALUE_RECEIVED_DISTANCE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceiveddistance";
     final static String ACTION_VALUE_RECEIVED_OFFSET = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedoffset";
     final static String ACTION_VALUE_RECEIVED_TIME = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedtime";
-
+    final static String ACTION_VALUE_RECEIVED_TRACKID = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedtrack";
 
     final static String EXTRA_DEVICE_ID = "de.tuberlin.mcc.simra.app.obsservice.extraid";
     final static String EXTRA_DEVICE_NAME = "de.tuberlin.mcc.simra.app.obsservice.extraname";
@@ -426,6 +429,11 @@ public class OBSService extends Service {
         intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);
     }
+    private void broadcastTrack(String value){
+        Intent intent = new Intent(ACTION_VALUE_RECEIVED_TRACKID);
+        intent.putExtra(EXTRA_VALUE, value);
+        broadcastManager.sendBroadcast(intent);
+    }
 
 
 
@@ -453,6 +461,9 @@ public class OBSService extends Service {
 
         public void onTime(int value){
         }
+
+        public void onTrack(String value){
+        }
     }
 
 
@@ -470,6 +481,7 @@ public class OBSService extends Service {
         filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
         filter.addAction(ACTION_VALUE_RECEIVED_OFFSET);
         filter.addAction(ACTION_VALUE_RECEIVED_TIME);
+        filter.addAction(ACTION_VALUE_RECEIVED_TRACKID);
 
         BroadcastReceiver rec = new BroadcastReceiver() {
             @Override
@@ -515,6 +527,10 @@ public class OBSService extends Service {
                     case ACTION_VALUE_RECEIVED_TIME:
                         callbacks.onTime(
                                 intent.getIntExtra(EXTRA_VALUE,0));
+                        break;
+                    case ACTION_VALUE_RECEIVED_TRACKID:
+                        callbacks.onTrack(
+                                intent.getStringExtra(EXTRA_VALUE));
                         break;
                 }
 
