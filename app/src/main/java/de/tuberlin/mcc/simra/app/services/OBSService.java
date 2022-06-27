@@ -168,7 +168,7 @@ public class OBSService extends Service {
             ).addCharacteristic(
                     BLEDevice.UUID_SERVICE_OBS_CHAR_CLOSEPASS ,
                     val -> broadcastClosePassEvent(val.getValue())
-            ).addCharacteristic(
+            )/*.addCharacteristic(
                     BLEDevice.UUID_SERVICE_OBS_CHAR_TIME,
                     val -> broadcastTime(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32,0))
             ).addCharacteristic(
@@ -177,7 +177,8 @@ public class OBSService extends Service {
             ).addCharacteristic(
                     BLEDevice.UUID_SERVICE_OBS_CHAR_TRACK,
                     val -> broadcastTrack(val.getStringValue(0))
-            ),
+            )
+            */,
 
 
             new BLEService(BLEDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
@@ -199,18 +200,17 @@ public class OBSService extends Service {
                     }
             )
     );
-
+    // Convert Byte Array into String
     private String ByteToString(byte[] data){
-
-
        if(data.length>=8) {
            long timeStamp;
            int leftSensor;
            int rightSensor;
-           timeStamp = (data[3] & 0xFF << 24) | (data[2] & 0xFF) << 16 | (data[1] & 0xFF) << 8 | (data[0] & 0xFF);
 
+           timeStamp = (data[3] & 0xFF << 24) | (data[2] & 0xFF) << 16 | (data[1] & 0xFF) << 8 | (data[0] & 0xFF);
            leftSensor = (data[5] & 0xFF) << 8 | (data[4] & 0xFF);
            rightSensor = (data[7] & 0xFF) << 8 | (data[6] & 0xFF);
+
            return timeStamp + ";" + leftSensor + ";" + rightSensor;
        }
        else{

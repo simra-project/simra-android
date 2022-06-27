@@ -105,7 +105,7 @@ public class BLEDevice {
                             Log.e(TAG, "Error connecting to Characteristic: " + characteristic.uuid);
                             continue;
                         }
-
+                        //Add all characteristics of current service to ArrayList
                         chars.add(gattCharacteristic);
                         nRegisteredCharacteristics++;
                     }
@@ -117,18 +117,13 @@ public class BLEDevice {
 
             @Override
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                //Log.d(TAG,"Characteristic is getting read:" + characteristic.getUuid().toString());
-                //Log.d(TAG,"Characteristic is read "+ Arrays.toString(characteristic.getValue()));
                 chars.remove(0);
                 servicesDefinitions.getServiceByCharacteristicUUID(characteristic.getUuid()).onValue(characteristic);
                 subscribeToCharacteristics(gatt);
-                Log.d(TAG,"onCharacteristicRead was reached");
             }
 
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-                //Log.d(TAG,"Characteristic is getting changed: "+ Arrays.toString(characteristic.getValue()));
-               //Log.d(TAG,"Notify Characteristic is getting changed UUID IS:"+ characteristic.getUuid());
                 servicesDefinitions.getServiceByCharacteristicUUID(characteristic.getUuid()).onValue(characteristic);
             }
             @Override
@@ -138,10 +133,13 @@ public class BLEDevice {
                 subscribeToCharacteristics(gatt);
             }
 
+            //Subscribe to all Characteristics in ArrayList for current Service
             private void subscribeToCharacteristics(BluetoothGatt gatt){
+                //Check to see if anymore Characteristics need to be subscribed, return otherwise
                 if(chars.size() == 0) return;
                 BluetoothGattCharacteristic gattCharacteristic = chars.get(0);
 
+                //Check if the Characteristic property is eaither Notify or Read
                 if(gattCharacteristic.getProperties() == gattCharacteristic.PROPERTY_NOTIFY) {
                     gatt.setCharacteristicNotification(gattCharacteristic, true);
                     BluetoothGattDescriptor desc = gattCharacteristic.getDescriptor(UUID.fromString(UUID_CLIENT_CHARACTERISTIC_CONFIGURATION));
@@ -151,9 +149,7 @@ public class BLEDevice {
                 else if(gattCharacteristic.getProperties() == gattCharacteristic.PROPERTY_READ){
                     gatt.readCharacteristic(gattCharacteristic);
                 }
-
             }
-
         });
     }
 
