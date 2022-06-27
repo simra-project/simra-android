@@ -168,7 +168,9 @@ public class OBSService extends Service {
             ).addCharacteristic(
                     BLEDevice.UUID_SERVICE_OBS_CHAR_CLOSEPASS ,
                     val -> broadcastClosePassEvent(val.getValue())
-            )/*.addCharacteristic(
+            ),
+            // Additional OBS services, not currently supported
+            /*.addCharacteristic(
                     BLEDevice.UUID_SERVICE_OBS_CHAR_TIME,
                     val -> broadcastTime(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32,0))
             ).addCharacteristic(
@@ -178,7 +180,7 @@ public class OBSService extends Service {
                     BLEDevice.UUID_SERVICE_OBS_CHAR_TRACK,
                     val -> broadcastTrack(val.getStringValue(0))
             )
-            */,
+            */
 
 
             new BLEService(BLEDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
@@ -202,6 +204,7 @@ public class OBSService extends Service {
     );
     // Convert Byte Array into String
     private String ByteToString(byte[] data){
+        // If Byte Array received is from Distance Characteristic
        if(data.length>=8) {
            long timeStamp;
            int leftSensor;
@@ -213,6 +216,7 @@ public class OBSService extends Service {
 
            return timeStamp + ";" + leftSensor + ";" + rightSensor;
        }
+       // If Byte Array received is from Offset Characteristic
        else{
            int leftOffset;
            int rightOffset;
