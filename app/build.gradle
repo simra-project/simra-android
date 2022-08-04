@@ -10,8 +10,8 @@ android {
         applicationId "de.tuberlin.mcc.simra.app.dev"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 90
-        versionName "90.0"
+        versionCode 91
+        versionName "91.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
@@ -72,6 +72,9 @@ dependencies {
     implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.4'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.4'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
+    implementation 'io.jenetics:jpx:1.4.0'
+    implementation 'stax:stax-api:1.0.1'
+    implementation 'com.fasterxml:aalto-xml:1.1.1'
 
     // RingBuffer
     implementation 'org.apache.commons:commons-collections4:4.4'
@@ -82,4 +85,7 @@ dependencies {
 
     // "Backporting" Java 8 streams for Android < 24
     implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
+
+
+
 }

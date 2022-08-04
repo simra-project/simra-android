@@ -385,12 +385,48 @@ public class IOUtils {
             return (isTempFile ? "Temp" : "") + rideId + "_accGps.csv";
         }
 
+        public static String getGPSLogGeoJsonFileName(int rideId, boolean isTempFile) {
+            return (isTempFile ? "Temp" : "") + rideId + "_accGps.geojson";
+        }
+
+        public static String getGPSLogGPXFileName(int rideId, boolean isTempFile) {
+            return (isTempFile ? "Temp" : "") + rideId + "_accGps.gpx";
+        }
+
+        public static String getGPSLogKMLFileName(int rideId, boolean isTempFile) {
+            return (isTempFile ? "Temp" : "") + rideId + "_accGps.kml";
+        }
+
         public static String getGPSLogFilePath(int rideId, boolean isTempFile, Context context) {
             return IOUtils.Directories.getBaseFolderPath(context) + getGPSLogFileName(rideId, isTempFile);
         }
 
+        public static String getGPSLogGeoJsonFilePath(int rideId, boolean isTempFile, Context context) {
+            return IOUtils.Directories.getBaseFolderPath(context) + getGPSLogGeoJsonFileName(rideId, isTempFile);
+        }
+
+        public static String getGPSLogGPXFilePath(int rideId, boolean isTempFile, Context context) {
+            return IOUtils.Directories.getBaseFolderPath(context) + getGPSLogGPXFileName(rideId, isTempFile);
+        }
+
+        public static String getGPSLogKMLFilePath(int rideId, boolean isTempFile, Context context) {
+            return IOUtils.Directories.getBaseFolderPath(context) + getGPSLogKMLFileName(rideId, isTempFile);
+        }
+
         public static File getGPSLogFile(int rideId, boolean isTempFile, Context context) {
             return new File(getGPSLogFilePath(rideId, isTempFile, context));
+        }
+
+        public static File getGPSLogGeoJsonFile(int rideId, boolean isTempFile, Context context) {
+            return new File(getGPSLogGeoJsonFilePath(rideId, isTempFile, context));
+        }
+
+        public static File getGPSLogGPXFile(int rideId, boolean isTempFile, Context context) {
+            return new File(getGPSLogGPXFilePath(rideId, isTempFile, context));
+        }
+
+        public static File getGPSLogKMLFile(int rideId, boolean isTempFile, Context context) {
+            return new File(getGPSLogKMLFilePath(rideId, isTempFile, context));
         }
 
         public static File getRegionsFile(Context context) {
