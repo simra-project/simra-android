@@ -47,9 +47,9 @@ import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 
-import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
+/*import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
 import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_DISTANCE;
-import static de.tuberlin.mcc.simra.app.services.OBSService.EXTRA_VALUE_SERIALIZED;
+import static de.tuberlin.mcc.simra.app.services.OBSService.EXTRA_VALUE_SERIALIZED;*/
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.mergeGPSandSensorLines;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
@@ -85,8 +85,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences.Editor editor;
     Location startLocation;
     // OpenBikeSensor
-    private final LinkedList<OBSService.Measurement> lastOBSDistanceValues = new LinkedList<>();
-    private final LinkedList<OBSService.ClosePassEvent> lastOBSClosePassEvents = new LinkedList<>();
+    /*private final LinkedList<OBSService.Measurement> lastOBSDistanceValues = new LinkedList<>();
+    private final LinkedList<OBSService.ClosePassEvent> lastOBSClosePassEvents = new LinkedList<>();*/
     private LocationManager locationManager;
     private Sensor accelerometer;
     private Sensor gyroscope;
@@ -94,7 +94,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private Sensor rotation;
     private int key;
     private Integer incidentDuringRide = null;
-    private final BroadcastReceiver openBikeSensorMessageReceiverDistanceValue = new BroadcastReceiver() {
+    /*private final BroadcastReceiver openBikeSensorMessageReceiverDistanceValue = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
@@ -113,7 +113,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 lastOBSClosePassEvents.add((OBSService.ClosePassEvent) serializable);
             }
         }
-    };
+    };*/
     private BroadcastReceiver incidentBroadcastReceiver;
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
@@ -238,9 +238,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG + ":RecorderService");
 
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverDistanceValue, new IntentFilter(ACTION_VALUE_RECEIVED_DISTANCE));
+        /*localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverDistanceValue, new IntentFilter(ACTION_VALUE_RECEIVED_DISTANCE));
         localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverClosePassEvent, new IntentFilter(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT));
-        incidentBroadcastReceiver = IncidentBroadcaster.receiveIncidents(this, new IncidentBroadcaster.IncidentCallbacks() {
+        */incidentBroadcastReceiver = IncidentBroadcaster.receiveIncidents(this, new IncidentBroadcaster.IncidentCallbacks() {
             @Override
             public void onManualIncident(int incidentType) {
                 incidentDuringRide = incidentType;
@@ -349,9 +349,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         locationManager.removeUpdates(this);
 
         // Stop OpenBikeSensor LocalBroadcast Listener
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverDistanceValue);
+        /*LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverDistanceValue);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverClosePassEvent);
-
+*/
         // Stop Manual Incident Broadcast Listener
         LocalBroadcastManager.getInstance(this).unregisterReceiver(incidentBroadcastReceiver);
 
@@ -472,14 +472,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         incidentDuringRide = null;
                     }
 
-                    while (lastOBSClosePassEvents.size() > 0) {
+                    /*while (lastOBSClosePassEvents.size() > 0) {
                         OBSService.ClosePassEvent closePassEvent = lastOBSClosePassEvents.removeFirst();
                         incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder()
                                 .withIncidentType(closePassEvent.getIncidentType())
                                 .withDescription(closePassEvent.getIncidentDescription(getApplicationContext()))
                                 .withBaseInformation(lastAccUpdate, thisLocation.getLatitude(), thisLocation.getLongitude())
                                 .build());
-                    }
+                    }*/
                 }
                 dataLogEntryBuilder.withGyroscope(
                         /**/gyroscopeMatrix[0],
@@ -487,10 +487,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         gyroscopeMatrix[2]/**/
                 );
 
-                if (lastOBSDistanceValues.size() > 0) {
+                /*if (lastOBSDistanceValues.size() > 0) {
                     OBSService.Measurement lastOBSDistanceValue = lastOBSDistanceValues.removeFirst();
                     dataLogEntryBuilder.withOBS(lastOBSDistanceValue.leftSensorValues.get(0), null, null, null, null);
-                }
+                }*/
 
                 if(isGPSLine) {
                     gpsLines.add(dataLogEntryBuilder.build());

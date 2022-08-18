@@ -320,7 +320,7 @@ public class ShowRouteActivity extends BaseActivity {
             myMarkerFunct = new MarkerFunct(ShowRouteActivity.this, dataLog, incidentLog, bike, pLoc, child == 1, trailer == 1);
             myMarkerFunct.updateIncidentMarkers(this.incidentLog);
 
-            myMarkerFunct.updateOBSMarkers(this.incidentLog, ShowRouteActivity.this);
+            // myMarkerFunct.updateOBSMarkers(this.incidentLog, ShowRouteActivity.this);
         });
 
         addCustomMarkerMode = false;

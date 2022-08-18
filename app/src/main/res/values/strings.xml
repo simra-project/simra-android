@@ -221,6 +221,9 @@
     <string name="uploadingDebugNotificationBody">SimRa lädt Dateien hoch</string>
 
     <!--- OpenBikeSensor -->
+    <string name="obs_activity_button_start_scan">Bluetooth Scan starten</string>
+    <string name="obs_activity_button_connect">Verbinden</string>
+    <string name="obs_activity_button_stop_scan">Bluetooth Scan stoppen</string>
     <string name="obsSwitchTitle">OpenBikeSensor verbinden</string>
     <string name="obsButton">OpenBikeSensor Einstellungen öffnen</string>
     <string name="availableDevices">Verfügbare Geräte</string>
@@ -234,6 +237,9 @@
     <string name="obsIncidentDescriptionAvg2sDataLine">Durchschnittliche Distanz: %1$s cm, kleinste Distanz: %2$s cm</string>
     <string name="obsIncidentDescriptionMinKalmanHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da es die kleinste Distanz während einer dichten Überholung erkannt hat.</string>
     <string name="obsIncidentDescriptionMinKalmanDataLine">Kleinste Distanz: %1$s cm</string>
+    <string name="obsServiceConnectionFailed">Fehler ERRORCODE beim Verbinden mit dem Gerät DEVICEADDRESS. Bitte erneut versuchen.</string>
+    <string name="obsServiceConnectionSuccessful">Verbindung zum OpenBikeSensor hergestellt</string>
+    <string name="obsServiceDisconnectionSuccessful">Verbindung zum OpenBikeSensor getrennt</string>
 
     <!--- Profile -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>

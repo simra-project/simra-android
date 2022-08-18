@@ -33,7 +33,7 @@ import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
 import de.tuberlin.mcc.simra.app.services.DebugUploadService;
-import de.tuberlin.mcc.simra.app.services.OBSService;
+// import de.tuberlin.mcc.simra.app.services.OBSService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
@@ -225,10 +225,10 @@ public class SettingsActivity extends BaseActivity {
                 if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
                     enableBluetooth();
                 } else {
-                    startOBSService();
+                    // startOBSService();
                 }
             } else {
-                OBSService.terminateService(this);
+                // OBSService.terminateService(this);
             }
         });
 
@@ -352,7 +352,7 @@ public class SettingsActivity extends BaseActivity {
         alert.show();
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    /*protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ENABLE_BT) {
             if (resultCode == Activity.RESULT_OK) {
@@ -361,7 +361,7 @@ public class SettingsActivity extends BaseActivity {
             } else {
                 SharedPref.Settings.OpenBikeSensor.setEnabled(false, this);
                 binding.obsSwitch.setChecked(false);
-                OBSService.terminateService(this);
+                // OBSService.terminateService(this);
                 binding.obsButton.setVisibility(View.GONE);
             }
         } else if (requestCode == DIRECTORY_PICKER_EXPORT && resultCode == Activity.RESULT_OK) {
@@ -379,12 +379,12 @@ public class SettingsActivity extends BaseActivity {
                 Log.d(TAG, " requestCode: " + requestCode + " resultCode: " + resultCode + " result " + data.getData());
             }
         }
-    }
+    }*/
 
-    private void startOBSService() {
+    /*private void startOBSService() {
         Intent intent = new Intent(this, OBSService.class);
         startService(intent);
-    }
+    }*/
 
     private void enableBluetooth() {
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);

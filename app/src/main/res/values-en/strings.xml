@@ -215,6 +215,9 @@
     <string name="uploadingDebugNotificationBody">SimRa is uploading files</string>
 
     <!--- OpenBikeSensor -->
+    <string name="obs_activity_button_start_scan">Start Bluetooth scan</string>
+    <string name="obs_activity_button_connect">Connect</string>
+    <string name="obs_activity_button_stop_scan">Stop Bluetooth scan</string>
     <string name="obsSwitchTitle">OpenBikeSensor connection</string>
     <string name="obsButton">Open OpenBikeSensor settings</string>
     <string name="availableDevices">Available Devices</string>
@@ -233,6 +236,9 @@
     <string name="obsIncidentDescriptionAvg2sDataLine">Average distance: %1$s cm, mininum distance: %2$s cm</string>
     <string name="obsIncidentDescriptionMinKalmanHeaderLine">This incident was automatically triggered from the OpenBikeSensor because it detected the smallest distance during a close pass.</string>
     <string name="obsIncidentDescriptionMinKalmanDataLine">Minimum distance: %1$s cm</string>
+    <string name="obsServiceConnectionFailed">Encountered error ERRORCODE while trying to connect to DEVICEADDRESS. Please try again.</string>
+    <string name="obsServiceConnectionSuccessful">Successfully connected to the OpenBikeSensor</string>
+    <string name="obsServiceDisconnectionSuccessful">Disconnected from OpenBikeSensor</string>
 
     <!-- Units -->
     <string name="meter_short">m</string>

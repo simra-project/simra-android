@@ -47,7 +47,7 @@ import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry.INCIDENT_TYPE;
-import de.tuberlin.mcc.simra.app.services.OBSService;
+// import de.tuberlin.mcc.simra.app.services.OBSService;
 import java9.util.function.Function;
 import java9.util.function.Predicate;
 import java9.util.stream.Collectors;
@@ -108,7 +108,7 @@ public class MarkerFunct {
         }
     }
 
-    public void updateOBSMarkers(IncidentLog incidentLog, Context context) {
+    /*public void updateOBSMarkers(IncidentLog incidentLog, Context context) {
         Collection<IncidentLogEntry> incidents = incidentLog.getIncidents().values();
 
         List<IncidentLogEntry> obsIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.isOBS(x.incidentType));
@@ -134,7 +134,7 @@ public class MarkerFunct {
 
         setDistanceMarkers(obsAvg2sIncidents, context.getColor(R.color.distanceMarkerWarning));
         setDistanceMarkers(obsMinKalmanIncidents, context.getColor(R.color.distanceMarkerDanger));
-    }
+    }*/
 
     private <T> List<T> simpleFilter(Collection<T> c, Predicate<? super T> filter) {
         return StreamSupport.stream(c).filter(filter).collect(Collectors.toList());

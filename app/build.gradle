@@ -1,4 +1,7 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'kotlin-android'
+    id 'com.android.application'
+}
 
 def ENV_VARIABLE_PREFIX = "SIMRA_"
 def API_ENDPOINT = "API_ENDPOINT"
@@ -82,4 +85,9 @@ dependencies {
 
     // "Backporting" Java 8 streams for Android < 24
     implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
+
+    // Kotlin
+    implementation 'androidx.core:core-ktx:1.6.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.6.0"
+
 }

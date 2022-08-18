@@ -35,9 +35,6 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_about_simra" />
         <activity
-            android:name=".activities.OpenBikeSensorActivity"
-            android:label="@string/title_activity_bluetooth_connection" />
-        <activity
             android:name=".activities.LicenseActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_library_license" />
@@ -87,6 +84,7 @@
         <activity
             android:name=".activities.SingleRideStatisticsActivity"
             android:configChanges="orientation|screenSize" /> <!-- Services -->
+        <activity android:name="de.tuberlin.mcc.simra.app.activities.OpenBikeSensorActivity" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
