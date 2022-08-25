@@ -13,7 +13,6 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import de.tuberlin.mcc.simra.app.R
-import de.tuberlin.mcc.simra.app.activities.OpenBikeSensorActivity.BLESTATE
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -209,8 +208,13 @@ class OBSService: Service() {
                         if (uuid == TIME_CHARACTERISTIC_UUID) {
                             val byteBuffer: ByteBuffer = ByteBuffer.wrap(value)
                             byteBuffer.order(ByteOrder.LITTLE_ENDIAN)
-                            val timerTickMs = byteBuffer.int
-                            Log.d(TAG, "Time: $uuid:\n$timerTickMs")
+                            val timeMS = byteBuffer.int
+                            Log.d(TAG, "Time: $uuid:\n$timeMS")
+                            val intent = Intent("timeNotification")
+                            intent.putExtra("time", timeMS)
+                            applicationContext.sendBroadcast(intent)
+                        } else {
+
                         }
 
                     }
@@ -264,6 +268,11 @@ class OBSService: Service() {
             return this@OBSService
         }
     }
+
+    enum class BLESTATE {
+        START, STOP, CONNECT, DISCONNECT
+    }
+
 
 
 }

@@ -25,16 +25,16 @@ class OpenBikeSensorActivity : BaseActivity() {
     private val bleScanner by lazy {
         bluetoothAdapter.bluetoothLeScanner
     }
-    private var blestate = BLESTATE.START
+    private var blestate = OBSService.BLESTATE.START
         set(value) {
             field = value
             runOnUiThread {
                 Log.d(TAG, "blestate: $blestate")
                 binding.bluetoothButton.text =
                         when (blestate) {
-                            BLESTATE.START -> getString(R.string.obs_activity_button_start_scan)
-                            BLESTATE.CONNECT -> getString(R.string.obs_activity_button_connect_device)
-                            BLESTATE.DISCONNECT -> getString(R.string.obs_activity_button_disconnect_device)
+                            OBSService.BLESTATE.START -> getString(R.string.obs_activity_button_start_scan)
+                            OBSService.BLESTATE.CONNECT -> getString(R.string.obs_activity_button_connect_device)
+                            OBSService.BLESTATE.DISCONNECT -> getString(R.string.obs_activity_button_disconnect_device)
                             else -> getString(R.string.obs_activity_button_stop_scan)
                         }
             }
@@ -90,9 +90,9 @@ class OpenBikeSensorActivity : BaseActivity() {
             }*/
             Log.d(TAG, "pressed button. blestate: $blestate")
             when (blestate) {
-                BLESTATE.START ->  obsService?.startBleScan()
-                BLESTATE.CONNECT -> obsService?.connectDevice(baseContext)
-                BLESTATE.DISCONNECT -> obsService?.disconnectDevice()
+                OBSService.BLESTATE.START ->  obsService?.startBleScan()
+                OBSService.BLESTATE.CONNECT -> obsService?.connectDevice(baseContext)
+                OBSService.BLESTATE.DISCONNECT -> obsService?.disconnectDevice()
                 else -> obsService?.stopBleScan()
             }
         }
@@ -108,6 +108,7 @@ class OpenBikeSensorActivity : BaseActivity() {
         super.onResume()
         registerReceiver(stateChangedReceiver, IntentFilter("stateChanged"))
         registerReceiver(closePassReceiver, IntentFilter("closePassNotification"))
+        registerReceiver(timeReceiver, IntentFilter("timeNotification"))
         if (!bluetoothAdapter.isEnabled) {
             promptEnableBluetooth()
         }
@@ -342,7 +343,7 @@ class OpenBikeSensorActivity : BaseActivity() {
 
     private val stateChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            val thisBleState: BLESTATE = intent?.extras?.get("BLESTATE") as BLESTATE
+            val thisBleState: OBSService.BLESTATE = intent?.extras?.get("BLESTATE") as OBSService.BLESTATE
             Log.d(TAG, "onReceive thisBleState: $thisBleState")
             blestate = thisBleState
         }
@@ -352,12 +353,15 @@ class OpenBikeSensorActivity : BaseActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val distanceLeftCm = intent?.extras?.getShort("leftSensor")
             val distanceRightCm = intent?.extras?.getShort("rightSensor")
-            Log.d(TAG, "onReceive closePassReceiver: $distanceLeftCm, $distanceRightCm")
+            Log.d(TAG, "onReceive closePassReceiver: $distanceLeftCm cm, $distanceRightCm cm")
         }
     }
 
-    enum class BLESTATE {
-        START, STOP, CONNECT, DISCONNECT
+    private val timeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val timeMS = intent?.extras?.getInt("time")
+            Log.d(TAG, "onReceive timeReceiver: $timeMS ms")
+        }
     }
 
 }

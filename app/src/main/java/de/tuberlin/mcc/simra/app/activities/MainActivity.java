@@ -67,7 +67,8 @@ import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.Profile;
-// import de.tuberlin.mcc.simra.app.services.OBSService;
+import de.tuberlin.mcc.simra.app.services.OBSService;
+import de.tuberlin.mcc.simra.app.services.OBSService.BLESTATE;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
@@ -111,6 +112,8 @@ public class MainActivity extends BaseActivity
         }
     };
     boolean obsEnabled = false;
+    private BLESTATE blestate = BLESTATE.START;
+    private OBSService obsService = null;
     BroadcastReceiver receiver;
     private MapView mMapView;
     private MapController mMapController;
@@ -118,7 +121,7 @@ public class MainActivity extends BaseActivity
     private LocationManager locationManager;
     private Boolean recording = false;
 
-    /*private void showOBSNotConnectedWarning() {
+    private void showOBSNotConnectedWarning() {
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
         alert.setTitle(R.string.not_connected_warnung_title);
         alert.setMessage(R.string.not_connected_warnung_message);
@@ -129,9 +132,9 @@ public class MainActivity extends BaseActivity
             startActivity(new Intent(this, OpenBikeSensorActivity.class));
         });
         alert.show();
-    }*/
+    }
 
-    /*private void showBluetoothNotEnableWarning() {
+    private void showBluetoothNotEnableWarning() {
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
         alert.setTitle(R.string.bluetooth_not_enable_title);
         alert.setMessage(R.string.bluetooth_not_enable_message);
@@ -140,12 +143,12 @@ public class MainActivity extends BaseActivity
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         });
         alert.setNegativeButton(R.string.no, (dialog, whichButton) -> {
-            deactivateOBS();
+            // deactivateOBS();
         });
         alert.show();
-    }*/
+    }
 
-    /*@Override
+    @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ENABLE_BT) {
@@ -157,7 +160,7 @@ public class MainActivity extends BaseActivity
                 deactivateOBS();
             }
         }
-    }*/
+    }
 
     @SuppressLint("MissingPermission")
     @Override
@@ -267,16 +270,16 @@ public class MainActivity extends BaseActivity
         });
 
         binding.appBarMain.buttonStartRecording.setOnClickListener(v -> {
-            /*if (obsEnabled) {
-                OBSService.ConnectionState currentState = OBSService.getConnectionState();
-                if (!currentState.equals(OBSService.ConnectionState.CONNECTED)) {
+            if (obsEnabled) {
+
+                if (blestate != BLESTATE.DISCONNECT) { // if not connected to OBS, try to reconnect
                     boolean reconnect = OBSService.tryConnectPairedDevice(this);
                     if (!reconnect) {
                         showOBSNotConnectedWarning();
                         return;
                     }
                 }
-            }*/
+            }
             startRecording();
         });
 
@@ -324,7 +327,7 @@ public class MainActivity extends BaseActivity
         new CheckVersionTask().execute();
 
 
-        /*// OpenBikeSensor
+        // OpenBikeSensor
         binding.appBarMain.buttonRideSettingsObs.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
 
         obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
@@ -343,10 +346,10 @@ public class MainActivity extends BaseActivity
                 // Bluetooth is enabled
                 startOBSService();
             }
-        }*/
+        }
     }
 
-    /*private void deactivateOBS() {
+    private void deactivateOBS() {
         obsEnabled = false;
         updateOBSButtonStatus(OBSService.ConnectionState.DISCONNECTED);
         SharedPref.Settings.OpenBikeSensor.setEnabled(false, this);
@@ -358,7 +361,7 @@ public class MainActivity extends BaseActivity
             OBSService.startScanning(this);
         }
         registerOBSService();
-    }*/
+    }
 
     public void displayButtonsForMenu() {
         binding.appBarMain.buttonStartRecording.setVisibility(View.VISIBLE);
@@ -368,7 +371,7 @@ public class MainActivity extends BaseActivity
         binding.appBarMain.reportIncidentContainer.setVisibility(View.GONE);
 
         //binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.VISIBLE);
-        // updateOBSButtonStatus(OBSService.getConnectionState());
+        updateOBSButtonStatus(OBSService.getConnectionState());
     }
 
     public void displayButtonsForDrive() {
@@ -381,11 +384,11 @@ public class MainActivity extends BaseActivity
         }
 
         //binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.GONE);
-        // updateOBSButtonStatus(OBSService.getConnectionState());
+        updateOBSButtonStatus(OBSService.getConnectionState());
 
     }
 
-    /*private void registerOBSService() {
+    private void registerOBSService() {
         receiver = OBSService.registerCallbacks(this, new OBSService.OBSServiceCallbacks() {
             public void onConnectionStateChanged(OBSService.ConnectionState newState) {
                 updateOBSButtonStatus(newState);
@@ -398,9 +401,9 @@ public class MainActivity extends BaseActivity
                 }
             }
         });
-    }*/
+    }
 
-    /*@Override
+    @Override
     protected void onDestroy() {
         OBSService.terminateService(this);
         super.onDestroy();
@@ -409,7 +412,7 @@ public class MainActivity extends BaseActivity
     private void unregisterOBSService() {
         OBSService.unRegisterCallbacks(receiver, this);
         receiver = null;
-    }*/
+    }
 
     private void startRecording() {
         if (!PermissionHelper.hasBasePermissions(this)) {
@@ -440,7 +443,7 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    /*private void updateOBSButtonStatus(OBSService.ConnectionState status) {
+    private void updateOBSButtonStatus(OBSService.BLESTATE status) {
         FloatingActionButton obsButton = binding.appBarMain.buttonRideSettingsObs;
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (obsEnabled) {
@@ -476,18 +479,18 @@ public class MainActivity extends BaseActivity
             default:
                 break;
         }
-    }*/
+    }
 
     public void onResume() {
         // UpdateHelper.checkForUpdates(this);
-        /*obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
+        obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
         if (obsEnabled) {
             OBSService.tryConnectPairedDevice(this);
         }
 
         if (receiver == null && obsEnabled) {
             registerOBSService();
-        }*/
+        }
         super.onResume();
 
         // Ensure the button that matches current state is presented.
@@ -529,7 +532,7 @@ public class MainActivity extends BaseActivity
         locationManager.removeUpdates(MainActivity.this);
         mLocationOverlay.onPause();
         mLocationOverlay.disableMyLocation();
-        // unregisterOBSService();
+        unregisterOBSService();
     }
 
     @SuppressLint("MissingPermission")
