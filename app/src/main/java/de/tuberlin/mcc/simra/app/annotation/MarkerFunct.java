@@ -108,7 +108,7 @@ public class MarkerFunct {
         }
     }
 
-    public void updateOBSMarkers(IncidentLog incidentLog, Context context) {
+    /*public void updateOBSMarkers(IncidentLog incidentLog, Context context) {
         Collection<IncidentLogEntry> incidents = incidentLog.getIncidents().values();
 
         List<IncidentLogEntry> obsIncidents = simpleFilter(incidents, x -> INCIDENT_TYPE.isOBS(x.incidentType));
@@ -133,7 +133,7 @@ public class MarkerFunct {
 
         setDistanceMarkers(obsAvg2sIncidents, context.getColor(R.color.distanceMarkerWarning));
         setDistanceMarkers(obsMinKalmanIncidents, context.getColor(R.color.distanceMarkerDanger));
-    }
+    }*/
 
     private <T> List<T> simpleFilter(Collection<T> c, Predicate<? super T> filter) {
         return StreamSupport.stream(c).filter(filter).collect(Collectors.toList());

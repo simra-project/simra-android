@@ -1,5 +1,6 @@
 package de.tuberlin.mcc.simra.app.services;
 
+import android.app.Application;
 import android.app.Notification;
 import android.app.Service;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -19,20 +20,20 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
+import de.tuberlin.mcc.simra.app.activities.OpenBikeSensorActivity;
 import de.tuberlin.mcc.simra.app.services.BLE.BLEDevice;
 import de.tuberlin.mcc.simra.app.services.BLE.BLEScanner;
 import de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
+import de.tuberlin.mcc.simra.app.util.SharedPref;
 
 import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEService;
 
 public class OBSService extends Service {
-    private static final String TAG = "OBSService";
+    private static final String TAG = "OBSService_LOG";
     private static final String sharedPrefsKey = "OBSServiceBLE";
     private static final String sharedPrefsKeyOBSID = "connectedDevice";
     private BLEDevice connectedDevice;
@@ -73,7 +74,7 @@ public class OBSService extends Service {
             return;
 
         this.connectionState = newState;
-        boradcastConnectionStateChanged(newState);
+        broadcastConnectionStateChanged(newState);
         ForegroundServiceNotificationManager.createOrUpdateNotification(
                 this,
                 "SimRa OpenBikeSensor connection",
@@ -160,35 +161,20 @@ public class OBSService extends Service {
 
 
     private BLEServiceManager obsServicesDefinition = new BLEServiceManager(
-            new BLEService(BLEDevice.UUID_SERVICE_HEARTRATE).addCharacteristic(
-                    BLEDevice.UUID_SERVICE_HEARTRATE_CHAR,
-                    val -> broadcastHeartRate(String.valueOf(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)))
-            ),
-
-            new BLEService(BLEDevice.UUID_SERVICE_CLOSEPASS).addCharacteristic(
-                    BLEDevice.UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE,
-                    val -> broadcastClosePassDistance(val.getStringValue(0))
+            new BLEService(BLEDevice.UUID_SERVICE_OBS).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_OBS_CHAR_SENSOR_DISTANCE,
+                    val -> broadcastSensorDistance(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, 0) + ";" + val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 4) + ";" + val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 6))
             ).addCharacteristic(
-                    BLEDevice.UUID_SERVICE_CLOSEPASS_CHAR_EVENT,
-                    val -> broadcastClosePassEvent(val.getStringValue(0))
-            ),
-
-            new BLEService(BLEDevice.UUID_SERVICE_DISTANCE).addCharacteristic(
-                    BLEDevice.UUID_SERVICE_DISTANCE_CHAR_50MS,
-                    val -> broadcastDistanceValue(val.getStringValue(0))
-            ),
-
-            //legacy Service from Radmesser
-            new BLEService(BLEDevice.UUID_SERVICE_CONNECTION).addCharacteristic(
-                    BLEDevice.UUID_SERVICE_CONNECTION_CHAR_CONNECTED,
-                    val -> {
-                        //Log.i(TAG, "new CONNECTION Value:" + val.getStringValue(0));
-                        String strVal = val.getStringValue(0);
-                        if (strVal != null && strVal.equals("1")) {
-                            connectedDevice.devicePaired = true;
-                        }
-                    }
-            )
+                    BLEDevice.UUID_SERVICE_OBS_CHAR_ClOSE_PASS,
+                    val -> broadcastClosePass(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, 0) + ";" + val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 4) + ";" + val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 6))
+            ).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_OBS_CHAR_TIME,
+                    val -> broadcastTime(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32,0))
+            )/*,
+            new BLEService(BLEDevice.UUID_SERVICE_OBS).addCharacteristic(
+                    BLEDevice.UUID_SERVICE_OBS_CHAR_ClOSE_PASS_EVENT,
+                    val -> broadcastClosePassEvent(val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, 0) + ";" + val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 4) + ";" + val.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 6))
+            )*/
     );
 
 
@@ -216,7 +202,7 @@ public class OBSService extends Service {
     private static String lastConnectionRequest;
 
     /*
-     * Request Service to connect to a specific device by providing its Hardware Adress
+     * Request Service to connect to a specific device by providing its Hardware Address
      *
      * returns false if already connecting to this device
      * */
@@ -301,7 +287,7 @@ public class OBSService extends Service {
     // internal processing of Action-Requests
     private void startScanning() {
         bluetoothScanner.findDevicesByServices(obsServicesDefinition,
-                device -> boradcastDeviceFound(device.getName(), device.getAddress())
+                device -> broadcastDeviceFound(device.getName(), device.getAddress())
         );
     }
 
@@ -317,7 +303,7 @@ public class OBSService extends Service {
 
     private void disconnectAndUnpairDevice() {
         disconnectAnyOBS();
-        unPairedOBS();
+        unPairedOBS(this);
     }
 
     private void disconnectAnyOBS() {
@@ -336,11 +322,9 @@ public class OBSService extends Service {
     // Broadcasts
     final static String ACTION_DEVICE_FOUND = "de.tuberlin.mcc.simra.app.obsservice.actiondevicefound";
     final static String ACTION_CONNECTION_STATE_CHANGED = "de.tuberlin.mcc.simra.app.obsservice.actiondconnectionstatechanged";
-    final static String ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedclosepass.distance";
-    final static String ACTION_VALUE_RECEIVED_HEARTRATE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedheartrate";
-    final static String ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedclosepass.event";
-    final static String ACTION_VALUE_RECEIVED_DISTANCE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceiveddistance";
-
+    final static String ACTION_VALUE_RECEIVED_SENSOR_DISTANCE = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedsensordistance";
+    final static String ACTION_VALUE_RECEIVED_CLOSEPASS = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereceivedclosepass";
+    final static String ACTION_VALUE_READ_TIME = "de.tuberlin.mcc.simra.app.obsservice.actiondvaluereadtime";
     final static String EXTRA_DEVICE_ID = "de.tuberlin.mcc.simra.app.obsservice.extraid";
     final static String EXTRA_DEVICE_NAME = "de.tuberlin.mcc.simra.app.obsservice.extraname";
     final static String EXTRA_CONNECTION_STATE = "de.tuberlin.mcc.simra.app.obsservice.extraconnectionstate";
@@ -348,43 +332,40 @@ public class OBSService extends Service {
     final static String EXTRA_VALUE_SERIALIZED = "de.tuberlin.mcc.simra.app.obsservice.extravalueserialized";
 
 
-    private void boradcastDeviceFound(String deviceName, String deviceId) {
+    private void broadcastDeviceFound(String deviceName, String deviceId) {
+        Log.d(TAG, "broadcastDeviceFound: " + deviceName + " " + deviceId);
         Intent intent = new Intent(ACTION_DEVICE_FOUND);
         intent.putExtra(EXTRA_DEVICE_ID, deviceId);
         intent.putExtra(EXTRA_DEVICE_NAME, deviceName);
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void boradcastConnectionStateChanged(ConnectionState newState) {
+    private void broadcastConnectionStateChanged(ConnectionState newState) {
         Intent intent = new Intent(ACTION_CONNECTION_STATE_CHANGED);
         intent.putExtra(EXTRA_CONNECTION_STATE, newState.toString());
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void broadcastClosePassDistance(String value) {
-        Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);
-        intent.putExtra(EXTRA_VALUE, value);
+
+    private void broadcastSensorDistance(String value) {
+        // Log.d(TAG, "broadcastSensorDistance: " + Measurement.fromString(value));
+        Intent intent = new Intent(ACTION_VALUE_RECEIVED_SENSOR_DISTANCE);
         intent.putExtra(EXTRA_VALUE_SERIALIZED, Measurement.fromString(value));
         broadcastManager.sendBroadcast(intent);
     }
 
-    private void broadcastHeartRate(String value) {
-        Intent intent = new Intent(ACTION_VALUE_RECEIVED_HEARTRATE);
-        intent.putExtra(EXTRA_VALUE, value);
-        broadcastManager.sendBroadcast(intent);
-    }
-
-    private void broadcastClosePassEvent(String value) {
-        Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
-        intent.putExtra(EXTRA_VALUE, value);
-        intent.putExtra(EXTRA_VALUE_SERIALIZED, new ClosePassEvent(value));
-        broadcastManager.sendBroadcast(intent);
-    }
-
-    private void broadcastDistanceValue(String value) {
-        Intent intent = new Intent(ACTION_VALUE_RECEIVED_DISTANCE);
-        intent.putExtra(EXTRA_VALUE, value);
+    private void broadcastClosePass(String value) {
+        Log.d(TAG, "broadcastClosePass: " + Measurement.fromString(value));
+        Intent intent = new Intent(ACTION_VALUE_RECEIVED_CLOSEPASS);
+        // intent.putExtra(EXTRA_VALUE, value);
         intent.putExtra(EXTRA_VALUE_SERIALIZED, Measurement.fromString(value));
+        broadcastManager.sendBroadcast(intent);
+    }
+
+    private void broadcastTime(int value) {
+        Log.d(TAG, "broadcastTime: " + value);
+        Intent intent = new Intent(ACTION_VALUE_READ_TIME);
+        intent.putExtra(EXTRA_VALUE, value);
         broadcastManager.sendBroadcast(intent);
     }
 
@@ -395,16 +376,25 @@ public class OBSService extends Service {
         public void onConnectionStateChanged(ConnectionState newState) {
         }
 
-        public void onClosePassIncidentDistance(@Nullable Measurement measurement) {
+        public void onClosePass(@Nullable Measurement measurement) {
         }
 
-        public void onClosePassIncidentEvent(@Nullable ClosePassEvent measurement) {
+        /*public void onClosePassIncidentEvent(@Nullable ClosePassEvent measurement) {
+        }*/
+
+        /*public void onDistanceValue(@Nullable Measurement measurement) {
+        }*/
+
+        public void onSensorDistance(@Nullable Measurement measurement) {
         }
 
-        public void onDistanceValue(@Nullable Measurement measurement) {
-        }
-
-        public void onHeartRate(Short value) {
+        public void onTime(int time, Context context) {
+            Log.d(TAG, "onTime: " + time);
+            long oldStartTime = SharedPref.App.OpenBikeSensor.getObsStartTime(context);
+            if (oldStartTime == 0L) {
+                long newStartTime = System.currentTimeMillis() - time;
+                SharedPref.App.OpenBikeSensor.setObsStartTime(newStartTime, context);
+            }
         }
     }
 
@@ -416,9 +406,11 @@ public class OBSService extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_DEVICE_FOUND);
         filter.addAction(ACTION_CONNECTION_STATE_CHANGED);
-        filter.addAction(ACTION_VALUE_RECEIVED_DISTANCE);
-        filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);
-        filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT);
+        /*filter.addAction(ACTION_VALUE_RECEIVED_DISTANCE);
+        filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE);*/
+        filter.addAction(ACTION_VALUE_RECEIVED_SENSOR_DISTANCE);
+        filter.addAction(ACTION_VALUE_RECEIVED_CLOSEPASS);
+        filter.addAction(ACTION_VALUE_READ_TIME);
 
         BroadcastReceiver rec = new BroadcastReceiver() {
             @Override
@@ -436,32 +428,36 @@ public class OBSService extends Service {
                                 ConnectionState.valueOf(intent.getStringExtra(EXTRA_CONNECTION_STATE))
                         );
                         break;
-                    case ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE:
+                   /* case ACTION_VALUE_RECEIVED_CLOSEPASS_DISTANCE:
                         serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
                         if (serializable instanceof Measurement) {
-                            callbacks.onClosePassIncidentDistance((Measurement) serializable);
+                            callbacks.onClosePassIncident((Measurement) serializable);
                         }
-                        break;
-                    case ACTION_VALUE_RECEIVED_DISTANCE:
+                        break;*/
+                    // case ACTION_VALUE_RECEIVED_DISTANCE:
+                    case ACTION_VALUE_RECEIVED_CLOSEPASS:
                         serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
                         if (serializable instanceof Measurement) {
-                            callbacks.onDistanceValue((Measurement) serializable);
+                            callbacks.onClosePass((Measurement) serializable);
                         }
                         break;
-                    case ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT:
-                        serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
-                        if (serializable instanceof ClosePassEvent) {
-                            callbacks.onClosePassIncidentEvent((ClosePassEvent) serializable);
+                    case ACTION_VALUE_READ_TIME:
+                        callbacks.onTime(intent.getIntExtra(EXTRA_VALUE, -1), ctx);
+
+
+                    case ACTION_VALUE_RECEIVED_SENSOR_DISTANCE:
+                        serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
+                        if (serializable instanceof Measurement) {
+                            callbacks.onSensorDistance((Measurement) serializable);
                         }
-                        break;
-                    case ACTION_VALUE_RECEIVED_HEARTRATE:
-                        callbacks.onHeartRate(
-                                parseShort(intent.getStringExtra(EXTRA_VALUE))
+                        /*String[] characteristicValues = intent.getStringExtra(EXTRA_VALUE).split(";");
+                        callbacks.onSensorDistance(
+                                Integer.parseInt(characteristicValues[0]),parseShort(characteristicValues[1]),parseShort(characteristicValues[2])
                         );
-                        break;
+*/                        break;
                 }
             }
         };
@@ -480,16 +476,16 @@ public class OBSService extends Service {
 
     public static class Measurement implements Serializable {
         public long timestamp;
-        public List<Integer> leftSensorValues;
-        public List<Integer> rightSensorValues;
+        public int leftSensorValue;
+        public int rightSensorValue;
 
         private Measurement(String line) throws MeasurementFormatException {
             try {
                 String[] sections = line.split(";", -1);
 
                 timestamp = Long.parseLong(sections[0]);
-                leftSensorValues = parseValues(sections[1].split(","));
-                rightSensorValues = parseValues(sections[2].split(","));
+                leftSensorValue = Integer.parseInt(sections[1]);
+                rightSensorValue = Integer.parseInt(sections[2]);
             } catch (ArrayIndexOutOfBoundsException | NumberFormatException | NullPointerException nex) {
                 throw new MeasurementFormatException();
             }
@@ -497,19 +493,15 @@ public class OBSService extends Service {
 
         @Override
         public String toString() {
-            return timestamp + " " + leftSensorValues + " " + rightSensorValues;
+            return timestamp + " " + leftSensorValue + " " + rightSensorValue;
+        }
+        public long getTimestamp() {
+            return timestamp;
         }
 
-        private static List<Integer> parseValues(String[] values) {
-            List<Integer> valueList = new ArrayList<>();
-
-            for (String value : values) {
-                if (value.equals("")) continue;
-                valueList.add((int) Float.parseFloat(value));
-            }
-            return valueList;
+        public void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
         }
-
         public static Measurement fromString(String line) {
             try {
                 return new Measurement(line);
@@ -518,11 +510,17 @@ public class OBSService extends Service {
             }
         }
 
+        public String getIncidentDescription(Context context) {
+            String headerLine = context.getString(R.string.obsIncidentDescriptionButtonHeaderLine);
+            String dataLine = context.getString(R.string.obsIncidentDescriptionButtonDataLine, TextUtils.concat("left distance: ", (String.valueOf(leftSensorValue)), "right distance: ", (String.valueOf(rightSensorValue))));
+            return String.format("%s\n%s", headerLine, dataLine);
+        }
+
         private class MeasurementFormatException extends Exception {
         }
     }
 
-    public static class ClosePassEvent implements Serializable {
+    /*public static class ClosePassEvent implements Serializable {
         private static final String EVENT_TYPE_BUTTON = "button";
         private static final String EVENT_TYPE_AVG2S = "avg2s";
         private static final String EVENT_TYPE_MIN_KALMAN = "min_kalman";
@@ -547,12 +545,12 @@ public class OBSService extends Service {
             return timestamp + " " + eventType + " " + TextUtils.join(", ", payload);
         }
 
-        /**
+        *//**
          * Only button events should be treated as a real close pass event. All
          * other events therefore will be assigned an "unknown" incident type
          * (prefixed with 'OBS_') to be hidden from the regular incident view
          * after a ride ends.
-         */
+         *//*
         public int getIncidentType() {
             if (eventType.equals(EVENT_TYPE_BUTTON))
                 return IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS;
@@ -562,12 +560,12 @@ public class OBSService extends Service {
             return IncidentLogEntry.INCIDENT_TYPE.OBS_UNKNOWN;
         }
 
-        /**
+        *//**
          * Creates an incident description that will be viewable by users and should therefore be human-readable.
          * This description always consists of a general description line, the payload data in a readable format and the
          * raw event string that was passed over bluetooth (formatted in square brackets). These sections are always
          * separated by a newline.
-         */
+         *//*
         public String getIncidentDescription(Context context) {
             String headerLine = context.getString(R.string.obsIncidentDescriptionHeaderLine, eventType);
             String dataLine = context.getString(R.string.obsIncidentDescriptionDataLine, TextUtils.join(", ", payload));
@@ -597,25 +595,26 @@ public class OBSService extends Service {
 
             return String.format("%s\n%s\n[%s]", headerLine, dataLine, originalValue);
         }
-    }
+    }*/
 
     public static void unRegisterCallbacks(BroadcastReceiver receiver, Context ctx) {
         if (receiver != null)
             LocalBroadcastManager.getInstance(ctx).unregisterReceiver(receiver);
     }
 
-    // TODO: Use Utils (or refactor) shared Prefs usage
-
-    public void unPairedOBS() {
-        getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().remove(sharedPrefsKeyOBSID).apply();
+    public void unPairedOBS(Context ctx) {
+        SharedPref.App.OpenBikeSensor.deleteObsDeviceName(ctx);
+        // getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().remove(sharedPrefsKeyOBSID).apply();
     }
 
     @Nullable
     private static String getPairedOBSID(Context ctx) {
-        return ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).getString(sharedPrefsKeyOBSID, null);
+        return SharedPref.App.OpenBikeSensor.getObsDeviceName(ctx);
+        // return ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).getString(sharedPrefsKeyOBSID, null);
     }
 
     private static void setPairedOBSID(String id, Context ctx) {
-        ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().putString(sharedPrefsKeyOBSID, id).apply();
+        SharedPref.App.OpenBikeSensor.setObsDeviceName(id,ctx);
+        // ctx.getSharedPreferences(sharedPrefsKey, Context.MODE_PRIVATE).edit().putString(sharedPrefsKeyOBSID, id).apply();
     }
 }

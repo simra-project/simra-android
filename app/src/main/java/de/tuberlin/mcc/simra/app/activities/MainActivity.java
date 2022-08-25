@@ -280,7 +280,7 @@ public class MainActivity extends BaseActivity
             startRecording();
         });
 
-        Consumer<Integer> recordIncident = (incidentType) -> {
+        Consumer<Integer> recordIncident = incidentType -> {
             Toast t = Toast.makeText(MainActivity.this, R.string.recorded_incident, Toast.LENGTH_SHORT);
             t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 230);
             t.show();

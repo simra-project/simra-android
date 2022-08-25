@@ -113,20 +113,24 @@ public class SharedPref {
         context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().putInt(name, value).apply();
     }
 
-    private static String readStringFromAppSharedPrefs(String defaultValue, Context context) {
-        return context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).getString(Settings.DisplayUnit.DISPLAY_UNIT, defaultValue);
+    private static String readStringFromAppSharedPrefs(String name, String defaultValue, Context context) {
+        return context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).getString(name, defaultValue);
     }
 
-    private static void writeStringToAppSharedPrefsAsync(String value, Context context) {
-        context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().putString(Settings.DisplayUnit.DISPLAY_UNIT, value).apply();
+    private static void writeStringToAppSharedPrefsAsync(String name, String value, Context context) {
+        context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().putString(name, value).apply();
     }
 
-    private static long readLongFromAppSharedPrefs(Context context) {
-        return context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).getLong(Settings.Ride.PrivacyDuration.PRIVACY_DURATION, 30);
+    private static void deleteStringFromAppSharedPrefs(String name, Context context) {
+        context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().remove(name).apply();
     }
 
-    private static void writeLongToAppSharedPrefsAsync(long value, Context context) {
-        context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().putLong(Settings.Ride.PrivacyDuration.PRIVACY_DURATION, value).apply();
+    private static long readLongFromAppSharedPrefs(String name, long defaultValue, Context context) {
+        return context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).getLong(name, defaultValue);
+    }
+
+    private static void writeLongToAppSharedPrefsAsync(String name, long value, Context context) {
+        context.getApplicationContext().getSharedPreferences(SharedPref.SHARED_PREF_NAME, SharedPref.DEFAULT_MODE).edit().putLong(name, value).apply();
     }
 
     public static void createEntry(String sharedPrefName, String line, Context context) {
@@ -186,12 +190,34 @@ public class SharedPref {
         // RIDE-KEY
         public static class RideKey {
             private static final String RIDE_KEY = "RIDE-KEY";
-            public static void setRideKey(int lastSeenNewsID, Context context) {
-                writeIntegerToAppSharedPrefsAsync(RIDE_KEY,lastSeenNewsID,context);
+            public static void setRideKey(int rideKey, Context context) {
+                writeIntegerToAppSharedPrefsAsync(RIDE_KEY,rideKey,context);
             }
             public static int getRideKey(Context context) {
                 return readIntegerFromAppSharedPrefs(RIDE_KEY,0,context);
             }
+        }
+
+        // OBS
+        public static class OpenBikeSensor {
+            private static final String OBS_START_TIME = "OBS-StartTime";
+            private static final String OBS_DEVICE_NAME = "OBS-DeviceName";
+            public static void setObsStartTime(long obsStartTime, Context context) {
+                writeLongToAppSharedPrefsAsync(OBS_START_TIME, obsStartTime, context);
+            }
+            public static long getObsStartTime(Context context) {
+                return readLongFromAppSharedPrefs(OBS_START_TIME, 0L, context);
+            }
+            public static void setObsDeviceName(String obsDeviceName, Context context) {
+                writeStringToAppSharedPrefsAsync(OBS_DEVICE_NAME, obsDeviceName, context);
+            }
+            public static String getObsDeviceName(Context context) {
+                return readStringFromAppSharedPrefs(OBS_DEVICE_NAME, null, context);
+            }
+            public static void deleteObsDeviceName(Context context) {
+                deleteStringFromAppSharedPrefs(OBS_DEVICE_NAME, context);
+            }
+
         }
 
         /**
@@ -199,7 +225,7 @@ public class SharedPref {
          */
         public static class Crash {
             /**
-             * Whether the use gave his permission to send Crash Reports
+             * Whether the user gave his permission to send Crash Reports
              */
             public static class SendCrashReportAllowed {
                 private static final String SEND_CRASH_ALLOWED = "SEND-CRASH";
@@ -228,11 +254,11 @@ public class SharedPref {
                 }
 
                 public static String getStatus(Context context) {
-                    return readStringFromAppSharedPrefs(UNKNOWN, context);
+                    return readStringFromAppSharedPrefs(SEND_CRASH_ALLOWED, UNKNOWN, context);
                 }
 
                 public static void setStatus(String enabled, Context context) {
-                    writeStringToAppSharedPrefsAsync(enabled, context);
+                    writeStringToAppSharedPrefsAsync(SEND_CRASH_ALLOWED, enabled, context);
                 }
             }
 
@@ -315,11 +341,11 @@ public class SharedPref {
             public static final String DISPLAY_UNIT = SETTINGS + "Unit";
 
             public static void setDisplayUnit(UnitHelper.DISTANCE unit, Context context) {
-                writeStringToAppSharedPrefsAsync(unit.getName(), context);
+                writeStringToAppSharedPrefsAsync(DISPLAY_UNIT,unit.getName(), context);
             }
 
             public static UnitHelper.DISTANCE getDisplayUnit(Context context) {
-                return UnitHelper.DISTANCE.parseFromString(readStringFromAppSharedPrefs(UnitHelper.DISTANCE.METRIC.getName(), context));
+                return UnitHelper.DISTANCE.parseFromString(readStringFromAppSharedPrefs(DISPLAY_UNIT,UnitHelper.DISTANCE.METRIC.getName(), context));
             }
 
             public static boolean isImperial(Context context) {
@@ -432,11 +458,11 @@ public class SharedPref {
                 private static final int MIN_DURATION = 0;
 
                 public static long getDuration(Context context) {
-                    return readLongFromAppSharedPrefs(context);
+                    return readLongFromAppSharedPrefs(PRIVACY_DURATION, 30, context);
                 }
 
                 public static void setDuration(long duration, Context context) {
-                    writeLongToAppSharedPrefsAsync(duration, context);
+                    writeLongToAppSharedPrefsAsync(PRIVACY_DURATION, duration, context);
                 }
 
                 public static long getMaxDuration() {

@@ -59,6 +59,7 @@ public class StartActivity extends BaseActivity {
         // Just some Logs
         Log.d(TAG, "getFilesDir(): " + Arrays.toString(new File(getFilesDir(), "../shared_prefs").listFiles()));
         Log.d(TAG, "onCreate() started");
+        resetOBSStartTime();
         showKeyPrefs(this);
         showDataDirectory(this);
         showMetadata(this);
@@ -74,6 +75,10 @@ public class StartActivity extends BaseActivity {
         next.setOnClickListener(v -> {
             navigateIfAllPermissionsGranted();
         });
+    }
+
+    private void resetOBSStartTime() {
+        SharedPref.App.OpenBikeSensor.setObsStartTime(0L, StartActivity.this);
     }
 
     public boolean allPermissionGranted() {

@@ -20,7 +20,7 @@ import java.util.UUID;
 
 
 public class BLEScanner {
-    private final String TAG = "BLEScanner";
+    private final String TAG = "BLEScanner_LOG";
     private BluetoothLeScanner bluetoothLeScanner;
     private Map<String, BluetoothDevice> foundDevices;
     private ScanCallback currentScan;
@@ -71,6 +71,7 @@ public class BLEScanner {
     public void findDeviceById(String obsID, DeviceFoundCallback deviceFoundCallback) {
         List<ScanFilter> filterList = new ArrayList<>();
         ScanFilter.Builder builder = new ScanFilter.Builder();
+        Log.d(TAG, "findDeviceById obsID: " + obsID);
         builder.setDeviceAddress(obsID);
         filterList.add(builder.build());
 
@@ -103,6 +104,7 @@ public class BLEScanner {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
                 String deviceID = result.getDevice().getAddress();
+                Log.d(TAG, "onScanResult deviceID: " + deviceID);
                 if (!foundDevices.containsKey(deviceID)) {
                     foundDevices.put(deviceID, result.getDevice());
                     deviceFoundCallback.onDeviceFound(result.getDevice());
@@ -121,7 +123,7 @@ public class BLEScanner {
             return false;
         }
 
-        // stop scanning after duration, if not already stoped
+        // stop scanning after duration, if not already stopped
         Handler stopScanHandler = new Handler(Looper.myLooper());
         stopScanHandler.postDelayed(() -> {
             if (finishScan()) {

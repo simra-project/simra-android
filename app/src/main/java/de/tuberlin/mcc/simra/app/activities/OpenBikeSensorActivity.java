@@ -2,7 +2,6 @@ package de.tuberlin.mcc.simra.app.activities;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,7 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashSet;
@@ -23,12 +22,12 @@ import java.util.Set;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityOpenbikesensorBinding;
 import de.tuberlin.mcc.simra.app.services.OBSService;
-import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import pl.droidsonroids.gif.GifImageView;
 
 
 public class OpenBikeSensorActivity extends AppCompatActivity {
+    private static final String TAG = "OpenBikeSensorActivity_LOG";
     BroadcastReceiver receiver;
     Set<BluetoothDevice> foundDevices;
     BluetoothDevice selectedDevice;
@@ -44,7 +43,7 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
 
         foundDevices = new HashSet<>();
         initializeToolBar();
-        Log.i("start", "OpenBikeSensorActivity");
+        Log.i(TAG, "OpenBikeSensorActivity");
         binding.retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -168,18 +167,47 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
 
             @Override
             public void onConnectionStateChanged(OBSService.ConnectionState newState) {
+                Log.d(TAG, "onConnectionStateChanged: " + newState.toString());
                 updateUI(newState);
             }
 
             @Override
+            public void onClosePass(@Nullable OBSService.Measurement measurement) {
+                if (measurement != null) {
+                    Log.d(TAG, "onClosePass: " + measurement);
+                } else {
+                    Log.e(TAG, "onClosePass measurement failed");
+                }
+            }
+
+            @Override
+            public void onSensorDistance(@Nullable OBSService.Measurement measurement) {
+                if (measurement != null) {
+                    // Log.d(TAG, "onSensorDistance: " + measurement);
+                    binding.deviceInfoTextView.setText(getString(R.string.obs_activity_text_last_distance) + " " + measurement.leftSensorValue + " cm");
+                    setClosePassBarColor(measurement.leftSensorValue);
+                } else {
+                    Log.e(TAG, "onSensorDistance measurement failed");
+                }
+            }
+
+            /*@Override
+            public void onSensorDistance(int time, Short leftDistance, Short rightDistance) {
+                Log.d(TAG, "onSensorDistance time: " + time + " leftDistance: " + leftDistance + " rightDistance: " + rightDistance);
+                binding.deviceInfoTextView.setText(getString(R.string.obs_activity_text_last_distance) + " " + leftDistance + " cm");
+                setClosePassBarColor(leftDistance);
+            }
+
+            @Override
             public void onDistanceValue(OBSService.Measurement value) {
+                Log.d(TAG, "onDistanceValue: " + value);
                 int distance = -1;
-                if (value != null && value.leftSensorValues.size() > 0) {
-                    distance = value.leftSensorValues.get(0);
+                if (value != null && value.leftSensorValue > 0) {
+                    distance = value.leftSensorValue;
                     binding.deviceInfoTextView.setText(getString(R.string.obs_activity_text_last_distance) + " " + distance + " cm");
                     setClosePassBarColor(distance);
                 }
-            }
+            }*/
         });
 
     }
@@ -199,9 +227,7 @@ public class OpenBikeSensorActivity extends AppCompatActivity {
         binding.toolbar.backButton.setOnClickListener(v -> finish());
     }
 
-    private void connectToDevice(String deviceId) {
-        OBSService.connectDevice(this, deviceId);
-    }
+
 
     private void showTutorialDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
