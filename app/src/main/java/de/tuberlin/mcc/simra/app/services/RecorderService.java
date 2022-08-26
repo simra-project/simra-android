@@ -99,12 +99,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             if (intent.getAction().equals(ACTION_VALUE_RECEIVED_CLOSEPASS)) {
                 Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
                 if (serializable instanceof OBSService.Measurement) {
-                    long measurementTime = ((OBSService.Measurement) serializable).getTimestamp();
-                    long startTime = SharedPref.App.OpenBikeSensor.getObsStartTime(context);
-                    long incidentTime = startTime + measurementTime;
-                    ((OBSService.Measurement) serializable).setTimestamp(incidentTime);
-                    obsMeasurements.add((OBSService.Measurement) serializable);
-                    Log.d(TAG, "Added incident at " + ((OBSService.Measurement) serializable).getTimestamp());
+                    OBSService.Measurement measurement = (OBSService.Measurement) serializable;
+                    if ((measurement.leftSensorValue >= 150 && measurement.leftSensorValue <= 1500) || ((measurement.rightSensorValue >= 150 && measurement.rightSensorValue <= 1500))) {
+                        long measurementTime = measurement.getTimestamp();
+                        long startTime = SharedPref.App.OpenBikeSensor.getObsStartTime(context);
+                        long incidentTime = startTime + measurementTime;
+                        measurement.setTimestamp(incidentTime);
+                        obsMeasurements.add(measurement);
+                    }
                 }
             }
         }
@@ -328,11 +330,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         if (recordingAllowed && lineAdded) {
             recordingHandler.removeCallbacksAndMessages(null);
             int region = lookUpIntSharedPrefs("Region", 0, "Profile", this);
+            addOBSIncidents(obsMeasurements, incidentLog, gpsLines, this);
             accGpsString = mergeGPSandSensorLines(gpsLines,sensorLines);
             overwriteFile((IOUtils.Files.getFileInfoLine() + DataLog.DATA_LOG_HEADER + System.lineSeparator() + accGpsString), IOUtils.Files.getGPSLogFile(key, false, this));
             MetaData.updateOrAddMetaDataEntryForRide(new MetaDataEntry(key, startTime, endTime, MetaData.STATE.JUST_RECORDED, 0, waitedTime, Math.round(route.getDistance()), 0, region), this);
-            addOBSIncidents(incidentLog, gpsLines, this);
-            Log.d(TAG, "number of incidents after addOBSIncidents: " + incidentLog.getIncidents().size());
             IncidentLog.saveIncidentLog(incidentLog, this);
             editor.putInt("RIDE-KEY", key + 1);
             editor.apply();
@@ -361,28 +362,27 @@ public class RecorderService extends Service implements SensorEventListener, Loc
      * Adds all incidents from obsMeasurements to incidentLog.
      * Matches the obsMeasurements to gpsLines first by taking the last gpsLine, whose timestamp
      * is smaller than the measurements' timestamp.
+     * @param obsMeasurements
      * @param incidentLog
      * @param gpsLines
      * @param context
      */
-    private void addOBSIncidents(IncidentLog incidentLog, Queue<DataLogEntry> gpsLines, Context context) {
+    private void addOBSIncidents(LinkedList<OBSService.Measurement> obsMeasurements, IncidentLog incidentLog, Queue<DataLogEntry> gpsLines, Context context) {
         int gpsLinesIndex = 0;
         DataLogEntry[] dataLogEntries = gpsLines.toArray(new DataLogEntry[0]);
-        for (int i = 0; i < obsMeasurements.size(); i++) {
-            OBSService.Measurement measurement = obsMeasurements.get(i);
+        for (int i = 0; i < this.obsMeasurements.size(); i++) {
+            OBSService.Measurement measurement = this.obsMeasurements.get(i);
             for (int j = gpsLinesIndex; j < gpsLines.size(); j++) {
                 DataLogEntry thisDataLogEntry = dataLogEntries[j];
-                long thisDataLongEntryTS = thisDataLogEntry.timestamp;
+                long thisDataLogEntryTS = thisDataLogEntry.timestamp;
                 long thisMeasurementTS = measurement.getTimestamp();
-                long thisDelta = thisDataLongEntryTS - thisMeasurementTS;
-                if (thisDelta >= 0 && j > 0 && i > 0) {
+                long thisDelta = thisDataLogEntryTS - thisMeasurementTS;
+                if (thisDelta >= 0 && j > 0) {
                     DataLogEntry lastDataLogEntry = dataLogEntries[j-1];
-                    long lastDataLongEntryTS = lastDataLogEntry.timestamp;
-                    double lastDataLongEntryLat = lastDataLogEntry.latitude;
-                    double lastDataLongEntryLon = lastDataLogEntry.longitude;
-                    OBSService.Measurement lastMeasurement = obsMeasurements.get(i-1);
-                    incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS).withBaseInformation(lastDataLongEntryTS,lastDataLongEntryLat,lastDataLongEntryLon).withDescription(lastMeasurement.getIncidentDescription(context)).build());
-                    Log.d(TAG, "added incident with timeStamp: " + lastDataLongEntryTS);
+                    long lastDataLogEntryTS = lastDataLogEntry.timestamp;
+                    double lastDataLogEntryLat = lastDataLogEntry.latitude;
+                    double lastDataLogEntryLon = lastDataLogEntry.longitude;
+                    incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS).withBaseInformation(lastDataLogEntryTS,lastDataLogEntryLat,lastDataLogEntryLon).withDescription(measurement.getIncidentDescription(context)).build());
                     if (j+1 >= gpsLines.size()) {
                         return;
                     } else {

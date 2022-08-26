@@ -10,30 +10,19 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
-
-import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEService;
-import static de.tuberlin.mcc.simra.app.services.BLE.BLEServiceManager.BLEServiceCharacteristic;
 
 public class BLEDevice {
     /**
      * Bluetooth Service UUIDs
      */
-    /*public static final String UUID_SERVICE_OBS = "1FE7FAF9-CE63-4236-0004-000000000000";
-    public static final String UUID_SERVICE_OBS_CHAR_SENSOR_DISTANCE = "1FE7FAF9-CE63-4236-0004-000000000002";*/
-    /*public static final String UUID_SERVICE_CLOSEPASS = "1FE7FAF9-CE63-4236-0003-000000000000";
-    public static final String UUID_SERVICE_CLOSEPASS_CHAR_DISTANCE = "1FE7FAF9-CE63-4236-0003-000000000001";
-    public static final String UUID_SERVICE_CLOSEPASS_CHAR_EVENT = "1FE7FAF9-CE63-4236-0003-000000000002";*/
-    /*public static final String UUID_SERVICE_DISTANCE = "1FE7FAF9-CE63-4236-0001-000000000000";
-    public static final String UUID_SERVICE_DISTANCE_CHAR_50MS = "1FE7FAF9-CE63-4236-0001-000000000001";*/
     public static final String UUID_SERVICE_OBS = "1FE7FAF9-CE63-4236-0004-000000000000";
     public static final String UUID_SERVICE_OBS_CHAR_SENSOR_DISTANCE = "1FE7FAF9-CE63-4236-0004-000000000002";
     public static final String UUID_SERVICE_OBS_CHAR_ClOSE_PASS = "1FE7FAF9-CE63-4236-0004-000000000003";
     public static final String UUID_SERVICE_OBS_CHAR_TIME = "1FE7FAF9-CE63-4236-0004-000000000001";
 
-    public static final String UUID_CCCD = "00002902-0000-1000-8000-00805f9b34fb";
+    public static final String UUID_CCC_DESCRIPTOR = "00002902-0000-1000-8000-00805f9b34fb";
 
     private final String TAG = "OpenBikeSensorDevice_LOG";
     public boolean devicePaired = true; // needed from the outside
@@ -62,7 +51,7 @@ public class BLEDevice {
                 Log.i(TAG, "onConnectionStateChange: " + gatt.getServices().size());
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     setConnectionState(ConnectionStatus.GATT_CONNECTED);
-                    gatt.discoverServices();
+                    gatt.discoverServices(); // callback -> BLEDevice.onServicesDiscovered
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     // try to reconnect, ony update status (stop connection in Service, if not Paired)
                     setConnectionState(ConnectionStatus.GATT_DISCONNECTED);
@@ -74,67 +63,21 @@ public class BLEDevice {
                 // ignore others
             }
 
+            /**
+             * Reads OBS time to determine obsStartTime. callback -> onCharacteristicRead
+             */
             @Override
             public void onServicesDiscovered(BluetoothGatt gatt, int status) {
                 Log.i(TAG, "onServicesDiscovered: " + gatt.getServices().size());
                 super.onServicesDiscovered(gatt, status);
                 BluetoothGattCharacteristic obsTimeCharacteristic = gatt.getService(UUID.fromString(UUID_SERVICE_OBS)).getCharacteristic(UUID.fromString(UUID_SERVICE_OBS_CHAR_TIME));
                 gatt.readCharacteristic(obsTimeCharacteristic);
-                BluetoothGattCharacteristic gattCharacteristic = gatt.getService(UUID.fromString(UUID_SERVICE_OBS)).getCharacteristic(UUID.fromString(UUID_SERVICE_OBS_CHAR_SENSOR_DISTANCE));
-                enableNotification(gatt,gattCharacteristic);
-
-                /*logCharacteristics(gatt);
-                for (BluetoothGattService foundService : gatt.getServices()) {
-                    BLEService service = servicesDefinitions.getServiceByUUID(foundService.getUuid());
-                    if (service == null) continue;
-                    Log.i(TAG, "subscribing to Service:" + foundService.getUuid().toString());
-
-                    if (service.registered) continue;
-
-                    // found new Service on device, which is to be registered
-                    int nRegisteredCharacteristics = 0;
-                    for (BLEServiceCharacteristic characteristic : service.characteristics) {
-                        BluetoothGattCharacteristic gattCharacteristic = gatt
-                                .getService(service.uuid)
-                                .getCharacteristic(characteristic.uuid);
-                        if (gattCharacteristic == null) {
-                            Log.e(TAG, "Error connecting to Characteristic: " + characteristic.uuid);
-                            continue;
-                        }
-
-                        // subscribe for notifications, if characteristic type is notify
-                        if (gattCharacteristic.getProperties() == BluetoothGattCharacteristic.PROPERTY_NOTIFY) {
-                            Log.d(TAG, "Characteristic " + gattCharacteristic.getUuid() + " is notifiable");
-                            if(enableNotification(gatt,gattCharacteristic)) {
-                                nRegisteredCharacteristics++;
-                            }
-                            byte[] payload = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE;
-                            BluetoothGattDescriptor cccDescriptor = gattCharacteristic.getDescriptor(UUID.fromString(UUID_CCCD));
-                            if (payload != null && cccDescriptor != null) {
-                                Log.d(TAG, "subscribing to characteristic " + gattCharacteristic.getUuid() + " with payload: " + Arrays.toString(payload));
-                                cccDescriptor.setValue(payload);
-                                gatt.writeDescriptor(cccDescriptor);
-                                gatt.setCharacteristicNotification(gattCharacteristic, true);
-                                nRegisteredCharacteristics++;
-                            }
-                        }
-
-                        *//*BluetoothGattDescriptor desc = new BluetoothGattDescriptor(UUID.randomUUID(), BluetoothGattDescriptor.PERMISSION_READ); // create generic descriptor
-                        desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                        gatt.writeDescriptor(desc);
-
-                        gatt.setCharacteristicNotification(gattCharacteristic, true);
-                        gatt.readCharacteristic(gattCharacteristic);
-                        nRegisteredCharacteristics++;*//*
-
-                    }
-
-                    service.registered = (nRegisteredCharacteristics == service.characteristics.size());
-                }*/
             }
 
-            /** TODO: QUEUE SYSTEM FOR SUBSCRIBING TO MULTIPLE CHARACTERISTICS
-             *
+            /**
+             * Gets called when sensor distance notifications are successfully subscribed to.
+             * This is done in onCharacteristicRead(), after the OBS start time is read.
+             * Sends a request to the OBS to subscribe to close pass notifications.
              */
             @Override
             public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
@@ -146,17 +89,22 @@ public class BLEDevice {
                 }
                 Log.d(TAG, thisCharacteristicsUUID.toString().toUpperCase() + ".equals(" + UUID_SERVICE_OBS_CHAR_SENSOR_DISTANCE.toUpperCase() +") = " + (thisCharacteristicsUUID.toString().equals(UUID_SERVICE_OBS_CHAR_SENSOR_DISTANCE)));
                 if (thisCharacteristicsUUID.equals(UUID.fromString(UUID_SERVICE_OBS_CHAR_SENSOR_DISTANCE))) {
-                    BluetoothGattCharacteristic gattCharacteristic = gatt.getService(UUID.fromString(UUID_SERVICE_OBS)).getCharacteristic(UUID.fromString(UUID_SERVICE_OBS_CHAR_ClOSE_PASS));
-                    enableNotification(gatt,gattCharacteristic);
+                    BluetoothGattCharacteristic closePassCharacteristic = gatt.getService(UUID.fromString(UUID_SERVICE_OBS)).getCharacteristic(UUID.fromString(UUID_SERVICE_OBS_CHAR_ClOSE_PASS));
+                    enableNotification(gatt,closePassCharacteristic);
                 }
 
 
             }
 
+            /**
+             * Gets called when obs time is successfully read.
+             * This is done in onServicesDiscovered().
+             * Sends a request to the OBS to subscribe to sensor distance notifications.
+             */
             @Override
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                BluetoothGattCharacteristic gattCharacteristic = gatt.getService(UUID.fromString(UUID_SERVICE_OBS)).getCharacteristic(UUID.fromString(UUID_SERVICE_OBS_CHAR_SENSOR_DISTANCE));
-                enableNotification(gatt,gattCharacteristic);
+                BluetoothGattCharacteristic sensorDistanceCharacteristic = gatt.getService(UUID.fromString(UUID_SERVICE_OBS)).getCharacteristic(UUID.fromString(UUID_SERVICE_OBS_CHAR_SENSOR_DISTANCE));
+                enableNotification(gatt,sensorDistanceCharacteristic);
                 servicesDefinitions.getServiceByCharacteristicUUID(characteristic.getUuid()).onValue(characteristic);
             }
 
@@ -169,9 +117,8 @@ public class BLEDevice {
 
     private void enableNotification(BluetoothGatt gatt, BluetoothGattCharacteristic gattCharacteristic) {
         byte[] payload = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE;
-        BluetoothGattDescriptor cccDescriptor = gattCharacteristic.getDescriptor(UUID.fromString(UUID_CCCD));
+        BluetoothGattDescriptor cccDescriptor = gattCharacteristic.getDescriptor(UUID.fromString(UUID_CCC_DESCRIPTOR));
         if (payload != null && cccDescriptor != null) {
-            Log.d(TAG, "subscribing to characteristic " + gattCharacteristic.getUuid() + " with payload: " + Arrays.toString(payload));
             cccDescriptor.setValue(payload);
             gatt.writeDescriptor(cccDescriptor);
             gatt.setCharacteristicNotification(gattCharacteristic, true);
@@ -212,15 +159,5 @@ public class BLEDevice {
 
     public interface ConnectionStateCallbacks {
         void onConnectionStateChange(ConnectionStatus newState, BLEDevice instnace);
-    }
-    private void logCharacteristics(BluetoothGatt gatt) {
-        for (BluetoothGattService service : gatt.getServices()) {
-            StringBuilder b = new StringBuilder("Found LE-Service: ").append(service.getUuid());
-            for(BluetoothGattCharacteristic characteristic: service.getCharacteristics()){
-                b.append( "\t #").append(characteristic.getUuid());
-            }
-            Log.i(TAG,  b.toString());
-        }
-
     }
 }

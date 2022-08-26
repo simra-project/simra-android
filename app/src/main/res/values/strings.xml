@@ -228,8 +228,9 @@
     <string name="obsHandlebarWidthText">Weite des Lenkers von der Außenseite zum Rahmen</string>
     <string name="obsIncidentDescriptionHeaderLine">Dieses Ereignis wurde durch das OpenBikeSensor-Event %1$s ausgelöst.</string>
     <string name="obsIncidentDescriptionDataLine">Weitere Daten: %1$s</string>
-    <string name="obsIncidentDescriptionButtonHeaderLine">Dieses Ereignis wurde durch einen physischen Button am OpenBikeSensor ausgelöst.</string>
-    <string name="obsIncidentDescriptionButtonDataLine">Distanz während der dichten Überholung: %1$s cm</string>
+    <string name="obsIncidentDescriptionButtonHeaderLine">OpenBikeSensor</string>
+    <string name="left">Links: </string>
+    <string name="right">Rechts: </string>
     <string name="obsIncidentDescriptionAvg2sHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da die durchschnittliche Distanz während einer dichten Überholung unter dem Grenzwert lag.</string>
     <string name="obsIncidentDescriptionAvg2sDataLine">Durchschnittliche Distanz: %1$s cm, kleinste Distanz: %2$s cm</string>
     <string name="obsIncidentDescriptionMinKalmanHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da es die kleinste Distanz während einer dichten Überholung erkannt hat.</string>
