@@ -181,8 +181,10 @@ public class IncidentLog {
         return numberOfIncidentsNotCountingRideSettingsIncident;
     }
     public IncidentLogEntry updateOrAddIncident(IncidentLogEntry incidentLogEntry) {
-        if (incidentLogEntry.key == null) {
+        if (incidentLogEntry.key == null) { // for manually added incidents
             incidentLogEntry.key = (1000 + incidents.size());
+        } else if (incidentLogEntry.key == 2000) { // for OBS incidents
+            incidentLogEntry.key = (2000 + incidents.size());
         }
         incidents.put(incidentLogEntry.key, incidentLogEntry);
         return incidentLogEntry;

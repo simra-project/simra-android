@@ -104,11 +104,6 @@
             android:name=".services.DebugUploadService"
             android:enabled="true"
             android:parentActivityName=".SettingsActivity" /> <!-- MetaData -->
-        <service
-            android:name=".services.OBSService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="connectedDevice" />
     </application>
     <uses-feature android:name="android.hardware.location.gps" />
 

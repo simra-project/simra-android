@@ -223,22 +223,25 @@
     <string name="availableDevices">Available Devices</string>
     <string name="obsAdvancedSettings">Advanced Settings</string>
     <string name="obsHandlebarWidthText">Distance of the outer point of the Handlebar to the frame</string>
-    <string name="not_connected_warnung_title">Warning : OpenBikeSensor is not connected</string>
-    <string name="not_connected_warnung_message">Do you still want to record the ride ?</string>
-    <string name="cancel_button">No, connect with the OpenBikeSensor</string>
-    <string name="bluetooth_not_enable_title">Warning: Bluetooth is off</string>
-    <string name="bluetooth_not_enable_message">Do you want to enable Bluetooth ? Otherwise the OpenBikeSensor feature cannot be activated</string>
-    <string name="obsIncidentDescriptionHeaderLine">This incident was triggered from the OpenBikeSensor event %1$s.</string>
-    <string name="obsIncidentDescriptionDataLine">Additional data: %1$s</string>
-    <string name="obsIncidentDescriptionButtonHeaderLine">This incident was triggered using a physical button on a OpenBikeSensor.</string>
-    <string name="obsIncidentDescriptionButtonDataLine">Distance during close pass: %1$s cm</string>
-    <string name="obsIncidentDescriptionAvg2sHeaderLine">This incident was automatically triggered from the OpenBikeSensor because the average distance during the close pass was below the threshold.</string>
-    <string name="obsIncidentDescriptionAvg2sDataLine">Average distance: %1$s cm, mininum distance: %2$s cm</string>
-    <string name="obsIncidentDescriptionMinKalmanHeaderLine">This incident was automatically triggered from the OpenBikeSensor because it detected the smallest distance during a close pass.</string>
-    <string name="obsIncidentDescriptionMinKalmanDataLine">Minimum distance: %1$s cm</string>
+    <string name="not_connected_warning_title">Warning: OpenBikeSensor is not connected!</string>
+    <string name="not_connected_recording_warning_message">Do you still want to record the ride?</string>
+    <string name="no_open_settings">No, open settings.</string>
+    <string name="could_not_connect_warning_title">Warning: Connecting to OpenBikeSensor failed!</string>
+    <string name="could_not_connect_warning_message">Do you want to open the settings?</string>
+    <string name="open_settings">Open settings.</string>
+    <string name="disable_obs">Disconnect from OBS.</string>
+    <string name="bluetooth_not_enable_title">Warning: Bluetooth is off!</string>
+    <string name="bluetooth_not_enable_message">Do you want to enable Bluetooth? Otherwise the OpenBikeSensor feature cannot be activated</string>
+    <string name="obsIncidentDescriptionButtonHeaderLine">OpenBikeSensor</string>
+    <string name="left">Left: </string>
+    <string name="right">Right: </string>
     <string name="obsServiceConnectionFailed">Encountered error ERRORCODE while trying to connect to DEVICEADDRESS. Please try again.</string>
     <string name="obsServiceConnectionSuccessful">Successfully connected to the OpenBikeSensor</string>
     <string name="obsServiceDisconnectionSuccessful">Disconnected from OpenBikeSensor</string>
+    <string name="obs_activity_text_start">Not connected to OBS</string>
+    <string name="obs_activity_text_stop">Searching for OBS</string>
+    <string name="obs_activity_text_connect">Found: %1$s</string>
+    <string name="obs_activity_text_disconnect">Connected to: %1$s</string>
 
     <!-- Units -->
     <string name="meter_short">m</string>
@@ -372,7 +375,7 @@
     <string name="activity_obs_title_device_info">Device-Info</string>
     <string name="obs_activity_button_connect_device">Connected to device</string>
     <string name="obs_activity_button_disconnect_device">Disconnect device</string>
-    <string name="obs_activity_text_last_distance">Last distance:</string>
+    <string name="obs_activity_text_last_distance">Last distance: %1$d cm</string>
     <string name="obsConnected">OpenBikeSensor connected</string>
     <string name="connecting">Connecting</string>
     <string name="obsSearching">Searching OpenBikeSensor</string>

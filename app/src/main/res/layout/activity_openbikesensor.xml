@@ -18,27 +18,21 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
 
+        <TextView
+            android:id="@+id/statusText"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/obs_activity_text_start"
+            android:textAlignment="center"/>
+
         <Button
             android:id="@+id/bluetoothButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:text="@string/obs_activity_button_start_scan" />
 
-        <LinearLayout
-            android:id="@+id/pairingLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/pairingText"
-                style="@style/TextAppearance.AppCompat.Large"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Pairing" />
-
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/deviceLayout"
@@ -46,12 +40,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="visible">
-
-            <TextView
-                style="@style/TextAppearance.AppCompat.Large"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/obs_activity_button_connect_device" />
 
             <TextView
                 android:id="@+id/deviceInfoTextView"

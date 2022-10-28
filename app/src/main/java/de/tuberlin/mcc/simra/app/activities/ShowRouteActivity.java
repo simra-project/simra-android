@@ -1,5 +1,6 @@
 package de.tuberlin.mcc.simra.app.activities;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -202,6 +203,7 @@ public class ShowRouteActivity extends BaseActivity {
         pLoc = SharedPref.Settings.Ride.PhoneLocation.getPhoneLocation(this);
 
         binding.routePrivacySlider.addOnSliderTouchListener(new RangeSlider.OnSliderTouchListener() {
+            @SuppressLint("RestrictedApi")
             @Override
             public void onStartTrackingTouch(@NonNull RangeSlider slider) {
                 // Remove Icons for better visibility of the track
@@ -209,6 +211,7 @@ public class ShowRouteActivity extends BaseActivity {
                 mMapView.getOverlays().remove(finishFlagOverlay);
             }
 
+            @SuppressLint("RestrictedApi")
             @Override
             public void onStopTrackingTouch(@NonNull RangeSlider slider) {
                 start = Math.round(slider.getValues().get(0));

@@ -10,7 +10,7 @@ def API_VERSION = "API_VERSION"
 android {
     compileSdkVersion 30
     defaultConfig {
-        applicationId "de.tuberlin.mcc.simra.app.dev"
+        applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 90
@@ -55,10 +55,10 @@ android {
         viewBinding = true
     }
     compileOptions {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = '1.9'
+        targetCompatibility = '1.9'
+        sourceCompatibility JavaVersion.VERSION_1_9
+        targetCompatibility JavaVersion.VERSION_1_9
     }
 }
 
