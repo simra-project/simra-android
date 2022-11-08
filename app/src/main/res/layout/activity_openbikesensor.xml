@@ -28,7 +28,7 @@
 
         <Button
             android:id="@+id/bluetoothButton"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/obs_activity_button_start_scan" />
@@ -58,14 +58,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:max="100"
-                android:progress="45" />
-
-            <Button
-                android:id="@+id/btnDisconnect"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/obs_activity_button_disconnect_device" />
+                android:progress="38" />
         </LinearLayout>
 
         <TextView

@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.TreeMap;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
@@ -212,11 +213,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             connectionEventListener.setOnClosePassNotification(measurement -> {
                 long closePassRealTime = (ConnectionManager.INSTANCE.getStartTime() + measurement.getObsTime());
                 Log.d(TAG, "Close Pass - Time: " + closePassRealTime + " left: " + measurement.getLeftDistance() + " right: " + measurement.getRightDistance());
-
-                if ((measurement.getLeftDistance() >= -1 && measurement.getLeftDistance() <= 150) || ((measurement.getRightDistance() >= -1 && measurement.getRightDistance() <= 150))) {
-                    obsMeasurements.add(measurement);
-                }
-
+                obsMeasurements.add(measurement);
                 return null;
             });
             ConnectionManager.INSTANCE.registerListener(connectionEventListener);
@@ -317,7 +314,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // For all subsequent rides, the key value increases by one at a time.
 
         key = sharedPrefs.getInt("RIDE-KEY", 0);
-        incidentLog = new IncidentLog(key, new HashMap<>(), 0);
+        incidentLog = new IncidentLog(key, new TreeMap<>(), 0);
 
         // Fire the notification while recording
         Notification notification =
@@ -404,20 +401,32 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 long thisDataLogEntryTS = thisDataLogEntry.timestamp;
                 long thisMeasurementTS = measurement.getRealTime();
                 long thisDelta = thisDataLogEntryTS - thisMeasurementTS;
+                // When thisDelta changes from negative to positive, the gpsLine this measurement belongs to was found.
                 if (thisDelta >= 0 && j > 0) {
                     DataLogEntry lastDataLogEntry = dataLogEntries[j-1];
                     long lastDataLogEntryTS = lastDataLogEntry.timestamp;
                     double lastDataLogEntryLat = lastDataLogEntry.latitude;
                     double lastDataLogEntryLon = lastDataLogEntry.longitude;
-                    incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS).withBaseInformation(lastDataLogEntryTS,lastDataLogEntryLat,lastDataLogEntryLon).withDescription(measurement.getIncidentDescription(context)).withKey(2000).build());
+                    // overtake distance is from side mirror of the car (~13cm) to the handlebar of the bicycle
+                    double realLeftDistance = measurement.getLeftDistance() - SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(this) - 13;
+                    double realRightDistance = measurement.getRightDistance() - SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(this) - 13;
+                    // if the obs measurement is between -100 an 150cm, it is a close pass and needs to be shown as a near miss incident, else a "regular" pass, just to be shown in the csv and hidden on the map.
+                    if ((realLeftDistance >= -100 && realLeftDistance <= 150) || ((realRightDistance >= -100 && realRightDistance <= 150))) {
+                        Log.d(TAG, "Adding hidden Close Pass with TS: " + lastDataLogEntryTS + " realLeftDistance: " + realLeftDistance + " and realRightDistance: " + realRightDistance);
+                        incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.OBS_UNKNOWN).withBaseInformation(lastDataLogEntryTS, lastDataLogEntryLat, lastDataLogEntryLon).withDescription(measurement.getIncidentDescription(context)).withKey(3000).build());
+                    } else {
+                        Log.d(TAG, "Adding visible Close Pass with TS: " + lastDataLogEntryTS + " realLeftDistance: " + realLeftDistance + " and realRightDistance: " + realRightDistance);
+                        incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS).withBaseInformation(lastDataLogEntryTS, lastDataLogEntryLat, lastDataLogEntryLon).withDescription(measurement.getIncidentDescription(context)).withKey(2000).build());
+                    }
+                    // finish, when at the end of the ride.
                     if (j+1 >= gpsLines.size()) {
                         return;
+                    // else, update gpsLinesIndex, so that the next obs measurement is searched in the rest of the ride.
                     } else {
                         gpsLinesIndex = j+1;
                         break;
                     }
                 }
-
             }
         }
     }

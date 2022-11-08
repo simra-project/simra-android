@@ -92,8 +92,14 @@ public class IncidentLogEntry implements Serializable {
         if (this.incidentType == null || (this.incidentType <= INCIDENT_TYPE.NOTHING && this.incidentType != INCIDENT_TYPE.FOR_RIDE_SETTINGS)) {
             shouldBeUploaded = false;
         }
+        // if scary situation is null, the incident marker was ignored => no upload
         if (this.scarySituation == null) {
             shouldBeUploaded = false;
+        }
+
+        // if incident type ist OBS_UNKNOWN, it is an invisible obs measurement => upload
+        if(this.incidentType != null && this.incidentType == INCIDENT_TYPE.OBS_UNKNOWN) {
+            shouldBeUploaded = true;
         }
         return shouldBeUploaded;
     }

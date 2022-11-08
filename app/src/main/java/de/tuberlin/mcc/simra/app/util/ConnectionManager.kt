@@ -29,6 +29,7 @@ import java.nio.ByteOrder
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.coroutines.coroutineContext
 
 object ConnectionManager {
     private const val TAG = "ConnectionManager_LOG"
@@ -623,18 +624,10 @@ object ConnectionManager {
 
         fun getIncidentDescription(context: Context): String {
             val headerLine = context.getString(de.tuberlin.mcc.simra.app.R.string.obsIncidentDescriptionButtonHeaderLine)
-            val leftValue: String = if (leftDistance <= 1500) {
-                "$leftDistance cm"
-            } else {
-                "---"
-            }
-            val rightValue: String = if (rightDistance <= 1500) {
-                "$rightDistance cm"
-            } else {
-                "---"
-            }
-            val leftLine = context.getString(de.tuberlin.mcc.simra.app.R.string.left) + leftValue
-            val rightLine = context.getString(de.tuberlin.mcc.simra.app.R.string.right) + rightValue
+            val realLeftDistance: Short = (leftDistance - SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(context) - 13).toShort()
+            val realRightDistance: Short = (rightDistance - SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(context) - 13).toShort()
+            val leftLine = "l: $realLeftDistance cm"
+            val rightLine = "r: $realRightDistance cm"
             return headerLine + System.lineSeparator() + leftLine + System.lineSeparator() + rightLine
         }
     }
