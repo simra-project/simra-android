@@ -21,13 +21,13 @@
     <string name="welcome_header">Willkommen bei SimRa!</string>
     <string name="welcome_text">Vielen Dank, dass du das SimRa-Projekt unterstützt.\nViel Spaß und Gute Fahrt!</string>
     <string name="sendErrorTitle">Ups!</string>
-    <string name="sendErrorMessage">Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchten Sie den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?</string>
+    <string name="sendErrorMessage">Bei der letzten Ausführung der App ist es wohl zu einem Fehler gekommen. Möchtest du den Fehlerbericht an SimRa schicken, damit wir die App verbessern können?</string>
     <string name="simra_closed">SimRa beendet</string>
     <string name="next">Weiter</string>
     <string name="close_simra">SimRa beenden</string>
     <string name="iAccept">Ich akzeptiere die Datenschutzerklärung</string>
     <string name="privacyAgreementTitle">Datenschutzerklärung</string>
-    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrtaufzeichnung Standort- und Sensordaten im Hintergrund auf, sowie von Ihnen eingegebene demografische Daten, um Ihnen Ihre mit SimRa aufgezeichneten Fahrten anzeigen zu können. Weitere Informationen finden Sie in unserer <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1">Datenschutzerklärung</a>.
+    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrtaufzeichnung Standort- und Sensordaten im Hintergrund auf, sowie von dir eingegebene demografische Daten, um dir deine mit SimRa aufgezeichneten Fahrten anzeigen zu können. Weitere Informationen findest du in unserer <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1">Datenschutzerklärung</a>.
     </string>
 
     <!--- Menu -->
@@ -58,39 +58,43 @@
 
     <!--- MainActivity -->
     <string name="osmCopyright">©        <a href="https://www.openstreetmap.org/copyright/de">OpenStreetMap</a> Mitwirkende </string>
-    <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um ihre Privatsphäre zu schützen.\nSie können dies im Menü "Einstellungen" anpassen.</string>
+    <string name="errorRideNotRecorded">Die Fahrt wurde nicht gespeichert, um deine Privatsphäre zu schützen.\nDue kannst dies im Menü "Einstellungen" anpassen.</string>
     <string name="startButtonText">Aufzeichnung\nstarten</string>
     <string name="stopButtonText">Aufzeichnung\nbeenden</string>
     <string name="reportIncidentText">Ereignis melden</string>
     <string name="reportIncidentClosepass">Dichtes Überholen</string>
     <string name="reportIncidentObstacle">Hindernis ausweichen</string>
     <string name="cancel">Abbrechen</string>
-    <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalten Sie es aus, damit die Fahrt aufgezeichnet werden kann.</string>
-    <string name="locationServiceisOff">Der Ortungsdienst Ihres Geräts ist aus.</string>
-    <string name="enableToRecord">Bitte schalten Sie den Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
+    <string name="airplaneModeIsOn">Der Flugmodus ist an! Bitte schalte es aus, damit die Fahrt aufgezeichnet werden kann.</string>
+    <string name="locationServiceisOff">Der Ortungsdienst deines Geräts ist aus.</string>
+    <string name="enableToRecord">Bitte schalte den Ortungsdienst an, damit die Fahrt aufgezeichnet werden kann.</string>
     <string name="checking_for_updates">Überprüfe auf neue Versionen</string>
-    <string name="new_app_version_text">Um fortzufahren, aktualisieren Sie bitte SimRa via Google Play Store oder laden Sie die .APK-Datei herunter.</string>
+    <string name="new_app_version_text">Um fortzufahren, aktualisiere bitte SimRa via Google Play Store oder lade die .APK-Datei herunter.</string>
     <string name="open_google_play_store">Google Play Store öffnen</string>
     <string name="download_the_apk_file">APK-Datei runterladen</string>
     <string name="installed_version">installierte Version:</string>
     <string name="newest_version">neueste Version:</string>
     <string name="new_app_version_title">Neue Version verfügbar</string>
     <string name="later">Später</string>
-    <string name="pleaseChooseRegion">Bitte stellen Sie Ihre Region ein, damit Ihre Daten richtig ausgewertet können. Ihre derzeit ausgewählte Region ist: </string>
+    <string name="pleaseChooseRegion">Bitte stelle deine Region ein, damit deine Daten richtig ausgewertet können. Deine derzeit ausgewählte Region ist: </string>
     <string name="selectRegion">Region auswählen</string>
     <string name="recording_not_started">Fahrtaufzeichnung wurde NICHT gestartet.</string>
     <string name="recording_started">Fahrtaufzeichnung wurde gestartet.</string>
-    <string name="not_connected_warnung_title">Warnung: OpenBikeSensor ist nicht verbunden</string>
-    <string name="not_connected_warnung_message">Wollen Sie trotzdem den Fahrt aufzeichnen ?</string>
-    <string name="cancel_button">Nein, mit dem OpenBikeSensor verbinden</string>
-    <string name="bluetooth_not_enable_title">Warnung: Bluetooth is ausgeschaltet</string>
-    <string name="bluetooth_not_enable_message">Möchten Sie die Bluetooth einschalten ? Ansonsten kann der OpenBikeSensor nicht verwendet werden</string>
-    <string name="recorded_incident">Ereignis gespeichert</string>
+    <string name="not_connected_warning_title">Warnung: OpenBikeSensor ist nicht verbunden!</string>
+    <string name="not_connected_recording_warning_message">Möchtest du die Fahrt trotzdem aufzeichnen?</string>
+    <string name="no_open_settings">Nein, Einstellungen öffnen.</string>
+    <string name="could_not_connect_warning_title">Warnung: Verbindung zum OpenBikeSensor fehlgeschlagen!</string>
+    <string name="could_not_connect_warning_message">Möchtest du zu den Einstellungen oder den OBS von SimRa entkoppeln?</string>
+    <string name="open_settings">Einstellungen öffnen.</string>
+    <string name="disable_obs">OBS entkoppeln.</string>
+    <string name="bluetooth_not_enable_title">Warnung: Bluetooth is ausgeschaltet!</string>
+    <string name="bluetooth_not_enable_message">Möchtest du die Bluetooth einschalten? Ansonsten kann der OpenBikeSensor nicht verwendet werden!</string>
+    <string name="recorded_incident">Ereignis gespeichert.</string>
 
 
     <!--- RecorderService -->
     <string name="foregroundNotificationTitle_record">Aufzeichnung der Fahrt</string>
-    <string name="foregroundNotificationBody_record">Ihre Fahrt wird aufgezeichnet.</string>
+    <string name="foregroundNotificationBody_record">Deine Fahrt wird aufgezeichnet.</string>
     <string name="foregroundNotificationButtonBack">Zurück zur App</string>
 
     <!--- History -->
@@ -116,7 +120,7 @@
     <string name="uploadingNotificationBody">SimRa lädt Fahrten hoch</string>
     <string name="upload_started">SimRa Hochladen gestartet</string>
     <string name="upload_completed">SimRa Hochladen abgeschlossen.</string>
-    <string name="upload_failed">SimRa Hochladen fehlgeschlagen. Versuchen Sie es später erneut.</string>
+    <string name="upload_failed">SimRa Hochladen fehlgeschlagen. Versuche es später erneut.</string>
     <string name="nothing_to_upload">SimRa: Keine Fahrt bereit zum Hochladen</string>
     <string name="upload_file_warning">Alle bearbeiteten und noch nicht hochgeladenen Fahrten werden hochgeladen. Die Fahrten können danach nicht weiter bearbeitet werden.</string>
     <string name="upload">Hochladen</string>
@@ -177,7 +181,7 @@
     <string name="incidentDetected"> Ereignis annotieren.</string>
 
     <!--- About -->
-    <string name="notReady">Wollen sie die Bearbeitung unfertig beenden?</string>
+    <string name="notReady">Möchtest du die Bearbeitung unfertig beenden?</string>
     <string name="privacyLink">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1</string>
 
     <!--- Settings -->
@@ -192,19 +196,19 @@
     <string name="showButtonsDescription">Buttons zum Hinzufügen von Ereignissen während der Fahrt</string>
     <string name="hideButtons">verstecken</string>
     <string name="showButtons">anzeigen</string>
-    <string name="incident_buttons_during_ride_warning">Bitte nutzen Sie die Buttons \"Dichtes Überholen\" und \"Hindernis Auswichen\", die während der Aufzeichnung angezeigt werden, mit großer Vorsicht und nur, wenn das Gerät auf dem SimRa läuft am Lenkrad befestigt ist. Achten Sie stets auf den Straßenverkehr, insbesondere auf STVO §23 (1a), damit Ihre Sicherheit und die der anderen nicht beeinträchtigt wird.</string>
+    <string name="incident_buttons_during_ride_warning">Bitte nutze die Buttons \"Dichtes Überholen\" und \"Hindernis Auswichen\", die während der Aufzeichnung angezeigt werden, mit großer Vorsicht und nur, wenn das Gerät auf dem SimRa läuft am Lenkrad befestigt ist. Achte stets auf den Straßenverkehr, insbesondere auf STVO §23 (1a), damit deine Sicherheit und die der anderen nicht beeinträchtigt wird.</string>
     <string name="rideAnalysis">Fahrten Analyse</string>
     <string name="onlineAI">Online KI gestützt</string>
     <string name="offlineNoAI">Offline Modus</string>
     <string name="importTitle">Datenimport</string>
     <string name="importPromptTitle">Datenimport von zuvor exportierten SimRa-Daten</string>
-    <string name="importButtonText">Bitte wählen Sie die "SimRa.zip"-Datei aus, die zuvor mit der Exportfunktion in SimRa erstellt wurde. Dadurch werden die Fahrten, Statistiken und Einstellungen, die zuvor exportiert wurden, übernommen. ACHTUNG! Dadurch werden aktuelle Fahrten, Statistiken und Einstellungen gelöscht bzw. überschrieben.</string>
-    <string name="importFile">Navigieren Sie bitte zu dem Ordner mit "SimRa.zip" und wählen diese aus.</string>
+    <string name="importButtonText">Bitte wähle die "SimRa.zip"-Datei aus, die zuvor mit der Exportfunktion in SimRa erstellt wurde. Dadurch werden die Fahrten, Statistiken und Einstellungen, die zuvor exportiert wurden, übernommen. ACHTUNG! Dadurch werden aktuelle Fahrten, Statistiken und Einstellungen gelöscht bzw. überschrieben.</string>
+    <string name="importFile">Navigiere bitte zu dem Ordner mit "SimRa.zip" und wähle ihn aus.</string>
     <string name="importDone">Datenimport abgeschlossen.</string>
     <string name="ok">Okay</string>
     <string name="exportTitle">Datenexport</string>
     <string name="exportPromptTitle">Datenexport der eigenen SimRa-Daten</string>
-    <string name="exportButtonText">Geben Sie bitte den Ort an, wo die Datei "SimRa.zip" gespeichert werden soll. Diese Datei kann dann in einem Android-Gerät in SimRa importiert werden. Dadurch können Sie Ihre Fahrten, Statistiken und Einstellungen behalten, wenn Sie ihr Handy wechseln oder formatieren. </string>
+    <string name="exportButtonText">Gebe bitte den Ort an, wo die Datei "SimRa.zip" gespeichert werden soll. Diese Datei kann dann in einem Android-Gerät in SimRa importiert werden. Dadurch kannst du deine Fahrten, Statistiken und Einstellungen behalten, wenn du dein Handy wechselst oder formatierst. </string>
     <string name="exportDirectory">Wo soll SimRa.zip gespeichert werden?</string>
     <string name="exportToast">"SimRa-Datei zum Importieren wurde erfolgreich erstellt"</string>
     <string name="dateFormatDescription">Datumsformat</string>
@@ -212,7 +216,7 @@
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Geräte</string>
     <string name="debugPromptTitle1">Eigene SimRa-Daten an das SimRa-Team senden?</string>
-    <string name="debugButtonText">Achtung! Nur auf den Weiterknopf tippen, wenn Sie vom SimRa Team dazu aufgefordert wurden. Mit dem Betätigen des Hochladebuttons im nächsten Schritt werden ihre Einstellungen und Profilangaben, sowie interne Programmvariablen an das Backend geschickt. Sie können auswählen, ob keine Fahrten, die letzten 10 Fahrten oder alle Fahrten (auch die bereits hochgeladenen) hochgeladen werden sollen.</string>
+    <string name="debugButtonText">Achtung! Nur auf den Weiterknopf tippen, wenn du vom SimRa Team dazu aufgefordert wurdest. Mit dem Betätigen des Hochladebuttons im nächsten Schritt werden deine Einstellungen und Profilangaben, sowie interne Programmvariablen an das Backend geschickt. Du kannst auswählen, ob keine Fahrten, die letzten 10 Fahrten oder alle Fahrten (auch die bereits hochgeladenen) hochgeladen werden sollen.</string>
     <string name="continueText">Weiter</string>
     <string name="debugPromptTitle2">Sollen Fahrten auch gesendet werden?</string>
     <string name="debugSendAllRides">Ja, alle</string>
@@ -221,19 +225,24 @@
     <string name="uploadingDebugNotificationBody">SimRa lädt Dateien hoch</string>
 
     <!--- OpenBikeSensor -->
+    <string name="obs_activity_button_start_scan">Bluetooth Scan starten</string>
+    <string name="obs_activity_button_connect">Verbinden</string>
+    <string name="obs_activity_button_stop_scan">Bluetooth Scan stoppen</string>
     <string name="obsSwitchTitle">OpenBikeSensor verbinden</string>
     <string name="obsButton">OpenBikeSensor Einstellungen öffnen</string>
     <string name="availableDevices">Verfügbare Geräte</string>
     <string name="obsAdvancedSettings">Weitere Einstellungen</string>
     <string name="obsHandlebarWidthText">Weite des Lenkers von der Außenseite zum Rahmen</string>
-    <string name="obsIncidentDescriptionHeaderLine">Dieses Ereignis wurde durch das OpenBikeSensor-Event %1$s ausgelöst.</string>
-    <string name="obsIncidentDescriptionDataLine">Weitere Daten: %1$s</string>
-    <string name="obsIncidentDescriptionButtonHeaderLine">Dieses Ereignis wurde durch einen physischen Button am OpenBikeSensor ausgelöst.</string>
-    <string name="obsIncidentDescriptionButtonDataLine">Distanz während der dichten Überholung: %1$s cm</string>
-    <string name="obsIncidentDescriptionAvg2sHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da die durchschnittliche Distanz während einer dichten Überholung unter dem Grenzwert lag.</string>
-    <string name="obsIncidentDescriptionAvg2sDataLine">Durchschnittliche Distanz: %1$s cm, kleinste Distanz: %2$s cm</string>
-    <string name="obsIncidentDescriptionMinKalmanHeaderLine">Dieses Ereignis wurde automatisch vom OpenBikeSensor ausgelöst, da es die kleinste Distanz während einer dichten Überholung erkannt hat.</string>
-    <string name="obsIncidentDescriptionMinKalmanDataLine">Kleinste Distanz: %1$s cm</string>
+    <string name="obsIncidentDescriptionButtonHeaderLine">OpenBikeSensor</string>
+    <string name="left">Links: </string>
+    <string name="right">Rechts: </string>
+    <string name="obsServiceConnectionFailed">Fehler ERRORCODE beim Verbinden mit dem Gerät DEVICEADDRESS. Bitte erneut versuchen.</string>
+    <string name="obsServiceConnectionSuccessful">Verbindung zum OpenBikeSensor hergestellt</string>
+    <string name="obsServiceDisconnectionSuccessful">Verbindung zum OpenBikeSensor getrennt</string>
+    <string name="obs_activity_text_start">Keine Verbindung zum OBS</string>
+    <string name="obs_activity_text_stop">Suche nach OBS</string>
+    <string name="obs_activity_text_connect">Gefunden: %1$s</string>
+    <string name="obs_activity_text_disconnect">Verbunden: %1$s</string>
 
     <!--- Profile -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
@@ -250,11 +259,11 @@
     <string name="regionManual">Selber bestimmen</string>
     <string name="regionAutomatic">Via GPS bestimmen</string>
     <string name="detectRegion">Region bestimmen</string>
-    <string name="enableToDetectRegion">Bitte schalten Sie den Ortungsdienst an, damit Ihre Region ermittelt werden kann.</string>
-    <string name="nearestRegions">Nächste Regionen zu Ihrem Standort:</string>
+    <string name="enableToDetectRegion">Bitte schalte den Ortungsdienst an, damit deine Region ermittelt werden kann.</string>
+    <string name="nearestRegions">Nächste Regionen zu deinem Standort:</string>
     <string name="selectedRegion">Gewählte Region: </string>
     <string name="experienceSpinnerTitle">Erfahrung als Fahrradfahrer</string>
-    <string name="rulesDescription">Wie oft halten Sie sich an die Verkehrsregeln?</string>
+    <string name="rulesDescription">Wie oft hältst du dich an die Verkehrsregeln?</string>
     <string name="never">Nie</string>
     <string name="always">Immer</string>
     <string name="on">EIN</string>
@@ -279,7 +288,7 @@
     <string name="ride_settings_title">Fahrteinstellungen</string>
     <string name="childString">Auf dem Fahrrad wird ein Kind transportiert.</string>
     <string name="trailerString">Am Fahrrad ist ein Anhänger angebracht.</string>
-    <string name="ride_settings_description">Unten finden Sie die Einstellungen, die für diese Fahrt verwendet werden. Sie können diese sowohl in diesem Fenster, als auch unter \"Einstellungen\" im Hauptmenü finden.</string>
+    <string name="ride_settings_description">Unten findest du die Einstellungen, die für diese Fahrt verwendet werden. Du kannst diese sowohl in diesem Fenster, als auch unter \"Einstellungen\" im Hauptmenü finden.</string>
     <string name="rememberChanges">Änderungen merken</string>
     <string name="locationTypeSpinnerTitle">Üblicher Ort des Geräts während der Fahrt:</string>
 
@@ -337,7 +346,7 @@
     <string name="dontkillmyapp_hint_news">Hinweis: Auf manchen Geräten (z.B. Huawei, OnePlus, Xiaomi) kann es sein, dass die Aufzeichnung im Hintergrund automatisch gestoppt wird. Das kann in den Energieeinstellungen des Smartphones korrigiert werden. Weitere Informationen auf www.DontKillMyApp.com</string>
 
     <!-- 27 -->
-    <string name="apologies_news">Einige Nutzer hatten in den letzten Updates mit Fehlern zu kämpfen, das tut mir Leid. Ich arbeite stets daran die App möglichst zu verbessern. Vielen Dank für die Unterstützung. Sollte immer noch etwas nicht stimmen, können Sie mich gerne über ask@mcc.tu-berin.de oder durch das Antippen auf Feedback im Menü kontaktieren.</string>
+    <string name="apologies_news">Einige Nutzer hatten in den letzten Updates mit Fehlern zu kämpfen, das tut mir Leid. Ich arbeite stets daran die App möglichst zu verbessern. Vielen Dank für die Unterstützung. Sollte immer noch etwas nicht stimmen, kannst du mich gerne über ask@mcc.tu-berin.de oder durch das Antippen auf Feedback im Menü kontaktieren.</string>
 
     <!-- 30 -->
     <string name="electric_news">Neu: Neuer Beteiligter \"E-Scooter\" im Annotationsmenü</string>
@@ -356,7 +365,7 @@
 
     <!-- 42 -->
     <string name="added_stuttgart_news_42">Neue Region: Stuttgart</string>
-    <string name="thanks">Vielen Dank für Ihre Unterstützung!</string>
+    <string name="thanks">Vielen Dank für deine Unterstützung!</string>
 
     <!-- 46 -->
     <string name="new_statistics_news_46">In den \"Statistiken\" befinden sich nun neue Kategorien.</string>
@@ -381,13 +390,13 @@
     <string name="activity_obs_title_device_info">Geräte-Info</string>
     <string name="obs_activity_button_connect_device">Mit Gerät verbinden</string>
     <string name="obs_activity_button_disconnect_device">Geräteverbindung trennen</string>
-    <string name="obs_activity_text_last_distance">Letzter Wert:</string>
+    <string name="obs_activity_text_last_distance">Letzter Wert: %1$d cm</string>
     <string name="obsConnected">OpenBikeSensor verbunden</string>
     <string name="connecting">Verbinde</string>
     <string name="obsSearching">OpenBikeSensor wird gesucht</string>
     <string name="obsNotConnected">OpenBikeSensor nicht verbunden</string>
     <string name="obsConnecting">Verbindung mit OpenBikeSensor</string>
-    <string name="obsTutorial">\nBitte halten Sie Ihr Hand nah an den Abstandsensor für 3 Sekunden</string>
+    <string name="obsTutorial">\nBitte halte dein Hand nah an den Abstandsensor für 3 Sekunden</string>
     <string name="obs">OpenBikeSensor</string>
     <string name="link_to_instagram">https://www.instagram.com/sicherheitimradverkehr/</string>
     <string name="link_simra_Dashboard">https://simra-project.github.io/dashboard/</string>

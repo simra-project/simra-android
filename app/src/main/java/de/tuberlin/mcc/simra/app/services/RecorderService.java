@@ -6,7 +6,6 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -27,11 +26,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.TreeMap;
 
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
@@ -40,16 +39,18 @@ import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.MetaDataEntry;
+import de.tuberlin.mcc.simra.app.util.ConnectionManager;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
+import de.tuberlin.mcc.simra.app.util.ble.ConnectionEventListener;
 
-import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
+/*import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
 import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_DISTANCE;
-import static de.tuberlin.mcc.simra.app.services.OBSService.EXTRA_VALUE_SERIALIZED;
+import static de.tuberlin.mcc.simra.app.services.OBSService.EXTRA_VALUE_SERIALIZED;*/
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.mergeGPSandSensorLines;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
@@ -85,8 +86,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     SharedPreferences.Editor editor;
     Location startLocation;
     // OpenBikeSensor
-    private final LinkedList<OBSService.Measurement> lastOBSDistanceValues = new LinkedList<>();
-    private final LinkedList<OBSService.ClosePassEvent> lastOBSClosePassEvents = new LinkedList<>();
+    private ConnectionEventListener connectionEventListener = null;
+    private final LinkedList<ConnectionManager.Measurement> obsMeasurements = new LinkedList<>();
+    /*private final LinkedList<OBSService.Measurement> lastOBSDistanceValues = new LinkedList<>();
+    private final LinkedList<OBSService.ClosePassEvent> lastOBSClosePassEvents = new LinkedList<>();*/
     private LocationManager locationManager;
     private Sensor accelerometer;
     private Sensor gyroscope;
@@ -94,7 +97,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private Sensor rotation;
     private int key;
     private Integer incidentDuringRide = null;
-    private final BroadcastReceiver openBikeSensorMessageReceiverDistanceValue = new BroadcastReceiver() {
+    /*private final BroadcastReceiver openBikeSensorMessageReceiverDistanceValue = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
@@ -113,7 +116,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 lastOBSClosePassEvents.add((OBSService.ClosePassEvent) serializable);
             }
         }
-    };
+    };*/
     private BroadcastReceiver incidentBroadcastReceiver;
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
@@ -205,6 +208,17 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         editor = sharedPrefs.edit();
 
+        if(SharedPref.Settings.OpenBikeSensor.isEnabled(getBaseContext()) && connectionEventListener == null) {
+            connectionEventListener = new ConnectionEventListener();
+            connectionEventListener.setOnClosePassNotification(measurement -> {
+                long closePassRealTime = (ConnectionManager.INSTANCE.getStartTime() + measurement.getObsTime());
+                Log.d(TAG, "Close Pass - Time: " + closePassRealTime + " left: " + measurement.getLeftDistance() + " right: " + measurement.getRightDistance());
+                obsMeasurements.add(measurement);
+                return null;
+            });
+            ConnectionManager.INSTANCE.registerListener(connectionEventListener);
+        }
+
         safetyDistanceWithTolerances = SharedPref.Settings.Ride.OvertakeWidth.getWidth(this);
 
         // Prepare the sensors for accGpsFile
@@ -238,9 +252,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG + ":RecorderService");
 
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverDistanceValue, new IntentFilter(ACTION_VALUE_RECEIVED_DISTANCE));
+        /*localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverDistanceValue, new IntentFilter(ACTION_VALUE_RECEIVED_DISTANCE));
         localBroadcastManager.registerReceiver(openBikeSensorMessageReceiverClosePassEvent, new IntentFilter(ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT));
-        incidentBroadcastReceiver = IncidentBroadcaster.receiveIncidents(this, new IncidentBroadcaster.IncidentCallbacks() {
+        */incidentBroadcastReceiver = IncidentBroadcaster.receiveIncidents(this, new IncidentBroadcaster.IncidentCallbacks() {
             @Override
             public void onManualIncident(int incidentType) {
                 incidentDuringRide = incidentType;
@@ -300,7 +314,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // For all subsequent rides, the key value increases by one at a time.
 
         key = sharedPrefs.getInt("RIDE-KEY", 0);
-        incidentLog = new IncidentLog(key, new HashMap<>(), 0);
+        incidentLog = new IncidentLog(key, new TreeMap<>(), 0);
 
         // Fire the notification while recording
         Notification notification =
@@ -327,6 +341,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onDestroy() {
 
+        // Unregister from OBS callbacks
+        if (connectionEventListener != null) {
+            ConnectionManager.INSTANCE.unregisterListener(connectionEventListener);
+        }
+
         // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
         // with current ride and and sharedPrefs with current ride key. Do these things only,
         // if recording is allowed (see privacyDuration and privacyDistance) and we have written some
@@ -334,6 +353,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         if (recordingAllowed && lineAdded) {
             recordingHandler.removeCallbacksAndMessages(null);
             int region = lookUpIntSharedPrefs("Region", 0, "Profile", this);
+            addOBSIncidents(obsMeasurements, incidentLog, gpsLines, this);
             accGpsString = mergeGPSandSensorLines(gpsLines,sensorLines);
             overwriteFile((IOUtils.Files.getFileInfoLine() + DataLog.DATA_LOG_HEADER + System.lineSeparator() + accGpsString), IOUtils.Files.getGPSLogFile(key, false, this));
             MetaData.updateOrAddMetaDataEntryForRide(new MetaDataEntry(key, startTime, endTime, MetaData.STATE.JUST_RECORDED, 0, waitedTime, Math.round(route.getDistance()), 0, region), this);
@@ -349,9 +369,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         locationManager.removeUpdates(this);
 
         // Stop OpenBikeSensor LocalBroadcast Listener
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverDistanceValue);
+        /*LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverDistanceValue);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(openBikeSensorMessageReceiverClosePassEvent);
-
+*/
         // Stop Manual Incident Broadcast Listener
         LocalBroadcastManager.getInstance(this).unregisterReceiver(incidentBroadcastReceiver);
 
@@ -360,6 +380,55 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         /**/stopForeground(true);/**/
         /**/wakeLock.release();/**/
+    }
+
+    /**
+     * Adds all incidents from obsMeasurements to incidentLog.
+     * Matches the obsMeasurements to gpsLines first by taking the last gpsLine, whose timestamp
+     * is smaller than the measurements' timestamp.
+     * @param obsMeasurements
+     * @param incidentLog
+     * @param gpsLines
+     * @param context
+     */
+    private void addOBSIncidents(LinkedList<ConnectionManager.Measurement> obsMeasurements, IncidentLog incidentLog, Queue<DataLogEntry> gpsLines, Context context) {
+        int gpsLinesIndex = 0;
+        DataLogEntry[] dataLogEntries = gpsLines.toArray(new DataLogEntry[0]);
+        for (int i = 0; i < this.obsMeasurements.size(); i++) {
+            ConnectionManager.Measurement measurement = this.obsMeasurements.get(i);
+            for (int j = gpsLinesIndex; j < gpsLines.size(); j++) {
+                DataLogEntry thisDataLogEntry = dataLogEntries[j];
+                long thisDataLogEntryTS = thisDataLogEntry.timestamp;
+                long thisMeasurementTS = measurement.getRealTime();
+                long thisDelta = thisDataLogEntryTS - thisMeasurementTS;
+                // When thisDelta changes from negative to positive, the gpsLine this measurement belongs to was found.
+                if (thisDelta >= 0 && j > 0) {
+                    DataLogEntry lastDataLogEntry = dataLogEntries[j-1];
+                    long lastDataLogEntryTS = lastDataLogEntry.timestamp;
+                    double lastDataLogEntryLat = lastDataLogEntry.latitude;
+                    double lastDataLogEntryLon = lastDataLogEntry.longitude;
+                    // overtake distance is from side mirror of the car (~13cm) to the handlebar of the bicycle
+                    double realLeftDistance = measurement.getLeftDistance() - SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(this) - 13;
+                    double realRightDistance = measurement.getRightDistance() - SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(this) - 13;
+                    // if the obs measurement is between -100 an 150cm, it is a close pass and needs to be shown as a near miss incident, else a "regular" pass, just to be shown in the csv and hidden on the map.
+                    if ((realLeftDistance >= -100 && realLeftDistance <= 150) || ((realRightDistance >= -100 && realRightDistance <= 150))) {
+                        Log.d(TAG, "Adding hidden Close Pass with TS: " + lastDataLogEntryTS + " realLeftDistance: " + realLeftDistance + " and realRightDistance: " + realRightDistance);
+                        incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.OBS_UNKNOWN).withBaseInformation(lastDataLogEntryTS, lastDataLogEntryLat, lastDataLogEntryLon).withDescription(measurement.getIncidentDescription(context)).withKey(3000).build());
+                    } else {
+                        Log.d(TAG, "Adding visible Close Pass with TS: " + lastDataLogEntryTS + " realLeftDistance: " + realLeftDistance + " and realRightDistance: " + realRightDistance);
+                        incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS).withBaseInformation(lastDataLogEntryTS, lastDataLogEntryLat, lastDataLogEntryLon).withDescription(measurement.getIncidentDescription(context)).withKey(2000).build());
+                    }
+                    // finish, when at the end of the ride.
+                    if (j+1 >= gpsLines.size()) {
+                        return;
+                    // else, update gpsLinesIndex, so that the next obs measurement is searched in the rest of the ride.
+                    } else {
+                        gpsLinesIndex = j+1;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private float computeAverage(Collection<Float> myVals) {
@@ -472,14 +541,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         incidentDuringRide = null;
                     }
 
-                    while (lastOBSClosePassEvents.size() > 0) {
+                    /*while (lastOBSClosePassEvents.size() > 0) {
                         OBSService.ClosePassEvent closePassEvent = lastOBSClosePassEvents.removeFirst();
                         incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder()
                                 .withIncidentType(closePassEvent.getIncidentType())
                                 .withDescription(closePassEvent.getIncidentDescription(getApplicationContext()))
                                 .withBaseInformation(lastAccUpdate, thisLocation.getLatitude(), thisLocation.getLongitude())
                                 .build());
-                    }
+                    }*/
                 }
                 dataLogEntryBuilder.withGyroscope(
                         /**/gyroscopeMatrix[0],
@@ -487,10 +556,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         gyroscopeMatrix[2]/**/
                 );
 
-                if (lastOBSDistanceValues.size() > 0) {
+                /*if (lastOBSDistanceValues.size() > 0) {
                     OBSService.Measurement lastOBSDistanceValue = lastOBSDistanceValues.removeFirst();
                     dataLogEntryBuilder.withOBS(lastOBSDistanceValue.leftSensorValues.get(0), null, null, null, null);
-                }
+                }*/
 
                 if(isGPSLine) {
                     gpsLines.add(dataLogEntryBuilder.build());

@@ -1,4 +1,7 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'kotlin-android'
+    id 'com.android.application'
+}
 
 def ENV_VARIABLE_PREFIX = "SIMRA_"
 def API_ENDPOINT = "API_ENDPOINT"
@@ -7,11 +10,11 @@ def API_VERSION = "API_VERSION"
 android {
     compileSdkVersion 30
     defaultConfig {
-        applicationId "de.tuberlin.mcc.simra.app.dev"
+        applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 89
-        versionName "89.0"
+        versionCode 90
+        versionName "90.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
@@ -52,10 +55,10 @@ android {
         viewBinding = true
     }
     compileOptions {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = '1.9'
+        targetCompatibility = '1.9'
+        sourceCompatibility JavaVersion.VERSION_1_9
+        targetCompatibility JavaVersion.VERSION_1_9
     }
 }
 
@@ -82,4 +85,9 @@ dependencies {
 
     // "Backporting" Java 8 streams for Android < 24
     implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
+
+    // Kotlin
+    implementation 'androidx.core:core-ktx:1.6.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.6.0"
+
 }

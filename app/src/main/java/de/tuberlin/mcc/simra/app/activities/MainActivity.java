@@ -2,9 +2,9 @@ package de.tuberlin.mcc.simra.app.activities;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -51,8 +51,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -67,13 +73,15 @@ import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.Profile;
-import de.tuberlin.mcc.simra.app.services.OBSService;
+import de.tuberlin.mcc.simra.app.util.ConnectionManager.BLESTATE;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.ConnectionManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.IncidentBroadcaster;
 import de.tuberlin.mcc.simra.app.util.PermissionHelper;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
+import de.tuberlin.mcc.simra.app.util.ble.ConnectionEventListener;
 
 import static de.tuberlin.mcc.simra.app.entities.Profile.profileIsInUnknownRegion;
 import static de.tuberlin.mcc.simra.app.update.VersionUpdater.Legacy.Utils.getAppVersionNumber;
@@ -111,26 +119,62 @@ public class MainActivity extends BaseActivity
         }
     };
     boolean obsEnabled = false;
-    BroadcastReceiver receiver;
     private MapView mMapView;
     private MapController mMapController;
     private MyLocationNewOverlay mLocationOverlay;
     private LocationManager locationManager;
     private Boolean recording = false;
+    private ConnectionEventListener connectionEventListener = null;
+    private int nRetries = 0; // number of OBS connection retries
+    private boolean showingOBSWarning = false;
 
-    private void showOBSNotConnectedWarning() {
+    /**
+     * Prompts user to start recording or open the OBS settings.
+     * Gets called, when OBS is enabled in the settings and user tries to star recording but there
+     * is not a connection to an OBS yet.
+     */
+    private void showOBSNotConnectedRecordingWarning() {
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
-        alert.setTitle(R.string.not_connected_warnung_title);
-        alert.setMessage(R.string.not_connected_warnung_message);
+        alert.setTitle(R.string.not_connected_warning_title);
+        alert.setMessage(R.string.not_connected_recording_warning_message);
         alert.setPositiveButton(R.string.yes, (dialog, whichButton) -> {
             startRecording();
         });
-        alert.setNegativeButton(R.string.cancel_button, (dialog, whichButton) -> {
+        alert.setNegativeButton(R.string.no_open_settings, (dialog, whichButton) -> {
             startActivity(new Intent(this, OpenBikeSensorActivity.class));
         });
         alert.show();
     }
 
+    /**
+     * Prompts user to open OBS settings or deactivate OBS.
+     * Gets called, when a connection to an OBS fails three times in a row.
+     */
+    private void showOBSNotConnectedWarning() {
+        if (showingOBSWarning) {
+            return;
+        }
+        showingOBSWarning = true;
+        android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
+        alert.setTitle(R.string.could_not_connect_warning_title);
+        alert.setMessage(R.string.could_not_connect_warning_message);
+        alert.setPositiveButton(R.string.open_settings, (dialog, whichButton) -> {
+            showingOBSWarning = false;
+            startActivity(new Intent(this, OpenBikeSensorActivity.class));
+        });
+        alert.setNegativeButton(R.string.disable_obs, (dialog, whichButton) -> {
+            showingOBSWarning = false;
+            deactivateOBS();
+        });
+        alert.setOnDismissListener(dialog -> showingOBSWarning = false);
+        alert.show();
+    }
+
+    /**
+     * Prompts user to enable Bluetooth or deactivate OBS.
+     * Gets called, if OBS is enabled in the settings but Bluetooth is disabled, so SimRa cannot
+     * connect to OBS.
+     */
     private void showBluetoothNotEnableWarning() {
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
         alert.setTitle(R.string.bluetooth_not_enable_title);
@@ -145,13 +189,19 @@ public class MainActivity extends BaseActivity
         alert.show();
     }
 
+    /**
+     * Gets called if user responds to the Bluetooth alert. Starts obs connection or disables obs.
+     */
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ENABLE_BT) {
             if (resultCode == RESULT_OK) {
                 // Bluetooth was enabled
-                startOBSService();
+                if (obsEnabled) {
+                    // Log.d(TAG, "Bluetooth was enabled, running tryConnectToOBS");
+                    new Thread(this::tryConnectToOBS).start();
+                }
             } else if (resultCode == RESULT_CANCELED) {
                 // Bluetooth was not enabled
                 deactivateOBS();
@@ -268,19 +318,15 @@ public class MainActivity extends BaseActivity
 
         binding.appBarMain.buttonStartRecording.setOnClickListener(v -> {
             if (obsEnabled) {
-                OBSService.ConnectionState currentState = OBSService.getConnectionState();
-                if (!currentState.equals(OBSService.ConnectionState.CONNECTED)) {
-                    boolean reconnect = OBSService.tryConnectPairedDevice(this);
-                    if (!reconnect) {
-                        showOBSNotConnectedWarning();
-                        return;
-                    }
+                if (ConnectionManager.INSTANCE.getBleState() == BLESTATE.DISCONNECTED) { // if not connected to OBS, try to connect
+                    showOBSNotConnectedRecordingWarning(); // try one reconnect and show warning if that one fails too
+                    return;
                 }
             }
             startRecording();
         });
 
-        Consumer<Integer> recordIncident = (incidentType) -> {
+        Consumer<Integer> recordIncident = incidentType -> {
             Toast t = Toast.makeText(MainActivity.this, R.string.recorded_incident, Toast.LENGTH_SHORT);
             t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 230);
             t.show();
@@ -317,7 +363,7 @@ public class MainActivity extends BaseActivity
                             .show();
                 }
             } catch (Exception e) {
-                Log.d(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
+                Log.e(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
             }
         });
 
@@ -326,39 +372,131 @@ public class MainActivity extends BaseActivity
 
         // OpenBikeSensor
         binding.appBarMain.buttonRideSettingsObs.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
+    }
 
-        obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
-        updateOBSButtonStatus(OBSService.ConnectionState.DISCONNECTED);
-        if (obsEnabled) {
-            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (mBluetoothAdapter == null) {
-                // Device does not support Bluetooth
-                deactivateOBS();
-                Toast.makeText(MainActivity.this, R.string.openbikesensor_bluetooth_incompatible, Toast.LENGTH_LONG)
-                        .show();
-            } else if (!mBluetoothAdapter.isEnabled() && obsEnabled) {
-                // Bluetooth is disabled
-                showBluetoothNotEnableWarning();
+    /**
+     * Runnable to connect to OBS.
+     */
+    FutureTask<Boolean> ft;
+    public class OBSTryConnectRunnable implements Runnable {
+        public void run() {
+            if (connectionEventListener == null) {
+                // Log.d(TAG, "creating connectionEventListener");
+                connectionEventListener = new ConnectionEventListener();
+                connectionEventListener.setOnScanStart(isSearching -> {
+                    // Log.d(TAG, "isSearching: " + isSearching);
+                    // updateOBSButtonStatus(BLESTATE.SEARCHING);
+                    updateOBSButtonStatus();
+                    return null;
+                });
+                connectionEventListener.setOnScanStop(foundOBS -> {
+                    // Log.d(TAG, "foundOBS: " + foundOBS);
+                    // updateOBSButtonStatus(BLESTATE.DISCONNECTED);
+                    updateOBSButtonStatus();
+                    return null;
+                });
+                connectionEventListener.setOnConnectionFailed(bluetoothDevice -> {
+                    Log.e(TAG,"Connecting to " + bluetoothDevice.getName() + " failed!");
+                    ft.run();
+                    return null;
+                });
+                connectionEventListener.setOnDeviceFound(bluetoothDevice -> {
+                    // Log.d(TAG, "Device found: " + bluetoothDevice.getName());
+                    // updateOBSButtonStatus(BLESTATE.FOUND);
+                    updateOBSButtonStatus();
+                    List<UUID> characteristicsToSubscribeTo = List.of(ConnectionManager.INSTANCE.getCLOSE_PASS_CHARACTERISTIC_UUID(),ConnectionManager.INSTANCE.getSENSOR_DISTANCE_CHARACTERISTIC_UUID());
+                    ConnectionManager.INSTANCE.connect(characteristicsToSubscribeTo,MainActivity.this);
+                    return null;
+                });
+                connectionEventListener.setOnConnectionSetupComplete(bluetoothGatt -> {
+                    // Log.d(TAG, "Connection setup complete.");
+                    // updateOBSButtonStatus(BLESTATE.CONNECTED);
+                    updateOBSButtonStatus();
+                    ft.run();
+                    return null;
+                });
+                connectionEventListener.setOnClosePassNotification(measurement -> {
+                    // Log.d(TAG, "Close Pass! Time: " + measurement.getObsTime() + " left: " + measurement.getLeftDistance() + " right: " + measurement.getRightDistance());
+                    return null;
+                });
+                connectionEventListener.setOnTimeRead(time -> {
+                    // Log.d(TAG, "Time: " + time);
+                    return null;
+                });
+                connectionEventListener.setOnDisconnect(bluetoothDevice -> {
+                    // Log.d(TAG, "Disconnected from " + bluetoothDevice.getName());
+                    // updateOBSButtonStatus(BLESTATE.DISCONNECTED);
+                    updateOBSButtonStatus();
+                    return null;
+                });
+            }
+
+            ConnectionManager.INSTANCE.registerListener(connectionEventListener);
+            if (ConnectionManager.INSTANCE.getBleState() == BLESTATE.SEARCHING) {
+                ConnectionManager.INSTANCE.stopScan();
+                /*if (ConnectionManager.INSTANCE.isConnected()) {
+                    // updateOBSButtonStatus(BLESTATE.CONNECTED);
+                }*/
+            }
+            if (ConnectionManager.INSTANCE.getBleState() == BLESTATE.DISCONNECTED) {
+                ConnectionManager.INSTANCE.startScan(MainActivity.this);
+                // updateOBSButtonStatus(BLESTATE.SEARCHING);
+            }
+            updateOBSButtonStatus();
+        }
+    }
+
+
+
+    private void tryConnectToOBS() {
+        if (!obsEnabled) {
+            Log.e(TAG, "OBS is not enabled (anymore)");
+            return;
+        }
+        if (ConnectionManager.INSTANCE.getBleState() == BLESTATE.CONNECTED && connectionEventListener != null) {
+            Log.e(TAG, "Already connected to OBS");
+            return;
+        }
+        ft = new FutureTask<>(() -> {}, null);
+        OBSTryConnectRunnable runnable = new OBSTryConnectRunnable();
+        // Log.d(TAG, "running tryConnectToOBS");
+        runOnUiThread(runnable);
+        int MAX_NUMBER_OF_OBS_CONNECTION_RETRIES = 3;
+        try {
+            ft.get(10, TimeUnit.SECONDS); // this will block 10 seconds until Runnable completes
+            if (ConnectionManager.INSTANCE.getBleState() == BLESTATE.DISCONNECTED) {
+                if (nRetries <= MAX_NUMBER_OF_OBS_CONNECTION_RETRIES) {
+                    nRetries++;
+                    // Log.d(TAG, nRetries + "/" + MAX_NUMBER_OF_OBS_CONNECTION_RETRIES + " running tryConnectToOBS()");
+                    tryConnectToOBS();
+                } else {
+                    runOnUiThread(this::showOBSNotConnectedWarning);
+                }
+            }
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            e.printStackTrace();
+            // Log.d(TAG, "exception while connecting to OBS, trying again");
+            if (nRetries <= MAX_NUMBER_OF_OBS_CONNECTION_RETRIES) {
+                nRetries++;
+                // Log.d(TAG, nRetries + "/" + MAX_NUMBER_OF_OBS_CONNECTION_RETRIES + " running tryConnectToOBS()");
+                tryConnectToOBS();
             } else {
-                // Bluetooth is enabled
-                startOBSService();
+                runOnUiThread(this::showOBSNotConnectedWarning);
             }
         }
     }
 
+
+
+    /**
+     * Deactivates the OBS Settings, so that in future SimRa won't try to connect to OBS automatically
+     */
     private void deactivateOBS() {
         obsEnabled = false;
-        updateOBSButtonStatus(OBSService.ConnectionState.DISCONNECTED);
+        binding.appBarMain.buttonRideSettingsObs.setVisibility(View.GONE);
         SharedPref.Settings.OpenBikeSensor.setEnabled(false, this);
     }
 
-    private void startOBSService() {
-        OBSService.ConnectionState currentState = OBSService.getConnectionState();
-        if (obsEnabled && currentState.equals(OBSService.ConnectionState.DISCONNECTED)) {
-            OBSService.startScanning(this);
-        }
-        registerOBSService();
-    }
 
     public void displayButtonsForMenu() {
         binding.appBarMain.buttonStartRecording.setVisibility(View.VISIBLE);
@@ -367,8 +505,7 @@ public class MainActivity extends BaseActivity
         binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
         binding.appBarMain.reportIncidentContainer.setVisibility(View.GONE);
 
-        //binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.VISIBLE);
-        updateOBSButtonStatus(OBSService.getConnectionState());
+        updateOBSButtonStatus();
     }
 
     public void displayButtonsForDrive() {
@@ -379,36 +516,7 @@ public class MainActivity extends BaseActivity
         if (SharedPref.Settings.IncidentsButtonsDuringRide.getIncidentButtonsEnabled(this)) {
             binding.appBarMain.reportIncidentContainer.setVisibility(View.VISIBLE);
         }
-
-        //binding.appBarMain.buttonRideSettingsGeneral.setVisibility(View.GONE);
-        updateOBSButtonStatus(OBSService.getConnectionState());
-
-    }
-
-    private void registerOBSService() {
-        receiver = OBSService.registerCallbacks(this, new OBSService.OBSServiceCallbacks() {
-            public void onConnectionStateChanged(OBSService.ConnectionState newState) {
-                updateOBSButtonStatus(newState);
-            }
-
-            public void onDeviceFound(String deviceName, String deviceId) {
-                if (!OBSService.getConnectionState().equals(OBSService.ConnectionState.CONNECTED)) {
-                    Toast.makeText(MainActivity.this, R.string.openbikesensor_toast_devicefound, Toast.LENGTH_LONG)
-                            .show();
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void onDestroy() {
-        OBSService.terminateService(this);
-        super.onDestroy();
-    }
-
-    private void unregisterOBSService() {
-        OBSService.unRegisterCallbacks(receiver, this);
-        receiver = null;
+        binding.appBarMain.buttonRideSettingsObs.setVisibility(View.GONE);
     }
 
     private void startRecording() {
@@ -440,19 +548,19 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void updateOBSButtonStatus(OBSService.ConnectionState status) {
+    private void updateOBSButtonStatus() {
         FloatingActionButton obsButton = binding.appBarMain.buttonRideSettingsObs;
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (obsEnabled) {
-            // einblenden
+            // enable Bluetooth button
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(true);
             obsButton.setVisibility(View.VISIBLE);
         } else {
-            // ausblenden
+            // disable Bluetooth button
             navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
             obsButton.setVisibility(View.GONE);
         }
-        switch (status) {
+        switch (ConnectionManager.INSTANCE.getBleState()) {
             case DISCONNECTED:
                 obsButton.setImageResource(R.drawable.ic_bluetooth_disabled);
                 obsButton.setContentDescription(getString(R.string.obsNotConnected));
@@ -463,7 +571,8 @@ public class MainActivity extends BaseActivity
                 obsButton.setContentDescription(getString(R.string.obsSearching));
                 obsButton.setColorFilter(Color.WHITE);
                 break;
-            case PAIRING:
+            case FOUND:
+            case CONNECTING:
                 obsButton.setImageResource(R.drawable.ic_bluetooth_searching);
                 obsButton.setContentDescription(getString(R.string.connecting));
                 obsButton.setColorFilter(Color.WHITE);
@@ -479,17 +588,27 @@ public class MainActivity extends BaseActivity
     }
 
     public void onResume() {
-        // UpdateHelper.checkForUpdates(this);
-        obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
-        if (obsEnabled) {
-            OBSService.tryConnectPairedDevice(this);
-        }
-
-        if (receiver == null && obsEnabled) {
-            registerOBSService();
-        }
         super.onResume();
 
+        // OpenBikeSensor
+        obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
+        updateOBSButtonStatus();
+        if (obsEnabled) {
+            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (mBluetoothAdapter == null) {
+                // Device does not support Bluetooth
+                deactivateOBS();
+                Toast.makeText(MainActivity.this, R.string.openbikesensor_bluetooth_incompatible, Toast.LENGTH_LONG)
+                        .show();
+            } else if (!mBluetoothAdapter.isEnabled() && obsEnabled) {
+                // Bluetooth is disabled
+                showBluetoothNotEnableWarning();
+            } else {
+                // Bluetooth is enabled
+                // Log.d(TAG,  "onResume - " + nRetries + "/" + MAX_NUMBER_OF_OBS_CONNECTION_RETRIES + " running tryConnectToOBS()");
+                new Thread(this::tryConnectToOBS).start();
+            }
+        }
         // Ensure the button that matches current state is presented.
         if (recording) {
             displayButtonsForDrive();
@@ -512,7 +631,6 @@ public class MainActivity extends BaseActivity
         mMapView.onResume(); // needed for compass and icons
         mLocationOverlay.onResume();
         mLocationOverlay.enableMyLocation();
-        updateOBSButtonStatus(OBSService.getConnectionState());
 
     }
 
@@ -529,7 +647,10 @@ public class MainActivity extends BaseActivity
         locationManager.removeUpdates(MainActivity.this);
         mLocationOverlay.onPause();
         mLocationOverlay.disableMyLocation();
-        unregisterOBSService();
+        // Stop listening to OBS callbacks
+        if (connectionEventListener != null) {
+            ConnectionManager.INSTANCE.unregisterListener(connectionEventListener);
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -604,40 +725,19 @@ public class MainActivity extends BaseActivity
             startActivity(i);
         } else if (id == R.id.nav_dashboard) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            //intent = new Intent(SocialMediaActivity.this, WebActivity.class);
             intent.setData(Uri.parse(getString(R.string.link_simra_Dashboard)));
             startActivity(intent);
-      /*  } else if (id == R.id.nav_feedback) {
-            // src:
-            // https://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
-            Intent i = new Intent(Intent.ACTION_SEND);
-            i.setType("message/rfc822");
-            i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedbackReceiver)});
-            i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedbackHeader));
-            i.putExtra(Intent.EXTRA_TEXT, (getString(R.string.feedbackReceiver)) + System.lineSeparator()
-                    + "App Version: " + BuildConfig.VERSION_CODE + System.lineSeparator() + "Android Version: ");
-            try {
-                startActivity(Intent.createChooser(i, "Send mail..."));
-            } catch (android.content.ActivityNotFoundException ex) {
-                Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-            }
-*/
         } else if (id == R.id.nav_imprint) {
             Intent intent = new Intent(MainActivity.this, WebActivity.class);
             intent.putExtra("URL", getString(R.string.tuberlin_impressum));
-
             startActivity(intent);
         } else if (id == R.id.nav_contact) {
-
             Intent i = new Intent(MainActivity.this, ContactActivity.class);
-            // Intent i = new Intent(Intent.ACTION_VIEW);
-            // i.setData(Uri.parse(getString(R.string.link_to_twitter)));
             startActivity(i);
         } else if (id == R.id.nav_bluetooth_connection) {
             Intent intent = new Intent(MainActivity.this, OpenBikeSensorActivity.class);
             startActivity(intent);
         }
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -818,8 +918,6 @@ public class MainActivity extends BaseActivity
         private CheckVersionTask() {
         }
 
-        ;
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -843,8 +941,6 @@ public class MainActivity extends BaseActivity
                 HttpsURLConnection urlConnection =
                         (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
-                // urlConnection.setRequestProperty("Content-Type","text/plain");
-                // urlConnection.setDoOutput(true);
                 urlConnection.setReadTimeout(10000);
                 urlConnection.setConnectTimeout(15000);
 

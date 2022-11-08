@@ -18,80 +18,21 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
 
-        <LinearLayout
-            android:id="@+id/connectDevicesLayout"
+        <TextView
+            android:id="@+id/statusText"
+            style="@style/TextAppearance.AppCompat.Large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:text="@string/obs_activity_text_start"
+            android:textAlignment="center"/>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/connectDevicesText"
-                    style="@style/TextAppearance.AppCompat.Large"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/availableDevices" />
-
-                <ProgressBar
-                    android:id="@+id/searchingCircle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignTop="@id/connectDevicesText"
-                    android:layout_alignBottom="@id/connectDevicesText"
-                    android:layout_marginLeft="4dp"
-                    android:layout_toRightOf="@id/connectDevicesText"
-                    android:indeterminate="true" />
-
-                <Button
-                    android:id="@+id/retryButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginStart="212dp"
-                    android:layout_marginEnd="73dp"
-                    android:height="38dip"
-                    android:minHeight="38dip"
-                    android:text="Retry"
-                    android:visibility="visible" />
-
-
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/devicesList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="vertical">
-
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Connect with A4:CF:12:9A:15:5A"
-                    android:visibility="invisible" />
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/pairingLayout"
+        <Button
+            android:id="@+id/bluetoothButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="vertical">
+            android:layout_gravity="center"
+            android:text="@string/obs_activity_button_start_scan" />
 
-            <TextView
-                android:id="@+id/pairingText"
-                style="@style/TextAppearance.AppCompat.Large"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Pairing" />
-
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/deviceLayout"
@@ -99,12 +40,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="visible">
-
-            <TextView
-                style="@style/TextAppearance.AppCompat.Large"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/obs_activity_button_connect_device" />
 
             <TextView
                 android:id="@+id/deviceInfoTextView"
@@ -123,14 +58,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:max="100"
-                android:progress="45" />
-
-            <Button
-                android:id="@+id/btnDisconnect"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/obs_activity_button_disconnect_device" />
+                android:progress="38" />
         </LinearLayout>
 
         <TextView

@@ -1,9 +1,5 @@
 package de.tuberlin.mcc.simra.app.activities;
 
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,17 +10,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,17 +26,13 @@ import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
 import de.tuberlin.mcc.simra.app.services.DebugUploadService;
-import de.tuberlin.mcc.simra.app.services.OBSService;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.ConnectionManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
-import pl.droidsonroids.gif.GifImageView;
 
 import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getBaseFolderPath;
-import static de.tuberlin.mcc.simra.app.util.IOUtils.importSimRaData;
-import static de.tuberlin.mcc.simra.app.util.IOUtils.zipto;
-
 import static de.tuberlin.mcc.simra.app.util.Utils.prepareDebugZip;
 import static de.tuberlin.mcc.simra.app.util.Utils.sortFileListLastModified;
 
@@ -210,6 +199,7 @@ public class SettingsActivity extends BaseActivity {
         // Switch: OpenBikeSensor device enabled
         boolean obsActivated = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
         binding.obsButton.setVisibility(obsActivated ? View.VISIBLE : View.GONE);
+        // binding.obsButton.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
         binding.obsButton.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
 
         if (BluetoothAdapter.getDefaultAdapter() == null) {
@@ -220,15 +210,8 @@ public class SettingsActivity extends BaseActivity {
         binding.obsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             SharedPref.Settings.OpenBikeSensor.setEnabled(isChecked, SettingsActivity.this);
             binding.obsButton.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-
-            if (isChecked) {
-                if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
-                    enableBluetooth();
-                } else {
-                    startOBSService();
-                }
-            } else {
-                OBSService.terminateService(this);
+            if (!isChecked && ConnectionManager.INSTANCE.getBleState() == ConnectionManager.BLESTATE.CONNECTED) {
+                ConnectionManager.INSTANCE.disconnect(ConnectionManager.INSTANCE.getScanResult().getDevice());
             }
         });
 
@@ -333,59 +316,6 @@ public class SettingsActivity extends BaseActivity {
         binding.privacyDistanceTextRight.setText(SharedPref.Settings.Ride.PrivacyDistance.getMaxDistance(unit) + UnitHelper.getShortTranslationForUnit(unit, this));
     }
 
-    private void showTutorialDialog() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle(getString(R.string.obsConnecting));
-        alert.setMessage(getString(R.string.obsTutorial));
-
-        LinearLayout gifLayout = new LinearLayout(this);
-        LinearLayout.LayoutParams gifMargins = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        GifImageView gif = new GifImageView(this);
-        gif.setImageResource(R.drawable.tutorial);
-        gif.setVisibility(View.VISIBLE);
-        gifMargins.setMargins(50, 0, 50, 0);
-        gif.setLayoutParams(gifMargins);
-        gifLayout.addView(gif);
-        alert.setView(gifLayout);
-        alert.setPositiveButton("Ok", (dialog, whichButton) -> {
-        });
-        alert.show();
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_ENABLE_BT) {
-            if (resultCode == Activity.RESULT_OK) {
-                startOBSService();
-                showTutorialDialog();
-            } else {
-                SharedPref.Settings.OpenBikeSensor.setEnabled(false, this);
-                binding.obsSwitch.setChecked(false);
-                OBSService.terminateService(this);
-                binding.obsButton.setVisibility(View.GONE);
-            }
-        } else if (requestCode == DIRECTORY_PICKER_EXPORT && resultCode == Activity.RESULT_OK) {
-            // triggers export to SimRa.zip (in a given directory)
-            zipto(SettingsActivity.this.getFilesDir().getParent(),data.getData(),SettingsActivity.this);
-        } else if (requestCode == FILE_PICKER_IMPORT && resultCode == Activity.RESULT_OK) {
-            // triggers import data from given SimRa.zip
-            importSimRaData(data.getData() ,this);
-            // reload activity so that the imported settings are shown in this view.
-            loadActivity();
-            // show toast that data import is completed
-            Toast.makeText(this,R.string.importDone, Toast.LENGTH_LONG).show();
-        } else {
-            if (data != null) {
-                Log.d(TAG, " requestCode: " + requestCode + " resultCode: " + resultCode + " result " + data.getData());
-            }
-        }
-    }
-
-    private void startOBSService() {
-        Intent intent = new Intent(this, OBSService.class);
-        startService(intent);
-    }
-
     private void enableBluetooth() {
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -411,34 +341,5 @@ public class SettingsActivity extends BaseActivity {
                 Toast.makeText(getApplicationContext(), R.string.upload_completed, Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    /*
-    public String getPath(Uri uri) {
-
-        String path = null;
-        String[] projection = { MediaStore.Files.FileColumns.DATA };
-        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-
-        if(cursor == null){
-            path = uri.getPath();
-        }
-        else{
-            cursor.moveToFirst();
-            int column_index = cursor.getColumnIndexOrThrow(projection[0]);
-            path = cursor.getString(column_index);
-            cursor.close();
-        }
-
-        return ((path == null || path.isEmpty()) ? (uri.getPath()) : path);
-    }*/
-
-    private void restartApp() {
-        Intent intent = new Intent(getApplicationContext(), StartActivity.class);
-        int mPendingIntentId = 1337;
-        PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-        System.exit(0);
     }
 }

@@ -8,10 +8,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.Utils;
@@ -19,11 +19,11 @@ import de.tuberlin.mcc.simra.app.util.Utils;
 public class IncidentLog {
     public final static String INCIDENT_LOG_HEADER = "key,lat,lon,ts,bike,childCheckBox,trailerCheckBox,pLoc,incident,i1,i2,i3,i4,i5,i6,i7,i8,i9,scary,desc,i10";
     public final int rideId;
-    private Map<Integer, IncidentLogEntry> incidents;
+    private TreeMap<Integer, IncidentLogEntry> incidents;
     public int nn_version;
     private static final String TAG = "IncidentLog_LOG";
 
-    public IncidentLog(int rideId, Map<Integer, IncidentLogEntry> incidents, int nn_version) {
+    public IncidentLog(int rideId, TreeMap<Integer, IncidentLogEntry> incidents, int nn_version) {
         this.rideId = rideId;
         this.incidents = incidents;
         this.nn_version = nn_version;
@@ -61,7 +61,7 @@ public class IncidentLog {
      */
     public static IncidentLog loadIncidentLogWithRideSettingsAndBoundary(int rideId, Integer bikeType, Integer phoneLocation, Boolean childOnBoard, Boolean bikeWithTrailer, Long startTimeBoundary, Long endTimeBoundary, Context context) {
         File incidentFile = getEventsFile(rideId, context);
-        Map<Integer, IncidentLogEntry> incidents = new HashMap() {};
+        TreeMap<Integer, IncidentLogEntry> incidents = new TreeMap() {};
         int nn_version = 0;
         if (incidentFile.exists()) {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(incidentFile))) {
@@ -93,7 +93,7 @@ public class IncidentLog {
     }
 
     public static IncidentLog filterIncidentLogTime(IncidentLog incidentLog, Long startTimeBoundary, Long endTimeBoundary) {
-        Map<Integer, IncidentLogEntry> incidents = new HashMap() {};
+        TreeMap<Integer, IncidentLogEntry> incidents = new TreeMap() {};
         for (Map.Entry<Integer, IncidentLogEntry> incidentLogEntry : incidentLog.getIncidents().entrySet()) {
             if (incidentLogEntry.getValue().isInTimeFrame(startTimeBoundary, endTimeBoundary)
             ) {
@@ -105,7 +105,7 @@ public class IncidentLog {
 
     public static IncidentLog filterIncidentLogUploadReady(IncidentLog incidentLog, Integer bikeType, Boolean childOnBoard, Boolean bikeWithTrailer, Integer phoneLocation, Boolean forUpload) {
 
-        Map<Integer, IncidentLogEntry> incidents = new HashMap() {};
+        TreeMap<Integer, IncidentLogEntry> incidents = new TreeMap() {};
         for (Map.Entry<Integer, IncidentLogEntry> incidentLogEntry : incidentLog.getIncidents().entrySet()) {
             Log.d(TAG," for loop 1 incidentLogEntry: " + incidentLogEntry.getValue().stringifyDataLogEntry());
             if (incidentLogEntry.getValue().isReadyForUpload()) {
@@ -181,8 +181,12 @@ public class IncidentLog {
         return numberOfIncidentsNotCountingRideSettingsIncident;
     }
     public IncidentLogEntry updateOrAddIncident(IncidentLogEntry incidentLogEntry) {
-        if (incidentLogEntry.key == null) {
-            incidentLogEntry.key = (1000 + incidents.size());
+        if (incidentLogEntry.key == null) { // for manually added incidents
+            incidentLogEntry.key = (calculateKey(1000));
+        } else if (incidentLogEntry.key == 2000) { // for visible OBS incidents
+            incidentLogEntry.key = (calculateKey(2000));
+        } else if (incidentLogEntry.key == 3000) {// for hidden OBS incidents
+            incidentLogEntry.key = (calculateKey(3000));
         }
         incidents.put(incidentLogEntry.key, incidentLogEntry);
         return incidentLogEntry;
@@ -195,5 +199,13 @@ public class IncidentLog {
     public Map<Integer, IncidentLogEntry> removeIncident(IncidentLogEntry incidentLogEntry) {
         incidents.remove(incidentLogEntry.key);
         return incidents;
+    }
+
+    public int calculateKey(int key) {
+        if (incidents.containsKey(key)) {
+            return (calculateKey(key+1));
+        } else {
+            return key;
+        }
     }
 }
