@@ -52,7 +52,7 @@
     <!--- WebActivity -->
     <string name="link_mcc_Page">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
     <string name="link_simra_Page">https://www.digital-future.berlin/forschung/projekte/simra/</string>
-    <string name="link_to_tutorial">http://www.redaktion.tu-berlin.de/fileadmin/fg344/simra/SimRa_Anleitung.pdf</string>
+    <string name="link_to_tutorial">https://tubcloud.tu-berlin.de/s/ACwzKWzF6geCd7p/download/SimRa_Instructions_DE.pdf</string>
     <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/mobil/</string>
 
 
@@ -182,7 +182,7 @@
 
     <!--- About -->
     <string name="notReady">Möchtest du die Bearbeitung unfertig beenden?</string>
-    <string name="privacyLink">https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1</string>
+    <string name="privacyLink">https://www.tu.berlin/mcc/forschung/projekte/simra-datenschutzerklaerung</string>
 
     <!--- Settings -->
     <string name="privacyDurationDescription">Verzögerung des Aufnahmestarts (in Sekunden)</string>
