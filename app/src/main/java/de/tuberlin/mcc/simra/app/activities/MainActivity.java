@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -350,7 +349,7 @@ public class MainActivity extends BaseActivity
                 unbindService(mRecorderServiceConnection);
                 stopService(recService);
                 recording = false;
-                if (mBoundRecorderService.getRecordingAllowed()) {
+                if (mBoundRecorderService.hasRecordedEnough()) {
                     ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(),
                             MetaData.STATE.JUST_RECORDED, true, this);
                 } else {

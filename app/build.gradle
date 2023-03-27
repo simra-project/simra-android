@@ -8,11 +8,11 @@ def API_ENDPOINT = "API_ENDPOINT"
 def API_VERSION = "API_VERSION"
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 91
         versionName "91.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

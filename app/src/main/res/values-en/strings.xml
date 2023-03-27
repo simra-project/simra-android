@@ -52,7 +52,7 @@
     <string name="link_mcc_Page">https://www.mcc.tu-berlin.de/menue/aktuelles/parameter/en/?isMobile=1</string>
     <string name="link_simra_Page">https://www.digital-future.berlin/en/research/projects/simra/</string>
     <string name="link_to_tutorial">https://tubcloud.tu-berlin.de/s/bQK6GemBMoXpbZT/download/SimRa_Instructions_EN.pdf</string>
-    <string name="tuberlin_impressum">https://www.tu-berlin.de/servicemenue/impressum/parameter/en/mobil/</string>
+    <string name="tuberlin_impressum">https://www.tu.berlin/en/site-credits</string>
     <string name="link_to_instagram">https://www.instagram.com/sicherheitimradverkehr/</string>
     <string name="link_simra_Dashboard">https://simra-project.github.io/dashboard/</string>
 

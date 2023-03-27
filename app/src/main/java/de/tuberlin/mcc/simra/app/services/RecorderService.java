@@ -27,7 +27,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.TreeMap;
@@ -142,8 +141,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         return (System.currentTimeMillis() - startTime);
     }
 
-    public boolean getRecordingAllowed() {
-        return recordingAllowed;
+    public boolean hasRecordedEnough() {
+        return recordingAllowed && lineAdded;
     }
 
 
@@ -350,6 +349,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         // with current ride and and sharedPrefs with current ride key. Do these things only,
         // if recording is allowed (see privacyDuration and privacyDistance) and we have written some
         // data.
+        Log.d(TAG, "recordingAllowed: " + recordingAllowed + " lineAdded: " + lineAdded);
         if (recordingAllowed && lineAdded) {
             recordingHandler.removeCallbacksAndMessages(null);
             int region = lookUpIntSharedPrefs("Region", 0, "Profile", this);

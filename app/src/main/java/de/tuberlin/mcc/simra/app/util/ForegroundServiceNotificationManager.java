@@ -24,7 +24,7 @@ public class ForegroundServiceNotificationManager {
         Intent mainActivityIntent = new Intent(ctx, MainActivity.class);
         mainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 0, mainActivityIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 0, mainActivityIntent, PendingIntent.FLAG_IMMUTABLE);
 
         // From API 26+ onwards a NotificationChannel has to be created
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
