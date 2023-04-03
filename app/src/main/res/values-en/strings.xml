@@ -27,7 +27,8 @@
     <string name="close_simra">Close SimRa</string>
     <string name="iAccept">I accept the privacy policy statement</string>
     <string name="privacyAgreementTitle">Privacy Policy Statement</string>
-    <string name="privacyAgreementMessage">SimRa records your location and sensor data in the background, when you start the recording of your ride. as well as demographics provided by you to show you your rides recorded with SimRa. For more information please read our <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/parameter/en/?isMobile=1">privacy policy statement</a>).</string>
+    <string name="privacyAgreementMessage">SimRa records your location and sensor data in the background, when you start the recording of your ride. as well as demographics provided by you to show you your rides recorded with SimRa. For more information please read our <a href="https://www.tu.berlin/en/mcc/research/projects/simra-privacy-policy-statement">privacy policy statement</a>.</string>
+    <string name="privacyUpdateAgreementMessage">We have updated our privacy policy. The only changes are a) providing more details on data handling and b) describing our optional features such as AI-based incident detection, OpenBikeSensor. You can find all details <a href="https://www.tu.berlin/en/mcc/research/projects/simra-privacy-policy-statement">here</a>.</string>
 
     <!--- Menu -->
     <string name="navigation_drawer_open">Open navigation drawer</string>

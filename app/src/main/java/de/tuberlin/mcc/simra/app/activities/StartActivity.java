@@ -81,13 +81,8 @@ public class StartActivity extends BaseActivity {
     }
 
     public void navigateIfAllPermissionsGranted() {
-        if (allPermissionGranted()) {
-            Intent intent = new Intent(StartActivity.this, MainActivity.class);
-            startActivity(intent);
-            // Call finish() to prevent going back to StartActivity,
-            // when the Back Button is pressed in MainActivity
-            finish();
-        } else {
+        if (!privacyPolicyAccepted()){
+            Log.d(TAG, "!privacyPolicyAccepted()");
             int screenSize = getResources().getConfiguration().screenLayout &
                     Configuration.SCREENLAYOUT_SIZE_MASK;
             if (screenSize == Configuration.SCREENLAYOUT_SIZE_SMALL) {
@@ -95,11 +90,31 @@ public class StartActivity extends BaseActivity {
             } else {
                 firePrivacyDialogNormalScreen();
             }
+        } else if (!privacyPolicyUpdateAccepted()) {
+            Log.d(TAG, "!privacyPolicyUpdateAccepted()");
+            int screenSize = getResources().getConfiguration().screenLayout &
+                    Configuration.SCREENLAYOUT_SIZE_MASK;
+            if (screenSize == Configuration.SCREENLAYOUT_SIZE_SMALL) {
+                firePrivacyUpdateDialogSmallScreen();
+            } else {
+                firePrivacyUpdateDialogNormalScreen();
+            }
+        } else {
+            Log.d(TAG, "else");
+            Intent intent = new Intent(StartActivity.this, MainActivity.class);
+            startActivity(intent);
+            // Call finish() to prevent going back to StartActivity,
+            // when the Back Button is pressed in MainActivity
+            finish();
         }
     }
 
     private boolean privacyPolicyAccepted() {
         return lookUpBooleanSharedPrefs("Privacy-Policy-Accepted", false, "simraPrefs", this);
+    }
+
+    private boolean privacyPolicyUpdateAccepted() {
+        return lookUpBooleanSharedPrefs("Privacy-Policy-Update-Accepted", false, "simraPrefs", this);
     }
 
     /**
@@ -123,7 +138,7 @@ public class StartActivity extends BaseActivity {
 
     private void checkPermissionsAndContinue() {
         // Check Permissions
-        if (allPermissionGranted()) {
+        if (privacyPolicyAccepted() && privacyPolicyUpdateAccepted() && PermissionHelper.hasBasePermissions(this)) {
             Intent intent = new Intent(StartActivity.this, MainActivity.class);
             startActivity(intent);
             // Call finish() to prevent going back to StartActivity,
@@ -178,6 +193,7 @@ public class StartActivity extends BaseActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 writeBooleanToSharedPrefs("Privacy-Policy-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this);
+                writeBooleanToSharedPrefs("Privacy-Policy-Update-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this);
                 PermissionHelper.requestFirstBasePermissionsNotGranted(StartActivity.this);
             }
         };
@@ -269,7 +285,122 @@ public class StartActivity extends BaseActivity {
         positiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                writeBooleanToSharedPrefs("Privacy-Policy-Update-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this);
                 writeBooleanToSharedPrefs("Privacy-Policy-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this);
+                PermissionHelper.requestFirstBasePermissionsNotGranted(StartActivity.this);
+                finalDialog.dismiss();
+            }
+        });
+    }
+
+    public void firePrivacyUpdateDialogNormalScreen() {
+        View checkBoxView = View.inflate(this, R.layout.checkbox, null);
+        CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
+
+        checkBox.setText(getString(R.string.iAccept));
+        AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
+
+        // Linkify the message
+        builder.setTitle(getString(R.string.privacyAgreementTitle));
+        builder.setMessage(getResources().getText(R.string.privacyUpdateAgreementMessage));
+
+        builder.setView(checkBoxView);
+        DialogInterface.OnClickListener positiveButtonListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                writeBooleanToSharedPrefs("Privacy-Policy-Update-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this);
+                PermissionHelper.requestFirstBasePermissionsNotGranted(StartActivity.this);
+            }
+        };
+        builder.setPositiveButton(R.string.next, positiveButtonListener);
+        builder.setNegativeButton(R.string.close_simra, (dialog, id) -> {
+            finish();
+            Toast.makeText(StartActivity.this, getString(R.string.simra_closed), Toast.LENGTH_LONG).show();
+        });
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        ((TextView) dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
+
+        // Initially disable the button
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
+    }
+
+
+    public void firePrivacyUpdateDialogSmallScreen() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
+        AlertDialog dialog = null;
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(35, 35, 35, 35);
+
+        TextView title = new TextView(this);
+        title.setText(getString(R.string.privacyAgreementTitle));
+        title.getTextSize();
+        // increase text size of title
+        title.setTextSize(TypedValue.COMPLEX_UNIT_PX, (title.getTextSize() * 1.2f));
+        title.setTypeface(null, Typeface.BOLD);
+        title.setPadding(0, 0, 0, 35);
+        layout.addView(title);
+
+        TextView message = new TextView(this);
+        message.setText(getResources().getText(R.string.privacyUpdateAgreementMessage));
+        message.setMovementMethod(LinkMovementMethod.getInstance());
+        layout.addView(message);
+
+        View checkBoxView = View.inflate(this, R.layout.checkbox, null);
+        CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
+
+        checkBox.setText(getString(R.string.iAccept));
+        layout.addView(checkBoxView);
+
+        RelativeLayout buttonsLayout = new RelativeLayout(this);
+
+        MaterialButton negativeButton = new MaterialButton(this);
+        RelativeLayout r2 = new RelativeLayout(this);
+        r2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+        RelativeLayout.LayoutParams negativeParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        negativeParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+        negativeButton.setLayoutParams(negativeParams);
+        negativeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                Toast.makeText(StartActivity.this, getString(R.string.simra_closed), Toast.LENGTH_LONG).show();
+            }
+        });
+        negativeButton.setText(R.string.close_simra);
+        r2.setPadding(35, 0, 0, 0);
+        r2.addView(negativeButton);
+        buttonsLayout.addView(r2);
+
+        MaterialButton positiveButton = new MaterialButton(this);
+        RelativeLayout r1 = new RelativeLayout(this);
+        r1.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+        RelativeLayout.LayoutParams positiveParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        positiveParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+        positiveButton.setLayoutParams(positiveParams);
+        positiveButton.setText(R.string.next);
+        r1.setPadding(0, 0, 35, 0);
+        r1.addView(positiveButton);
+        buttonsLayout.addView(r1);
+
+
+        positiveButton.setEnabled(false);
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            positiveButton.setEnabled(isChecked);
+        });
+        layout.addView(buttonsLayout);
+        final ScrollView scrollView = new ScrollView(this);
+        scrollView.addView(layout);
+        builder.setView(scrollView);
+        dialog = builder.create();
+        dialog.show();
+        AlertDialog finalDialog = dialog;
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                writeBooleanToSharedPrefs("Privacy-Policy-Update-Accepted", checkBox.isChecked(), "simraPrefs", StartActivity.this);
                 PermissionHelper.requestFirstBasePermissionsNotGranted(StartActivity.this);
                 finalDialog.dismiss();
             }

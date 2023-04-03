@@ -27,8 +27,8 @@
     <string name="close_simra">SimRa beenden</string>
     <string name="iAccept">Ich akzeptiere die Datenschutzerklärung</string>
     <string name="privacyAgreementTitle">Datenschutzerklärung</string>
-    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrtaufzeichnung Standort- und Sensordaten im Hintergrund auf, sowie von dir eingegebene demografische Daten, um dir deine mit SimRa aufgezeichneten Fahrten anzeigen zu können. Weitere Informationen findest du in unserer <a href="https://www.mcc.tu-berlin.de/menue/forschung/projekte/simra/datenschutzerklaerung/parameter/de/?isMobile=1">Datenschutzerklärung</a>.
-    </string>
+    <string name="privacyAgreementMessage">SimRa zeichnet während der Fahrtaufzeichnung Standort- und Sensordaten im Hintergrund auf, sowie von dir eingegebene demografische Daten, um dir deine mit SimRa aufgezeichneten Fahrten anzeigen zu können. Weitere Informationen findest du in unserer <a href="https://www.tu.berlin/mcc/forschung/projekte/simra-datenschutzerklaerung">Datenschutzerklärung</a>.</string>
+    <string name="privacyUpdateAgreementMessage">Wir haben unsere Datenschutzerklärung aktualisiert. Neu sind nur a) mehr präzise Details zur Datenverarbeitung und b) die Ergänzung der optionalen Features wie KI-basierte Erkennung und OpenBikeSensor. Weitere Infos findest du <a href="https://www.tu.berlin/mcc/forschung/projekte/simra-datenschutzerklaerung">hier</a>.</string>
 
     <!--- Menu -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
