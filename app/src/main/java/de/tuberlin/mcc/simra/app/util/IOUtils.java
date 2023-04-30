@@ -1,22 +1,10 @@
 package de.tuberlin.mcc.simra.app.util;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.util.Log;
-import android.util.Xml;
 import android.widget.Toast;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xmlpull.v1.XmlPullParser;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -27,22 +15,14 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import androidx.documentfile.provider.DocumentFile;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
-import de.tuberlin.mcc.simra.app.activities.AboutActivity;
-import de.tuberlin.mcc.simra.app.activities.SettingsActivity;
 
 import static de.tuberlin.mcc.simra.app.util.SharedPref.clearSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.createEntry;
@@ -88,7 +68,7 @@ public class IOUtils {
         }
     }
 
-    public static boolean zipto(String sourcePath, Uri toLocation, Context ctx) {
+    public static boolean zipTo(String sourcePath, Uri toLocation, Context ctx) {
 
         final int BUFFER = 2048;
 
@@ -129,7 +109,6 @@ public class IOUtils {
             e.printStackTrace();
             return false;
         }
-        Toast.makeText(ctx, R.string.exportToast, Toast.LENGTH_SHORT).show();
         return true;
     }
 

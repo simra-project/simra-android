@@ -204,13 +204,15 @@
     <string name="importPromptTitle">Datenimport von zuvor exportierten SimRa-Daten</string>
     <string name="importButtonText">Bitte wähle die "SimRa.zip"-Datei aus, die zuvor mit der Exportfunktion in SimRa erstellt wurde. Dadurch werden die Fahrten, Statistiken und Einstellungen, die zuvor exportiert wurden, übernommen. ACHTUNG! Dadurch werden aktuelle Fahrten, Statistiken und Einstellungen gelöscht bzw. überschrieben.</string>
     <string name="importFile">Navigiere bitte zu dem Ordner mit "SimRa.zip" und wähle ihn aus.</string>
-    <string name="importDone">Datenimport abgeschlossen.</string>
+    <string name="importSuccess">Datenimport abgeschlossen.</string>
+    <string name="importFail">Fehler: Datenimport fehlgeschlagen.</string>
     <string name="ok">Okay</string>
     <string name="exportTitle">Datenexport</string>
     <string name="exportPromptTitle">Datenexport der eigenen SimRa-Daten</string>
     <string name="exportButtonText">Gebe bitte den Ort an, wo die Datei "SimRa.zip" gespeichert werden soll. Diese Datei kann dann in einem Android-Gerät in SimRa importiert werden. Dadurch kannst du deine Fahrten, Statistiken und Einstellungen behalten, wenn du dein Handy wechselst oder formatierst. </string>
     <string name="exportDirectory">Wo soll SimRa.zip gespeichert werden?</string>
-    <string name="exportToast">"SimRa-Datei zum Importieren wurde erfolgreich erstellt"</string>
+    <string name="exportSuccessToast">"SimRa-Datei zum Importieren wurde erfolgreich erstellt."</string>
+    <string name="exportFailToast">"Fehler beim Erstellen der SimRa-Datei zum Importieren."</string>
     <string name="dateFormatDescription">Datumsformat</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>

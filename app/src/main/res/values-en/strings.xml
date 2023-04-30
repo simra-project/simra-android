@@ -195,13 +195,15 @@
     <string name="importPromptTitle">Import data from previously exported SimRa data</string>
     <string name="importButtonText">Please choose the "SimRa.zip" file previously created with the export feature in simRa. This will import all rides, statistics and settings from that file. WARNING! This will delete/overwrite all existing rides, statistics and settings.</string>
     <string name="importFile">Please navigate to the directory containing "SimRa.zip" and select it.</string>
-    <string name="importDone">Data imported.</string>
+    <string name="importSuccess">Data imported.</string>
+    <string name="importFail">Error: Data import failed.</string>
     <string name="ok">Okay</string>
     <string name="exportTitle">Export Data</string>
     <string name="exportPromptTitle">Export SimRa data</string>
     <string name="exportButtonText">Please give the location where to save the "SimRa.zip" file. This file can be used to import your rides, statistics and settings to another Android phone. </string>
     <string name="exportDirectory">Where shall SimRa.zip be saved?</string>
-    <string name="exportToast">"SimRa file for import was successfully created."</string>
+    <string name="exportSuccessToast">"SimRa file for import was successfully created."</string>
+    <string name="exportFailToast">"Error: Could not create SimRa file for import."</string>
     <string name="dateFormatDescription">Date Format</string>
     <string name="germanDate">dd.mm.yy, hh:mm</string>
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>

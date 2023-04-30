@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
@@ -33,6 +38,8 @@ import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.UnitHelper;
 
 import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getBaseFolderPath;
+import static de.tuberlin.mcc.simra.app.util.IOUtils.importSimRaData;
+import static de.tuberlin.mcc.simra.app.util.IOUtils.zipTo;
 import static de.tuberlin.mcc.simra.app.util.Utils.prepareDebugZip;
 import static de.tuberlin.mcc.simra.app.util.Utils.sortFileListLastModified;
 
@@ -171,6 +178,7 @@ public class SettingsActivity extends BaseActivity {
                         chooseFile.setType("application/zip");
                         chooseFile = Intent.createChooser(chooseFile, getString(R.string.importFile));
                         startActivityForResult(chooseFile, FILE_PICKER_IMPORT);
+                        importZipFromLocation.launch(new String[]{"application/zip"});
                     }
                 });
                 builder.setNegativeButton(R.string.cancel, null);
@@ -186,9 +194,7 @@ public class SettingsActivity extends BaseActivity {
                 builder.setPositiveButton(R.string.continueText, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                        i.addCategory(Intent.CATEGORY_DEFAULT);
-                        startActivityForResult(Intent.createChooser(i, getString(R.string.exportDirectory)), DIRECTORY_PICKER_EXPORT);
+                        exportZipToLocation.launch(Uri.parse(DocumentsContract.PROVIDER_INTERFACE));
                     }
                 });
                 builder.setNegativeButton(R.string.cancel, null);
@@ -342,4 +348,31 @@ public class SettingsActivity extends BaseActivity {
             }
         }
     }
+
+    private final ActivityResultLauncher<Uri> exportZipToLocation =
+            registerForActivityResult(new ActivityResultContracts.OpenDocumentTree(),
+                    new ActivityResultCallback<Uri>() {
+                        @Override
+                        public void onActivityResult(Uri uri) {
+                            boolean successfullyExported = zipTo(SettingsActivity.this.getFilesDir().getParent(),uri,SettingsActivity.this);
+                            if (successfullyExported) {
+                                Toast.makeText(SettingsActivity.this, R.string.exportSuccessToast, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(SettingsActivity.this, R.string.exportFailToast, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+    private final ActivityResultLauncher<String[]> importZipFromLocation =
+            registerForActivityResult(new ActivityResultContracts.OpenDocument(),
+                    new ActivityResultCallback<Uri>() {
+                        @Override
+                        public void onActivityResult(Uri uri) {
+                            boolean successfullyImported = importSimRaData(uri, SettingsActivity.this);
+                            if (successfullyImported) {
+                                Toast.makeText(SettingsActivity.this, R.string.importSuccess, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(SettingsActivity.this, R.string.importFail, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
 }
