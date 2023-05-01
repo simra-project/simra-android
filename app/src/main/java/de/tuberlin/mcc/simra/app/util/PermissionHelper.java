@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 
@@ -92,7 +94,7 @@ public class PermissionHelper {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             return hasPermissions(Location.permissions, context) && hasPermissions(Storage.permissions, context);
         } else {
-            return hasPermissions(LocationAndroidR.permissions, context) && hasPermissions(Storage.permissions, context);
+            return hasPermissions(LocationAndroidR.permissions, context);
         }
     }
 
