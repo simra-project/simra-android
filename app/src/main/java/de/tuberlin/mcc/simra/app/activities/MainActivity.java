@@ -1,6 +1,7 @@
 package de.tuberlin.mcc.simra.app.activities;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
@@ -61,6 +62,10 @@ import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.util.Consumer;
@@ -86,6 +91,7 @@ import static de.tuberlin.mcc.simra.app.entities.Profile.profileIsInUnknownRegio
 import static de.tuberlin.mcc.simra.app.update.VersionUpdater.Legacy.Utils.getAppVersionNumber;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
+import static de.tuberlin.mcc.simra.app.util.Utils.activityResultLauncher;
 import static de.tuberlin.mcc.simra.app.util.Utils.fireProfileRegionPrompt;
 import static de.tuberlin.mcc.simra.app.util.Utils.getNews;
 import static de.tuberlin.mcc.simra.app.util.Utils.isLocationServiceOff;
@@ -126,6 +132,7 @@ public class MainActivity extends BaseActivity
     private ConnectionEventListener connectionEventListener = null;
     private int nRetries = 0; // number of OBS connection retries
     private boolean showingOBSWarning = false;
+    private ActivityResultLauncher<Intent> activityResultLauncher;
 
     /**
      * Prompts user to start recording or open the OBS settings.
@@ -180,13 +187,14 @@ public class MainActivity extends BaseActivity
         alert.setMessage(R.string.bluetooth_not_enable_message);
         alert.setPositiveButton(R.string.yes, (dialog, whichButton) -> {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            activityResultLauncher.launch(enableBtIntent);
         });
         alert.setNegativeButton(R.string.no, (dialog, whichButton) -> {
             deactivateOBS();
         });
         alert.show();
     }
+
 
     /**
      * Gets called if user responds to the Bluetooth alert. Starts obs connection or disables obs.
@@ -370,13 +378,14 @@ public class MainActivity extends BaseActivity
 
 
         // OpenBikeSensor
+        activityResultLauncher = activityResultLauncher(MainActivity.this);
         binding.appBarMain.buttonRideSettingsObs.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
     }
 
     /**
      * Runnable to connect to OBS.
      */
-    FutureTask<Boolean> ft;
+    FutureTask<Boolean> obsFT;
     public class OBSTryConnectRunnable implements Runnable {
         public void run() {
             if (connectionEventListener == null) {
@@ -396,7 +405,7 @@ public class MainActivity extends BaseActivity
                 });
                 connectionEventListener.setOnConnectionFailed(bluetoothDevice -> {
                     Log.e(TAG,"Connecting to " + bluetoothDevice.getName() + " failed!");
-                    ft.run();
+                    obsFT.run();
                     return null;
                 });
                 connectionEventListener.setOnDeviceFound(bluetoothDevice -> {
@@ -411,7 +420,7 @@ public class MainActivity extends BaseActivity
                     // Log.d(TAG, "Connection setup complete.");
                     // updateOBSButtonStatus(BLESTATE.CONNECTED);
                     updateOBSButtonStatus();
-                    ft.run();
+                    obsFT.run();
                     return null;
                 });
                 connectionEventListener.setOnClosePassNotification(measurement -> {
@@ -456,13 +465,13 @@ public class MainActivity extends BaseActivity
             Log.e(TAG, "Already connected to OBS");
             return;
         }
-        ft = new FutureTask<>(() -> {}, null);
+        obsFT = new FutureTask<>(() -> {}, null);
         OBSTryConnectRunnable runnable = new OBSTryConnectRunnable();
         // Log.d(TAG, "running tryConnectToOBS");
         runOnUiThread(runnable);
         int MAX_NUMBER_OF_OBS_CONNECTION_RETRIES = 3;
         try {
-            ft.get(10, TimeUnit.SECONDS); // this will block 10 seconds until Runnable completes
+            obsFT.get(10, TimeUnit.SECONDS); // this will block 10 seconds until Runnable completes
             if (ConnectionManager.INSTANCE.getBleState() == BLESTATE.DISCONNECTED) {
                 if (nRetries <= MAX_NUMBER_OF_OBS_CONNECTION_RETRIES) {
                     nRetries++;

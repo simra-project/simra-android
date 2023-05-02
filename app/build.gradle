@@ -87,7 +87,7 @@ dependencies {
     implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
 
     // Kotlin
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.6.0"
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.0"
 
 }

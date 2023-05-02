@@ -1,13 +1,17 @@
 package de.tuberlin.mcc.simra.app.activities
 
+import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
+import androidx.core.app.ActivityCompat
 import de.tuberlin.mcc.simra.app.R
 import de.tuberlin.mcc.simra.app.databinding.ActivityOpenbikesensorBinding
 import de.tuberlin.mcc.simra.app.util.BaseActivity
@@ -16,6 +20,8 @@ import de.tuberlin.mcc.simra.app.util.ConnectionManager.BLESTATE
 import de.tuberlin.mcc.simra.app.util.ConnectionManager.CLOSE_PASS_CHARACTERISTIC_UUID
 import de.tuberlin.mcc.simra.app.util.ConnectionManager.SENSOR_DISTANCE_CHARACTERISTIC_UUID
 import de.tuberlin.mcc.simra.app.util.SharedPref
+import de.tuberlin.mcc.simra.app.util.Utils
+import de.tuberlin.mcc.simra.app.util.Utils.activityResultLauncher
 import de.tuberlin.mcc.simra.app.util.ble.ConnectionEventListener
 
 
@@ -29,6 +35,7 @@ class OpenBikeSensorActivity : BaseActivity() {
     private val notifyingCharacteristicsToSubscribeTo = listOf(SENSOR_DISTANCE_CHARACTERISTIC_UUID, CLOSE_PASS_CHARACTERISTIC_UUID)
     private var blestate = BLESTATE.DISCONNECTED
     private var deviceName = "---"
+    private lateinit var activityResultLauncher:ActivityResultLauncher<Intent>
 
 
     private fun updateUI() {
@@ -57,6 +64,7 @@ class OpenBikeSensorActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        activityResultLauncher = activityResultLauncher(this@OpenBikeSensorActivity)
         binding = ActivityOpenbikesensorBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
@@ -71,7 +79,13 @@ class OpenBikeSensorActivity : BaseActivity() {
 
             Log.d(TAG, "pressed button. blestate: $blestate")
             when (blestate) {
-                BLESTATE.DISCONNECTED ->  ConnectionManager.startScan(this)
+                BLESTATE.DISCONNECTED -> {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        Utils.requestBlePermissions(this@OpenBikeSensorActivity, Utils.REQUEST_ENABLE_BT)
+                    } else {
+                        ConnectionManager.startScan(this)
+                    }
+                }
                 BLESTATE.FOUND -> ConnectionManager.connect(notifyingCharacteristicsToSubscribeTo,this)
                 BLESTATE.CONNECTED -> ConnectionManager.disconnect(ConnectionManager.scanResult.device)
                 else -> ConnectionManager.stopScan()
@@ -109,7 +123,7 @@ class OpenBikeSensorActivity : BaseActivity() {
     private fun promptEnableBluetooth() {
         if (!bluetoothAdapter.isEnabled) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
+            activityResultLauncher.launch(enableBtIntent)
         }
     }
 
