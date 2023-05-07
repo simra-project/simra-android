@@ -37,15 +37,14 @@ class OpenBikeSensorActivity : BaseActivity() {
 
 
     private val notifyingCharacteristicsToSubscribeTo = listOf(SENSOR_DISTANCE_CHARACTERISTIC_UUID, CLOSE_PASS_CHARACTERISTIC_UUID)
-    private var blestate = BLESTATE.DISCONNECTED
     private var deviceName = "---"
     private lateinit var activityResultLauncher:ActivityResultLauncher<Intent>
 
 
     private fun updateUI() {
         runOnUiThread {
-            Log.d(TAG, "updateUI() - blestate: $blestate")
-            when (blestate) {
+            Log.d(TAG, "updateUI() - blestate: ${ConnectionManager.bleState}")
+            when (ConnectionManager.bleState) {
                 BLESTATE.DISCONNECTED -> {
                     binding.bluetoothButton.text = getString(R.string.obs_activity_button_start_scan)
                     binding.statusText.text = getString(R.string.obs_activity_text_start)
@@ -74,15 +73,14 @@ class OpenBikeSensorActivity : BaseActivity() {
         setContentView(view)
         initializeToolBar()
         if (ConnectionManager.bleState == BLESTATE.CONNECTED) {
-            blestate = BLESTATE.CONNECTED
             deviceName = ConnectionManager.scanResult.device.name
             updateUI()
         }
 
         binding.bluetoothButton.setOnClickListener {
 
-            Log.d(TAG, "pressed button. blestate: $blestate")
-            when (blestate) {
+            Log.d(TAG, "pressed button. blestate: ${ConnectionManager.bleState}")
+            when (ConnectionManager.bleState) {
                 BLESTATE.DISCONNECTED -> {
                     if (!hasBLEPermissions(this)) {
                         requestBlePermissions(this@OpenBikeSensorActivity, REQUEST_ENABLE_BT)
@@ -135,19 +133,19 @@ class OpenBikeSensorActivity : BaseActivity() {
         ConnectionEventListener().apply {
             onScanStart = {
                 Log.d(TAG, "connectionEventListener: onScanStart")
-                blestate = BLESTATE.SEARCHING
+                // blestate = BLESTATE.SEARCHING
                 updateUI()
             }
             onDeviceFound = {
                 Log.d(TAG, "connectionEventListener: onDeviceFound")
                 deviceName = it.name
-                blestate = BLESTATE.FOUND
+                // blestate = BLESTATE.FOUND
                 updateUI()
             }
             onScanStop = {
                 Log.d(TAG, "connectionEventListener: onScanStop")
                 if (!it) {
-                    blestate = BLESTATE.DISCONNECTED
+                    // blestate = BLESTATE.DISCONNECTED
                     updateUI()
                 }
             }
@@ -155,14 +153,14 @@ class OpenBikeSensorActivity : BaseActivity() {
                 Log.d(TAG, "connectionEventListener: onConnectionSetupComplete")
                 deviceName = it.device.name
                 SharedPref.App.OpenBikeSensor.setObsDeviceName(deviceName, this@OpenBikeSensorActivity)
-                blestate = BLESTATE.CONNECTED
+                // blestate = BLESTATE.CONNECTED
                 updateUI()
             }
             onDisconnect = {
                 Log.d(TAG, "connectionEventListener: onDisconnect")
                 deviceName = "---"
                 SharedPref.App.OpenBikeSensor.deleteObsDeviceName(this@OpenBikeSensorActivity)
-                blestate = BLESTATE.DISCONNECTED
+                // blestate = BLESTATE.DISCONNECTED
                 updateUI()
             }
             onSensorDistanceNotification = {

@@ -389,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // Log.d(TAG, "creating connectionEventListener");
                 connectionEventListener = new ConnectionEventListener();
                 connectionEventListener.setOnScanStart(isSearching -> {
-                    // Log.d(TAG, "isSearching: " + isSearching);
+                    Log.d(TAG, "isSearching: " + isSearching);
                     // updateOBSButtonStatus(BLESTATE.SEARCHING);
                     updateOBSButtonStatus();
                     return null;
