@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -17,6 +18,8 @@ import java.util.Objects;
 public class PermissionHelper {
     // Log tag
     private static final String TAG = "PermissionHelper_LOG";
+
+    public final static int REQUEST_ENABLE_BT = 2122;
 
     public static final BasePermission Storage = new BasePermission(1002, new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -40,6 +43,16 @@ public class PermissionHelper {
     });
     public static final BasePermission LocationAndroidR = new BasePermission(1001, new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION,
+    });
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    public static final BasePermission Ble12 = new BasePermission((1005), new String[]{
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT
+    });
+
+    public static final BasePermission Ble = new BasePermission((1005), new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
     });
 
     /**
@@ -95,6 +108,23 @@ public class PermissionHelper {
             return hasPermissions(Location.permissions, context) && hasPermissions(Storage.permissions, context);
         } else {
             return hasPermissions(LocationAndroidR.permissions, context);
+        }
+    }
+
+    public static boolean hasBLEPermissions(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return hasPermissions(Ble12.permissions, context);
+        } else {
+            return hasPermissions(Ble.permissions, context);
+        }
+    }
+
+    public static void requestBlePermissions(Activity activity, int requestCode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(activity, Ble12.permissions, requestCode);
+        }
+        else {
+            ActivityCompat.requestPermissions(activity, Ble.permissions, requestCode);
         }
     }
 

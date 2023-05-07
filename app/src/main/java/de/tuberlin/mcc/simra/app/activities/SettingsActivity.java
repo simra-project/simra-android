@@ -46,10 +46,10 @@ import de.tuberlin.mcc.simra.app.util.UnitHelper;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getBaseFolderPath;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.importSimRaData;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.zipTo;
-import static de.tuberlin.mcc.simra.app.util.Utils.REQUEST_ENABLE_BT;
+import static de.tuberlin.mcc.simra.app.util.PermissionHelper.REQUEST_ENABLE_BT;
+import static de.tuberlin.mcc.simra.app.util.PermissionHelper.requestBlePermissions;
 import static de.tuberlin.mcc.simra.app.util.Utils.activityResultLauncher;
 import static de.tuberlin.mcc.simra.app.util.Utils.prepareDebugZip;
-import static de.tuberlin.mcc.simra.app.util.Utils.requestBlePermissions;
 import static de.tuberlin.mcc.simra.app.util.Utils.showBluetoothNotEnableWarning;
 import static de.tuberlin.mcc.simra.app.util.Utils.sortFileListLastModified;
 

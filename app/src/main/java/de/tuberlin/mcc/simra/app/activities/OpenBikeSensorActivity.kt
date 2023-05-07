@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
@@ -19,6 +20,9 @@ import de.tuberlin.mcc.simra.app.util.ConnectionManager
 import de.tuberlin.mcc.simra.app.util.ConnectionManager.BLESTATE
 import de.tuberlin.mcc.simra.app.util.ConnectionManager.CLOSE_PASS_CHARACTERISTIC_UUID
 import de.tuberlin.mcc.simra.app.util.ConnectionManager.SENSOR_DISTANCE_CHARACTERISTIC_UUID
+import de.tuberlin.mcc.simra.app.util.PermissionHelper.REQUEST_ENABLE_BT
+import de.tuberlin.mcc.simra.app.util.PermissionHelper.hasBLEPermissions
+import de.tuberlin.mcc.simra.app.util.PermissionHelper.requestBlePermissions
 import de.tuberlin.mcc.simra.app.util.SharedPref
 import de.tuberlin.mcc.simra.app.util.Utils
 import de.tuberlin.mcc.simra.app.util.Utils.activityResultLauncher
@@ -80,8 +84,8 @@ class OpenBikeSensorActivity : BaseActivity() {
             Log.d(TAG, "pressed button. blestate: $blestate")
             when (blestate) {
                 BLESTATE.DISCONNECTED -> {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                        Utils.requestBlePermissions(this@OpenBikeSensorActivity, Utils.REQUEST_ENABLE_BT)
+                    if (!hasBLEPermissions(this)) {
+                        requestBlePermissions(this@OpenBikeSensorActivity, REQUEST_ENABLE_BT)
                     } else {
                         ConnectionManager.startScan(this)
                     }
@@ -130,27 +134,32 @@ class OpenBikeSensorActivity : BaseActivity() {
     private val connectionEventListener by lazy {
         ConnectionEventListener().apply {
             onScanStart = {
+                Log.d(TAG, "connectionEventListener: onScanStart")
                 blestate = BLESTATE.SEARCHING
                 updateUI()
             }
             onDeviceFound = {
+                Log.d(TAG, "connectionEventListener: onDeviceFound")
                 deviceName = it.name
                 blestate = BLESTATE.FOUND
                 updateUI()
             }
             onScanStop = {
+                Log.d(TAG, "connectionEventListener: onScanStop")
                 if (!it) {
                     blestate = BLESTATE.DISCONNECTED
                     updateUI()
                 }
             }
             onConnectionSetupComplete = {
+                Log.d(TAG, "connectionEventListener: onConnectionSetupComplete")
                 deviceName = it.device.name
                 SharedPref.App.OpenBikeSensor.setObsDeviceName(deviceName, this@OpenBikeSensorActivity)
                 blestate = BLESTATE.CONNECTED
                 updateUI()
             }
             onDisconnect = {
+                Log.d(TAG, "connectionEventListener: onDisconnect")
                 deviceName = "---"
                 SharedPref.App.OpenBikeSensor.deleteObsDeviceName(this@OpenBikeSensorActivity)
                 blestate = BLESTATE.DISCONNECTED

@@ -724,9 +724,6 @@ public class Utils {
             return this.timeStamp;
         }
     }
-
-    public final static int REQUEST_ENABLE_BT = 2122;
-
     /**
      * Prompts user to enable Bluetooth or deactivate OBS.
      * Gets called, if OBS is enabled in the settings but Bluetooth is disabled, so SimRa cannot
@@ -760,23 +757,5 @@ public class Utils {
                 }
             }
     );
-    }
-
-
-    private static final String[] BLE_PERMISSIONS = new String[]{
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
-    };
-
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    private static final String[] ANDROID_12_BLE_PERMISSIONS = new String[]{
-            Manifest.permission.BLUETOOTH_SCAN,
-            Manifest.permission.BLUETOOTH_CONNECT
-    };
-    public static void requestBlePermissions(Activity activity, int requestCode) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            ActivityCompat.requestPermissions(activity, ANDROID_12_BLE_PERMISSIONS, requestCode);
-        else
-            ActivityCompat.requestPermissions(activity, BLE_PERMISSIONS, requestCode);
     }
 }

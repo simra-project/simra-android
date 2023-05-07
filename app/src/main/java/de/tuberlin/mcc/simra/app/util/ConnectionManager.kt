@@ -15,9 +15,11 @@
  */
 package de.tuberlin.mcc.simra.app.util
 
+import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.le.*
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
@@ -29,11 +31,11 @@ import java.nio.ByteOrder
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.coroutines.coroutineContext
 
+@SuppressLint("MissingPermission", "StaticFieldLeak")
 object ConnectionManager {
     private const val TAG = "ConnectionManager_LOG"
-    val OBS_SERVICE_UUID = UUID.fromString("1FE7FAF9-CE63-4236-0004-000000000000")
+    val OBS_SERVICE_UUID = UUID.fromString("1fe7faf9-ce63-4236-0004-000000000000")
     val SENSOR_DISTANCE_CHARACTERISTIC_UUID = UUID.fromString("1FE7FAF9-CE63-4236-0004-000000000002")
     val TIME_CHARACTERISTIC_UUID = UUID.fromString("1FE7FAF9-CE63-4236-0004-000000000001")
     val CLOSE_PASS_CHARACTERISTIC_UUID = UUID.fromString("1FE7FAF9-CE63-4236-0004-000000000003")
@@ -53,6 +55,7 @@ object ConnectionManager {
     private var isSearching = false
     private var foundOBS = false
     var startTime = 0L
+    private var startScanContext: Context? = null
 
     fun registerListener(listener: ConnectionEventListener) {
         if (listeners.map { it.get() }.contains(listener)) { return }
@@ -113,6 +116,34 @@ object ConnectionManager {
     }
 
     fun disconnect(device: BluetoothDevice) {
+        // Get connected devices.
+
+        if (startScanContext != null) {
+            val bluetoothManager = startScanContext!!.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+            val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+            if (connectedDevices.isNotEmpty()) {
+                for (connectedDevice in connectedDevices) {
+                    val deviceName = connectedDevice.name
+                    val deviceHardwareAddress = connectedDevice.address // MAC address
+                    val deviceAlias = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        connectedDevice.alias
+                    } else {
+                        null
+                    }
+                    Log.d(TAG, "deviceName: $deviceName deviceHardwareAddress: $deviceHardwareAddress deviceAlias: $deviceAlias")
+                }
+            }
+        }
+        // Get paired devices.
+        val pairedDevices: Set<BluetoothDevice> = bluetoothAdapter.bondedDevices
+        if (pairedDevices.isNotEmpty()) {
+            // There are paired devices. Get the name and address of each paired device.
+            for (pairedDevice in pairedDevices) {
+                val deviceName = pairedDevice.name
+                val deviceHardwareAddress = pairedDevice.address // MAC address
+                Log.d(TAG, "deviceName: $deviceName deviceHardwareAddress: $deviceHardwareAddress state:")
+            }
+        }
         if (device.isConnected()) {
             enqueueOperation(Disconnect(device))
         } else {
@@ -223,6 +254,7 @@ object ConnectionManager {
 
         if (operation is StartScan) {
             with(operation) {
+                startScanContext = context
                 Log.d(TAG, "Starting scan")
                 isSearching = true
                 bleState = BLESTATE.SEARCHING
@@ -556,7 +588,11 @@ object ConnectionManager {
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
+            Log.d(TAG, "onScanResult: $callbackType result: $result")
+            Log.d(TAG, "result.scanRecord?.serviceUuids: ${result.scanRecord?.serviceUuids}")
+
             with(result.device) {
+                Log.d(TAG, "name: $name")
                 if (name != null && name.contains("OpenBikeSensor")) {
                     stopScan()
                     signalEndOfOperation()
