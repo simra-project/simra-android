@@ -24,6 +24,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
+import androidx.annotation.RequiresApi
 import de.tuberlin.mcc.simra.app.util.ble.*
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
@@ -95,6 +96,7 @@ object ConnectionManager {
         if (bleState != BLESTATE.SEARCHING) {
             Log.e(TAG, "There is no search to be stopped")
         } else {
+            changeBLEstate(BLESTATE.DISCONNECTED, "ConnectionMAnager - stopScan")
             /*if (isConnected) {
                 changeBLEstate(BLESTATE.CONNECTED, "ConnectionManager - stopScan - isConnected")
             } else {
@@ -273,7 +275,7 @@ object ConnectionManager {
                     ).build()
                 )
                 val settings = ScanSettings.Builder().setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH).setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
-                bleScanner.startScan(filter,settings,scanCallback)
+                bleScanner.startScan(/*filter,settings,*/scanCallback)
             }
             return
         }
@@ -589,10 +591,13 @@ object ConnectionManager {
     }
 
     private val scanCallback = object : ScanCallback() {
+        @RequiresApi(Build.VERSION_CODES.Q)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             Log.d(TAG, "onScanResult: $callbackType result: $result")
             Log.d(TAG, "result.scanRecord?.serviceUuids: ${result.scanRecord?.serviceUuids}")
-
+            Log.d(TAG, "result.device.uuids: ${result.device.uuids}")
+            Log.d(TAG, "result.scanRecord?.deviceName: ${result.scanRecord?.deviceName}")
+            Log.d(TAG, "result.scanRecord?.serviceSolicitationUuids: ${result.scanRecord?.serviceSolicitationUuids}")
             with(result.device) {
                 Log.d(TAG, "name: $name")
                 if (name != null && name.contains("OpenBikeSensor")) {

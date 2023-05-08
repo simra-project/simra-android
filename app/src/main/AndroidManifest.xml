@@ -5,7 +5,8 @@
 
     <application
         android:name=".SimraApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
         android:icon="@mipmap/simra_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
