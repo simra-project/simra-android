@@ -389,5 +389,6 @@
     <string name="dashboard">Dashboard</string>
     <string name="project_website">SimRa Project Website</string>
     <string name="website_link_text">www.digital-future.berlin</string>
+    <string name="try_later">Error. Please try again later.</string>
 
 </resources>

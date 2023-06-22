@@ -403,5 +403,6 @@
     <string name="link_to_instagram">https://www.instagram.com/sicherheitimradverkehr/</string>
     <string name="link_simra_Dashboard">https://simra-project.github.io/dashboard/</string>
     <string name="dashboard">Dashboard</string>
+    <string name="try_later">Fehlgeschlagen. Versuchen Sie es später erneut.</string>
 
 </resources>

@@ -597,7 +597,6 @@ object ConnectionManager {
             Log.d(TAG, "result.scanRecord?.serviceUuids: ${result.scanRecord?.serviceUuids}")
             Log.d(TAG, "result.device.uuids: ${result.device.uuids}")
             Log.d(TAG, "result.scanRecord?.deviceName: ${result.scanRecord?.deviceName}")
-            Log.d(TAG, "result.scanRecord?.serviceSolicitationUuids: ${result.scanRecord?.serviceSolicitationUuids}")
             with(result.device) {
                 Log.d(TAG, "name: $name")
                 if (name != null && name.contains("OpenBikeSensor")) {
