@@ -10,7 +10,7 @@ def API_VERSION = "API_VERSION"
 android {
     compileSdkVersion 33
     defaultConfig {
-        applicationId "de.tuberlin.mcc.simra.app.OBS"
+        applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 95
