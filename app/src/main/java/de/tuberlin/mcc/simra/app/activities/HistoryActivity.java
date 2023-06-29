@@ -3,10 +3,13 @@ package de.tuberlin.mcc.simra.app.activities;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +21,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -44,6 +50,7 @@ import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 
+import static de.tuberlin.mcc.simra.app.util.IOUtils.copyTo;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpBooleanSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeBooleanToSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.fireProfileRegionPrompt;
@@ -347,6 +354,25 @@ public class HistoryActivity extends BaseActivity {
                     }
                 }
             });
+            row.setOnLongClickListener(new View.OnLongClickListener() {
+                                           @Override
+                                           public boolean onLongClick(View view) {
+                                               String clicked = (String) binding.listView.getItemAtPosition(position);
+                                               longClickedRideID = Integer.parseInt(clicked.split(";")[0].substring(1));
+                                               androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(HistoryActivity.this).setTitle(R.string.exportRideTitle);
+                                               builder.setMessage(R.string.exportRideButtonText);
+                                               builder.setPositiveButton(R.string.continueText, new DialogInterface.OnClickListener() {
+                                                   @Override
+                                                   public void onClick(DialogInterface dialog, int which) {
+                                                       exportRideToLocation.launch(Uri.parse(DocumentsContract.PROVIDER_INTERFACE));
+                                                   }
+                                               });
+                                               builder.setNegativeButton(R.string.cancel, null);
+                                               builder.show();
+                                               return true;
+                                           }
+                                       }
+            );
 
             holder.btnDelete.setOnClickListener(v -> {
                 Log.d(TAG, "Delete Button Clicked");
@@ -365,4 +391,20 @@ public class HistoryActivity extends BaseActivity {
             ImageButton btnDelete;
         }
     }
+    int longClickedRideID = -1;
+
+    private final ActivityResultLauncher<Uri> exportRideToLocation =
+            registerForActivityResult(new ActivityResultContracts.OpenDocumentTree(),
+                    new ActivityResultCallback<Uri>() {
+                        @Override
+                        public void onActivityResult(Uri uri) {
+                            boolean successfullyExportedGPSPart = copyTo(IOUtils.Files.getGPSLogFile(longClickedRideID, false, HistoryActivity.this),uri,HistoryActivity.this);
+                            boolean successfullyExportedIncidentPart = copyTo(IOUtils.Files.getIncidentLogFile(longClickedRideID, false, HistoryActivity.this),uri,HistoryActivity.this);
+                            if (successfullyExportedGPSPart && successfullyExportedIncidentPart) {
+                                Toast.makeText(HistoryActivity.this, R.string.exportRideSuccessToast, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(HistoryActivity.this, R.string.exportRideFailToast, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
 }

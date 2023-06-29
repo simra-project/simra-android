@@ -124,6 +124,12 @@
     <string name="nothing_to_upload">SimRa: Keine Fahrt bereit zum Hochladen</string>
     <string name="upload_file_warning">Alle bearbeiteten und noch nicht hochgeladenen Fahrten werden hochgeladen. Die Fahrten können danach nicht weiter bearbeitet werden.</string>
     <string name="upload">Hochladen</string>
+    <string name="exportRideTitle">SimRa-Fahrt Export</string>
+    <string name="exportRidePromptTitle">Export einer SimRa-Fahrt</string>
+    <string name="exportRideButtonText">Gebe bitte den Ort an, wo die Fahrt gespeichert werden soll.</string>
+    <string name="exportRideDirectory">Wo soll die SimRa-Fahrt gespeichert werden?</string>
+    <string name="exportRideSuccessToast">"SimRa-Fahrt wurde erfolgreich exportiert."</string>
+    <string name="exportRideFailToast">"Fehler beim Erstellen der SimRa-Fahrt."</string>
 
     <!--- ShowRoute -->
     <string name="quitAddIncident">Hinzufügen\nbeenden</string>
