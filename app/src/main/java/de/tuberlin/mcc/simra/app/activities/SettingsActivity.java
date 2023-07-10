@@ -1,5 +1,7 @@
 package de.tuberlin.mcc.simra.app.activities;
 
+import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.util.Log;
@@ -24,9 +27,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
@@ -40,19 +46,25 @@ import de.tuberlin.mcc.simra.app.util.UnitHelper;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.Directories.getBaseFolderPath;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.importSimRaData;
 import static de.tuberlin.mcc.simra.app.util.IOUtils.zipTo;
+import static de.tuberlin.mcc.simra.app.util.PermissionHelper.REQUEST_ENABLE_BT;
+import static de.tuberlin.mcc.simra.app.util.PermissionHelper.requestBlePermissions;
+import static de.tuberlin.mcc.simra.app.util.Utils.activityResultLauncher;
 import static de.tuberlin.mcc.simra.app.util.Utils.prepareDebugZip;
+import static de.tuberlin.mcc.simra.app.util.Utils.showBluetoothNotEnableWarning;
 import static de.tuberlin.mcc.simra.app.util.Utils.sortFileListLastModified;
 
 
 public class SettingsActivity extends BaseActivity {
 
     private static final String TAG = "SettingsActivity_LOG";
-    private final static int REQUEST_ENABLE_BT = 1;
     private final static int DIRECTORY_PICKER_EXPORT = 9999;
     private static final int FILE_PICKER_IMPORT = 8778;
 
     BroadcastReceiver br;
     ActivitySettingsBinding binding;
+
+    private ActivityResultLauncher<Intent> activityResultLauncher;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,8 +217,22 @@ public class SettingsActivity extends BaseActivity {
         // Switch: OpenBikeSensor device enabled
         boolean obsActivated = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
         binding.obsButton.setVisibility(obsActivated ? View.VISIBLE : View.GONE);
-        // binding.obsButton.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
-        binding.obsButton.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
+        activityResultLauncher = activityResultLauncher(SettingsActivity.this);
+        binding.obsButton.setOnClickListener(view ->
+        {
+            requestBlePermissions(SettingsActivity.this, REQUEST_ENABLE_BT);
+            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (mBluetoothAdapter == null) {
+                // Device does not support Bluetooth
+                Toast.makeText(SettingsActivity.this, R.string.openbikesensor_bluetooth_incompatible, Toast.LENGTH_LONG)
+                        .show();
+            } else if (!mBluetoothAdapter.isEnabled()) {
+                // Bluetooth is disabled
+                showBluetoothNotEnableWarning(activityResultLauncher,SettingsActivity.this);
+            } else {
+                startActivity(new Intent(this, OpenBikeSensorActivity.class));
+            }
+        });
 
         if (BluetoothAdapter.getDefaultAdapter() == null) {
             // Device does not support Bluetooth
@@ -320,11 +346,6 @@ public class SettingsActivity extends BaseActivity {
         binding.privacyDistanceSlider.setValue(SharedPref.Settings.Ride.PrivacyDistance.getDistance(unit, this));
         binding.privacyDistanceTextLeft.setText(SharedPref.Settings.Ride.PrivacyDistance.getMinDistance(unit) + UnitHelper.getShortTranslationForUnit(unit, this));
         binding.privacyDistanceTextRight.setText(SharedPref.Settings.Ride.PrivacyDistance.getMaxDistance(unit) + UnitHelper.getShortTranslationForUnit(unit, this));
-    }
-
-    private void enableBluetooth() {
-        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
     }
 
     public void fireIncidentButtonsEnablePrompt() {

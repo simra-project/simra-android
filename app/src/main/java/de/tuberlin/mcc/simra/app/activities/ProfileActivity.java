@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -144,14 +145,19 @@ public class ProfileActivity extends AppCompatActivity {
                                     .setNegativeButton(R.string.cancel, null).show();
                         // get the three nearest regions and let the user choose one of them or cancel in an AlertDialog
                         } else {
-                            int[] nearestRegionCodes = nearestRegionsToThisLocation(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude(),
-                                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude(),
-                                    ProfileActivity.this);
-                            String[] nearestRegionNames = getCorrectRegionNames(regionsDecoder(nearestRegionCodes, ProfileActivity.this));
-                            AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this).setTitle(R.string.nearestRegions);
-                            createButtons(builder, nearestRegionNames, regionContentArray, profile, ProfileActivity.this);
-                            builder.setNegativeButton(R.string.cancel,null);
-                            builder.create().show();
+                            try {
+                                int[] nearestRegionCodes = nearestRegionsToThisLocation(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude(),
+                                        locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude(),
+                                        ProfileActivity.this);
+                                String[] nearestRegionNames = getCorrectRegionNames(regionsDecoder(nearestRegionCodes, ProfileActivity.this));
+                                AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this).setTitle(R.string.nearestRegions);
+                                createButtons(builder, nearestRegionNames, regionContentArray, profile, ProfileActivity.this);
+                                builder.setNegativeButton(R.string.cancel,null);
+                                builder.create().show();
+                            } catch (NullPointerException npe) {
+                                npe.printStackTrace();
+                                Toast.makeText(ProfileActivity.this, R.string.try_later, Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 }

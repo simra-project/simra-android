@@ -54,8 +54,6 @@ public class StartActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-
-
         // Just some Logs
         Log.d(TAG, "getFilesDir(): " + Arrays.toString(new File(getFilesDir(), "../shared_prefs").listFiles()));
         Log.d(TAG, "onCreate() started");
@@ -68,7 +66,7 @@ public class StartActivity extends BaseActivity {
         // IMPORTANT: Do not remove!
         UpdateHelper.migrate(this);
 
-        showErrorDialogIfCrashedBefore();
+        checkPermissionsAndContinue();
 
         Button next = findViewById(R.id.nextBtn);
         next.setOnClickListener(v -> {
@@ -81,6 +79,9 @@ public class StartActivity extends BaseActivity {
     }
 
     public void navigateIfAllPermissionsGranted() {
+        Log.d(TAG, "privacyPolicyAccepted(): " + privacyPolicyAccepted());
+        Log.d(TAG, "privacyPolicyUpdateAccepted(): " + privacyPolicyUpdateAccepted());
+        Log.d(TAG, "PermissionHelper.hasBasePermissions(this): " + PermissionHelper.hasBasePermissions(this));
         if (!privacyPolicyAccepted()){
             Log.d(TAG, "!privacyPolicyAccepted()");
             int screenSize = getResources().getConfiguration().screenLayout &
@@ -99,6 +100,8 @@ public class StartActivity extends BaseActivity {
             } else {
                 firePrivacyUpdateDialogNormalScreen();
             }
+        } else if(!PermissionHelper.hasBasePermissions(this)) {
+            PermissionHelper.requestFirstBasePermissionsNotGranted(this);
         } else {
             Log.d(TAG, "else");
             Intent intent = new Intent(StartActivity.this, MainActivity.class);
@@ -115,25 +118,6 @@ public class StartActivity extends BaseActivity {
 
     private boolean privacyPolicyUpdateAccepted() {
         return lookUpBooleanSharedPrefs("Privacy-Policy-Update-Accepted", false, "simraPrefs", this);
-    }
-
-    /**
-     * Look up whether to ask the user for a permission to
-     * send the crash logs to the server. If the user gives permission, upload the crash report(s).
-     */
-    private void showErrorDialogIfCrashedBefore() {
-        if (SharedPref.App.Crash.NewCrash.isActive(this)) {
-            if (SharedPref.App.Crash.SendCrashReportAllowed.isUnknown(this)) {
-                fireSendErrorDialog();
-            } else if (SharedPref.App.Crash.SendCrashReportAllowed.isAllowed(this)) {
-                Intent intent = new Intent(StartActivity.this, UploadService.class);
-                intent.putExtra("CRASH_REPORT", true);
-                startService(intent);
-                checkPermissionsAndContinue();
-            }
-        } else {
-            checkPermissionsAndContinue();
-        }
     }
 
     private void checkPermissionsAndContinue() {

@@ -11,10 +11,13 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -78,8 +81,9 @@ public class IOUtils {
             DocumentFile parent = DocumentFile.fromTreeUri(ctx, toLocation);
             try {
                 parent.findFile("SimRa.zip").delete();
-            } catch (NullPointerException ignored) {
-
+            } catch (NullPointerException npe) {
+                Log.d(TAG, "SimRa.zip could either be not found or not deleted.");
+                npe.printStackTrace();
             }
             DocumentFile zipFile = parent.createFile("application/zip", "SimRa.zip");
             Uri zipUri = null;
@@ -153,6 +157,46 @@ public class IOUtils {
                 }
             }
         }
+    }
+
+
+    /**
+     * Copies the specified file to the specified location.
+     * @param fileToSave
+     * @param toLocation
+     * @param ctx
+     * @return true if the file was saved successfully, false otherwise.
+     */
+    public static boolean copyTo(File fileToSave, Uri toLocation, Context ctx) {
+        boolean result = false;
+
+        int bytesRead;
+        InputStream inStream;
+        try {
+            inStream = new FileInputStream(fileToSave);
+            DocumentFile parent = DocumentFile.fromTreeUri(ctx, toLocation);
+            if (parent != null && parent.findFile(fileToSave.getName()) != null) {
+                parent.findFile(fileToSave.getName()).delete();
+            }
+            DocumentFile outFile = parent.createFile("text", fileToSave.getName());
+
+            Uri outUri;
+            if (outFile != null) {
+                outUri = outFile.getUri();
+                FileOutputStream fs = (FileOutputStream) ctx.getContentResolver().openOutputStream(outUri);
+                Log.d(TAG, "copyFile: " + fileToSave + " to: " + outFile.getUri().getPath());
+                byte[] buffer = new byte[1444];
+                while ((bytesRead = inStream.read(buffer)) != -1) {
+                    fs.write(buffer, 0, bytesRead);
+                }
+                inStream.close();
+                fs.close();
+                result = true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     /*
@@ -370,6 +414,18 @@ public class IOUtils {
 
         public static File getGPSLogFile(int rideId, boolean isTempFile, Context context) {
             return new File(getGPSLogFilePath(rideId, isTempFile, context));
+        }
+
+        public static String getIncidentLogFileName(int rideId, boolean isTempFile) {
+            return (isTempFile ? "Temp" : "accEvents") + rideId + ".csv";
+        }
+
+        public static String getIncidentLogFilePath(int rideId, boolean isTempFile, Context context) {
+            return IOUtils.Directories.getBaseFolderPath(context) + getIncidentLogFileName(rideId, isTempFile);
+        }
+
+        public static File getIncidentLogFile(int rideId, boolean isTempFile, Context context) {
+            return new File(getIncidentLogFilePath(rideId, isTempFile, context));
         }
 
         public static File getRegionsFile(Context context) {

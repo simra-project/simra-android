@@ -1,10 +1,15 @@
 package de.tuberlin.mcc.simra.app.util;
 
+import android.Manifest;
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.location.LocationManager;
+import android.os.Build;
 import android.util.Log;
 import android.util.Pair;
 
@@ -34,7 +39,14 @@ import java.util.Queue;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import androidx.activity.ComponentActivity;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
@@ -711,5 +723,39 @@ public class Utils {
         public long getTimeStamp() {
             return this.timeStamp;
         }
+    }
+    /**
+     * Prompts user to enable Bluetooth or deactivate OBS.
+     * Gets called, if OBS is enabled in the settings but Bluetooth is disabled, so SimRa cannot
+     * connect to OBS.
+     */
+    public static void showBluetoothNotEnableWarning(ActivityResultLauncher<Intent> activityResultLauncher, Context ctx) {
+        android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(ctx);
+        alert.setTitle(R.string.bluetooth_not_enable_title);
+        alert.setMessage(R.string.bluetooth_not_enable_message);
+        alert.setPositiveButton(R.string.yes, (dialog, whichButton) -> {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            activityResultLauncher.launch(enableBtIntent);
+        });
+        alert.setNegativeButton(R.string.no, (dialog, whichButton) -> {
+
+        });
+        alert.show();
+    }
+
+    public static ActivityResultLauncher<Intent> activityResultLauncher(Activity activity) {
+        return ((ComponentActivity)activity).registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Log.e(TAG, "Activity result: OK");
+                        // There are no request codes
+                        Intent data = result.getData();
+                        Log.d(TAG, "data: " + data);
+                    }
+                }
+            }
+    );
     }
 }

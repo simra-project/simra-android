@@ -114,6 +114,12 @@
     <string name="nothing_to_upload">SimRa could not find a ride to upload</string>
     <string name="upload_file_warning">All annotated and not uploaded files will be uploaded. It is not possible to annotate them afterwards.</string>
     <string name="upload">Upload</string>
+    <string name="exportRideTitle">SimRa Ride Export</string>
+    <string name="exportRidePromptTitle">Export of a SimRa ride</string>
+    <string name="exportRideButtonText">Please specify where to save the SimRa ride.</string>
+    <string name="exportRideDirectory">Where should the SimRa ride be saved?</string>
+    <string name="exportRideSuccessToast">"SimRa ride saved successfully."</string>
+    <string name="exportRideFailToast">"Error while saving the SimRa ride."</string>
 
     <!--- ShowRoute -->
     <string name="quitAddIncident">Cancel\nadding</string>
@@ -209,7 +215,7 @@
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Devices</string>
     <string name="debugPromptTitle1">Send local app data to the SimRa team?</string>
-    <string name="debugButtonText">Attention! Only tap the Continue button, if you were asked to do so by the SimRa team. By pressing the Upload button in the next step, you send your SimRa configuration to the SimRa team. You can also specify to upload the last 10 rides or all rides.</string>
+    <string name="debugButtonText">Attention! Only tap the Continue button, if you were asked to do so by the SimRa team. By pressing the Upload button in the next step, you send your SimRa configuration to the SimRa team.</string>
     <string name="continueText">Continue</string>
     <string name="debugPromptTitle2">Do you also want to send rides?</string>
     <string name="debugSendAllRides">Yes, all</string>
@@ -376,7 +382,7 @@
     <string name="openbikesensor_toast_devicefound">Device found. Push the Bluetooth Button to connect to it.</string>
     <string name="openbikesensor_bluetooth_incompatible">Your device does not support bluetooth.</string>
     <string name="activity_obs_title_device_info">Device-Info</string>
-    <string name="obs_activity_button_connect_device">Connected to device</string>
+    <string name="obs_activity_button_connect_device">Connect to device</string>
     <string name="obs_activity_button_disconnect_device">Disconnect device</string>
     <string name="obs_activity_text_last_distance">Last distance: %1$d cm</string>
     <string name="obsConnected">OpenBikeSensor connected</string>
@@ -389,5 +395,6 @@
     <string name="dashboard">Dashboard</string>
     <string name="project_website">SimRa Project Website</string>
     <string name="website_link_text">www.digital-future.berlin</string>
+    <string name="try_later">Error. Please try again later.</string>
 
 </resources>

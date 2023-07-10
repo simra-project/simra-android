@@ -15,13 +15,16 @@
  */
 package de.tuberlin.mcc.simra.app.util
 
+import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.le.*
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
+import androidx.annotation.RequiresApi
 import de.tuberlin.mcc.simra.app.util.ble.*
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
@@ -29,11 +32,11 @@ import java.nio.ByteOrder
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.coroutines.coroutineContext
 
+@SuppressLint("MissingPermission", "StaticFieldLeak")
 object ConnectionManager {
     private const val TAG = "ConnectionManager_LOG"
-    val OBS_SERVICE_UUID = UUID.fromString("1FE7FAF9-CE63-4236-0004-000000000000")
+    val OBS_SERVICE_UUID = UUID.fromString("1fe7faf9-ce63-4236-0004-000000000000")
     val SENSOR_DISTANCE_CHARACTERISTIC_UUID = UUID.fromString("1FE7FAF9-CE63-4236-0004-000000000002")
     val TIME_CHARACTERISTIC_UUID = UUID.fromString("1FE7FAF9-CE63-4236-0004-000000000001")
     val CLOSE_PASS_CHARACTERISTIC_UUID = UUID.fromString("1FE7FAF9-CE63-4236-0004-000000000003")
@@ -49,10 +52,9 @@ object ConnectionManager {
     private lateinit var bleScanner: BluetoothLeScanner
     lateinit var scanResult: ScanResult
     var bleState = BLESTATE.DISCONNECTED
-    private var isConnected = false
-    private var isSearching = false
     private var foundOBS = false
     var startTime = 0L
+    private var startScanContext: Context? = null
 
     fun registerListener(listener: ConnectionEventListener) {
         if (listeners.map { it.get() }.contains(listener)) { return }
@@ -76,22 +78,31 @@ object ConnectionManager {
     }
 
     fun startScan(context: Context) {
-        if (isConnected) {
-            Log.e(TAG, "Already connected to an OpenBikeSensor")
-        } else if (isSearching) {
-            Log.e(TAG, "Already searching for an OpenBikeSensor")
-        } else {
-            foundOBS = false
-            enqueueOperation(StartScan(null,context))
+        when (bleState) {
+            BLESTATE.CONNECTED -> {
+                Log.e(TAG, "Already connected to an OpenBikeSensor")
+            }
+            BLESTATE.SEARCHING -> {
+                Log.e(TAG, "Already searching for an OpenBikeSensor")
+            }
+            else -> {
+                foundOBS = false
+                enqueueOperation(StartScan(null,context))
+            }
         }
     }
 
     fun stopScan() {
-        if (!isSearching) {
+        if (bleState != BLESTATE.SEARCHING) {
             Log.e(TAG, "There is no search to be stopped")
         } else {
-            bleState = if (isConnected) BLESTATE.CONNECTED else BLESTATE.DISCONNECTED
-            isSearching = false
+            changeBLEstate(BLESTATE.DISCONNECTED, "ConnectionMAnager - stopScan")
+            /*if (isConnected) {
+                changeBLEstate(BLESTATE.CONNECTED, "ConnectionManager - stopScan - isConnected")
+            } else {
+                changeBLEstate(BLESTATE.DISCONNECTED, "ConnectionManager - stopScan - !isConnected")
+            }*/
+            // bleState = if (isConnected) BLESTATE.CONNECTED else BLESTATE.DISCONNECTED
             if (pendingOperation is StartScan) {
                 pendingOperation = null
                 if (operationQueue.isNotEmpty()) {
@@ -113,6 +124,34 @@ object ConnectionManager {
     }
 
     fun disconnect(device: BluetoothDevice) {
+        // Get connected devices.
+
+        if (startScanContext != null) {
+            val bluetoothManager = startScanContext!!.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+            val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+            if (connectedDevices.isNotEmpty()) {
+                for (connectedDevice in connectedDevices) {
+                    val deviceName = connectedDevice.name
+                    val deviceHardwareAddress = connectedDevice.address // MAC address
+                    val deviceAlias = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        connectedDevice.alias
+                    } else {
+                        null
+                    }
+                    Log.d(TAG, "deviceName: $deviceName deviceHardwareAddress: $deviceHardwareAddress deviceAlias: $deviceAlias")
+                }
+            }
+        }
+        // Get paired devices.
+        val pairedDevices: Set<BluetoothDevice> = bluetoothAdapter.bondedDevices
+        if (pairedDevices.isNotEmpty()) {
+            // There are paired devices. Get the name and address of each paired device.
+            for (pairedDevice in pairedDevices) {
+                val deviceName = pairedDevice.name
+                val deviceHardwareAddress = pairedDevice.address // MAC address
+                Log.d(TAG, "deviceName: $deviceName deviceHardwareAddress: $deviceHardwareAddress state:")
+            }
+        }
         if (device.isConnected()) {
             enqueueOperation(Disconnect(device))
         } else {
@@ -223,10 +262,10 @@ object ConnectionManager {
 
         if (operation is StartScan) {
             with(operation) {
+                startScanContext = context
                 Log.d(TAG, "Starting scan")
-                isSearching = true
-                bleState = BLESTATE.SEARCHING
-                listeners.forEach { it.get()?.onScanStart?.invoke(isSearching) }
+                changeBLEstate(BLESTATE.SEARCHING, "ConnectionManager - doNextOperation - StartScan")
+                listeners.forEach { it.get()?.onScanStart?.invoke(bleState == BLESTATE.SEARCHING) }
                 val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
                 bluetoothAdapter = bluetoothManager.adapter
                 bleScanner = bluetoothAdapter.bluetoothLeScanner
@@ -236,7 +275,7 @@ object ConnectionManager {
                     ).build()
                 )
                 val settings = ScanSettings.Builder().setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH).setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
-                bleScanner.startScan(filter,settings,scanCallback)
+                bleScanner.startScan(/*filter,settings,*/scanCallback)
             }
             return
         }
@@ -263,7 +302,7 @@ object ConnectionManager {
         when (operation) {
             is Disconnect -> with(operation) {
                 Log.d(TAG,"Disconnecting from ${device.address}")
-                isConnected = false
+                changeBLEstate(BLESTATE.DISCONNECTED, "ConnectionManager - doNextOperation - Disconnect")
                 gatt.close()
                 deviceGattMap.remove(device)
                 listeners.forEach { it.get()?.onDisconnect?.invoke(device) }
@@ -356,20 +395,17 @@ object ConnectionManager {
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     // Log.d(TAG,"onConnectionStateChange: connected to $deviceAddress")
                     deviceGattMap[gatt.device] = gatt
-                    isConnected = true
-                    bleState = BLESTATE.FOUND
+                    changeBLEstate(BLESTATE.FOUND, "ConnectionManager - onConnectionStateChange - STATE_CONNECTED")
                     Handler(Looper.getMainLooper()).post {
                         gatt.discoverServices() // callback -> onServicesDiscovered()
                     }
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     // Log.e(TAG,"onConnectionStateChange: disconnected from $deviceAddress")
                     disconnect(gatt.device)
-                    isConnected = false
-                    bleState = BLESTATE.DISCONNECTED
+                    changeBLEstate(BLESTATE.DISCONNECTED, "ConnectionManager - onConnectionStateChange - STATE_CONNECTED")
                 }
             } else {
-                isConnected = false
-                bleState = BLESTATE.DISCONNECTED
+                changeBLEstate(BLESTATE.DISCONNECTED, "ConnectionManager - onConnectionStateChange - else")
                 // Log.e(TAG,"onConnectionStateChange: status $status encountered for $deviceAddress!")
                 if (pendingOperation is Connect) {
                     signalEndOfOperation()
@@ -386,7 +422,7 @@ object ConnectionManager {
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             with(gatt) {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-                    bleState = BLESTATE.CONNECTING
+                    changeBLEstate(BLESTATE.CONNECTING, "ConnectionManager - onServicesDiscovered - GATT_SUCCESS")
                     // Log.d(TAG,"Discovered ${services.size} services for ${device.address}.")
                     subscribeToRequestedNotifyingCharacteristics(gatt)
                     // listeners.forEach { it.get()?.onConnectionSetupComplete?.invoke(this) }
@@ -420,7 +456,7 @@ object ConnectionManager {
                         } else {
                             Log.e(TAG, "Unknown UUID")
                         }
-                        bleState = BLESTATE.CONNECTED
+                        changeBLEstate(BLESTATE.CONNECTED, "ConnectionManager - onCharacteristicRead - GATT_SUCCESS")
                         listeners.forEach { it.get()?.onConnectionSetupComplete?.invoke(gatt) }
                     }
                     BluetoothGatt.GATT_READ_NOT_PERMITTED -> {
@@ -555,13 +591,19 @@ object ConnectionManager {
     }
 
     private val scanCallback = object : ScanCallback() {
+        @RequiresApi(Build.VERSION_CODES.Q)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
+            Log.d(TAG, "onScanResult: $callbackType result: $result")
+            Log.d(TAG, "result.scanRecord?.serviceUuids: ${result.scanRecord?.serviceUuids}")
+            Log.d(TAG, "result.device.uuids: ${result.device.uuids}")
+            Log.d(TAG, "result.scanRecord?.deviceName: ${result.scanRecord?.deviceName}")
             with(result.device) {
+                Log.d(TAG, "name: $name")
                 if (name != null && name.contains("OpenBikeSensor")) {
                     stopScan()
                     signalEndOfOperation()
                     foundOBS = true
-                    bleState = BLESTATE.FOUND
+                    changeBLEstate(BLESTATE.FOUND, "ConnectionManager - onScanResult")
                     // Log.d(TAG, "Found BLE device! Name: ${name ?: "Unnamed"}, address: $address, bondState: $bondState, type: $type")
                     scanResult = result
                     // Log.d(TAG, "listeners.size: ${listeners.size}")
@@ -636,6 +678,11 @@ object ConnectionManager {
 
     enum class BLESTATE {
         DISCONNECTED, SEARCHING, FOUND, CONNECTING, CONNECTED
+    }
+
+    fun changeBLEstate(blestate: BLESTATE, from: String) {
+        Log.d(TAG, "changeBLEstate - $from is changing from ${this.bleState} to $blestate")
+        this.bleState = blestate
     }
 
 }

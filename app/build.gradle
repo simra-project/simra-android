@@ -1,6 +1,7 @@
 plugins {
     id 'kotlin-android'
     id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
 }
 
 def ENV_VARIABLE_PREFIX = "SIMRA_"
@@ -8,13 +9,13 @@ def API_ENDPOINT = "API_ENDPOINT"
 def API_VERSION = "API_VERSION"
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
     defaultConfig {
         applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
-        targetSdkVersion 33
-        versionCode 92
-        versionName "92.0"
+        targetSdkVersion 34
+        versionCode 95
+        versionName "95.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
@@ -55,11 +56,12 @@ android {
         viewBinding = true
     }
     compileOptions {
-        sourceCompatibility = '1.9'
-        targetCompatibility = '1.9'
-        sourceCompatibility JavaVersion.VERSION_1_9
-        targetCompatibility JavaVersion.VERSION_1_9
+        sourceCompatibility = '17'
+        targetCompatibility = '17'
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
+    namespace 'de.tuberlin.mcc.simra.app'
 }
 
 dependencies {
@@ -78,6 +80,7 @@ dependencies {
 
     // RingBuffer
     implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'androidx.core:core-ktx:1.10.1'
 
     // Tests
     testImplementation 'junit:junit:4.13'
@@ -87,7 +90,7 @@ dependencies {
     implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
 
     // Kotlin
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.6.0"
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.21"
 
 }

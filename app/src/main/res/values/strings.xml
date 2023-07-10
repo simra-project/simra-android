@@ -124,6 +124,12 @@
     <string name="nothing_to_upload">SimRa: Keine Fahrt bereit zum Hochladen</string>
     <string name="upload_file_warning">Alle bearbeiteten und noch nicht hochgeladenen Fahrten werden hochgeladen. Die Fahrten können danach nicht weiter bearbeitet werden.</string>
     <string name="upload">Hochladen</string>
+    <string name="exportRideTitle">SimRa-Fahrt Export</string>
+    <string name="exportRidePromptTitle">Export einer SimRa-Fahrt</string>
+    <string name="exportRideButtonText">Gebe bitte den Ort an, wo die Fahrt gespeichert werden soll.</string>
+    <string name="exportRideDirectory">Wo soll die SimRa-Fahrt gespeichert werden?</string>
+    <string name="exportRideSuccessToast">"SimRa-Fahrt wurde erfolgreich exportiert."</string>
+    <string name="exportRideFailToast">"Fehler beim Erstellen der SimRa-Fahrt."</string>
 
     <!--- ShowRoute -->
     <string name="quitAddIncident">Hinzufügen\nbeenden</string>
@@ -218,7 +224,7 @@
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Geräte</string>
     <string name="debugPromptTitle1">Eigene SimRa-Daten an das SimRa-Team senden?</string>
-    <string name="debugButtonText">Achtung! Nur auf den Weiterknopf tippen, wenn du vom SimRa Team dazu aufgefordert wurdest. Mit dem Betätigen des Hochladebuttons im nächsten Schritt werden deine Einstellungen und Profilangaben, sowie interne Programmvariablen an das Backend geschickt. Du kannst auswählen, ob keine Fahrten, die letzten 10 Fahrten oder alle Fahrten (auch die bereits hochgeladenen) hochgeladen werden sollen.</string>
+    <string name="debugButtonText">Achtung! Nur auf den Weiterknopf tippen, wenn du vom SimRa Team dazu aufgefordert wurdest. Mit dem Betätigen des Hochladebuttons im nächsten Schritt werden deine Einstellungen und Profilangaben, sowie interne Programmvariablen an das Backend geschickt.</string>
     <string name="continueText">Weiter</string>
     <string name="debugPromptTitle2">Sollen Fahrten auch gesendet werden?</string>
     <string name="debugSendAllRides">Ja, alle</string>
@@ -403,5 +409,6 @@
     <string name="link_to_instagram">https://www.instagram.com/sicherheitimradverkehr/</string>
     <string name="link_simra_Dashboard">https://simra-project.github.io/dashboard/</string>
     <string name="dashboard">Dashboard</string>
+    <string name="try_later">Fehlgeschlagen. Versuchen Sie es später erneut.</string>
 
 </resources>
