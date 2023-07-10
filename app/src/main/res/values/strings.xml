@@ -224,7 +224,7 @@
     <string name="englishDate">mm/dd/yy, hh:mm (AM/PM)</string>
     <string name="devices">Geräte</string>
     <string name="debugPromptTitle1">Eigene SimRa-Daten an das SimRa-Team senden?</string>
-    <string name="debugButtonText">Achtung! Nur auf den Weiterknopf tippen, wenn du vom SimRa Team dazu aufgefordert wurdest. Mit dem Betätigen des Hochladebuttons im nächsten Schritt werden deine Einstellungen und Profilangaben, sowie interne Programmvariablen an das Backend geschickt. Du kannst auswählen, ob keine Fahrten, die letzten 10 Fahrten oder alle Fahrten (auch die bereits hochgeladenen) hochgeladen werden sollen.</string>
+    <string name="debugButtonText">Achtung! Nur auf den Weiterknopf tippen, wenn du vom SimRa Team dazu aufgefordert wurdest. Mit dem Betätigen des Hochladebuttons im nächsten Schritt werden deine Einstellungen und Profilangaben, sowie interne Programmvariablen an das Backend geschickt.</string>
     <string name="continueText">Weiter</string>
     <string name="debugPromptTitle2">Sollen Fahrten auch gesendet werden?</string>
     <string name="debugSendAllRides">Ja, alle</string>
