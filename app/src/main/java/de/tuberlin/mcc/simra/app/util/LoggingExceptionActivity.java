@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
+import com.bugsnag.android.Bugsnag;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
@@ -82,6 +84,7 @@ public class LoggingExceptionActivity extends AppCompatActivity implements Threa
             // restartApp();
 
         } catch (Exception e) {
+            Bugsnag.notify(e);
             Log.e(TAG, "Exception Logger failed!", e);
         }
 

@@ -9,6 +9,9 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+
+import com.bugsnag.android.Bugsnag;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +20,7 @@ import java.net.URL;
 import javax.net.ssl.HttpsURLConnection;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
+import de.tuberlin.mcc.simra.app.activities.SettingsActivity;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
@@ -42,6 +46,8 @@ public class DebugUploadService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        // delete zip.zip after upload is finished
+        new File(IOUtils.Directories.getBaseFolderPath(DebugUploadService.this) + "zip.zip").deleteOnExit();
 
         ForegroundServiceNotificationManager.cancelNotification(this);
         if (wakeLock.isHeld()) {
@@ -98,8 +104,10 @@ public class DebugUploadService extends Service {
             try {
                 uploadFile(context);
             } catch (IOException e) {
-                e.printStackTrace();
+                Bugsnag.notify(e);
+                Bugsnag.notify(e);
             }
+
             return null;
 
         }
@@ -181,7 +189,8 @@ public class DebugUploadService extends Service {
                 fileToUpload.delete();
 
 
-            } catch (IOException ie ) {
+            } catch (IOException ie) {
+                Bugsnag.notify(ie);
                 Log.d(TAG, "Upload Files Response: " + ie.toString());
             }
 

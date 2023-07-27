@@ -31,6 +31,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bugsnag.android.Bugsnag;
+import com.bugsnag.android.Event;
+import com.bugsnag.android.OnErrorCallback;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -62,6 +65,7 @@ import java.util.concurrent.TimeoutException;
 import javax.net.ssl.HttpsURLConnection;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -217,7 +221,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        com.bugsnag.android.Configuration config = com.bugsnag.android.Configuration.load(this);
+        config.addOnError(new OnErrorCallback() {
+            @Override
+            public boolean onError(@NonNull Event event) {
+                event.setUser("3", "bugs.nag@bugsnag.com", "Bugs Nag");
+                event.clearMetadata("device","batteryLevel");
+                event.clearMetadata("device","brand");
+                event.clearMetadata("device","charging");
+                event.clearMetadata("device","dpi");
+                event.clearMetadata("device","emulator");
+                event.clearMetadata("device","screenDensity");
+                event.clearMetadata("device","screenResolution");
+                return true;
+            }
+        });
+        Bugsnag.start(this, config);
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
 
@@ -281,6 +300,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mMapController.animateTo(new GeoPoint(mLocationOverlay.getLastFix().getLatitude(),
                         mLocationOverlay.getLastFix().getLongitude()));
             } catch (RuntimeException re) {
+                Bugsnag.notify(re);
                 Log.d(TAG, re.getMessage());
             }
         }
@@ -318,6 +338,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         centerMap.setOnClickListener(v -> {
             mLocationOverlay.enableFollowLocation();
             mMapController.setZoom(ZOOM_LEVEL);
+            // Bugsnag.notify(new RuntimeException("Tessst error"));
+            try {
+                throw new Exception("tesssst");
+            } catch (Exception e) {
+                Bugsnag.notify(e);
+                throw new RuntimeException(e);
+            }
         });
 
         binding.appBarMain.buttonStartRecording.setOnClickListener(v -> {
@@ -367,6 +394,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             .show();
                 }
             } catch (Exception e) {
+                Bugsnag.notify(e);
                 Log.e(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
             }
         });
@@ -480,6 +508,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                Bugsnag.notify(e);
                 e.printStackTrace();
                 // Log.d(TAG, "exception while connecting to OBS, trying again");
                 if (nRetries <= MAX_NUMBER_OF_OBS_CONNECTION_RETRIES) {
@@ -633,6 +662,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         } catch (SecurityException se) {
+            Bugsnag.notify(se);
             Log.d(TAG, "onStart() permission not granted yet");
         }
 
@@ -675,6 +705,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
         } catch (Exception se) {
+            Bugsnag.notify(se);
             se.printStackTrace();
         }
     }
@@ -795,6 +826,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 try {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
                 } catch (android.content.ActivityNotFoundException anfe) {
+                    Bugsnag.notify(anfe);
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
                 }
             }
@@ -964,6 +996,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 int status = urlConnection.getResponseCode();
                 Log.d(TAG, "Server status: " + status);
             } catch (IOException e) {
+                Bugsnag.notify(e);
                 e.printStackTrace();
             }
             Log.d(TAG, "GET version response: " + response.toString());
@@ -1035,6 +1068,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 status = urlConnection.getResponseCode();
                 Log.d(TAG, "Server status: " + status);
             } catch (IOException e) {
+                Bugsnag.notify(e);
                 e.printStackTrace();
             }
             Log.d(TAG, "GET regions response: " + checkRegionsResponse.toString());
@@ -1116,6 +1150,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 Log.d(TAG, "Server statusDE: " + statusDE + " statusEN: " + statusEN);
             } catch (IOException e) {
+                Bugsnag.notify(e);
                 e.printStackTrace();
             }
             Log.d(TAG, "GET news DE response: " + checkNewsResponseDE.toString());

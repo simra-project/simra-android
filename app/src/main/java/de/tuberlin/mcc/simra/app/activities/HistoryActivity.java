@@ -26,6 +26,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 
+import com.bugsnag.android.Bugsnag;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
@@ -137,6 +138,7 @@ public class HistoryActivity extends BaseActivity {
                 }
                 Log.d(TAG, "metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             } catch (IOException e) {
+                Bugsnag.notify(e);
                 e.printStackTrace();
             }
 

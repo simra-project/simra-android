@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.bugsnag.android.Bugsnag;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import de.tuberlin.mcc.simra.app.BuildConfig;
@@ -59,6 +61,7 @@ public class FeedbackActivity extends AppCompatActivity {
                     try {
                         startActivity(Intent.createChooser(intent, "Send mail..."));
                     } catch (android.content.ActivityNotFoundException ex) {
+                        Bugsnag.notify(ex);
                         Toast.makeText(FeedbackActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                     }
                     break;

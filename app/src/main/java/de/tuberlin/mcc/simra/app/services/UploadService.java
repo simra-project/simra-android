@@ -12,6 +12,8 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.util.Pair;
 
+import com.bugsnag.android.Bugsnag;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -155,6 +157,7 @@ public class UploadService extends Service {
             try {
                 uploadFile(context);
             } catch (IOException e) {
+                Bugsnag.notify(e);
                 e.printStackTrace();
             }
 

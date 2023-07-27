@@ -6,6 +6,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.bugsnag.android.Bugsnag;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -68,6 +70,7 @@ public class IOUtils {
             zos.close();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
+            Bugsnag.notify(e);
         }
     }
 
@@ -83,6 +86,7 @@ public class IOUtils {
                 parent.findFile("SimRa.zip").delete();
             } catch (NullPointerException npe) {
                 Log.d(TAG, "SimRa.zip could either be not found or not deleted.");
+                Bugsnag.notify(npe);
                 npe.printStackTrace();
             }
             DocumentFile zipFile = parent.createFile("application/zip", "SimRa.zip");
@@ -110,6 +114,7 @@ public class IOUtils {
 
             out.close();
         } catch (Exception e) {
+            Bugsnag.notify(e);
             e.printStackTrace();
             return false;
         }
@@ -194,6 +199,7 @@ public class IOUtils {
                 result = true;
             }
         } catch (IOException e) {
+            Bugsnag.notify(e);
             e.printStackTrace();
         }
         return result;
@@ -213,7 +219,7 @@ public class IOUtils {
         return lastPathComponent;
     }
 
-    public static void zip(List<File> files, File zipFile ) throws IOException {
+    public static void zip(List<File> files, File zipFile ) throws Exception {
         final int BUFFER_SIZE = 4096;
 
         BufferedInputStream origin;
@@ -294,6 +300,7 @@ public class IOUtils {
             zis.close();
         }
         catch(IOException e) {
+            Bugsnag.notify(e);
             e.printStackTrace();
             return false;
         }

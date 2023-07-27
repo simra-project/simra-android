@@ -25,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 
+import com.bugsnag.android.Bugsnag;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.RangeSlider;
 
@@ -433,6 +434,7 @@ public class ShowRouteActivity extends BaseActivity {
             pool.shutdown();
             pool.awaitTermination(2, TimeUnit.SECONDS);
         } catch (InterruptedException | NullPointerException ie) {
+            Bugsnag.notify(ie);
             ie.printStackTrace();
         }
     }
@@ -579,6 +581,7 @@ public class ShowRouteActivity extends BaseActivity {
                 }
 
             } catch (Exception ex) {
+                Bugsnag.notify(ex);
                 ex.printStackTrace();
             }
         });

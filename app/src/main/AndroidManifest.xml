@@ -104,6 +104,9 @@
             android:name=".services.DebugUploadService"
             android:enabled="true"
             android:parentActivityName=".SettingsActivity" /> <!-- MetaData -->
+        <meta-data
+            android:name="com.bugsnag.android.API_KEY"
+            android:value="deca66b8bc14867d8032f8f94da90244"/>
     </application>
     <uses-feature android:name="android.hardware.location.gps" />
 

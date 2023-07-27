@@ -3,6 +3,8 @@ package de.tuberlin.mcc.simra.app.entities;
 import android.content.Context;
 import android.location.Location;
 
+import com.bugsnag.android.Bugsnag;
+
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
@@ -72,6 +74,7 @@ public class DataLog {
                 startTime = dataPoints.get(0).timestamp;
                 endTime = dataPoints.get(dataPoints.size() - 1).timestamp;
             } catch (IOException e) {
+                Bugsnag.notify(e);
                 e.printStackTrace();
             }
         }
@@ -91,6 +94,7 @@ public class DataLog {
                 writer.write(dataLogEntry.stringifyDataLogEntry() + System.lineSeparator());
             }
         } catch (IOException e) {
+            Bugsnag.notify(e);
             e.printStackTrace();
         }
     }

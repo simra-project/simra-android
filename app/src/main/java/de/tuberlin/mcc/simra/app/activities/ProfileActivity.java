@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.bugsnag.android.Bugsnag;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -155,6 +157,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 builder.setNegativeButton(R.string.cancel,null);
                                 builder.create().show();
                             } catch (NullPointerException npe) {
+                                Bugsnag.notify(npe);
                                 npe.printStackTrace();
                                 Toast.makeText(ProfileActivity.this, R.string.try_later, Toast.LENGTH_SHORT).show();
                             }

@@ -2,6 +2,8 @@ package de.tuberlin.mcc.simra.app.util;
 
 import android.content.Context;
 
+import com.bugsnag.android.Bugsnag;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,6 +28,7 @@ public class SimRAuthenticator {
             // StandardCharsets.UTF_8.name() > JDK 7
             hashSuffix =  result.toString("UTF-8");
         } catch (IOException e) {
+            Bugsnag.notify(e);
             e.printStackTrace();
         }
 

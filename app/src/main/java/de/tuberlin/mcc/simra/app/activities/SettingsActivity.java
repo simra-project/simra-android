@@ -22,6 +22,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bugsnag.android.Bugsnag;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,6 +82,7 @@ public class SettingsActivity extends BaseActivity {
         try {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         } catch (NullPointerException ignored) {
+            Bugsnag.notify(ignored);
             Log.d(TAG, "NullPointerException");
         }
         binding.toolbar.toolbar.setTitle("");
@@ -259,7 +262,11 @@ public class SettingsActivity extends BaseActivity {
                 builder.setPositiveButton(R.string.continueText, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        fireDebugPrompt();
+                        try {
+                            fireDebugPrompt();
+                        } catch (Exception e) {
+                            Bugsnag.notify(e);
+                        }
                     }
                 });
                 builder.setNegativeButton(R.string.cancel, null);
@@ -284,7 +291,7 @@ public class SettingsActivity extends BaseActivity {
     }
 
 
-    private void fireDebugPrompt() {
+    private void fireDebugPrompt() throws Exception {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(SettingsActivity.this).setTitle(R.string.debugPromptTitle2);
         File[] dirFiles = new File(getBaseFolderPath(SettingsActivity.this)).listFiles();
         List<File> files = new ArrayList<File>(Arrays.asList(dirFiles));
@@ -329,11 +336,13 @@ public class SettingsActivity extends BaseActivity {
         builder.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                prepareDebugZip(clicked[0], ridesAndAccEvents, SettingsActivity.this);
+                try {
+                    prepareDebugZip(clicked[0], ridesAndAccEvents, SettingsActivity.this);
+                } catch (Exception e) {
+                    Bugsnag.notify(e);
+                }
                 Intent intent = new Intent(SettingsActivity.this, DebugUploadService.class);
                 startService(intent);
-                // delete zip.zip after upload is finished
-                new File(IOUtils.Directories.getBaseFolderPath(SettingsActivity.this) + "zip.zip").deleteOnExit();
             }
         });
         builder.setNegativeButton(R.string.cancel, null);

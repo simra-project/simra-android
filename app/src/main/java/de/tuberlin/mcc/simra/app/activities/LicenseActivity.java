@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.bugsnag.android.Bugsnag;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -116,6 +118,7 @@ public class LicenseActivity extends AppCompatActivity {
                 is.close();
                 message = stringBuilder.toString();
             } catch (IOException e) {
+                Bugsnag.notify(e);
                 e.printStackTrace();
             }
             TextView textView = showLicenseDialog.findViewById(R.id.tv);

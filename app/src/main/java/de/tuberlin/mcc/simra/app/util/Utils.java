@@ -13,6 +13,8 @@ import android.os.Build;
 import android.util.Log;
 import android.util.Pair;
 
+import com.bugsnag.android.Bugsnag;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.osmdroid.util.GeoPoint;
@@ -82,6 +84,7 @@ public class Utils {
                 content.append(line).append(System.lineSeparator());
             }
         } catch (IOException ioe) {
+            Bugsnag.notify(ioe);
             Log.d(TAG, "readContentFromFile() Exception: " + Arrays.toString(ioe.getStackTrace()));
         }
         return content.toString();
@@ -109,6 +112,7 @@ public class Utils {
                     content.append(line).append(System.lineSeparator());
                 }
             } catch (IOException e) {
+                Bugsnag.notify(e);
                 e.printStackTrace();
             }
         }
@@ -130,6 +134,7 @@ public class Utils {
             writer.flush();
             writer.close();
         } catch (IOException ioe) {
+            Bugsnag.notify(ioe);
             Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
         }
     }
@@ -287,6 +292,7 @@ public class Utils {
             }
 
         } catch (IOException | JSONException e) {
+            Bugsnag.notify(e);
             e.printStackTrace();
         }
 
@@ -454,8 +460,10 @@ public class Utils {
                 }
             }
         } catch (IOException e) {
+            Bugsnag.notify(e);
             e.printStackTrace();
         } catch (NumberFormatException e) {
+            Bugsnag.notify(e);
             e.printStackTrace();
             fixRide(rideId, context);
             Log.d(TAG,"fixed ride");
@@ -496,6 +504,7 @@ public class Utils {
             }
             overwriteFile(fixedRideContent.toString(),IOUtils.Files.getGPSLogFile(rideId, false, context));
         } catch (IOException e) {
+            Bugsnag.notify(e);
             e.printStackTrace();
         }
 
@@ -657,12 +666,13 @@ public class Utils {
         try {
             gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         } catch (Exception ex) {
+            Bugsnag.notify(ex);
             Log.d(TAG, ex.getMessage());
         }
         return (!gps_enabled);
     }
 
-    public static void prepareDebugZip(int mode,List<File> ridesAndAccEvents , Context context) {
+    public static void prepareDebugZip(int mode,List<File> ridesAndAccEvents , Context context) throws Exception {
         List<File> filesToUpload = new ArrayList<File>(ridesAndAccEvents);
         if (mode == 2) {
             filesToUpload.clear();
@@ -673,11 +683,7 @@ public class Utils {
         }
         filesToUpload.add(IOUtils.Files.getMetaDataFile(context));
         filesToUpload.addAll(Arrays.asList(getSharedPrefsDirectory(context).listFiles()));
-        try {
-            zip(filesToUpload,new File(IOUtils.Directories.getBaseFolderPath(context) + "zip.zip"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        zip(filesToUpload,new File(IOUtils.Directories.getBaseFolderPath(context) + "zip.zip"));
     }
 
     public static void sortFileListLastModified(List<File> fileList) {

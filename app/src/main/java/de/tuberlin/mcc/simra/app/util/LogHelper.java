@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.bugsnag.android.Bugsnag;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,6 +48,7 @@ public class LogHelper {
                 Log.d(TAG, metaDataLine);
             }
         } catch (IOException e) {
+            Bugsnag.notify(e);
             e.printStackTrace();
             Log.d(TAG, "Exception in showMetadata(): " + Arrays.toString(e.getStackTrace()));
         }
