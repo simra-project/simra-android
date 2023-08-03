@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+
 import javax.net.ssl.HttpsURLConnection;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
@@ -98,6 +100,8 @@ public class DebugUploadService extends Service {
             try {
                 uploadFile(context);
             } catch (IOException e) {
+                Log.e(TAG, "DebugUploadTask - Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 e.printStackTrace();
             }
             return null;
@@ -169,6 +173,8 @@ public class DebugUploadService extends Service {
                 dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
 
                 // retrieve response code and indicate that the upload was successful
+                Log.d(TAG,"response message: " + conn.getResponseMessage());
+                Log.d(TAG,"response code: " + conn.getResponseCode());
                 int status = conn.getResponseCode();
                 if (status == 200) {
                     uploadSuccessful = true;
@@ -182,8 +188,8 @@ public class DebugUploadService extends Service {
 
 
             } catch (IOException ie ) {
-                Log.d(TAG, "Upload Files Response: " + ie.toString());
-            }
+                Log.e(TAG, "uploadFile() - Exception: " + ie.getMessage());
+                Log.e(TAG, Arrays.toString(ie.getStackTrace()));            }
 
         }
 

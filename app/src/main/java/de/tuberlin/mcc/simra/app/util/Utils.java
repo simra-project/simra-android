@@ -496,6 +496,8 @@ public class Utils {
             }
             overwriteFile(fixedRideContent.toString(),IOUtils.Files.getGPSLogFile(rideId, false, context));
         } catch (IOException e) {
+            Log.e(TAG, "fixRide() - Exception: " + e.getMessage());
+            Log.e(TAG, Arrays.toString(e.getStackTrace()));
             e.printStackTrace();
         }
 
@@ -672,10 +674,14 @@ public class Utils {
             }
         }
         filesToUpload.add(IOUtils.Files.getMetaDataFile(context));
+        Log.d(TAG, "prepareDebugZip - filesToUpload: " + filesToUpload);
         filesToUpload.addAll(Arrays.asList(getSharedPrefsDirectory(context).listFiles()));
+        Log.d(TAG, "prepareDebugZip - filesToUpload: " + filesToUpload);
         try {
             zip(filesToUpload,new File(IOUtils.Directories.getBaseFolderPath(context) + "zip.zip"));
         } catch (IOException e) {
+            Log.e(TAG, "prepareDebugZip - Exception: " + e.getMessage());
+            Log.e(TAG, Arrays.toString(e.getStackTrace()));
             e.printStackTrace();
         }
     }

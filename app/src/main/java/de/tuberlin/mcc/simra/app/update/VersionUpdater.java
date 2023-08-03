@@ -186,8 +186,8 @@ public class VersionUpdater {
                 Legacy.Utils.overWriteFile(contentOfNewMetaData.toString(), "metaData.csv", context);
             } catch (IOException ioe) {
                 Log.d(TAG, "++++++++++++++++++++++++++++++");
-                Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
-                Log.d(TAG, ioe.getMessage());
+                Log.e(TAG, "updateToV27 - Exception: " + ioe.getMessage());
+                Log.e(TAG, Arrays.toString(ioe.getStackTrace()));
             }
 
             // renew profile.csv
@@ -226,6 +226,8 @@ public class VersionUpdater {
                             contentOfNewAccEvents.append(line).append(System.lineSeparator());
                         }
                     } catch (IOException e) {
+                        Log.e(TAG, "updateToV30 - Exception: " + e.getMessage());
+                        Log.e(TAG, Arrays.toString(e.getStackTrace()));
                         e.printStackTrace();
                     }
                     Legacy.Utils.overWriteFile(contentOfNewAccEvents.toString(), fileList[i].getName(), context);
@@ -292,8 +294,8 @@ public class VersionUpdater {
                 Legacy.Utils.updateProfile(true, context, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, null, -2, totalNumberOfScary);
 
             } catch (IOException e) {
-                Log.d(TAG, "updateToV31() exception: " + e.getLocalizedMessage());
-                Log.d(TAG, Arrays.toString(e.getStackTrace()));
+                Log.e(TAG, "updateToV31 - Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
             }
             Legacy.Utils.overWriteFile(contentOfNewMetaData.toString(), metaDataFile.getName(), context);
         }
@@ -333,12 +335,16 @@ public class VersionUpdater {
                                 }
                             }
                         } catch (IOException e) {
+                            Log.e(TAG, "updateToV32 - Exception: " + e.getMessage());
+                            Log.e(TAG, Arrays.toString(e.getStackTrace()));
                             e.printStackTrace();
                         }
                     }
                 }
 
             } catch (IOException e) {
+                Log.e(TAG, "updateToV32 - Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 e.printStackTrace();
             }
             Legacy.Utils.updateProfile(true, context, -1, -1, -1, -1, -1, -1, totalNumberOfIncidents, -1, -1, -1, null, -2, -1);
@@ -364,6 +370,8 @@ public class VersionUpdater {
 
                 Legacy.Utils.overWriteFile(fileInfoLine + Constants.METADATA_HEADER + contentOfNewMetaData.toString(), metaDataFile.getName(), context);
             } catch (IOException e) {
+                Log.e(TAG, "updateToV39 - Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 e.printStackTrace();
             }
 
@@ -376,8 +384,8 @@ public class VersionUpdater {
             try {
                 Legacy.Utils.recalculateStatistics(context);
             } catch (Exception e) {
-                Log.d(TAG, "updateToV50 exception: " + e.getLocalizedMessage());
-                Log.d(TAG, Arrays.toString(e.getStackTrace()));
+                Log.e(TAG, "updateToV50 - Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
             }
         }
     }
@@ -428,6 +436,8 @@ public class VersionUpdater {
                 Legacy.Utils.overWriteFile(contentOfNewMetaData.toString(), metaDataFile.getName(), context);
 
             } catch (IOException e) {
+                Log.e(TAG, "updateToV58 - Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 e.printStackTrace();
             }
         }
@@ -498,6 +508,8 @@ public class VersionUpdater {
                             previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
                         }
                     } catch (NumberFormatException nfe) {
+                        Log.e(TAG, "calculateWaitedTimePolyLineDistance - Exception: " + nfe.getMessage());
+                        Log.e(TAG, Arrays.toString(nfe.getStackTrace()));
                         nfe.printStackTrace();
                     }
                 }
@@ -531,7 +543,9 @@ public class VersionUpdater {
                         content.append(line).append(System.lineSeparator());
                     }
                 } catch (IOException ioe) {
-                    Log.d(TAG, "readContentFromFile() Exception: " + Arrays.toString(ioe.getStackTrace()));
+                    Log.e(TAG, "readContentFromFile() - Exception: " + ioe.getMessage());
+                    Log.e(TAG, Arrays.toString(ioe.getStackTrace()));
+                    ioe.printStackTrace();
                 }
                 return content.toString();
             }
@@ -543,8 +557,8 @@ public class VersionUpdater {
                     writer.flush();
                     writer.close();
                 } catch (IOException ioe) {
-                    Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
-                }
+                    Log.e(TAG, "overWriteFile() - Exception: " + ioe.getMessage());
+                    Log.e(TAG, Arrays.toString(ioe.getStackTrace()));                }
             }
 
             public static int lookUpIntSharedPrefs(String key, int defValue, String sharedPrefName, Context context) {
@@ -575,7 +589,8 @@ public class VersionUpdater {
                 try {
                     pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
                 } catch (PackageManager.NameNotFoundException e) {
-                    Log.d(TAG, Arrays.toString(e.getStackTrace()));
+                    Log.e(TAG, "getAppVersionNumber - Exception: " + e.getMessage());
+                    Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 }
                 int installedVersionNumber = -1;
                 if (pinfo != null) {
@@ -767,7 +782,8 @@ public class VersionUpdater {
                                 }
                             }
                         } catch (IOException e) {
-                            Log.d(TAG, "Exception in recalculateStatistics(): " + Arrays.toString(e.getStackTrace()));
+                            Log.e(TAG, "recalculateStatistics() - Exception: " + e.getMessage());
+                            Log.e(TAG, Arrays.toString(e.getStackTrace()));
                             e.printStackTrace();
                         }
                         // Update the total number of (scary) incidents only if the ride has already been uploaded.
@@ -845,7 +861,8 @@ public class VersionUpdater {
                     overWriteFile(contentOfMetaData.toString(), "metaData.csv", context);
                     updateProfile(true, context, -1, -1, -1, -1, totalNumberOfRides, totalDuration, totalNumberOfIncidents, totalWaitedTime, totalDistance, totalCO2Savings, timeBuckets, -2, totalNumberOfScary);
                 } catch (IOException e) {
-                    Log.d(TAG, "Exception in recalculateStatistics(): " + Arrays.toString(e.getStackTrace()));
+                    Log.e(TAG, "recalculateStatistics() - Exception: " + e.getMessage());
+                    Log.e(TAG, Arrays.toString(e.getStackTrace()));
                     e.printStackTrace();
                 }
                 Log.d(TAG, "===========================Λ=recalculateStatistics=Λ===========================");
@@ -912,12 +929,16 @@ public class VersionUpdater {
                                     previousTimeStamp = Long.valueOf(accGpsLineArray[5]);
                                 }
                             } catch (NumberFormatException nfe) {
-                                Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(nfe.getStackTrace()));
+                                Log.e(TAG, "calculateRideStatistics - Exception: " + nfe.getMessage());
+                                Log.e(TAG, Arrays.toString(nfe.getStackTrace()));
+                                nfe.printStackTrace();
                             }
                         }
                     }
                 } catch (IOException e) {
-                    Log.d(TAG, "fixIncidentStatistics() Exception: " + Arrays.toString(e.getStackTrace()));
+                    Log.e(TAG, "fixIncidentStatistics() - Exception: " + e.getMessage());
+                    Log.e(TAG, Arrays.toString(e.getStackTrace()));
+                    e.printStackTrace();
                 }
                 result[0] = distance;
                 result[1] = endTimeStamp - startTimeStamp;
@@ -947,6 +968,8 @@ public class VersionUpdater {
                         is.close();
                         simRa_regions_config = stringBuilder.toString().split(System.lineSeparator());
                     } catch (IOException e) {
+                        Log.e(TAG, "getRegions - Exception: " + e.getMessage());
+                        Log.e(TAG, Arrays.toString(e.getStackTrace()));
                         e.printStackTrace();
                     }
                 }

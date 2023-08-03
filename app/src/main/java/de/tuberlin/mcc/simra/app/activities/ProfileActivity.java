@@ -18,6 +18,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import androidx.core.content.ContextCompat;
@@ -155,6 +156,8 @@ public class ProfileActivity extends AppCompatActivity {
                                 builder.setNegativeButton(R.string.cancel,null);
                                 builder.create().show();
                             } catch (NullPointerException npe) {
+                                Log.e(TAG, "automatic region detection - Exception: " + npe.getMessage());
+                                Log.e(TAG, Arrays.toString(npe.getStackTrace()));
                                 npe.printStackTrace();
                                 Toast.makeText(ProfileActivity.this, R.string.try_later, Toast.LENGTH_SHORT).show();
                             }

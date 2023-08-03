@@ -290,27 +290,36 @@ public class SettingsActivity extends BaseActivity {
         List<File> files = new ArrayList<File>(Arrays.asList(dirFiles));
         List<File> ridesAndAccEvents = new ArrayList<>();
         sortFileListLastModified(files);
+        Log.d(TAG, "fireDebugPrompt - files: " + files);
         double sizeAllInMB = 0;
         double size10InMB = 0;
         int i10 = 0;
         for (int i = 0; i < files.size(); i++) {
             File file = files.get(i);
-            if (file.getName().contains("accGps")) {
-                int id = Integer.parseInt(file.getName().split("_")[0]);
-                String path = file.getParent() + File.separator + "accEvents" + id + ".csv";
-                File accEvents = new File(path);
-                sizeAllInMB += file.length() / 1024.0 / 1024.0;
-                ridesAndAccEvents.add(file);
-                if (accEvents.exists()) {
-                    sizeAllInMB += accEvents.length() / 1024.0 / 1024.0;
-                    ridesAndAccEvents.add(accEvents);
+            Log.d(TAG, "fireDebugPrompt - file: " + file);
+            try {
+                if (file.getName().contains("accGps")) {
+                    int id = Integer.parseInt(file.getName().split("_")[0]);
+                    String path = file.getParent() + File.separator + "accEvents" + id + ".csv";
+                    File accEvents = new File(path);
+                    sizeAllInMB += file.length() / 1024.0 / 1024.0;
+                    ridesAndAccEvents.add(file);
+                    if (accEvents.exists()) {
+                        sizeAllInMB += accEvents.length() / 1024.0 / 1024.0;
+                        ridesAndAccEvents.add(accEvents);
+                    }
+                    if (i10 < 10) {
+                        size10InMB = sizeAllInMB;
+                        i10++;
+                    }
                 }
-                if (i10 < 10) {
-                    size10InMB = sizeAllInMB;
-                    i10++;
-                }
+            } catch (Exception e) {
+                Log.e(TAG, "fireDebugPrompt() - Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
             }
+
         }
+        Log.d(TAG, "fireDebugPrompt - ridesAndAccEvents: " + ridesAndAccEvents);
         sizeAllInMB = Math.round(sizeAllInMB / 3.0 * 100.0) / 100.0;
         size10InMB = Math.round(size10InMB / 3.0 * 100.0) / 100.0;
         final int[] clicked = {2};

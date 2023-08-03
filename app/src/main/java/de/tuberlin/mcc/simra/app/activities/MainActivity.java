@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -367,8 +368,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             .show();
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Exception: " + e.getLocalizedMessage() + e.getMessage() + e.toString());
-            }
+                Log.e(TAG, "Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));            }
         });
 
         new CheckVersionTask().execute();
@@ -480,6 +481,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                Log.e(TAG, "Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 e.printStackTrace();
                 // Log.d(TAG, "exception while connecting to OBS, trying again");
                 if (nRetries <= MAX_NUMBER_OF_OBS_CONNECTION_RETRIES) {
@@ -633,6 +636,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         } catch (SecurityException se) {
+            Log.e(TAG, "onStart() permission not granted yet - Exception: " + se.getMessage());
+            Log.e(TAG, Arrays.toString(se.getStackTrace()));
             Log.d(TAG, "onStart() permission not granted yet");
         }
 
@@ -675,6 +680,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
         } catch (Exception se) {
+            Log.e(TAG, "onStop() permission not granted yet - Exception: " + se.getMessage());
+            Log.e(TAG, Arrays.toString(se.getStackTrace()));
             se.printStackTrace();
         }
     }
@@ -964,6 +971,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 int status = urlConnection.getResponseCode();
                 Log.d(TAG, "Server status: " + status);
             } catch (IOException e) {
+                Log.e(TAG, "checkVersion Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 e.printStackTrace();
             }
             Log.d(TAG, "GET version response: " + response.toString());
@@ -1035,6 +1044,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 status = urlConnection.getResponseCode();
                 Log.d(TAG, "Server status: " + status);
             } catch (IOException e) {
+                Log.e(TAG, "RegionTask Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 e.printStackTrace();
             }
             Log.d(TAG, "GET regions response: " + checkRegionsResponse.toString());
@@ -1116,6 +1127,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 Log.d(TAG, "Server statusDE: " + statusDE + " statusEN: " + statusEN);
             } catch (IOException e) {
+                Log.e(TAG, "NewsTask Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 e.printStackTrace();
             }
             Log.d(TAG, "GET news DE response: " + checkNewsResponseDE.toString());

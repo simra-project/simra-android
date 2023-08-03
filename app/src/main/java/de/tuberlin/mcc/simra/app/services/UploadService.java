@@ -21,6 +21,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -155,7 +156,8 @@ public class UploadService extends Service {
             try {
                 uploadFile(context);
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "UploadTask - Exception: " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
             }
 
             return null;

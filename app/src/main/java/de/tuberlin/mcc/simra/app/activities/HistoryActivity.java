@@ -137,6 +137,8 @@ public class HistoryActivity extends BaseActivity {
                 }
                 Log.d(TAG, "metaDataLines: " + Arrays.deepToString(metaDataLines.toArray()));
             } catch (IOException e) {
+                Log.e(TAG, "Exception in refreshMyRides(): " + e.getMessage());
+                Log.e(TAG, Arrays.toString(e.getStackTrace()));
                 e.printStackTrace();
             }
 

@@ -46,8 +46,9 @@ public class LogHelper {
                 Log.d(TAG, metaDataLine);
             }
         } catch (IOException e) {
+            Log.e(TAG, "Exception in showMetadata(): " + e.getMessage());
+            Log.e(TAG, Arrays.toString(e.getStackTrace()));
             e.printStackTrace();
-            Log.d(TAG, "Exception in showMetadata(): " + Arrays.toString(e.getStackTrace()));
         }
         Log.d(TAG, "===========================Λ=metaData=Λ===========================");
     }

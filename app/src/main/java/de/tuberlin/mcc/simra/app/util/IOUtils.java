@@ -18,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -82,14 +83,18 @@ public class IOUtils {
             try {
                 parent.findFile("SimRa.zip").delete();
             } catch (NullPointerException npe) {
-                Log.d(TAG, "SimRa.zip could either be not found or not deleted.");
+                Log.e(TAG, "SimRa.zip could either be not found or not deleted.");
+                Log.e(TAG, "zipTo - Exception: " + npe.getMessage());
+                Log.e(TAG, Arrays.toString(npe.getStackTrace()));
                 npe.printStackTrace();
             }
             DocumentFile zipFile = parent.createFile("application/zip", "SimRa.zip");
+            Log.d(TAG, "zipTo - zipFile: " + zipFile);
             Uri zipUri = null;
             if (zipFile != null) {
                 zipUri = zipFile.getUri();
             }
+            Log.d(TAG, "zipTo - zipUri: " + zipUri);
             FileOutputStream dest = (FileOutputStream) ctx.getContentResolver().openOutputStream(zipUri);
             ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
             if (sourceFile.isDirectory()) {
@@ -110,6 +115,8 @@ public class IOUtils {
 
             out.close();
         } catch (Exception e) {
+            Log.e(TAG, "Exception in zipTo(): " + e.getMessage());
+            Log.e(TAG, Arrays.toString(e.getStackTrace()));
             e.printStackTrace();
             return false;
         }
@@ -222,6 +229,7 @@ public class IOUtils {
             byte[] data = new byte[BUFFER_SIZE];
 
             for (File file : files) {
+                Log.d(TAG, "zip - file: " + file);
                 if (!file.isFile()) {
                     continue;
                 }
