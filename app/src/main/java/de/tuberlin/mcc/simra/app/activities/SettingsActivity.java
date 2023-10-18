@@ -1,7 +1,5 @@
 package de.tuberlin.mcc.simra.app.activities;
 
-import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,12 +25,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
@@ -271,10 +266,14 @@ public class SettingsActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        br = new SettingsActivity.MyBroadcastReceiver();
+        br = new MyBroadcastReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("de.tuberlin.mcc.simra.app.UPLOAD_COMPLETE");
-        this.registerReceiver(br, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            this.registerReceiver(br, filter, RECEIVER_EXPORTED);
+        } else {
+            this.registerReceiver(br, filter);
+        }
     }
 
     @Override

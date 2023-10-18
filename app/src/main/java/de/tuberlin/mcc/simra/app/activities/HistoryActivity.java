@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.util.Log;
@@ -171,7 +172,11 @@ public class HistoryActivity extends BaseActivity {
         br = new MyBroadcastReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("de.tuberlin.mcc.simra.app.UPLOAD_COMPLETE");
-        this.registerReceiver(br, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            this.registerReceiver(br, filter, RECEIVER_EXPORTED);
+        } else {
+            this.registerReceiver(br, filter);
+        }
         refreshMyRides();
     }
 
