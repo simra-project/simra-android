@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
@@ -21,6 +22,8 @@ import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
+
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
 import static de.tuberlin.mcc.simra.app.util.SimRAuthenticator.getClientHash;
 
 public class DebugUploadService extends Service {
@@ -69,7 +72,11 @@ public class DebugUploadService extends Service {
                         getResources().getString(R.string.uploadingNotificationTitle),
                         getResources().getString(R.string.uploadingDebugNotificationBody)
                 );
-        startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        } else {
+            startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
+        }
         // acquire wakelock to stay awake
         wakeLock.acquire(1000 * 60 * 15);
 

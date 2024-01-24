@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
@@ -42,6 +43,7 @@ import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.writeIntToSharedPrefs;
@@ -126,7 +128,11 @@ public class UploadService extends Service {
                         getResources().getString(R.string.uploadingNotificationTitle),
                         getResources().getString(R.string.uploadingNotificationBody)
                 );
-        startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification,FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        } else {
+            startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
+        }
         wakeLock.acquire(1000 * 60 * 15);
 
         new UploadTask(this, intent).execute();
