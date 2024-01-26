@@ -15,6 +15,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -50,6 +51,7 @@ import de.tuberlin.mcc.simra.app.util.ble.ConnectionEventListener;
 /*import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
 import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_DISTANCE;
 import static de.tuberlin.mcc.simra.app.services.OBSService.EXTRA_VALUE_SERIALIZED;*/
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.mergeGPSandSensorLines;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
@@ -322,7 +324,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         getResources().getString(R.string.foregroundNotificationTitle_record),
                         getResources().getString(R.string.foregroundNotificationBody_record)
                 );
-        startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification, FOREGROUND_SERVICE_TYPE_LOCATION);
+        } else {
+            startForeground(ForegroundServiceNotificationManager.getNotificationId(), notification);
+        }
         wakeLock.acquire(28800000);
 
         // Register Accelerometer and Gyroscope
