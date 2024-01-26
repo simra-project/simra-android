@@ -99,11 +99,15 @@
         <service
             android:name=".services.UploadService"
             android:enabled="true"
-            android:parentActivityName=".HistoryActivity" />
+            android:parentActivityName=".HistoryActivity"
+            android:foregroundServiceType="dataSync"
+            />
         <service
             android:name=".services.DebugUploadService"
             android:enabled="true"
-            android:parentActivityName=".SettingsActivity" /> <!-- MetaData -->
+            android:parentActivityName=".SettingsActivity"
+            android:foregroundServiceType="dataSync"/>
+        <!-- MetaData -->
     </application>
     <uses-feature android:name="android.hardware.location.gps" />
 
@@ -127,5 +131,6 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
 </manifest>
