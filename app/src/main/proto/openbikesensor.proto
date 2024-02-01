@@ -1,0 +1,241 @@
+syntax = "proto3";
+
+package openbikesensor;
+option java_package = "de.tuberlin.mcc.simra.app";
+option java_multiple_files = true;
+
+message Time {
+  int32 source_id = 1;
+
+  // Timestamp in seconds and nanoseconds since the reference time.
+  int64 seconds = 2;
+  int32 nanoseconds = 3;
+
+  Reference reference = 4;
+
+  enum Reference {
+    REFERENCE_UNSPECIFIED = 0;
+
+    // The source clock has no real-world reference, or its real-world
+    // reference is unknown.
+    ARBITRARY = 1;
+
+    // The source clock is referencing UTC time relative to the unix epoch.
+    UNIX = 2;
+
+    // The source clock is referencing GPS time since its epoch 1980-01-06. The
+    // week number is converted to seconds and added to the seconds part.
+    GPS = 3;
+  }
+}
+
+message DistanceMeasurement {
+  // A unique ID for the source device of this measurement. Check your device
+  // manual for interpretation of this value (e. g. left/right mapping).
+  int32 source_id = 1;
+
+  // The distance measured, in meters.
+  float distance = 2;
+
+  // A fraction (0..1) that represents the quality of this measurement, or the
+  // degree of certainty for this value to be accurate.
+  //   0       not specified
+  //   0<x<=1  relative quality
+  //   1       perfect measurement
+  //   else    invalid value
+  float quality = 3;
+
+  // The raw time of flight measured (if applicable) in picoseconds. Depending
+  // on sensor type, converting this to a distance with additional information
+  // (if available) may be more accurate than the provided distance (e. g.
+  // speed of sound depends on temperature and pressure). It is assumed that
+  // the type of sensor (sound, light) is known or can be derived.
+  int64 time_of_flight = 4;
+}
+
+message TextMessage {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    DEBUG = 1;
+    INFO = 2;
+    WARNING = 3;
+    ERROR = 4;
+  }
+
+  Type type = 1;
+  string text = 2;
+}
+
+message Geolocation {
+  int32 source_id = 1;
+
+  // Position on WSG84 in degrees, see also
+  // https://github.com/googleapis/googleapis/blob/master/google/type/latlng.proto
+  double latitude = 2;
+  double longitude = 3;
+
+  // Altitude above mean sea level, in meters.
+  double altitude = 4;
+
+  // Ground speed, in meters per second.
+  float ground_speed = 5;
+
+  // Direction of travel, in degrees clockwise from
+  // true north (0...360).
+  float course_over_ground = 6;
+
+  // Horizontal accuracy (GPS).
+  float hdop = 10;
+}
+
+message UserInput {
+  enum Type {
+    USER_INPUT_TYPE_UNSPECIFIED = 0;
+
+    // == Core functionality ==
+    OVERTAKER = 1;
+    ONCOMING_TRAFFIC = 2;
+
+    // Conflict with another traffic participant. The conflict may be of any
+    // nature, such as a complicated situation on shared infrastructure that
+    // required slowdown or stopping.
+    CONFLICT = 10;
+    CONFLICT_PEDESTRIAN = 11;
+    CONFLICT_BYCYCLE = 12;
+    CONFLICT_VEHICLE = 13;
+    UNCOMFORTABLE_SITUATION = 14;
+    DANGEROUS_SITUATION = 15;
+    COLLISION = 16;
+    ACCIDENT = 17;
+    NO_SITUATION = 18; // to mark something that the sensors might consider a "situation" otherwise
+
+    USING_CYCLEWAY = 20;
+    USING_ROAD = 21;
+    USING_FOOTPATH = 22;
+
+    // == Recording control ==
+    TRACK = 81; // timing=IMMEDIATE -> split track
+    PAUSE = 83; // timing=IMMEDIATE -> toggle pause
+    MODE_PRIVATE = 86; // timing=IMMEDIATE -> toggle private
+    INVALIDATE_PREVIOUS_INPUT = 88;
+    MANUAL_EDITING_REQUIRED = 89;
+
+    // == Parking and dooring ==
+    PARKED_VEHICLE = 100;
+    PARKED_VEHICLE_OBSTACLE = 102;
+    PARKED_VEHICLE_ENDANGERMENT = 103;
+    DOORING_ZONE = 104;
+
+    // == Traffic situation ==
+    TRAFFIC_LIGHT = 120;
+    TRAFFIC_LIGHT_RED = 121;
+    TRAFFIC_LIGHT_GREEN = 122;
+    CONGESTION = 123;
+    EMERGENCY_VEHICLE = 124;
+    CONSTRUCTION = 125;
+    PASSING_QUEUE = 126;
+    TAILGATING = 127;
+
+    ADDON = 200;
+  }
+
+  enum Timing {
+    USER_INPUT_TIMING_UNSPECIFIED = 0;
+    IMMEDIATE = 1;
+    START = 2;
+    END = 3;
+  }
+
+  enum Direction {
+    DIRECTION_UNSPECIFIED = 0;
+
+    AROUND = 1;
+    LEFT = 2;
+    RIGHT = 3;
+    FORWARD = 4;
+    BACK = 5;
+  }
+
+  // The mapping of the button that was pressed.
+  Type type = 1;
+
+  Timing timing = 2;
+
+  Direction direction = 3;
+
+  // A string describing the addon action.
+  string addon = 4;
+}
+
+// Arbitrary meta information for the track, the device or the recording. The
+// values can be interpreted as UTF-8 strings. Keys are application and
+// device specific. Common use cases include transmitting and storing
+// firmware version and settings, active modes, or rider statistics or
+// information.
+message Metadata {
+  map<string, bytes> data = 1;
+
+  // Note: Metadata is usually track or recording specific. A recording might
+  // start with a metadata event, but a stream of events might not be monitored
+  // when it starts. There might be a special routine to request emission of a
+  // metadata event on demand, such as when a recording device starts listening
+  // on a stream. This depends on the transmission protocol in use for the
+  // respective data stream and is potentially documented there.
+
+  // Interpretation of metadata is up to the application. In general, it can be
+  // assumed that many of these values do not change during a recording. If
+  // they do, it may be assumed that the first metadata event in the recording
+  // determines the initial state of the value, and a change in the value takes
+  // effect at the moment of the first event that emitted it. Partial metadata
+  // may be emitted for separate sets of keys, and may be merged by the
+  // application into a single state (or not, depending on meaning).
+}
+
+// Information about a battery in a recording device.
+message BatteryStatus {
+  int32 source_id = 1;
+
+  float charge_level = 2;  // in range [0 .. 1]
+  float voltage = 3; // in volts
+  float current = 4; // in amperes
+  int32 time_remaining = 5; // in seconds
+  Mode mode = 6;
+
+  enum Mode {
+    BATTERY_STATUS_MODE_UNSPECIFIED = 0;
+    CHARGING = 1;
+    DISCHARGING = 2;
+    IDLE = 3;
+    UNKNOWN = 4;
+    UNAVAILABLE = 5;
+    DEFECTIVE = 6;
+  }
+}
+
+message Event {
+  // This field should usually contain at least one time entry that allows
+  // referencing this message to a point in time. If the message contains
+  // multiple time entries from different references, this may be used to
+  // synchronize clocks.
+  repeated Time time = 2;
+
+  // The packet may contain debug content, depending on the device and message
+  // type. This can be interpreted by developers who know the above and
+  // therefore know how to interpret this content. It is usually not used for
+  // evaluation of the data.
+  bytes debug = 3;
+
+  oneof content {
+    DistanceMeasurement distance_measurement = 10;
+    TextMessage text_message = 11;
+    Geolocation geolocation = 12;
+    UserInput user_input = 13;
+    Metadata metadata = 14;
+    BatteryStatus battery_status = 15;
+  }
+
+  // Addons may place their contents here -- removed for now, as
+  // google.protobuf.Any is hard to compile with NanoPB, and we don't need
+  // it yet.
+  // repeated google.protobuf.Any addons = 99;
+}

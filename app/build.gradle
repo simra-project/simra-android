@@ -2,6 +2,7 @@ plugins {
     id 'kotlin-android'
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id "com.google.protobuf" version "0.9.1"
 }
 
 def ENV_VARIABLE_PREFIX = "SIMRA_"
@@ -14,8 +15,8 @@ android {
         applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 100
-        versionName "100.0"
+        versionCode 101
+        versionName "101.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
@@ -93,4 +94,31 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.21"
 
+    // Proto
+    implementation  "androidx.datastore:datastore:1.0.0"
+    implementation  "com.google.protobuf:protobuf-javalite:3.18.0"
+    implementation "androidx.datastore:datastore-rxjava3:1.0.0"
+    implementation 'com.github.mik3y:usb-serial-for-android:3.7.0'
+
+
+
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.23.2"
+    }
+
+    // Generates the java Protobuf-lite code for the Protobufs in this project. See
+    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+    // for more information.
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+            }
+        }
+    }
 }
