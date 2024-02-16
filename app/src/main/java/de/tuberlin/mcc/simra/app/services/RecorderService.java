@@ -160,7 +160,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private LinkedList<Byte> obsLiteData = new LinkedList<>();
-    private LooperThread obsLiteLooper = new LooperThread();
+    private LooperThread obsLiteLooper;
     private UsbManager usbManager;
     private static final String ACTION_USB_PERMISSION =
             "com.android.example.USB_PERMISSION";
@@ -194,20 +194,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         }
     };
 
-    private enum UsbPermission { Unknown, Requested, Granted, Denied }
-
-    private static final String INTENT_ACTION_GRANT_USB = BuildConfig.APPLICATION_ID + ".GRANT_USB";
-    private static final int WRITE_WAIT_MILLIS = 2000;
-    private static final int READ_WAIT_MILLIS = 2000;
-
-    private int deviceId, portNum, baudRate;
-    private boolean withIoManager;
-
-
     private SerialInputOutputManager usbIoManager;
     private UsbSerialPort usbSerialPort;
-    private UsbPermission usbPermission = UsbPermission.Unknown;
-    private boolean connected = false;
 
     public int getCurrentRideKey() {
         return key;
@@ -335,12 +323,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 incidentDuringRide = incidentType;
             }
         });
+        obsLiteLooper = new LooperThread();
         obsLiteLooper.start();
-        obsLiteLooper.mHandler.post(this::connect);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        obsLiteLooper.mHandler.post(this::connect);
         Log.d(TAG, "onBind()");
         return mBinder;
     }
@@ -648,6 +637,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 if(isGPSLine) {
                     gpsLines.add(dataLogEntryBuilder.build());
+                    Log.d(TAG,"obsLiteData.size(): " + obsLiteData.size());
                 } else if(!gpsLines.isEmpty()) {
                     sensorLines.add(dataLogEntryBuilder.build());
                 }
@@ -683,13 +673,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             Looper.prepare();
 
 
-            mHandler = new Handler(Objects.requireNonNull(Looper.myLooper())) {
-                public void handleMessage(@NonNull Message msg) {
+            mHandler = new Handler(Looper.myLooper()) {
+                public void handleMessage(Message msg) {
                     Log.d(TAG, "msg:" + msg);
                 }
             };
             Looper.loop();
         }
+
     }
 
     private void connect() {
@@ -722,7 +713,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     }
 
     private void disconnect() {
-        connected = false;
         if(usbIoManager != null) {
             usbIoManager.setListener(null);
             usbIoManager.stop();
@@ -736,13 +726,15 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onNewData(byte[] data) {
 
-        obsLiteLooper.mHandler.post(() -> {
+        boolean posted = obsLiteLooper.mHandler.post(() -> {
             for (byte datum : data) {
                 obsLiteData.add(datum);
             }
-            Log.d(TAG,"obsLiteData.size(): " + obsLiteData.size());
-
+            Log.d(TAG, "data.length: " + data.length);
         });
+        Log.d(TAG, "data successfully posted: " + posted);
+        Log.d(TAG, "is idle: " + obsLiteLooper.mHandler.getLooper().getQueue().isIdle());
+
     }
 
     @Override

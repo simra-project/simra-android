@@ -43,9 +43,7 @@ import android.widget.Toast;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
@@ -65,8 +63,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HexFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -88,14 +84,11 @@ import androidx.core.util.Consumer;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import de.tuberlin.mcc.simra.app.BuildConfig;
-import de.tuberlin.mcc.simra.app.Event;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.Profile;
-import de.tuberlin.mcc.simra.app.util.Cobs;
-import de.tuberlin.mcc.simra.app.util.CobsUtils;
 import de.tuberlin.mcc.simra.app.util.ConnectionManager.BLESTATE;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.ConnectionManager;
@@ -118,7 +111,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.isLocationServiceOff;
 import static de.tuberlin.mcc.simra.app.util.Utils.nearestRegionsToThisLocation;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener, ActivityCompat.OnRequestPermissionsResultCallback, SerialInputOutputManager.Listener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener, ActivityCompat.OnRequestPermissionsResultCallback{
 
     private static final String TAG = "MainActivity_LOG";
     private final static int REQUEST_ENABLE_BT = 1;
@@ -454,73 +447,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
             usbManager.requestPermission(driver.getDevice(),permissionIntent);
-        } else {
-            UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
-            try {
-                port.open(connection);
-                port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-                Log.d(TAG, "port opened");
-                usbIoManager = new SerialInputOutputManager(port, this);
-                /*byte[] readBytes = new byte[5];
-                byte zeroByte = 0;
-                boolean zeroRead = false;
-                while (!zeroRead) {
-                    Log.d(TAG,"" +port.read(readBytes, 6000));
-                    for (int i = 0; i < readBytes.length; i++) {
-                        if (readBytes[i] == zeroByte) {
-                            StringBuilder result = new StringBuilder();
-                            for (byte aByte : readBytes) {
-                                result.append("\\x").append(String.format("%02x", aByte));
-                                // upper case
-                                // result.append(String.format("%02X", aByte));
-                            }
-                            Log.d(TAG, "onNewData: " + result);
-                            Log.d(TAG, "data.length: " + readBytes.length);
-                            for (int j = 0; j < readBytes.length; j++) {
-                                Log.d(TAG, "readBytes["+j+"]: \\x" + String.format("%02X", readBytes[j]));
-                            }
-                            // readBytes = new byte[5];
-                            zeroRead = true;
-                        }
-                    }
-                }*/
-                // SerialInputOutputManager.DEBUG=true;
-                usbIoManager.run();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         }
 
-
-
-        /*HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
-        if (deviceList.size() > 0) {
-            Log.d(TAG, "deviceList.keySet(): " + deviceList.keySet());
-            UsbDevice device = deviceList.get(deviceList.keySet().toArray()[0].toString());
-            Log.d(TAG, "device: " + device);
-            if (device != null) {
-                PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
-                IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    this.registerReceiver(usbReceiver,filter,RECEIVER_EXPORTED);
-                } else {
-                    this.registerReceiver(usbReceiver,filter);
-                }
-                Log.d(TAG, "requesting usb device permission");
-                usbManager.requestPermission(device, permissionIntent);
-                Log.d(TAG, "device: " + device);
-                UsbInterface intf = device.getInterface(0);
-                Log.d(TAG, "intf: " + intf);
-                UsbEndpoint endpoint = intf.getEndpoint(0);
-                Log.d(TAG, "endpoint: " + endpoint);
-                UsbDeviceConnection connection = usbManager.openDevice(device);
-                Log.d(TAG, "connection: " + connection);
-                connection.claimInterface(intf, true);
-                byte[] bytes = new byte[119500];
-                connection.bulkTransfer(endpoint,bytes,119500,6000);
-            }
-
-        }*/
     }
 
     /**
@@ -528,58 +456,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     FutureTask<Boolean> obsFT;
 
-    public static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
-        }
-        return data;
-    }
-
-    @Override
-    public void onNewData(byte[] data) {
-        runOnUiThread(() -> {
-            for (byte datum : data) {
-                byteLinkedList.add(datum);
-            }
-            if (byteLinkedList.size() > 100) {
-
-                StringBuilder result = new StringBuilder();
-                for (Byte aByte : byteLinkedList) {
-                    if(aByte == 0x00) {
-                        Log.d(TAG, "found!");
-                    }
-                    result.append("\\x").append(String.format("%02x", aByte));
-                }
-                Log.d(TAG, "onNewData: " + result);
-                byte[] CDRIVES = hexStringToByteArray("11120910fa0318f0eab7db03520a0801150106c64220904e00");
-                byte[] decodedData = CobsUtils.decode(CDRIVES);
-                StringBuilder decodedResult = new StringBuilder();
-                for (Byte dByte : decodedData) {
-                    decodedResult.append("\\x").append(String.format("%02x", dByte));
-                }
-                Log.d(TAG, "decoded: " + decodedResult);
-                try {
-                    Event event = Event.parseFrom(decodedData);
-                    if (event.hasTextMessage()) {
-                        Log.d(TAG, "event message: " + event.getTextMessage().getText());
-                    }
-                    if (event.hasDistanceMeasurement()) {
-                        Log.d(TAG, "event distance: " + event.getDistanceMeasurement().getDistance());
-                    }
-                } catch (InvalidProtocolBufferException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onRunError(Exception e) {
-
-    }
 
     public class OBSTryConnectRunnable implements Runnable {
         public void run() {
