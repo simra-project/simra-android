@@ -66,6 +66,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HexFormat;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -234,6 +236,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // OBS-Lite
     UsbManager usbManager;
+    SerialInputOutputManager usbIoManager;
+    LinkedList<Byte> byteLinkedList = new LinkedList<>();
+    LinkedList<LinkedList<Byte>> splittedByteLinkedList = new LinkedList<>();
 
     private static final String ACTION_USB_PERMISSION =
             "com.android.example.USB_PERMISSION";
@@ -440,17 +445,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
         UsbSerialDriver driver = availableDrivers.get(0);
         UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
-
-        UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
-        try {
-            port.open(connection);
-            port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-            Log.d(TAG, "port opened");
-            SerialInputOutputManager usbIoManager = new SerialInputOutputManager(port, this);
-            usbIoManager.start();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (connection == null) {
+            IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                this.registerReceiver(usbReceiver,filter,RECEIVER_EXPORTED);
+            } else {
+                this.registerReceiver(usbReceiver,filter);
+            }
+            PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+            usbManager.requestPermission(driver.getDevice(),permissionIntent);
+        } else {
+            UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
+            try {
+                port.open(connection);
+                port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+                Log.d(TAG, "port opened");
+                usbIoManager = new SerialInputOutputManager(port, this);
+                /*byte[] readBytes = new byte[5];
+                byte zeroByte = 0;
+                boolean zeroRead = false;
+                while (!zeroRead) {
+                    Log.d(TAG,"" +port.read(readBytes, 6000));
+                    for (int i = 0; i < readBytes.length; i++) {
+                        if (readBytes[i] == zeroByte) {
+                            StringBuilder result = new StringBuilder();
+                            for (byte aByte : readBytes) {
+                                result.append("\\x").append(String.format("%02x", aByte));
+                                // upper case
+                                // result.append(String.format("%02X", aByte));
+                            }
+                            Log.d(TAG, "onNewData: " + result);
+                            Log.d(TAG, "data.length: " + readBytes.length);
+                            for (int j = 0; j < readBytes.length; j++) {
+                                Log.d(TAG, "readBytes["+j+"]: \\x" + String.format("%02X", readBytes[j]));
+                            }
+                            // readBytes = new byte[5];
+                            zeroRead = true;
+                        }
+                    }
+                }*/
+                // SerialInputOutputManager.DEBUG=true;
+                usbIoManager.run();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+
+
 
         /*HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
         if (deviceList.size() > 0) {
@@ -487,33 +528,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     FutureTask<Boolean> obsFT;
 
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
+    }
+
     @Override
     public void onNewData(byte[] data) {
         runOnUiThread(() -> {
-            Log.d(TAG, "onNewData: " + new String(data));
-            Log.d(TAG, "data.length: " + data.length);
-            for (int i = 0; i < data.length; i++) {
-                Log.d(TAG, "data["+i+"]: " + data[i]);
+            for (byte datum : data) {
+                byteLinkedList.add(datum);
             }
+            if (byteLinkedList.size() > 100) {
 
-            /*byte[] decodedData = CobsUtils.decode(data);
-            Log.d(TAG, "decodedData: " + new String(decodedData));
-            for (int i = 0; i < decodedData.length; i++) {
-                Log.d(TAG, "decodedData["+i+"]: " + decodedData[i]);
-            }*/
-
-            try {
-                Event event = Event.parseFrom(data);
-                if (event.hasTextMessage()) {
-                    Log.d(TAG, "event message: " + event.getTextMessage().getText());
+                StringBuilder result = new StringBuilder();
+                for (Byte aByte : byteLinkedList) {
+                    if(aByte == 0x00) {
+                        Log.d(TAG, "found!");
+                    }
+                    result.append("\\x").append(String.format("%02x", aByte));
                 }
-                if (event.hasDistanceMeasurement()) {
-                    Log.d(TAG, "event distance: " + event.getDistanceMeasurement().getDistance());
+                Log.d(TAG, "onNewData: " + result);
+                byte[] CDRIVES = hexStringToByteArray("11120910fa0318f0eab7db03520a0801150106c64220904e00");
+                byte[] decodedData = CobsUtils.decode(CDRIVES);
+                StringBuilder decodedResult = new StringBuilder();
+                for (Byte dByte : decodedData) {
+                    decodedResult.append("\\x").append(String.format("%02x", dByte));
                 }
-            } catch (InvalidProtocolBufferException e) {
-                throw new RuntimeException(e);
+                Log.d(TAG, "decoded: " + decodedResult);
+                try {
+                    Event event = Event.parseFrom(decodedData);
+                    if (event.hasTextMessage()) {
+                        Log.d(TAG, "event message: " + event.getTextMessage().getText());
+                    }
+                    if (event.hasDistanceMeasurement()) {
+                        Log.d(TAG, "event distance: " + event.getDistanceMeasurement().getDistance());
+                    }
+                } catch (InvalidProtocolBufferException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            // textView.append(new String(data));
         });
     }
 

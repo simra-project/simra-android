@@ -2,15 +2,22 @@ package de.tuberlin.mcc.simra.app.services;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbEndpoint;
+import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,19 +26,26 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.os.PowerManager;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
@@ -51,12 +65,18 @@ import de.tuberlin.mcc.simra.app.util.ble.ConnectionEventListener;
 /*import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
 import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_DISTANCE;
 import static de.tuberlin.mcc.simra.app.services.OBSService.EXTRA_VALUE_SERIALIZED;*/
+import static android.app.PendingIntent.getActivity;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.mergeGPSandSensorLines;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
-public class RecorderService extends Service implements SensorEventListener, LocationListener {
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialPort;
+import com.hoho.android.usbserial.driver.UsbSerialProber;
+import com.hoho.android.usbserial.util.SerialInputOutputManager;
+
+public class RecorderService extends Service implements SensorEventListener, LocationListener, SerialInputOutputManager.Listener {
     public static final String TAG = "RecorderService_LOG:";
     long startTime = 0;
     long endTime;
@@ -134,6 +154,60 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private Queue<DataLogEntry> gpsLines = new LinkedList<>();
     private Queue<DataLogEntry> sensorLines = new LinkedList<>();
     private IncidentLog incidentLog = null;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // OBS-Lite
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private LinkedList<Byte> obsLiteData = new LinkedList<>();
+    private LooperThread obsLiteLooper = new LooperThread();
+    private UsbManager usbManager;
+    private static final String ACTION_USB_PERMISSION =
+            "com.android.example.USB_PERMISSION";
+    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "intent: " + intent);
+            String action = intent.getAction();
+            if (ACTION_USB_PERMISSION.equals(action)) {
+                synchronized (this) {
+                    UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        if(device != null){
+                            Log.d(TAG, "device: " + device);
+                            UsbInterface intf = device.getInterface(0);
+                            Log.d(TAG, "intf: " + intf);
+                            UsbEndpoint endpoint = intf.getEndpoint(0);
+                            Log.d(TAG, "endpoint: " + endpoint);
+                            UsbDeviceConnection connection = usbManager.openDevice(device);
+                            Log.d(TAG, "connection: " + connection);
+                            connection.claimInterface(intf, true);
+                            byte[] bytes = new byte[0];
+                            connection.bulkTransfer(endpoint,bytes,119500,6000);
+                        }
+                    }
+                    else {
+                        Log.d(TAG, "permission denied for device " + device);
+                    }
+                }
+            }
+        }
+    };
+
+    private enum UsbPermission { Unknown, Requested, Granted, Denied }
+
+    private static final String INTENT_ACTION_GRANT_USB = BuildConfig.APPLICATION_ID + ".GRANT_USB";
+    private static final int WRITE_WAIT_MILLIS = 2000;
+    private static final int READ_WAIT_MILLIS = 2000;
+
+    private int deviceId, portNum, baudRate;
+    private boolean withIoManager;
+
+
+    private SerialInputOutputManager usbIoManager;
+    private UsbSerialPort usbSerialPort;
+    private UsbPermission usbPermission = UsbPermission.Unknown;
+    private boolean connected = false;
 
     public int getCurrentRideKey() {
         return key;
@@ -261,6 +335,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 incidentDuringRide = incidentType;
             }
         });
+        obsLiteLooper.start();
+        obsLiteLooper.mHandler.post(this::connect);
     }
 
     @Override
@@ -350,6 +426,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         if (connectionEventListener != null) {
             ConnectionManager.INSTANCE.unregisterListener(connectionEventListener);
         }
+
+        // disconnect from OBS Lite
+        obsLiteLooper.mHandler.post(this::disconnect);
 
         // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
         // with current ride and and sharedPrefs with current ride key. Do these things only,
@@ -594,6 +673,81 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             lastHandlerStart = start;
             recordingHandler.postDelayed(this,50);
         }
+    }
+
+    static class LooperThread extends Thread {
+        public Handler mHandler;
+
+        @Override
+        public void run() {
+            Looper.prepare();
+
+
+            mHandler = new Handler(Objects.requireNonNull(Looper.myLooper())) {
+                public void handleMessage(@NonNull Message msg) {
+                    Log.d(TAG, "msg:" + msg);
+                }
+            };
+            Looper.loop();
+        }
+    }
+
+    private void connect() {
+        usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
+        UsbSerialDriver driver = availableDrivers.get(0);
+        UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
+
+        if (connection == null) {
+            IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                this.registerReceiver(usbReceiver,filter,RECEIVER_EXPORTED);
+            } else {
+                this.registerReceiver(usbReceiver,filter);
+            }
+            PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+            usbManager.requestPermission(driver.getDevice(),permissionIntent);
+        } else {
+            UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
+            try {
+                port.open(connection);
+                port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+                Log.d(TAG, "usb serial port opened");
+                usbIoManager = new SerialInputOutputManager(port, this);
+                usbIoManager.run();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void disconnect() {
+        connected = false;
+        if(usbIoManager != null) {
+            usbIoManager.setListener(null);
+            usbIoManager.stop();
+        }
+        usbIoManager = null;
+        try {
+            usbSerialPort.close();
+        } catch (IOException ignored) {}
+        usbSerialPort = null;
+    }
+    @Override
+    public void onNewData(byte[] data) {
+
+        obsLiteLooper.mHandler.post(() -> {
+            for (byte datum : data) {
+                obsLiteData.add(datum);
+            }
+            Log.d(TAG,"obsLiteData.size(): " + obsLiteData.size());
+
+        });
+    }
+
+    @Override
+    public void onRunError(Exception e) {
+
     }
 
     public class MyBinder extends Binder {
