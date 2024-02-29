@@ -45,7 +45,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
-import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
@@ -63,7 +62,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -228,17 +226,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     // OBS-Lite
+    boolean obsLiteEnabled = false;
     UsbManager usbManager;
-    SerialInputOutputManager usbIoManager;
-    LinkedList<Byte> byteLinkedList = new LinkedList<>();
-    LinkedList<LinkedList<Byte>> splittedByteLinkedList = new LinkedList<>();
-
+    UsbDeviceConnection obsLiteConnection;
+    /**
+     * Prompts user to start recording or open the OBS settings.
+     * Gets called, when OBS is enabled in the settings and user tries to star recording but there
+     * is not a connection to an OBS yet.
+     */
+    private void showOBSLiteNotConnectedRecordingWarning() {
+        android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this);
+        alert.setTitle(R.string.not_connected_warning_title);
+        alert.setMessage(R.string.not_connected_recording_warning_message);
+        alert.setPositiveButton(R.string.yes, (dialog, whichButton) -> {
+            startRecording();
+        });
+        alert.setNegativeButton(R.string.no_open_settings, (dialog, whichButton) -> {
+            startActivity(new Intent(this, OpenBikeSensorActivity.class));
+        });
+        alert.show();
+    }
     private static final String ACTION_USB_PERMISSION =
             "com.android.example.USB_PERMISSION";
     private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
 
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "intent: " + intent);
             String action = intent.getAction();
             if (ACTION_USB_PERMISSION.equals(action)) {
                 synchronized (this) {
@@ -380,6 +392,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     showOBSNotConnectedRecordingWarning(); // try one reconnect and show warning if that one fails too
                     return;
                 }
+            } else if (obsLiteEnabled) {
+                if (obsLiteConnection == null) {
+                    showOBSLiteNotConnectedRecordingWarning();
+                }
+
             }
             startRecording();
         });
@@ -433,21 +450,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.appBarMain.buttonRideSettingsObs.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
 
 
-        // OBS Lite
+        /*// OBS Lite
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
-        UsbSerialDriver driver = availableDrivers.get(0);
-        UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
-        if (connection == null) {
-            IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                this.registerReceiver(usbReceiver,filter,RECEIVER_EXPORTED);
-            } else {
-                this.registerReceiver(usbReceiver,filter);
+        if (availableDrivers.size() > 0) {
+            UsbSerialDriver driver = availableDrivers.get(0);
+            UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
+            if (connection == null) {
+                IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.registerReceiver(usbReceiver,filter,RECEIVER_EXPORTED);
+                } else {
+                    this.registerReceiver(usbReceiver,filter);
+                }
+                PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+                usbManager.requestPermission(driver.getDevice(),permissionIntent);
             }
-            PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
-            usbManager.requestPermission(driver.getDevice(),permissionIntent);
-        }
+        }*/
+
 
     }
 
@@ -571,6 +591,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void tryConnectOBSLite() {
+        usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
+        if (availableDrivers.size() > 0) {
+            UsbSerialDriver driver = availableDrivers.get(0);
+            obsLiteConnection = usbManager.openDevice(driver.getDevice());
+
+            if (obsLiteConnection == null) {
+                IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.registerReceiver(usbReceiver, filter, RECEIVER_EXPORTED);
+                } else {
+                    this.registerReceiver(usbReceiver, filter);
+                }
+                PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+                usbManager.requestPermission(driver.getDevice(), permissionIntent);
+            }
+        }
+    }
+
 
 
     /**
@@ -591,6 +631,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.appBarMain.reportIncidentContainer.setVisibility(View.GONE);
 
         updateOBSButtonStatus();
+        updateOBSLiteButtonStatus();
     }
 
     public void displayButtonsForDrive() {
@@ -672,12 +713,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void updateOBSLiteButtonStatus() {
+        FloatingActionButton obsLiteButton = binding.appBarMain.buttonRideSettingsObsLite;
+        if (obsLiteEnabled) {
+            // enable Bluetooth button
+            // navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(true);
+            obsLiteButton.setVisibility(View.VISIBLE);
+        } else {
+            // disable Bluetooth button
+            // navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
+            obsLiteButton.setVisibility(View.GONE);
+        }
+    }
+
     public void onResume() {
         super.onResume();
 
         // OpenBikeSensor
         obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
+        obsLiteEnabled = SharedPref.Settings.OBSLite.isEnabled(this);
         updateOBSButtonStatus();
+        updateOBSLiteButtonStatus();
         if (obsEnabled) {
             BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (mBluetoothAdapter == null) {
@@ -690,9 +746,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 showBluetoothNotEnableWarning();
             } else if(ConnectionManager.INSTANCE.getBleState() != BLESTATE.CONNECTED) {
                 // Bluetooth is enabled
-                Log.d(TAG, "tryConnectToOBS from 623");
                 new Thread(this::tryConnectToOBS).start();
             }
+        }
+
+        if (obsLiteEnabled) {
+            tryConnectOBSLite();
         }
         // Ensure the button that matches current state is presented.
         if (recording) {

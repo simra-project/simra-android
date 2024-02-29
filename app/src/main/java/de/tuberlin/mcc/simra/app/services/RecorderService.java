@@ -31,7 +31,6 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.osmdroid.util.GeoPoint;
@@ -41,11 +40,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.TreeMap;
 
-import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
@@ -329,7 +326,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public IBinder onBind(Intent intent) {
-        obsLiteLooper.mHandler.post(this::connect);
+        obsLiteLooper.mHandler.post(this::tryConnectOBSLite);
         Log.d(TAG, "onBind()");
         return mBinder;
     }
@@ -417,7 +414,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         }
 
         // disconnect from OBS Lite
-        obsLiteLooper.mHandler.post(this::disconnect);
+        obsLiteLooper.mHandler.post(this::disconnectOBSLite);
 
         // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
         // with current ride and and sharedPrefs with current ride key. Do these things only,
@@ -638,6 +635,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 if(isGPSLine) {
                     gpsLines.add(dataLogEntryBuilder.build());
                     Log.d(TAG,"obsLiteData.size(): " + obsLiteData.size());
+                    Log.d(TAG, "gpsLines.size(): " + gpsLines.size());
+                    Log.d(TAG, "sensorLines.size(): " + sensorLines.size());
                 } else if(!gpsLines.isEmpty()) {
                     sensorLines.add(dataLogEntryBuilder.build());
                 }
@@ -683,36 +682,38 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     }
 
-    private void connect() {
+    private void tryConnectOBSLite() {
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
-        UsbSerialDriver driver = availableDrivers.get(0);
-        UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
+        if (availableDrivers.size() > 0) {
+            UsbSerialDriver driver = availableDrivers.get(0);
+            UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
 
-        if (connection == null) {
-            IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                this.registerReceiver(usbReceiver,filter,RECEIVER_EXPORTED);
+            if (connection == null) {
+                IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.registerReceiver(usbReceiver,filter,RECEIVER_EXPORTED);
+                } else {
+                    this.registerReceiver(usbReceiver,filter);
+                }
+                PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+                usbManager.requestPermission(driver.getDevice(),permissionIntent);
             } else {
-                this.registerReceiver(usbReceiver,filter);
-            }
-            PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
-            usbManager.requestPermission(driver.getDevice(),permissionIntent);
-        } else {
-            UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
-            try {
-                port.open(connection);
-                port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-                Log.d(TAG, "usb serial port opened");
-                usbIoManager = new SerialInputOutputManager(port, this);
-                usbIoManager.run();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
+                try {
+                    port.open(connection);
+                    port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+                    Log.d(TAG, "usb serial port opened");
+                    usbIoManager = new SerialInputOutputManager(port, this);
+                    usbIoManager.run();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
 
-    private void disconnect() {
+    private void disconnectOBSLite() {
         if(usbIoManager != null) {
             usbIoManager.setListener(null);
             usbIoManager.stop();
@@ -726,14 +727,18 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onNewData(byte[] data) {
 
-        boolean posted = obsLiteLooper.mHandler.post(() -> {
+        for (byte datum : data) {
+            obsLiteData.add(datum);
+        }
+
+        /*boolean posted = obsLiteLooper.mHandler.post(() -> {
             for (byte datum : data) {
                 obsLiteData.add(datum);
             }
             Log.d(TAG, "data.length: " + data.length);
-        });
-        Log.d(TAG, "data successfully posted: " + posted);
-        Log.d(TAG, "is idle: " + obsLiteLooper.mHandler.getLooper().getQueue().isIdle());
+        });*/
+        // Log.d(TAG, "data successfully posted: " + posted);
+        // Log.d(TAG, "is idle: " + obsLiteLooper.mHandler.getLooper().getQueue().isIdle());
 
     }
 

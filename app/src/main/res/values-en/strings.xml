@@ -227,7 +227,7 @@
     <string name="obs_activity_button_start_scan">Start Bluetooth scan</string>
     <string name="obs_activity_button_connect">Connect</string>
     <string name="obs_activity_button_stop_scan">Stop Bluetooth scan</string>
-    <string name="obsSwitchTitle">OpenBikeSensor connection</string>
+    <string name="obsSwitchTitle">OpenBikeSensor Bluetooth connection</string>
     <string name="obsButton">Open OpenBikeSensor settings</string>
     <string name="availableDevices">Available Devices</string>
     <string name="obsAdvancedSettings">Advanced Settings</string>
@@ -251,6 +251,12 @@
     <string name="obs_activity_text_stop">Searching for OBS</string>
     <string name="obs_activity_text_connect">Found: %1$s</string>
     <string name="obs_activity_text_disconnect">Connected to: %1$s</string>
+    <string name="obs_lite_not_connected_warning_title">Warning: OBS-Lite is not connected!</string>
+
+    <!--- OBS Lite -->
+    <string name="obsLiteSwitchTitle">OBS-Lite USB connection</string>
+    <string name="obsLiteButton">Open OBS-Lite settings</string>
+    <string name="obs_lite_activity_text_start">Not connected to OBS-Lite</string>
 
     <!-- Units -->
     <string name="meter_short">m</string>

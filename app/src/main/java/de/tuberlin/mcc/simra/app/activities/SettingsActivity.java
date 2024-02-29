@@ -1,11 +1,17 @@
 package de.tuberlin.mcc.simra.app.activities;
 
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbEndpoint;
+import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +25,9 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialProber;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -59,6 +68,32 @@ public class SettingsActivity extends BaseActivity {
     ActivitySettingsBinding binding;
 
     private ActivityResultLauncher<Intent> activityResultLauncher;
+
+    boolean obsLiteEnabled = false;
+    UsbManager usbManager;
+    UsbDeviceConnection obsLiteConnection;
+    private static final String ACTION_USB_PERMISSION =
+            "com.android.example.USB_PERMISSION";
+    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
+
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (ACTION_USB_PERMISSION.equals(action)) {
+                synchronized (this) {
+                    UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        if(device != null){
+
+                        }
+                    }
+                    else {
+                        Log.d(TAG, "permission denied for device " + device);
+                    }
+                }
+            }
+        }
+    };
 
 
     @Override
@@ -242,6 +277,27 @@ public class SettingsActivity extends BaseActivity {
             }
         });
 
+        // Switch: OBS Lute device enabled
+        boolean obsLiteActivated = SharedPref.Settings.OBSLite.isEnabled(this);
+        binding.obsLiteButton.setVisibility(obsLiteActivated ? View.VISIBLE : View.GONE);
+        activityResultLauncher = activityResultLauncher(SettingsActivity.this);
+        binding.obsLiteButton.setOnClickListener(view ->
+        {
+            if(obsLiteConnection == null) {
+                tryConnectOBSLite();
+            } else {
+                startActivity(new Intent(this, OBSLiteActivity.class));
+            }
+        });
+
+
+        binding.obsLiteSwitch.setChecked(obsLiteActivated);
+        binding.obsLiteSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPref.Settings.OBSLite.setEnabled(isChecked, SettingsActivity.this);
+            binding.obsLiteButton.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
+
+
         // Version Text
         TextView appVersionTextView = findViewById(R.id.appVersionTextView);
         appVersionTextView.setText("Version: " + BuildConfig.VERSION_CODE + "(" + BuildConfig.VERSION_NAME + ")");
@@ -404,4 +460,24 @@ public class SettingsActivity extends BaseActivity {
                             }
                         }
                     });
+
+    private void tryConnectOBSLite() {
+        usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
+        if (availableDrivers.size() > 0) {
+            UsbSerialDriver driver = availableDrivers.get(0);
+            obsLiteConnection = usbManager.openDevice(driver.getDevice());
+
+            if (obsLiteConnection == null) {
+                IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.registerReceiver(usbReceiver, filter, RECEIVER_EXPORTED);
+                } else {
+                    this.registerReceiver(usbReceiver, filter);
+                }
+                PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+                usbManager.requestPermission(driver.getDevice(), permissionIntent);
+            }
+        }
+    }
 }

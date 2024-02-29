@@ -2,9 +2,6 @@ package de.tuberlin.mcc.simra.app.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
-
-import java.util.Arrays;
 
 /**
  * Helper for central access to all shared prefs used by the app
@@ -327,6 +324,18 @@ public class SharedPref {
 
             public static void setEnabled(Boolean enabled, Context context) {
                 writeBooleanToAppSharedPrefsAsync(OBS_ENABLED, enabled, context);
+            }
+        }
+
+        public static class OBSLite {
+            private static final String OBS_LITE_ENABLED = SETTINGS + "OBS_LITE_ENABLED";
+
+            public static boolean isEnabled(Context context) {
+                return readBooleanFromAppSharedPrefs(OBS_LITE_ENABLED, context);
+            }
+
+            public static void setEnabled(Boolean enabled, Context context) {
+                writeBooleanToAppSharedPrefsAsync(OBS_LITE_ENABLED, enabled, context);
             }
         }
 
