@@ -83,8 +83,9 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.SingleRideStatisticsActivity"
-            android:configChanges="orientation|screenSize" /> <!-- Services -->
+            android:configChanges="orientation|screenSize" />
         <activity android:name="de.tuberlin.mcc.simra.app.activities.OpenBikeSensorActivity" />
+        <activity android:name="de.tuberlin.mcc.simra.app.activities.OBSLiteActivity" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
@@ -92,6 +93,7 @@
             android:name="io.sentry.auto-init"
             android:value="false" />
 
+        <!-- Services -->
         <service
             android:name=".services.RecorderService"
             android:foregroundServiceType="location"

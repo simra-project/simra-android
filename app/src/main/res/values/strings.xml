@@ -258,6 +258,10 @@
     <string name="obsLiteSwitchTitle">OBS Lite per USB verbinden</string>
     <string name="obsLiteButton">OBS Lite Einstellungen öffnen</string>
     <string name="obs_lite_activity_text_start">Keine Verbindung zum OBS Lite</string>
+    <string name="obs_lite_connected">OBS Lite Verbunden</string>
+    <string name="obs_lite_text_last_distance_left">Distanz Links: %1$d cm</string>
+    <string name="obs_lite_text_last_distance_right">Distanz Rechts: %1$d cm</string>
+
 
     <!--- Profile -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>

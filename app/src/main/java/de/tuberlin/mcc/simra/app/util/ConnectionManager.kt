@@ -438,6 +438,7 @@ object ConnectionManager {
             }
         }
 
+        @Deprecated("Deprecated in Java")
         override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
             with(characteristic) {
                 when (status) {
@@ -473,6 +474,7 @@ object ConnectionManager {
             }
         }
 
+        @Deprecated("Deprecated in Java")
         override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
             with(characteristic) {
                 // Log.i(TAG,"Characteristic $uuid changed | value: ${value.toHexString()}")
@@ -486,6 +488,7 @@ object ConnectionManager {
             }
         }
 
+        @Deprecated("Deprecated in Java")
         override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
             with(descriptor) {
                 when (status) {

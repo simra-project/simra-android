@@ -43,8 +43,11 @@ import android.widget.Toast;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
+import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
@@ -62,6 +65,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -82,11 +86,13 @@ import androidx.core.util.Consumer;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import de.tuberlin.mcc.simra.app.BuildConfig;
+import de.tuberlin.mcc.simra.app.Event;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivityMainBinding;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.Profile;
+import de.tuberlin.mcc.simra.app.util.CobsUtils;
 import de.tuberlin.mcc.simra.app.util.ConnectionManager.BLESTATE;
 import de.tuberlin.mcc.simra.app.services.RecorderService;
 import de.tuberlin.mcc.simra.app.util.ConnectionManager;
@@ -109,7 +115,7 @@ import static de.tuberlin.mcc.simra.app.util.Utils.isLocationServiceOff;
 import static de.tuberlin.mcc.simra.app.util.Utils.nearestRegionsToThisLocation;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener, ActivityCompat.OnRequestPermissionsResultCallback{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener, ActivityCompat.OnRequestPermissionsResultCallback, SerialInputOutputManager.Listener{
 
     private static final String TAG = "MainActivity_LOG";
     private final static int REQUEST_ENABLE_BT = 1;
@@ -228,6 +234,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // OBS-Lite
     boolean obsLiteEnabled = false;
     UsbManager usbManager;
+    SerialInputOutputManager usbIoManager;
+    LinkedList<Byte> byteLinkedList = new LinkedList<>();
+    LinkedList<LinkedList<Byte>> splittedByteLinkedList = new LinkedList<>();
     UsbDeviceConnection obsLiteConnection;
     /**
      * Prompts user to start recording or open the OBS settings.
@@ -257,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        if(device != null){
+                        /*if(device != null){
                             Log.d(TAG, "device: " + device);
                             UsbInterface intf = device.getInterface(0);
                             Log.d(TAG, "intf: " + intf);
@@ -268,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             connection.claimInterface(intf, true);
                             byte[] bytes = new byte[0];
                             connection.bulkTransfer(endpoint,bytes,119500,6000);
-                        }
+                        }*/
                     }
                     else {
                         Log.d(TAG, "permission denied for device " + device);
@@ -450,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.appBarMain.buttonRideSettingsObs.setOnClickListener(view -> startActivity(new Intent(this, OpenBikeSensorActivity.class)));
 
 
-        /*// OBS Lite
+        // OBS Lite
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
         if (availableDrivers.size() > 0) {
@@ -465,8 +474,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
                 usbManager.requestPermission(driver.getDevice(),permissionIntent);
-            }
-        }*/
+            } /*else {
+                UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
+                try {
+                    port.open(connection);
+                    port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+                    Log.d(TAG, "port opened");
+                    usbIoManager = new SerialInputOutputManager(port, this);
+                    usbIoManager.run();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }*/
+        }
 
 
     }
@@ -475,6 +495,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Runnable to connect to OBS.
      */
     FutureTask<Boolean> obsFT;
+
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
+    }
+    @Override
+    public void onNewData(byte[] data) {
+        runOnUiThread(() -> {
+            byte[] CDRIVES = hexStringToByteArray("11120910fa0318f0eab7db03520a0801150106c64220904e00");
+            byte[] decodedData = CobsUtils.decode(CDRIVES);
+            StringBuilder decodedResult = new StringBuilder();
+            for (Byte dByte : decodedData) {
+                decodedResult.append("\\x").append(String.format("%02x", dByte));
+            }
+            Log.d(TAG, "decoded: " + decodedResult);
+            try {
+                Event event = Event.parseFrom(decodedData);
+                if (event.hasTextMessage()) {
+                    Log.d(TAG, "event message: " + event.getTextMessage().getText());
+                }
+                if (event.hasDistanceMeasurement()) {
+                    Log.d(TAG, "event distance: " + event.getDistanceMeasurement().getDistance());
+                }
+            } catch (InvalidProtocolBufferException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @Override
+    public void onRunError(Exception e) {
+
+    }
 
 
     public class OBSTryConnectRunnable implements Runnable {
@@ -594,7 +652,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void tryConnectOBSLite() {
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
-        if (availableDrivers.size() > 0) {
+        if (!availableDrivers.isEmpty()) {
             UsbSerialDriver driver = availableDrivers.get(0);
             obsLiteConnection = usbManager.openDevice(driver.getDevice());
 

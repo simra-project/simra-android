@@ -282,13 +282,7 @@ public class SettingsActivity extends BaseActivity {
         binding.obsLiteButton.setVisibility(obsLiteActivated ? View.VISIBLE : View.GONE);
         activityResultLauncher = activityResultLauncher(SettingsActivity.this);
         binding.obsLiteButton.setOnClickListener(view ->
-        {
-            if(obsLiteConnection == null) {
-                tryConnectOBSLite();
-            } else {
-                startActivity(new Intent(this, OBSLiteActivity.class));
-            }
-        });
+        { startActivity(new Intent(this, OBSLiteActivity.class)); });
 
 
         binding.obsLiteSwitch.setChecked(obsLiteActivated);

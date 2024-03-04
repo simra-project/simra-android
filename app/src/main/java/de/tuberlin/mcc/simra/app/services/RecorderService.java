@@ -408,6 +408,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onDestroy() {
 
+        Log.d(TAG, "obsLiteData.size: " + obsLiteData.size());
+
         // Unregister from OBS callbacks
         if (connectionEventListener != null) {
             ConnectionManager.INSTANCE.unregisterListener(connectionEventListener);

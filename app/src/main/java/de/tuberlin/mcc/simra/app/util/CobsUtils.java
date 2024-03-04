@@ -43,13 +43,13 @@ public class CobsUtils {
 
     // Expected to be the entire packet to decode with trailing 0
     public static byte[] decode(byte[] packet) {
-        Log.d(TAG, "empty: " + (packet == null || packet.length == 0 || packet[packet.length - 1] != 0));
+        // Log.d(TAG, "empty: " + (packet == null || packet.length == 0 || packet[packet.length - 1] != 0));
         if (packet == null
                 || packet.length == 0
                 || packet[packet.length - 1] != 0) {
             return new byte[]{};
         }
-        Log.d(TAG, "packet[packet.length - 1]: " + packet[packet.length - 1]);
+        // Log.d(TAG, "packet[packet.length - 1]: " + packet[packet.length - 1]);
 
         byte[] output = new byte[packet.length - 2];
         int srcPacketLength = packet.length - 1;

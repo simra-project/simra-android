@@ -257,6 +257,9 @@
     <string name="obsLiteSwitchTitle">OBS-Lite USB connection</string>
     <string name="obsLiteButton">Open OBS-Lite settings</string>
     <string name="obs_lite_activity_text_start">Not connected to OBS-Lite</string>
+    <string name="obs_lite_connected">OBS-Lite Connected</string>
+    <string name="obs_lite_text_last_distance_left">Distance Left: %1$d cm</string>
+    <string name="obs_lite_text_last_distance_right">Distance Right: %1$d cm</string>
 
     <!-- Units -->
     <string name="meter_short">m</string>
