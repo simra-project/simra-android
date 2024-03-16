@@ -260,6 +260,8 @@
     <string name="obs_lite_connected">OBS-Lite Connected</string>
     <string name="obs_lite_text_last_distance_left">Distance Left: %1$d cm</string>
     <string name="obs_lite_text_last_distance_right">Distance Right: %1$d cm</string>
+    <string name="overtake_press_button">Overtake Event (Push OBS-Lite Button):</string>
+    <string name="overtake_distance_left">Distance Left: %1$d cm</string>
 
     <!-- Units -->
     <string name="meter_short">m</string>

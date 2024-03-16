@@ -64,6 +64,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -104,6 +105,7 @@ import de.tuberlin.mcc.simra.app.util.ble.ConnectionEventListener;
 
 import static de.tuberlin.mcc.simra.app.entities.Profile.profileIsInUnknownRegion;
 import static de.tuberlin.mcc.simra.app.update.VersionUpdater.Legacy.Utils.getAppVersionNumber;
+import static de.tuberlin.mcc.simra.app.util.CobsUtils.hexStringToByteArray;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.PermissionHelper.hasBLEPermissions;
 import static de.tuberlin.mcc.simra.app.util.PermissionHelper.requestBlePermissions;
@@ -232,9 +234,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     // OBS-Lite
-    boolean obsLiteEnabled = false;
+    // boolean obsLiteEnabled = false;
+    boolean obslEnabled = false;
     UsbManager usbManager;
     SerialInputOutputManager usbIoManager;
+    private UsbDevice usbDevice = null;
+    // private boolean obsLiteConnected = false;
+    boolean obslConnected = false;
+    private UsbSerialPort obsLitePort = null;
     LinkedList<Byte> byteLinkedList = new LinkedList<>();
     LinkedList<LinkedList<Byte>> splittedByteLinkedList = new LinkedList<>();
     UsbDeviceConnection obsLiteConnection;
@@ -251,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startRecording();
         });
         alert.setNegativeButton(R.string.no_open_settings, (dialog, whichButton) -> {
-            startActivity(new Intent(this, OpenBikeSensorActivity.class));
+            startActivity(new Intent(this, OBSLiteActivity.class));
         });
         alert.show();
     }
@@ -263,21 +270,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             String action = intent.getAction();
             if (ACTION_USB_PERMISSION.equals(action)) {
                 synchronized (this) {
-                    UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    UsbDevice device;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE, UsbDevice.class);
+                    } else {
+                        device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    }
 
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        /*if(device != null){
-                            Log.d(TAG, "device: " + device);
-                            UsbInterface intf = device.getInterface(0);
-                            Log.d(TAG, "intf: " + intf);
-                            UsbEndpoint endpoint = intf.getEndpoint(0);
-                            Log.d(TAG, "endpoint: " + endpoint);
-                            UsbDeviceConnection connection = usbManager.openDevice(device);
-                            Log.d(TAG, "connection: " + connection);
-                            connection.claimInterface(intf, true);
-                            byte[] bytes = new byte[0];
-                            connection.bulkTransfer(endpoint,bytes,119500,6000);
-                        }*/
+                        usbDevice = device;
+                        obslConnected = true;
+                        updateOBSLiteButtonStatus();
+                        ArrayList<UsbSerialDriver> availableDrivers = (ArrayList<UsbSerialDriver>) UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
+                        if (!availableDrivers.isEmpty()) {
+                            UsbSerialDriver driver = availableDrivers.get(0);
+                            UsbDeviceConnection connection =  usbManager.openDevice(driver.getDevice());
+                            obsLitePort = driver.getPorts().get(0); // Most devices have just one port
+                            try {
+                                obsLitePort.open(connection);
+                                obsLitePort.setParameters(115200,8,UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+                                SerialInputOutputManager usbIoManager = new SerialInputOutputManager(obsLitePort, MainActivity.this);
+                                // usbIoManager.start();
+                                Toast.makeText(MainActivity.this, R.string.obs_lite_connected, Toast.LENGTH_LONG).show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
                     else {
                         Log.d(TAG, "permission denied for device " + device);
@@ -396,18 +415,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         binding.appBarMain.buttonStartRecording.setOnClickListener(v -> {
+            Log.d(TAG, "obsEnabled: " + obsEnabled);
+            Log.d(TAG, "obslEnabled: " + obslEnabled);
+            Log.d(TAG, "obslConnected: " + obslConnected);
             if (obsEnabled) {
                 if (ConnectionManager.INSTANCE.getBleState() == BLESTATE.DISCONNECTED) { // if not connected to OBS, try to connect
                     showOBSNotConnectedRecordingWarning(); // try one reconnect and show warning if that one fails too
-                    return;
+                } else {
+                    startRecording();
                 }
-            } else if (obsLiteEnabled) {
-                if (obsLiteConnection == null) {
+            } else if (obslEnabled) {
+                if (!obslConnected) {
                     showOBSLiteNotConnectedRecordingWarning();
+                } else {
+                    startRecording();
                 }
-
+            } else {
+                startRecording();
             }
-            startRecording();
         });
 
         Consumer<Integer> recordIncident = incidentType -> {
@@ -435,8 +460,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 stopService(recService);
                 recording = false;
                 if (mBoundRecorderService.hasRecordedEnough()) {
-                    ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(),
-                            MetaData.STATE.JUST_RECORDED, true, this);
+                    if (obslEnabled && obslConnected) {
+                        ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(), MetaData.STATE.JUST_RECORDED, mBoundRecorderService.getObsLiteStartTime(), true, this);
+                    } else {
+                        ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(), MetaData.STATE.JUST_RECORDED, true, this);
+                    }
                 } else {
                     new AlertDialog.Builder(MainActivity.this)
                             .setMessage(getString(R.string.errorRideNotRecorded))
@@ -460,6 +488,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         // OBS Lite
+        binding.appBarMain.buttonRideSettingsObsLite.setOnClickListener(v -> {
+            Log.d(TAG, "obslConnected: " + obslConnected);
+            if (!obslConnected) {
+                tryConnectOBSLite();
+            } else {
+                startActivity(new Intent(MainActivity.this, OBSLiteActivity.class));
+            }
+        });
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
         if (availableDrivers.size() > 0) {
@@ -496,15 +532,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     FutureTask<Boolean> obsFT;
 
-    public static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
-        }
-        return data;
-    }
     @Override
     public void onNewData(byte[] data) {
         runOnUiThread(() -> {
@@ -650,6 +677,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void tryConnectOBSLite() {
+        Log.d(TAG, "initiating tryConnectOBSLite");
+        Log.d(TAG, "obslEnabled: " + obslEnabled);
+        Log.d(TAG, "obslConnected: " + obslConnected);
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
         if (!availableDrivers.isEmpty()) {
@@ -665,6 +695,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
                 usbManager.requestPermission(driver.getDevice(), permissionIntent);
+            } else {
+                obslConnected = true;
+                updateOBSLiteButtonStatus();
             }
         }
     }
@@ -773,10 +806,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void updateOBSLiteButtonStatus() {
         FloatingActionButton obsLiteButton = binding.appBarMain.buttonRideSettingsObsLite;
-        if (obsLiteEnabled) {
+        if (obslEnabled) {
             // enable Bluetooth button
             // navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(true);
             obsLiteButton.setVisibility(View.VISIBLE);
+            obsLiteButton.setColorFilter(Color.RED);
+            if (obslConnected) {
+                obsLiteButton.setImageResource(R.drawable.baseline_usb_24);
+                obsLiteButton.setColorFilter(Color.GREEN);
+            }
         } else {
             // disable Bluetooth button
             // navigationView.getMenu().findItem(R.id.nav_bluetooth_connection).setVisible(false);
@@ -789,7 +827,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // OpenBikeSensor
         obsEnabled = SharedPref.Settings.OpenBikeSensor.isEnabled(this);
-        obsLiteEnabled = SharedPref.Settings.OBSLite.isEnabled(this);
+        obslEnabled = SharedPref.Settings.OBSLite.isEnabled(this);
         updateOBSButtonStatus();
         updateOBSLiteButtonStatus();
         if (obsEnabled) {
@@ -808,7 +846,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
 
-        if (obsLiteEnabled) {
+        if (obslEnabled) {
             tryConnectOBSLite();
         }
         // Ensure the button that matches current state is presented.

@@ -261,6 +261,8 @@
     <string name="obs_lite_connected">OBS Lite Verbunden</string>
     <string name="obs_lite_text_last_distance_left">Distanz Links: %1$d cm</string>
     <string name="obs_lite_text_last_distance_right">Distanz Rechts: %1$d cm</string>
+    <string name="overtake_press_button">Überhol-Event (OBS-Lite-Knopf drücken):</string>
+    <string name="overtake_distance_left">Distanz Links: %1$d cm</string>
 
 
     <!--- Profile -->

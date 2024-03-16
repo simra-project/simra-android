@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp"
-                android:text="@string/activity_obs_title_device_info" />
+                android:text="@string/left" />
 
             <ProgressBar
                 android:id="@+id/leftSensorProgressBar"
@@ -69,10 +69,46 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp"
-                android:text="@string/activity_obs_title_device_info" />
+                android:text="@string/right" />
 
             <ProgressBar
                 android:id="@+id/rightSensorProgressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:max="100"
+                android:progress="38" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/userInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/userInputTextView"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:text="@string/overtake_press_button" />
+
+            <TextView
+                android:id="@+id/userInputProgressbarTextView"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:text="@string/overtake_distance_left" />
+
+            <ProgressBar
+                android:id="@+id/leftSensorUserInputProgressBar"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

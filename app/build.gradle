@@ -73,7 +73,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-service:2.3.1"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.4.0'
-    api 'org.osmdroid:osmdroid-android:6.1.10'
+    api 'org.osmdroid:osmdroid-android:6.1.18'
     api 'com.github.MKergall:osmbonuspack:6.7.0'
     implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.4'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.4'
