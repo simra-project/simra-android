@@ -132,6 +132,8 @@
     <string name="exportRideDirectory">Wo soll die SimRa-Fahrt gespeichert werden?</string>
     <string name="exportRideSuccessToast">"SimRa-Fahrt wurde erfolgreich exportiert."</string>
     <string name="exportRideFailToast">"Fehler beim Erstellen der SimRa-Fahrt."</string>
+    <string name="exportOBSLiteSuccessToast">"OBS-Lite Binärdatei wurde erfolgreich exportiert."</string>
+    <string name="exportOBSLiteFailToast">"Fehler beim Erstellen der OBS-Lite Binärdatei."</string>
 
     <!--- ShowRoute -->
     <string name="quitAddIncident">Hinzufügen\nbeenden</string>
@@ -263,6 +265,10 @@
     <string name="obs_lite_text_last_distance_right">Distanz Rechts: %1$d cm</string>
     <string name="overtake_press_button">Überhol-Event (OBS-Lite-Knopf drücken):</string>
     <string name="overtake_distance_left">Distanz Links: %1$d cm</string>
+    <string name="obs_lite_url">URL zum OBS-Lite Server: </string>
+    <string name="obs_lite_username">OBS Benutzername: </string>
+    <string name="obs_lite_api_key">Geheimer OBS API Key: </string>
+
 
 
     <!--- Profile -->

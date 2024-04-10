@@ -616,6 +616,9 @@ public class Utils {
     public static String getCorrectRegionName(String regionLine) {
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
         boolean languageIsEnglish = locale.equals(new Locale("en").getLanguage());
+        /*if(regionLine.split("=").length < 2) {
+            return "";
+        }*/
         if (languageIsEnglish) {
             return regionLine.split("=")[0];
         } else {

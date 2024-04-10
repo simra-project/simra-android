@@ -221,6 +221,7 @@ public class IncidentLogEntry implements Serializable {
     }
 
     public static class INCIDENT_TYPE {
+        public static final int OBS_LITE = -6;
         public static final int FOR_RIDE_SETTINGS = -5;
         public static final int OBS_MIN_KALMAN = -4;
         public static final int OBS_AVG2S = -3;

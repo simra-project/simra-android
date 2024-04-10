@@ -41,9 +41,14 @@ import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -63,14 +68,12 @@ import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.MetaDataEntry;
-import de.tuberlin.mcc.simra.app.obslite.OBSLiteSession;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
 import de.tuberlin.mcc.simra.app.util.CobsUtils;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.Utils;
 
-import static de.tuberlin.mcc.simra.app.util.CobsUtils.hexStringToByteArray;
 import static de.tuberlin.mcc.simra.app.util.Constants.ZOOM_LEVEL;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 
@@ -80,7 +83,6 @@ public class ShowRouteActivity extends BaseActivity {
     private static final String EXTRA_RIDE_ID = "EXTRA_RIDE_ID";
     private static final String EXTRA_STATE = "EXTRA_STATE";
     private static final String EXTRA_SHOW_RIDE_SETTINGS_DIALOG = "EXTRA_SHOW_RIDE_SETTINGS_DIALOG";
-    private static final String EXTRA_OBS_LITE_START_TIME = "EXTRA_OBS_LITE_START_TIME";
     public ExecutorService pool = Executors.newFixedThreadPool(6);
 
     public int state;
@@ -110,11 +112,6 @@ public class ShowRouteActivity extends BaseActivity {
     private IncidentLog incidentLog;
     private DataLog dataLog;
     private DataLog originalDataLog;
-    // OBS-Lite
-    String obsLiteData;
-    long obsLiteStartTime;
-    boolean rideUpdateTaskDone = false;
-    boolean obsLiteTaskDone = false;
 
     /**
      * Returns the longitudes of the southern- and northernmost points
@@ -154,16 +151,6 @@ public class ShowRouteActivity extends BaseActivity {
         intent.putExtra(EXTRA_RIDE_ID, rideId);
         intent.putExtra(EXTRA_STATE, state);
         intent.putExtra(EXTRA_SHOW_RIDE_SETTINGS_DIALOG, showRideSettingsDialog);
-        context.startActivity(intent);
-    }
-
-    public static void startShowRouteActivity(int rideId, Integer state,  long obsLiteStartTime, boolean showRideSettingsDialog, Context context) {
-        Intent intent = new Intent(context, ShowRouteActivity.class);
-        intent.putExtra(EXTRA_RIDE_ID, rideId);
-        intent.putExtra(EXTRA_STATE, state);
-        intent.putExtra(EXTRA_SHOW_RIDE_SETTINGS_DIALOG, showRideSettingsDialog);
-        // intent.putExtra(EXTRA_OBS_LITE_DATA, obsLiteData);
-        intent.putExtra(EXTRA_OBS_LITE_START_TIME, obsLiteStartTime);
         context.startActivity(intent);
     }
 
@@ -224,6 +211,45 @@ public class ShowRouteActivity extends BaseActivity {
 
         gpsFile = IOUtils.Files.getGPSLogFile(rideId, false, this);
 
+        File obsLiteBinaryFile = IOUtils.Files.getOBSLiteSessionFile(rideId,this);
+
+        if (obsLiteBinaryFile.exists()) {
+            try {
+
+                boolean endReached = false;
+                LinkedList<Byte> bytes = new LinkedList<>();
+                DataInputStream dis = new DataInputStream(new FileInputStream(obsLiteBinaryFile));
+                while (true) {
+                    byte aByte = dis.readByte();
+
+                    bytes.add(aByte);
+
+                    if (aByte == 0) {
+                        // Log.d(TAG, "bytes: " + bytes);
+                        byte[] decoded = CobsUtils.decode(bytes);
+                        // Log.d(TAG, "decoded: " + Arrays.toString(decoded));
+                        Event event = Event.parseFrom(decoded);
+                        if (event.hasUserInput()) {
+                            Log.d(TAG, event.toString());
+                        }
+                        bytes = new LinkedList<>();
+                    }
+
+                    /*if (aByte == -1) {
+                        endReached = true;
+                    }*/
+                }
+
+                // Log.d(TAG, "obsLite binary: " + bytes);
+
+                // br.readLine() to skip the first line which contains the headers
+            } catch (EOFException e) {
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         bike = SharedPref.Settings.Ride.BikeType.getBikeType(this);
         child = SharedPref.Settings.Ride.ChildOnBoard.getValue(this);
         trailer = SharedPref.Settings.Ride.BikeWithTrailer.getValue(this);
@@ -282,36 +308,12 @@ public class ShowRouteActivity extends BaseActivity {
             addCustomMarkerMode = false;
         });
 
-        // OBS-Lite
-        if (/*getIntent().hasExtra(EXTRA_OBS_LITE_DATA)*/getIntent().hasExtra(EXTRA_OBS_LITE_START_TIME)) {
-            // obsLiteData = getIntent().getStringExtra(EXTRA_OBS_LITE_DATA);
-            obsLiteData = readOBSLiteSessionFile();
-            obsLiteStartTime = getIntent().getLongExtra(EXTRA_OBS_LITE_START_TIME, 0L);
-            Log.d(TAG, "obsLiteData: " + obsLiteData);
-        }
-
         if (state < MetaData.STATE.SYNCED && showRideSettingsDialog) {
-            fireRideSettingsDialog(obsLiteData, obsLiteStartTime);
+            fireRideSettingsDialog();
         } else {
             new RideUpdateTask(false, false).execute();
         }
 
-    }
-
-    private String readOBSLiteSessionFile() {
-        String content = "";
-
-        File obsLiteSessionFile = IOUtils.Files.getOBSLiteSessionFile(this);
-        if (obsLiteSessionFile.exists()) {
-            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(obsLiteSessionFile))) {
-                 content = bufferedReader.readLine();
-            } catch (IOException e) {
-                Log.d(TAG, "could not read obsLiteSessionFile");
-                e.printStackTrace();
-            }
-        }
-
-        return content;
     }
 
     private void refreshRoute(int rideId, boolean updateBoundaries, boolean calculateEvents) {
@@ -486,9 +488,6 @@ public class ShowRouteActivity extends BaseActivity {
         } catch (InterruptedException | NullPointerException ie) {
             ie.printStackTrace();
         }
-        if (obsLiteData != null) {
-            IOUtils.Files.getOBSLiteSessionFile(this).delete();
-        }
     }
 
     /**
@@ -521,7 +520,7 @@ public class ShowRouteActivity extends BaseActivity {
         }
     }
 
-    public void fireRideSettingsDialog(String obsLiteData, long obsLiteStartTime) {
+    public void fireRideSettingsDialog() {
 
         // Create a alert dialog builder.
         final AlertDialog.Builder builder = new AlertDialog.Builder(ShowRouteActivity.this);
@@ -628,10 +627,6 @@ public class ShowRouteActivity extends BaseActivity {
                 alertDialog.cancel();
                 if (state == 0) {
                     new RideUpdateTask(false, true).execute();
-                    if (obsLiteData != null) {
-                        Log.d(TAG, obsLiteData);
-                        new OBSLiteTask(false, obsLiteData, obsLiteStartTime).execute();
-                    }
                 } else {
                     new RideUpdateTask(false, false).execute();
                 }
@@ -645,73 +640,6 @@ public class ShowRouteActivity extends BaseActivity {
         alertDialog.show();
     }
 
-    private class OBSLiteTask extends AsyncTask {
-        private final boolean updateBoundaries;
-        private final String obsLiteData;
-        private final long obsLiteStartTime;
-
-        private OBSLiteTask(boolean updateBoundaries, String obsLiteData, long obsLiteStartTime) {
-            this.updateBoundaries = updateBoundaries;
-            this.obsLiteData = obsLiteData;
-            this.obsLiteStartTime = obsLiteStartTime;
-        }
-
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            handleOBSLiteData(obsLiteData, obsLiteStartTime);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-            obsLiteTaskDone = true;
-            if (rideUpdateTaskDone) {
-                binding.loadingAnimationLayout.setVisibility(View.GONE);
-                if (updateBoundaries) {
-                    InfoWindow.closeAllInfoWindowsOn(binding.showRouteMap);
-                }
-            }
-        }
-    }
-
-    private void handleOBSLiteData(String obsLiteData, long obsLiteStartTime) {
-
-        OBSLiteSession ols = new OBSLiteSession(obsLiteStartTime);
-
-        Log.d(TAG, "obsLiteData: " + obsLiteData);
-        String[] obsLiteEventArray = obsLiteData.split("#");
-        // Log.d(TAG, "obsLiteData: " + obsLiteData);
-        for (String obsLiteStringWithLocation : obsLiteEventArray) {
-            // Log.d(TAG, "obsLiteStringWithLocation: " + obsLiteStringWithLocation);
-            String[] obsLiteStringWithLocationArray = obsLiteStringWithLocation.split(",");
-            // Log.d(TAG, "obsLiteStringWithLocationArray: " + Arrays.toString(obsLiteStringWithLocationArray));
-            if (obsLiteStringWithLocationArray.length == 5) {
-                byte[] cobsMessage = hexStringToByteArray(obsLiteStringWithLocationArray[0]);
-                byte[] decodedProtoMessage = CobsUtils.decode(cobsMessage);
-                double lat = Double.parseDouble(obsLiteStringWithLocationArray[1]);
-                double lon = Double.parseDouble(obsLiteStringWithLocationArray[2]);
-                double altitude = Double.parseDouble(obsLiteStringWithLocationArray[3]);
-                float accuracy = Float.parseFloat(obsLiteStringWithLocationArray[4]);
-                ols.addEvent(lat, lon, altitude, accuracy, decodedProtoMessage);
-            }
-        }
-        IOUtils.createBinaryFileOBSLite(ols.getCompleteEvents(),IOUtils.Files.getOBSLiteSessionFile(this));
-    }
-
-    private ArrayList<LinkedList<Byte>> splitCobsPackages(byte[] obsLiteData) {
-        ArrayList<LinkedList<Byte>> cobsPackages = new ArrayList<>();
-        LinkedList<Byte> tempCobsPackage = new LinkedList<>();
-
-        for (byte aByte : obsLiteData) {
-            tempCobsPackage.add(aByte);
-            if (aByte == 0x00) {
-                cobsPackages.add(tempCobsPackage);
-                tempCobsPackage = new LinkedList<>();
-            }
-        }
-        return cobsPackages;
-    }
 
     private class RideUpdateTask extends AsyncTask {
 
@@ -740,12 +668,9 @@ public class ShowRouteActivity extends BaseActivity {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
 
-            rideUpdateTaskDone = true;
-            if (obsLiteTaskDone) {
-                binding.loadingAnimationLayout.setVisibility(View.GONE);
-                if (updateBoundaries) {
-                    InfoWindow.closeAllInfoWindowsOn(binding.showRouteMap);
-                }
+            binding.loadingAnimationLayout.setVisibility(View.GONE);
+            if (updateBoundaries) {
+                InfoWindow.closeAllInfoWindowsOn(binding.showRouteMap);
             }
         }
     }

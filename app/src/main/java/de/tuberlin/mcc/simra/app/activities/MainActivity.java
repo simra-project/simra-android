@@ -460,11 +460,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 stopService(recService);
                 recording = false;
                 if (mBoundRecorderService.hasRecordedEnough()) {
-                    if (obslEnabled && obslConnected) {
-                        ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(), MetaData.STATE.JUST_RECORDED, mBoundRecorderService.getObsLiteStartTime(), true, this);
-                    } else {
-                        ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(), MetaData.STATE.JUST_RECORDED, true, this);
-                    }
+                    ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(), MetaData.STATE.JUST_RECORDED, true, this);
                 } else {
                     new AlertDialog.Builder(MainActivity.this)
                             .setMessage(getString(R.string.errorRideNotRecorded))

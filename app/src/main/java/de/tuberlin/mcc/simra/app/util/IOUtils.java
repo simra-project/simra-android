@@ -458,8 +458,8 @@ public class IOUtils {
             return new File(IOUtils.Directories.getBaseFolderPath(context) + "simRa_news_en.config");
         }
 
-        public static File getOBSLiteSessionFile(Context context) {
-            return new File(IOUtils.Directories.getBaseFolderPath(context) + "obsLiteSession.csv");
+        public static File getOBSLiteSessionFile(int rideId, Context context) {
+            return new File(IOUtils.Directories.getBaseFolderPath(context) + "obsLiteSession" + rideId + ".bin");
         }
 
     }

@@ -11,207 +11,285 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
-    <LinearLayout
-        android:id="@+id/obsLiteMainView"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:visibility="visible">
-
-        <Button
-            android:id="@+id/usbButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/obs_activity_button_connect" />
-
-
-        <LinearLayout
-            android:id="@+id/leftSensorLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="visible">
-
-            <TextView
-                android:id="@+id/leftSensorTextView"
-                style="@style/TextAppearance.AppCompat.Medium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
-                android:text="@string/left" />
-
-            <ProgressBar
-                android:id="@+id/leftSensorProgressBar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:max="100"
-                android:progress="38" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/rightSensorLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="visible">
-
-            <TextView
-                android:id="@+id/rightSensorTextView"
-                style="@style/TextAppearance.AppCompat.Medium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
-                android:text="@string/right" />
-
-            <ProgressBar
-                android:id="@+id/rightSensorProgressBar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:max="100"
-                android:progress="38" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/userInputLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="visible">
-
-            <TextView
-                android:id="@+id/userInputTextView"
-                style="@style/TextAppearance.AppCompat.Medium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
-                android:text="@string/overtake_press_button" />
-
-            <TextView
-                android:id="@+id/userInputProgressbarTextView"
-                style="@style/TextAppearance.AppCompat.Medium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
-                android:text="@string/overtake_distance_left" />
-
-            <ProgressBar
-                android:id="@+id/leftSensorUserInputProgressBar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:max="100"
-                android:progress="38" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/devicesTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/obsAdvancedSettings"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp"
+        android:layout_marginTop="@dimen/toolbar_space"
+        android:fadingEdgeLength="80dp"
+        android:requiresFadingEdge="vertical"
+        android:scrollbars="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="5dp"
+            android:background="@android:color/transparent"
             android:orientation="vertical">
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/obsLiteMainView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/obsHandlebarWidthText" />
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:visibility="visible">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/usbButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/obs_activity_button_connect" />
+
+
+                <LinearLayout
+                    android:id="@+id/leftSensorLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/leftSensorTextView"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:text="@string/left" />
+
+                    <ProgressBar
+                        android:id="@+id/leftSensorProgressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:max="100"
+                        android:progress="38" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/rightSensorLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/rightSensorTextView"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:text="@string/right" />
+
+                    <ProgressBar
+                        android:id="@+id/rightSensorProgressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:max="100"
+                        android:progress="38" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/userInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/userInputTextView"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:text="@string/overtake_press_button" />
+
+                    <TextView
+                        android:id="@+id/userInputProgressbarTextView"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:text="@string/overtake_distance_left" />
+
+                    <ProgressBar
+                        android:id="@+id/leftSensorUserInputProgressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:max="100"
+                        android:progress="38" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/devicesTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/obsAdvancedSettings"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical">
 
-                    <NumberPicker
-                        android:id="@+id/handleBarWidth"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@string/obsHandlebarWidthText" />
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:layout_marginLeft="10dp"
+                                android:gravity="center"
+                                android:text="@string/left" />
+
+                            <NumberPicker
+                                android:id="@+id/handleBarWidthLeft"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:layout_marginLeft="10dp"
+                                android:gravity="center"
+                                android:text="@string/centimeter_short"
+                                android:layout_marginRight="25dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:layout_marginLeft="25dp"
+                                android:gravity="center"
+                                android:text="@string/right"
+                                android:layout_marginRight="10dp"/>
+
+                            <NumberPicker
+                                android:id="@+id/handleBarWidthRight"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:layout_marginLeft="10dp"
+                                android:gravity="center"
+                                android:text="@string/centimeter_short" />
+                        </LinearLayout>
+                    </LinearLayout>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="fill_parent"
-                        android:layout_marginLeft="10dp"
                         android:gravity="center"
-                        android:text="@string/centimeter_short" />
+                        android:text="@string/obs_lite_url" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/obsLiteURL"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="https://localhost:3000/"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:gravity="center"
+                        android:text="@string/obs_lite_username" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/obsLiteUsername"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="USERNAME"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:gravity="center"
+                        android:text="@string/obs_lite_api_key" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/obsLiteAPIKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="SECRETAPIKEY"/>
+
                 </LinearLayout>
+
             </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/loadingAnimationLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                android:elevation="9dp"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@color/white"
+                    android:paddingStart="25dp"
+                    android:paddingEnd="25dp"
+                    android:paddingBottom="10dp">
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="@android:style/Widget.Material.ProgressBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:indeterminate="true" />
+
+                    <TextView
+                        android:id="@+id/connectingToUsbText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/progressBar"
+                        android:layout_centerHorizontal="true"
+                        android:text="@string/connecting" />
+                    <Button
+                        android:id="@+id/usbConnectionCancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/connectingToUsbText"
+                        android:text="@string/cancel"
+                        />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
         </LinearLayout>
-
-    </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/loadingAnimationLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/transparent"
-        android:elevation="9dp"
-        android:visibility="gone">
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@color/white"
-            android:paddingStart="25dp"
-            android:paddingEnd="25dp"
-            android:paddingBottom="10dp">
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="@android:style/Widget.Material.ProgressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
-                android:indeterminate="true" />
-
-            <TextView
-                android:id="@+id/connectingToUsbText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/progressBar"
-                android:layout_centerHorizontal="true"
-                android:text="@string/connecting" />
-            <Button
-                android:id="@+id/usbConnectionCancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/connectingToUsbText"
-                android:text="@string/cancel"
-                />
-
-        </RelativeLayout>
-
-    </RelativeLayout>
-
-
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import com.google.protobuf.InvalidProtocolBufferException
 import com.hoho.android.usbserial.driver.UsbSerialPort
@@ -134,12 +135,21 @@ class OBSLiteActivity : BaseActivity(), SerialInputOutputManager.Listener {
         initializeToolBar()
 
         // handlebar width
-        binding.handleBarWidth.maxValue = 60
-        binding.handleBarWidth.minValue = 0
-        binding.handleBarWidth.value =
-            SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(this)
-        binding.handleBarWidth.setOnValueChangedListener { picker, oldVal, newVal ->
-            SharedPref.Settings.Ride.OvertakeWidth.setTotalWidthThroughHandlebarWidth(newVal, this)
+        // left
+        binding.handleBarWidthLeft.maxValue = 60
+        binding.handleBarWidthLeft.minValue = 0
+        binding.handleBarWidthLeft.value =
+            SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidthLeft(this)
+        binding.handleBarWidthLeft.setOnValueChangedListener { picker, oldVal, newVal ->
+            SharedPref.Settings.Ride.OvertakeWidth.setTotalWidthThroughHandlebarWidthLeft(newVal, this)
+        }
+        // right
+        binding.handleBarWidthRight.maxValue = 60
+        binding.handleBarWidthRight.minValue = 0
+        binding.handleBarWidthRight.value =
+            SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidthRight(this)
+        binding.handleBarWidthRight.setOnValueChangedListener { picker, oldVal, newVal ->
+            SharedPref.Settings.Ride.OvertakeWidth.setTotalWidthThroughHandlebarWidthRight(newVal, this)
         }
 
         // OBS-Lite
@@ -159,6 +169,15 @@ class OBSLiteActivity : BaseActivity(), SerialInputOutputManager.Listener {
             this.registerReceiver(usbReceiver, filter)
         }
         updateOBSLiteButton()
+        val obsLiteUrl = SharedPref.Settings.OBSLite.getObsLiteURL(this)
+        binding.obsLiteURL.setText(obsLiteUrl,TextView.BufferType.EDITABLE)
+
+        val obsUsername = SharedPref.Settings.OBSLite.getObsLiteUsername(this)
+        binding.obsLiteUsername.setText(obsUsername,TextView.BufferType.EDITABLE)
+
+        val obsLiteAPIKey = SharedPref.Settings.OBSLite.getObsLiteAPIKey(this)
+        binding.obsLiteAPIKey.setText(obsLiteAPIKey,TextView.BufferType.EDITABLE)
+
     }
 
     private fun getOBSLitePermission() {
@@ -193,6 +212,14 @@ class OBSLiteActivity : BaseActivity(), SerialInputOutputManager.Listener {
 
     override fun onPause() {
         super.onPause()
+        val obsLiteUrl = binding.obsLiteURL.getText()
+        SharedPref.Settings.OBSLite.setObsLiteURL(obsLiteUrl.toString(),this)
+
+        val obsLiteUsername = binding.obsLiteUsername.getText()
+        SharedPref.Settings.OBSLite.setObsLiteUsername(obsLiteUsername.toString(),this)
+
+        val obsLiteAPIKey = binding.obsLiteAPIKey.getText()
+        SharedPref.Settings.OBSLite.setObsLiteAPIKey(obsLiteAPIKey.toString(),this)
     }
 
     override fun onDestroy() {

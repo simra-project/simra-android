@@ -23,6 +23,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
@@ -43,6 +44,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import de.tuberlin.mcc.simra.app.Event;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
@@ -116,26 +118,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private Sensor rotation;
     private int key;
     private Integer incidentDuringRide = null;
-    /*private final BroadcastReceiver openBikeSensorMessageReceiverDistanceValue = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
-            if (serializable instanceof OBSService.Measurement) {
-                lastOBSDistanceValues.add((OBSService.Measurement) serializable);
-            }
-        }
-    };
-    private final BroadcastReceiver openBikeSensorMessageReceiverClosePassEvent = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
-
-            if (serializable instanceof OBSService.ClosePassEvent) {
-                lastOBSClosePassEvents.add((OBSService.ClosePassEvent) serializable);
-            }
-        }
-    };*/
     private BroadcastReceiver incidentBroadcastReceiver;
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
@@ -161,7 +144,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private byte[] obsLiteDataArray = new byte[0];
     private StringBuffer obsLiteDataSB = new StringBuffer();
     private LooperThread obsLiteLooperThread;
-    private OBSLiteSession2 obsLiteSession2;
+    private Handler obsLiteHandler;
+    private HandlerThread obsLiteHandlerThread;
+    private OBSLiteSession2 obsLiteSession;
+    private Event obsLiteEvent;
+
     private UsbManager usbManager;
     private boolean obsLiteEnabled = false;
     private long obsLiteStartTime = 0L;
@@ -223,6 +210,14 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     }*/
 
     public long getObsLiteStartTime() { return obsLiteStartTime; }
+
+    public int getObsLiteSessionCompleteEventsLength() {
+        if (obsLiteSession == null) {
+            return 0;
+        } else {
+            return obsLiteSession.getCompleteEvents().length;
+        }
+    }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -340,9 +335,15 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         });
 
         obsLiteEnabled = SharedPref.Settings.OBSLite.isEnabled(this);
+        if (obsLiteEnabled) {
+            obsLiteLooperThread = new LooperThread();
+            obsLiteLooperThread.start();
+            obsLiteHandlerThread = new HandlerThread("HandlerThread");
+            obsLiteHandlerThread.start();
+            obsLiteHandler = new Handler(obsLiteHandlerThread.getLooper());
+            obsLiteSession = new OBSLiteSession2(this);
+        }
 
-        obsLiteLooperThread = new LooperThread();
-        obsLiteLooperThread.start();
 
     }
 
@@ -438,7 +439,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         }
 
         // disconnect from OBS Lite
-        obsLiteLooperThread.mHandler.post(this::disconnectOBSLite);
+        if (obsLiteEnabled) {
+            // obsLiteLooperThread.mHandler.post(this::disconnectOBSLite);
+            obsLiteHandler.post(this::disconnectOBSLite);
+            obsLiteHandlerThread.quitSafely();
+        }
 
         // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
         // with current ride and and sharedPrefs with current ride key. Do these things only,
@@ -456,8 +461,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             editor.putInt("RIDE-KEY", key + 1);
             editor.apply();
 
-            if (obsLiteDataSB.length() > 0) {
-                overwriteFile(obsLiteDataSB.toString(), IOUtils.Files.getOBSLiteSessionFile(this));
+            if (obsLiteEnabled && obsLiteSession.getCompleteEvents().length > 0) {
+                // overwriteFile(obsLiteDataSB.toString(), IOUtils.Files.getOBSLiteSessionFile(key,this));
+                IOUtils.createBinaryFileOBSLite(obsLiteSession.getCompleteEvents(),IOUtils.Files.getOBSLiteSessionFile(key,this));
             }
         }
 
@@ -640,6 +646,20 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         incidentDuringRide = null;
                     }
 
+                    if (obsLiteEvent != null) {
+                        double handleBarLength = SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(RecorderService.this);
+                        double eventDistance = obsLiteEvent.getDistanceMeasurement().getDistance() * 100.0;
+                        double realDistance = handleBarLength + eventDistance;
+                        if (realDistance >= 150) {
+                            Log.d(TAG, "Adding hidden Close Pass with TS: " + lastAccUpdate + " realLeftDistance: " + realDistance);
+                            incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(lastAccUpdate,lastLocation.getLatitude(),lastLocation.getLongitude()).withIncidentType(IncidentLogEntry.INCIDENT_TYPE.OBS_LITE).withDescription(getString(R.string.overtake_distance_left,((int)obsLiteEvent.getDistanceMeasurement().getDistance()))).withKey(5000).build());
+                        } else {
+                            Log.d(TAG, "Adding visible Close Pass with TS: " + lastAccUpdate + " realLeftDistance: " + realDistance);
+                            incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(lastAccUpdate,lastLocation.getLatitude(),lastLocation.getLongitude()).withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS).withDescription(getString(R.string.overtake_distance_left,obsLiteEvent.getDistanceMeasurement().getDistance())).withKey(4000).build());
+                        }
+                        obsLiteEvent = null;
+                    }
+
                     /*while (lastOBSClosePassEvents.size() > 0) {
                         OBSService.ClosePassEvent closePassEvent = lastOBSClosePassEvents.removeFirst();
                         incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder()
@@ -698,7 +718,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         @Override
         public void run() {
             Looper.prepare();
-            Log.d(TAG, "hi");
 
 
             mHandler = new Handler(Objects.requireNonNull(Looper.myLooper())) {
@@ -754,34 +773,48 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             }
         } catch (IOException ignored) {}
         usbSerialPort = null;
+        Log.d(TAG,"disconnected from obsLite");
+        Log.d(TAG, "obsLiteSession.getByteListQueue().size(): " + obsLiteSession.getByteListQueue().size());
     }
     @Override
     public void onNewData(byte[] data) {
 
-        obsLiteLooperThread.mHandler.post(new Runnable() {
+        obsLiteHandler.post(new Runnable() {
             @Override
             public void run() {
-                bla();
+                handleObsLiteData(data);
             }
         });
+    }
+    @SuppressLint("MissingPermission")
+    public void handleObsLiteData(byte[] data) {
 
         if (obsLiteStartTime == 0L) {
             obsLiteStartTime = System.currentTimeMillis();
+            obsLiteSession.setObsLiteStartTime(obsLiteStartTime);
         }
-        if (lastLocation != null) {
-            for (byte aByte : data) {
-                obsLiteDataSB.append(String.format("%02x", aByte));
-                if (aByte == 0x00) {
-                    obsLiteDataSB.append(",").append(lastLocation.getLatitude()).append(",").append(lastLocation.getLongitude()).append(",").append(lastLocation.getAltitude()).append(",").append(lastLocation.getAccuracy());
-                    obsLiteDataSB.append("#");
-                }
+
+        obsLiteSession.fillByteList(data);
+
+        boolean foundZero = obsLiteSession.completeCobsAvailable();
+
+        if (lastLocation == null) {
+            LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                lastLocation = locationManager.getLastKnownLocation(LocationManager.FUSED_PROVIDER);
+            } else {
+                lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             }
         }
 
-    }
+        if (foundZero) {
+            Event userInputEvent = obsLiteSession.handleEvent(lastLocation.getLatitude(),
+                    lastLocation.getLongitude(), lastLocation.getAltitude(), lastLocation.getAccuracy());
+            if (userInputEvent != null) {
+                obsLiteEvent = userInputEvent;
+            }
+        }
 
-    public void bla() {
-        Log.d(TAG, "hi");
     }
 
     @Override
