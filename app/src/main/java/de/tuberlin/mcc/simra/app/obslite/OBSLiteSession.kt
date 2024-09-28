@@ -55,19 +55,25 @@ class OBSLiteSession(val context: Context) {
                 startTime = obsEvent.getTime(0).seconds
             }
 
-            val secondsSinceFirstOBSTime = obsEvent.getTime(0).seconds - startTime
+            val obsTime: Time = Time.newBuilder().setNanoseconds(obsEvent.getTime(0).nanoseconds)
+                .setSourceId(2).setReference(Time.Reference.UNIX).build()
+
+            val smartphoneTime: Time = Time.newBuilder().setNanoseconds(System.currentTimeMillis().toInt())
+                .setSourceId(3).setReference(Time.Reference.UNIX).build()
+
+            /*val secondsSinceFirstOBSTime = obsEvent.getTime(0).seconds - startTime
             val epochSecondsOfEvent = ((obsLiteStartTime/1000) + secondsSinceFirstOBSTime)
             val nanoseconds = obsEvent.getTime(0).nanoseconds
 
             val time: Time = Time.newBuilder().setSeconds(epochSecondsOfEvent).setNanoseconds(nanoseconds).setSourceId(2).setReference(
-                Time.Reference.UNIX).build()
+                Time.Reference.UNIX).build()*/
 
             if (lat != lastLat || lon != lastLon) {
                 val geolocation: Geolocation = Geolocation.newBuilder()
                     .setLatitude(lat).setLongitude(lon)
                     .setAltitude(altitude).setHdop(accuracy).build()
 
-                val gpsEvent = Event.newBuilder().setGeolocation(geolocation).addTime(time).build()
+                val gpsEvent = Event.newBuilder().setGeolocation(geolocation).addTime(obsTime).addTime(smartphoneTime).build()
                 events.add(gpsEvent)
                 completeEvents.addAll(encodeEvent(gpsEvent))
                 lastLat = lat
@@ -76,7 +82,7 @@ class OBSLiteSession(val context: Context) {
 
             if (obsEvent.hasDistanceMeasurement()) {
                 val dm = obsEvent.distanceMeasurement
-                obsEvent = obsEvent.toBuilder().addTime(time).setDistanceMeasurement(dm).build()
+                obsEvent = obsEvent.toBuilder().addTime(obsTime).addTime(smartphoneTime).setDistanceMeasurement(dm).build()
                 // left sensor event
                 if (obsEvent.distanceMeasurement.sourceId == 1) {
                     val distance = ((obsEvent.distanceMeasurement.distance * 100) + SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidthLeft(context)).toInt()
@@ -86,18 +92,18 @@ class OBSLiteSession(val context: Context) {
                 }
             } else if (obsEvent.hasUserInput()) {
                 val ui = obsEvent.userInput
-                obsEvent = obsEvent.toBuilder().addTime(time).setUserInput(ui).build()
+                obsEvent = obsEvent.toBuilder().addTime(obsTime).addTime(smartphoneTime).setUserInput(ui).build()
                 events.add(obsEvent)
                 completeEvents.addAll(encodeEvent(obsEvent))
                 val dm: DistanceMeasurement = DistanceMeasurement.newBuilder()
                     .setDistance(movingMedian.median.toFloat()).build()
-                obsEvent = obsEvent.toBuilder().addTime(time).setDistanceMeasurement(dm).build()
+                obsEvent = obsEvent.toBuilder().addTime(obsTime).addTime(smartphoneTime).setDistanceMeasurement(dm).build()
                 // Log.d(TAG, "user input event: $obsEvent")
                 byteListQueue.removeFirst()
                 return obsEvent
 
             } else {
-                obsEvent = obsEvent.toBuilder().addTime(time).build()
+                obsEvent = obsEvent.toBuilder().addTime(obsTime).addTime(smartphoneTime).build()
                 Log.d(TAG, obsEvent.toString())
             }
 
