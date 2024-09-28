@@ -55,18 +55,15 @@ class OBSLiteSession(val context: Context) {
                 startTime = obsEvent.getTime(0).seconds
             }
 
-            val obsTime: Time = Time.newBuilder().setNanoseconds(obsEvent.getTime(0).nanoseconds)
+            val obsTime: Time = Time.newBuilder()
+                .setSeconds(obsEvent.getTime(0).seconds)
+                .setNanoseconds(obsEvent.getTime(0).nanoseconds)
                 .setSourceId(2).setReference(Time.Reference.UNIX).build()
 
-            val smartphoneTime: Time = Time.newBuilder().setNanoseconds(System.currentTimeMillis().toInt())
+            val smartphoneTime: Time = Time.newBuilder()
+                .setSeconds(System.currentTimeMillis()/1000)
+                .setNanoseconds(((System.currentTimeMillis()%1000) * 1000000).toInt())
                 .setSourceId(3).setReference(Time.Reference.UNIX).build()
-
-            /*val secondsSinceFirstOBSTime = obsEvent.getTime(0).seconds - startTime
-            val epochSecondsOfEvent = ((obsLiteStartTime/1000) + secondsSinceFirstOBSTime)
-            val nanoseconds = obsEvent.getTime(0).nanoseconds
-
-            val time: Time = Time.newBuilder().setSeconds(epochSecondsOfEvent).setNanoseconds(nanoseconds).setSourceId(2).setReference(
-                Time.Reference.UNIX).build()*/
 
             if (lat != lastLat || lon != lastLon) {
                 val geolocation: Geolocation = Geolocation.newBuilder()
