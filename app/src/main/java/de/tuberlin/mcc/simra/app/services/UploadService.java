@@ -13,18 +13,22 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.util.Pair;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Authenticator;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -52,6 +56,13 @@ import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.Utils;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
@@ -225,12 +236,11 @@ public class UploadService extends Service {
                 }
 
                 List<MetaDataEntry> metaDataEntries = MetaData.getMetaDataEntries(context);
-                ArrayList<File> obsLiteDataToUpload = new ArrayList<>();
                 for (MetaDataEntry metaDataEntry : metaDataEntries) {
                     // found a ride which is ready to upload in metaData.csv
                     if (metaDataEntry.state.equals(MetaData.STATE.ANNOTATED)) {
                         if (IOUtils.Files.getOBSLiteSessionFile(metaDataEntry.rideId, context).exists()) {
-                            obsLiteDataToUpload.add(IOUtils.Files.getOBSLiteSessionFile(metaDataEntry.rideId, context));
+                            postOBSLiteMultipart(IOUtils.Files.getOBSLiteSessionFile(metaDataEntry.rideId, context));
                         }
                         foundARideToUpload = true;
                         // concatenate fileInfoVersion, accEvents and accGps content
@@ -264,6 +274,7 @@ public class UploadService extends Service {
 
 
                         // if the respond is ok, mark ride as uploaded in metaData.csv
+
                         if (response.first.equals(200)) {
                             metaDataEntry.state = MetaData.STATE.SYNCED;
                             MetaData.updateOrAddMetaDataEntryForRide(metaDataEntry, context);
@@ -278,9 +289,6 @@ public class UploadService extends Service {
                     }
                 }
 
-                for (File obsLiteBinary :obsLiteDataToUpload) {
-                    postOBSLiteFile(obsLiteBinary);
-                }
                 if (!foundARideToUpload) {
                     Intent intent = new Intent();
                     intent.setAction("de.tuberlin.mcc.simra.app.UPLOAD_COMPLETE");
@@ -356,11 +364,9 @@ public class UploadService extends Service {
             String locale = simRa_regions_config[region].split("=")[2];
             Log.d(TAG, "localeInt: " + region + " locale: " + locale);
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + fileType + "?loc=" + locale + "&clientHash=" + getClientHash(context));
-            Log.d(TAG, "URL: " + url.toString());
+            Log.d(TAG, "URL: " + url);
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
@@ -399,7 +405,6 @@ public class UploadService extends Service {
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
-            // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
             URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + getClientHash(context));
 
             HttpsURLConnection urlConnection =
@@ -426,202 +431,51 @@ public class UploadService extends Service {
             return new Pair<>(status, response);
         }
 
-        private Pair<Integer, String> postOBSLiteFile(File file) throws IOException {
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // int appVersion = getAppVersionNumber(context);
-            // Tell the URLConnection to use a SocketFactory from our SSLContext
-
-            String obsLiteUrl = SharedPref.Settings.OBSLite.getObsLiteURL(context);
-
-            URL url = new URL(obsLiteUrl);
-            Log.d(TAG, "URL: " + url.toString());
-            HttpsURLConnection urlConnection =
-                    (HttpsURLConnection) url.openConnection();
-            Authenticator.setDefault(new CustomAuthenticator(context));
-
-            urlConnection.setRequestMethod("POST");
-            urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
-            urlConnection.setReadTimeout(10000);
-            urlConnection.setConnectTimeout(15000);
-            urlConnection.setRequestProperty("Content-Type", "application/octet-stream");
-            byte[] outputInBytes = new byte[(int) file.length()];
-            DataInputStream dis = new DataInputStream(new FileInputStream(file));
-            dis.readFully(outputInBytes);
-            dis.close();
-            OutputStream os = urlConnection.getOutputStream();
-            os.write(outputInBytes);
-            os.close();
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(urlConnection.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            int status = urlConnection.getResponseCode();
-            if (status == 200) {
-                uploadSuccessful = true;
-            }
-            Log.d(TAG, "Server status: " + status);
-            Log.d(TAG, "Server Response: " + response);
-
-            return new Pair<>(status, response.toString());
-        }
-
-        public static class CustomAuthenticator extends Authenticator {
-
-            private final Context context;
-
-            public CustomAuthenticator(Context context) {
-                this.context = context;
+        private void postOBSLiteMultipart(File file) {
+            String obsLiteURL = SharedPref.Settings.OBSLite.getObsLiteURL(context);
+            if (!(obsLiteURL.endsWith("/api/tracks") || obsLiteURL.endsWith("/api/tracks/"))) {
+                if (obsLiteURL.endsWith("/")) {
+                    obsLiteURL += "api/tracks";
+                } else {
+                    obsLiteURL += "/api/tracks";
+                }
             }
 
-            // Called when password authorization is needed
-            protected PasswordAuthentication getPasswordAuthentication() {
+            String obsAPIKey = SharedPref.Settings.OBSLite.getObsLiteAPIKey(context);
+            OkHttpClient client = new OkHttpClient();
 
-                // Get information about the request
-                String prompt = getRequestingPrompt();
-                String hostname = getRequestingHost();
-                InetAddress ipaddr = getRequestingSite();
-                int port = getRequestingPort();
+            MediaType mediaType = MediaType.parse("application/octet-stream");
 
-                String username = SharedPref.Settings.OBSLite.getObsLiteUsername(this.context);
-                String password = SharedPref.Settings.OBSLite.getObsLiteAPIKey(this.context);
+            RequestBody body = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("body", file.getName(), RequestBody.create(file, mediaType))
+                    .build();
+            Request request = new Request.Builder()
+                    .url(obsLiteURL)
+                    .post(body)
+                    .addHeader("Authorization", "OBSUserId " + obsAPIKey)
+                    .addHeader("content-type", "multipart/form-data;")
+                    .build();
 
-                // Return the information (a data holder that is used by Authenticator)
-                return new PasswordAuthentication(username,password.toCharArray());
-
-            }
-
-        }
-
-        /*private String postOBSLiteFile(File file) throws IOException {
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // int appVersion = getAppVersionNumber(context);
-            // Tell the URLConnection to use a SocketFactory from our SSLContext
-            String url = "http://localhost:3000/api/tracks";
-            HashMap<String,String> params = new HashMap<>();
-            params.put("body","testfile.bin");
-
-
-            return multipartRequest(url,params,file.getPath(),file.getName(),"application/octet-stream");;
-        }*/
-
-        public String multipartRequest(String urlTo, Map<String, String> params, String filepath, String filefield, String fileMimeType) {
-            HttpsURLConnection connection = null;
-            DataOutputStream outputStream = null;
-            InputStream inputStream = null;
-
-            String twoHyphens = "--";
-            String boundary = "*****" + Long.toString(System.currentTimeMillis()) + "*****";
-            String lineEnd = "\r\n";
-
-            String result = "";
-
-            int bytesRead, bytesAvailable, bufferSize;
-            byte[] buffer;
-            int maxBufferSize = 1 * 1024 * 1024;
-
-            String[] q = filepath.split("/");
-            int idx = q.length - 1;
-
+            Response response;
             try {
-                File file = new File(filepath);
-                FileInputStream fileInputStream = new FileInputStream(file);
-
-                URL url = new URL(urlTo);
-                connection = (HttpsURLConnection) url.openConnection();
-
-                connection.setDoInput(true);
-                connection.setDoOutput(true);
-                connection.setUseCaches(false);
-
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Connection", "Keep-Alive");
-                connection.setRequestProperty("User-Agent", "Android Multipart HTTP Client 1.0");
-                connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-
-                outputStream = new DataOutputStream(connection.getOutputStream());
-                outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-                outputStream.writeBytes("Content-Disposition: form-data; name=\"" + filefield + "\"; filename=\"" + q[idx] + "\"" + lineEnd);
-                outputStream.writeBytes("Content-Type: " + fileMimeType + lineEnd);
-                outputStream.writeBytes("Content-Transfer-Encoding: binary" + lineEnd);
-
-                outputStream.writeBytes(lineEnd);
-
-                bytesAvailable = fileInputStream.available();
-                bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                buffer = new byte[bufferSize];
-
-                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-                while (bytesRead > 0) {
-                    outputStream.write(buffer, 0, bufferSize);
-                    bytesAvailable = fileInputStream.available();
-                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-                }
-
-                outputStream.writeBytes(lineEnd);
-
-                // Upload POST Data
-                Iterator<String> keys = params.keySet().iterator();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    String value = params.get(key);
-
-                    outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-                    outputStream.writeBytes("Content-Disposition: form-data; name=\"" + key + "\"" + lineEnd);
-                    outputStream.writeBytes("Content-Type: text/plain" + lineEnd);
-                    outputStream.writeBytes(lineEnd);
-                    outputStream.writeBytes(value);
-                    outputStream.writeBytes(lineEnd);
-                }
-
-                outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
-
-                if (200 != connection.getResponseCode()) {
-                    throw new Exception("Failed to upload code:" + connection.getResponseCode() + " " + connection.getResponseMessage());
-                }
-
-                inputStream = connection.getInputStream();
-
-                result = this.convertStreamToString(inputStream);
-
-                fileInputStream.close();
-                inputStream.close();
-                outputStream.flush();
-                outputStream.close();
-            } catch (Exception e) {
-                Log.d(TAG, Objects.requireNonNull(e.getMessage()));
-                e.printStackTrace();
-            }
-            return result;
-        }
-
-        private String convertStreamToString(InputStream is) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            StringBuilder sb = new StringBuilder();
-
-            String line = null;
-            try {
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
+                response = client.newCall(request).execute();
             } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                throw new RuntimeException(e);
             }
-            return sb.toString();
+
+            String responseBody;
+            int responseCode;
+            try {
+                responseCode = response.code();
+                responseBody = response.body().string();
+                Log.d(TAG, "obs lite response code: " + responseCode);
+                Log.d(TAG, "obs lite response body: " + responseBody);
+            } catch (IOException | NullPointerException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+            response.close();
         }
     }
 }

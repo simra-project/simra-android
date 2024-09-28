@@ -52,7 +52,7 @@ import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.MetaDataEntry;
-import de.tuberlin.mcc.simra.app.obslite.OBSLiteSession2;
+import de.tuberlin.mcc.simra.app.obslite.OBSLiteSession;
 import de.tuberlin.mcc.simra.app.util.ConnectionManager;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
@@ -146,7 +146,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private LooperThread obsLiteLooperThread;
     private Handler obsLiteHandler;
     private HandlerThread obsLiteHandlerThread;
-    private OBSLiteSession2 obsLiteSession;
+    private OBSLiteSession obsLiteSession;
     private Event obsLiteEvent;
 
     private UsbManager usbManager;
@@ -254,6 +254,8 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             startLocation = location;
         }
         lastLocation = location;
+
+        obsLiteSession.addGPSEvent(location);
     }
 
     @Override
@@ -341,7 +343,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             obsLiteHandlerThread = new HandlerThread("HandlerThread");
             obsLiteHandlerThread.start();
             obsLiteHandler = new Handler(obsLiteHandlerThread.getLooper());
-            obsLiteSession = new OBSLiteSession2(this);
+            obsLiteSession = new OBSLiteSession(this);
         }
 
 
@@ -349,7 +351,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     @Override
     public IBinder onBind(Intent intent) {
-        obsLiteLooperThread.mHandler.post(this::tryConnectOBSLite);
+        if (obsLiteLooperThread != null) {
+            obsLiteLooperThread.mHandler.post(this::tryConnectOBSLite);
+        }
         Log.d(TAG, "onBind()");
         return mBinder;
     }

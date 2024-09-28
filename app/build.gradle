@@ -12,7 +12,7 @@ def API_VERSION = "API_VERSION"
 android {
     compileSdkVersion 34
     defaultConfig {
-        applicationId "de.tuberlin.mcc.simra.app"
+        applicationId "de.tuberlin.mcc.simra.app.obslite"
         minSdkVersion 23
         targetSdkVersion 34
         versionCode 101
@@ -29,7 +29,7 @@ android {
         }
 
 
-        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://vm2.mcc.tu-berlin.de:8082/\""
+        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://vm1.mcc.tu-berlin.de:8082/\""
         buildConfigField "String", API_VERSION, properties.getProperty(API_VERSION) ?: "\"13/\""
 
     }
@@ -99,7 +99,7 @@ dependencies {
     implementation "androidx.datastore:datastore-rxjava3:1.0.0"
     implementation 'com.github.mik3y:usb-serial-for-android:3.7.0'
 
-
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
 }
 
