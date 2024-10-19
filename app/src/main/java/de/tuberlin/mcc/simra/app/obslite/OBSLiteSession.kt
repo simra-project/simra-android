@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedDeque
 
 class OBSLiteSession(val context: Context) {
     var obsLiteStartTime: Long = 0L
-    val TAG = "OBSLiteSession2_LOG"
+    val TAG = "OBSLiteSession_LOG"
     private var events: ArrayList<Event> = ArrayList()
     var byteListQueue = ConcurrentLinkedDeque<LinkedList<Byte>>()
     var lastByteRead: Byte? = null
@@ -50,6 +50,7 @@ class OBSLiteSession(val context: Context) {
 
         try {
             var obsEvent: Event = Event.parseFrom(decodedData)
+            val currentTimeMillis: Long = System.currentTimeMillis();
 
             if (startTime == -1L) {
                 startTime = obsEvent.getTime(0).seconds
@@ -61,8 +62,8 @@ class OBSLiteSession(val context: Context) {
                 .setSourceId(2).setReference(Time.Reference.UNIX).build()
 
             val smartphoneTime: Time = Time.newBuilder()
-                .setSeconds(System.currentTimeMillis()/1000)
-                .setNanoseconds(((System.currentTimeMillis()%1000) * 1000000).toInt())
+                .setSeconds(currentTimeMillis/1000)
+                .setNanoseconds(((currentTimeMillis%1000) * 1000000).toInt())
                 .setSourceId(3).setReference(Time.Reference.UNIX).build()
 
             if (lat != lastLat || lon != lastLon) {
