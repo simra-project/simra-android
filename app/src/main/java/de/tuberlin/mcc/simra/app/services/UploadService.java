@@ -13,27 +13,41 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.util.Pair;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.Authenticator;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.IncidentLog;
-import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.MetaDataEntry;
 import de.tuberlin.mcc.simra.app.entities.Profile;
@@ -42,6 +56,13 @@ import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.Utils;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
@@ -218,6 +239,9 @@ public class UploadService extends Service {
                 for (MetaDataEntry metaDataEntry : metaDataEntries) {
                     // found a ride which is ready to upload in metaData.csv
                     if (metaDataEntry.state.equals(MetaData.STATE.ANNOTATED)) {
+                        if (IOUtils.Files.getOBSLiteSessionFile(metaDataEntry.rideId, context).exists()) {
+                            postOBSLiteMultipart(IOUtils.Files.getOBSLiteSessionFile(metaDataEntry.rideId, context));
+                        }
                         foundARideToUpload = true;
                         // concatenate fileInfoVersion, accEvents and accGps content
                         Pair<String, IncidentLog> contentToUploadAndAccEventsContentToOverwrite = Utils.getConsolidatedRideForUpload(metaDataEntry.rideId, context);
@@ -250,6 +274,7 @@ public class UploadService extends Service {
 
 
                         // if the respond is ok, mark ride as uploaded in metaData.csv
+
                         if (response.first.equals(200)) {
                             metaDataEntry.state = MetaData.STATE.SYNCED;
                             MetaData.updateOrAddMetaDataEntryForRide(metaDataEntry, context);
@@ -263,6 +288,7 @@ public class UploadService extends Service {
                         }
                     }
                 }
+
                 if (!foundARideToUpload) {
                     Intent intent = new Intent();
                     intent.setAction("de.tuberlin.mcc.simra.app.UPLOAD_COMPLETE");
@@ -338,11 +364,9 @@ public class UploadService extends Service {
             String locale = simRa_regions_config[region].split("=")[2];
             Log.d(TAG, "localeInt: " + region + " locale: " + locale);
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
             URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + fileType + "?loc=" + locale + "&clientHash=" + getClientHash(context));
-            Log.d(TAG, "URL: " + url.toString());
+            Log.d(TAG, "URL: " + url);
             HttpsURLConnection urlConnection =
                     (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
@@ -381,7 +405,6 @@ public class UploadService extends Service {
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // int appVersion = getAppVersionNumber(context);
             // Tell the URLConnection to use a SocketFactory from our SSLContext
-            // URL url = new URL(Constants.MCC_VM3 + "upload/" + fileHash + "?version=" + appVersion + "&loc=" + locale + "&clientHash=" + clientHash);
             URL url = new URL(BuildConfig.API_ENDPOINT + BuildConfig.API_VERSION + fileType + "?fileHash=" + fileHash + "&filePassword=" + filePassword + "&loc=" + locale + "&clientHash=" + getClientHash(context));
 
             HttpsURLConnection urlConnection =
@@ -406,6 +429,53 @@ public class UploadService extends Service {
             Log.d(TAG, "Server Response: " + response);
 
             return new Pair<>(status, response);
+        }
+
+        private void postOBSLiteMultipart(File file) {
+            String obsLiteURL = SharedPref.Settings.OBSLite.getObsLiteURL(context);
+            if (!(obsLiteURL.endsWith("/api/tracks") || obsLiteURL.endsWith("/api/tracks/"))) {
+                if (obsLiteURL.endsWith("/")) {
+                    obsLiteURL += "api/tracks";
+                } else {
+                    obsLiteURL += "/api/tracks";
+                }
+            }
+
+            String obsAPIKey = SharedPref.Settings.OBSLite.getObsLiteAPIKey(context);
+            OkHttpClient client = new OkHttpClient();
+
+            MediaType mediaType = MediaType.parse("application/octet-stream");
+
+            RequestBody body = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("body", file.getName(), RequestBody.create(file, mediaType))
+                    .build();
+            Request request = new Request.Builder()
+                    .url(obsLiteURL)
+                    .post(body)
+                    .addHeader("Authorization", "OBSUserId " + obsAPIKey)
+                    .addHeader("content-type", "multipart/form-data;")
+                    .build();
+
+            Response response;
+            try {
+                response = client.newCall(request).execute();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            String responseBody;
+            int responseCode;
+            try {
+                responseCode = response.code();
+                responseBody = response.body().string();
+                Log.d(TAG, "obs lite response code: " + responseCode);
+                Log.d(TAG, "obs lite response body: " + responseBody);
+            } catch (IOException | NullPointerException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+            response.close();
         }
     }
 }

@@ -27,6 +27,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.RangeSlider;
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.BoundingBox;
@@ -39,12 +40,25 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import de.tuberlin.mcc.simra.app.Event;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.annotation.IncidentPopUpActivity;
 import de.tuberlin.mcc.simra.app.annotation.MarkerFunct;
@@ -55,6 +69,7 @@ import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.MetaDataEntry;
 import de.tuberlin.mcc.simra.app.util.BaseActivity;
+import de.tuberlin.mcc.simra.app.util.CobsUtils;
 import de.tuberlin.mcc.simra.app.util.IOUtils;
 import de.tuberlin.mcc.simra.app.util.SharedPref;
 import de.tuberlin.mcc.simra.app.util.Utils;
@@ -137,7 +152,6 @@ public class ShowRouteActivity extends BaseActivity {
         intent.putExtra(EXTRA_STATE, state);
         intent.putExtra(EXTRA_SHOW_RIDE_SETTINGS_DIALOG, showRideSettingsDialog);
         context.startActivity(intent);
-
     }
 
     public MapView getmMapView() {
@@ -196,6 +210,45 @@ public class ShowRouteActivity extends BaseActivity {
         });
 
         gpsFile = IOUtils.Files.getGPSLogFile(rideId, false, this);
+
+        File obsLiteBinaryFile = IOUtils.Files.getOBSLiteSessionFile(rideId,this);
+
+        if (obsLiteBinaryFile.exists()) {
+            try {
+
+                boolean endReached = false;
+                LinkedList<Byte> bytes = new LinkedList<>();
+                DataInputStream dis = new DataInputStream(new FileInputStream(obsLiteBinaryFile));
+                while (true) {
+                    byte aByte = dis.readByte();
+
+                    bytes.add(aByte);
+
+                    if (aByte == 0) {
+                        // Log.d(TAG, "bytes: " + bytes);
+                        byte[] decoded = CobsUtils.decode(bytes);
+                        // Log.d(TAG, "decoded: " + Arrays.toString(decoded));
+                        Event event = Event.parseFrom(decoded);
+                        if (event.hasUserInput()) {
+                            Log.d(TAG, event.toString());
+                        }
+                        bytes = new LinkedList<>();
+                    }
+
+                    /*if (aByte == -1) {
+                        endReached = true;
+                    }*/
+                }
+
+                // Log.d(TAG, "obsLite binary: " + bytes);
+
+                // br.readLine() to skip the first line which contains the headers
+            } catch (EOFException e) {
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         bike = SharedPref.Settings.Ride.BikeType.getBikeType(this);
         child = SharedPref.Settings.Ride.ChildOnBoard.getValue(this);
@@ -587,10 +640,11 @@ public class ShowRouteActivity extends BaseActivity {
         alertDialog.show();
     }
 
+
     private class RideUpdateTask extends AsyncTask {
 
-        private boolean updateBoundaries;
-        private boolean calculateEvents;
+        private final boolean updateBoundaries;
+        private final boolean calculateEvents;
 
         private RideUpdateTask(boolean updateBoundaries, boolean calculateEvents) {
             this.updateBoundaries = updateBoundaries;
@@ -613,6 +667,7 @@ public class ShowRouteActivity extends BaseActivity {
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
+
             binding.loadingAnimationLayout.setVisibility(View.GONE);
             if (updateBoundaries) {
                 InfoWindow.closeAllInfoWindowsOn(binding.showRouteMap);

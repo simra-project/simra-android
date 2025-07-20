@@ -352,6 +352,17 @@ public class IOUtils {
         fOut.close();
     }
 
+    public static void createBinaryFileOBSLite(byte[] byteArray, File file) {
+        try {
+            FileOutputStream writer = new FileOutputStream(file);
+            writer.write(byteArray);
+            writer.flush();
+            writer.close();
+        } catch (IOException ioe) {
+            Log.d(TAG, Arrays.toString(ioe.getStackTrace()));
+        }
+    }
+
     public static class Directories {
 
         /**
@@ -445,6 +456,10 @@ public class IOUtils {
         }
         public static File getENNewsFile(Context context) {
             return new File(IOUtils.Directories.getBaseFolderPath(context) + "simRa_news_en.config");
+        }
+
+        public static File getOBSLiteSessionFile(int rideId, Context context) {
+            return new File(IOUtils.Directories.getBaseFolderPath(context) + "obsLiteSession" + rideId + ".bin");
         }
 
     }

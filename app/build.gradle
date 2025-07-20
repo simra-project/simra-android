@@ -2,6 +2,7 @@ plugins {
     id 'kotlin-android'
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id "com.google.protobuf" version "0.9.1"
 }
 
 def ENV_VARIABLE_PREFIX = "SIMRA_"
@@ -9,13 +10,13 @@ def API_ENDPOINT = "API_ENDPOINT"
 def API_VERSION = "API_VERSION"
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 35
     defaultConfig {
         applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
-        targetSdkVersion 34
-        versionCode 100
-        versionName "100.0"
+        targetSdkVersion 35
+        versionCode 101
+        versionName "101.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
@@ -28,7 +29,7 @@ android {
         }
 
 
-        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://vm2.mcc.tu-berlin.de:8082/\""
+        buildConfigField "String", API_ENDPOINT, properties.getProperty(API_ENDPOINT) ?: "\"https://simra-backend.3s-rg.de:8082/\""
         buildConfigField "String", API_VERSION, properties.getProperty(API_VERSION) ?: "\"13/\""
 
     }
@@ -61,18 +62,26 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
+    }
     namespace 'de.tuberlin.mcc.simra.app'
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    implementation "androidx.lifecycle:lifecycle-service:2.3.1"
+    implementation "androidx.lifecycle:lifecycle-service:2.7.0"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.material:material:1.4.0'
-    api 'org.osmdroid:osmdroid-android:6.1.10'
+    implementation 'com.google.android.material:material:1.11.0'
+    api 'org.osmdroid:osmdroid-android:6.1.18'
     api 'com.github.MKergall:osmbonuspack:6.7.0'
     implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.4'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.4'
@@ -80,7 +89,6 @@ dependencies {
 
     // RingBuffer
     implementation 'org.apache.commons:commons-collections4:4.4'
-    implementation 'androidx.core:core-ktx:1.10.1'
 
     // Tests
     testImplementation 'junit:junit:4.13'
@@ -90,7 +98,34 @@ dependencies {
     implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.2'
 
     // Kotlin
-    implementation 'androidx.core:core-ktx:1.10.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.21"
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.22"
 
+    // Proto
+    implementation  "androidx.datastore:datastore:1.0.0"
+    implementation  "com.google.protobuf:protobuf-javalite:3.18.0"
+    implementation "androidx.datastore:datastore-rxjava3:1.0.0"
+    implementation 'com.github.mik3y:usb-serial-for-android:3.7.0'
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.23.2"
+    }
+
+    // Generates the java Protobuf-lite code for the Protobufs in this project. See
+    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+    // for more information.
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+            }
+        }
+    }
 }

@@ -187,6 +187,10 @@ public class IncidentLog {
             incidentLogEntry.key = (calculateKey(2000));
         } else if (incidentLogEntry.key == 3000) {// for hidden OBS incidents
             incidentLogEntry.key = (calculateKey(3000));
+        } else if (incidentLogEntry.key == 4000) {// for hidden OBS-Lite incidents
+            incidentLogEntry.key = (calculateKey(4000));
+        } else if (incidentLogEntry.key == 5000) {// for hidden OBS-Lite incidents
+            incidentLogEntry.key = (calculateKey(5000));
         }
         incidents.put(incidentLogEntry.key, incidentLogEntry);
         return incidentLogEntry;

@@ -2,15 +2,20 @@ package de.tuberlin.mcc.simra.app.services;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -18,20 +23,29 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.os.PowerManager;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import de.tuberlin.mcc.simra.app.Event;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.entities.DataLog;
 import de.tuberlin.mcc.simra.app.entities.DataLogEntry;
@@ -39,6 +53,7 @@ import de.tuberlin.mcc.simra.app.entities.IncidentLog;
 import de.tuberlin.mcc.simra.app.entities.IncidentLogEntry;
 import de.tuberlin.mcc.simra.app.entities.MetaData;
 import de.tuberlin.mcc.simra.app.entities.MetaDataEntry;
+import de.tuberlin.mcc.simra.app.obslite.OBSLiteSession;
 import de.tuberlin.mcc.simra.app.util.ConnectionManager;
 import de.tuberlin.mcc.simra.app.util.Constants;
 import de.tuberlin.mcc.simra.app.util.ForegroundServiceNotificationManager;
@@ -51,12 +66,18 @@ import de.tuberlin.mcc.simra.app.util.ble.ConnectionEventListener;
 /*import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_CLOSEPASS_EVENT;
 import static de.tuberlin.mcc.simra.app.services.OBSService.ACTION_VALUE_RECEIVED_DISTANCE;
 import static de.tuberlin.mcc.simra.app.services.OBSService.EXTRA_VALUE_SERIALIZED;*/
+import static android.app.PendingIntent.getActivity;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION;
 import static de.tuberlin.mcc.simra.app.util.SharedPref.lookUpIntSharedPrefs;
 import static de.tuberlin.mcc.simra.app.util.Utils.mergeGPSandSensorLines;
 import static de.tuberlin.mcc.simra.app.util.Utils.overwriteFile;
 
-public class RecorderService extends Service implements SensorEventListener, LocationListener {
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialPort;
+import com.hoho.android.usbserial.driver.UsbSerialProber;
+import com.hoho.android.usbserial.util.SerialInputOutputManager;
+
+public class RecorderService extends Service implements SensorEventListener, LocationListener, SerialInputOutputManager.Listener {
     public static final String TAG = "RecorderService_LOG:";
     long startTime = 0;
     long endTime;
@@ -98,26 +119,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private Sensor rotation;
     private int key;
     private Integer incidentDuringRide = null;
-    /*private final BroadcastReceiver openBikeSensorMessageReceiverDistanceValue = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
 
-            if (serializable instanceof OBSService.Measurement) {
-                lastOBSDistanceValues.add((OBSService.Measurement) serializable);
-            }
-        }
-    };
-    private final BroadcastReceiver openBikeSensorMessageReceiverClosePassEvent = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Serializable serializable = intent.getSerializableExtra(EXTRA_VALUE_SERIALIZED);
-
-            if (serializable instanceof OBSService.ClosePassEvent) {
-                lastOBSClosePassEvents.add((OBSService.ClosePassEvent) serializable);
-            }
-        }
-    };*/
     private BroadcastReceiver incidentBroadcastReceiver;
     // This is set to true, when recording is allowed according to Privacy-Duration and
     // Privacy-Distance (see sharedPrefs, set in StartActivity and edited in settings)
@@ -135,6 +137,59 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private Queue<DataLogEntry> sensorLines = new LinkedList<>();
     private IncidentLog incidentLog = null;
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // OBS-Lite
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private LinkedList<Byte> obsLiteData = new LinkedList<>();
+    private byte[] obsLiteDataArray = new byte[0];
+    private StringBuffer obsLiteDataSB = new StringBuffer();
+    private LooperThread obsLiteLooperThread;
+    private Handler obsLiteHandler;
+    private HandlerThread obsLiteHandlerThread;
+    private OBSLiteSession obsLiteSession;
+    private Event obsLiteEvent;
+
+    private UsbManager usbManager;
+    private boolean obsLiteEnabled = false;
+    private long obsLiteStartTime = 0L;
+    private static final String ACTION_USB_PERMISSION =
+            "com.android.example.USB_PERMISSION";
+    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "intent: " + intent);
+            String action = intent.getAction();
+            if (ACTION_USB_PERMISSION.equals(action)) {
+                synchronized (this) {
+                    UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+                    List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
+                    if (!availableDrivers.isEmpty()) {
+                        UsbSerialDriver driver = availableDrivers.get(0);
+                        UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                            UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
+                            try {
+                                port.open(connection);
+                                port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+                                Log.d(TAG, "usb serial port opened");
+                                usbIoManager = new SerialInputOutputManager(port);
+                                usbIoManager.run();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else {
+                            Log.d(TAG, "permission denied for device " + device);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    private SerialInputOutputManager usbIoManager;
+    private UsbSerialPort usbSerialPort;
+
     public int getCurrentRideKey() {
         return key;
     }
@@ -145,6 +200,24 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
     public boolean hasRecordedEnough() {
         return recordingAllowed && lineAdded;
+    }
+
+    public String getOBSLiteData() {
+        Log.d(TAG, "obsLiteDataSB: " + obsLiteDataSB.toString());
+        return obsLiteDataSB.toString();
+    }
+    /*public byte[] getOBSLiteData() {
+        return obsLiteDataArray;
+    }*/
+
+    public long getObsLiteStartTime() { return obsLiteStartTime; }
+
+    public int getObsLiteSessionCompleteEventsLength() {
+        if (obsLiteSession == null) {
+            return 0;
+        } else {
+            return obsLiteSession.getCompleteEvents().length;
+        }
     }
 
 
@@ -182,6 +255,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             startLocation = location;
         }
         lastLocation = location;
+
+        // Only add GPS event if OBSLite is enabled and session exists
+        if (obsLiteEnabled && obsLiteSession != null) {
+            obsLiteSession.addGPSEvent(location);
+        }
     }
 
     @Override
@@ -261,10 +339,25 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 incidentDuringRide = incidentType;
             }
         });
+
+        obsLiteEnabled = SharedPref.Settings.OBSLite.isEnabled(this);
+        if (obsLiteEnabled) {
+            obsLiteLooperThread = new LooperThread();
+            obsLiteLooperThread.start();
+            obsLiteHandlerThread = new HandlerThread("HandlerThread");
+            obsLiteHandlerThread.start();
+            obsLiteHandler = new Handler(obsLiteHandlerThread.getLooper());
+            obsLiteSession = new OBSLiteSession(this);
+        }
+
+
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        if (obsLiteLooperThread != null) {
+            obsLiteLooperThread.mHandler.post(this::tryConnectOBSLite);
+        }
         Log.d(TAG, "onBind()");
         return mBinder;
     }
@@ -346,9 +439,18 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     @Override
     public void onDestroy() {
 
+        Log.d(TAG, "obsLiteDataArray.length: " + obsLiteDataArray.length);
+
         // Unregister from OBS callbacks
         if (connectionEventListener != null) {
             ConnectionManager.INSTANCE.unregisterListener(connectionEventListener);
+        }
+
+        // disconnect from OBS Lite
+        if (obsLiteEnabled) {
+            // obsLiteLooperThread.mHandler.post(this::disconnectOBSLite);
+            obsLiteHandler.post(this::disconnectOBSLite);
+            obsLiteHandlerThread.quitSafely();
         }
 
         // Create a file for the ride and write ride into it (AccGpsFile). Also, update metaData.csv
@@ -366,6 +468,11 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             IncidentLog.saveIncidentLog(incidentLog, this);
             editor.putInt("RIDE-KEY", key + 1);
             editor.apply();
+
+            if (obsLiteEnabled && obsLiteSession.getCompleteEvents().length > 0) {
+                // overwriteFile(obsLiteDataSB.toString(), IOUtils.Files.getOBSLiteSessionFile(key,this));
+                IOUtils.createBinaryFileOBSLite(obsLiteSession.getCompleteEvents(),IOUtils.Files.getOBSLiteSessionFile(key,this));
+            }
         }
 
         // Unregister receiver and listener prior to gpsExecutor shutdown
@@ -542,9 +649,23 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                             thisLocation.getAccuracy()
                     );
 
-                    if (incidentDuringRide != null) {
+                    if (incidentDuringRide != null && lastLocation != null) {
                         incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(incidentDuringRide).withBaseInformation(lastAccUpdate, lastLocation.getLatitude(), lastLocation.getLongitude()).build());
                         incidentDuringRide = null;
+                    }
+
+                    if (obsLiteEvent != null && lastLocation != null) {
+                        double handleBarLength = SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(RecorderService.this);
+                        double eventDistance = obsLiteEvent.getDistanceMeasurement().getDistance() * 100.0;
+                        double realDistance = handleBarLength + eventDistance;
+                        if (realDistance >= 150) {
+                            Log.d(TAG, "Adding hidden Close Pass with TS: " + lastAccUpdate + " realLeftDistance: " + realDistance);
+                            incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(lastAccUpdate,lastLocation.getLatitude(),lastLocation.getLongitude()).withIncidentType(IncidentLogEntry.INCIDENT_TYPE.OBS_LITE).withDescription(getString(R.string.overtake_distance_left,((int)obsLiteEvent.getDistanceMeasurement().getDistance()))).withKey(5000).build());
+                        } else {
+                            Log.d(TAG, "Adding visible Close Pass with TS: " + lastAccUpdate + " realLeftDistance: " + realDistance);
+                            incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(lastAccUpdate,lastLocation.getLatitude(),lastLocation.getLongitude()).withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS).withDescription(getString(R.string.overtake_distance_left,obsLiteEvent.getDistanceMeasurement().getDistance())).withKey(4000).build());
+                        }
+                        obsLiteEvent = null;
                     }
 
                     /*while (lastOBSClosePassEvents.size() > 0) {
@@ -569,6 +690,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 if(isGPSLine) {
                     gpsLines.add(dataLogEntryBuilder.build());
+                    Log.d(TAG,"obsLiteDataSB.length(): " + obsLiteDataSB.length());
+                    Log.d(TAG, "gpsLines.size(): " + gpsLines.size());
+                    Log.d(TAG, "sensorLines.size(): " + sensorLines.size());
                 } else if(!gpsLines.isEmpty()) {
                     sensorLines.add(dataLogEntryBuilder.build());
                 }
@@ -594,6 +718,115 @@ public class RecorderService extends Service implements SensorEventListener, Loc
             lastHandlerStart = start;
             recordingHandler.postDelayed(this,50);
         }
+    }
+
+    static class LooperThread extends Thread {
+        public Handler mHandler;
+
+        @Override
+        public void run() {
+            Looper.prepare();
+
+
+            mHandler = new Handler(Objects.requireNonNull(Looper.myLooper())) {
+                public void handleMessage(@NonNull Message msg) {
+                    Log.d(TAG, "msg:" + msg);
+                }
+            };
+            Looper.loop();
+        }
+
+    }
+
+    private void tryConnectOBSLite() {
+        usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
+        if (!availableDrivers.isEmpty()) {
+            UsbSerialDriver driver = availableDrivers.get(0);
+            UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
+
+            if (connection == null) {
+                IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    this.registerReceiver(usbReceiver,filter,RECEIVER_EXPORTED);
+                } else {
+                    ContextCompat.registerReceiver(this, usbReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+                }
+                PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+                usbManager.requestPermission(driver.getDevice(),permissionIntent);
+            } else {
+                UsbSerialPort port = driver.getPorts().get(0); // Most devices have just one port (port 0)
+                try {
+                    port.open(connection);
+                    port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+                    Log.d(TAG, "usb serial port opened");
+                    usbIoManager = new SerialInputOutputManager(port, this);
+                    usbIoManager.run();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    private void disconnectOBSLite() {
+        if(usbIoManager != null) {
+            usbIoManager.setListener(null);
+            usbIoManager.stop();
+        }
+        usbIoManager = null;
+        try {
+            if (usbSerialPort != null) {
+                usbSerialPort.close();
+            }
+        } catch (IOException ignored) {}
+        usbSerialPort = null;
+        Log.d(TAG,"disconnected from obsLite");
+        Log.d(TAG, "obsLiteSession.getByteListQueue().size(): " + obsLiteSession.getByteListQueue().size());
+    }
+    @Override
+    public void onNewData(byte[] data) {
+
+        obsLiteHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                handleObsLiteData(data);
+            }
+        });
+    }
+    @SuppressLint("MissingPermission")
+    public void handleObsLiteData(byte[] data) {
+
+        if (obsLiteStartTime == 0L) {
+            obsLiteStartTime = System.currentTimeMillis();
+            obsLiteSession.setObsLiteStartTime(obsLiteStartTime);
+        }
+
+        obsLiteSession.fillByteList(data);
+
+        boolean foundZero = obsLiteSession.completeCobsAvailable();
+
+        if (lastLocation == null) {
+            LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            // Only use GPS provider for privacy
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            }
+        }
+        if (foundZero && lastLocation != null) {
+            Event userInputEvent = obsLiteSession.handleEvent(lastLocation.getLatitude(),
+                    lastLocation.getLongitude(), lastLocation.getAltitude(), lastLocation.getAccuracy());
+            if (userInputEvent != null) {
+                Log.d(TAG, "OBS event:" + userInputEvent.toString());
+                obsLiteEvent = userInputEvent;
+            }
+        }
+
+    }
+
+    @Override
+    public void onRunError(Exception e) {
+
     }
 
     public class MyBinder extends Binder {

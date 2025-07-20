@@ -22,9 +22,16 @@
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
+
         </activity>
         <activity
             android:name=".activities.StatisticsActivity"
@@ -83,8 +90,9 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.SingleRideStatisticsActivity"
-            android:configChanges="orientation|screenSize" /> <!-- Services -->
+            android:configChanges="orientation|screenSize" />
         <activity android:name="de.tuberlin.mcc.simra.app.activities.OpenBikeSensorActivity" />
+        <activity android:name="de.tuberlin.mcc.simra.app.activities.OBSLiteActivity" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
@@ -92,6 +100,7 @@
             android:name="io.sentry.auto-init"
             android:value="false" />
 
+        <!-- Services -->
         <service
             android:name=".services.RecorderService"
             android:foregroundServiceType="location"
@@ -112,6 +121,9 @@
     <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-feature android:name="android.hardware.location.network" />
+
+    <uses-feature android:name="android.hardware.usb.host" />
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH"

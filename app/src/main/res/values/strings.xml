@@ -50,10 +50,10 @@
 
 
     <!--- WebActivity -->
-    <string name="link_mcc_Page">https://www.mcc.tu-berlin.de/menue/aktuelles/?isMobile=1</string>
+    <string name="link_mcc_Page">https://www.tu.berlin/3s/</string>
     <string name="link_simra_Page">https://www.digital-future.berlin/forschung/projekte/simra/</string>
-    <string name="link_to_tutorial">https://tubcloud.tu-berlin.de/s/ACwzKWzF6geCd7p/download/SimRa_Instructions_DE.pdf</string>
-    <string name="tuberlin_impressum">https://www.tu.berlin/impressum</string>
+    <string name="link_to_tutorial">https://simra-backend.3s-rg.de:4998/SimRa_Anleitung_Android.pdf</string>
+    <string name="tuberlin_impressum">https://www.tu.berlin/footer/impressum</string>
 
 
     <!--- MainActivity -->
@@ -90,6 +90,8 @@
     <string name="bluetooth_not_enable_title">Warnung: Bluetooth is ausgeschaltet!</string>
     <string name="bluetooth_not_enable_message">Möchtest du die Bluetooth einschalten? Ansonsten kann der OpenBikeSensor nicht verwendet werden!</string>
     <string name="recorded_incident">Ereignis gespeichert.</string>
+    <string name="obs_lite_not_connected_warning_title">Warnung: OBS Lite ist nicht verbunden!</string>
+
 
 
     <!--- RecorderService -->
@@ -130,6 +132,8 @@
     <string name="exportRideDirectory">Wo soll die SimRa-Fahrt gespeichert werden?</string>
     <string name="exportRideSuccessToast">"SimRa-Fahrt wurde erfolgreich exportiert."</string>
     <string name="exportRideFailToast">"Fehler beim Erstellen der SimRa-Fahrt."</string>
+    <string name="exportOBSLiteSuccessToast">"OBS-Lite Binärdatei wurde erfolgreich exportiert."</string>
+    <string name="exportOBSLiteFailToast">"Fehler beim Erstellen der OBS-Lite Binärdatei."</string>
 
     <!--- ShowRoute -->
     <string name="quitAddIncident">Hinzufügen\nbeenden</string>
@@ -236,7 +240,7 @@
     <string name="obs_activity_button_start_scan">Bluetooth Scan starten</string>
     <string name="obs_activity_button_connect">Verbinden</string>
     <string name="obs_activity_button_stop_scan">Bluetooth Scan stoppen</string>
-    <string name="obsSwitchTitle">OpenBikeSensor verbinden</string>
+    <string name="obsSwitchTitle">OpenBikeSensor per Bluetooth verbinden</string>
     <string name="obsButton">OpenBikeSensor Einstellungen öffnen</string>
     <string name="availableDevices">Verfügbare Geräte</string>
     <string name="obsAdvancedSettings">Weitere Einstellungen</string>
@@ -251,6 +255,21 @@
     <string name="obs_activity_text_stop">Suche nach OBS</string>
     <string name="obs_activity_text_connect">Gefunden: %1$s</string>
     <string name="obs_activity_text_disconnect">Verbunden: %1$s</string>
+
+    <!--- OBS Lite -->
+    <string name="obsLiteSwitchTitle">OBS Lite per USB verbinden</string>
+    <string name="obsLiteButton">OBS Lite Einstellungen öffnen</string>
+    <string name="obs_lite_activity_text_start">Keine Verbindung zum OBS Lite</string>
+    <string name="obs_lite_connected">OBS Lite Verbunden</string>
+    <string name="obs_lite_text_last_distance_left">Distanz Links: %1$d cm</string>
+    <string name="obs_lite_text_last_distance_right">Distanz Rechts: %1$d cm</string>
+    <string name="overtake_press_button">Überhol-Event (OBS-Lite-Knopf drücken):</string>
+    <string name="overtake_distance_left">Distanz Links: %1$d cm</string>
+    <string name="obs_lite_url">URL zum OBS-Lite Server: </string>
+    <string name="obs_lite_username">OBS Benutzername: </string>
+    <string name="obs_lite_api_key">Geheimer OBS API Key: </string>
+
+
 
     <!--- Profile -->
     <string name="ageGroupSpinnerTitle">Geburtsjahr</string>
@@ -270,6 +289,8 @@
     <string name="enableToDetectRegion">Bitte schalte den Ortungsdienst an, damit deine Region ermittelt werden kann.</string>
     <string name="nearestRegions">Nächste Regionen zu deinem Standort:</string>
     <string name="selectedRegion">Gewählte Region: </string>
+    <string name="getting_location">Bitte warten, GPS-Standort wird ermittelt…</string>
+    <string name="gps_not_available">GPS ist nicht verfügbar. Bitte aktivieren Sie GPS in den Einstellungen.</string>
     <string name="experienceSpinnerTitle">Erfahrung als Fahrradfahrer</string>
     <string name="rulesDescription">Wie oft hältst du dich an die Verkehrsregeln?</string>
     <string name="never">Nie</string>

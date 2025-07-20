@@ -407,6 +407,15 @@ public class HistoryActivity extends BaseActivity {
                         public void onActivityResult(Uri uri) {
                             boolean successfullyExportedGPSPart = copyTo(IOUtils.Files.getGPSLogFile(longClickedRideID, false, HistoryActivity.this),uri,HistoryActivity.this);
                             boolean successfullyExportedIncidentPart = copyTo(IOUtils.Files.getIncidentLogFile(longClickedRideID, false, HistoryActivity.this),uri,HistoryActivity.this);
+                            if (IOUtils.Files.getIncidentLogFile(longClickedRideID, false, HistoryActivity.this).exists()) {
+                                boolean successfullyExportedOBSLite = copyTo(IOUtils.Files.getOBSLiteSessionFile(longClickedRideID, HistoryActivity.this),uri,HistoryActivity.this);
+                                if (successfullyExportedOBSLite) {
+                                    Toast.makeText(HistoryActivity.this, R.string.exportOBSLiteSuccessToast, Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(HistoryActivity.this, R.string.exportOBSLiteFailToast, Toast.LENGTH_LONG).show();
+                                }
+                            }
+
                             if (successfullyExportedGPSPart && successfullyExportedIncidentPart) {
                                 Toast.makeText(HistoryActivity.this, R.string.exportRideSuccessToast, Toast.LENGTH_SHORT).show();
                             } else {

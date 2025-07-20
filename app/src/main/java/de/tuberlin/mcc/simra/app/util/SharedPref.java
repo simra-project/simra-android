@@ -2,9 +2,8 @@ package de.tuberlin.mcc.simra.app.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import java.util.Arrays;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Helper for central access to all shared prefs used by the app
@@ -20,6 +19,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static String lookUpSharedPrefs(String key, String defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -29,6 +29,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static int lookUpIntSharedPrefs(String key, int defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -38,6 +39,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static boolean lookUpBooleanSharedPrefs(String key, boolean defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -47,6 +49,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static void writeToSharedPrefs(String key, String value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -58,6 +61,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static void writeIntToSharedPrefs(String key, int value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -69,6 +73,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static void writeLongToSharedPrefs(String key, long value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -80,6 +85,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static long lookUpLongSharedPrefs(String key, long defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -89,6 +95,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static void writeBooleanToSharedPrefs(String key, boolean value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -330,6 +337,46 @@ public class SharedPref {
             }
         }
 
+        public static class OBSLite {
+            private static final String OBS_LITE_ENABLED = SETTINGS + "OBS_LITE_ENABLED";
+            private static final String OBS_LITE_URL = SETTINGS + "OBS_LITE_URL";
+            private static final String OBS_LITE_USERNAME = SETTINGS + "OBS_LITE_USERNAME";
+            private static final String OBS_LITE_API_KEY = SETTINGS + "OBS_LITE_API_KEY";
+
+
+            public static boolean isEnabled(Context context) {
+                return readBooleanFromAppSharedPrefs(OBS_LITE_ENABLED, context);
+            }
+
+            public static void setEnabled(Boolean enabled, Context context) {
+                writeBooleanToAppSharedPrefsAsync(OBS_LITE_ENABLED, enabled, context);
+            }
+
+            public static String getObsLiteURL(Context context) {
+                return readStringFromAppSharedPrefs(OBS_LITE_URL,"http://localhost:3000/" , context);
+            }
+
+            public static void setObsLiteURL(String url, Context context) {
+                writeStringToAppSharedPrefsAsync(OBS_LITE_URL, url, context);
+            }
+
+            public static String getObsLiteUsername(Context context) {
+                return readStringFromAppSharedPrefs(OBS_LITE_USERNAME,"OBS_USERNAME" , context);
+            }
+
+            public static void setObsLiteUsername(String username, Context context) {
+                writeStringToAppSharedPrefsAsync(OBS_LITE_USERNAME, username, context);
+            }
+
+            public static String getObsLiteAPIKey( Context context) {
+                return readStringFromAppSharedPrefs(OBS_LITE_API_KEY,"http://localhost:3000/" , context);
+            }
+
+            public static void setObsLiteAPIKey(String apiKey, Context context) {
+                writeStringToAppSharedPrefsAsync(OBS_LITE_API_KEY, apiKey, context);
+            }
+        }
+
         public static class DisplayUnit {
             // See top of this class before changing this string
             public static final String DISPLAY_UNIT = SETTINGS + "Unit";
@@ -547,6 +594,8 @@ public class SharedPref {
             public static class OvertakeWidth {
                 // See top of this class before changing this string
                 public static final String OVERTAKE_WIDTH = SETTINGS + "OVERTAKE_WIDTH";
+                public static final String OVERTAKE_WIDTH_LEFT = SETTINGS + "OVERTAKE_WIDTH";
+                public static final String OVERTAKE_WIDTH_RIGHT = SETTINGS + "OVERTAKE_WIDTH";
                 /**
                  * Safety Clearance + Side Mirror Length in cm
                  */
@@ -556,16 +605,48 @@ public class SharedPref {
                     return readIntegerFromAppSharedPrefs(OVERTAKE_WIDTH, SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH, context);
                 }
 
+                public static int getWidthLeft(Context context) {
+                    return readIntegerFromAppSharedPrefs(OVERTAKE_WIDTH_LEFT, SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH, context);
+                }
+
+                public static int getWidthRight(Context context) {
+                    return readIntegerFromAppSharedPrefs(OVERTAKE_WIDTH_RIGHT, SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH, context);
+                }
+
                 public static void setWidth(int width, Context context) {
                     writeIntegerToAppSharedPrefsAsync(OVERTAKE_WIDTH, width, context);
+                }
+
+                public static void setWidthLeft(int width, Context context) {
+                    writeIntegerToAppSharedPrefsAsync(OVERTAKE_WIDTH_LEFT, width, context);
+                }
+
+                public static void setWidthRight(int width, Context context) {
+                    writeIntegerToAppSharedPrefsAsync(OVERTAKE_WIDTH_RIGHT, width, context);
                 }
 
                 public static int getHandlebarWidth(Context context) {
                     return calculateHandleBarWidthFromTotal(getWidth(context));
                 }
 
+                public static int getHandlebarWidthLeft(Context context) {
+                    return calculateHandleBarWidthFromTotal(getWidthLeft(context));
+                }
+
+                public static int getHandlebarWidthRight(Context context) {
+                    return calculateHandleBarWidthFromTotal(getWidthRight(context));
+                }
+
                 public static void setTotalWidthThroughHandlebarWidth(int width, Context context) {
                     setWidth(calculateTotalWidth(width), context);
+                }
+
+                public static void setTotalWidthThroughHandlebarWidthLeft(int width, Context context) {
+                    setWidthLeft(calculateTotalWidth(width), context);
+                }
+
+                public static void setTotalWidthThroughHandlebarWidthRight(int width, Context context) {
+                    setWidthRight(calculateTotalWidth(width), context);
                 }
 
                 private static int calculateTotalWidth(int handlebarWidth) {
@@ -575,6 +656,7 @@ public class SharedPref {
                 private static int calculateHandleBarWidthFromTotal(int totalWidth) {
                     return totalWidth - SAFETY_CLEARANCE_AND_SIDE_MIRROR_WIDTH;
                 }
+
             }
 
         }
