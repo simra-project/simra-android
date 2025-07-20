@@ -1,4 +1,4 @@
 <!--- This file is for overwriting strings in debug mode -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:locale="de">
-    <string name="app_name">SimRa_OBSLite</string>
+    <string name="app_name">SimRa</string>
 </resources>

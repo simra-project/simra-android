@@ -31,6 +31,7 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.osmdroid.util.GeoPoint;
@@ -255,7 +256,10 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         }
         lastLocation = location;
 
-        obsLiteSession.addGPSEvent(location);
+        // Only add GPS event if OBSLite is enabled and session exists
+        if (obsLiteEnabled && obsLiteSession != null) {
+            obsLiteSession.addGPSEvent(location);
+        }
     }
 
     @Override
@@ -645,12 +649,12 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                             thisLocation.getAccuracy()
                     );
 
-                    if (incidentDuringRide != null) {
+                    if (incidentDuringRide != null && lastLocation != null) {
                         incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withIncidentType(incidentDuringRide).withBaseInformation(lastAccUpdate, lastLocation.getLatitude(), lastLocation.getLongitude()).build());
                         incidentDuringRide = null;
                     }
 
-                    if (obsLiteEvent != null) {
+                    if (obsLiteEvent != null && lastLocation != null) {
                         double handleBarLength = SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(RecorderService.this);
                         double eventDistance = obsLiteEvent.getDistanceMeasurement().getDistance() * 100.0;
                         double realDistance = handleBarLength + eventDistance;
@@ -737,16 +741,16 @@ public class RecorderService extends Service implements SensorEventListener, Loc
     private void tryConnectOBSLite() {
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
-        if (availableDrivers.size() > 0) {
+        if (!availableDrivers.isEmpty()) {
             UsbSerialDriver driver = availableDrivers.get(0);
             UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
 
             if (connection == null) {
                 IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     this.registerReceiver(usbReceiver,filter,RECEIVER_EXPORTED);
                 } else {
-                    this.registerReceiver(usbReceiver,filter);
+                    ContextCompat.registerReceiver(this, usbReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
                 }
                 PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
                 usbManager.requestPermission(driver.getDevice(),permissionIntent);
@@ -804,17 +808,16 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
         if (lastLocation == null) {
             LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                lastLocation = locationManager.getLastKnownLocation(LocationManager.FUSED_PROVIDER);
-            } else {
+            // Only use GPS provider for privacy
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             }
         }
-
-        if (foundZero) {
+        if (foundZero && lastLocation != null) {
             Event userInputEvent = obsLiteSession.handleEvent(lastLocation.getLatitude(),
                     lastLocation.getLongitude(), lastLocation.getAltitude(), lastLocation.getAccuracy());
             if (userInputEvent != null) {
+                Log.d(TAG, "OBS event:" + userInputEvent.toString());
                 obsLiteEvent = userInputEvent;
             }
         }

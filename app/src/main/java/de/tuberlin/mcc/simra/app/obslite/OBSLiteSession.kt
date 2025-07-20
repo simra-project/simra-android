@@ -102,7 +102,7 @@ class OBSLiteSession(val context: Context) {
 
             } else {
                 obsEvent = obsEvent.toBuilder().addTime(obsTime).addTime(smartphoneTime).build()
-                Log.d(TAG, obsEvent.toString())
+                // Log.d(TAG, obsEvent.toString())
             }
 
             // Log.d(TAG, obsEvent.toString())

@@ -19,6 +19,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static String lookUpSharedPrefs(String key, String defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -28,6 +29,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static int lookUpIntSharedPrefs(String key, int defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -37,6 +39,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static boolean lookUpBooleanSharedPrefs(String key, boolean defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -46,6 +49,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static void writeToSharedPrefs(String key, String value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -57,6 +61,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static void writeIntToSharedPrefs(String key, int value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -68,6 +73,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static void writeLongToSharedPrefs(String key, long value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -79,6 +85,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static long lookUpLongSharedPrefs(String key, long defValue, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
@@ -88,6 +95,7 @@ public class SharedPref {
     /**
      * @deprecated
      */
+    @Deprecated
     public static void writeBooleanToSharedPrefs(String key, boolean value, String sharedPrefName, Context context) {
         SharedPreferences sharedPrefs = context.getApplicationContext()
                 .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);

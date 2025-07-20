@@ -8,8 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.util.Pair;
 
@@ -658,13 +662,71 @@ public class Utils {
      * @return true if the gps provider is disabled, false, if it is enabled
      */
     public static boolean isLocationServiceOff(LocationManager locationManager) {
-        boolean gps_enabled = false;
-        try {
-            gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception ex) {
-            Log.d(TAG, ex.getMessage());
+        return !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+    /**
+     * Check if GPS provider is available and enabled
+     * @param locationManager LocationManager instance
+     * @return true if GPS is available and enabled
+     */
+    public static boolean isGPSAvailable(LocationManager locationManager) {
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    /**
+     * Get a fresh GPS location with timeout
+     * @param context Application context
+     * @param timeoutMs Timeout in milliseconds
+     * @param callback Callback to receive the location or null if timeout
+     */
+    public static void getGPSLocation(Context context, long timeoutMs, LocationCallback callback) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        
+        if (!isGPSAvailable(locationManager)) {
+            callback.onLocationResult(null);
+            return;
         }
-        return (!gps_enabled);
+
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                if (location != null && location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
+                    locationManager.removeUpdates(this);
+                    callback.onLocationResult(location);
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+            @Override
+            public void onProviderEnabled(String provider) {}
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                locationManager.removeUpdates(this);
+                callback.onLocationResult(null);
+            }
+        };
+
+        // Request location updates
+        try {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            
+            // Set timeout
+            new Handler().postDelayed(() -> {
+                locationManager.removeUpdates(locationListener);
+                callback.onLocationResult(null);
+            }, timeoutMs);
+            
+        } catch (SecurityException e) {
+            callback.onLocationResult(null);
+        }
+    }
+
+    public interface LocationCallback {
+        void onLocationResult(Location location);
     }
 
     public static void prepareDebugZip(int mode,List<File> ridesAndAccEvents , Context context) {
@@ -708,6 +770,7 @@ public class Utils {
     /**
      * @deprecated Use IncidentLogEntry  instead
      */
+    @Deprecated
     private static class AccEvent {
 
         public long timeStamp;

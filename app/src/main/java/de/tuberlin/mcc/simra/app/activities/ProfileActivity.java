@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -32,9 +33,12 @@ import static de.tuberlin.mcc.simra.app.util.Utils.getCorrectRegionName;
 import static de.tuberlin.mcc.simra.app.util.Utils.getCorrectRegionNames;
 import static de.tuberlin.mcc.simra.app.util.Utils.getRegions;
 import static de.tuberlin.mcc.simra.app.util.Utils.isLocationServiceOff;
+import static de.tuberlin.mcc.simra.app.util.Utils.isGPSAvailable;
+import static de.tuberlin.mcc.simra.app.util.Utils.getGPSLocation;
 import static de.tuberlin.mcc.simra.app.util.Utils.nearestRegionsToThisLocation;
 import static de.tuberlin.mcc.simra.app.util.Utils.regionsDecoder;
 import static de.tuberlin.mcc.simra.app.util.Utils.regionEncoder;
+import de.tuberlin.mcc.simra.app.util.Utils.LocationCallback;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "ProfileActivity_LOG";
@@ -146,20 +150,28 @@ public class ProfileActivity extends AppCompatActivity {
                                     .setNegativeButton(R.string.cancel, null).show();
                         // get the three nearest regions and let the user choose one of them or cancel in an AlertDialog
                         } else {
-                            try {
-                                int[] nearestRegionCodes = nearestRegionsToThisLocation(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude(),
-                                        locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude(),
-                                        ProfileActivity.this);
-                                String[] nearestRegionNames = getCorrectRegionNames(regionsDecoder(nearestRegionCodes, ProfileActivity.this));
-                                AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this).setTitle(R.string.nearestRegions);
-                                createButtons(builder, nearestRegionNames, regionContentArray, profile, ProfileActivity.this);
-                                builder.setNegativeButton(R.string.cancel,null);
-                                builder.create().show();
-                            } catch (NullPointerException npe) {
-                                Log.e(TAG, "automatic region detection - Exception: " + npe.getMessage());
-                                Log.e(TAG, Arrays.toString(npe.getStackTrace()));
-                                npe.printStackTrace();
-                                Toast.makeText(ProfileActivity.this, R.string.try_later, Toast.LENGTH_SHORT).show();
+                            // Use the utility method for GPS-only location
+                            if (isGPSAvailable(locationManager)) {
+                                Toast.makeText(ProfileActivity.this, R.string.getting_location, Toast.LENGTH_SHORT).show();
+                                
+                                getGPSLocation(ProfileActivity.this, 30000, new LocationCallback() {
+                                    @Override
+                                    public void onLocationResult(Location location) {
+                                        if (location != null) {
+                                            int[] nearestRegionCodes = nearestRegionsToThisLocation(location.getLatitude(),
+                                                    location.getLongitude(), ProfileActivity.this);
+                                            String[] nearestRegionNames = getCorrectRegionNames(regionsDecoder(nearestRegionCodes, ProfileActivity.this));
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this).setTitle(R.string.nearestRegions);
+                                            createButtons(builder, nearestRegionNames, regionContentArray, profile, ProfileActivity.this);
+                                            builder.setNegativeButton(R.string.cancel, null);
+                                            builder.create().show();
+                                        } else {
+                                            Toast.makeText(ProfileActivity.this, R.string.try_later, Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(ProfileActivity.this, R.string.gps_not_available, Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
