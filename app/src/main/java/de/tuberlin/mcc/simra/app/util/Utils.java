@@ -618,15 +618,31 @@ public class Utils {
      * @return the correct display name as a string according to System locale
      */
     public static String getCorrectRegionName(String regionLine) {
+        if (regionLine == null) {
+            return "";
+        }
+
+        String[] parts = regionLine.split("=");
+
+        // Falls das Format nicht stimmt (kein "=" o.ä.), lieber
+        // den Originalstring zurückgeben als abzustürzen.
+        if (parts.length == 0) {
+            return regionLine.trim();
+        }
+
         String locale = Resources.getSystem().getConfiguration().locale.getLanguage();
         boolean languageIsEnglish = locale.equals(new Locale("en").getLanguage());
-        /*if(regionLine.split("=").length < 2) {
-            return "";
-        }*/
+
         if (languageIsEnglish) {
-            return regionLine.split("=")[0];
+            // Englisch: erster Teil, sonst irgendein Fallback
+            return parts[0].trim();
         } else {
-            return regionLine.split("=")[1];
+            // Deutsch: zweiter Teil, falls vorhanden, sonst erster
+            if (parts.length >= 2) {
+                return parts[1].trim();
+            } else {
+                return parts[0].trim();
+            }
         }
     }
 
@@ -682,7 +698,7 @@ public class Utils {
      */
     public static void getGPSLocation(Context context, long timeoutMs, LocationCallback callback) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        
+
         if (!isGPSAvailable(locationManager)) {
             callback.onLocationResult(null);
             return;
@@ -713,13 +729,13 @@ public class Utils {
         // Request location updates
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            
+
             // Set timeout
             new Handler().postDelayed(() -> {
                 locationManager.removeUpdates(locationListener);
                 callback.onLocationResult(null);
             }, timeoutMs);
-            
+
         } catch (SecurityException e) {
             callback.onLocationResult(null);
         }
@@ -817,17 +833,17 @@ public class Utils {
 
     public static ActivityResultLauncher<Intent> activityResultLauncher(Activity activity) {
         return ((ComponentActivity)activity).registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Log.e(TAG, "Activity result: OK");
-                        // There are no request codes
-                        Intent data = result.getData();
-                        Log.d(TAG, "data: " + data);
+                new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            Log.e(TAG, "Activity result: OK");
+                            // There are no request codes
+                            Intent data = result.getData();
+                            Log.d(TAG, "data: " + data);
+                        }
                     }
                 }
-            }
-    );
+        );
     }
 }

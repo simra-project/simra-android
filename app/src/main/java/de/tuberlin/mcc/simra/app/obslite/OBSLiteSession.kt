@@ -28,29 +28,31 @@ class OBSLiteSession(val context: Context) {
     private var lastLat: Double = 0.0
     private var lastLon: Double = 0.0
     private var completeEvents = ArrayList<Byte>()
+
     init {
 
-        val handlebarOffsetLeft: ByteString = ByteString.copyFromUtf8(SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidthLeft(context)
-            .toString())
-        val handlebarOffsetRight: ByteString = ByteString.copyFromUtf8(SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidthRight(context)
-            .toString())
+        val handlebarOffsetLeft: ByteString = ByteString.copyFromUtf8(
+            SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidthLeft(context).toString()
+        )
+        val handlebarOffsetRight: ByteString = ByteString.copyFromUtf8(
+            SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidthRight(context).toString()
+        )
         val metaData: Metadata = Metadata.newBuilder()
-            .putData("HandlebarOffsetLeft",handlebarOffsetLeft)
-            .putData("HandlebarOffsetRight",handlebarOffsetRight)
+            .putData("HandlebarOffsetLeft", handlebarOffsetLeft)
+            .putData("HandlebarOffsetRight", handlebarOffsetRight)
             .putData("SimRaVersion", ByteString.copyFromUtf8(BuildConfig.VERSION_NAME))
             .build()
+        // Nur intern merken, NICHT in completeEvents (Binary), sonst hat das Portal ein Event ohne Zeit
         events.add(Event.newBuilder().setMetadata(metaData).build())
     }
 
-
-
     // handles distance event and user input events of obs lite
-    fun handleEvent(lat: Double, lon: Double, altitude: Double, accuracy: Float) : Event? {
+    fun handleEvent(lat: Double, lon: Double, altitude: Double, accuracy: Float): Event? {
         val decodedData = CobsUtils.decode(byteListQueue.first)
 
         try {
             var obsEvent: Event = Event.parseFrom(decodedData)
-            val currentTimeMillis: Long = System.currentTimeMillis();
+            val currentTimeMillis: Long = System.currentTimeMillis()
 
             if (startTime == -1L) {
                 startTime = obsEvent.getTime(0).seconds
@@ -62,8 +64,8 @@ class OBSLiteSession(val context: Context) {
                 .setSourceId(2).setReference(Time.Reference.UNIX).build()
 
             val smartphoneTime: Time = Time.newBuilder()
-                .setSeconds(currentTimeMillis/1000)
-                .setNanoseconds(((currentTimeMillis%1000) * 1000000).toInt())
+                .setSeconds(currentTimeMillis / 1000)
+                .setNanoseconds(((currentTimeMillis % 1000) * 1000000).toInt())
                 .setSourceId(3).setReference(Time.Reference.UNIX).build()
 
             if (lat != lastLat || lon != lastLon) {
@@ -71,7 +73,11 @@ class OBSLiteSession(val context: Context) {
                     .setLatitude(lat).setLongitude(lon)
                     .setAltitude(altitude).setHdop(accuracy).build()
 
-                val gpsEvent = Event.newBuilder().setGeolocation(geolocation).addTime(obsTime).addTime(smartphoneTime).build()
+                val gpsEvent = Event.newBuilder()
+                    .setGeolocation(geolocation)
+                    .addTime(obsTime)
+                    .addTime(smartphoneTime)
+                    .build()
                 events.add(gpsEvent)
                 completeEvents.addAll(encodeEvent(gpsEvent))
                 lastLat = lat
@@ -79,36 +85,70 @@ class OBSLiteSession(val context: Context) {
             }
 
             if (obsEvent.hasDistanceMeasurement()) {
-                val dm = obsEvent.distanceMeasurement
-                obsEvent = obsEvent.toBuilder().addTime(obsTime).addTime(smartphoneTime).setDistanceMeasurement(dm).build()
-                // left sensor event
-                if (obsEvent.distanceMeasurement.sourceId == 1) {
-                    val distance = ((obsEvent.distanceMeasurement.distance * 100) + SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidthLeft(context)).toInt()
+                // >>> Änderung: Lenkerbreite vom linken Sensor-Abstand abziehen
+                var dm: DistanceMeasurement = obsEvent.distanceMeasurement
+                var dmBuilder = dm.toBuilder()
+
+                if (dm.sourceId == 1) {
+                    val handlebarLeftCm =
+                        SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidthLeft(context)
+
+                    val rawMeters = dm.distance                 // Sensor -> Objekt
+                    val handlebarMeters = handlebarLeftCm / 100.0f
+
+                    var correctedMeters = rawMeters - handlebarMeters
+                    if (correctedMeters < 0f) {
+                        correctedMeters = 0f
+                    }
+
+                    dmBuilder = dmBuilder.setDistance(correctedMeters)
+
+                    val correctedCm = (correctedMeters * 100.0f)
+                        .toInt()
+                        .coerceAtLeast(0)
                     // calculate minimal moving median for when the user presses obs lite button
-                    movingMedian.newValue(distance)
-                    // Log.d(TAG, "distance event: $event")
+                    movingMedian.newValue(correctedCm)
+                } else {
+                    // andere Sensoren unverändert lassen
                 }
+
+                dm = dmBuilder.build()
+                obsEvent = obsEvent.toBuilder()
+                    .addTime(obsTime)
+                    .addTime(smartphoneTime)
+                    .setDistanceMeasurement(dm)
+                    .build()
+
             } else if (obsEvent.hasUserInput()) {
                 val ui = obsEvent.userInput
-                obsEvent = obsEvent.toBuilder().addTime(obsTime).addTime(smartphoneTime).setUserInput(ui).build()
+                obsEvent = obsEvent.toBuilder()
+                    .addTime(obsTime)
+                    .addTime(smartphoneTime)
+                    .setUserInput(ui)
+                    .build()
                 events.add(obsEvent)
                 completeEvents.addAll(encodeEvent(obsEvent))
                 val dm: DistanceMeasurement = DistanceMeasurement.newBuilder()
                     .setDistance(movingMedian.median.toFloat()).build()
-                obsEvent = obsEvent.toBuilder().addTime(obsTime).addTime(smartphoneTime).setDistanceMeasurement(dm).build()
+                obsEvent = obsEvent.toBuilder()
+                    .addTime(obsTime)
+                    .addTime(smartphoneTime)
+                    .setDistanceMeasurement(dm).build()
                 // Log.d(TAG, "user input event: $obsEvent")
                 byteListQueue.removeFirst()
                 return obsEvent
 
             } else {
-                obsEvent = obsEvent.toBuilder().addTime(obsTime).addTime(smartphoneTime).build()
+                obsEvent = obsEvent.toBuilder()
+                    .addTime(obsTime)
+                    .addTime(smartphoneTime)
+                    .build()
                 // Log.d(TAG, obsEvent.toString())
             }
 
             // Log.d(TAG, obsEvent.toString())
             events.add(obsEvent)
             completeEvents.addAll(encodeEvent(obsEvent))
-
 
         } catch (_: InvalidProtocolBufferException) {
         }
@@ -131,7 +171,7 @@ class OBSLiteSession(val context: Context) {
     fun fillByteList(data: ByteArray?) {
         for (datum in data!!) {
             // start new COBS package when last byte was 00 or it is the first data
-            if (lastByteRead?.toInt() == 0x00 || byteListQueue.isEmpty()){
+            if (lastByteRead?.toInt() == 0x00 || byteListQueue.isEmpty()) {
                 val newByteList = LinkedList<Byte>()
                 newByteList.add(datum)
                 byteListQueue.add(newByteList)
@@ -177,11 +217,11 @@ class OBSLiteSession(val context: Context) {
             .setLatitude(location.latitude).setLongitude(location.longitude)
             .setAltitude(location.altitude).setHdop(location.accuracy).build()
 
-        val time: Time = Time.newBuilder().setNanoseconds((location.time*1000000).toInt()).build()
+        val time: Time = Time.newBuilder()
+            .setNanoseconds((location.time * 1000000).toInt()).build()
 
         val gpsEvent = Event.newBuilder().setGeolocation(geolocation).addTime(time).build()
         events.add(gpsEvent)
         completeEvents.addAll(encodeEvent(gpsEvent))
-
     }
 }

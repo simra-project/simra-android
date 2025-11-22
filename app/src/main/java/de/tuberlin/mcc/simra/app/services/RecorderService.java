@@ -534,7 +534,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     // finish, when at the end of the ride.
                     if (j+1 >= gpsLines.size()) {
                         return;
-                    // else, update gpsLinesIndex, so that the next obs measurement is searched in the rest of the ride.
+                        // else, update gpsLinesIndex, so that the next obs measurement is searched in the rest of the ride.
                     } else {
                         gpsLinesIndex = j+1;
                         break;
@@ -569,17 +569,13 @@ public class RecorderService extends Service implements SensorEventListener, Loc
               - GPS (lat, lon, accuracy) roughly every 3 seconds
               - accelerometer data (x,y,z) roughly 50 times a second
               - gyroscope data (a,b,c) roughly every 3 seconds
-              <p>
+
               Every Data Type is given asynchronously via its Callback function.
-              In order to synchronize the accelerometer interval ist used as baseline.
-              1. We wait till there are 30 values generated
-              2. We write a Log Entry every {@link Constants.MVG_AVG_STEP}
-                 as this number of values is removed at the end of this function
-                 and we wait again till there are 30
+              In order to synchronize the accelerometer interval the accelerometer interval is used as baseline.
              */
             boolean isGPSLine = false;
             long start = System.currentTimeMillis() - startTime;
-            /**/
+
             if (accelerometerQueueX.size() < 30) {
                 accelerometerQueueX.add(accelerometerMatrix[0]);
                 accelerometerQueueY.add(accelerometerMatrix[1]);
@@ -597,31 +593,31 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                 rotationQueueZ.add(rotationMatrix[2]);
                 rotationQueueC.add(rotationMatrix[3]);
             }
-             /**/
-            /**/if (accelerometerQueueX.size() >= 30 && linearAccelerometerQueueX.size() >= 30 && rotationQueueX.size() >= 30) {
+
+            if (accelerometerQueueX.size() >= 30 && linearAccelerometerQueueX.size() >= 30 && rotationQueueX.size() >= 30) {
                 DataLogEntry.DataLogEntryBuilder dataLogEntryBuilder = DataLogEntry.newBuilder();
                 long lastAccUpdate = System.currentTimeMillis();
                 dataLogEntryBuilder.withTimestamp(lastAccUpdate);
                 dataLogEntryBuilder.withAccelerometer(
                         // Every average is computed over 30 data points
-                        /**/computeAverage(accelerometerQueueX),
+                        computeAverage(accelerometerQueueX),
                         computeAverage(accelerometerQueueY),
-                        computeAverage(accelerometerQueueZ)/**/
+                        computeAverage(accelerometerQueueZ)
                 );
 
                 dataLogEntryBuilder.withLinearAccelerometer(
                         // Every average is computed over 30 data points
-                        /**/computeAverage(linearAccelerometerQueueX),
+                        computeAverage(linearAccelerometerQueueX),
                         computeAverage(linearAccelerometerQueueY),
-                        computeAverage(linearAccelerometerQueueZ)/**/
+                        computeAverage(linearAccelerometerQueueZ)
                 );
 
                 dataLogEntryBuilder.withRotation(
                         // Every average is computed over 30 data points
-                        /**/computeAverage(rotationQueueX),
+                        computeAverage(rotationQueueX),
                         computeAverage(rotationQueueY),
                         computeAverage(rotationQueueZ),
-                        computeAverage(rotationQueueC)/**/
+                        computeAverage(rotationQueueC)
                 );
 
                 if ((lastAccUpdate - lastGPSUpdate) >= Constants.GPS_FREQUENCY) {
@@ -654,16 +650,34 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                         incidentDuringRide = null;
                     }
 
+                    // OBS-Lite Ereignisse (Knopf) – Distanz ist bereits korrigiert (cm) in DistanceMeasurement.distance
                     if (obsLiteEvent != null && lastLocation != null) {
-                        double handleBarLength = SharedPref.Settings.Ride.OvertakeWidth.getHandlebarWidth(RecorderService.this);
-                        double eventDistance = obsLiteEvent.getDistanceMeasurement().getDistance() * 100.0;
-                        double realDistance = handleBarLength + eventDistance;
-                        if (realDistance >= 150) {
-                            Log.d(TAG, "Adding hidden Close Pass with TS: " + lastAccUpdate + " realLeftDistance: " + realDistance);
-                            incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(lastAccUpdate,lastLocation.getLatitude(),lastLocation.getLongitude()).withIncidentType(IncidentLogEntry.INCIDENT_TYPE.OBS_LITE).withDescription(getString(R.string.overtake_distance_left,((int)obsLiteEvent.getDistanceMeasurement().getDistance()))).withKey(5000).build());
+                        double realDistanceCm = obsLiteEvent.getDistanceMeasurement().getDistance(); // bereits in cm
+                        if (realDistanceCm < 0) {
+                            realDistanceCm = 0;
+                        }
+                        int realDistanceInt = (int) Math.round(realDistanceCm);
+
+                        if (realDistanceCm >= 150) {
+                            Log.d(TAG, "Adding hidden Close Pass with TS: " + lastAccUpdate + " realLeftDistance(cm): " + realDistanceCm);
+                            incidentLog.updateOrAddIncident(
+                                    IncidentLogEntry.newBuilder()
+                                            .withBaseInformation(lastAccUpdate, lastLocation.getLatitude(), lastLocation.getLongitude())
+                                            .withIncidentType(IncidentLogEntry.INCIDENT_TYPE.OBS_LITE)
+                                            .withDescription(getString(R.string.overtake_distance_left, realDistanceInt))
+                                            .withKey(5000)
+                                            .build()
+                            );
                         } else {
-                            Log.d(TAG, "Adding visible Close Pass with TS: " + lastAccUpdate + " realLeftDistance: " + realDistance);
-                            incidentLog.updateOrAddIncident(IncidentLogEntry.newBuilder().withBaseInformation(lastAccUpdate,lastLocation.getLatitude(),lastLocation.getLongitude()).withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS).withDescription(getString(R.string.overtake_distance_left,obsLiteEvent.getDistanceMeasurement().getDistance())).withKey(4000).build());
+                            Log.d(TAG, "Adding visible Close Pass with TS: " + lastAccUpdate + " realLeftDistance(cm): " + realDistanceCm);
+                            incidentLog.updateOrAddIncident(
+                                    IncidentLogEntry.newBuilder()
+                                            .withBaseInformation(lastAccUpdate, lastLocation.getLatitude(), lastLocation.getLongitude())
+                                            .withIncidentType(IncidentLogEntry.INCIDENT_TYPE.CLOSE_PASS)
+                                            .withDescription(getString(R.string.overtake_distance_left, realDistanceInt))
+                                            .withKey(4000)
+                                            .build()
+                            );
                         }
                         obsLiteEvent = null;
                     }
@@ -678,9 +692,9 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     }*/
                 }
                 dataLogEntryBuilder.withGyroscope(
-                        /**/gyroscopeMatrix[0],
+                        gyroscopeMatrix[0],
                         gyroscopeMatrix[1],
-                        gyroscopeMatrix[2]/**/
+                        gyroscopeMatrix[2]
                 );
 
                 /*if (lastOBSDistanceValues.size() > 0) {
@@ -700,7 +714,6 @@ public class RecorderService extends Service implements SensorEventListener, Loc
 
                 endTime = System.currentTimeMillis();
 
-                /**/
                 for (int i = 0; i < Constants.MVG_AVG_STEP; i++) {
                     accelerometerQueueX.remove();
                     accelerometerQueueY.remove();
@@ -713,8 +726,7 @@ public class RecorderService extends Service implements SensorEventListener, Loc
                     rotationQueueZ.remove();
                     rotationQueueC.remove();
                 }
-                 /**/
-            /**/}
+            }
             lastHandlerStart = start;
             recordingHandler.postDelayed(this,50);
         }
@@ -835,3 +847,4 @@ public class RecorderService extends Service implements SensorEventListener, Loc
         }
     }
 }
+
