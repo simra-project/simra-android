@@ -29,7 +29,6 @@ import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -78,6 +77,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MyLocationNewOverlay mLocationOverlay;
     private LocationManager locationManager;
     private Boolean recording = false;
+    private OnBackPressedCallback backPressedCallback;
     private ConnectionEventListener connectionEventListener = null;
     private int nRetries = 0; // number of OBS connection retries
     private boolean showingOBSWarning = false;
@@ -343,7 +344,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Set compass (from OSMdroid sample project:
         // https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/
         // java/org/osmdroid/samplefragments/location/SampleFollowMe.java)
+        // setCompassCenter takes dp (multiplied by density inside CompassOverlay).
+        // Align vertically with center_button; X mirrors its end margin (15+20dp).
         CompassOverlay mCompassOverlay = new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx), mMapView);
+        float density = getResources().getDisplayMetrics().density;
+        View centerButton = binding.appBarMain.centerButton;
+        centerButton.addOnLayoutChangeListener(
+                (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+                    if (top != oldTop || bottom != oldBottom) {
+                        float centerYDp = ((top + bottom) / 2f) / density;
+                        mCompassOverlay.setCompassCenter(35f, centerYDp);
+                        mMapView.invalidate();
+                    }
+                });
 
         // Sets the icon to device location.
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mMapView);
@@ -403,6 +416,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+        setupBackNavigation(drawer);
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -459,6 +473,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 unbindService(mRecorderServiceConnection);
                 stopService(recService);
                 recording = false;
+                updateBackPressedCallback();
                 if (mBoundRecorderService.hasRecordedEnough()) {
                     ShowRouteActivity.startShowRouteActivity(mBoundRecorderService.getCurrentRideKey(), MetaData.STATE.JUST_RECORDED, true, this);
                 } else {
@@ -756,6 +771,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startService(intent);
                 bindService(intent, mRecorderServiceConnection, Context.BIND_IMPORTANT);
                 recording = true;
+                updateBackPressedCallback();
                 Toast.makeText(MainActivity.this, R.string.recording_started, Toast.LENGTH_LONG).show();
             }
         }
@@ -910,34 +926,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5 && keyCode == KeyEvent.KEYCODE_BACK
-                && event.getRepeatCount() == 0) {
-            onBackPressed();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Navigation Drawer / predictive back (required for targetSdk 36+)
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private void setupBackNavigation(DrawerLayout drawer) {
+        backPressedCallback = new OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                    return;
+                }
+                if (Boolean.TRUE.equals(recording)) {
+                    Intent home = new Intent(Intent.ACTION_MAIN);
+                    home.addCategory(Intent.CATEGORY_HOME);
+                    home.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(home);
+                }
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, backPressedCallback);
+        drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                updateBackPressedCallback();
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                updateBackPressedCallback();
+            }
+        });
+        updateBackPressedCallback();
     }
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Navigation Drawer
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            if (recording) {
-                Intent setIntent = new Intent(Intent.ACTION_MAIN);
-                setIntent.addCategory(Intent.CATEGORY_HOME);
-                setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(setIntent);
-            } else {
-                super.onBackPressed();
-            }
+    private void updateBackPressedCallback() {
+        if (backPressedCallback == null) {
+            return;
         }
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        boolean interceptBack = drawer.isDrawerOpen(GravityCompat.START) || Boolean.TRUE.equals(recording);
+        backPressedCallback.setEnabled(interceptBack);
     }
 
     public boolean onNavigationItemSelected(MenuItem item) {
