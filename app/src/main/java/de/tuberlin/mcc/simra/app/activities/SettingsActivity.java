@@ -37,6 +37,7 @@ import java.util.List;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import dalvik.system.ZipPathValidator;
 import de.tuberlin.mcc.simra.app.BuildConfig;
 import de.tuberlin.mcc.simra.app.R;
 import de.tuberlin.mcc.simra.app.databinding.ActivitySettingsBinding;
@@ -446,6 +447,10 @@ public class SettingsActivity extends BaseActivity {
                     new ActivityResultCallback<Uri>() {
                         @Override
                         public void onActivityResult(Uri uri) {
+                            // https://developer.android.com/about/versions/14/behavior-changes-14#zip-path-traversal
+                            if (Build.VERSION.SDK_INT >= 34) {
+                                ZipPathValidator.clearCallback();
+                            }
                             boolean successfullyImported = importSimRaData(uri, SettingsActivity.this);
                             if (successfullyImported) {
                                 Toast.makeText(SettingsActivity.this, R.string.importSuccess, Toast.LENGTH_SHORT).show();
