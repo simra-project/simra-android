@@ -15,8 +15,8 @@ android {
         applicationId "de.tuberlin.mcc.simra.app"
         minSdkVersion 23
         targetSdkVersion 36
-        versionCode 103
-        versionName "103.0"
+        versionCode 104
+        versionName "104.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // defining the build date
@@ -85,7 +85,7 @@ dependencies {
     api 'com.github.MKergall:osmbonuspack:6.7.0'
     implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.4'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.4'
-    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.29'
 
     // RingBuffer
     implementation 'org.apache.commons:commons-collections4:4.4'
