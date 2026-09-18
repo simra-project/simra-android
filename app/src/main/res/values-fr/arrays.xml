@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="ageGroupList">
+        <item>@string/pleaseChoose</item>
+        <item>après 2004</item>
+        <item>2000–2004</item>
+        <item>1995–1999</item>
+        <item>1990–1994</item>
+        <item>1985–1989</item>
+        <item>1980–1984</item>
+        <item>1975–1979</item>
+        <item>1970–1974</item>
+        <item>1965–1969</item>
+        <item>1960–1964</item>
+        <item>1955–1959</item>
+        <item>1950–1954</item>
+        <item>avant 1950</item>
+    </string-array>
+    <string-array name="aboutSimraItems">
+        <item>Site du projet SimRa</item>
+        <item>Politique de confidentialité</item>
+        <item>Licences tierces</item>
+        <item>Crédits graphiques</item>
+    </string-array>
+    <string-array name="ContactItems">
+        <item>Site du projet SimRa</item>
+        <item>Donner mon avis</item>
+        <item>Twitter</item>
+        <item>Instagram</item>
+    </string-array>
+</resources>
