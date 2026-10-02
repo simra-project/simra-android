@@ -1,0 +1,417 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="fr">
+
+    <!--- ActivityTitles -->
+    <string name="app_name">SimRa</string>
+    <string name="title_activity_history">Mes trajets</string>
+    <string name="title_activity_settings">Paramètres</string>
+    <string name="title_activity_profile">Profil</string>
+    <string name="title_activity_imprint">Mentions légales</string>
+    <string name="title_activity_privacy">Protection des données</string>
+    <string name="title_activity_credits">Crédits graphiques</string>
+    <string name="title_activity_ride_settings">Modifier les paramètres du trajet</string>
+    <string name="title_activity_showRoute">Annoter le trajet</string>
+    <string name="title_activity_library_license">Licences tierces</string>
+    <string name="title_activity_about_simra">À propos de SimRa</string>
+    <string name="title_activity_statistics">Statistiques</string>
+    <string name="title_activity_bluetooth_connection">OpenBikeSensor</string>
+    <string name="title_activity_contact">Contact</string>
+
+
+    <!--- Start -->
+    <string name="welcome_header">Bienvenue sur SimRa !</string>
+    <string name="welcome_text">Merci de soutenir le projet SimRa.\nAmusez-vous bien et bonne route !</string>
+    <string name="sendErrorTitle">Oups !</string>
+    <string name="sendErrorMessage">Une erreur semble s’être produite lors de votre dernière session. Voulez-vous envoyer un rapport pour nous aider à améliorer l’application ?</string>
+    <string name="simra_closed">SimRa fermé</string>
+    <string name="next">Continuer</string>
+    <string name="close_simra">Fermer SimRa</string>
+    <string name="iAccept">J’accepte la politique de confidentialité</string>
+    <string name="privacyAgreementTitle">Politique de confidentialité</string>
+    <string name="privacyAgreementMessage">Lorsque vous lancez l’enregistrement d’un trajet, SimRa enregistre en arrière-plan votre position et les données des capteurs, ainsi que les données démographiques que vous fournissez, afin de vous afficher les trajets enregistrés avec SimRa. Pour plus d’informations, veuillez lire notre <a href="https://www.tu.berlin/en/mcc/research/projects/simra-privacy-policy-statement">politique de confidentialité</a> (en anglais).</string>
+    <string name="privacyUpdateAgreementMessage">Nous avons mis à jour notre politique de confidentialité. Les seuls changements sont a) des précisions sur le traitement des données et b) la description de nos fonctionnalités optionnelles, comme la détection d’incidents par IA et l’OpenBikeSensor. Tous les détails sont disponibles <a href="https://www.tu.berlin/en/mcc/research/projects/simra-privacy-policy-statement">ici</a> (en anglais).</string>
+
+    <!--- Menu -->
+    <string name="navigation_drawer_open">Ouvrir le menu de navigation</string>
+    <string name="navigation_drawer_close">Fermer le menu de navigation</string>
+    <string name="nav_header_title">MCC TU Berlin</string>
+    <string name="nav_header_desc">En-tête de navigation</string>
+    <string name="feedbackReceiver">ask@mcc.tu-berlin.de</string>
+    <string name="demoDataHeader">Données utilisateur SimRa</string>
+    <string name="feedbackHeader">Retour SimRa</string>
+    <string name="about_simra">À propos</string>
+    <string name="imprint">Mentions légales</string>
+    <string name="feedback">Donner mon avis</string>
+    <string name="title_tutorial">Tutoriel</string>
+    <string name="twitter_simra">\@SimRa_App</string>
+    <string name="link_to_twitter">https://twitter.com/SimRa_App</string>
+
+    <!--- Permission -->
+
+    <string name="base_permission_rationale">Pour continuer, veuillez autoriser SimRa à accéder à votre position et au stockage pendant l’enregistrement de votre trajet en arrière-plan.\nCes accès sont nécessaires pour afficher votre position sur la carte et enregistrer vos trajets.</string>
+
+    <!--- WebActivity -->
+    <string name="link_mcc_Page">https://www.tu.berlin/en/3s</string>
+    <string name="link_simra_Page">https://www.digital-future.berlin/en/research/projects/simra/</string>
+    <string name="link_to_tutorial">https://simra-backend.3s-rg.de:4998/SimRa_Instructions_Android.pdf</string>
+    <string name="tuberlin_impressum">https://www.tu.berlin/en/footer/site-credits</string>
+    <string name="link_to_instagram">https://www.instagram.com/sicherheitimradverkehr/</string>
+    <string name="link_simra_Dashboard">https://simra-project.github.io/dashboard/</string>
+
+    <!--- MainActivity -->
+    <string name="osmCopyright">Contributeurs <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> </string>
+    <string name="errorRideNotRecorded">Le trajet n’a pas été enregistré en raison des paramètres de confidentialité !\nVous pouvez les vérifier dans le menu Paramètres.</string>
+    <string name="cancel">Annuler</string>
+    <string name="startButtonText">Démarrer\nl’enregistrement</string>
+    <string name="stopButtonText">Arrêter\nl’enregistrement</string>
+    <string name="airplaneModeIsOn">Le mode avion est activé ! Veuillez le désactiver pour que le trajet puisse être enregistré.</string>
+    <string name="locationServiceisOff">Le service de localisation est désactivé !</string>
+    <string name="enableToRecord">Veuillez l’activer pour que le trajet puisse être enregistré.</string>
+    <string name="checking_for_updates">Recherche de mises à jour</string>
+    <string name="new_app_version_text">Pour continuer, veuillez télécharger la nouvelle version via Google Play ou manuellement via le fichier .APK.</string>
+    <string name="open_google_play_store">Ouvrir le Google Play Store</string>
+    <string name="download_the_apk_file">Télécharger le fichier .APK</string>
+    <string name="installed_version">version installée :</string>
+    <string name="newest_version">dernière version :</string>
+    <string name="new_app_version_title">Nouvelle mise à jour disponible</string>
+    <string name="pleaseChooseRegion">Veuillez choisir votre région afin que nous puissions analyser correctement votre trajet. Région sélectionnée :</string>
+    <string name="selectRegion">Choisir la région</string>
+    <string name="later">Plus tard</string>
+    <string name="reportIncidentClosepass">Dépassement serré</string>
+    <string name="reportIncidentObstacle">Évitement d’obstacle</string>
+    <string name="recording_not_started">L’enregistrement n’a PAS démarré.</string>
+    <string name="recording_started">Enregistrement démarré.</string>
+
+
+    <!--- ForegroundNotification -->
+    <string name="foregroundNotificationTitle_record">Enregistrement du trajet</string>
+    <string name="foregroundNotificationBody_record">Votre trajet est en cours d’enregistrement.</string>
+    <string name="foregroundNotificationButtonBack">Retour à l’application</string>
+
+    <!--- History -->
+    <string name="noHistory">"Aucun trajet trouvé."</string>
+    <string name="uploadAndExit">Envoyer &amp; quitter</string>
+    <string name="uploadRidesSuccessful">Envoi réussi !</string>
+    <string name="noFilesToBeUploaded">Tous les trajets annotés\nont déjà été envoyés.</string>
+    <string name="justUpload">Envoyer</string>
+    <string name="uploadProgressDialogTitle">Envoi</string>
+    <string name="uploadProgressDialogText">Envoi des trajets en cours. Veuillez patienter.</string>
+    <string name="newRideInHistoryActivity">À annoter.</string>
+    <string name="rideAnnotatedInHistoryActivity">Prêt à être envoyé.</string>
+    <string name="rideUploadedInHistoryActivity">Envoyé.</string>
+    <string name="uploadInBackground">Continuer en arrière-plan</string>
+    <string name="ride_length">durée du trajet</string>
+    <string name="ride_distance">Distance</string>
+    <string name="descriptionUpload">Envoyer</string>
+    <string name="descriptionExit">Quitter</string>
+    <string name="delete_file_warning">Ce trajet n’a pas encore été envoyé. Voulez-vous quand même le supprimer ?</string>
+    <string name="delete_ride_approve">Supprimer le trajet</string>
+    <string name="ride_deleted">Trajet supprimé</string>
+    <string name="uploadingNotificationTitle">SimRa</string>
+    <string name="uploadingNotificationBody">SimRa envoie les trajets</string>
+    <string name="upload_started">Envoi des trajets SimRa démarré</string>
+    <string name="upload_completed">Envoi SimRa terminé.</string>
+    <string name="upload_failed">L’envoi SimRa a échoué. Veuillez réessayer plus tard</string>
+    <string name="nothing_to_upload">SimRa n’a trouvé aucun trajet à envoyer</string>
+    <string name="upload_file_warning">Tous les trajets annotés et non envoyés vont être envoyés. Il ne sera plus possible de les annoter ensuite.</string>
+    <string name="upload">Envoyer</string>
+    <string name="exportRideTitle">Export de trajet SimRa</string>
+    <string name="exportRidePromptTitle">Exporter un trajet SimRa</string>
+    <string name="exportRideButtonText">Veuillez indiquer où enregistrer le trajet SimRa.</string>
+    <string name="exportRideDirectory">Où enregistrer le trajet SimRa ?</string>
+    <string name="exportRideSuccessToast">"Trajet SimRa enregistré avec succès."</string>
+    <string name="exportRideFailToast">"Erreur lors de l’enregistrement du trajet SimRa."</string>
+    <string name="exportOBSLiteSuccessToast">"Fichier binaire OBS-Lite enregistré avec succès."</string>
+    <string name="exportOBSLiteFailToast">"Erreur lors de l’enregistrement du fichier binaire OBS-Lite."</string>
+    <!--- ShowRoute -->
+    <string name="quitAddIncident">Annuler\nl’ajout</string>
+    <string name="warning">Attention</string>
+    <string name="newIncidents">Réinitialiser</string>
+    <string name="warningRefreshMessage">Si le trajet est modifié, de nouveaux incidents seront calculés, et les incidents précédents de ce trajet ainsi que leurs annotations seront supprimés.</string>
+    <string name="warningDeleteEmptyMessage">Tous les marqueurs non annotés seront supprimés.</string>
+    <string name="privacySlider">Couper le début ou la fin du trajet</string>
+    <string name="calculating_incidents">Calcul des incidents</string>
+    <string name="addIncident">Ajouter\nun incident</string>
+    <string name="saveIncident">Enregistrer &amp;\nrevenir</string>
+    <string name="returnAsText">Retour</string>
+    <string name="savedRide">Trajet enregistré</string>
+    <string name="doNotShowAgain">Ne plus afficher</string>
+    <string name="ride_undo">Réinitialiser</string>
+
+
+    <!--- IncidentPopUp -->
+    <string name="description">Commentaire (facultatif)</string>
+    <string name="annotation_title">Que s’est-il passé ici ?</string>
+    <string name="incident_type">Type d’incident</string>
+    <string name="descriptionBody">Commentaire facultatif</string>
+    <string name="incidentType1">Rien</string>
+    <string name="incidentType2">Dépassement serré</string>
+    <string name="incidentType3">Véhicule qui s’insère ou déboîte</string>
+    <string name="incidentType4">Coupure de trajectoire en tournant (à gauche ou à droite)</string>
+    <string name="incidentType5">Véhicule arrivant en face</string>
+    <string name="incidentType6">Véhicule collé derrière</string>
+    <string name="incidentType7">Portière ouverte de justesse</string>
+    <string name="incidentType8">Évitement d’un obstacle (ex. : un chien)</string>
+    <string name="incidentType9">Autre (préciser ci-dessous)</string>
+    <string name="involvedType1">Bus/Car</string>
+    <string name="involvedType2">Cycliste</string>
+    <string name="involvedType3">Piéton</string>
+    <string name="involvedType4">Camionnette de livraison</string>
+    <string name="involvedType5">Poids lourd</string>
+    <string name="involvedType6">Motard</string>
+    <string name="involvedType7">Voiture</string>
+    <string name="involvedType8">Taxi/VTC</string>
+    <string name="involvedType9">Autre\n(préciser ci-dessous)</string>
+    <string name="involvedType10">Trottinette électrique</string>
+    <string name="locationType1">Poche</string>
+    <string name="locationType2">Guidon</string>
+    <string name="locationType3">Poche de veste</string>
+    <string name="locationType4">Main</string>
+    <string name="locationType5">Panier/Sacoche</string>
+    <string name="locationType6">Sac à dos/Sac</string>
+    <string name="locationType7">Autre (préciser ci-dessous)</string>
+    <string name="done">Terminé</string>
+    <string name="editingIncidentAborted">Modifications non enregistrées</string>
+    <string name="editingIncidentCompleted">Modifications enregistrées</string>
+    <string name="involved_type">autre usager impliqué</string>
+    <string name="scarinessString">Cette situation m’a fait peur</string>
+    <string name="customIncidentAddedTitle">Nouvel incident ajouté !</string>
+    <string name="customIncidentAddedMessage">Un incident s’est-il produit ici ?</string>
+    <string name="incidentDetected">"annoter l’incident."</string>
+
+    <!--- About -->
+    <string name="notReady">Voulez-vous laisser l’annotation inachevée ?</string>
+    <string name="privacyLink">https://www.tu.berlin/en/mcc/research/projects/simra-privacy-policy-statement</string>
+
+    <!--- Settings -->
+    <string name="privacyDurationDescription">Délai avant le début de l’enregistrement (en secondes)</string>
+    <string name="privacy_settings_title">Confidentialité</string>
+    <string name="privacyDistanceDescription">Distance avant le début de l’enregistrement</string>
+    <string name="settingsSaved">Paramètres enregistrés</string>
+    <string name="general_settings_title">Paramètres généraux</string>
+    <string name="unitDescription">Système d’unités</string>
+    <string name="imperial">Impérial</string>
+    <string name="metric">Métrique</string>
+    <string name="showButtonsDescription">Boutons pour signaler des incidents pendant le trajet</string>
+    <string name="hideButtons">masquer</string>
+    <string name="showButtons">afficher</string>
+    <string name="incident_buttons_during_ride_warning">Utilisez les boutons « Dépassement serré » et « Évitement d’obstacle », affichés pendant l’enregistrement d’un trajet, avec la plus grande prudence et uniquement si votre smartphone est fixé au guidon. Restez toujours concentré sur la circulation et respectez le code de la route pour votre propre sécurité.</string>
+    <string name="rideAnalysis">Analyse du trajet</string>
+    <string name="onlineAI">IA en ligne</string>
+    <string name="offlineNoAI">Mode hors ligne</string>
+    <string name="importTitle">Importer des données</string>
+    <string name="importPromptTitle">Importer des données SimRa exportées précédemment</string>
+    <string name="importButtonText">Veuillez choisir le fichier « SimRa.zip » créé auparavant avec la fonction d’export de SimRa. Tous les trajets, statistiques et paramètres de ce fichier seront importés. ATTENTION ! Tous les trajets, statistiques et paramètres existants seront supprimés ou écrasés.</string>
+    <string name="importFile">Veuillez ouvrir le dossier contenant « SimRa.zip » et le sélectionner.</string>
+    <string name="importSuccess">Données importées.</string>
+    <string name="importFail">Erreur : l’import des données a échoué.</string>
+    <string name="ok">OK</string>
+    <string name="exportTitle">Exporter des données</string>
+    <string name="exportPromptTitle">Exporter les données SimRa</string>
+    <string name="exportButtonText">Veuillez indiquer où enregistrer le fichier « SimRa.zip ». Ce fichier permet d’importer vos trajets, statistiques et paramètres sur un autre téléphone Android. </string>
+    <string name="exportDirectory">Où enregistrer SimRa.zip ?</string>
+    <string name="exportSuccessToast">"Le fichier SimRa pour l’import a été créé avec succès."</string>
+    <string name="exportFailToast">"Erreur : impossible de créer le fichier SimRa pour l’import."</string>
+    <string name="dateFormatDescription">Format de date</string>
+    <string name="germanDate">jj.mm.aa, hh:mm</string>
+    <string name="englishDate">mm/jj/aa, hh:mm (AM/PM)</string>
+    <string name="devices">Appareils</string>
+    <string name="debugPromptTitle1">Envoyer les données locales de l’application à l’équipe SimRa ?</string>
+    <string name="debugButtonText">Attention ! N’appuyez sur Continuer que si l’équipe SimRa vous l’a demandé. En appuyant sur le bouton Envoyer à l’étape suivante, vous transmettez votre configuration SimRa à l’équipe SimRa.</string>
+    <string name="continueText">Continuer</string>
+    <string name="debugPromptTitle2">Voulez-vous aussi envoyer des trajets ?</string>
+    <string name="debugSendAllRides">Oui, tous</string>
+    <string name="debugSend10Rides">Oui, les 10 derniers</string>
+    <string name="debugDoNotSendRides">Non, n’envoyer aucun trajet</string>
+    <string name="uploadingDebugNotificationBody">SimRa envoie des fichiers</string>
+
+    <!--- OpenBikeSensor -->
+    <string name="obs_activity_button_start_scan">Lancer la recherche Bluetooth</string>
+    <string name="obs_activity_button_connect">Connecter</string>
+    <string name="obs_activity_button_stop_scan">Arrêter la recherche Bluetooth</string>
+    <string name="obsSwitchTitle">Connexion Bluetooth OpenBikeSensor</string>
+    <string name="obsButton">Ouvrir les paramètres OpenBikeSensor</string>
+    <string name="availableDevices">Appareils disponibles</string>
+    <string name="obsAdvancedSettings">Paramètres avancés</string>
+    <string name="obsHandlebarWidthText">Distance entre l’extrémité du guidon et le cadre</string>
+    <string name="not_connected_warning_title">Attention : l’OpenBikeSensor n’est pas connecté !</string>
+    <string name="not_connected_recording_warning_message">Voulez-vous quand même enregistrer le trajet ?</string>
+    <string name="no_open_settings">Non, ouvrir les paramètres.</string>
+    <string name="could_not_connect_warning_title">Attention : la connexion à l’OpenBikeSensor a échoué !</string>
+    <string name="could_not_connect_warning_message">Voulez-vous ouvrir les paramètres ?</string>
+    <string name="open_settings">Ouvrir les paramètres.</string>
+    <string name="disable_obs">Se déconnecter de l’OBS.</string>
+    <string name="bluetooth_not_enable_title">Attention : le Bluetooth est désactivé !</string>
+    <string name="bluetooth_not_enable_message">Voulez-vous activer le Bluetooth ? Sinon, la fonction OpenBikeSensor ne peut pas être activée</string>
+    <string name="obsIncidentDescriptionButtonHeaderLine">OpenBikeSensor</string>
+    <string name="left">Gauche : </string>
+    <string name="right">Droite : </string>
+    <string name="obsServiceConnectionFailed">Erreur ERRORCODE lors de la tentative de connexion à DEVICEADDRESS. Veuillez réessayer.</string>
+    <string name="obsServiceConnectionSuccessful">Connecté à l’OpenBikeSensor</string>
+    <string name="obsServiceDisconnectionSuccessful">Déconnecté de l’OpenBikeSensor</string>
+    <string name="obs_activity_text_start">Non connecté à l’OBS</string>
+    <string name="obs_activity_text_stop">Recherche de l’OBS</string>
+    <string name="obs_activity_text_connect">Trouvé : %1$s</string>
+    <string name="obs_activity_text_disconnect">Connecté à : %1$s</string>
+    <string name="obs_lite_not_connected_warning_title">Attention : l’OBS-Lite n’est pas connecté !</string>
+
+    <!--- OBS Lite -->
+    <string name="obsLiteSwitchTitle">Connexion USB OBS-Lite</string>
+    <string name="obsLiteButton">Ouvrir les paramètres OBS-Lite</string>
+    <string name="obs_lite_activity_text_start">Non connecté à l’OBS-Lite</string>
+    <string name="obs_lite_connected">OBS-Lite connecté</string>
+    <string name="obs_lite_text_last_distance_left">Distance gauche : %1$d cm</string>
+    <string name="obs_lite_text_last_distance_right">Distance droite : %1$d cm</string>
+    <string name="overtake_press_button">Dépassement (appuyez sur le bouton de l’OBS-Lite) :</string>
+    <string name="overtake_distance_left">Distance gauche : %1$d cm</string>
+    <string name="obs_lite_url">URL du serveur OBS-Lite : </string>
+    <string name="obs_lite_username">Nom d’utilisateur OBS : </string>
+    <string name="obs_lite_api_key">Clé API OBS secrète : </string>
+
+    <!-- Units -->
+    <string name="meter_short">m</string>
+    <string name="feet_short">ft</string>
+    <string name="seconds_short">s</string>
+    <string name="centimeter_short">cm</string>
+    <string name="hour_format">HH:mm</string>
+    <string name="datetime_format">dd/MM/yy, HH:mm</string>
+
+    <!--- Profil -->
+    <string name="ageGroupSpinnerTitle">Année de naissance</string>
+    <string name="genderSpinnerTitle">Genre</string>
+    <string name="male">Homme</string>
+    <string name="female">Femme</string>
+    <string name="otherGender">Autre</string>
+    <string name="experienceMoreThen10">Plus de 10 ans</string>
+    <string name="experience5to10">5 à 10 ans</string>
+    <string name="experience2to4">2 à 4 ans</string>
+    <string name="experienceLessThen2">Moins de 2 ans</string>
+    <string name="editingProfileCompleted">Profil enregistré</string>
+    <string name="regionSpinnerTitle">Région</string>
+    <string name="regionManual">Choisir manuellement</string>
+    <string name="regionAutomatic">Détecter par GPS</string>
+    <string name="detectRegion">Détecter la région</string>
+    <string name="enableToDetectRegion">Veuillez l’activer pour que votre région puisse être détectée.</string>
+    <string name="selectedRegion">Région sélectionnée : </string>
+    <string name="nearestRegions">Régions les plus proches de votre position :</string>
+    <string name="getting_location">Localisation GPS en cours, veuillez patienter…</string>
+    <string name="gps_not_available">GPS indisponible. Veuillez activer le GPS dans les paramètres.</string>
+    <string name="experienceSpinnerTitle">Expérience à vélo</string>
+    <string name="rulesDescription">À quelle fréquence respectez-vous le code de la route ?</string>
+    <string name="never">Jamais</string>
+    <string name="always">Toujours</string>
+    <string name="on">ACTIVÉ</string>
+    <string name="off">DÉSACTIVÉ</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="pleaseChoose">Veuillez choisir</string>
+    <string name="yesClose"><![CDATA[Oui & fermer]]></string>
+    <string name="close">Fermer</string>
+    <string name="crash_error">Erreur ! SimRa s’est fermé.</string>
+
+    <!--- RideSettings -->
+    <string name="bikeTypeSpinnerTitle">Type de vélo</string>
+    <string name="cityBike">Vélo de ville/VTC</string>
+    <string name="roadRacingBike">Vélo de route</string>
+    <string name="tandemBike">Tandem</string>
+    <string name="eBike">Vélo électrique</string>
+    <string name="freightBicycle">Vélo cargo</string>
+    <string name="recumbentBicycle">Vélo couché</string>
+    <string name="mountainBike">VTT</string>
+    <string name="other">Autre</string>
+    <string name="ride_settings_title">Paramètres du trajet</string>
+    <string name="childString">Un enfant est transporté sur le vélo</string>
+    <string name="trailerString">Une remorque est attachée au vélo</string>
+    <string name="ride_settings_description">Vous trouverez ci-dessous les paramètres choisis pour ce trajet. Vous pouvez les modifier ici ou dans le menu Paramètres.</string>
+    <string name="rememberChanges">Mémoriser les modifications</string>
+    <string name="locationTypeSpinnerTitle">Emplacement habituel de votre téléphone pendant un trajet :</string>
+
+    <!--- Credits -->
+    <string name="bycicleCreditTxt">Icône créée par Nikita Golubev, www.flaticon.com .</string>
+    <string name="freepikCredit">Icône créée par Freepik, www.flaticon.com .</string>
+    <string name="googleCredit">Icône créée par Google, www.flaticon.com .</string>
+    <string name="logoMakrCredit">Logo gratuit créé sur www.LogoMakr.com .</string>
+    <string name="smashiconCredit">Icône créée par Smashicon, www.flaticon.com .</string>
+    <string name="pixelCredit">Icône créée par Pixel perfect, www.flaticon.com .</string>
+    <string name="icons8Credit">Icône créée par Icons8, https://icons8.com .</string>
+
+    <!--- Statistics -->
+    <string name="uploaded_rides">Trajets envoyés :</string>
+    <string name="distance">Distance :</string>
+    <string name="avgDistance">Distance moyenne :</string>
+    <string name="duration">Durée totale :</string>
+    <string name="incidents">Tous les incidents :</string>
+    <string name="scary">Incidents effrayants :</string>
+    <string name="idle">Temps d’arrêt total :</string>
+    <string name="avgIdle">Temps d’arrêt moyen :</string>
+    <string name="average_Speed">Vitesse moyenne :</string>
+    <string name="co2Savings">CO2 économisé :</string>
+    <string name="kcalConsumption">Calories dépensées :</string>
+    <string name="rideDistribution">Répartition des trajets dans la journée</string>
+    <string name="hourOfDay">Heure</string>
+
+    <!--- News -->
+    <string name="news">Nouveautés</string>
+    <!--- 24 -->
+    <string name="statistics_news">Nouveau : vos statistiques de profil sont disponibles dans l’entrée correspondante du menu.</string>
+    <string name="profile_news">Nouveau : une nouvelle option est disponible dans « Profil ».</string>
+    <string name="distance_news">Nouveau : les distances des trajets sont affichées dans « Mes trajets ».</string>
+    <string name="annotate_hint_news">Astuce : vous pouvez ignorer les marqueurs où il ne s’est rien passé.</string>
+    <string name="dontkillmyapp_hint_news">Astuce : sur certains appareils (Huawei, OnePlus, Xiaomi…), l’enregistrement d’un trajet peut être interrompu automatiquement. Vous pouvez l’éviter dans les paramètres de l’appareil. Plus d’informations sur www.DontKillMyApp.com.</string>
+
+    <!-- 27 -->
+    <string name="apologies_news">Certains utilisateurs ont rencontré des erreurs lors des dernières mises à jour. Je travaille dur pour les corriger. Merci pour votre soutien ! Si vous rencontrez encore des problèmes, n’hésitez pas à me contacter à ask@mcc.tu-berlin.de ou via « Donner mon avis » dans le menu.</string>
+
+    <!-- 30 -->
+    <string name="electric_news">Nouveau : nouvel usager « Trottinette électrique » dans le menu d’annotation.</string>
+    <string name="bern_news">Nouveau : la région de Berne peut être choisie dans le menu « Profil ».</string>
+    <string name="waitedTimeCorrected_news">Nouveau : précision accrue du temps d’arrêt dans « Statistiques ».</string>
+    <!-- 32 -->
+    <string name="units_news_32">Nouveau : le système d’unités et le format de date peuvent être modifiés dans les paramètres.</string>
+    <string name="scary_news_32">Nouveau : le nombre total d’incidents effrayants est affiché dans « Statistiques ».</string>
+    <!-- 40 -->
+    <string name="average_speed_news_40">Nouveau : la vitesse moyenne des trajets passés est affichée dans « Statistiques ».</string>
+    <string name="reworked_my_rides_news_40">Nouveau : design amélioré de « Mes trajets ».</string>
+    <string name="increased_precision_news_40">Nouveau : précision accrue des distances, vitesses et durées dans « Mes trajets » et « Statistiques ».</string>
+    <string name="added_regions_news_40">Nouveau : régions ajoutées : Augsbourg, Bochum, Pforzheim/Enzkreis.</string>
+
+    <!-- 42 -->
+    <string name="added_stuttgart_news_42">Nouvelle région : Stuttgart</string>
+    <string name="thanks">Merci pour votre soutien !</string>
+
+    <!-- 46 -->
+    <string name="new_statistics_news_46">De nouvelles catégories sont disponibles dans « Statistiques ».</string>
+    <string name="improved_calculation_speed_news_46">Calcul des incidents plus rapide.</string>
+
+    <!-- 50 -->
+    <string name="new_region_news_50">SimRa prend désormais en charge la région de la Ruhr ! Veuillez choisir votre région dans « Profil ».</string>
+    <string name="statistics_changed_news_50"> Plusieurs bugs ont été corrigés dans « Statistiques ».</string>
+    <string name="settings_and_profile"> Veuillez vérifier dans « Paramètres » et « Profil » que les bonnes options sont sélectionnées !</string>
+    <string name="chooseRegion">Veuillez choisir une région</string>
+
+    <!-- 55 -->
+    <string name="wegli_news_55">Vous connaissez <a href="https://www.weg-li.de">weg-li.de</a> ? Ce site permet de signaler facilement un stationnement gênant (en Allemagne).</string>
+    <string name="power_save_news_55">SimRa devrait maintenant consommer moins de batterie. Contactez-nous en cas de problème.</string>
+
+    <!-- 55 -->
+    <string name="added_new_regions_news_58">Les régions suivantes sont désormais disponibles : Leipzig, Wuppertal/Solingen/Remscheid et Düsseldorf</string>
+    <string name="reportIncidentText">Signaler un incident</string>
+    <string name="recorded_incident">Incident enregistré</string>
+    <string name="openbikesensor_toast_devicefound">Appareil trouvé. Appuyez sur le bouton Bluetooth pour vous y connecter.</string>
+    <string name="openbikesensor_bluetooth_incompatible">Votre appareil ne prend pas en charge le Bluetooth.</string>
+    <string name="activity_obs_title_device_info">Infos appareil</string>
+    <string name="obs_activity_button_connect_device">Se connecter à l’appareil</string>
+    <string name="obs_activity_button_disconnect_device">Déconnecter l’appareil</string>
+    <string name="obs_activity_text_last_distance">Dernière distance : %1$d cm</string>
+    <string name="obsConnected">OpenBikeSensor connecté</string>
+    <string name="connecting">Connexion</string>
+    <string name="obsSearching">Recherche de l’OpenBikeSensor</string>
+    <string name="obsNotConnected">OpenBikeSensor déconnecté</string>
+    <string name="obsConnecting">Connexion à l’OpenBikeSensor</string>
+    <string name="obsTutorial">\nVeuillez tenir votre main près du capteur de distance pendant 3 secondes</string>
+    <string name="obs">OpenBikeSensor</string>
+    <string name="dashboard">Tableau de bord</string>
+    <string name="project_website">Site du projet SimRa</string>
+    <string name="website_link_text">www.digital-future.berlin</string>
+    <string name="try_later">Erreur. Veuillez réessayer plus tard.</string>
+
+</resources>
